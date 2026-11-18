@@ -16,13 +16,11 @@ public final class BlacklightHunterModel extends GeoModel<BlacklightHunter> {
         if(entity.committedAttack()&&!entity.isBeingConsumed()){
             var table=com.codex.blacklight.combat.CreaturePoseTable.HUNTER;
             float age=entity.attackAge(state.getPartialTick());var move=entity.attackMove();
-            var pose=table.sample(move.clip,age);
-            var rest=table.sample("idle",0);
-            float weight=Math.clamp(Math.min(age/3,(move.ticks-age)/5),0,1);
+            var pose=com.codex.blacklight.combat.HunterContactPose.pose(move,age,entity.counterBarrage());
             for(int i=0;i<table.bones.length;i++){
                 var bone=getAnimationProcessor().getBone(table.bones[i]);if(bone==null)continue;
                 // Blend from the sampled idle at the endpoints, not from a stale attack controller.
-                var blended=com.codex.blacklight.combat.CreaturePoseTable.blend(rest[i],pose[i],weight);
+                var blended=pose[i];
                 bone.updateRotation(blended[0],blended[1],blended[2]);
                 bone.setPosX(blended[3]);bone.setPosY(blended[4]);bone.setPosZ(blended[5]);
             }
@@ -32,8 +30,8 @@ public final class BlacklightHunterModel extends GeoModel<BlacklightHunter> {
         float t = visual.active() ? visual.progress(entity.level().getGameTime(), state.getPartialTick()) : 0;
         var hit=entity.getData(com.codex.blacklight.registry.ModAttachments.HIT_REACTION);
         float hitWeight=hit.weight(entity.level().getGameTime(),state.getPartialTick());
-        boolean sourcePose=com.codex.blacklight.client.animation.NativeReceiverPose.apply(this,entity,state.getPartialTick());
-        if(!sourcePose&&!visual.active()&&hitWeight>0){
+        boolean sourcePose=!entity.committedAttack()&&com.codex.blacklight.client.animation.NativeReceiverPose.apply(this,entity,state.getPartialTick());
+        if(!entity.committedAttack()&&!sourcePose&&!visual.active()&&hitWeight>0){
             applyReaction("head",-.3F*hitWeight,0,.08F*hitWeight);
             applyReaction("torso",-.15F*hitWeight,0,0);
             for(String side:new String[]{"right","left"}){

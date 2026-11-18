@@ -1,0 +1,9 @@
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure {
+        include '**/VehicleDestructionTest.class'
+        reports.junitXml.outputLocation=layout.buildDirectory.dir('test-results/vehicle-destruction')
+        reports.html.outputLocation=layout.buildDirectory.dir('reports/tests/vehicle-destruction')
+        binaryResultsDirectory=layout.buildDirectory.dir('test-results/vehicle-destruction-binary')
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

@@ -1,0 +1,13 @@
+allprojects { afterEvaluate {
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    neoForge.runs.client.systemProperty 'blacklight.test.hiddenRagdoll','true'
+    tasks.named('processResources').configure {
+        inputs.property('hiddenRagdollQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+} }

@@ -27,7 +27,7 @@ public final class VehicleFireGameTest {
     private static net.minecraft.server.level.ServerPlayer driver(GameTestHelper h,MilitaryVehicleGameTest.Fixture f,MilitaryVehicle vehicle){
         var p=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(p);p.setPos(f.x-2,81,0);h.assertTrue(p.startRiding(vehicle),"real driver boards");return p;
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void actualGunMuzzleOwnerIdentityAmmoAndCooldownAreOneShot(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,195000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",2);
         h.runAfterDelay(20,()->{try(f){
@@ -39,7 +39,7 @@ public final class VehicleFireGameTest {
             h.assertTrue(shell.position().distanceTo(new Vec3(mount.x(),mount.y(),mount.z()))<.05&&shell.getOwner()==p&&shell.weaponId().equals("autocannon"),"projectile starts at actual gun muzzle and keeps actual actor and weapon identity");
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void blockedBarrelAndEmptyStockNeverFireOrSpendAmmo(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,196000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",2);
         h.runAfterDelay(20,()->{try(f){
@@ -49,7 +49,7 @@ public final class VehicleFireGameTest {
             h.assertTrue(!VehicleAttackService.fire(v,p,"vehicle_rocket")&&v.inventory().ammunition("rocket_round")==0,"empty secondary mount cannot create a projectile");
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void realGunnerRevokesDriverWeaponAuthority(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,197000);var v=apc(f);var p=driver(h,f,v);var gunner=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(gunner);gunner.setPos(f.x-2,81,0);h.assertTrue(gunner.startRiding(v),"real second player occupies gunner seat");v.inventory().addAmmunition("autocannon_round",2);
         h.runAfterDelay(20,()->{try(f){
@@ -57,7 +57,7 @@ public final class VehicleFireGameTest {
             h.assertTrue(VehicleAttackService.fire(v,gunner,"autocannon")&&v.inventory().ammunition("autocannon_round")==1,"actual gunner can fire its actual weapon once");
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void canceledProjectileJoinRestoresOnlyItsOwnUncommittedDebit(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,198000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",2);
         h.runAfterDelay(20,()->{try(f){
@@ -67,7 +67,7 @@ public final class VehicleFireGameTest {
             h.assertTrue(REJECTIONS.getOrDefault(p.getUUID(),0)==1&&v.inventory().snapshot().equals(before),"the actual cancellation event happened and restores exactly its own pending debit");REJECTIONS.remove(p.getUUID());
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void existingRifleHitsActualMechanicalHull(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,199000);var tank=ModEntities.MILITARY_TANK.get().create(f.level);tank.setPos(f.x+.5,81,7);f.level.addFreshEntity(tank);f.entities.add(tank);var p=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(p);p.setPos(f.x+.5,81,-6);
         h.runAfterDelay(20,()->{try(f){
@@ -75,7 +75,7 @@ public final class VehicleFireGameTest {
             h.assertTrue(tank.health()<before&&Math.abs((before-tank.health())-.4F)<.001,"ordinary real rifle query reaches the mechanical parent with heavy-armor coefficient");
         }h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void liveAutocannonProjectileDamagesOneMechanicalHullExactlyOnce(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,200000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",1);
         var target=ModEntities.MILITARY_TANK.get().create(f.level);target.setPos(f.x+.5,81,12);f.level.addFreshEntity(target);f.entities.add(target);
@@ -84,7 +84,7 @@ public final class VehicleFireGameTest {
             h.runAfterDelay(8,()->{try(f){h.assertTrue(Math.abs(target.health()-(target.maxHealth()-2.4F))<.001,"direct projectile plus splash/parent/part must not double-hit the same heavy hull");h.assertTrue(v.inventory().ammunition("autocannon_round")==0,"the live impact retains its one actual debit");}h.succeed();});
         });
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=100)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=100)
     public static void sameKindHeAndApKeepTheirActualWeaponIdentityThroughEntitySave(GameTestHelper h){
         try(var f=new MilitaryVehicleGameTest.Fixture(h,201000)){
             var tank=ModEntities.MILITARY_TANK.get().create(f.level);tank.setPos(f.x+.5,81,.5);f.level.addFreshEntity(tank);f.entities.add(tank);var p=driver(h,f,tank);
@@ -95,7 +95,7 @@ public final class VehicleFireGameTest {
             }
         }h.succeed();
     }
-    @GameTest(template="blackwatch_arena",batch="vehicle6",timeoutTicks=120)
+    @GameTest(template="blackwatch_arena",batch="vehicle6_fire",timeoutTicks=120)
     public static void deadShooterCannotLeaveAnUnattributedDamagingProjectile(GameTestHelper h){
         var f=new MilitaryVehicleGameTest.Fixture(h,202000);var v=apc(f);var p=driver(h,f,v);v.inventory().addAmmunition("autocannon_round",1);
         var target=ModEntities.MILITARY_TANK.get().create(f.level);target.setPos(f.x+.5,81,12);f.level.addFreshEntity(target);f.entities.add(target);

@@ -28,6 +28,8 @@ public final class GameplayBalanceConfig {
     public static final ModConfigSpec.DoubleValue CONSUME_LAST_CHANCE_THRESHOLD;
     public static final ModConfigSpec.BooleanValue CONVERSION_ENABLED;
     public static final ModConfigSpec.IntValue CONVERSION_PER_TICK,CONVERSION_RETRY_TICKS;
+    public static final ModConfigSpec.IntValue GREENE_EXPOSED_TICKS;
+    public static final ModConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
     static {
         var b=new ModConfigSpec.Builder();
         b.comment("感染传播。概率使用0～1；20 tick约1秒。仅服务端决定结果；不修改强制感染指令。").push("infection");
@@ -114,6 +116,9 @@ public final class GameplayBalanceConfig {
         CONVERSION_ENABLED=b.comment("暂停／恢复原生生物到黑光宿主的自动替换；关闭时保留原生生物、感染和装备。").define("enabled",true);
         CONVERSION_PER_TICK=b.comment("整个服务器每 tick 最多尝试的自动转换数量，包括失败尝试。剩余生物留在原处，下个 tick 继续；不批量清怪。").defineInRange("maxAttemptsPerServerTick",4,1,64);
         CONVERSION_RETRY_TICKS=b.comment("第三方生物准备／保存数据失败后，下次尝试的间隔；同物种完整异常日志也按此间隔限流。20 tick约1秒。").defineInRange("preparationFailureRetryTicks",1200,20,24000);b.pop();
+        b.comment("格林倒下与虚弱计时。任务中的失血、下潜和波次条件仍在独立还原。").push("greene");
+        GREENE_SOURCE_TIMER=b.comment("使用原版计时：从倒下开始计26.6667秒，带正负1秒随机量；每轮只取样一次，存档保留余时。").define("useSourceExposureTimer",true);
+        GREENE_EXPOSED_TICKS=b.comment("仅关闭useSourceExposureTimer时使用：倒地后停留刻数，不含倒下与起身；受击不重置。").defineInRange("exposedHoldTicks",400,75,2400);b.pop();
         SPEC=b.build();
     }
     private GameplayBalanceConfig(){}

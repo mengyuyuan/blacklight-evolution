@@ -1,0 +1,1186 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "task": "P1 Greene Crater source playback and lifecycle",
+  "state": "Static source evidence only; production unchanged; not compiled or game-tested",
+  "method": "Original RZ decompression, P3D/FIG/META byte parsing, shader name/hash search and x86 disassembly only. No native execution/emulation, Java, tests, game/client, media playback or SSH.",
+  "sourceSha256": {
+    "input/prototypeenginef.dll": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "input/comparison/mother.p3d.rz": "337de53fcaae0a4bdf55f25f117dd113407921b2d46891ff81e62f240099003a",
+    "input/comparison/mother_fig.p3d.rz": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167",
+    "input/comparison/mother_tod.p3d.rz": "1977fad275c92e99fed57639005a5cfb06e289b435dba7a7a5f6e50005ca9776"
+  },
+  "assets": {
+    "source": "input/comparison/mother.p3d.rz",
+    "decompressedBytes": 5659038,
+    "craterComposite": {
+      "offset": 5632332,
+      "name": "hydraCrater001",
+      "skeletonOffset": 4262274,
+      "renderPrimitiveCount": 2,
+      "primitives": [
+        {
+          "name": "hydraCrater001Damaged1Shape",
+          "offset": 5632386,
+          "jointIndex": 4
+        },
+        {
+          "name": "garbageRubble001InitialShape",
+          "offset": 5632443,
+          "jointIndex": 5
+        }
+      ]
+    },
+    "debrisComposites": [
+      {
+        "name": "hydraCrater001Spawn1",
+        "offset": 5632591,
+        "primitive": "hydraCrater001Spawn1InitialShape"
+      },
+      {
+        "name": "hydraCrater001Spawn2",
+        "offset": 5632714,
+        "primitive": "hydraCrater001Spawn2InitialShape"
+      },
+      {
+        "name": "hydraCrater001Spawn3",
+        "offset": 5632837,
+        "primitive": "hydraCrater001Spawn3InitialShape"
+      },
+      {
+        "name": "hydraCrater001Spawn4",
+        "offset": 5632960,
+        "primitive": "hydraCrater001Spawn4InitialShape"
+      },
+      {
+        "name": "hydraCrater001Spawn5",
+        "offset": 5633083,
+        "primitive": "hydraCrater001Spawn5InitialShape"
+      },
+      {
+        "name": "hydraCrater001Spawn6",
+        "offset": 5633206,
+        "primitive": "hydraCraterSpawn6InitialShape"
+      }
+    ],
+    "meshes": [
+      {
+        "name": "garbageRubble001InitialShape",
+        "offset": 4299318,
+        "groups": [
+          {
+            "offset": 4299411,
+            "shader": "8d0900bfff1335bd63c749f8efae0f11",
+            "vertices": 341,
+            "indices": 963,
+            "triangles": 321
+          }
+        ],
+        "localAabb": [
+          -11.145709991455078,
+          0.018769225105643272,
+          -9.150588035583496,
+          10.857718467712402,
+          0.674139142036438,
+          12.825831413269043
+        ]
+      },
+      {
+        "name": "hydraCrater001Damaged1Shape",
+        "offset": 4334159,
+        "groups": [
+          {
+            "offset": 4334252,
+            "shader": "e0d073cfe40f70c1af5ba96e70587561",
+            "vertices": 797,
+            "indices": 1176,
+            "triangles": 392
+          }
+        ],
+        "localAabb": [
+          -7.186874866485596,
+          -0.18346244096755981,
+          -4.683269500732422,
+          6.229394435882568,
+          0.8203880190849304,
+          6.335035800933838
+        ]
+      },
+      {
+        "name": "hydraCrater001Spawn1InitialShape",
+        "offset": 4375270,
+        "groups": [
+          {
+            "offset": 4375367,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 136,
+            "indices": 180,
+            "triangles": 60
+          }
+        ],
+        "localAabb": [
+          -0.8164978623390198,
+          -0.2452944964170456,
+          -1.1702537536621094,
+          0.4163146913051605,
+          0.24621550738811493,
+          0.9870812892913818
+        ]
+      },
+      {
+        "name": "hydraCrater001Spawn2InitialShape",
+        "offset": 4382665,
+        "groups": [
+          {
+            "offset": 4382762,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 150,
+            "indices": 216,
+            "triangles": 72
+          }
+        ],
+        "localAabb": [
+          -0.6284865140914917,
+          -0.27251410484313965,
+          -0.8830877542495728,
+          0.6284866333007812,
+          0.2969052195549011,
+          0.8830883502960205
+        ]
+      },
+      {
+        "name": "hydraCrater001Spawn3InitialShape",
+        "offset": 4390804,
+        "groups": [
+          {
+            "offset": 4390901,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 160,
+            "indices": 216,
+            "triangles": 72
+          }
+        ],
+        "localAabb": [
+          -0.9469161629676819,
+          -0.2843838930130005,
+          -0.7623510360717773,
+          0.9469164609909058,
+          0.2843838334083557,
+          0.7623510360717773
+        ]
+      },
+      {
+        "name": "hydraCrater001Spawn4InitialShape",
+        "offset": 4399423,
+        "groups": [
+          {
+            "offset": 4399520,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 178,
+            "indices": 228,
+            "triangles": 76
+          }
+        ],
+        "localAabb": [
+          -0.8384063243865967,
+          -0.29084816575050354,
+          -1.0070971250534058,
+          0.8384057283401489,
+          0.30819791555404663,
+          0.9266631603240967
+        ]
+      },
+      {
+        "name": "hydraCrater001Spawn5InitialShape",
+        "offset": 4408930,
+        "groups": [
+          {
+            "offset": 4409027,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 124,
+            "indices": 156,
+            "triangles": 52
+          }
+        ],
+        "localAabb": [
+          -0.6039159893989563,
+          -0.2677600085735321,
+          -0.9239721298217773,
+          0.725451648235321,
+          0.32970428466796875,
+          0.9617248177528381
+        ]
+      },
+      {
+        "name": "hydraCraterSpawn6InitialShape",
+        "offset": 4415701,
+        "groups": [
+          {
+            "offset": 4415798,
+            "shader": "b1ca02717baf91a6de0250a5b580e44a",
+            "vertices": 148,
+            "indices": 192,
+            "triangles": 64
+          }
+        ],
+        "localAabb": [
+          -0.9710424542427063,
+          -0.2646429240703583,
+          -0.6802221536636353,
+          0.9227892756462097,
+          0.3197424113750458,
+          0.879128098487854
+        ]
+      }
+    ],
+    "materials": [
+      {
+        "shader": "8d0900bfff1335bd63c749f8efae0f11",
+        "offset": 3690539,
+        "textureBindings": [
+          {
+            "semantic": "color",
+            "texture": "global_floor_rubble_diffuse.dds",
+            "nameHash": "0x9773ae487dc18af9",
+            "offset": 3690650
+          },
+          {
+            "semantic": "normal",
+            "texture": "global_floor_rubble_normal.dds",
+            "nameHash": "0xb412bf5d0bedd8ca",
+            "offset": 3690717
+          }
+        ]
+      },
+      {
+        "shader": "b1ca02717baf91a6de0250a5b580e44a",
+        "offset": 3691344,
+        "textureBindings": [
+          {
+            "semantic": "bottom",
+            "texture": "street_road_plain_diffuse.dds",
+            "nameHash": "0x70eae54620d029b9",
+            "offset": 3691467
+          },
+          {
+            "semantic": "grime_texture",
+            "texture": "global_grime01_diffuse.dds",
+            "nameHash": "0x3f935603b9bc972d",
+            "offset": 3691534
+          },
+          {
+            "semantic": "specular",
+            "texture": "street_road_specular_diffuse.dds",
+            "nameHash": "0x9a57b8118a533d3c",
+            "offset": 3691605
+          }
+        ]
+      },
+      {
+        "shader": "e0d073cfe40f70c1af5ba96e70587561",
+        "offset": 3692347,
+        "textureBindings": [
+          {
+            "semantic": "bottom",
+            "texture": "street_road_plain_diffuse.dds",
+            "nameHash": "0x70eae54620d029b9",
+            "offset": 3692470
+          },
+          {
+            "semantic": "grime_texture",
+            "texture": "global_grime01_diffuse.dds",
+            "nameHash": "0x3f935603b9bc972d",
+            "offset": 3692537
+          },
+          {
+            "semantic": "specular",
+            "texture": "street_road_specular_diffuse.dds",
+            "nameHash": "0x9a57b8118a533d3c",
+            "offset": 3692608
+          }
+        ]
+      }
+    ],
+    "animation": {
+      "name": "PTRN_hydraCrater001",
+      "offset": 4220469,
+      "controllerOffset": 5632500,
+      "headerFrames": 25.0,
+      "headerFps": 24.0,
+      "type": "PTRN",
+      "channelNames": [
+        "joint2",
+        "hydraCrater001Damaged1",
+        "hydraCrater001DamagedCollision"
+      ],
+      "channelOffsets": [
+        4220625,
+        4220828,
+        4220955
+      ],
+      "boundary": "AnimationControl authors initial 0..15, final 0..30 and restore hold30. The asset header has 25 frames at24fps; final endpoint-clamp / controller execution is not proved here, and hydraCrater001Scaled omits the PoseAnimationBehaviour explicitly present on hydraCrater001. Do not invent a30-frame asset or assume the scaled template animates identically."
+    },
+    "missingInitialPrimitive": {
+      "name": "hydraCrater001InitialShape",
+      "hash": "0x7873ba0aa743b9b9",
+      "status": "Referenced by PrimitiveDisplay only; absent from this source composite and its mesh inventory. No replacement geometry invented."
+    },
+    "textureAvailability": {
+      "status": "The five texture names are bound by original shaders, but exact texture chunks were not found in the22 unique non-FIG/TOD archives currently cached under P1/input. This is not a claim that complete extraction lacks them. No matching local standalone names were found by rg --files.",
+      "names": [
+        "global_floor_rubble_diffuse.dds",
+        "global_floor_rubble_normal.dds",
+        "street_road_plain_diffuse.dds",
+        "global_grime01_diffuse.dds",
+        "street_road_specular_diffuse.dds"
+      ],
+      "cachedArchiveCount": 22,
+      "searchProof": "private/greene-crater-texture-search.json",
+      "remoteIndexCandidates": [
+        {
+          "FullName": "E:\\虐杀原形\\Prototype-1\\Prototype\\art\\locations\\manhattan\\textures.p3d.rz",
+          "Length": 16089211
+        },
+        {
+          "FullName": "E:\\虐杀原形\\Prototype-1\\Prototype\\art\\packages\\missions\\Hydra\\Hydra.p3d.rz",
+          "Length": 1089251
+        }
+      ],
+      "candidateBoundary": "remote-art.json confirms paths and compressed lengths, not that these packages contain the five textures. textures.p3d.rz is a concrete next archive to statically inspect; Hydra.p3d.rz is already among cached search inputs.",
+      "sourceLocationRecord": "D:/PrototypeReference/laptop/source-locations.json",
+      "latestRecordedSource": "192.168.0.100; E:/虐杀原形/Prototype-1/Prototype/art; D:/CodexCache/ssh/config_laptop; verified2026-11-16",
+      "otherLocalReference": "p1/reference-models/uav001/material-links.json repeats road/grime/specular bindings but does not supply these texture pixels."
+    }
+  },
+  "scaleAndAttachment": {
+    "authoredTemplate": {
+      "name": "hydraCrater001Scaled",
+      "hash": "0xee2bcaebd123121c",
+      "source": "comparison/mother_tod.p3d.rz",
+      "object_offset": 1338,
+      "meta_data_offset": 1445,
+      "meta_length": 528,
+      "scale": [
+        3,
+        1,
+        3
+      ],
+      "scale_float_offsets": [
+        1483,
+        1487,
+        1491
+      ],
+      "physics": "HydraCraterScaledPhysicsMongo",
+      "render": "hydraCrater001",
+      "playback": "//hydraCrater001/2_states",
+      "propLogic": "//2_states"
+    },
+    "correctionToEarlierAudit": "UseParentScale=false and SetScale=false DO NOT preserve template[3,1,3] in this SpawnObject path. The native action writes a fresh unit scale to the spawned scale attribute.",
+    "fieldProof": "1025d4b0 registry useParentScale→1025c910 sets track+a6 bit2; setScale→1025c930 sets+a5 bit40; attachToParent→1025c720 sets+a4 bit8. Original43316 has false,false,true respectively.",
+    "attributeProof": "10d72a30 registers11283058 as scale;10257680 gets attribute data through virtual+4 and stores the pointer at result+10. Result at stack+bc therefore provides the writable vector at stack+cc in1025a010.",
+    "overwrite": "1025a32f loads constant10d936e0(1.0), copies to all3 axes; only branch1025a359 applies parent scale, only1025a39d applies specified scale.1025a3de..3e7 writes [1,1,1] to this spawned attribute.",
+    "renderConsumer": "At1025ad88..ad99 changed attribute is notified through107ce6f0 (cat1/sub0). RenderBehaviour1084f916..97f matches scale, compares to[1,1,1], clears extra-scale pointer for unit values. In render update1084f0f4..f21d the optional scale matrix is multiplied only if that pointer exists. This is not a retained3x model-scale multiplier.",
+    "separatePhysicsBoundary": "PhysicsBehaviour also observes scale changes (109113b0..d0); exact rebuilding of its custom HydraCraterScaledPhysicsMongo capsule is not audited. Unit render scale does not prove collider dimensions match mesh.",
+    "spawnAndAttachment": "43316 requests GameObjectSpace offset[0,20,0], nojoint, noEuler.1025a3ef..4ff builds default attachment descriptor via107e9010, resolves empty joint via10127b00, copies offset and rotation, sends GrabSlotCrater assignment.102c7ac0 stores the child handle then sends catf/sub0 with owner as parent.",
+    "attachmentBoundary": "The mode0 AttachableBehaviour matrix path from greene-mouth-attachment-source.json orthonormalizes basis while preserving translation, but the scaled Crater META does not explicitly contain AttachableBehaviour. This audit has not proved a dynamically added receiver for this template. Therefore neither a crater that follows motherY+20 nor a stationary world crater is asserted as the effective runtime result. Do not reuse Mouth behavior merely because AttachToParent is true."
+  },
+  "playback": {
+    "display": [
+      {
+        "offset": 1952,
+        "payload": 1964,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "restore",
+        "entries": [
+          {
+            "primitive": "hydraCrater001InitialShape",
+            "primitiveHash": "0x7873ba0aa743b9b9",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          },
+          {
+            "primitive": "hydraCrater001Damaged1Shape",
+            "primitiveHash": "0x58c1a925d998d21b",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          },
+          {
+            "primitive": "garbageRubble001InitialShape",
+            "primitiveHash": "0x756e5915e998286b",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 2344,
+        "payload": 2356,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "restore",
+        "entries": [
+          {
+            "primitive": "hydraCrater001InitialShape",
+            "primitiveHash": "0x7873ba0aa743b9b9",
+            "display": "Off",
+            "displayHash": "0x0000004f268cb2cf"
+          },
+          {
+            "primitive": "hydraCrater001Damaged1Shape",
+            "primitiveHash": "0x58c1a925d998d21b",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          },
+          {
+            "primitive": "garbageRubble001InitialShape",
+            "primitiveHash": "0x756e5915e998286b",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 2704,
+        "payload": 2716,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCrater001Spawn1InitialShape",
+            "primitiveHash": "0x604a3e881728a363",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 3000,
+        "payload": 3012,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCrater001Spawn2InitialShape",
+            "primitiveHash": "0x84f9ef371eb902e0",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 3296,
+        "payload": 3308,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCrater001Spawn3InitialShape",
+            "primitiveHash": "0x4f969f053e1dd4f5",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 3592,
+        "payload": 3604,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCrater001Spawn4InitialShape",
+            "primitiveHash": "0x858da64b31d682f2",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 3888,
+        "payload": 3900,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCrater001Spawn5InitialShape",
+            "primitiveHash": "0xd23cc2ac11fca97f",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      },
+      {
+        "offset": 4184,
+        "payload": 4196,
+        "flags": 0,
+        "timeBegin": 0.0,
+        "propertyGroup": "tracks",
+        "entries": [
+          {
+            "primitive": "hydraCraterSpawn6InitialShape",
+            "primitiveHash": "0xcfa61ab933918d43",
+            "display": "On",
+            "displayHash": "0x00000000004f131f"
+          }
+        ]
+      }
+    ],
+    "restoreGroup": "The formerly unknown FIG propertyhash9d4f7f70ebc30caa is restore:1089d690 registers tracks→node+28 and restore→node+2c.1089d500 installs restore in both ordinary and restore-only paths; restore-only resets new action TimeBegin to0. Do not label these records FinishTracks.",
+    "displayEnum": "10d76aa0 initializes11317de0/8/f0 from On,Off,<No Change>;1089bca0 skips index2 and uses index0 as visible=true. Each entry retains its name hash. Render messages cat8/sub1 are dispatched independently of animation curves.",
+    "missingTargetNoOp": "1089bca0→RenderBehaviour1084fa43→107da2b0→107d5740. Lookup106c0460 returns0xffff when a primitive name is absent;106c05d0 range-checks and returns without changing another primitive.107d5740 continues the next entry. Both initial and final restore explicitly set damaged1 and garbageRubble On; missingInitialShape On/Off therefore neither hides the whole composite nor removes those existing two primitives. No invented InitialShape is necessary.",
+    "transition": "GrabbedPlayback100cb7d0 first queries current Crater slot(cat1f/sub0), then100c5130 creates playback message(catb/sub3).PlaybackTreeBehaviour10887baa..c2d resolves target node and queues1089d4e0→10a7f970. On processing,10a7fc31 calls10a7f600 BEFORE new node action creation(+30 virtual→1089d500).",
+    "unstartedCancellation": "10a7f600 only exits actions with active bit4, then releases the entire old chain at10a7f644..653 and zeros its clock. It does not call enter+14 on not-yet-active actions. Therefore old initial SpawnObject tracks not yet at TimeBegin are cancelled by final; already-created debris objects are not deleted by action-list clearing.",
+    "clockOrigin": "Parent spawn_prop requests Crater initial40384 at0 and gates actual coming_out through Opportunity40544 at.2666670083999634, possibly delayed by PlayerDevastator. Spawn43316 also requests initial. final42116 occurs.33333298563957214 after coming_out begins, NOT.333 seconds after the initial Crater clock. With same-origin successful initial the two authored waits sum to.5999999940395355 seconds; the Spawn4 threshold.6000000238418579 is especially sensitive to actual update/order. Restart/reuse of an existing slot and scheduling boundaries must be preserved, not replaced by a fixed claim of2,5,or6 emitted pieces.",
+    "debris": [
+      {
+        "offset": 348,
+        "payload": 360,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.5,
+          "TemplateName": {
+            "hash": "118571486427852476",
+            "name": "hydraCrater001Spawn1"
+          },
+          "ObjectName": {
+            "hash": "12091683148973342747",
+            "name": "#a7ce49c26f22001b"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            1.2000000476837158,
+            1,
+            0.699999988079071
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            4,
+            7,
+            0
+          ],
+          "AngularVelocity": [
+            0,
+            0,
+            -10
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      },
+      {
+        "offset": 612,
+        "payload": 624,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.4000000059604645,
+          "TemplateName": {
+            "hash": "118571486427852479",
+            "name": "hydraCrater001Spawn2"
+          },
+          "ObjectName": {
+            "hash": "12091683148973539678",
+            "name": "#a7ce49c26f25015e"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -1.2000000476837158,
+            1,
+            -0.699999988079071
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -4,
+            5,
+            0
+          ],
+          "AngularVelocity": [
+            0,
+            0,
+            10
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      },
+      {
+        "offset": 876,
+        "payload": 888,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.30000001192092896,
+          "TemplateName": {
+            "hash": "118571486427852478",
+            "name": "hydraCrater001Spawn3"
+          },
+          "ObjectName": {
+            "hash": "12091683148973473949",
+            "name": "#a7ce49c26f24009d"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.8619999885559082,
+            1,
+            0.6990000009536743
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -2,
+            6,
+            4
+          ],
+          "AngularVelocity": [
+            5,
+            0,
+            1
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      },
+      {
+        "offset": 1140,
+        "payload": 1152,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.6000000238418579,
+          "TemplateName": {
+            "hash": "118571486427852473",
+            "name": "hydraCrater001Spawn4"
+          },
+          "ObjectName": {
+            "hash": "12091683148973146072",
+            "name": "#a7ce49c26f1effd8"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.4580000042915344,
+            1,
+            -1.6549999713897705
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            0.23499999940395355,
+            5,
+            -6
+          ],
+          "AngularVelocity": [
+            -5,
+            0,
+            1
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      },
+      {
+        "offset": 1404,
+        "payload": 1416,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.5,
+          "TemplateName": {
+            "hash": "118571486427852472",
+            "name": "hydraCrater001Spawn5"
+          },
+          "ObjectName": {
+            "hash": "12091683148973080343",
+            "name": "#a7ce49c26f1dff17"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            1.0859999656677246,
+            1,
+            -1.034000039100647
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            5,
+            8,
+            -2
+          ],
+          "AngularVelocity": [
+            -2,
+            0,
+            -3
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      },
+      {
+        "offset": 1668,
+        "payload": 1680,
+        "owner": "hydraCrater001/#6d8759d639c627b3/initial",
+        "fields": {
+          "Unknown1": 0,
+          "TimeBegin": 0.30000001192092896,
+          "TemplateName": {
+            "hash": "118571486427852475",
+            "name": "hydraCrater001Spawn6"
+          },
+          "ObjectName": {
+            "hash": "12091683148973277274",
+            "name": "#a7ce49c26f21005a"
+          },
+          "AddSuffix": true,
+          "InitialState": "initial",
+          "SpecificPlaybackset": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "SpawnSpace": {
+            "hash": "15800074974379949085",
+            "name": "GameObjectSpace"
+          },
+          "SpawnJoint": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "Offset": [
+            -0.9610000252723694,
+            1,
+            -1.2869999408721924
+          ],
+          "Orientation": [
+            0,
+            0,
+            0
+          ],
+          "AttachToParent": false,
+          "DetachAfterSpawn": false,
+          "AICharacter": false,
+          "AutomaticTag": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          },
+          "CopyPose": false,
+          "InheritSpawnerVelocity": false,
+          "LinearVelocity": [
+            -2.611999988555908,
+            7,
+            -2.996000051498413
+          ],
+          "AngularVelocity": [
+            -5,
+            0,
+            0
+          ],
+          "CollideWithSpawnerDelay": 3,
+          "SpawnSleeping": false,
+          "ManageLifetime": true,
+          "ManageLifetimeThrownProp": false,
+          "InheritSpawnerTarget": false,
+          "InheritSpawnerCharge": {
+            "hash": "4122290943349627157",
+            "name": "Invalid"
+          },
+          "UseParentScale": false,
+          "SetScale": false,
+          "Scale": [
+            1,
+            1,
+            1
+          ],
+          "Probability": 1,
+          "UseSpawnerAsDamageOriginator": false,
+          "DamageOriginatorFromSpawner": true,
+          "TransferTargetLocks": false,
+          "SendMessageToScenarioTree": false,
+          "ApplyColourTint": false,
+          "InheritPackage": true,
+          "TintColour": [
+            0.5019609928131104,
+            0.5019609928131104,
+            0.5019609928131104,
+            1
+          ],
+          "CacheDamageOrigionatorAsCollider": true
+        }
+      }
+    ],
+    "damageBoundary": "There is no Hit or Explosion inside crater playback. Six debris have physical/prop behavior, but this proof does not convert their rigidbody collisions into an extra radial damage event or block excavation."
+  },
+  "submergeLifetime": {
+    "record": {
+      "offset": 37984,
+      "payload": 37996,
+      "flags": 1,
+      "timeBegin": 3.0,
+      "manageLifetime": true,
+      "attachedToParent": true,
+      "grabSlot": "Crater",
+      "hash": "0x314aa6574a562515"
+    },
+    "detachRecord": {
+      "offset": 38028,
+      "payload": 38040,
+      "flags": 1,
+      "timeBegin": 3.0,
+      "grabSlot": "Crater"
+    },
+    "fieldProof": "1025de30 registers timeBegin,manageLifetime,attachedToParent,grabSlot; setters1025caf0 writes+1d,1025cb00 writes+1c and1025cc60 copies+10. Raw payload at37996 is flags1,t3,bool1,bool1,Craterhash.",
+    "sameObjectScope": "1025b2a0 uses attachedToParent to query the owner current Crater handle at ACTION EXECUTION, then validates handle/generation. This is the same logical slot as Spawn43316 and GrabbedPlayback; it is not a separately spawned crater nor a snapshot captured at track construction. If the slot changes, current occupant is selected.",
+    "managerNotImmediateDelete": "1025b37d calls registered callback11255bd0 with that handle andmanageLifetime=true.10499d00 installs10499c90;true routes10499680, which inserts/queues handle in lifetime manager;false routes10498940, which removes it from managed lists. There is no immediate discard/delete call in the true branch. Exact expiry/cull policy downstream is outside this audit.",
+    "threeSecondsIsStartNotLifetime": "TimeBegin3 is the action activation threshold, not a3-second debris lifetime. Spawned debris own ManageLifetime=true enters the same manager at spawn; parent Crater spawn has false.",
+    "reachability": "Both retirement and detach are background(flags1) in the exit node, and the proven exit clip is44/(30*.5)=2.9333333333s. They do not hold the node to3s. Existing scheduler clearing cancels unstarted actions. Thus the authored3s request does not establish guaranteed retirement on every normal submerge. Exact native frame overshoot/transition evaluation may change whether3s is crossed before exit; no unconditional at3s deletion is justified.",
+    "adaptationRequirement": "Any Minecraft guaranteed cleanup on owner death/unload/new-cycle/end must be explicitly an adapter lifecycle policy, not represented as native ManageLifetime immediate deletion."
+  },
+  "javaApiReview": [
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/SourceBossMotion.java",
+      "reusable": "sourceUnitBlocks() supplies established mother source-length conversion. Preserve source offsets/mesh lengths separate from temporal units and native scaleattr.",
+      "limit": "Does not decode this prop composite, PTRN controller, render visibility or attachment receiver."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/client/renderer/ContactTerrainDebris.java",
+      "reusable": "Bounded client debris storage, render integration and collision sampling.",
+      "limit": "Its block cube visuals, gravity.04 and hardcoded19/11degree rotations are MC effects. Cannot present them as six original meshes or source per-axis angular velocities; no crater ownership/state."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/movement/LandingDebrisSystem.java",
+      "reusable": "Server display publication, bounded64 entries, no-save cleanup and shutdown handling.",
+      "limit": "Only BlockDisplay cubes; fragment size clamps.08..55; fixed gravity/lifetime. A substitute would need an explicit adaptation, not silently claim authored Spawn velocities/angular motion."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/TerrainImpactEffects.java",
+      "reusable": "Real support collider/material lookup and visibility checks for an explicitly selected MC dust adaptation.",
+      "limit": "emit produces rings, particles and loose-item impulses; none are demonstrated by this Crater playback. Do not call it as a source-equivalent crater explosion."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/entity/HydraDebris.java",
+      "reusable": "Reference for persistent entity lifecycle and swept collision.",
+      "limit": "Hardwired BlacklightHydra carrier/combatGrip/action/damage rules; cannot reuse as Greene decorative debris without a new contract."
+    }
+  ],
+  "remaining": [
+    {
+      "id": "texturePixels",
+      "next": "Statically inspect the indexed manhattan/textures.p3d.rz and resolve exact five DDS hashes/names. No SSH or retrieval performed this task."
+    },
+    {
+      "id": "scaledTemplateReceiver",
+      "next": "Close whether scaledCrater gains AttachableBehaviour or anothercatf receiver through factory/global behavior. Also close whether missingPoseAnimationBehaviour blocks PTRN animation or controller has separate renderer execution."
+    },
+    {
+      "id": "clockAndRetirement",
+      "next": "Close initial reuse/restart ordering relative to spawn_prop and coming_out gates, exact scheduler dt crossing near.6/3seconds, and lifetime-manager actual cull policy."
+    },
+    {
+      "id": "physicsVelocity",
+      "next": "Source six linear/angular vectors are preserved; gravity,mass,collision response and physical spin units not established here. Avoid turning raw impulse or angular velocity into arbitrary MC knockback/rotation."
+    }
+  ],
+  "privateProof": "D:/PrototypeReference/p1/private/greene-crater-playback-proof.json",
+  "related": [
+    "art/encounters/greene-emergence-hit-source.json",
+    "art/encounters/greene-battle-cycle-integration-20261117.json",
+    "art/encounters/greene-mouth-attachment-source.json"
+  ],
+  "productionChanged": false,
+  "privateProofSha256": "6ecbfccbcba86e06265e3aa80cfd04b0ad294e5c7ee76c0e9bd919312923b697"
+}

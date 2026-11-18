@@ -1,0 +1,366 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-16",
+  "overallGoalComplete": false,
+  "scope": "Authored ground-vehicle and helicopter destruction presentation, emitted once by server destruction and rendered as bounded local wrecks",
+  "behavior": {
+    "chassis": [
+      "truck",
+      "apc",
+      "tank",
+      "helicopter"
+    ],
+    "fireTicks": 120,
+    "smokeEmissionTicks": 240,
+    "wreckTicks": 360,
+    "finalFadeTicks": 40,
+    "maxActiveWrecks": 8,
+    "receiptRangeBlocks": 128,
+    "nativeMeshes": "Burnt tint, collapsed hull height, detached doors/wheels/rotors, displaced turret and opened hatches; authored parts reused",
+    "sounds": "Existing firearm blast or native helicopter blast, near metal break, timed chain debris and fire ambience; no newly authored recordings",
+    "submerged": "Bubbles and wreck, no fire surfaces, flame particles, fire ambience or shock ring",
+    "authority": "No new damage, block editing, inventory, salvage or collision introduced; original helicopter radius-three damage retained",
+    "lifecycle": "Server accepted lethal transition only, helicopter impact/final crash only, client receipt deduplication, cap, expiry and world unload cleanup"
+  },
+  "sourceComparison": {
+    "audit": "D:\\PrototypeReference\\p1\\blackwatch-fig-audit.json",
+    "sha256": "3af4b69ad4a021a99b2459da3282bfe096b474ddbabb5fd6345416b4e520beb5",
+    "records": [
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 24140,
+        "type": "AIMessage",
+        "owner": "helicopter_state/states/hit/disabled/LOD2/#362dfe587e2c90a6",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Type": {
+            "hash": "6119690315119812053",
+            "name": "Explosion"
+          },
+          "Intensity": 1,
+          "Taker": {
+            "hash": "5051030",
+            "name": "Me"
+          },
+          "UseOriginator": true,
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          }
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 24960,
+        "type": "WaitOnCollision",
+        "owner": "helicopter_state/states/hit/disabled/disabled/transition/#cefe404cae2f9315"
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 25164,
+        "type": "AIMessage",
+        "owner": "helicopter_state/states/hit/disabled/disabled/transition/#cefe404cae2f9315",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Type": {
+            "hash": "6119690315119812053",
+            "name": "Explosion"
+          },
+          "Intensity": 1,
+          "Taker": {
+            "hash": "5051030",
+            "name": "Me"
+          },
+          "UseOriginator": true,
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          }
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 25352,
+        "type": "AIMessage",
+        "owner": "helicopter_state/states/hit/disabled/disabled/transition/final",
+        "fields": {
+          "Unknown1": 1,
+          "TimeBegin": 0,
+          "Type": {
+            "hash": "6119690315119812053",
+            "name": "Explosion"
+          },
+          "Intensity": 1,
+          "Taker": {
+            "hash": "5051030",
+            "name": "Me"
+          },
+          "UseOriginator": true,
+          "GrabSlot": {
+            "hash": "0",
+            "name": "#0"
+          }
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 422912,
+        "type": "RequestCallStrikeTeam",
+        "owner": "military/autonomous/states/#d912518989f17d14/#7a2215450f6c6f4/fight/callStrikeTeam",
+        "fields": {
+          "MinActorAge": 15
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 423572,
+        "type": "ClassName",
+        "owner": "military/autonomous/states/#d912518989f17d14/#7a2215450f6c6f4/fight/callStrikeTeam/movement/movement",
+        "fields": {
+          "Compare": {
+            "hash": "2164770",
+            "name": "#210822"
+          },
+          "Value": {
+            "hash": "503475604896",
+            "name": "uav"
+          }
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 438916,
+        "type": "ClassName",
+        "owner": "military/autonomous/states/idle/#7a2215450f6c6f4/uav",
+        "fields": {
+          "Compare": {
+            "hash": "4001598",
+            "name": "#3d0f3e"
+          },
+          "Value": {
+            "hash": "503475604896",
+            "name": "uav"
+          }
+        }
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 439004,
+        "type": "TargetCanSee",
+        "owner": "military/autonomous/states/idle/#7a2215450f6c6f4/uav/#f260a7c5e14223d",
+        "fields": {
+          "Seen": true,
+          "Since": 0
+        }
+      }
+    ],
+    "supported": "Helicopter disabled branches contain WaitOnCollision and Explosion AIMessage tracks. This supports disabled/collision/final explosion ordering, not exact FX reconstruction.",
+    "notDecoded": "Original comparison hash meanings and exact flame/debris/audio lifetimes are not decoded; all 120/240/360 timings are explicit Minecraft adaptations.",
+    "uav": "UAV ClassName appears under callStrikeTeam movement; shared RequestCallStrikeTeam MinActorAge=15 is decoded. This does not establish the complete original viral detector or summon conditions.",
+    "currentUav": "Existing code performs sustained 60-tick visible infection scan, breaks player disguise, and reports to nearby soldiers. Autonomous UAV dispatch of new reinforcements is not yet implemented; nearby officers still require their own radio eligibility and visibility."
+  },
+  "visualReview": {
+    "reviewedSelectedFrames": 40,
+    "finding": "Explosion burst and animated fire are visible; detached authored parts settle; burnt wreck remains after fire/smoke stop; underwater samples show no fire.",
+    "firstPassCorrection": "Moved fire/smoke above the hull, added animated native fire surfaces independent of particle settings, and made initial explosion emission receipt-driven instead of assuming the first client tick age is zero or one."
+  },
+  "regressionFixture": "A fresh combined Forge suite exposed an old airSite fixture that added a guard outside the queryable entity area: alive=true, UUID lookup=false, native query=false. The fixture now forces its one chunk, keeps the guard persistent, waits for actual native query visibility, asserts occupied landing rejection, then removes the guard and restores the prior chunk flag. Production landing safety is unchanged.",
+  "protocol": {
+    "neo": "standalone-66-vehicle-destruction",
+    "forge": "forge-1.20.1-26-vehicle-destruction"
+  },
+  "limits": [
+    "Client presentation only: late joiners and save reloads do not reconstruct old wrecks; no persistent lootable wreck entity.",
+    "Wreck root probes support vertically; debris arcs use a local support plane, not full wall/stair/complex-terrain rigid-body collision.",
+    "Native QA uses one connected integrated-server client on each loader, not a multi-client dedicated-server soak.",
+    "Audio cue dispatch verified in muted QA; subjective listening and source-game frame-by-frame equivalence remain open."
+  ],
+  "platforms": {
+    "neo": {
+      "unitTests": [
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleDestructionTest",
+          "count": 4
+        }
+      ],
+      "regressionTests": 48,
+      "regressionLog": "D:\\CodexCache\\creature-combat-neo-vehicleDestructionRegression.log",
+      "regressionLogSha256": "9273d71f21404c0b4c5ebb3e380092a2630d12b8f59aeffd63d82c96a0a1f93b",
+      "nativeEvidence": "D:\\CodexCache\\vehicle-destruction-qa\\neo-frames\\evidence.json",
+      "nativeEvidenceSha256": "265d0bcbf0371e456455eed9142f3c3ed6e071ddc3a61432f3f79aab56fa6835",
+      "frames": 632,
+      "selected": [
+        "truck-028.png",
+        "truck-048.png",
+        "truck-100.png",
+        "truck-300.png",
+        "apc-028.png",
+        "apc-048.png",
+        "apc-100.png",
+        "apc-300.png",
+        "tank-028.png",
+        "tank-048.png",
+        "tank-100.png",
+        "tank-300.png",
+        "helicopter-048.png",
+        "helicopter-076.png",
+        "helicopter-120.png",
+        "helicopter-300.png",
+        "submerged_tank-027.png",
+        "submerged_tank-048.png",
+        "submerged_tank-100.png",
+        "submerged_tank-300.png"
+      ],
+      "sheet": "D:\\CodexCache\\vehicle-destruction-qa\\neo-review.jpg",
+      "lowestRenderedY": 80.9911188930273,
+      "floorY": 81,
+      "results": [
+        {
+          "case": "truck",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "apc",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "tank",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "helicopter",
+          "receipts": 1,
+          "removedAt": 43,
+          "expired": true
+        },
+        {
+          "case": "submerged_tank",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        }
+      ],
+      "observedSoundEvents": [
+        "block.chain.break",
+        "block.fire.ambient",
+        "block.water.ambient",
+        "entity.generic.explode",
+        "firearm.impact",
+        "music.game",
+        "vehicle.helicopter_alarm"
+      ],
+      "productionSha256": {
+        "military/vehicle/VehicleDestruction.java": "8cc5dc8dc2b1616ae1246c36facec1a38341e9793ef20a4bbb7861224c7f56a2",
+        "military/vehicle/VehicleDestructionEffects.java": "292f8ba8f27dc57ea47f5c0200bf28eaa42f0091cd0dee3c6f3694cbb6a5086b",
+        "network/VehicleDestructionPayload.java": "3573f6ac3ff4eb389be6a0a9e3aaeb098bbff42ae59b53d0eff16890651d8edf",
+        "network/ModNetwork.java": "5c347b01b69e7944fec09d3e8cf38b062fea74caa1ae373be4fe9e114d11aaa6",
+        "entity/MilitaryVehicle.java": "ea550f02674859a0d2da3bce01d558e8932ce8f7841caba95a1c08574e8c1f21",
+        "entity/BlackwatchHelicopter.java": "e211346b9e010e398cf861b04a84fc1a865935f6b8f2617e9603c4e2dc580ed1",
+        "client/model/VehicleWreckPose.java": "afeeef546789c24375bbdab9b5ed892cf4b4b37b3385c96831649bdebf9dd430",
+        "client/model/MilitaryVehicleModel.java": "847ce2e7a9310cc882d88b67248b34cf1de32203ef6d1248ca1cd442bf9c8824",
+        "client/model/HelicopterModel.java": "24c4ae91e86492018e05c9b185300ec4afd665308b8c80235007c3ede0521c16",
+        "client/renderer/VehicleDestructionVisuals.java": "058e051ae4ce5e04baa56cde71720430b3e6d971faca1961482959db22d84118"
+      }
+    },
+    "forge": {
+      "unitTests": [
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleDestructionTest",
+          "count": 4
+        }
+      ],
+      "regressionTests": 48,
+      "regressionLog": "D:\\CodexCache\\creature-combat-forge-vehicleDestructionRegression.log",
+      "regressionLogSha256": "72485aee27e48b199343dd15ee6edaa18a3a9c72380bd01908634c1edd7b787e",
+      "nativeEvidence": "D:\\CodexCache\\vehicle-destruction-qa\\forge-frames\\evidence.json",
+      "nativeEvidenceSha256": "d5363785a0e01b5dccf7dd54e69cce4f930bec13bf2484afbd3be11793867d19",
+      "frames": 632,
+      "selected": [
+        "truck-028.png",
+        "truck-048.png",
+        "truck-100.png",
+        "truck-300.png",
+        "apc-028.png",
+        "apc-048.png",
+        "apc-100.png",
+        "apc-300.png",
+        "tank-028.png",
+        "tank-048.png",
+        "tank-100.png",
+        "tank-300.png",
+        "helicopter-048.png",
+        "helicopter-076.png",
+        "helicopter-120.png",
+        "helicopter-300.png",
+        "submerged_tank-028.png",
+        "submerged_tank-048.png",
+        "submerged_tank-100.png",
+        "submerged_tank-300.png"
+      ],
+      "sheet": "D:\\CodexCache\\vehicle-destruction-qa\\forge-review.jpg",
+      "lowestRenderedY": 80.9911188930273,
+      "floorY": 81,
+      "results": [
+        {
+          "case": "truck",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "apc",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "tank",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        },
+        {
+          "case": "helicopter",
+          "receipts": 1,
+          "removedAt": 43,
+          "expired": true
+        },
+        {
+          "case": "submerged_tank",
+          "receipts": 1,
+          "removedAt": 20,
+          "expired": true
+        }
+      ],
+      "observedSoundEvents": [
+        "block.chain.break",
+        "block.fire.ambient",
+        "block.water.ambient",
+        "entity.generic.explode",
+        "firearm.impact",
+        "music.game",
+        "vehicle.helicopter_alarm"
+      ],
+      "productionSha256": {
+        "military/vehicle/VehicleDestruction.java": "4ec68004dd48bd6ff3625f36f8800990cc469dd456f10b625b924472904351bc",
+        "military/vehicle/VehicleDestructionEffects.java": "1583b619d2a4e0200a863bc8da736d35f7c6cdcf59d418d7d74a98ea14e0dca7",
+        "network/VehicleDestructionPayload.java": "16f239072016ae6e28abb1f1aa173a340178fc2814680ef819293b3b91e6739d",
+        "network/ModNetwork.java": "dedcf0e76a6e2105fd2318b7e2dfb266d3a02412887e990a19d74d27b2fe20a3",
+        "entity/MilitaryVehicle.java": "e0c5324331715a603334d789fe0ea706aaf378bf4e3ddb1c8d6f19e62840a27d",
+        "entity/BlackwatchHelicopter.java": "1af4e7a8c1103a8bbcc0b017e2d7a6749571c64b6f0ca14bfdf2fbe5a11b4e1f",
+        "client/model/VehicleWreckPose.java": "17e0c31ded4f4201bff35dceb00703d9f5758b45ffc450164b0fb5f403af073f",
+        "client/model/MilitaryVehicleModel.java": "e83b516547b1d774c575abedf7a22c75dcbccf205180da7cf04017cc44e885f6",
+        "client/model/HelicopterModel.java": "24c4ae91e86492018e05c9b185300ec4afd665308b8c80235007c3ede0521c16",
+        "client/renderer/VehicleDestructionVisuals.java": "086167349b9b97ff84f3ec173980217cba09ad253408b1bb06c5f227edb671a7"
+      }
+    }
+  }
+}

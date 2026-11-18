@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "runtimeSha256": "bfd62e944eaed5762bc791306f54ab4c2ce03705e52180f44d0da5cd7cc7e07d",
+  "runtimeEvidence": [
+    {
+      "name": "Puppet update phases",
+      "beginVA": "0x10728cd0",
+      "endExclusiveVA": "0x10728ec4",
+      "fileOffset": 7504080,
+      "bytes": 500,
+      "sha256": "7e8b4786440863c9dfd717ab20393004f4712089ba44e04c20b31cbcc49ef9a0",
+      "meaning": "Phase 4 advances/evaluates choreography and pose; phase 0x10 validates/consumes root delta. It does not contain a Behemoth hand-floor clamp."
+    },
+    {
+      "name": "Character root delta to matrix",
+      "beginVA": "0x10248a70",
+      "endExclusiveVA": "0x10248a99",
+      "fileOffset": 2391664,
+      "bytes": 41,
+      "sha256": "93d6ba2272f2b6791e6b0f1f2cac966419185831adadab4cc533acfec4b278f9",
+      "meaning": "Constructs a matrix from choreography root quaternion and translation, not a fist correction."
+    },
+    {
+      "name": "Owner spatial transform getter",
+      "beginVA": "0x10698f20",
+      "endExclusiveVA": "0x10698f27",
+      "fileOffset": 6914848,
+      "bytes": 7,
+      "sha256": "1712db53bfbd6071c7724999a4260f130dc058e41efebff8a12d372341ad4f1c",
+      "meaning": "Behaviour owner at +4 then actor spatial at +0x1c."
+    },
+    {
+      "name": "Actor spatial transform setter",
+      "beginVA": "0x10699820",
+      "endExclusiveVA": "0x106999ce",
+      "fileOffset": 6917152,
+      "bytes": 430,
+      "sha256": "8c552a3b26061f5b474a2fea1cbeec860fefc719a7f772b03a947311fa0135f3",
+      "meaning": "Finite-checks and copies matrix to actor spatial, then transform-changed dispatch."
+    },
+    {
+      "name": "CharacterSolver update",
+      "beginVA": "0x10726180",
+      "endExclusiveVA": "0x107266bb",
+      "fileOffset": 7492992,
+      "bytes": 1339,
+      "sha256": "79f87bf9fd6b31c75c2dc36bec7eaf8d0f9d643eeaf6adb4b8426b79028cf48e",
+      "meaning": "Combines extracted root delta and actor spatial transform, then collision/support. Optional limb IK is a separate guarded branch."
+    },
+    {
+      "name": "Support solve",
+      "beginVA": "0x106cf5b0",
+      "endExclusiveVA": "0x106cff76",
+      "fileOffset": 7137712,
+      "bytes": 2502,
+      "sha256": "294c224f3aa659e6d78767c02fe7973e8062a65d7de32f1ef67230445623f5b1",
+      "meaning": "Support-surface solve writes the actor output matrix; there is no per-hand joint lookup or skin offset in this path."
+    },
+    {
+      "name": "WorldCone actor anchor",
+      "beginVA": "0x100f7200",
+      "endExclusiveVA": "0x100f7708",
+      "fileOffset": 1009152,
+      "bytes": 1288,
+      "sha256": "f4d47a8ee030b09dbd2fd5b01cffd45246d1880d51d77e5536db814852702c95",
+      "meaning": "At 0x100f723a resolves actor handle; 0x100f723f reads actor+0x1c spatial transform. Track position is actor-local. No joint hash or Motion_Root lookup."
+    }
+  ],
+  "grounding": {
+    "finding": "Ordinary Puppet root Q/T reset and the conditional support correction are now decoded. BehemothPhysicsCapsule starts Simulating2, which removes the along-support-direction correction; restingLength6 does not prove final actor Y=6. Physics-to-actor delivery uses the runtime body matrix. No new giant-fist lift or scale correction is proven.",
+    "remaining": [
+      "Actual active physics mode and final native rigid-body/actor spatial matrix at the slam contact frame, including support/constraint response",
+      "Final post-controller world/skin matrices for weighted Wrist_L and shields plus the terrain plane on that same frame"
+    ],
+    "unchanged": "Keep source wrist curves, authored giant fist volume and receiving surfaces unchanged; giant support crossing remains open."
+  },
+  "worldConeAnchor": {
+    "native": "Actor spatial transform * track-local position [2.5,0,-13].",
+    "currentAdapter": "GoliathGroundImpact uses reference Motion_Root in the MC source-bound model, then that local position. This root anchor is a coordinate-baseline adapter, not a decoded WorldCone joint field.",
+    "unresolved": "Native WorldCone remains actor-local. Reference-root Y6 rebase is arithmetically equivalent to ordinary root identity only if the actor supplies that baseline; Simulating2 support projection does not establish this. Final actor baseline remains unobserved, so no numerical anchor replacement is justified.",
+    "change": "No numerical anchor change in this round."
+  },
+  "actionablePivot": "goliath-charge-provenance.json adds verified bullrush slices, original root travel and native joint-index sphere-chain contacts instead of repeatedly reporting the unresolved grounding gap.",
+  "validation": "Static disassembly/field/curve analysis only. No original DLL execution, Java compilation, tests or client.",
+  "supportPlaneFollowup": {
+    "record": "goliath-support-plane-audit.json",
+    "decoder": "tools/inspect_goliath_actor_support.py",
+    "newEvidence": [
+      "Ordinary Puppet phase4 -> choreo10681b13 -> root identity10680ad0 -> local/world/skin, independent of NIS PoseAnimationBehaviour",
+      "Support reference identity plus direction/resting-length projection, with inverse-keyframed gating at107219f9 ->106cfea4",
+      "Actual Behemoth capsule centre/axis/extent/radius and Simulating2 / createRigidBody=true / gravityEnabled=false decoded against the correct P2 metadata",
+      "PhysicsBehaviour ->1072a250 can deliver the single root body matrix to actor; this is conditional runtime physics state, not a hand-floor clamp"
+    ],
+    "numericScope": "Five original front-slam source frames across every rig joint; independent root-identity rebuild and existing reference-root rebase agree to 3.552713678800501e-15 source matrix units when the same actor baseline is supplied. This does not prove that native final actor baseline.",
+    "productionChange": "None. Retained unresolved source-vs-authored fist support and volume gap; no model lift, wrist offset, scale, receiving-body or world-effect numerical change."
+  }
+}

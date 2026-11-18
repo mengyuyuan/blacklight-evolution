@@ -12,6 +12,7 @@ public final class HunterBalance {
     public static float damageMultiplier(CreatureAttack move) {
         return switch (move) {
             case BARRAGE -> .75F;
+            case COUNTER -> .375F; // P1 left opening 75 : release barrage 150.
             case SLAM -> 1.6F;
             case LEAP -> 1.25F;
             default -> 1F;
@@ -22,6 +23,7 @@ public final class HunterBalance {
     public static float infectedDamage(float rawDamage, CreatureAttack move, float difficulty) {
         float budget = switch (move) {
             case BARRAGE -> 48F;
+            case COUNTER -> 24F;
             case SLAM -> 96F;
             case LEAP -> 76F;
             default -> 60F;

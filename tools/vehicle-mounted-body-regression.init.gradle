@@ -1,0 +1,17 @@
+// Occupied ground-vehicle firing and native animated-body reception only.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.exclude { entry -> !entry.directory && entry.file.path.replace('\\','/').contains('/src/vehicleTest/') && !['MilitaryVehicleGameTest.java','VehicleTestReadiness.java','VehicleFireGameTest.java','VehicleMountedBodyGameTest.java'].contains(entry.file.name) }
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    def stageVehicleMountedBodyClasses=tasks.register('stageVehicleMountedBodyClasses',Sync){
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('vehicle-mounted-body-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stageVehicleMountedBodyClasses
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('vehicle-mounted-body-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

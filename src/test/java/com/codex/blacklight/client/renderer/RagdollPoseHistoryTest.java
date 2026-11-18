@@ -46,7 +46,19 @@ class RagdollPoseHistoryTest {
     @Test void historyIsBoundedAndNeverExtrapolatesFutureMotion(){
         var h=new RagdollPoseHistory();for(int i=0;i<120;i++)h.record(i,new Vec3(i,0,0),new Quaternionf(),1);
         assertEquals(24,h.sample(-10).position().x);assertEquals(119,h.sample(999).position().x);
-        assertThrows(IllegalArgumentException.class,()->h.record(118,Vec3.ZERO,new Quaternionf(),1));
+        h.record(118,Vec3.ZERO,new Quaternionf(),1);
+        assertEquals(Vec3.ZERO,h.sample(117).position());assertEquals(Vec3.ZERO,h.sample(999).position());
+    }
+    @Test void correctedServerClockCannotReuseFutureSkinToAuthorizeADelayedCut(){
+        var h=new RagdollPoseHistory();
+        h.record(120,Vec3.ZERO,new Quaternionf(),1);h.record(121,new Vec3(1,0,0),new Quaternionf(),1);
+        h.record(118,new Vec3(6,0,0),new Quaternionf(),1);
+        var stale=new SweptBladeSurface(h.localPath(List.of(blade(120,-1,Vec3.ZERO),blade(121,1,Vec3.ZERO)),Vec3.ZERO));
+        assertFalse(stale.covers(Vec3.ZERO));
+        h.record(119,new Vec3(8,0,0),new Quaternionf(),1);
+        assertEquals(7,h.sample(118.5).position().x,1e-6);
+        var child=new RagdollPoseHistory();child.inherit(h,new Vec3(2,0,0));
+        assertEquals(8,child.sample(100).position().x,1e-6);
     }
     @Test void receiverFrameDoesNotLoseDistantWorldPrecision(){
         var h=new RagdollPoseHistory();var origin=new Vec3(29_000_000.125,251,29_000_000.25);

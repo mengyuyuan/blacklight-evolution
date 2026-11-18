@@ -1,6 +1,7 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.firearms.GunplayEffects;
+import com.codex.blacklight.firearms.HelicopterCannonTrace;
 import com.codex.blacklight.network.GunplayFeedbackPayload;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
@@ -38,7 +39,7 @@ public final class GunplayVisuals {
     public static void accept(GunplayFeedbackPayload p){
         var mc=Minecraft.getInstance();if(mc.level==null||mc.player==null||!p.valid())return;
         if(world!=mc.level){ACTIVE.clear();world=mc.level;window=-1;kickAt=-1000;}
-        var point=new Vec3(p.x(),p.y(),p.z());if(mc.player.position().distanceToSqr(point)>112*112)return;
+        var point=new Vec3(p.x(),p.y(),p.z());if(p.weapon()==15?!HelicopterCannonTrace.visibleFrom(mc.player.position(),point,new Vec3(p.endX(),p.endY(),p.endZ()),112):mc.player.position().distanceToSqr(point)>112*112)return;
         long now=mc.level.getGameTime();if(window!=now){window=now;count=0;}
         if(count++>=32&&p.event()==0)return;
         while(ACTIVE.size()>=com.codex.blacklight.config.GunplayClientConfig.EFFECT_LIMIT.get())ACTIVE.removeFirst();ACTIVE.addLast(new Effect(p,now));received++;
@@ -55,12 +56,12 @@ public final class GunplayVisuals {
     @SubscribeEvent public static void render(RenderLevelStageEvent e){
         if(e.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
         var mc=Minecraft.getInstance();if(mc.level==null||mc.level!=world){ACTIVE.clear();world=mc.level;return;}
-        double now=mc.level.getGameTime()+e.getPartialTick().getGameTimeDeltaPartialTick(false);ACTIVE.removeIf(f->now<f.at||now-f.at>24);
+        double now=mc.level.getGameTime()+e.getPartialTick().getGameTimeDeltaPartialTick(false);ACTIVE.removeIf(f->now<f.at||now-f.at>(f.data.event()==1?(f.data.weapon()==13?60:f.data.weapon()==14?20:24):f.data.weapon()==15?30:24));
         if(ACTIVE.isEmpty())return;
         var pose=e.getPoseStack();var camera=e.getCamera().getPosition();var buffers=mc.renderBuffers().bufferSource();var type=RenderType.entityTranslucent(ConsumedMobVisuals.WHITE);var out=buffers.getBuffer(type);
         pose.pushPose();pose.translate(-camera.x,-camera.y,-camera.z);
         for(var fx:ACTIVE){var p=fx.data;double age=now-fx.at;Vec3 start=new Vec3(p.x(),p.y(),p.z()),end=new Vec3(p.endX(),p.endY(),p.endZ());
-            if(start.distanceToSqr(camera)>96*96)continue;
+            if(p.weapon()==15?!HelicopterCannonTrace.visibleFrom(camera,start,end,112):start.distanceToSqr(camera)>96*96)continue;
             if(p.event()==1){explosion(pose,out,end,p,age);continue;}
             if(p.event()==2){if(age<10)impact(pose,out,end,p,age);continue;}
             if(mc.level.getEntity(p.actor()) instanceof com.codex.blacklight.entity.MilitarySoldier soldier){
@@ -77,12 +78,22 @@ public final class GunplayVisuals {
                 GunplayGeometry.rod(pose,out,start,start.add(axis.scale(size*2.2)),size*.45,0,0xffffc15b,LightTexture.FULL_BRIGHT);
                 GunplayGeometry.rod(pose,out,start,start.add(axis.scale(size*1.2)),size*.24,0,0xfffff5c3,LightTexture.FULL_BRIGHT);
             }
-            if(GunplayEffects.bullet(p.weapon())){
-                if(age<3&&com.codex.blacklight.config.GunplayClientConfig.TRACERS.get()){double length=start.distanceTo(end),head=Math.min(length,age*36+2),tail=Math.max(.5,head-7);
-                    if(head>tail)GunplayGeometry.rod(pose,out,start.add(axis.scale(tail)),start.add(axis.scale(head)),.009,.006,GunplayGeometry.alpha(0xffdf9e,1-age/3),LightTexture.FULL_BRIGHT);}
-                if(com.codex.blacklight.config.GunplayClientConfig.CASINGS.get())casing(pose,out,start,axis,p.seed(),age);
+            if(p.weapon()==15){
+                double length=start.distanceTo(end),arrival=HelicopterCannonTrace.arrival(length);
+                if(com.codex.blacklight.config.GunplayClientConfig.TRACERS.get()){
+                    double head=HelicopterCannonTrace.head(age,length),tail=HelicopterCannonTrace.tail(age,length);
+                    if(head>tail)GunplayGeometry.rod(pose,out,start.add(axis.scale(tail)),start.add(axis.scale(head)),.026,.012,0xffffd183,LightTexture.FULL_BRIGHT);
+                }
+                double impactAge=age-arrival;
+                if(p.impact()>0&&impactAge>=0&&impactAge<10)impact(pose,out,end,p,impactAge);
+            }else{
+                if(GunplayEffects.bullet(p.weapon())){
+                    if(age<3&&com.codex.blacklight.config.GunplayClientConfig.TRACERS.get()){double length=start.distanceTo(end),head=Math.min(length,age*36+2),tail=Math.max(.5,head-7);
+                        if(head>tail)GunplayGeometry.rod(pose,out,start.add(axis.scale(tail)),start.add(axis.scale(head)),.009,.006,GunplayGeometry.alpha(0xffdf9e,1-age/3),LightTexture.FULL_BRIGHT);}
+                    if(com.codex.blacklight.config.GunplayClientConfig.CASINGS.get())casing(pose,out,start,axis,p.seed(),age);
+                }
+                if(p.impact()>0&&age<10)impact(pose,out,end,p,age);
             }
-            if(p.impact()>0&&age<10)impact(pose,out,end,p,age);
         }
         pose.popPose();buffers.endBatch(type);
     }
@@ -117,7 +128,7 @@ public final class GunplayVisuals {
         }
     }
     private static void explosion(PoseStack pose,VertexConsumer out,Vec3 at,GunplayFeedbackPayload p,double age){
-        double radius=Math.max(.5,p.size()),t=age/20,fade=Math.max(0,1-age/24);boolean infected=p.weapon()==7;
+        boolean hellfire=p.weapon()==13,rapid=p.weapon()==14;double radius=Math.max(.5,p.size()),t=age/20,fade=Math.max(0,1-age/(hellfire?60:rapid?20:24));boolean infected=p.weapon()==7;
         var normal=new Vec3(p.nx(),p.ny(),p.nz()).normalize();if(normal.lengthSqr()<.01)normal=new Vec3(0,1,0);
         var side=normal.cross(new Vec3(0,1,0));if(side.lengthSqr()<.01)side=new Vec3(1,0,0);side=side.normalize();var up=normal.cross(side);
         if(age<5){double r=radius*.32*(1-age/5);GunplayGeometry.box(pose,out,at.add(normal.scale(.12)),r,r,r,GunplayGeometry.alpha(infected?0x8d2856:0xfff0c6,1-age/5),LightTexture.FULL_BRIGHT);}
@@ -129,13 +140,20 @@ public final class GunplayVisuals {
         }
         for(int i=0;i<9;i++){
             double a=i*Math.PI*2/9+(p.seed()&7)*.13;var radial=new Vec3(Math.cos(a),0,Math.sin(a));
-            double spread=radius*(.2+t*.95);var smoke=at.add(radial.scale(spread)).add(0,.15+t*(.7+(i%3)*.2),0);
-            double size=(.12+t*.38)*radius;
+            double spread=radius*(.2+t*(hellfire?.55:.95));var smoke=at.add(radial.scale(spread)).add(0,.15+t*(.7+(i%3)*.2),0);
+            double size=(.12+t*(hellfire?.23:.38))*radius;
             GunplayGeometry.box(pose,out,smoke,size,size*.8,size,GunplayGeometry.alpha(infected?0x542832:i%2==0?0x68615b:0x918471,fade*.42),0x00900090);
             if(age<11){var debris=at.add(radial.scale(t*(2.2+radius*.4))).add(0,.2+t*(1.7+i%3)-t*t*4,0);
                 GunplayGeometry.box(pose,out,debris,.075,.06,.075,GunplayGeometry.alpha(0x766b60,Math.max(0,1-age/14)),0x00b000b0);}
-            if(age<7){double head=radius*Math.min(1,age/6);GunplayGeometry.rod(pose,out,at.add(radial.scale(head*.7)).add(0,.03,0),at.add(radial.scale(head)).add(0,.03,0),.016,.004,GunplayGeometry.alpha(0xd2c1a0,1-age/7),LightTexture.FULL_BRIGHT);}
+            if(rapid?age>=9&&age<12:age<7){double head=rapid?2+4*Math.min(1,age-9):hellfire?hellfireFront(age):radius*Math.min(1,age/6);double ringFade=rapid?(12-age)/3:1-age/7;
+                GunplayGeometry.rod(pose,out,at.add(radial.scale(head*.7)).add(0,.03,0),at.add(radial.scale(head)).add(0,.03,0),.016,.004,GunplayGeometry.alpha(0xd2c1a0,ringFade),LightTexture.FULL_BRIGHT);}
         }
+    }
+    /** Source Hit radius knots; cosmetics interpolate between the authored boundaries. */
+    private static double hellfireFront(double age){
+        if(age<2.0/3)return 1+3*Math.max(0,age)/(2.0/3);
+        if(age<2)return 4+3*(age-2.0/3)/(4.0/3);
+        return 7+2*Math.min(1,(age-2)/2);
     }
     private GunplayVisuals(){}
 }

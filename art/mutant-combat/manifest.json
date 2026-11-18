@@ -1,0 +1,41 @@
+{
+  "source": "Existing authored attack poses; retimed contacts and new authored transition/locomotion keyframes.",
+  "clips": {
+    "stalker/claw": {
+      "seconds": 1.2,
+      "frames": 37
+    },
+    "stalker/pounce": {
+      "seconds": 1.8,
+      "frames": 55
+    },
+    "stalker/double_claw": {
+      "seconds": 1.9,
+      "frames": 58
+    },
+    "spitter/spit": {
+      "seconds": 1.5,
+      "frames": 46
+    },
+    "spitter/volley": {
+      "seconds": 2.3,
+      "frames": 70
+    },
+    "spitter/retreat": {
+      "seconds": 1.3,
+      "frames": 40
+    },
+    "brute/hammer": {
+      "seconds": 1.7,
+      "frames": 52
+    },
+    "brute/ground_slam": {
+      "seconds": 2.3,
+      "frames": 70
+    },
+    "brute/charge": {
+      "seconds": 2.3,
+      "frames": 70
+    }
+  }
+}

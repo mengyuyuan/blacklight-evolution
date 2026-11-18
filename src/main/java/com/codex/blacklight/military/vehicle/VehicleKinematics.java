@@ -77,9 +77,26 @@ public final class VehicleKinematics {
         var support=support(vehicle,vehicle.getX(),vehicle.getY(),vehicle.getZ(),vehicle.getYRot());
         return support.reason==StopReason.NONE&&Math.abs(support.height-vehicle.getY())<EPSILON;
     }
+    /** Item placement snaps to the same supported surface that driving uses, including slabs and one-block rises.
+     * The final full hull must still be clear; this never removes blocks or ignores another entity. */
+    public static StopReason settlePlacement(MilitaryVehicle vehicle){
+        if(!(vehicle.level() instanceof ServerLevel))return StopReason.CLIENT;
+        var support=support(vehicle,vehicle.getX(),vehicle.getY(),vehicle.getZ(),vehicle.getYRot());
+        if(support.reason!=StopReason.NONE)return support.reason;
+        var destination=new Vec3(vehicle.getX(),support.height,vehicle.getZ());
+        var shape=VehicleHullShape.from(vehicle.definition(),vehicle.turretYaw(),vehicle.gunPitch());
+        var parts=pose(shape,destination,vehicle.getYRot(),0);
+        var reason=clear(vehicle,parts);if(reason!=StopReason.NONE)return reason;
+        // Living entities do not expose native hard collision shapes. Do not materialize a chassis through them.
+        for(var part:parts)for(var entity:vehicle.level().getEntities(vehicle,part.aabb(),
+                other->other instanceof net.minecraft.world.entity.LivingEntity&&other.isAlive()&&!other.isSpectator()))
+            if(part.intersects(entity.getBoundingBox()))return StopReason.BLOCKED;
+        vehicle.setPos(destination.x,destination.y,destination.z);
+        return StopReason.NONE;
+    }
     private static void setMotion(MilitaryVehicle vehicle,Vec3 before) { vehicle.setDeltaMovement(vehicle.position().subtract(before)); vehicle.hasImpulse=true; }
     private static MoveResult result(MilitaryVehicle vehicle,double distance,float yaw,StopReason reason) {
-        vehicle.setStopReason(reason);vehicle.syncVehicleState();return new MoveResult(distance,yaw,reason);
+        vehicle.recordDrive(distance,yaw);vehicle.setStopReason(reason);vehicle.syncVehicleState();return new MoveResult(distance,yaw,reason);
     }
     /**
      * A hull box rotated by the body yaw. The axis-aligned envelope of a turned hull is much

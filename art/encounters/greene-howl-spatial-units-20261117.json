@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "Implemented and statically reviewed in both repositories; no Java/build/tests/game/native binary execution.",
+  "source": {
+    "fig": {
+      "path": "D:\\PrototypeReference\\p1\\input\\comparison\\mother_fig.p3d.rz",
+      "sha256": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167"
+    },
+    "audit": {
+      "path": "D:\\PrototypeReference\\p1\\boss-fig-audit.json",
+      "sha256": "9170dbf3a05e81fe2d659e907f06188005dc18efd59029662e99e8ff4b8d1183"
+    },
+    "preservedModel": {
+      "path": "D:\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\models\\encounter_elizabeth_greene_source.json",
+      "sha256": "4aa8aa47c53ad3cefa9ff2ae91253215b40316f7254581ba8563ca6df14b9bbb"
+    },
+    "windows": [
+      {
+        "offset": 17116,
+        "radius": 8,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 5000,
+        "collideWith": 66
+      },
+      {
+        "offset": 17412,
+        "radius": 12,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 4000,
+        "collideWith": 66
+      },
+      {
+        "offset": 17708,
+        "radius": 16,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 2500,
+        "collideWith": 66
+      },
+      {
+        "offset": 18004,
+        "radius": 20,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 2500,
+        "collideWith": 66
+      },
+      {
+        "offset": 18300,
+        "radius": 25,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 2500,
+        "collideWith": 66
+      },
+      {
+        "offset": 18596,
+        "radius": 30,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 2500,
+        "collideWith": 66
+      },
+      {
+        "offset": 18892,
+        "radius": 40,
+        "localOffset": [
+          0,
+          2,
+          0
+        ],
+        "damageMin": 2500,
+        "collideWith": 66
+      }
+    ]
+  },
+  "units": {
+    "rawResourceUnchanged": true,
+    "pixelsPerSourceUnit": 7.167352101048183,
+    "javaFloatLoadedBlocksPerSourceUnit": 0.4479595124721527,
+    "worldRadii": [
+      3.5836760997772217,
+      5.3755141496658325,
+      7.167352199554443,
+      8.959190249443054,
+      11.198987811803818,
+      13.438785374164581,
+      17.91838049888611
+    ],
+    "worldLocalOffset": [
+      0,
+      0.8959190249443054,
+      0
+    ],
+    "range": "Stored40 is the source-unit maximum-wave bound used by the MC launch adapter, not a newly proved native AI selection distance. worldRange applies the same model scale.",
+    "declaration": "Only elizabeth_greene:HOWL explicitly declares spatialUnits=source_model, spatialModel=elizabeth_greene. Existing already-converted Goliath and other rows retain default minecraft units."
+  },
+  "integration": {
+    "api": "Raw range/radius/windows remain inspectable. worldRange/worldRadius and waveDamageScale use world distances. SourceRadialWave applies the same factor once to all local-offset axes and radius.",
+    "broadphase": "SourceRadialWave.bounds unions the active transformed spheres including their offset, adding1e-7block padding so strict Minecraft AABB intersects does not omit exact tangencies. Final sphere contact uses the exact unpadded radius. Null means no active sphere. Root EncounterMob now uses this union, worldRange, and worldRadius; its cover ray begins at the converted Hit origin.",
+    "generator": "HOWL exporter now writes the previously omitted localOffset and explicit spatial declaration. The complete legacy exporter was not run; only the HOWL units metadata was patched into the current resource without changing other actions.",
+    "damage": "Window timing, source damage values, same-target hit dedup, MC damage tuning, impulse tuning and cover policy are retained. Only spatial conversion and broadphase are changed here."
+  },
+  "nativeCategoryBoundary": {
+    "collideWith": "P1 HOWL0x42 = SimulatedObject(bit1)|Prop(bit6), not Player|Prop. Native mask match uses any intersecting bit.",
+    "staticAddresses": [
+      "10d4e3b1 SimulatedObject registration",
+      "10d4e3b8 stores bit1 enum",
+      "10699b61..10699b72 mask0/object+2c AND mask1/object+28 nonzero checks"
+    ],
+    "unproved": "Full runtime membership of player/NPC entity types in SimulatedObject remains unresolved. Existing Minecraft LivingEntity targets/blocks and tuned damage are adapters; these changes do not claim native filtering or prop damage is complete.",
+    "fixture": "Pig-based integration fixtures test the existing MC target pipeline only; pure sphere boundary checks make no category assumption."
+  },
+  "queuedChecks": [
+    "GreeneMotionTest.radialWaveUsesDecodedHitOriginAndSphereContactInsteadOfRootDistance: scaled first/second sphere, high surface, just-outside boundary, old8block-high rejection, offset-aware bounds, unchanged already-world Goliath scale.",
+    "GreeneCycleGameTest radialWaveIsBlockedByCoverBelowTheBossEyeRay and radialWaveHitsRaisedTargetInsideItsFirstSphere: covered/exposed controls and old unscaled raised target negative control.",
+    "EncounterGameTest.sourceRoarExpandsAndDoesNotRepeatDamage: ten-source-unit target waits for converted12-unit ring, then receives no repeated damage.",
+    "GreeneCycleGameTest.joinedHealthScaleAndLaterMaximumChangesPreserveArmourAndFloorFractions plus existing stun/reload cases: actual health basis, one damage-unit conversion, partial armour/floor ratio and no healing of broken limbs."
+  ],
+  "healthReview": {
+    "rootChanges": "HealthBasis persists the actual max basis; constructor-to-join and later max changes rebase limbs/minimum/pre-stun snapshot. Loading first reads armour in the saved basis, then rebases once. Ordinary part damage multiplies units once; scripted already-HP stun divides before ordinary hurt. No new static blocking issue found.",
+    "testChanges": "Expected raw part shares multiply units; desired HP damage calls divide units, including the separate EncounterGameTest sourceExposed ten-HP assertion. GreeneCycleGameTest now has32 cases and compares saved HealthBasis across phases."
+  },
+  "runners": {
+    "GreeneMotionTest": "Existing playerFixUnit **/Greene*Test.class; not run.",
+    "GreeneCycleGameTest": "Existing tools/player-boss-regression.init.gradle/playerBossServer; not run.",
+    "EncounterGameTest": "tools/encounter-test.init.gradle; current player-boss-regression whitelist excludes this class. No runner edits made."
+  },
+  "files": {
+    "src/main/java/com/codex/blacklight/combat/SourceBossAction.java": {
+      "neoSha256": "7bf426403353c1cd018bda23ca06734cf5959798b3f44d2522e673b9a75d4ae8",
+      "forgeSha256": "7bf426403353c1cd018bda23ca06734cf5959798b3f44d2522e673b9a75d4ae8"
+    },
+    "src/main/java/com/codex/blacklight/combat/SourceRadialWave.java": {
+      "neoSha256": "b659e75f1dab56b423c9e54018b3ede5d7973ee480635328f2aa4934c75c879b",
+      "forgeSha256": "b659e75f1dab56b423c9e54018b3ede5d7973ee480635328f2aa4934c75c879b"
+    },
+    "src/main/resources/assets/blacklight/models/encounter_source_actions.json": {
+      "neoSha256": "cc29f1dfffcfe63f6bfb1d507384153eb72bf851871c6ab5371b5d1c950b3b50",
+      "forgeSha256": "cc29f1dfffcfe63f6bfb1d507384153eb72bf851871c6ab5371b5d1c950b3b50"
+    },
+    "tools/export_encounter_source_actions.mjs": {
+      "neoSha256": "044a27c9adfded9387c3debf57559d860b5990fb37562a212c0088996725cb89",
+      "forgeSha256": "044a27c9adfded9387c3debf57559d860b5990fb37562a212c0088996725cb89"
+    },
+    "src/test/java/com/codex/blacklight/combat/GreeneMotionTest.java": {
+      "neoSha256": "1b1d8c4469ed4133f84b942ed7960bc814b2d54d6c3b8026256cfbaf83f8f6fd",
+      "forgeSha256": "1b1d8c4469ed4133f84b942ed7960bc814b2d54d6c3b8026256cfbaf83f8f6fd"
+    },
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": {
+      "neoSha256": "01a85db60cfbcda223968b7564912f15dfc21fcb53eb87f45e75c842b578d901",
+      "forgeSha256": "7f87cecc8d02fbc811affbe4d418f62ecab57a685d411e193f3751152f68e7fc"
+    },
+    "src/encounterTest/java/com/codex/blacklight/gametest/EncounterGameTest.java": {
+      "neoSha256": "05b9bd86d25d03b0f61e46b1aca04a28f969b3c2b5ab8b9c088fe9345a361848",
+      "forgeSha256": "b962709edcc70ac03252aa182ca1763bcb70d5257c223a49091463fc69bb899f"
+    }
+  },
+  "rootCallersReadOnly": {
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": {
+      "neoSha256": "264f4d6391820c30f865860f7c58c29245fae57284d846799a76101c8cdf22db",
+      "forgeSha256": "0f877c5ae282af92223866ef00c2a704749502ca30e805980d906526e36cc905"
+    },
+    "src/main/java/com/codex/blacklight/combat/GreeneBattleCycle.java": {
+      "neoSha256": "042a7cfc0f510b1f3ee412bf017f0a441557d8a91b08cc3ffc2d7c715700adfa",
+      "forgeSha256": "042a7cfc0f510b1f3ee412bf017f0a441557d8a91b08cc3ffc2d7c715700adfa"
+    }
+  }
+}

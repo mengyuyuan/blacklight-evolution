@@ -15,6 +15,10 @@ public final class LithiumVehicleCollision {
         AABB blacklight$collisionQuery();
     }
     public static VoxelShape narrow(VoxelShape original,Entity other,Entity mover,AABB query){
+        if(other instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft && mover instanceof net.minecraft.world.entity.LivingEntity){
+            return mover.isPassengerOfSameVehicle(craft)?Shapes.empty():
+                    com.codex.blacklight.military.aircraft.HelicopterSkinContact.walkingShape(craft,query);
+        }
         MilitaryVehicle vehicle=other instanceof MilitaryVehicle parent?parent:other instanceof VehicleHullPart part?part.getParent():null;
         if(vehicle==null)return original;
         if(mover!=null&&(mover.is(vehicle)||mover.isPassengerOfSameVehicle(vehicle)

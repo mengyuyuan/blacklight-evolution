@@ -1,0 +1,1159 @@
+{
+  "date": "2026-11-14T09:52:34.372Z",
+  "revision": "source-boss-actions-r8",
+  "deferred": [
+    "alex_mercer"
+  ],
+  "suites": [
+    {
+      "platform": "neo",
+      "unit": 24,
+      "gameTests": 49,
+      "passed": true,
+      "unitTimestamp": "2026-11-14T09:50:09.828Z",
+      "gameTestLog": "D:/CodexCache/creature-combat-neo-encounterServer.log",
+      "gameTestLogSha256": "fceaade021f5a2580d34ba3bb137601de2633554914fde2e2da1d9b47d15a2d8"
+    },
+    {
+      "platform": "forge",
+      "unit": 24,
+      "gameTests": 49,
+      "passed": true,
+      "unitTimestamp": "2026-11-14T09:46:42",
+      "gameTestLog": "D:/CodexCache/creature-combat-forge-encounterServer.log",
+      "gameTestLogSha256": "d73156f3d6fe9306f95f89ae47680aa253344b838e49d13b358751e9d888fd1c"
+    }
+  ],
+  "source": {
+    "decodedSpecies": [
+      "leader_hunter",
+      "elizabeth_greene",
+      "goliath"
+    ],
+    "activeSpecies": [
+      "leader_hunter",
+      "elizabeth_greene"
+    ],
+    "activeProfiles": [
+      "leader_hunter:CLAW",
+      "elizabeth_greene:HOWL",
+      "elizabeth_greene:VOLLEY",
+      "elizabeth_greene:ORBS",
+      "elizabeth_greene:EXPOSED"
+    ],
+    "provenance": "source-motion-provenance.json"
+  },
+  "hud": "Existing Supreme Hunter flesh frame, health percentage, independent per-boss damage trails and phase marks. Secondary defense strip uses the same frame; exposure follows real state.",
+  "visual": {
+    "platform": "forge-1.20.1",
+    "directory": "D:/CodexCache/encounter-qa/autonomous",
+    "scenes": [
+      "leader_hunter_p0",
+      "elizabeth_greene_p0"
+    ],
+    "frames": 245,
+    "sceneCounts": {
+      "leader_hunter_p0": 66,
+      "elizabeth_greene_p0": 179
+    },
+    "reviewedPages": 17,
+    "renderedMoves": {
+      "leader_hunter_p0": [
+        "NONE",
+        "DOUBLE",
+        "CLAW"
+      ],
+      "elizabeth_greene_p0": [
+        "NONE",
+        "HOWL",
+        "ORBS",
+        "VOLLEY",
+        "EXPOSED"
+      ]
+    },
+    "method": "Hidden muted independent QA world; normal AI chooses targets/moves. Scripted body damage at tick 100 validates HUD, and three weakpoint strikes at 370/382/394 trigger the exposure cycle. No begin(), target selection or pose injection. All current captured frames inspected in paginated contact sheets.",
+    "files": [
+      {
+        "file": "leader_hunter_p0-none-015.png",
+        "sha256": "697e8c0fd8e7b1e757df5ca58e458ede3c0f43f571fe5a8ef093bcb47169454f"
+      },
+      {
+        "file": "leader_hunter_p0-double-028.png",
+        "sha256": "a0214fc9d1d81c26d332ef6f462d688b1fe0eabff50e03a0d94be2bfc7003d2a"
+      },
+      {
+        "file": "leader_hunter_p0-double-031.png",
+        "sha256": "1d18f85d7ad764fc92dac879bb2a891a8f6043b6e4f6dd53228b48c7bf6eecf2"
+      },
+      {
+        "file": "leader_hunter_p0-double-032.png",
+        "sha256": "05e3cc3e2280bc956ca6752bc3c293b7613ad4006881a5ca1f78595bd8f2094d"
+      },
+      {
+        "file": "leader_hunter_p0-double-033.png",
+        "sha256": "1e308bdcdf76d99fc0b2e34ae2bb8c6f26a13c9dc2a83b4b445d5ba9402984d5"
+      },
+      {
+        "file": "leader_hunter_p0-double-034.png",
+        "sha256": "f524b1a9c97620718cf986706d6a46cb2defc31f995b09e7ec745e2812582522"
+      },
+      {
+        "file": "leader_hunter_p0-double-035.png",
+        "sha256": "cbcf4880dc0eabfd4b5146e05920d1f8725af6a6638f2e0254667720e428292d"
+      },
+      {
+        "file": "leader_hunter_p0-double-045.png",
+        "sha256": "4dc0dfc36aaca71a361a515b9b2a3d6aa6672e17529539aaee9d5320d0116c31"
+      },
+      {
+        "file": "leader_hunter_p0-double-058.png",
+        "sha256": "f52b855053e37375d9132e46f8db5bb8a007aeb8b47ef7d310b9a02a70357cbb"
+      },
+      {
+        "file": "leader_hunter_p0-claw-086.png",
+        "sha256": "ce3d35ceed6626ed8e8d52a842c13dc655ad5e40f309bc2b396e468e4ddf7dda"
+      },
+      {
+        "file": "leader_hunter_p0-claw-088.png",
+        "sha256": "d3333c6c7a1719260e64accc05975601ef84e6f61abf66addc3656b2aced8b8d"
+      },
+      {
+        "file": "leader_hunter_p0-claw-089.png",
+        "sha256": "60bb8f4e92b2d53d858ab468c7bc6cd2c265b10916ec415adfe6103c7e651803"
+      },
+      {
+        "file": "leader_hunter_p0-claw-090.png",
+        "sha256": "05005cb4a7065fde6a46af1ce8faaaa8e4121c16e9597e7e7a51edc14dfd722a"
+      },
+      {
+        "file": "leader_hunter_p0-claw-091.png",
+        "sha256": "0879b153af5bc10f5092e9eb945e4ecf17d6acaa812a8c37e43ee5386af1a77c"
+      },
+      {
+        "file": "leader_hunter_p0-claw-092.png",
+        "sha256": "df19eac91b81330256708e1a14c78cab71d6af7d3eba8c177b7ca3482d9dad0c"
+      },
+      {
+        "file": "leader_hunter_p0-claw-093.png",
+        "sha256": "7e2e992f790fc40e6fc74c7d3cc43a54b94b5bd8ebf09e1522d7fbfd71f6a84e"
+      },
+      {
+        "file": "leader_hunter_p0-claw-094.png",
+        "sha256": "6d44e5b8a4076ae7b1ecf4811fe7b6c3fff477f39a2b50b1f9eeed4f829c29c0"
+      },
+      {
+        "file": "leader_hunter_p0-claw-095.png",
+        "sha256": "0b6ac0dc14a1ba72e48f3b8b60de5e3a906d10731c7240fa8a7d0c9cf1a799fe"
+      },
+      {
+        "file": "leader_hunter_p0-claw-098.png",
+        "sha256": "b52fe8392ef9f3c69ea0e1b09535d65b8b1d71581b939e6dc4e9da03d00a2c3c"
+      },
+      {
+        "file": "leader_hunter_p0-claw-101.png",
+        "sha256": "f7410cff61230a000070ecaa489b6ad17068ffda6f01b4379ad5f52240135cc4"
+      },
+      {
+        "file": "leader_hunter_p0-double-149.png",
+        "sha256": "514ab0a24a39a4391b46588da6a87b7db1ec9868e962de58250b9232ed02a035"
+      },
+      {
+        "file": "leader_hunter_p0-double-150.png",
+        "sha256": "4c1e228fc8cb565bbec126ff3b8b660cb73f043ac3e44783b710465a0f4e08c8"
+      },
+      {
+        "file": "leader_hunter_p0-double-152.png",
+        "sha256": "9d660df474fcde69b53e78b6e6599b663fd4e426acd7fb450de0a044b40074be"
+      },
+      {
+        "file": "leader_hunter_p0-double-153.png",
+        "sha256": "b861217c47c01cc77622a9b5877732e54c508b680d3fa48a54de4801b23e84b8"
+      },
+      {
+        "file": "leader_hunter_p0-double-154.png",
+        "sha256": "721d3d0396d2561f727dfafb121751c78a20a718141b44a5f94dab4fdc7d44be"
+      },
+      {
+        "file": "leader_hunter_p0-double-155.png",
+        "sha256": "3ea9fffbe60c9ebfee5b7f15c7e0a3ebb3fa892ea6d15575596dc17adaba8ce0"
+      },
+      {
+        "file": "leader_hunter_p0-double-156.png",
+        "sha256": "aa5a30d89c57a57674b83083e901b5003c0581badb923159e9ae26e5f2477a4a"
+      },
+      {
+        "file": "leader_hunter_p0-double-179.png",
+        "sha256": "013d1b143118c29cf9693d81e20f44c193ded92606dce4af7b7cfdf06d5c4bd5"
+      },
+      {
+        "file": "leader_hunter_p0-claw-203.png",
+        "sha256": "150565298f8ca0491b1642fecc43d12af73425ea5bb33253365a4d1119d7c267"
+      },
+      {
+        "file": "leader_hunter_p0-claw-204.png",
+        "sha256": "bf453be89b3856753c2ac64a18151aa33e06da42a23673c83e54bfce00c51d5d"
+      },
+      {
+        "file": "leader_hunter_p0-claw-206.png",
+        "sha256": "974d45e7f2afbf91516ddd057ef39fb1c9fbeef5ea1c5c076d24fc27d1115931"
+      },
+      {
+        "file": "leader_hunter_p0-claw-207.png",
+        "sha256": "286ff020e40aa69aacdb3a4646268e08b8d838c833b7a594db49311c1e3f23fb"
+      },
+      {
+        "file": "leader_hunter_p0-claw-208.png",
+        "sha256": "ebe9588c7cd53d031dc08d3ca0df5307e9461ce7f256dd562777a2ca84caaea4"
+      },
+      {
+        "file": "leader_hunter_p0-claw-209.png",
+        "sha256": "dfe5fb5520fc07b5e0eba6441cdaf5777041c7eb903d711dadcb7efcc8fa15fc"
+      },
+      {
+        "file": "leader_hunter_p0-claw-210.png",
+        "sha256": "adf7d157433ee486376dcccb6067d8d65a2bb9e78091752cf0a929b43ff3d227"
+      },
+      {
+        "file": "leader_hunter_p0-claw-213.png",
+        "sha256": "712020d2850e4ff6ae67374c23bd67ea0b9b7747f5f750e48775319096506bf0"
+      },
+      {
+        "file": "leader_hunter_p0-claw-216.png",
+        "sha256": "ed9ad4215c3d75d05ea3f34b6e79ef452ad4886549a21f7cde919af7b0f3fd90"
+      },
+      {
+        "file": "leader_hunter_p0-claw-219.png",
+        "sha256": "e5b6442ddbe3f526bde995c03c99fa3d084343a56a8122291166e8a66fc431d3"
+      },
+      {
+        "file": "leader_hunter_p0-claw-222.png",
+        "sha256": "5e52631950d9bc183f8771c7a18bcd1160c67c585770ea56a9118a194451f4f2"
+      },
+      {
+        "file": "leader_hunter_p0-claw-225.png",
+        "sha256": "23bf0248ed69b2833a080b55475b1f36247d4f8f9710f27518dfcf2fd562fc03"
+      },
+      {
+        "file": "leader_hunter_p0-double-247.png",
+        "sha256": "af6c2d2a961f43c8babd871f94eb7ba1aa1b35d8ce7ca446fe54f39e1eba7745"
+      },
+      {
+        "file": "leader_hunter_p0-double-250.png",
+        "sha256": "75a9ad475a140da7a512e2bc3d88d09eab893ca9df9e8971d3343e9d8b951ec2"
+      },
+      {
+        "file": "leader_hunter_p0-double-251.png",
+        "sha256": "e1d66bc5978ee0d0fd625874e88473919fd2e6806225c491a85a22a7c79e9b01"
+      },
+      {
+        "file": "leader_hunter_p0-double-252.png",
+        "sha256": "fe9a57be72b34db74139bf5be4dc96e88cb455d7f6d6e40454311876128cf887"
+      },
+      {
+        "file": "leader_hunter_p0-double-253.png",
+        "sha256": "a74ee9e071b3771827d883268d21ce2c988a216ced431de98188cdc2ec351bc8"
+      },
+      {
+        "file": "leader_hunter_p0-double-254.png",
+        "sha256": "d7bb1bb58c51b8755e6b3494810046df131094fb104eee21cd813817701c8aed"
+      },
+      {
+        "file": "leader_hunter_p0-double-277.png",
+        "sha256": "46c1e369e16c7e6cd086fb9329fcc87468e4fe8ece39db5ec7216d664e1b2be8"
+      },
+      {
+        "file": "leader_hunter_p0-claw-299.png",
+        "sha256": "08b4f5a2a55d15cc4d78496f5b90a66661548de3853c249907371752875f7361"
+      },
+      {
+        "file": "leader_hunter_p0-claw-301.png",
+        "sha256": "95b99093dc4556ca6534b5f1be6bd35dd47e155dccc93dae530fa0f6b1a4e012"
+      },
+      {
+        "file": "leader_hunter_p0-claw-302.png",
+        "sha256": "c68343794c5c30201c58e1fafc9560af8cfac488d3d59e384f2b9ae6cd1bc72d"
+      },
+      {
+        "file": "leader_hunter_p0-claw-304.png",
+        "sha256": "6613b983b521158d78b47f82d0a677f50c78e2ae1c5281eb0c86eadc18f5ebf5"
+      },
+      {
+        "file": "leader_hunter_p0-claw-305.png",
+        "sha256": "5ff32176cddabea1e252a664ecfca81c0b98d10065f0d7943583e57d0af72d46"
+      },
+      {
+        "file": "leader_hunter_p0-claw-306.png",
+        "sha256": "c0631d3988ed9b30519b6168739babcd6c80e2900ab7655a551e47b5c6542870"
+      },
+      {
+        "file": "leader_hunter_p0-claw-307.png",
+        "sha256": "01531fdd1e9b43eec8d45ae6b114bbc9031fe92e7446f3a5e611f06e9c23a367"
+      },
+      {
+        "file": "leader_hunter_p0-claw-308.png",
+        "sha256": "9c4eb69d6027db9d1dcdb2f264c0318fc265f90de36e030215be6992b9b0ea78"
+      },
+      {
+        "file": "leader_hunter_p0-claw-311.png",
+        "sha256": "896d75fe6ca749b320b08c7a3db907799df90c6e94e6e59962f0317c93cb355c"
+      },
+      {
+        "file": "leader_hunter_p0-claw-314.png",
+        "sha256": "2a26ce14578eeb6d5b94dd871d6cbb193aebdb7c2735a72985ad7e8c190e53ff"
+      },
+      {
+        "file": "leader_hunter_p0-claw-317.png",
+        "sha256": "9bb8797d72b4b3183c2362b79a2455263913f4710c03ceb11cfd7ee653b80bb1"
+      },
+      {
+        "file": "leader_hunter_p0-claw-320.png",
+        "sha256": "539f41354874b5c2baa143455c5acd2d4dde0489a56c511b47fe251deb0e45b6"
+      },
+      {
+        "file": "leader_hunter_p0-claw-323.png",
+        "sha256": "c98e01056131379e8b950922f7f44a96825d3672a85ce946470622a2140b9a27"
+      },
+      {
+        "file": "leader_hunter_p0-double-345.png",
+        "sha256": "27bd1790c0004dc39ac4af2f34c3ac79bd876aa5b5622f0af7de815999246dcf"
+      },
+      {
+        "file": "leader_hunter_p0-double-348.png",
+        "sha256": "4b77cd891b82d308746063444dd3bde707ccdf03522df46093ebab8b509f1b62"
+      },
+      {
+        "file": "leader_hunter_p0-double-349.png",
+        "sha256": "f6c12e1c875faec79419c99a6ef31a5964fb21107edd4b461766742ff46cda67"
+      },
+      {
+        "file": "leader_hunter_p0-double-350.png",
+        "sha256": "ad2082b33af0b7c3d8bb67ca31173fa9bb4cdfe6727ed3ecb807f7553f07d09d"
+      },
+      {
+        "file": "leader_hunter_p0-double-351.png",
+        "sha256": "495165b17699f504999833b8299dd7950ea3b2ba5a782a903d16c9259acaf436"
+      },
+      {
+        "file": "leader_hunter_p0-double-352.png",
+        "sha256": "f5a3931c3655e5b0cc4f05ff90d45154e1420c1d94b9e2c24dbe707c247b8aac"
+      },
+      {
+        "file": "elizabeth_greene_p0-none-015.png",
+        "sha256": "431175074c8119b8abc01a8495c9cec19b491d5aee2e38306fbe585aa22d56b6"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-026.png",
+        "sha256": "40c2b50931b4b50e782306a82b604afaff0c8c1998fc12268ec2f2648c709b10"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-029.png",
+        "sha256": "2cf07f273fa8755fb7d7d0d23565425cbe79c8a1123200f0d213f4e9886fbd46"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-035.png",
+        "sha256": "523368096039dff346c6193d3828b0e6a205d5dee5b6d2f712e7b1bc2ac4a247"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-038.png",
+        "sha256": "1e30921553a599c0a918766cfaaf4779af1efc72b6b712e4c8a3f0b6764ca7f2"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-041.png",
+        "sha256": "6ee0c3f66f85242a4ed3f9473a045db55d724da372ed7000dceea020c4fcd117"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-044.png",
+        "sha256": "473f9cc02f6911ee4b7d13420c8fa10f74956df398bb991b03ed41dba1f81186"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-045.png",
+        "sha256": "591c4560d56c34c940a1ddff291df4d6b7195edf2328aeea0cf72c73948d5349"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-047.png",
+        "sha256": "ceb30574a9febd60350853e01bb58ea745d6c9329c327b6dc95889ec8142a7d1"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-050.png",
+        "sha256": "c38db3a7b2e4de8972b3835eb315222f3065b58737c6c82e2c93ee2ba544d142"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-053.png",
+        "sha256": "8c6e96ebd879d542990584559c6acbe6d41d61bfb25fc5acaf4d5709a329fd01"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-056.png",
+        "sha256": "69baea62496e9cd8f5bc2eeb3a3d4db59bc995735df875b52de76e053ac71e59"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-059.png",
+        "sha256": "13cf166a756d27382ed017eb8ad082fdefc56d78d83ee2ee3aeea00e88628564"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-062.png",
+        "sha256": "839980c62da96ba767a5e1b90b6a08e282192e9030d44a97f3b46ef3996bf757"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-065.png",
+        "sha256": "b0ad3a7f0af1aeb69fe5d4747528bd00f9b2652282f42aba7ac06f0ab07ffa02"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-068.png",
+        "sha256": "1ef6de66da417ec70562ed9c28d71a21dbf3b625a88be047619a6bdf3b3fc401"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-071.png",
+        "sha256": "3f7755938d42652b48537f493fa8495374d986cc40a8c9c9c9607a6d2a032630"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-074.png",
+        "sha256": "6974ba9229bfcf1c7f8a90c0fe45518c208e9ee59e8831e2945a72e252c168bb"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-077.png",
+        "sha256": "6274320644b82ff2e93de9e8dd0abcba5f911901083250863152bcb2cd71cc4b"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-080.png",
+        "sha256": "d406b30cb5863c106b42a4612d7754400ee44c5e86e8169fa8dbc6a8383ea25d"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-083.png",
+        "sha256": "50133c4c2abc3ec2cb370937610d278b7dad18bc848b36b51ae7def50577806b"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-086.png",
+        "sha256": "d9b0fc843fecd8608a0af30554c52e24db460e56756f4c815c3f29380c7db8ae"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-088.png",
+        "sha256": "043c5a7ce445db147672172c94dcdd90714251f316ab452b1b67cbb7c05ff408"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-089.png",
+        "sha256": "07c53a1e3e7d828f15d8a757dbff924d92d31eb6ffb078ea2ec33fe51872b153"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-090.png",
+        "sha256": "0a3e65ff09987e82e9e32c1a0128a54408026844f3b1234d61671204ad88e156"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-091.png",
+        "sha256": "179e004d1985321ed35d0808c63af8c3241ea0c9dedc656c026a435261dc60c0"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-092.png",
+        "sha256": "7e8682fdc4d8cb3814032555a35f1962d37b6296afa2afd4aa972e058857afc0"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-093.png",
+        "sha256": "f2adfc12ae201b0f371eccb1132ae7fa695729522cf74f722a013832b5e9388d"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-094.png",
+        "sha256": "0727882087e98fe1d48c6579d5012ccc42e793073eb4a7731ff3c36912d0a911"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-095.png",
+        "sha256": "7a74c9007cced16573751fa89dad966d096296e0116403d8f28902132f4b1a5c"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-098.png",
+        "sha256": "99c86969c6e80561377d65e36b2ab385f8750cae94f1f740bbe613710e98a2d1"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-101.png",
+        "sha256": "b214f62ae92fd207a5447b048610abd230823c2b14614ef529f42209788b3f63"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-145.png",
+        "sha256": "fa29b329aad89a4568bef6092a9cf9811d14d9f971bad34f1f25590006460cad"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-148.png",
+        "sha256": "6b61ac497f724c64895e030a5e2db8bbba758468fd09c1ebc3ccd4cca056500a"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-150.png",
+        "sha256": "e635592d75627caccccf7a9b1899e430736e4c3cbab611723790e3f3b735ddc6"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-151.png",
+        "sha256": "abd2c4131790968cfc64b39360490f707b77aff7ee4d1e61ad8dad9f10ab1747"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-154.png",
+        "sha256": "d5da6b3d6ab767f9027dfa01127bc4b818bde653507265ef4acc2006943bf04d"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-155.png",
+        "sha256": "ac8d5e9544ad2c453907db9c6f1afcaaa8b0617ec9fcafc6bd91b47d1b43a779"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-156.png",
+        "sha256": "4ce6175f6ba14db2d9abdbd49b324d89cd4acdecdc0eeaf51b060fa1bdb1e4a3"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-157.png",
+        "sha256": "7d8c18e5206c9f458f86bb764acf13cd7b793b2633949e95f0929c9cbfdcf4a0"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-158.png",
+        "sha256": "8565cbea4b2e921570bdd29a3dd2fcc32e740e95e0ca13d084885f19a63e4599"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-160.png",
+        "sha256": "3606b1585d413726b379306dd21e6d62561ee6af56405d8d6d1b9d0098a78378"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-163.png",
+        "sha256": "d176e80ce7ab74aa0c0d04debe88bd6d2191716c3503041fb831ed832286a25a"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-166.png",
+        "sha256": "177429455ae41dc90b8536930c7541c994051f7d772a642cc4dfe6ebda51d313"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-169.png",
+        "sha256": "1c9f9754e8b3222ae73bc316d884475fdeecbfde31bc71fc00023e190445a1a1"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-172.png",
+        "sha256": "308644936ace692868244cd402bc449fe20f83a76d524dd7bd5afd5f23c20f1d"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-174.png",
+        "sha256": "b4263fa8ccbf7b5f2c11be32f2019c863c4a6a9049f28e5cf6a612d23a48b5cb"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-175.png",
+        "sha256": "c83b91dfe1d369bb4cb4b33173ca4049bdcf0c5c3996add50bbd2f23073ee13e"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-178.png",
+        "sha256": "21187af666af7a487c27f098337b23a3273aaaabd854d674ad014106094d9864"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-212.png",
+        "sha256": "5c25a3e32db445450c6c0478bb1ebefccc41ce4a68e0a99a3f6d8fdba7bce4aa"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-215.png",
+        "sha256": "45795caf76a5174414eb307c7ba6dbf23215fd81184f0e41296ba855e5703b75"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-218.png",
+        "sha256": "8899c9ac8a8b183edb7c48509dd25d64cb522d3e09ecb99c5adc71c5b79a3251"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-221.png",
+        "sha256": "693912f7bff3e42d098dc9359982b7dac37c711ff1b95adfaf0cabdd1ca84d76"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-224.png",
+        "sha256": "bbeedd9c016fe658b6592440ebbcdc2fa82077a8835816e2636e9ff24c23db40"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-227.png",
+        "sha256": "ac9eedfdb4daf186bb1f9834e4449ffa1b3accb4a46f4b31b28aa3c9649df904"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-230.png",
+        "sha256": "1e3011590e551b6ad84a40f284efab961cb1437ae8ef631f9d878255e5060d16"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-233.png",
+        "sha256": "1b7f80d2a25f72f4e609dc9e7cbb0b580d8e5d069a3f310dbc7e1cb638eef347"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-236.png",
+        "sha256": "c88e54a7c08606b43389491a6438804ed128f8a8af9746a6fce6eb3b714c82e2"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-239.png",
+        "sha256": "68d0985f8cbac16dd9bb378b67164a393fbe89e51ce1334477408ef282bd60a8"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-242.png",
+        "sha256": "4b377f26a2a13d158e93a2c63dd09bfed51d02990c952b451ea3ee3ebfb44006"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-245.png",
+        "sha256": "30b078c338b80495e1fec250970a50a41c488030e1cdc9a0d6c70e12758d484e"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-248.png",
+        "sha256": "2593465153836ccd2baf34ab5b28c5c3df6fd5fbec79640549476b4f946ad34a"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-251.png",
+        "sha256": "4b9cd71302d01f683cdd952db0887272f681d521fcf0fc9c8e7f712685e2f74e"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-254.png",
+        "sha256": "d6f8ac4d4531fd09c5513e9d82bf11d5f919d5249b7c6e730bcacef4cb6f9a60"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-257.png",
+        "sha256": "4d8ee6dd61d8255b3cce08cb64847adfb1d99f6b073aa2dae8a30246d83e0cea"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-258.png",
+        "sha256": "752dcd1c187ee03835e62260c155eddf2bbdc408c7888922c35f344e6b7f5f8f"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-259.png",
+        "sha256": "772b37e838637fddcc3b5309df3c3c993f4c81b9ccb707cef0ef78e63ea526b3"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-260.png",
+        "sha256": "8dcfa660c143aac85c13cb35f6ed7382b2a2ad712d84be9fa2fcb34e0f28dc00"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-261.png",
+        "sha256": "8a25447720b80d6aa73c1c334fbed957e7b60d4ea984dd99ce4b79c4c4dae5ec"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-263.png",
+        "sha256": "e31433277ed4717fd46445e9dd4ad4f49b503193f5db343b7ff64097565714af"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-266.png",
+        "sha256": "a675e1d25bfe894bf6cc3e27e1951d3cd635585e3f2f05dd8e58afa74067e4e3"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-269.png",
+        "sha256": "eeb23676f7ea4cde14fc7aa78c18ee6050b8b1ec0f2be2adcaacd5f73c6e3369"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-272.png",
+        "sha256": "8d174b800aced3493fbf0cd4ceeb798f00888e931e7c80acc3b571063e527687"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-275.png",
+        "sha256": "3c9e860fc55fbd371a0c5c129467a6f15b01f3bd7aa4941c55d3f56fe9971a8c"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-278.png",
+        "sha256": "58375cce5d6a94dc5ff34a834880cd811a027d6a190f34c4450ba32227ecbbc3"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-281.png",
+        "sha256": "1a653e4838718739fe37b936429788c8cba6c5658bf98369e9f2828a1ec608d5"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-284.png",
+        "sha256": "f67c0934c260d9f13e5af6c903f4aa54bd6b9d73c5a50670f06146ceac38f75b"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-287.png",
+        "sha256": "41b82132af61848832907ae33fd7bcb55c884b8e51718390c0ff301993a03fe5"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-290.png",
+        "sha256": "ea8de138ad7da8c7b12e32f75361691c7e52a92b7922d04d4d34d108e04ff7b3"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-293.png",
+        "sha256": "3c21a2d6e9c49a26f655955ef01940706500e3ea1066503a134ccf3ecfd35a88"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-296.png",
+        "sha256": "bcaeb3229ef152304d7af53b18b3802feea8bc8e9f5ae8d22b7bf628d0a26120"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-299.png",
+        "sha256": "47fcf675b5082140ed58f217cfd728c57494024226a2c4453f322dededa819c7"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-302.png",
+        "sha256": "7d83183f7cd8405ee6b42cf7898ad975df588ec6b6eaa048ec09a204d8de978b"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-305.png",
+        "sha256": "239a540f5521f27861e9b2854df561c578504afb19b317f7627da7f16bd95d08"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-308.png",
+        "sha256": "490194ca1a931b01cd349e8db4780ff421b78413ad26627c8cd4feb7a72ffcc7"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-311.png",
+        "sha256": "ae7f3b62088ddf004570386bf862bb1e82a139bfe38c21a23158c3ba72f43b36"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-314.png",
+        "sha256": "ab5a0d0f934f0290ce716d7d3dd9b55ce0bb82665c497ec5ae828d229eb4a7c8"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-317.png",
+        "sha256": "97796bd23a13339fce0a6d6627d03d563359da10ef933a94f12a2b281b4c7f23"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-320.png",
+        "sha256": "50a090813ca952996a9043634ce82479773ffdd39ba3b8a2949291824b5c500c"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-323.png",
+        "sha256": "9d3c34880b51b6ddd643233b96bc60c6c295865d6cca8905c64ea3e852f95b83"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-326.png",
+        "sha256": "ca088c0b967fc7c5e91c2b8b45c7635a5b6187542e1b57155018df27d2d5ff4b"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-329.png",
+        "sha256": "6b77eedbdcb88151f05e11857a879c7074c15d18bc3f0777ea8b44bf2e3e5a6e"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-330.png",
+        "sha256": "6a8d9097dfaf2b74fb7626ff941877b10940504ea288b119624a0511365c333a"
+      },
+      {
+        "file": "elizabeth_greene_p0-volley-335.png",
+        "sha256": "98c4aa6ba6f33a5588b533308595466e08aabf1c5e3c3c54c4dd0dd6e776e1b2"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-374.png",
+        "sha256": "a5100b150871442edb5ee2f1b17c75ff1bd92d30d688ca19b5403d8aca8d00db"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-377.png",
+        "sha256": "a287c1b7e7a78cb7729ee03adf39a9bbd0932fb3880c467a9a87d4137d2303b7"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-380.png",
+        "sha256": "3dfcad4827d651b66bfe054f82d2e9b1f8a7566506920f94433f6dfc04e5c22f"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-383.png",
+        "sha256": "d3a6149a7bfb53e40b0de445f91057eedac2928a8f15fb6c1bfff28428bc6cb0"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-386.png",
+        "sha256": "5f2676aec564c5ec8f79df26514faef3c06580a069a38ac94e061147d6900bc6"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-387.png",
+        "sha256": "0560323375a17cd4af457f52b859b6dfdd5b3b9edd1c076a5d4c300df49c8e2d"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-388.png",
+        "sha256": "cd58cb5dd1e0f5278acd2200c0982ea923bd722171adfb03ff8d64aba67aaad0"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-389.png",
+        "sha256": "6ba793b0a6b2b3f61e29b1e8fb84083222dfd0e34089efa7da84861efea3c329"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-390.png",
+        "sha256": "b8efc264952b34a33c98ca6b423a5730cc2dff40284da878438d0a252403ed44"
+      },
+      {
+        "file": "elizabeth_greene_p0-orbs-392.png",
+        "sha256": "ff215b13c84e3c5d7dc198c55778f7d295e6b63433a115f71e172c6fa2010aac"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-394.png",
+        "sha256": "213cc6a6178168ed7a9bcc5ac019cefd460b24ae46dd8b1340ba9e9069b34ad5"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-399.png",
+        "sha256": "654575cdc54ed7948616d9e684ae182b1a21c4f8f63a4aed38a989729b3aa61a"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-404.png",
+        "sha256": "219eb910b978913e0494225d2d669ffa2ec4df5edabd351d56be568240d97a59"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-409.png",
+        "sha256": "0125f3c1b086a1dc7deccde7dcc07e8b7a539996cdad7c45583a6de25499dd63"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-414.png",
+        "sha256": "c2741c021049d55b91f492d68e961bde6f6d3abfed776dc90b9c79f38716787c"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-419.png",
+        "sha256": "fa83f33b8218075c2dbc19ffeaf307996208c9f7ae4941faf5efafc9374281f2"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-424.png",
+        "sha256": "5a6b2a24fe9d0ab3bc897f23ef7e3db890aec0b1bab0beb3ecadc5a373658ebd"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-429.png",
+        "sha256": "de29fbb7cd4fdfff06a1aeedbffffec9768a54d64a75a86e575b188ac2d659c6"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-434.png",
+        "sha256": "baacca6ec02269fa3b54225f759aaf7cb893bf6889ad4b5034062997cf5b17d1"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-439.png",
+        "sha256": "8b1b59bc994afc95af161d0839dd94ee26fe56cea9e960b41fe6e7ce574bca9a"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-444.png",
+        "sha256": "bfcd4a6c4ebfa7d59d43f40b60df34e9bd9dd92800e51ec0f904f1bbcf38fdd8"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-449.png",
+        "sha256": "cee8bd622aba8d8bf9b98d1be5b4e5ecb4d50c463f77a77ca0723d4146958f1e"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-454.png",
+        "sha256": "acab93a52dced286e8bc0118b3fd918707cb7a46786afb82ee5f3ae3284bddec"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-459.png",
+        "sha256": "aee7b6c1e58bc9a0331a127164fc5358de01f4761792afb5e6f5b350ff03f128"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-464.png",
+        "sha256": "b76f7104540b2651aeeb71dada39fd0a57b14ed6f4a6e30ebbbf7227fa02cedb"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-469.png",
+        "sha256": "6d2db4b40a45e05d91b85fa8d09620739fb24e20f08d87baffab4855990f2361"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-474.png",
+        "sha256": "750d3099a68e882d7d7ff89b1139bbf0a57b9246466717db7bc86ede9620609c"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-479.png",
+        "sha256": "6ca9c531297bda3af7b7427cb86c14b826c95b98dfeb609cc79cfdde3eb9ae65"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-484.png",
+        "sha256": "95895f74f936354847e790ff03547a8dca404d60baf9aec39cec8f7e3424dfa5"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-489.png",
+        "sha256": "c2eedd82cf80c69e1968abc24630a300d6b869e7da325990820583629679db87"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-494.png",
+        "sha256": "150bc8d0ebdb683f64e3f047bb83f2c9603a44f96bfb4d94c29ad1a1408acc60"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-499.png",
+        "sha256": "98f30a74715c255070d531ac55c7393132704879a26d744ecdede22af9e453b0"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-504.png",
+        "sha256": "9fcb937e2b6a63f98302646b783b10b23d1b4aba8bb83412a05ba24e1a728424"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-509.png",
+        "sha256": "85ba1f6d53dd2e5a93f91d03def666992448709a77422db17e1da4631d9d5196"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-514.png",
+        "sha256": "c85f09ff746ef9259a1ed81ef2689c2d69854e88bf78ccb3ca17de4b9e79a570"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-519.png",
+        "sha256": "d044f63a0d85d2d1d60bcd9a2bb20ac915f9858908d7b147c9b301f8d2c19d93"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-524.png",
+        "sha256": "87d1d37430be061a8fa9b35e4939648f53f39bde97da229b1e00beec08b692d2"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-529.png",
+        "sha256": "93582be2a81b956418a0236abee893156bfa70f837763753af0b0aebc76c712f"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-534.png",
+        "sha256": "1d98f70053596785d18334c195ced9be1ed319839e36318cbc9fee43132e22fc"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-539.png",
+        "sha256": "126d5ae82fc11c1c09a1d7372cc01b04517e158eac2ed4128ff36639434811b5"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-544.png",
+        "sha256": "126ef671706d4cb68b90c10023d108f1bf15c9a427a88b83b2b6396a81b6c3e0"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-549.png",
+        "sha256": "8373084b8953c93110b018595a35275df8a95e8e736244828cdf3a5163e3d66c"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-554.png",
+        "sha256": "32f1da8ffe65f6e6f77f94dc86cfc31f5784c601f92ee397751aa3f39dc8b6bb"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-559.png",
+        "sha256": "afab4bd52deccdb1c776a4ae7e3fecbf1494e32a604adb1d560e8df160c80c1a"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-564.png",
+        "sha256": "915e5a36276c938df5d9e79b42fba31de69a9a89931a938ecbb7e0929c19b72b"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-569.png",
+        "sha256": "e85ec705b0d222b56fd4d3626e458c3fd611780c868ee96a5815afccd36e98a9"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-574.png",
+        "sha256": "8e09543e7de2edfda5d8f761b6ef7a90e481a663be90ec1cadb251a894317d33"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-579.png",
+        "sha256": "1b3fe673e13f906361bc81518f805af8f9daec7f34a00d40d4018be04bb49c65"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-584.png",
+        "sha256": "60615556c0f84c99e1c4a53ab34b5020fd88a5c513aedc96131b3291df60c55e"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-589.png",
+        "sha256": "42ca6845f1408ad16ed00d10ecb5f45542f748c1e8b52975586fdbd20190ec59"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-594.png",
+        "sha256": "7a1eb86cde3e6f3c7be6b0ffa3c1785fd2be67c242e558e7808327af51c5bee6"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-599.png",
+        "sha256": "bfcbff90918c8f4dbba3f25f9b121970640169ae0fb1eacad442a22893d87e31"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-604.png",
+        "sha256": "0745ee3b96f549bfb82c75bb48f23fd54ac36c379f290c620aa24726988139dd"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-609.png",
+        "sha256": "b8d8568dea4fe9a28f56828ab3c302af74427b015222d2ed2fcf8ff5d3cec5b9"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-614.png",
+        "sha256": "b99961d9455078f12fc93af2939ec031eb1ae8a8093305f99858a8c113fdd44c"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-619.png",
+        "sha256": "36e380b9010c613f59ddc659dcd0c523b4f21cdd2b061635582fa28f591612d7"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-624.png",
+        "sha256": "e4aa1a8790e7c0ff559de38f34c9f71218f3d47c2d970edacbae2b3c4ccbfaf1"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-629.png",
+        "sha256": "ccc0b3a5cd0e582e36c4deb4be1379db1a09229c1571174e83638fb669393196"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-634.png",
+        "sha256": "67347f6b2ffbc9aaf5996f186d709b5062099fa26ec9f2c2e9d9d522b8686a1d"
+      },
+      {
+        "file": "elizabeth_greene_p0-exposed-639.png",
+        "sha256": "4bc5365d2b2bed26d400de61f2215a5cb7d584ca3da1ed3f1c4435797ab0bd03"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-644.png",
+        "sha256": "6bbbbf58d93470ff85a27a2462cc86cf9624a5b44c76dfb70e38ebd95d477b93"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-647.png",
+        "sha256": "2b8a253ec9c4d07e6371c03c125acb46446e2703a0eef0eec25581d3c115f2ee"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-650.png",
+        "sha256": "9a72add393a507f087af5e92392246a532f7e940d7e3e21a7ebf8a76da754932"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-653.png",
+        "sha256": "0977435a57bf5fd609dee8eb11278739b5591d7fea7a9b1a3b7c21d47945f1ec"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-656.png",
+        "sha256": "922e66a63dc6605bed2a60d9b0916ba340f6cde811dcc8f4e0d87797ab2720fc"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-659.png",
+        "sha256": "b207d93f4d982ee7d3b70be480bbfb0fefcdcb58d85816d1355c4637473c9f76"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-662.png",
+        "sha256": "a78c1a19a80fa4d52776ee3e9d5269e5879050611cb03c878f46e9d31f4be020"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-665.png",
+        "sha256": "eb20b545475600d0e92c526bd8b508565d9537f9f497dc4093ca4277c43a444c"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-668.png",
+        "sha256": "8695c591df8cfa27d5df98e59724e5c149a0e560b2f1089c0a4bf2886e8a8d8f"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-671.png",
+        "sha256": "80d489e1e0d64b79836545ffdd7d104fd18454e3cf46691e3ba164a8f9557bd4"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-674.png",
+        "sha256": "549d9c2f087e5a14dea68db54bfc9d4e4caac8ae8d59c8af5fce8062b052ec2a"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-677.png",
+        "sha256": "964115f9f82b96c8bc0542fb9c9ab171af354053cd83c92c377b705bd922b58f"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-680.png",
+        "sha256": "52de9bd87622e63a8a0b95b9b19bf62ccb99d9365be14e630b4ca154f7f4c184"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-683.png",
+        "sha256": "6ec1059b21312981f52dc01ae8a42e896dcb7f520c6c2576ef361aa78acbc54b"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-686.png",
+        "sha256": "df6171d144de265952806b647121d358d2d56e43a5a8e661b0d83ecb65376bbe"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-689.png",
+        "sha256": "cf7e197ebcac7b02dcbf7b2f4f74d2e6f37a133dd52614a62cf9c2d5eec162a7"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-692.png",
+        "sha256": "3a3d43c5ba99f224c6f622a3c493300677171afccb6a8f35b4b5212699c3ab76"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-695.png",
+        "sha256": "f08f90d0110bff23cea552835fdcf8efe41ee7d46a92e690426458ccadd545cc"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-698.png",
+        "sha256": "ce00e033f68a67625897fadd3019adc763f7f6c5ddf9fe0b61caf7c99903f753"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-701.png",
+        "sha256": "a9574e2ed28c1564931e164ad33be4063163f4c54c4c28d984519ca45843ca4e"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-704.png",
+        "sha256": "983fda30a5ca6926f8bf7b45aa5fa9744db4f5a1220d8f9980bf7fcfa439a9a2"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-706.png",
+        "sha256": "005482b0475244ff16f26f3374fe3b0a786db4553d42411901743ac6117c320c"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-707.png",
+        "sha256": "d7f0de079fdb0cc0189e79dbe36b8f54825a684bc2e0da4faeb0a872ffbbd8aa"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-709.png",
+        "sha256": "0aa11b8d715ae7274d48d352b85338fb79ed90a7cb9df6b24e3e7ad743770720"
+      },
+      {
+        "file": "elizabeth_greene_p0-howl-710.png",
+        "sha256": "b4b3cf13c335913a19f965c2f32372c6c330a39a9cd054149b9e3c5a7433ec6f"
+      }
+    ],
+    "evidenceSha256": "a2233aef5e36350b0416d3420e0e1760a57e30a34f4c77b413311145f7523636"
+  },
+  "limits": [
+    "Visual client is Forge 1.20.1; Neo has compilation, unit, server and identical asset checks, not a separate visual run.",
+    "Not original-game video/frame equivalence. Current HUD damage scene interrupts the first HOWL on phase change; full wave radius/damage behavior is covered by server tests and the preceding source visual run.",
+    "Global acquisition distance, priority/selection/cooldowns, pathfinding, damage scaling and impulses remain Minecraft adaptations.",
+    "Original projectile patterns, mount points and guidance are not fully ported.",
+    "P2 FIG behavior is not yet reliably decoded; Goliath original attack curves remain disabled.",
+    "Mother down-state duration is sequential clip-span adaptation; original dynamic exit conditions remain unported."
+  ],
+  "assets": [
+    {
+      "file": "models/encounter_source_actions.json",
+      "sha256": "d8b4a97972f08622510c5f1e269fd4bd8d21904f32926da33e5c54f11e3450c7"
+    },
+    {
+      "file": "models/encounter_leader_hunter_source.json",
+      "sha256": "1b04b1640e556657442e72892c2a3ff0ed66df09fde4cdc9bcd8b9e29c3f0fb3"
+    },
+    {
+      "file": "models/encounter_elizabeth_greene_source.json",
+      "sha256": "d4ec4db521873c4bb02d50ebeb168186b4c418c6b23cb9fa3fd9f82e8b2c6888"
+    },
+    {
+      "file": "models/encounter_goliath_source.json",
+      "sha256": "cee4c833b85166fa608ba9b782132af74aa56285bac68d52614d30b7dacb1f98"
+    },
+    {
+      "file": "geo/elizabeth_greene_mc.geo.json",
+      "sha256": "9056615574a24118cf0518bb32c3edc98630886e7aedb85552a319ce9a9eae1e"
+    }
+  ],
+  "code": {
+    "neo": [
+      {
+        "file": "combat/SourceBossMotion.java",
+        "sha256": "72781cccdf0efd3ccdefb45b9bd1ac72bb794f65baf0bcb66a13b41d306c1f32"
+      },
+      {
+        "file": "combat/SourceBossAction.java",
+        "sha256": "cb5d7b9b49e93d9900d2159c93290dc91fa7b7d4a1608a951da868e466eedd98"
+      },
+      {
+        "file": "combat/EncounterImpact.java",
+        "sha256": "83347917125ed8b416563e62a90fb95c6bd30c4742ce1afd6f250785a5e41156"
+      },
+      {
+        "file": "combat/EncounterTactics.java",
+        "sha256": "fc8f674ec17203fb95fdab66e01e6843348414f20ade5393550b8d69fe9bf05d"
+      },
+      {
+        "file": "entity/EncounterMob.java",
+        "sha256": "f169c8e1e379f55e292842eeeacbad3ac679543df64524526992f16fd7ab8a93"
+      },
+      {
+        "file": "client/model/SourceBossPose.java",
+        "sha256": "7f2dd94bd8b0ca65f442dbd5a679426f6ae7dcd8f3989116fc5121028c6dfcc1"
+      },
+      {
+        "file": "client/model/EncounterPose.java",
+        "sha256": "be0a2dbbcc03a5ed459a08ec4d7b03d147486225e1efd7ac76592e4d066f3326"
+      },
+      {
+        "file": "client/SupremeHunterBossBar.java",
+        "sha256": "6f688db6116f5f87d2875130014fda137fe36da13d9f3b226f3056ec330a5d4d"
+      }
+    ],
+    "forge": [
+      {
+        "file": "combat/SourceBossMotion.java",
+        "sha256": "72781cccdf0efd3ccdefb45b9bd1ac72bb794f65baf0bcb66a13b41d306c1f32"
+      },
+      {
+        "file": "combat/SourceBossAction.java",
+        "sha256": "cb5d7b9b49e93d9900d2159c93290dc91fa7b7d4a1608a951da868e466eedd98"
+      },
+      {
+        "file": "combat/EncounterImpact.java",
+        "sha256": "dd3e250e0f1a8cdf68793c16d3ff8f091827b2cb402ff893f53b839240ab84ee"
+      },
+      {
+        "file": "combat/EncounterTactics.java",
+        "sha256": "fc8f674ec17203fb95fdab66e01e6843348414f20ade5393550b8d69fe9bf05d"
+      },
+      {
+        "file": "entity/EncounterMob.java",
+        "sha256": "3d640a9ae0ed26179c977d96e67564627e34c26ad470246b6ae62a988992092b"
+      },
+      {
+        "file": "client/model/SourceBossPose.java",
+        "sha256": "7f2dd94bd8b0ca65f442dbd5a679426f6ae7dcd8f3989116fc5121028c6dfcc1"
+      },
+      {
+        "file": "client/model/EncounterPose.java",
+        "sha256": "be0a2dbbcc03a5ed459a08ec4d7b03d147486225e1efd7ac76592e4d066f3326"
+      },
+      {
+        "file": "client/SupremeHunterBossBar.java",
+        "sha256": "c20c44712709d2d8712047f5bed0cf2464b11c5059c68994c8805d57a3ac857d"
+      }
+    ]
+  }
+}

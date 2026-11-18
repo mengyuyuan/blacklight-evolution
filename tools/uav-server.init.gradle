@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/uavTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

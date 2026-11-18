@@ -21,7 +21,7 @@ public final class BladeEffects {
         if(surface.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK||surface.getDirection()!=net.minecraft.core.Direction.UP)return;
         var at=surface.getLocation();var block=player.level().getBlockState(surface.getBlockPos());
         player.serverLevel().sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,block),at.x,at.y+.06,at.z,16,.4,.08,.4,.16);
-        player.serverLevel().sendParticles(ParticleTypes.DUST_PLUME,at.x,at.y+.08,at.z,4,.4,.06,.4,.035);
+        player.serverLevel().sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),at.x,at.y+.08,at.z,4,.4,.06,.4,.035);
         var forward=Vec3.directionFromRotation(0,player.getYRot());
         for(int i=-2;i<=2;i++){
             var point=at.add(forward.scale(i*.25));
@@ -35,25 +35,6 @@ public final class BladeEffects {
         com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.BLADE,"ground",at,1F,1F);
     }
     public static void hit(ServerPlayer player,LivingEntity target,WeaponMove move){
-        boolean heavy=heavy(move);
-        var center=target.getBoundingBox().getCenter();
-        var eye=player.getEyePosition();
-        var contact=target.getBoundingBox().clip(eye,center).orElse(center);
-        contact=contact.add(eye.subtract(center).normalize().scale(.04));
-        var forward=Vec3.directionFromRotation(0,player.getYRot());
-        var right=new Vec3(-forward.z,0,forward.x);
-        boolean reverse=move==WeaponMove.BLADE_RETURN||move==WeaponMove.BLADE_COMBO_C2;
-        var cut=move==WeaponMove.BLADE_DIVE?new Vec3(0,-1,0):right.scale(reverse?-1:1).add(0,reverse?.28:-.35,0).normalize();
-        float size=(float)Math.clamp(target.getBbHeight()*.45,heavy?.7:.45,heavy?1.35:.95);
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player,new CombatImpactPayload(contact.x,contact.y,contact.z,size,false,true,(float)cut.x,(float)cut.y,(float)cut.z));
-        boolean metal=target instanceof net.minecraft.world.entity.animal.IronGolem;
-        int count=heavy?18:11;
-        for(int i=0;i<(RagdollImpact.supportedBody(target)?0:count);i++){
-            double along=(i/(double)(count-1)-.5)*size;
-            var point=contact.add(cut.scale(along));
-            var velocity=cut.scale(.12+player.getRandom().nextDouble()*.2).add(forward.scale(.04)).add(0,player.getRandom().nextDouble()*.1,0);
-            player.serverLevel().sendParticles(metal?ParticleTypes.CRIT:(i%3==0?DARK:RED),point.x,point.y,point.z,0,velocity.x,velocity.y,velocity.z,1);
-        }
-        if(metal)player.level().playSound(null,target.blockPosition(),SoundEvents.ANVIL_HIT,SoundSource.PLAYERS,.18F,heavy?.7F:.9F);
+        CombatImpactEffects.target(player,target,move);
     }
 }

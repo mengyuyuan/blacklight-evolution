@@ -1,0 +1,18 @@
+// Pending real-AI jump/counter regressions; opt-in disposable world only.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/feedbackTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+    sourceSets.main.java.exclude { entry -> !entry.directory
+        && entry.file.path.replace('\\','/').contains('/src/feedbackTest/')
+        && !(entry.file.name in ['CommonInfectedLeapGameTest.java','HunterCounterGameTest.java']) }
+    def stagePlayerCreature=tasks.register('stagePlayerCreature',Sync) {
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('player-creature-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stagePlayerCreature
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('player-creature-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

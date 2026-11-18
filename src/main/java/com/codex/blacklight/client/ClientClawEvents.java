@@ -84,6 +84,7 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(GRAB);
+        event.register(ContextActionInput.KEY);
         event.register(CYCLE_FORM);
         event.register(TOGGLE_CLAWS);
         event.register(PROTOTYPE_MODE);
@@ -96,7 +97,14 @@ public final class ClientClawEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.BLACKWATCH_HELICOPTER.get(),com.codex.blacklight.client.renderer.HelicopterRenderer::new);
+        com.codex.blacklight.registry.EncounterEntities.CREATURES.values().forEach(type->event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.EncounterMob>(context,com.codex.blacklight.entity.EncounterMob::asset)));
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.UAV.get(),com.codex.blacklight.client.renderer.UavRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SEGMENT_CORPSE.get(),com.codex.blacklight.client.renderer.GreeneSegmentCorpseRenderer::new);
         event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
+        event.registerEntityRenderer(ModEntities.HELLFIRE_BLAST.get(),net.minecraft.client.renderer.entity.NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.MILITARY_TRUCK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"truck"));
         event.registerEntityRenderer(ModEntities.MILITARY_APC.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"apc"));
         event.registerEntityRenderer(ModEntities.MILITARY_TANK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"tank"));
@@ -114,6 +122,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.BLACKWATCH_OFFICER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
         event.registerEntityRenderer(ModEntities.BLACKWATCH_COMMANDER.get(),context->new com.codex.blacklight.client.renderer.BlackwatchRenderer(context,false));
         event.registerEntityRenderer(ModEntities.THROWN_BLOCK.get(),com.codex.blacklight.client.renderer.ThrownBlockRenderer::new);
+        event.registerEntityRenderer(ModEntities.HYDRA_DEBRIS.get(),com.codex.blacklight.client.renderer.HydraDebrisRenderer::new);
         event.registerEntityRenderer(ModEntities.BIOMASS_HUSK.get(),com.codex.blacklight.client.renderer.BiomassHuskRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
@@ -126,6 +135,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.EVOLVED_QUILL.get(),com.codex.blacklight.client.renderer.EvolvedQuillRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_TUMOR.get(),com.codex.blacklight.client.renderer.InfectedTumorRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HUNTER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.LEGACY_BRAWLER.get(), com.codex.blacklight.client.renderer.BlacklightHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.SUPREME_HUNTER.get(), com.codex.blacklight.client.renderer.SupremeHunterRenderer::new);
         event.registerEntityRenderer(ModEntities.SUPREME_HUNTER_DEBRIS.get(), context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context,2.6F,false));
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HYDRA.get(), com.codex.blacklight.client.renderer.BlacklightHydraRenderer::new);
@@ -205,6 +215,8 @@ public final class ClientClawEvents {
     /** Opens the timeline once for repeatable development screenshots and nothing else. */
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        com.codex.blacklight.client.audio.GreeneProjectileAudio.tick();
+        ContextActionInput.poll();
         resetInputOwner();
         suppressPrototypePlayerList();
         if(VehicleControls.riding()){
@@ -255,7 +267,7 @@ public final class ClientClawEvents {
                 && (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))) {
             event.setCanceled(true);tickGrabButtons();return;
         }
-        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
+        if(com.codex.blacklight.mode.PrototypeSurvivalLock.holdingPlacementItem(minecraft.player)||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 
@@ -410,7 +422,8 @@ public final class ClientClawEvents {
             return;
         }
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
-        if (ClientWeaponCombat.active() || minecraft.player.getData(ModAttachments.CONSUMING) || !state.isInfected() || !state.isPrototypeMode()
+        if (com.codex.blacklight.mode.PrototypeSurvivalLock.holdingPlacementItem(minecraft.player)
+                || ClientWeaponCombat.active() || minecraft.player.getData(ModAttachments.CONSUMING) || !state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) {
             clearLeftAttackHold();
             lastPhysicalLeftDown = physicallyDown;
@@ -549,7 +562,7 @@ public final class ClientClawEvents {
         if(state.isPrototypeMode()&&minecraft.player.getData(ModAttachments.CONSUMING)) {
             event.setSwingHand(false);event.setCanceled(true);tickGrabButtons();return;
         }
-        if(com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
+        if(com.codex.blacklight.mode.PrototypeSurvivalLock.holdingPlacementItem(minecraft.player)||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
                 || state.getActivePower() != PowerForm.CLAWS) return;
 

@@ -1,0 +1,613 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T23:39:03",
+  "status": "Source circle movement checkpoint; complete conditional tactic bank and whole-project goal remain active.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-circle-source.json",
+    "sha256": "133a4487ee06495fa83fa8b04cec011d5a8f7189ee63e79b5cfae50e4cfc549b"
+  },
+  "previousCheckpoint": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-rapid-blast-validation.json",
+    "sha256": "0b146de06b3edb5a7953c7ef9b1297283b8f96c38ef97abb0c818abb31c7e948"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 74,
+      "nativeHelicopterTests": 78,
+      "circleCases": [
+        "hydra=false raised=true samples=106 height=33.550428505714464/33.550428505714464 speed=0.6663584700005919 gunShots=40 travel=38.670246072816724 health=49720.0 max=50000.0 contacts=0",
+        "hydra=true raised=false samples=106 height=16.0/16.0 speed=0.6681556083907118 gunShots=40 travel=38.12301474373165 health=49720.0 max=50000.0 contacts=14",
+        "hydra=false raised=false samples=106 height=6.094098818489314/6.094098818489314 speed=0.7717903012879948 gunShots=40 travel=42.80962524813317 health=49720.0 max=50000.0 contacts=0"
+      ],
+      "hoverCases": [
+        "case=hover-reload-no-duplicate entry=300 firstShot=329 age=410 rockets=1 gunShots=52 speed=0.4160584923966749 reloadWait=true reloadFire=true",
+        "case=hover-cover-cancel-reacquire entry=300 firstShot=537 age=537 rockets=1 gunShots=64 speed=0.0 reloadWait=false reloadFire=false",
+        "case=hover-brake-wait-fire-resume entry=300 firstShot=322 age=346 rockets=1 gunShots=41 speed=0.035 reloadWait=false reloadFire=false"
+      ],
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-hellfireUnit-passed.log",
+          "sha256": "a16de1c0efd340cf8c02cdca67f7dae7ead995af866e912366674b0f0da5aa10"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-helicopterHullServer-passed.log",
+          "sha256": "7ed49fa54865978920a2a9fd6787c72e8bb5482ab25f13ed9da7f086dcc5af98"
+        },
+        "helicopterCircleVisual": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-helicopterCircleVisual-passed.log",
+          "sha256": "ee76a7a2c7e81225155cf545ba79a5a10a18849a1c67c7ca3fc18b4ec8a0e19a"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "d1bbb7bd1980fac80d107db7ee3bb4b941f6f21bbfc86c736b9d316e29e78d89"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "2e542ceffb52e4e98d5698af72eaf1624d901a9f3fcde861c936ed02557664ce"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "16f9d07cdf75da6978bad1e3f1a7118bbd603cec78de6aa320d61a9ceffc0906"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "a04f51e308b8f3ed140f698f7ef27f552d5b3ce8446c9d0a0655d51bc945ba67"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest.xml",
+          "sha256": "a6f68e1e8df633975e257358b3fdd0788958486abf1e4780c5a0ef9e45058584"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "c1e3bc23cc0cdf49597e0ec38f52da4c64024b5b718f6dfe5c83a3552efb71cd"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "6477f75c0598cf116c69e59a3828534220c43f7e13a17ec82cba98e9aa95cb0e"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "9d59edac1290e7deac49865526ecddd387564265679b8f019fa5422045559215"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "6e44b0f2379dd90bbc7566129d79f71ffa2fc51d04efb3de2431a51b9ef0854a"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "89fecb334b4fe246ded827629ac49c8b785e1d9259584d00befe4379dd549c5f"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "29e99afc931310904bc14d61fdc7ddea3e5cfd7261316b546ebf76b6c01f3fd8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest.xml",
+          "sha256": "a8b575e7d14046739e8987ae63237d90ca07ae6085845591610903976e34d881"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "363a2d9faddcf789f4f8df0299351ae3d2109a4be86e390965a3aa9842aff35d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "6c2b3a7dbf1b211706dccad1afa39b0ac188c94191f4119fac0234fb573cf389"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "2308985fdec42214f953a593f8c8aa6318cc54107dddf0f22155f099c3d7a833"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "0b80237ece36750a5886b473289773ca5cc85171fb11b78c6ec1c6b155117835"
+        }
+      ],
+      "initialFailure": {
+        "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-initial-server.log",
+        "sha256": "f7deecc7f135f483899bb2b3d9da0f290ac303fe3c6ab9fa07052f5b0c5745ce"
+      },
+      "client": {
+        "frames": 103,
+        "circleSamples": 105,
+        "circleTravel": 40.59148050167958,
+        "firstHover": 300,
+        "firstShot": 323,
+        "launchSpeed": 0.0,
+        "impact": true,
+        "maximumRackError": 3.852414385327219e-05,
+        "rackSamples": 8560,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.coaxial",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\evidence.json",
+          "sha256": "755fe6be7b22a2a7e2f9330718e9ce2dc011259a0d51dd318fa467223feecfd9"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-circle-review.png",
+          "sha256": "8421024b552e191e07a04452f0b8a729a2161015e471f4b25cc5d161e97170d2"
+        },
+        "reviewedFrames": [
+          {
+            "image": "circle-100-STRAFE.png",
+            "age": 101,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-100-STRAFE.png",
+            "sha256": "d8d60e30f573790c32a87afa18cca558f1f1091bfe99f276c6fee1f60496f9ce"
+          },
+          {
+            "image": "circle-150-STRAFE.png",
+            "age": 150,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-150-STRAFE.png",
+            "sha256": "4f4128a47c3c7c8726cd9ca7e228a520ed10a65745e5ab93994945ba2d80af61"
+          },
+          {
+            "image": "circle-180-STRAFE.png",
+            "age": 180,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-180-STRAFE.png",
+            "sha256": "91d7d7c7203e60f5a10e7b5ca5efb63ee9e79f0a5b1c9733492c7a301eaf26fc"
+          },
+          {
+            "image": "circle-220-STRAFE.png",
+            "age": 220,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-220-STRAFE.png",
+            "sha256": "92dae5744e6816749a5ad9592837af716d24fad23a82a91796f8c854ad18396d"
+          },
+          {
+            "image": "circle-260-STRAFE.png",
+            "age": 261,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-260-STRAFE.png",
+            "sha256": "8be50e1957eaeabfcea5395e57d478bac031e9e389eaa1389b61ce3e3d394ac4"
+          },
+          {
+            "image": "circle-300-WAIT.png",
+            "age": 300,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-300-WAIT.png",
+            "sha256": "e01aabbbf7955a7e11c245f68ff0b4c1aa26bdc0ae986ceac4bb673399c4c51c"
+          },
+          {
+            "image": "circle-312-WAIT.png",
+            "age": 312,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-312-WAIT.png",
+            "sha256": "e0eb2407875351c0031d75f438dc3b4ad443568b251acf139634c4a831fab971"
+          },
+          {
+            "image": "circle-322-AIM.png",
+            "age": 322,
+            "stage": "AIM",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-322-AIM.png",
+            "sha256": "6f8b596811f1792285f9cfe777875f466e45c6c8579a8045ce3960cfefa31fee"
+          },
+          {
+            "image": "circle-323-FIRE.png",
+            "age": 324,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-323-FIRE.png",
+            "sha256": "7bdd264f778cb164b1a962b3d34244ed2a99efd8cb17ac998021a5a82ddcbbab"
+          },
+          {
+            "image": "circle-324-FIRE.png",
+            "age": 325,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-324-FIRE.png",
+            "sha256": "727fc34b1636127f37988acfcf574f851d2aa53546092061f2bd58b982e15c8d"
+          },
+          {
+            "image": "circle-333-RECOVER.png",
+            "age": 333,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-333-RECOVER.png",
+            "sha256": "ab12a815adf91759858c7f23cc28cf40e952bf8f343e11936728e35c735eeb86"
+          },
+          {
+            "image": "circle-342-RECOVER.png",
+            "age": 343,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-342-RECOVER.png",
+            "sha256": "27675cbf9a22194192d800eaee54873c8b8ac5e89d7b4122baf75fd3a07a4ac0"
+          },
+          {
+            "image": "circle-345-RECOVER.png",
+            "age": 346,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-345-RECOVER.png",
+            "sha256": "e3a9cb94de8b2ce0d8d7356f22f264a9cf0b471e627872bcfe0348eb26de715a"
+          },
+          {
+            "image": "circle-360-STRAFE.png",
+            "age": 360,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-360-STRAFE.png",
+            "sha256": "9fc2cd56cb463d2dd8ca05011c54e05adadf36d356ad8db1039f68f820a86f45"
+          },
+          {
+            "image": "circle-390-STRAFE.png",
+            "age": 390,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-390-STRAFE.png",
+            "sha256": "0f0d3913152b1817e95a672d4a165375d4d8704b4deb5b6841ab03a614787a42"
+          },
+          {
+            "image": "circle-420-STRAFE.png",
+            "age": 420,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-frames\\circle-420-STRAFE.png",
+            "sha256": "51179465a06360f967f1311a7347c037b23ac9febe5fc2372022725b69a1ea83"
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCircleStrafe.java": "c0af0acec4071abbe5106f7955dc180b80249e000220d5372c0d2457c37277c7",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "85f5c37bc5046844a096f4201b50577ba6a5ee0a9ec9b051d2aef2fc23cbf0dd",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "b51a7152b54b99612b311fa88ba40dedbca34c7a0144c883d52a9b82754e8691",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "e4d0e1dc343f76f00bf857f7505bf6eda48d1d4d6722d4e27a26faa5ee50e0e8",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterCircleStrafeTest.java": "8b41cf852f9ab4d4fb8b338c23430a321720097d62b645464c6276422f1cf2da",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCircleGameTest.java": "13c405d150033e996c60bce097de260ec86354feeae5eff7ddb29cca449525bc",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "190e702b2fff3633dbcc7bf50c84bb0be6c68b2579a4e53bc28557b493cd58d9",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHoverGameTest.java": "d304978595d6aaab2454d70f3f77b8c608bd30e2fefef03424ae78291e7916ce",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "e80d5e600b272225179f2cef3ce745772b5f34676023a45a8b41b5b0c0333b7c",
+        "src/circleVisual/java/com/codex/blacklight/client/HelicopterCircleVisual.java": "68f1120806a76f015a8591474e841b8b52029c4ddac5d95924ccbf3883abf4a8",
+        "tools/helicopter-circle-visual.init.gradle": "22b5ed14e107067a02898dc38f8dcd8c5583f07b4bf246aa91676f780f58fd24"
+      }
+    },
+    "forge": {
+      "unitTests": 74,
+      "nativeHelicopterTests": 78,
+      "circleCases": [
+        "hydra=false raised=true samples=106 height=33.47493400392922/33.47493400392922 speed=0.7918380614017532 gunShots=40 travel=44.25579472760835 health=49720.0 max=50000.0 contacts=0",
+        "hydra=true raised=false samples=106 height=16.0/16.0 speed=0.6096057997950086 gunShots=39 travel=35.51960489234168 health=49720.0 max=50000.0 contacts=14",
+        "hydra=false raised=false samples=106 height=6.060542564128781/6.060542564128781 speed=0.7315992167774463 gunShots=40 travel=41.07640094788205 health=49720.0 max=50000.0 contacts=0"
+      ],
+      "hoverCases": [
+        "case=hover-reload-no-duplicate entry=300 firstShot=337 age=418 rockets=1 gunShots=54 speed=0.39290327222937466 reloadWait=true reloadFire=true",
+        "case=hover-cover-cancel-reacquire entry=300 firstShot=529 age=529 rockets=1 gunShots=64 speed=0.0 reloadWait=false reloadFire=false",
+        "case=hover-brake-wait-fire-resume entry=300 firstShot=341 age=369 rockets=1 gunShots=41 speed=0.035 reloadWait=false reloadFire=false"
+      ],
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-hellfireUnit-passed.log",
+          "sha256": "a2182411d36f7e85f24c503fd5d8fac467fccf4dc382d5cfe3b7b298ee9b7b88"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-helicopterHullServer-passed.log",
+          "sha256": "ea3ea14c2ebf102acf5d0f7e15b20376693b1afabfebe870cab25fac45561e3a"
+        },
+        "helicopterCircleVisual": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-helicopterCircleVisual-passed.log",
+          "sha256": "9f42c125443dc6a593278191067c359bf48c282ff08cbf9cb2b76eeb48becfb9"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "f908f02f57e05943f54992e48d06c0867570bb9721bf4e1b6824136991635d1c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "ea1e87e1bc46c96f691767abe24f8c6e14d8859a6815f03361a0d4518ae66387"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "101d9df3666360b31db08b27af1e821a61ddb5a6479780de901c0d5631676794"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "48935480c12dc1d1c4f1bedfa39a75ccf96fd399a08c72aea23cf3c1b896694f"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterCircleStrafeTest.xml",
+          "sha256": "ab1f468f9f3dee86ff40e8fb9beddca4e9d422355821ab1fe1df5fe80f30c7b2"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterControlPayloadTest.xml",
+          "sha256": "209ced22417c56c16ebb748c919279c5b1ae718090f0a00d79951218ec5f6675"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "859ce7bd7ea338f53177b2d0a796f884b2d5c81b162b2438a024a7a4a6b6a5fb"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "827b6b823723399f12a3fd179795fea50dd60d81acdc4aa19519b5b4452f4c98"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "185a7460be8f747324f401a5f1dcd6b786b39a91cead2167b4630a55b43f3022"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "1acb6e974985fd95afd18354b42c043e42883e19c84fbce4a976107dec906bbd"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "68dc0457f7812ae381b2d3acae0a7357c9a60dbbbc6e3938115179de546cc11d"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidBlastTest.xml",
+          "sha256": "88f5649a7d97645336796d3404e433a349a6a5ab1a94f4bd8a5abab8951efa85"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRapidTest",
+          "tests": 5,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRapidTest.xml",
+          "sha256": "be923ed073b4e055ecb8dd657ea03c3e12c21bacee77ab0940c4ed3678966fb9"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "3a7428562117975b56f9eb0f6f31687bd9e1e46c3ebd848da1eaa746fa9abe6c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "a53f8b43350f2f654b578fa8bbba2a408963a49ccadb3d3cd4e70718e8299e0f"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "bcbb493a924a91d2e77305489db645a84f180bf60a93feac50880c2ab51a1107"
+        }
+      ],
+      "initialFailure": {
+        "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-initial-server.log",
+        "sha256": "f1ef4cb5e22f041a45d19bfb1aa8dfbd23a07fc8dfc9f4d7c11560f63148621c"
+      },
+      "client": {
+        "frames": 105,
+        "circleSamples": 105,
+        "circleTravel": 44.426082377452225,
+        "firstHover": 300,
+        "firstShot": 324,
+        "launchSpeed": 0.0,
+        "impact": true,
+        "maximumRackError": 1.7373191718038354e-05,
+        "rackSamples": 8776,
+        "activeSounds": [
+          "blacklight:firearm.impact",
+          "blacklight:vehicle.coaxial",
+          "blacklight:vehicle.helicopter_rotor",
+          "blacklight:vehicle.helicopter_turbine",
+          "blacklight:vehicle.rocket"
+        ],
+        "evidence": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\evidence.json",
+          "sha256": "a0c3b000db29724de556efc27ac810a8e406b23fde39a10080b410776c921c88"
+        },
+        "reviewSheet": {
+          "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-circle-review.png",
+          "sha256": "41d3c3b34b71a176b40fe39262b951ad6067326919a6ce5dc641492ae0fb45b6"
+        },
+        "reviewedFrames": [
+          {
+            "image": "circle-100-STRAFE.png",
+            "age": 100,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-100-STRAFE.png",
+            "sha256": "1ade04260cbd9f85158f613ddbddb56e91215c63f0eb704d727fa6349f466994"
+          },
+          {
+            "image": "circle-150-STRAFE.png",
+            "age": 150,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-150-STRAFE.png",
+            "sha256": "db5feb7f4d33931d0cb1132cd34db899dcf69c13c37aa9c4a9ee972af2cc1e9a"
+          },
+          {
+            "image": "circle-180-STRAFE.png",
+            "age": 180,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-180-STRAFE.png",
+            "sha256": "9e25b8290596e0eafe1287181eb81bb1a2ca7fb9b18726c09187d61876db1fd6"
+          },
+          {
+            "image": "circle-220-STRAFE.png",
+            "age": 220,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-220-STRAFE.png",
+            "sha256": "11c650ad74d21a7ddb9e65d78fbccc0d9bc09c491d6a69d5a4b52898a89815ac"
+          },
+          {
+            "image": "circle-260-STRAFE.png",
+            "age": 260,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-260-STRAFE.png",
+            "sha256": "24ddb91b6e0edb4459f7f5f266e838d8275187074b2d1919633f100161289925"
+          },
+          {
+            "image": "circle-300-WAIT.png",
+            "age": 300,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-300-WAIT.png",
+            "sha256": "ca81dc8d2599b33af8179cfff53fa06830143d77eee28ac98c60072d9fa32176"
+          },
+          {
+            "image": "circle-312-WAIT.png",
+            "age": 312,
+            "stage": "WAIT",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-312-WAIT.png",
+            "sha256": "e8ee9d4d2d57d573eb0664efc319dd66b6ec76ffbc36b630afd266aa9c2143dc"
+          },
+          {
+            "image": "circle-323-AIM.png",
+            "age": 323,
+            "stage": "AIM",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-323-AIM.png",
+            "sha256": "a31913eec96c96c0fdab842a7ba4fee23eec2458978b984ab91a618a1932b85f"
+          },
+          {
+            "image": "circle-324-FIRE.png",
+            "age": 325,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-324-FIRE.png",
+            "sha256": "35354d056f723b2e6443333bcc8b1abd6c98673127cef669c43aa1890ede33c7"
+          },
+          {
+            "image": "circle-326-FIRE.png",
+            "age": 326,
+            "stage": "FIRE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-326-FIRE.png",
+            "sha256": "896dd88b99d57294faf1455baf8e5a9c157213d8eca6fe4c3912e9b53a787a7b"
+          },
+          {
+            "image": "circle-333-RECOVER.png",
+            "age": 334,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-333-RECOVER.png",
+            "sha256": "4e9da0f335567d32249b366b77f2bdc4a4d6caf3ce1d6eeaea2ec1454a790221"
+          },
+          {
+            "image": "circle-342-RECOVER.png",
+            "age": 343,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-342-RECOVER.png",
+            "sha256": "cf4ad4063b941aea9fa2d8fc6c32db3c43a0d1585bd55a9e07fc3fcc82fdae43"
+          },
+          {
+            "image": "circle-347-RECOVER.png",
+            "age": 348,
+            "stage": "RECOVER",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-347-RECOVER.png",
+            "sha256": "7e0c742672877fdfb35b028607b7747f03360b76ee57a1687949b1fb8c38e91a"
+          },
+          {
+            "image": "circle-360-STRAFE.png",
+            "age": 360,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-360-STRAFE.png",
+            "sha256": "208deb04c96a386b214696702217785950835e5096e7eecadbd960a0be972f54"
+          },
+          {
+            "image": "circle-390-STRAFE.png",
+            "age": 391,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-390-STRAFE.png",
+            "sha256": "490ab97afc08b79d54d3b187524aef2023f52ede872f7da8da85156fa56cbeac"
+          },
+          {
+            "image": "circle-420-STRAFE.png",
+            "age": 420,
+            "stage": "STRAFE",
+            "file": "D:\\CodexCache\\helicopter-circle-qa\\forge-frames\\circle-420-STRAFE.png",
+            "sha256": "d15411eb3dd31ca8f343cda586fe4229d66b1dcf911f0c796c13bad676325cd7"
+          }
+        ]
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCircleStrafe.java": "a9f1561959337b87fcf688bac58bae80d778cd30f4c1035a12df2edef1a52970",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "85f5c37bc5046844a096f4201b50577ba6a5ee0a9ec9b051d2aef2fc23cbf0dd",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "fc32276495d90e9e713953370df471ec496f4c9727f4b0201f6977e10bea8c84",
+        "src/main/java/com/codex/blacklight/network/ModNetwork.java": "47493376f19089c8f7ea8fadd2d48ce8ba3550a6f0be7bc02d304383e7bebd64",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterCircleStrafeTest.java": "7478b6f1b8cd5c9075490d24e19d1f55b930ab2896eb1ab7b0c20feabf429007",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCircleGameTest.java": "9e8e71dbec139578f4bcd7de29498354dde391040e47da61e25d8595043e85ba",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterCombatGameTest.java": "5b677331761eb0c04dde95b062c967ceee036352aaa74b5f60777fd3a1c5b9b6",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterHoverGameTest.java": "613656cb92354edb7d4b5ccfd14273fb46ce1873bd8f1775d36e421ef353d48b",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "68ceb0d1254528a73b8004795e293465f9612b4e08fa40c91d40ae3138deb030",
+        "src/circleVisual/java/com/codex/blacklight/client/HelicopterCircleVisual.java": "3b9445e3ae51d4c335fb45788703930948d1a4b1bec9f548e79aec8fca9e8c57",
+        "tools/helicopter-circle-visual.init.gradle": "47f7860608f280c8242df42a1c9bb6c3ce7fe410905c65f820369db6f09c57c9"
+      }
+    }
+  },
+  "coverage": [
+    "Both platforms use native aircraft motion and physics to maintain a20..30 horizontal band and separate ordinary6..10/hydra15..20 height bands. A nearby105-high pillar raises ordinary band relative to target81 to30..34. At least100 consecutive native observations per scene verify height/distance and continued tangential travel.",
+    "Actual craft NBT save/load at scene tick120 preserves the sampled .6..8 speed. New unit integration converges from inside, outside and coincident starting positions through production acceleration rather than directly assigning positions.",
+    "Full78 native helicopter suite retains finite player70mm/Hellfire, phased blasts, projectile/hull collision, source infinite AI ammunition, crew/PvP/events, hover timing and reload. Ordinary and actual multipart Hydra circles require chin-gun shots; Hydra additionally requires live native proxies, reduced parent health and accepted incoming-contact effects. All three new cases preserve player stores.",
+    "Actual integrated clients perform source circle travel, brake into the source-timed Hellfire hover, fire one guided missile, accept its target impact, then resume chin gun. Native renderer checks all eight fixed AI rack nodes against actual launch positions and active original mod audio channels."
+  ],
+  "failuresAndCorrections": [
+    "Initial native runs exposed actual residual hover motion after replacing the slower orbit: the old fixed-anchor flight controller pulled back toward its entry point during the short pre-aim wait. The production hover now requests zero translation, braking via existing acceleration with no teleport or direct velocity reset. Final native and client runs verify launch speed below .04.",
+    "Old cover fixtures assumed the former circular path: a midpoint cube could intersect the smaller circle airframe, and a fixed world-axis wall could miss the new path. Replaced with empty-interior opaque enclosures around actual targets; noCollision asserts valid target interiors. Occlusion assertions, source timer and no-fire requirements remain.",
+    "Friendly-ray fixture moved to an isolated forced-chunk sortie and waits for actual STRAFE state/entity time. It additionally removes the intervening friend and requires real gunfire to resume with the friend unharmed; this is stronger than the old fixed-tick no-shot assertion.",
+    "Multipart gun audit found that the AI rejected non-LivingEntity parts after native ray selection. It now resolves parent allegiance and applies an exact animated contact. The strengthened Hydra test then revealed the shared fixture delayed cleanup had discarded owned body proxies; diagnosis recorded real mesh intersections but part isAlive=false. Cleanup now retains parts whose parent belongs to the fixture, and the test requires live parts, real gunfire, health loss and accepted contact effects."
+  ],
+  "review": {
+    "method": "Both native16-frame contact sheets and a full-size aircraft frame per platform inspected, including circle flight, braking/hover, missile impact and resumed gun.",
+    "audio": "SoundManager active events with logical sound1 and physical OpenAL gain0; native playback proven, no human listening/source waveform identity claim."
+  },
+  "limits": [
+    "Default combat movement remains circle outside Hellfire. Conditional weighted selection of source circle/strafe/simple-engage and token/reserved-volume coordination are not yet implemented; this is not complete helicopter AI.",
+    "MC loaded-column heightmap,20tick cache,.65 maximum speed,.035 acceleration, one-block phase tolerance and coincident-position heading fallback are explicit engine adaptations.",
+    "Audit identifies separate Blackwatch/standard70mm branches and a disabled legacy simple-engage controller. It does not prove absence of all scripted70mm AI in other source trees; no unrestricted Blackwatch70mm AI was added.",
+    "Only integrated clients were run. Dedicated multiplayer, original full model/FX/audio identity, all named creatures and remaining soldier behavior remain open.",
+    "The native Hydra case verifies AI chin-gun contact only. Client capture uses an ordinary infected target; no new Hydra visual, manual multipart gun or multipart rocket verification is claimed.",
+    "No new shared ground-vehicle29-case regression or destruction-visual run is claimed; preceding checks remain historical. No release/install/commit or user-world changes."
+  ],
+  "qaDriver": {
+    "file": "D:\\CodexCache\\creature-combat-run.ps1",
+    "sha256": "86a1a8b0cd2fc9f427964f39ea61da92fb56c0635d357f51610825d3a61487e3"
+  },
+  "multipartDiagnostic": {
+    "file": "D:\\CodexCache\\helicopter-circle-qa\\neo-hydra-diagnostic.log",
+    "sha256": "9cd41a346ef0a47ed64422d7cb76e54251ef4eea61fdcb87ad9574c59af4358c"
+  }
+}

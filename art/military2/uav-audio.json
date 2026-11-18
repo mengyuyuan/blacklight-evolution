@@ -1,0 +1,60 @@
+{
+  "origin": "Project-authored synthesis referenced to source roles, measured durations and broad dominant frequency bands; not original recordings or a waveform reconstruction",
+  "sourceAudioPackageSha256": "6c1a48ddb61fe61242ee9c5f308f6cc870e0a85a5e46da7e700a78b90a062493",
+  "sampleRate": 48000,
+  "cues": [
+    {
+      "cue": "rotor",
+      "sourcePatch": "UAV_idle",
+      "sourceSample": "uav_idle_01",
+      "loop": true,
+      "seconds": 1.5473333333333332,
+      "decodedSamples": 74272,
+      "decodedPeak": 0.682846188545227,
+      "rms": 0.26108771562576294,
+      "loopBoundaryJump": 0.0006391312927007675,
+      "sha256": "1532c708fbfa0551abb0492f20a892c2139445bf16eee6f70ee7a59d61a53f25"
+    },
+    {
+      "cue": "seeing",
+      "sourcePatch": "UAV_seeing",
+      "sourceSample": "uav_seeing_01",
+      "loop": true,
+      "seconds": 1.0246666666666666,
+      "decodedSamples": 49184,
+      "decodedPeak": 0.688453733921051,
+      "rms": 0.3066001534461975,
+      "loopBoundaryJump": 0.006376870907843113,
+      "sha256": "78ed700da3840dbea1b830e1ca187e68e94a90b4b4b96c696b81e11ecb357f05"
+    },
+    {
+      "cue": "scan",
+      "sourcePatch": "UAV_servotalk",
+      "sourceSample": "uav_start_scan",
+      "loop": false,
+      "seconds": 0.53,
+      "decodedSamples": 25472,
+      "decodedPeak": 0.7058570981025696,
+      "rms": 0.26959946751594543,
+      "loopBoundaryJump": null,
+      "sha256": "0d0110d34611f70edf05a9870658e15a6a290647953ea10f80bd89f706884595"
+    },
+    {
+      "cue": "alert",
+      "sourcePatch": "UAV_alert",
+      "sourceSample": "uav_alerted",
+      "loop": false,
+      "seconds": 2.466,
+      "decodedSamples": 118368,
+      "decodedPeak": 0.6865028738975525,
+      "rms": 0.2533058524131775,
+      "loopBoundaryJump": null,
+      "sha256": "42db32d0172d9e2ae0b861fec2ea3ab50ccc366ed5e49a29c2bb5bdb34b7bd81"
+    }
+  ],
+  "additional": "Existing uav_break retained for accepted destruction. Legacy transmit/confirm event IDs and files retained but no longer triggered by UAV; original state cues replace the invented recurring transmission/acknowledgement beeps.",
+  "limits": [
+    "Original recording timbre is not claimed identical",
+    "Minecraft range, volume, maximum simultaneous voices and recognition clock are adaptations"
+  ]
+}

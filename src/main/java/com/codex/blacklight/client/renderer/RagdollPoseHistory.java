@@ -21,7 +21,11 @@ final class RagdollPoseHistory {
     }
     private final List<Pose> poses=new ArrayList<>();
     void record(double time,Vec3 position,Quaternionf rotation,float scale){
-        if(!poses.isEmpty()&&time<poses.getLast().time)throw new IllegalArgumentException("Pose clock moved backwards");
+        // The client world clock can be corrected backwards by a server time
+        // update after a stall. Old samples no longer identify this body's pose
+        // on the corrected clock; start a new history instead of crashing or
+        // using future skin positions to authorize delayed cuts.
+        if(!poses.isEmpty()&&time<poses.getLast().time)poses.clear();
         var pose=new Pose(time,position,rotation,scale);
         if(!poses.isEmpty()&&time==poses.getLast().time)poses.set(poses.size()-1,pose);else poses.add(pose);
         while(poses.size()>96)poses.removeFirst();

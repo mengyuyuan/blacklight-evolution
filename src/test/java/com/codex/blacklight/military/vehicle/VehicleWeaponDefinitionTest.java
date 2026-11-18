@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VehicleWeaponDefinitionTest {
-    @Test void fiveExplicitWeaponsMatchActualAmmoAndCooldownStorage(){
-        assertEquals(5,VehicleWeaponDefinition.ALL.size());
+    @Test void sevenExplicitWeaponsMatchActualAmmoAndCooldownStorage(){
+        assertEquals(7,VehicleWeaponDefinition.ALL.size());
         for(String chassis:new String[]{"apc","tank"})for(var stored:VehicleCatalog.loadDefault().require(chassis).weapons().values()){
             var runtime=VehicleWeaponDefinition.require(stored.id()).weapon();
             assertEquals(stored.ammunitionId(),runtime.ammoId());assertEquals(stored.cooldownTicks(),runtime.cooldownTicks());

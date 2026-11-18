@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "GameTest code and static metadata only; no Java, compilation, unit/GameTest, client or native execution.",
+  "methodCount": 33,
+  "methods": [
+    "coreHitSplitsAcrossAttachedLimbsBeforeItsOwnImmunity",
+    "aCoolingLimbStillCountsInTheSameIncomingDamageDivisor",
+    "detachedLimbLeavesTheMinecraftHealthChildSet",
+    "evenHugeCoreHitsMustFinishCollapseBeforeOwnDamage",
+    "redirectedHealthIsOnePhysicalContactRatherThanThreeFakeImpacts",
+    "appendagesHaveIndependentHealthAndHitClocks",
+    "brokenAppendageStopsReceivingWithoutRemovingOtherBodyRegions",
+    "joinedHealthScaleAndLaterMaximumChangesPreserveArmourAndFloorFractions",
+    "crossBasisReloadPreservesDamageFloorsAndStunSnapshotWithoutDoubleScaling",
+    "bodyHealthThresholdsDoNotReplaceTheAppendageCycle",
+    "animatedReceivingBoxesDoNotMoveTheWorldOrigin",
+    "collapseTimerStartsAtCollapseAndRestoresOnlyAfterTheChosenRecovery",
+    "saveLoadPreservesPartialArmorAndEveryRecoveryStage",
+    "loadDoesNotCatchUpAnUnobservedRecovery",
+    "sameObjectLoadReleasesOldPhysicsAndHonorsIncomingNoGravity",
+    "sameObjectLegacyReadClearsPendingRecoveryAndOldRootOwnership",
+    "downStunIsOnceAndCountsTowardEarlyRecovery",
+    "firstFloorSurvivesOverkillButTheSecondExposureCanDie",
+    "nestedBypassDeathCannotBeRaisedByTheOuterFloorWrite",
+    "sourceSubmergeMovesTheRootAndEmergenceHandsOffToARealAttack",
+    "breakingDefensesCancelsPendingProjectiles",
+    "nativeRayHitsActualAppendageSurface",
+    "nativeSpitIgnoresItsOwnersExtendedAppendages",
+    "radialWaveIsBlockedByCoverBelowTheBossEyeRay",
+    "radialWaveHitsRaisedTargetInsideItsFirstSphere",
+    "nativeRifleReachesVisibleEnemyBeyondAppendages",
+    "antiVehicleProgramsRejectAnOnFootTarget",
+    "sourceMissileIgnoresItsOwnersExtendedAppendages",
+    "occupiedTankSelectsAntiTankAndReceivesHullDamage",
+    "shotgunProximityCannotDamageThroughSideCover",
+    "finalPresentationSurvivesReloadWithoutASecondHit",
+    "ordinaryOnFootAttackUsesTheSourceDistanceBank",
+    "removedTargetCancelsSourceWeaponWindup"
+  ],
+  "changes": [
+    "Appendage expectations use actual greeneSegmentMaximum/source500,700,900,1000 divided by6000 core max. Raw100->20/30 shares multiply recipient CombatScale.units once; desired final-HP test hits divide by units before hurt.",
+    "Joined health scale and later maximum-health edits preserve intact/partial armour and the current minimum-health fraction; broken limbs never regenerate on rebase. Saved HealthBasis is compared during every phase reload.",
+    "HOWL geometry fixtures use preserved-model scale, with exposed/covered positive controls and an old unscaled raised negative control. Pigs test the existing MC living-target adapter, not proven native category membership.",
+    "Normal natural timer now verifies50rise,400 total sinking/underground wait, new700 tier at emerge wait, then real return to guarded.",
+    "Every stage0..7 participates in real UNLOADED_TO_CHUNK removal,24 observed world ticks offline, reload/re-add with original UUID, and resumed ticking without duplicate stun/wave.",
+    "First DOWN checks one8.5% debit and uses only the remaining17.5% damage to prove26% early recovery includes the script debit.",
+    "Actual first-floor overkill spends real absorption and survives; a complete next natural wave reaches the negative second floor and accepts lethal damage.",
+    "Physical source sink depth, source gate targetable proxies, root restoration and actual committed rifle handoff at age80 are checked. Saving two ticks into the handoff then unloading24ticks must preserve the remaining four-tick blend and republish the same client pose clock.",
+    "A live same-object Entity.load from actual sinking into guarded data releases old noPhysics while preserving the incoming explicit NoGravity=true.",
+    "A live same-object readAdditionalSaveData migrates legacy DOWN after real damage queued recovery, then legacy inactive data from an actual sink; stale recovery/stun/root/wave/emerge fields cannot survive, and old45/90 armour stays half intact.",
+    "QA-only once-consumed event marker emits nested genericKill inside ordinary core damage; final outer health write must not revive the boss.",
+    "Cross-basis full Entity.load regression uses real partial/broken appendages with a smaller destination maximum, then an actual DOWN pre-stun snapshot/floor with a larger maximum. Repeated original-tag loads and a normalized-tag reload must be idempotent and cannot heal."
+  ],
+  "fixtureBoundaries": [
+    "Health/pose arena is restricted to10blocks, inside source brood locator radii, to keep these tests independent of separate brood ownership/spawning fixtures.",
+    "done discards any remaining loaded child carrying this exact BlacklightGreeneOwner UUID before disposing its owner; no unrelated children are selected.",
+    "Actual core-hit tests explicitly reset vanilla invulnerableTime after the scripted stun where the test intends a second independent hit.",
+    "Handoff fixture enables AI at emerge wait with goals removed so the ordinary action cooldown drains before the80tick source gate.",
+    "Detached reload-inspection copies use unload removal, not discard, so a duplicate unscheduled copy cannot dispose the live owner brood."
+  ],
+  "runner": "Existing tools/player-boss-regression.init.gradle includes src/greeneTest/java and blackwatch_arena resource; parent playerBossServer queue is the execution entry. No runner or production entity/controller changed here.",
+  "loadReview": {
+    "result": "Final read-only review found the identified same-object physics, legacy pending-state, handoff persistence and same-world-tick clock issues addressed in both platform implementations. Runtime behavior is unverified.",
+    "physics": "EncounterMob.load calls beforeLoad before vanilla applies incoming NoGravity; cycle load/loadLegacy also release old owned physics for direct readAdditionalSaveData callers. Uncontrolled guarded state does not overwrite unrelated flags.",
+    "legacy": "loadLegacy resets stage/counters/pending flags/disposed/player/emergence fields, retires the old brood task, then clears its local snapshot. World ledger rebind excludes RETIRING Hunters as well as Hydras.",
+    "clocks": "initializeNew/load/loadLegacy and stage entry all anchor lastTick to current world gameTime; an extra controller observation in the same tick cannot increment authoritative age ahead of published Started.",
+    "handoff": "HandoffAge and relative HandoffElapsed persist only the remaining four-tick blend; load reconstructs HandoffAt from current gameTime and republishes the client fields without offline catchup."
+  },
+  "reviewedRootFiles": {
+    "src/main/java/com/codex/blacklight/combat/GreeneBattleCycle.java": {
+      "neoSha256": "042a7cfc0f510b1f3ee412bf017f0a441557d8a91b08cc3ffc2d7c715700adfa",
+      "forgeSha256": "042a7cfc0f510b1f3ee412bf017f0a441557d8a91b08cc3ffc2d7c715700adfa"
+    },
+    "src/main/java/com/codex/blacklight/combat/GreeneBrood.java": {
+      "neoSha256": "c5e45127e53a8fc8d0c1aa105a7b32671ba0190dc03698a69c622d458c4acffe",
+      "forgeSha256": "c39deab05fed0a982670efb956b86a41eac167463b5707729ece72f7cfe9aa1f"
+    },
+    "src/main/java/com/codex/blacklight/combat/GreeneMotion.java": {
+      "neoSha256": "c53115b5444b5c3f080da09f1bcd6c7807f918f4bc58965118306669aecaa4d9",
+      "forgeSha256": "c53115b5444b5c3f080da09f1bcd6c7807f918f4bc58965118306669aecaa4d9"
+    },
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": {
+      "neoSha256": "264f4d6391820c30f865860f7c58c29245fae57284d846799a76101c8cdf22db",
+      "forgeSha256": "0f877c5ae282af92223866ef00c2a704749502ca30e805980d906526e36cc905"
+    }
+  },
+  "unverified": [
+    "All actual runtime assertions remain unexecuted by user instruction.",
+    "No claim of player visual or client target-selection validation.",
+    "Nested Neo Pre versus Forge final-Damage fixture wiring must be exercised when testing is permitted."
+  ],
+  "files": {
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneCycleGameTest.java": {
+      "neoSha256": "3bdbee86f831b33514efb3e9f2a24a90c930cb6d91509e6d8d5a38bea07d460f",
+      "forgeSha256": "e9e0270664d448a74e5d57fc3401214edd6c0fb59ce95051d80c3961e9e15d56"
+    }
+  },
+  "crossBasisFollowup": {
+    "method": "crossBasisReloadPreservesDamageFloorsAndStunSnapshotWithoutDoubleScaling",
+    "status": "Written and mirrored; static source/metadata inspection only. Not compiled or run.",
+    "firstScenario": "Real hurtPart leaves slot0 at75%, slot1 broken and slot2 intact. Snapshot HealthBasis and armor remain in original units while the saved vanilla attribute list is replaced with actual half-max attributes. HP is explicitly below both maxima so vanilla max-health clipping cannot hide extra healing. Each of three full same-object loads must preserve broken bits and exact armor fractions.",
+    "secondScenario": "After real cooldowns the remaining limbs are broken and the controller reaches real DOWN. Its actual nonzero InitialStunnedHealth and first-collapse MinimumHealth are loaded with actual double-max attributes. Both values must scale once; saved current HP must remain unchanged even when the rebased floor exceeds HP.",
+    "idempotence": "After three copies of the original mismatched-basis snapshot, save the normalized result, load it on the same object, refresh twice, and compare armor/basis/floor/snapshot and HP. Two later DOWN ticks must not heal, replay stun or change the wave.",
+    "platformNbt": "Uses the actual attribute list produced by getAttributes().save(), selecting the key already present in the vanilla entity snapshot: attributes on Neo1.21.1 and Attributes on Forge1.20.1. The source cycle and armor snapshot are not rescaled by the fixture.",
+    "entry": "Existing playerBossServer queue via tools/player-boss-regression.init.gradle already includes this class. No runner or production edits."
+  }
+}

@@ -1,0 +1,491 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Source clock closed and dedicated branch authored; NOT compiled or executed. Pending tests are source files only.",
+  "privateProof": "D:/PrototypeReference/p1/private/hydra-thermobaric-clock-proof.json",
+  "sourceSha256": {
+    "prototypeenginef.dll": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "Hydra_fig.p3d.rz": "6a9c1ab979ee6ee36b88a8fd2d3510094dec4a5095f006667735cf0f12c5d27e",
+    "Hydra.p3d": "b4bd053853eeb705699a0e7e24229e5f75dcd2cd8baa0eeef0fbeb75528ad5b1"
+  },
+  "clock": {
+    "initialization": "TrackGroupAction ctor10a8dcf0 flags0x760 constructs independent embedded ActionList at+0x40 via10a7f4e0. Child clock+0x38=0, speed+0x34=1 (constant10d936e0 float1).",
+    "creation": "Start slot+0x14 at10a8dda0 evaluates conditions and inserts tracks into that embedded list through10a834d0/10a850b0. TrackGroup getter10a863f0 supplies TimeBegin;10a86400 supplies TimeEnd-TimeBegin.10a850b0 copies times to action+0x10/+0x14. Insert10a7f6c0 adds destination list current clock to action start, not the outer parent clock.",
+    "firstActivation": "Scheduler10a7fc20 increments listClock bydt*speed atfc8a..fc9e; gates listClock>=action.start atfcc6..fcda. First activation writes action+0x18=listClock-action.start atfcff..fd0b and invokes start slot+0x14.",
+    "recursiveClock": "On subsequent active updates action+0x18=dt*speed atfd5c. For flagsbit8,fd75..fd8c calls slot+0x0c (TrackGroup10a8dba0 returns this+0x40), then recursively calls10a7fc20(childList,context,action+0x18). Thus a new child list starts from initial overshoot, not the outer absolute clock. Parent begin1 is added to child thresholds0,.166667,1.",
+    "termination": "10a7fdb0 recursively ends/clears child actions; negative TimeEnd disables duration countdown. Hydra Death@6516 starts at childclock1 independently of the still-playing puppet. The native scheduler continuous thresholds are mapped to ceil(totalSeconds*20) in MC."
+  },
+  "fig": {
+    "reactionConditionOffset": 5852,
+    "damageType": "Thermobaric1",
+    "damageHash": "0xf95bd0315221aad5",
+    "puppet": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 5920,
+      "payload": 5932,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "3457771448731151504",
+          "name": "hyd_death"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": 98,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 0,
+        "BlendInTime": 0,
+        "BlendOutTime": 0.16666699945926666
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 6048
+    },
+    "group": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 6252,
+      "payload": 6264,
+      "length": 20,
+      "type": "TrackGroup",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 0,
+        "GroupName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "TimeBegin": 1,
+        "TimeEnd": -1
+      },
+      "schema": "TrackGroupTrack",
+      "end": 6576
+    },
+    "burst": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 6316,
+      "payload": 6328,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 214
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 6376
+    },
+    "hide": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 6376,
+      "payload": 6388,
+      "length": 20,
+      "type": "Execute",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0.16666699945926666,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 218
+        }
+      },
+      "schema": "ExecuteTrack",
+      "end": 6436
+    },
+    "death": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 6516,
+      "payload": 6528,
+      "length": 24,
+      "type": "Death",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 1,
+        "DeadTemplate": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CopyDrawable": false,
+        "GrabberIsOriginator": false
+      },
+      "schema": "DeathTrack",
+      "end": 6560
+    },
+    "effectDefinition": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 92884,
+      "payload": 92896,
+      "length": 444,
+      "type": "Effect",
+      "kind": "TrackHash",
+      "owner": "hydra/effects/#e69a76772a0e76f/#e69a76772a0e76f",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 0.16666699945926666,
+        "EffectName": {
+          "hash": "1504754981071609599",
+          "name": "#14e1f6aec8c5deff"
+        },
+        "ParentObjectName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EmitSpace": {
+          "hash": "15800074974379949085",
+          "name": "GameObjectSpace"
+        },
+        "EmitJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Offset": [
+          0,
+          2.940999984741211,
+          0
+        ],
+        "Orientation": [
+          0,
+          0,
+          0
+        ],
+        "AttachSpace": {
+          "hash": "5062814898204701870",
+          "name": "WorldSpace"
+        },
+        "AttachJoint": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortWhenInterrupted": false,
+        "SlotName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "AbortBelowJointScale": -1,
+        "FadeTime": 4,
+        "EffectController": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "EffectStore": {
+          "hash": "11883458559045687845",
+          "name": "Character"
+        },
+        "HighPriority": false,
+        "Scale": 3,
+        "Collides": false,
+        "Restitution": 0.5,
+        "Friction": 1,
+        "RenderOffset": 1.5,
+        "UsePropScaling": true,
+        "CloneName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "CloneTint": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "Biases": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "BiasesEmissionRate": 2,
+        "BiasesEmissionRateAreaScale": 1,
+        "BiasesEmissionRateScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesLifeSpan": 0.699999988079071,
+        "BiasesLifeSpanVariance": 0.699999988079071,
+        "BiasesSpeed": 40,
+        "BiasesSpeedVariance": 40,
+        "BiasesSize1D": 40,
+        "BiasesSize1DVariance": 40,
+        "BiasesSize1DAreaScale": 1,
+        "BiasesSize1DScaleFunction": {
+          "hash": "4206860010037910535",
+          "name": "Linear"
+        },
+        "BiasesSpin1D": 1,
+        "BiasesSpin1DVariance": 1,
+        "BiasesWeight": 8,
+        "BiasesWeightVariance": 1,
+        "BiasesAngle": 1,
+        "BiasesAngleVariance": 1,
+        "BiasesGravity": 1,
+        "BiasesDrag": 1,
+        "BiasesColourRed": 1,
+        "BiasesColourGreen": 1,
+        "BiasesColourBlue": 1,
+        "BiasesAlpha": 1,
+        "BiasesColourOverLifeRed": 1,
+        "BiasesColourOverLifeGreen": 1,
+        "BiasesColourOverLifeBlue": 1,
+        "BiasesAlphaOverLife": 1,
+        "BiasesColourVariance": 1,
+        "BiasesAlphaVariance": 1,
+        "BiasesGeneratorRadius": 1,
+        "BiasesGeneratorRadial": 1,
+        "BiasesGeneratorHorizSpread": 5,
+        "BiasesGeneratorVertSpread": 5,
+        "BiasesGeneratorWidth": 1,
+        "BiasesGeneratorHeight": 1,
+        "BiasesMeshGeneratorScale": [
+          1,
+          1,
+          1
+        ],
+        "Overrides": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "OverridesEmissionRate": -1,
+        "OverridesEmissionRatePerMeter": -1,
+        "OverridesMaxParticles": -1,
+        "OverridesParticleAllocation": -1,
+        "OverridesLifeSpan": -1,
+        "OverridesLifeSpanVariance": -1,
+        "OverridesSpeed": -1,
+        "OverridesSpeedVariance": -1,
+        "OverridesSize1D": -1,
+        "OverridesSize1DVariance": -1,
+        "OverridesSpin1D": -1,
+        "OverridesSpin1DVariance": -1,
+        "OverridesWeight": -1,
+        "OverridesWeightVariance": -1,
+        "OverridesAngle": -1,
+        "OverridesAngleVariance": -1,
+        "OverridesGravity": -1,
+        "OverridesDrag": -1,
+        "OverridesColourRed": -1,
+        "OverridesColourGreen": -1,
+        "OverridesColourBlue": -1,
+        "OverridesAlpha": -1,
+        "OverridesColourVariance": -1,
+        "OverridesAlphaVariance": -1,
+        "OverridesGeneratorWidth": -1,
+        "OverridesGeneratorHeight": -1
+      },
+      "schema": "EffectTrack",
+      "end": 93368
+    },
+    "sound": {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 6576,
+      "payload": 6588,
+      "length": 72,
+      "type": "Sound",
+      "kind": "TrackHash",
+      "owner": "hydra/death/#dde5fdb6245b5c3c",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "Patch": {
+          "hash": "7696709824372853067",
+          "name": "#6ad034ce6d00c94b"
+        },
+        "Trigger": {
+          "hash": "31616665440155042",
+          "name": "play"
+        },
+        "VolumeFactor": 1,
+        "MinDistance": 100,
+        "MaxDistance": 400,
+        "MinPitch": 0.699999988079071,
+        "MaxPitch": 0.800000011920929,
+        "CyclicPhase": 0,
+        "InstanceName": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Frequency": 1,
+        "PolledLifetime": false,
+        "TriggerType": {
+          "hash": "6266415434618234495",
+          "name": "StopExisting"
+        }
+      },
+      "schema": "SoundTrack",
+      "end": 6668
+    },
+    "manageLifetime": {
+      "offset": 6436,
+      "flags": 1,
+      "localTime": 1.0,
+      "globalTime": 2.0,
+      "manageLifetime": true,
+      "attachedToParent": true,
+      "grabSlot": "Crater",
+      "grabSlotHash": "0x314aa6574a562515",
+      "raw": "010000000000803f01000000010000001525564a57a64a31",
+      "fieldProof": "Same schema1025de30/setters1025caf0/1025cb00/1025cc60 closed in private/greene-crater-playback-proof.json. Raw<IfIIQ confirms flags1,time1,bool1,bool1,Craterhash.",
+      "scope": "1025b2a0 resolves current owner Crater slot at execution; callback10499c90(true) enters lifetime manager10499680, not immediate deletion. Track is background and at same local1 threshold as Death, so no guaranteed independent crater removal is claimed."
+    },
+    "detach": {
+      "offset": 6480,
+      "flags": 1,
+      "localTime": 1.0,
+      "globalTime": 2.0,
+      "grabSlot": "Crater",
+      "raw": "010000000000803f1525564a57a64a31"
+    }
+  },
+  "nativeThresholds": {
+    "group": 1,
+    "effect": 1,
+    "hide": 1.1666669994592667,
+    "death": 2
+  },
+  "mcTicks": {
+    "groupEffect": 20,
+    "hideBody": 24,
+    "delete": 40
+  },
+  "bodySkins": [
+    {
+      "offset": 1333100,
+      "name": "hydra_bodyShape"
+    },
+    {
+      "offset": 1409152,
+      "name": "hydra_L_clawShape"
+    },
+    {
+      "offset": 1421798,
+      "name": "hydra_L_knuckleShape"
+    },
+    {
+      "offset": 1436142,
+      "name": "hydra_mouthShape"
+    },
+    {
+      "offset": 1471000,
+      "name": "hydra_R_clawShape"
+    },
+    {
+      "offset": 1483646,
+      "name": "hydra_R_knuckleShape"
+    },
+    {
+      "offset": 1497986,
+      "name": "hydra_tendonShape"
+    },
+    {
+      "offset": 1501008,
+      "name": "hydra_throatShape"
+    },
+    {
+      "offset": 1539766,
+      "name": "hydra_tongueShape"
+    }
+  ],
+  "otherPropMeshes": [
+    {
+      "offset": 1208722,
+      "name": "garbageRubble001InitialShape"
+    },
+    {
+      "offset": 1230247,
+      "name": "groundRip001InitialShape"
+    },
+    {
+      "offset": 1243563,
+      "name": "hydraCrater001Damaged1Shape"
+    },
+    {
+      "offset": 1284674,
+      "name": "hydraCrater001Spawn1InitialShape"
+    },
+    {
+      "offset": 1292069,
+      "name": "hydraCrater001Spawn2InitialShape"
+    },
+    {
+      "offset": 1300208,
+      "name": "hydraCrater001Spawn3InitialShape"
+    },
+    {
+      "offset": 1308827,
+      "name": "hydraCrater001Spawn4InitialShape"
+    },
+    {
+      "offset": 1318334,
+      "name": "hydraCrater001Spawn5InitialShape"
+    },
+    {
+      "offset": 1325105,
+      "name": "hydraCraterSpawn6InitialShape"
+    }
+  ],
+  "presentationScope": "The ref218 hide list exactly equals all9 Skin chunks in Hydra.p3d. The MC renderer skips only its authored body model recursive draw from observed age24; it does not set entity invisible, remove at hide time, or suppress external FX. Authored body cuboids are an approximation, not9 copied weighted skins. Corpse damage/pickability already ends on accepted death, independently of later hide.",
+  "animation": "Both branches use hyd_death0..98, speed1,30fps, BlendIn0. Thermal ends at global2s/frame60 and never enters normal hyd_exit. Existing Hydra rigid mapping and rooted actor are retained. No assets/geometry changed.",
+  "runtime": {
+    "deathKind": {
+      "0": "ordinary66+37ticks",
+      "1": "Thermobaric1 counterpart40ticks"
+    },
+    "sourceMapping": "Only DamageSource.directEntity OrdnanceProjectile definition.kind THERMOBARIC; OrdnanceProjectile.onHit currently forwards explosion(this,getOwner()) to actual target.hurt. Other explosion tags are insufficient.",
+    "saveSchema": {
+      "HydraNativeDeathAge": "INT nonnegative capped to selected branch duration; old ordinary-only tags stay ordinary.",
+      "HydraNativeDeathKind": "INT0/1. Absent kind with age means pre-change ordinary. Present invalid kind/type or negative age declines native playback, retaining legacy expiry; healthy load clears type/age/hide.",
+      "sync": "DEATH_AGE INT(-1 inactive), DEATH_KIND INT(0 ordinary,1thermal); root owns protocol update.",
+      "transaction": "Existing first-dead-GETFIELD guard commits type andage before reward callbacks. Same-generation recursive die rejected. load/expiry never reissue die or rewards. Observed tick clock only; no unloaded catch-up."
+    }
+  },
+  "pendingTests": {
+    "unit": "HydraDeathTest4 methods",
+    "entity": "HydraDeathGameTest9 methods; thermal23/24/39/40, reward snapshot type, load without reveal, legacy and invalid NBT"
+  },
+  "limits": [
+    "No compile, unit/GameTest, client, native execution/emulation or media playback performed.",
+    "Original burst Effect0x14e1f6aec8c5deff and sound Patch0x6ad034ce6d00c94b are retained as source fields; actual particle/audio delivery is not ported. No invented blood explosion or replacement audio.",
+    "Crater slot ManageLifetime/deattach and native manager expiry remain unimplemented; do not claim immediate crater deletion.",
+    "Native actor/root controller travel and full original weighted Hydra skin remain outside this change.",
+    "Client interpolation, late-join body-hide/no-flash, rendering/shadow behavior, death while holding a player and true projectile impact need later permitted player tests."
+  ]
+}

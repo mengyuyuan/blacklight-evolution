@@ -309,8 +309,7 @@ public final class ClawCombatSystem {
                 alreadyHit.add(target);
                 if (target.hurt(player.damageSources().playerAttack(player),
                         clawDamage(state, 16.0F))) {
-                    if(!CombatTargeting.multipart(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
-                    ClawPhysicalEffects.onComboTargetHit(player, target, true);
+                    if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
                     WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
                 }
             }
@@ -346,7 +345,7 @@ public final class ClawCombatSystem {
                         .limit(3).toList()) {
                     if (target.hurt(player.damageSources().playerAttack(player),
                             clawDamage(state, 9.0F))) {
-                        if(!CombatTargeting.multipart(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
+                        if(!CombatTargeting.anchoredBody(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
                         hitCount++;
                         ClawPhysicalEffects.onComboTargetHit(player, target, false);
                     }
@@ -413,12 +412,10 @@ public final class ClawCombatSystem {
         int hitCount = 0;
         for (LivingEntity target : targets) {
             if (target.hurt(player.damageSources().playerAttack(player), damage)) {
-                if(!CombatTargeting.multipart(target))target.push(forward.x * knockback,
+                if(!CombatTargeting.anchoredBody(target))target.push(forward.x * knockback,
                         action == ClawCombatState.Action.AUTO_3 ? 0.28D : 0.08D,
                         forward.z * knockback);
                 hitCount++;
-                ClawPhysicalEffects.onComboTargetHit(player, target,
-                        action == ClawCombatState.Action.AUTO_3);
                 WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
             }
         }
@@ -445,7 +442,7 @@ public final class ClawCombatSystem {
         Vec3 requested = lockedTarget == null
                 ? player.position().add(forward.scale(
                 GroundSpikeRules.BASE_CAST_DISTANCE * rangeMultiplier))
-                : CombatTargeting.positionNear(player.position(),lockedTarget);
+                : CombatTargeting.aimPoint(player,player.position(),lockedTarget);
         BlockPos surface = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 BlockPos.containing(requested));
         double x = surface.getX() + 0.5D;

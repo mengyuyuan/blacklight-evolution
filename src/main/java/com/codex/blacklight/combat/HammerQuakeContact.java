@@ -20,6 +20,27 @@ public final class HammerQuakeContact {
     private static final class Mesh { static final List<Probe> POINTS=load(); }
     private HammerQuakeContact() {}
     public static boolean owns(WeaponMove move){return move==WeaponMove.HAMMER_QUAKE||move==WeaponMove.HAMMER_QUAKE_CHARGED;}
+    public static com.codex.blacklight.animation.BlacklightPose projectedPose(ServerPlayer p,WeaponMove move,float seconds,Vec3 feet,float yaw){
+        var pose=MotionLibrary.pose(move.id,seconds,false);
+        HammerGroundPose.quake(p,pose,move.id,seconds,feet,yaw,WeaponAttackScales.sample(move.id,seconds,false),WeaponAttackScales.sample(move.id,seconds,true));
+        return pose;
+    }
+    private static BlockHitResult projectedContact(ServerPlayer p,WeaponMove move,float seconds,Vec3 feet,float yaw,BlockHitResult requested){
+        var pose=projectedPose(p,move,seconds,feet,yaw);
+        var world=new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).scale(.9375F*p.getScale());
+        BlockHitResult result=null;double nearest=Double.POSITIVE_INFINITY;
+        for(var local:HammerGroundPose.fist(pose,WeaponAttackScales.sample(move.id,seconds,false),false)){
+            var point=world.transformPosition(local);var at=feet.add(point.x,point.y,point.z);
+            // The solver stops just above the face. This small contact skin does
+            // not allow a fist hovering over a ledge to emit a remote ground hit.
+            if(Math.abs(at.y-requested.getLocation().y)>.065)continue;
+            var hit=p.level().clip(new ClipContext(at.add(0,.035,0),at.add(0,-.065,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
+            if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=Direction.UP||hit.isInside())continue;
+            double distance=hit.getLocation().distanceToSqr(requested.getLocation());
+            if(distance<nearest){nearest=distance;result=hit;}
+        }
+        return result;
+    }
     private static List<Probe> load(){
         try(var input=HammerQuakeContact.class.getResourceAsStream("/assets/blacklight/models/form_hammerfists.json")){
             var json=JsonParser.parseReader(new InputStreamReader(Objects.requireNonNull(input),StandardCharsets.UTF_8)).getAsJsonObject();
@@ -74,7 +95,11 @@ public final class HammerQuakeContact {
                 double fraction=a.distanceToSqr(hit.getLocation())/Math.max(1e-10,a.distanceToSqr(b));
                 if(fraction<earliest){earliest=fraction;first=hit;}
             }
-            if(first!=null)return first;
+            if(first!=null){
+                var resolved=projectedContact(p,move,(float)(from+(to-from)*alpha),oldFeet.lerp(p.position(),alpha),
+                        oldYaw+net.minecraft.util.Mth.wrapDegrees(yaw-oldYaw)*(float)alpha,first);
+                if(resolved!=null)return resolved;
+            }
             before=after;
         }
         return null;

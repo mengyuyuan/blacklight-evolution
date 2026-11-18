@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "blacklight:entity/military_vehicles_military"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "blacklight:entity/military_vehicles_blackwatch"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "blacklight:entity/blackwatch_helicopter"
+    }
+  ]
+}

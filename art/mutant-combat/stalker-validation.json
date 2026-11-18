@@ -1,0 +1,1547 @@
+{
+  "date": "2026-11-15T08:26:10.979Z",
+  "scope": "Authored Minecraft stalker: swept sharp digits, separate left/right blows, real pounce flight, collision/landing, spatial audio and bounded client presentation.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 610,
+      "units": 25,
+      "logs": [
+        {
+          "stage": "stalkerServer",
+          "count": 11,
+          "file": "D:/CodexCache/creature-combat-neo-stalkerServer.log",
+          "sha256": "e65a3c7c07124c7e7fe05017d61ab34ea38855ffbcdce3f31488b2ef81dd9fbd"
+        },
+        {
+          "stage": "server",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-neo-server.log",
+          "sha256": "1d52d3c22567fefdc8db31e286e957269a5a7b2ccb95b8a61c0e76b80eb5992b"
+        },
+        {
+          "stage": "spitterServer",
+          "count": 10,
+          "file": "D:/CodexCache/creature-combat-neo-spitterServer.log",
+          "sha256": "1f42b0fe00f4d2960248d04f96abf42a0d3b9d3cc61dc1dbacf63515235e033a"
+        }
+      ],
+      "unitEvidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "ef9a0c16ac14255bf92c9ccc15b9a40d1bac66ceb6e7b85d65bbfa1be6c0aba3"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "55c1f4b956cce64743ad1d8c4470ebdaf5f92e387751a650a580e164789a6f6e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "8185f3e9e72996d3ab793dedf54496543076d24795a6b8304cabcf4288012ff3"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "e3de19c9e8503a4f689ee2bde0e6bd893972d23ec41a57296a2babfa37be4059"
+        }
+      ],
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 77,
+          "sharpSamples": 32,
+          "maxNativeSharpError": 0.000010440689865278525,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 12,
+              "contactAge": 11.75,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 5,
+              "at": {
+                "x": 0.050000011920928955,
+                "y": 81.95983464288189,
+                "z": 1.5467011161924125
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 183308,
+              "shown": 183308.50000572205,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slash-012-sub1.png",
+              "clawGapAtPresentation": 0.05601552408253844,
+              "attackAgeAtPresentation": 12.500006
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 0,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.032294
+            },
+            {
+              "scene": 0,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0218889
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 63,
+            "health": 995,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-0.jpg",
+            "sha256": "bc975615ed3f6a765fd6c7bf3457842b35fa270d754e23c5e7ded4dea21faac7"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 76,
+          "sharpSamples": 50,
+          "maxNativeSharpError": 0.000011205691537904716,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 11,
+              "contactAge": 10.75,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 4.25,
+              "at": {
+                "x": -0.31024894952153553,
+                "y": 82.02350036755081,
+                "z": 1.1854683217063473
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            },
+            {
+              "scene": 1,
+              "age": 25,
+              "contactAge": 25,
+              "bone": "left_arm",
+              "digit": 0,
+              "damage": 4.25,
+              "at": {
+                "x": -0.18137086181940498,
+                "y": 81.95818315960202,
+                "z": 1.307022072591551
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 183391,
+              "shown": 183391.440007329,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-double_claw-011-sub1.png",
+              "clawGapAtPresentation": 0.07086763037732599,
+              "attackAgeAtPresentation": 11.440007
+            },
+            {
+              "serial": 3,
+              "tick": 183405,
+              "shown": 183405.00000727177,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-double_claw-025.png",
+              "clawGapAtPresentation": 0.0005084636490134945,
+              "attackAgeAtPresentation": 25.000008
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 1,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.96646106
+            },
+            {
+              "scene": 1,
+              "age": 7,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0152488
+            },
+            {
+              "scene": 1,
+              "age": 21,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0109249
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 63,
+            "health": 991.5,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-1.jpg",
+            "sha256": "14a2d259caa878fa151bac8418e68f1a7e47eb588c1730ad27ba385a5b15a471"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 73,
+          "sharpSamples": 45,
+          "maxNativeSharpError": 0.000009017376228990403,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 18,
+              "contactAge": 17.68421,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 6.5,
+              "at": {
+                "x": 0.17500009674906047,
+                "y": 82.36736319126484,
+                "z": 5.050000011920929
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81.79673570967218,
+                "z": 4.1
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 183482,
+              "shown": 183483.700009346,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-pounce-019-sub2.png",
+              "clawGapAtPresentation": 2.4349115019657552e-8,
+              "attackAgeAtPresentation": 19.700008
+            },
+            {
+              "serial": 5,
+              "tick": 183485,
+              "shown": 183485.16000938416,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 2,
+              "firstImage": "2-pounce-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 2,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0143561
+            },
+            {
+              "scene": 2,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 0.97927266
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 63,
+            "health": 993.5,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 4.382657707832451
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.18654034241203
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-2.jpg",
+            "sha256": "1cabd5dce1aaeeb30f340cf53fd78103c19139e1023bbd1cf5f9c63aeab1b6d8"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 75,
+          "sharpSamples": 47,
+          "maxNativeSharpError": 0.000010322861236786088,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 6,
+              "tick": 183569,
+              "shown": 183569.22001063824,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 3,
+              "firstImage": "3-pounce_dodge-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 3,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.99954015
+            },
+            {
+              "scene": 3,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 0.98100847
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.264000010490418
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.264000010490418
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-3.jpg",
+            "sha256": "50122ea8c148b5f6f8f364e3d4b98af2c7d02f567d35c545ad7fc71011fa9e9f"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 76,
+          "sharpSamples": 48,
+          "maxNativeSharpError": 0.000009171563991337455,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 7,
+              "tick": 183647,
+              "shown": 183647.5400121212,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-pounce_wall-015-sub1.png"
+            },
+            {
+              "serial": 8,
+              "tick": 183653,
+              "shown": 183653.30001211166,
+              "kind": 0,
+              "surfaceCount": 45,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-pounce_wall-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 4,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.008744
+            },
+            {
+              "scene": 4,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 1.0175333
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.550000011920929
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.550000011920929
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-4.jpg",
+            "sha256": "7ce8a01e6a7f763f658b2fb4635f257c754839a2469e3a353566c2e5fd23e5f1"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 78,
+          "sharpSamples": 35,
+          "maxNativeSharpError": 0.000020001864427344013,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 5,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0101238
+            },
+            {
+              "scene": 5,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.98233694
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-5.jpg",
+            "sha256": "4bf16d54289c8b9cdaeb6d2b9c14ff7b70a47ba479c9981d55c3f68b99421d5b"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 78,
+          "sharpSamples": 34,
+          "maxNativeSharpError": 0.000010202801566067913,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 6,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.98271203
+            },
+            {
+              "scene": 6,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.96045655
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-6.jpg",
+            "sha256": "21a57347c0105bd4ad7574cfee888e176859ae6a59fc09b876ecc37db6a3580a"
+          }
+        },
+        {
+          "scene": 7,
+          "frames": 77,
+          "sharpSamples": 16,
+          "maxNativeSharpError": 0.000010262617519398842,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 7,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.99158084
+            },
+            {
+              "scene": 7,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 1.0041335
+            }
+          ],
+          "last": {
+            "scene": 7,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 82.00133601766969,
+              "z": 1.7000000000000002
+            },
+            "onGround": false,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/stalker-review-7.jpg",
+            "sha256": "32fce3bef6c075805adc8cc6e81c17cfb802a1357c4a97e3eb17ea195aaa876e"
+          }
+        }
+      ],
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_1.ogg",
+          "sha256": "b7996345083f9e01306b43d22727f2ec3a6212b15b5d6114f5adf96695cd786b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_2.ogg",
+          "sha256": "ac00d4cddc487d262853c5596c0c80491773569aaccd0398cdd92289e4d1ff42"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_3.ogg",
+          "sha256": "b3d860b9e0f9a92a59c414cf564390f9f201f6b3106e4bd8c1771540034c1b47"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_1.ogg",
+          "sha256": "c7686830e0602480fe5191fdc605b79b18f8bad3e560e1b0fa5f60ae59b43894"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_2.ogg",
+          "sha256": "230557c218dd3eb3d43af2e88cc829d2ba8a951ca82995d42c0d409e230e2366"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_3.ogg",
+          "sha256": "4710859c459d1f594281eed60a41eb48f7412c29d06e38bbbc10e136a25a4913"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_1.ogg",
+          "sha256": "b11d2a4fb450a74a85bcd89e881190daae73d8dc6f41898990c198e4438ec708"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_2.ogg",
+          "sha256": "039f4b8d821168ad6ac2bc6720d2d09f03256ebebbee09cbc9ae1da8a7477825"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_3.ogg",
+          "sha256": "c86f42e5595b94e08cd1a39c601ef86eaa4f79c975168192cc2f3976b3d11c22"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_1.ogg",
+          "sha256": "e3447f8a249cad63d137326964b8ca0bb27fb7a4784c3fba36647ffb41f810b4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_2.ogg",
+          "sha256": "40f482c5bea252f1f34a5ffee2d9f741874bb1d98f14bc4bd66826731aba0d21"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_3.ogg",
+          "sha256": "62305728cb8c06d2697219a70ede9653fc30ba5f409610df5f4bf980d35cded0"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-stalker-frames/evidence.json",
+        "sha256": "1d8a4604978d99c5d0d3ae89f18552a629257fd5f566530095ce655b1ef52ac1"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/StalkerContact.java",
+          "sha256": "d54d2ece3995a893d02460d0af81033855afdfec51413e4d214eaea60a4a7b79"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/MutantMove.java",
+          "sha256": "f3a79ccca362e96fbdf3131f310210d899db66773fa0d222622d0dce401fa7d2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "13dd4a108d9488d54e97032b9f3249b64d889f16b019653dd76df2b5949ec64b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "2f9a7617f7cf4adbb34a52f977c120138eaf3fbf1007c16fbe0c821755391930"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+          "sha256": "201f0df2c14711fffd613c15c03f055a7c659c9168e25ea7ee5f59d34d4bd3c1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "d07603b88513e66767c79737ab4ec607da0cb5bd59e20195699cfa6186ce7e75"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/StalkerContactPresentation.java",
+          "sha256": "5cff56c268a043260c89516774af14677e391b5fddee84e101b0bf059649d413"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_stalker_mc.geo.json",
+          "sha256": "b98c1d02b5e2d79523337d4c74aa1a05d6e7355152d8306c8536139a3ac507bd"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/stalker_combat_motion.json",
+          "sha256": "c99e20980be36540fdf22e9c03e6a85d7eb4893b95df6d5b7d992f07a426a705"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/animations/blacklight_stalker.animation.json",
+          "sha256": "c59cc616bbd3ff0244ab4303fd92bd93f2ced41a65a0c1c7b62398d85eb5dfcf"
+        },
+        {
+          "file": "src/stalkerVisual/java/com/codex/blacklight/client/StalkerVisual.java",
+          "sha256": "c3a00207f292d7d4887f171e294da188303cda859c0908b1ec4556351a44c2d7"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/StalkerContactTest.java",
+          "sha256": "96e95ffedea48e52e1f41f65a7b7a19bf1c4d4db10a05433602eae91b54a08be"
+        },
+        {
+          "file": "src/stalkerTest/java/com/codex/blacklight/gametest/StalkerContactGameTest.java",
+          "sha256": "59243ef949f3f8ff8e7ea1ec1256a2b4dd6102cc58ba1b8ff23b60fe46cb9232"
+        },
+        {
+          "file": "src/creatureCombatTest/java/com/codex/blacklight/gametest/CreatureSkillsGameTest.java",
+          "sha256": "ff8f01dd298358d00bec57e75dc27f10b4f99555d4f0d4e1bd01eb130c6a28e9"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 643,
+      "units": 25,
+      "logs": [
+        {
+          "stage": "stalkerServer",
+          "count": 11,
+          "file": "D:/CodexCache/creature-combat-forge-stalkerServer.log",
+          "sha256": "2ab6699edb88dcd4bc78c69d8178440ccdcf10325b0fe176b827e30489cb73bb"
+        },
+        {
+          "stage": "server",
+          "count": 19,
+          "file": "D:/CodexCache/creature-combat-forge-server.log",
+          "sha256": "4a2438bdef7dc51b21141306780ebe9a2e9f2bae7c64ab3e5677eaa9a9c59c89"
+        },
+        {
+          "stage": "spitterServer",
+          "count": 10,
+          "file": "D:/CodexCache/creature-combat-forge-spitterServer.log",
+          "sha256": "99cafd5b966d2a1cd36a4b1d553a18a01daaee4e9eb72bafb355101289aceb67"
+        }
+      ],
+      "unitEvidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "62be467b467c307fc06eb0359c5ca32fc6def300565162f9568ada38c8bd2812"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "d0fe79a727d2fe9fde963791e04d83c3ac7da11a70cd36aea4766ad56f6d4867"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "f8abc18e7b635f4af3df39f5b521ddffbd62b236a355dbe4d149bcc6f9f3b8c8"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "4a4ce51aa366b99927cfbe6d1f49b75865fedf3be110d2649563c1f6225793ec"
+        }
+      ],
+      "cases": [
+        {
+          "scene": 0,
+          "frames": 80,
+          "sharpSamples": 35,
+          "maxNativeSharpError": 0.000012406504651427419,
+          "hits": [
+            {
+              "scene": 0,
+              "age": 12,
+              "contactAge": 11.75,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 5,
+              "at": {
+                "x": 0.050000011920928955,
+                "y": 81.95983464288189,
+                "z": 1.5467011161924125
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 1,
+              "tick": 101358,
+              "shown": 101358.12000215054,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 0,
+              "firstImage": "0-slash-012.png",
+              "clawGapAtPresentation": 0.009222293921289877,
+              "attackAgeAtPresentation": 12.120002
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 0,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0088441
+            },
+            {
+              "scene": 0,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9611526
+            }
+          ],
+          "last": {
+            "scene": 0,
+            "age": 63,
+            "health": 995,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-0.jpg",
+            "sha256": "b850d738fe845c028e63395d6b0e595ff7598a761909d99ecad38a3e9e9b37e1"
+          }
+        },
+        {
+          "scene": 1,
+          "frames": 80,
+          "sharpSamples": 54,
+          "maxNativeSharpError": 0.000011938399872770827,
+          "hits": [
+            {
+              "scene": 1,
+              "age": 11,
+              "contactAge": 10.75,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 4.25,
+              "at": {
+                "x": -0.31024894952153553,
+                "y": 82.02350036755081,
+                "z": 1.1854683217063473
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            },
+            {
+              "scene": 1,
+              "age": 25,
+              "contactAge": 25,
+              "bone": "left_arm",
+              "digit": 0,
+              "damage": 4.25,
+              "at": {
+                "x": -0.18137086181940498,
+                "y": 81.95818315960202,
+                "z": 1.307022072591551
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81,
+                "z": 0.5
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 2,
+              "tick": 101441,
+              "shown": 101441.40000367165,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-double_claw-011-sub1.png",
+              "clawGapAtPresentation": 0.05710827242635594,
+              "attackAgeAtPresentation": 11.400003
+            },
+            {
+              "serial": 3,
+              "tick": 101455,
+              "shown": 101455.24000382423,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 1,
+              "firstImage": "1-double_claw-025.png",
+              "clawGapAtPresentation": 0.023254633925497443,
+              "attackAgeAtPresentation": 25.240004
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 1,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0077616
+            },
+            {
+              "scene": 1,
+              "age": 7,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 1.0056056
+            },
+            {
+              "scene": 1,
+              "age": 21,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9776777
+            }
+          ],
+          "last": {
+            "scene": 1,
+            "age": 63,
+            "health": 991.5,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-1.jpg",
+            "sha256": "a2fd364178362df9ec479f00d80cef94f5c5e8f5de2386c92902e77ce06dbfa3"
+          }
+        },
+        {
+          "scene": 2,
+          "frames": 81,
+          "sharpSamples": 53,
+          "maxNativeSharpError": 0.0000103297528869619,
+          "hits": [
+            {
+              "scene": 2,
+              "age": 18,
+              "contactAge": 17.68421,
+              "bone": "right_arm",
+              "digit": 0,
+              "damage": 6.5,
+              "at": {
+                "x": 0.17500009674906047,
+                "y": 82.36736319126484,
+                "z": 5.050000011920929
+              },
+              "actor": {
+                "x": 0.5,
+                "y": 81.79673570967218,
+                "z": 4.1
+              }
+            }
+          ],
+          "receipts": [
+            {
+              "serial": 4,
+              "tick": 101532,
+              "shown": 101533.46000599861,
+              "kind": 2,
+              "surfaceCount": 0,
+              "soundCount": 1,
+              "scene": 2,
+              "firstImage": "2-pounce-019-sub1.png",
+              "clawGapAtPresentation": 0.05122080438579249,
+              "attackAgeAtPresentation": 19.460007
+            },
+            {
+              "serial": 5,
+              "tick": 101535,
+              "shown": 101535.08000600338,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 2,
+              "firstImage": "2-pounce-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 2,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9824889
+            },
+            {
+              "scene": 2,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 1.0260614
+            }
+          ],
+          "last": {
+            "scene": 2,
+            "age": 63,
+            "health": 993.5,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 4.382657707832451
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.18654034241203
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-2.jpg",
+            "sha256": "e7655d979c5b53c78c893f869163dc064aeb08a2002b25f145821b814f661b34"
+          }
+        },
+        {
+          "scene": 3,
+          "frames": 81,
+          "sharpSamples": 53,
+          "maxNativeSharpError": 0.000010157001905621504,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 6,
+              "tick": 101619,
+              "shown": 101619.2400071621,
+              "kind": 0,
+              "surfaceCount": 48,
+              "soundCount": 2,
+              "scene": 3,
+              "firstImage": "3-pounce_dodge-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 3,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0048211
+            },
+            {
+              "scene": 3,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 0.9749206
+            }
+          ],
+          "last": {
+            "scene": 3,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.264000010490418
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 5.264000010490418
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-3.jpg",
+            "sha256": "8f14533013bd716f2516f6817b7c966a8951d09f20c8f3b01ac9c38ccfdd60fe"
+          }
+        },
+        {
+          "scene": 4,
+          "frames": 79,
+          "sharpSamples": 51,
+          "maxNativeSharpError": 0.000011500306831492495,
+          "hits": [],
+          "receipts": [
+            {
+              "serial": 7,
+              "tick": 101697,
+              "shown": 101697.52000927925,
+              "kind": 5,
+              "surfaceCount": 1,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-pounce_wall-015-sub1.png"
+            },
+            {
+              "serial": 8,
+              "tick": 101703,
+              "shown": 101703.28000926971,
+              "kind": 0,
+              "surfaceCount": 45,
+              "soundCount": 2,
+              "scene": 4,
+              "firstImage": "4-pounce_wall-021.png"
+            }
+          ],
+          "sounds": [
+            {
+              "scene": 4,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 0.9955062
+            },
+            {
+              "scene": 4,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 1.0182592
+            }
+          ],
+          "last": {
+            "scene": 4,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.550000011920929
+            },
+            "groundImpact": {
+              "x": 0.5,
+              "y": 81,
+              "z": 2.550000011920929
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-4.jpg",
+            "sha256": "7b17b6aaa53698f643eb6d03d07ab9278e4210961c9025b5a7879d0cd2682164"
+          }
+        },
+        {
+          "scene": 5,
+          "frames": 83,
+          "sharpSamples": 38,
+          "maxNativeSharpError": 0.000012407589198787284,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 5,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0093404
+            },
+            {
+              "scene": 5,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.99244004
+            }
+          ],
+          "last": {
+            "scene": 5,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-5.jpg",
+            "sha256": "163b709f695fa1552e385e4b6f0a7cd24b547e0dad902319528b330d0817e0ab"
+          }
+        },
+        {
+          "scene": 6,
+          "frames": 78,
+          "sharpSamples": 35,
+          "maxNativeSharpError": 0.000011666851477905272,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 6,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0174203
+            },
+            {
+              "scene": 6,
+              "age": 9,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.43,
+              "pitch": 0.9821249
+            }
+          ],
+          "last": {
+            "scene": 6,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 81,
+              "z": 0.5
+            },
+            "onGround": true,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-6.jpg",
+            "sha256": "5275903fb770b798b108f09d47ad859d54c2ea734d2672793fee51035a4e8de1"
+          }
+        },
+        {
+          "scene": 7,
+          "frames": 81,
+          "sharpSamples": 17,
+          "maxNativeSharpError": 0.000008377808789236916,
+          "hits": [],
+          "receipts": [],
+          "sounds": [
+            {
+              "scene": 7,
+              "age": 0,
+              "event": "blacklight:infection.tension",
+              "at": {
+                "x": 0.5,
+                "y": 81.55000001192093,
+                "z": 0.5
+              },
+              "volume": 0.55,
+              "pitch": 1.0102767
+            },
+            {
+              "scene": 7,
+              "age": 12,
+              "event": "blacklight:infection.swing",
+              "at": {
+                "x": 0.5,
+                "y": 82.55133602959062,
+                "z": 1.7000000000000002
+              },
+              "volume": 0.43,
+              "pitch": 0.9733469
+            }
+          ],
+          "last": {
+            "scene": 7,
+            "age": 63,
+            "health": 1000,
+            "actor": {
+              "x": 0.5,
+              "y": 82.00133601766969,
+              "z": 1.7000000000000002
+            },
+            "onGround": false,
+            "move": "NONE"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/stalker-review-7.jpg",
+            "sha256": "df900958461830f46c9e526249f7c0ea1f9384ee2767cf581707aecf0b83f207"
+          }
+        }
+      ],
+      "audio": [
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_1.ogg",
+          "sha256": "aa9efb5f5f00be523cee08cdaaf49637a7982c876b54d8d571d70ac84896c8b8"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_2.ogg",
+          "sha256": "4bd53571a5e4943c4277c1fb6b5b141805fef5fd3745e1d59a00fbc6d8c11e3f"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_1.ogg",
+          "sha256": "b7996345083f9e01306b43d22727f2ec3a6212b15b5d6114f5adf96695cd786b"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_2.ogg",
+          "sha256": "ac00d4cddc487d262853c5596c0c80491773569aaccd0398cdd92289e4d1ff42"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/swing_3.ogg",
+          "sha256": "b3d860b9e0f9a92a59c414cf564390f9f201f6b3106e4bd8c1771540034c1b47"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_1.ogg",
+          "sha256": "c7686830e0602480fe5191fdc605b79b18f8bad3e560e1b0fa5f60ae59b43894"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_2.ogg",
+          "sha256": "230557c218dd3eb3d43af2e88cc829d2ba8a951ca82995d42c0d409e230e2366"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/tear_3.ogg",
+          "sha256": "4710859c459d1f594281eed60a41eb48f7412c29d06e38bbbc10e136a25a4913"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_1.ogg",
+          "sha256": "b11d2a4fb450a74a85bcd89e881190daae73d8dc6f41898990c198e4438ec708"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_2.ogg",
+          "sha256": "039f4b8d821168ad6ac2bc6720d2d09f03256ebebbee09cbc9ae1da8a7477825"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/ground_3.ogg",
+          "sha256": "c86f42e5595b94e08cd1a39c601ef86eaa4f79c975168192cc2f3976b3d11c22"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_1.ogg",
+          "sha256": "e3447f8a249cad63d137326964b8ca0bb27fb7a4784c3fba36647ffb41f810b4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_2.ogg",
+          "sha256": "40f482c5bea252f1f34a5ffee2d9f741874bb1d98f14bc4bd66826731aba0d21"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/sounds/infection/crush_3.ogg",
+          "sha256": "62305728cb8c06d2697219a70ede9653fc30ba5f409610df5f4bf980d35cded0"
+        }
+      ],
+      "manifest": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-stalker-frames/evidence.json",
+        "sha256": "b65a92f249bd4a1855b6bbeb7c3ba3bada98ccfb3becf9d27b889cd1b04e9bed"
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/StalkerContact.java",
+          "sha256": "d54d2ece3995a893d02460d0af81033855afdfec51413e4d214eaea60a4a7b79"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/MutantMove.java",
+          "sha256": "f3a79ccca362e96fbdf3131f310210d899db66773fa0d222622d0dce401fa7d2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightMutant.java",
+          "sha256": "1e59c850a88a401be7a97dbd7c0c05d918513bfb6bd4d219909abff680358f3a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "bf6041d429dc40ec036816b2a24df434284b053ab35b1fbed02b72bd1a7f35ce"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/registry/ModEntities.java",
+          "sha256": "68c23fb6a777992ad107f049839733fa9e9f6b9114a01ab583718f6424718490"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/ContactEffectsPresentation.java",
+          "sha256": "0e52dd34ec9c3dc395704b8b16643c67ea8425bdb63ed340e025d445a2a7885a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/StalkerContactPresentation.java",
+          "sha256": "5cff56c268a043260c89516774af14677e391b5fddee84e101b0bf059649d413"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_stalker_mc.geo.json",
+          "sha256": "b98c1d02b5e2d79523337d4c74aa1a05d6e7355152d8306c8536139a3ac507bd"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/stalker_combat_motion.json",
+          "sha256": "c99e20980be36540fdf22e9c03e6a85d7eb4893b95df6d5b7d992f07a426a705"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/animations/blacklight_stalker.animation.json",
+          "sha256": "c59cc616bbd3ff0244ab4303fd92bd93f2ced41a65a0c1c7b62398d85eb5dfcf"
+        },
+        {
+          "file": "src/stalkerVisual/java/com/codex/blacklight/client/StalkerVisual.java",
+          "sha256": "5cffcbb90651524ef39365a6a047f70cae587dcca695d7b29693108ff483a62e"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/combat/StalkerContactTest.java",
+          "sha256": "96e95ffedea48e52e1f41f65a7b7a19bf1c4d4db10a05433602eae91b54a08be"
+        },
+        {
+          "file": "src/stalkerTest/java/com/codex/blacklight/gametest/StalkerContactGameTest.java",
+          "sha256": "25fe3c4f56bfc832c7395cb2cdcee5535b28bb8f267604509301808b2c0a91e3"
+        },
+        {
+          "file": "src/creatureCombatTest/java/com/codex/blacklight/gametest/CreatureSkillsGameTest.java",
+          "sha256": "e13fd2bb5ebf1f942e3a0d9c3a89eba78d4c92fa78a8b7086a4ef61ebda57bcd"
+        }
+      ]
+    }
+  ],
+  "pending": [
+    "Existing low-detail mesh is retained. Species silhouette/detail, hurt/death/consume choreography and full combat pacing remain open. Wall stopping uses the entity hull and damage uses line traces; visible claw/limb recoil against cover is still open.",
+    "Muted native clients verify dispatch, positions and counts, not listening acceptance or crowd mix.",
+    "An earlier Forge broad Brute charge-wall check failed without detail; an instrumented rerun passed. This intermittent check remains a Brute follow-up, not evidence of complete Brute acceptance.",
+    "Multiplayer latency, player/mod target matrix, vanilla hurt-flash timing and all-terrain fidelity are not accepted. The NoAI fixture tests attack cancellation; vanilla NoAI freezes subsequent motion and it does not validate a falling/recovery animation.",
+    "Other creatures, Blackwatch soldiers/helicopters and detailed vehicle items remain in the active goal."
+  ],
+  "boundary": "Four sharp digit cuboids are transformed from the existing authored rig and swept against native target bounding boxes. This is not arbitrary skin-triangle collision or verified original-game species mapping. Native bone matrices are independently sampled after rendering, correcting Gecko matrix addition/current-position origin. Pounce tissue/audio waits at most six ticks for the visible claws; server damage and vanilla hurt flash are unchanged. No release package was produced.",
+  "visualReview": {
+    "status": "sixteen_keyframe_sheets_reviewed",
+    "framesPerSheet": 8,
+    "everyCapturedFrameManuallyReviewed": false
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-17",
+  "status": "Code, static call-path review and metadata only. No Java, Gradle, unit/GameTest, game, native binary or media execution.",
+  "scope": "Player-reported Blackwatch corpse hopping; passive generic corpse constraint response, also applicable to the same renderer used by other dead actors.",
+  "evidence": [
+    "Part.step applies gravity to every limb on every half-step. Only that limb own translation collision previously removed downward velocity and advanced still.",
+    "Joint.solve and the final connectedPose positional projection restore the connected skeleton after integration without changing the retained velocity. A head/forearm held above terrain can accumulate downward speed while repeatedly being put back by its parent.",
+    "The old allMatch(still>=24) corpse sleep gate additionally required every limb to collide downward by itself; a supported torso with suspended connected limbs could never satisfy it.",
+    "The same mismatch exists for stored spin when the final joint angle correction rejects the integrated orientation. A positional repair is not a fresh impulse.",
+    "CorpseFragmentMotion.drop is an absolute elapsed-time parabola with a ground clamp, used by ConsumeFracture cosmetic fragments; no repeated accumulator was found there, and that helper was not changed."
+  ],
+  "changes": [
+    "Retain each corpse part half-step initial and unconstrained final pose. After existing joint/terrain/connected-skin projection, reject only velocity directed opposite the actual constraint correction. Do not derive velocity from terrain lift or joint-repair displacement.",
+    "Apply the corresponding shortest-rotation correction to world angular velocity, then express remaining spin in the corrected local frame.",
+    "Count rest using remaining velocity/spin and completed position/orientation displacement, with the existing0.002 speed-square and24half-step criteria.",
+    "Require real downward collision support within0.025blocks, propagated only along surviving joints. Reuse Entity.collideBoundingBox and the existing bounded9-probe path for very large parts.",
+    "Recheck sleeping component support each tick. Removing its ground resets its rest state; detached unsupported fragments cannot inherit support across a cut.",
+    "New response runs only for dead, uncaptured bodies. Live recovery/consume pull paths, gravity, restitution, mass, rig and cut budgets are unchanged this batch."
+  ],
+  "mathBoundary": {
+    "linear": "For correction c with v dot c<0, vNew=v-c*(v dot c)/(c dot c). Squared speed decreases by (v dot c)^2/(c dot c); other motion is unchanged. Corrections shorter than existing1e-5 collision epsilon are ignored.",
+    "angular": "Use the vector axis of shortest correctedRotation*inverse(predictedRotation), apply the same projection in world space and rotate back. Unit quaternion rotations preserve speed norm, up to float rounding.",
+    "limit": "This is a dissipative MC solver correction, not a claim of exact P1 rigid-body physics or conservation of full linked-body momentum. No restitution/friction constants were tuned."
+  },
+  "regressionsWritten": [
+    "aSuspendedHeadCannotStoreTheFallRejectedByItsTorso",
+    "aStepOrWallOnlyRemovesMotionIntoItsCorrection",
+    "anAngularLimitCannotKeepDrivingARejectedRotation",
+    "supportCrossesRealJointsButCannotCrossASeveredGap",
+    "supportedHeadSettlesAndLosingTheFloorWakesItsWholeComponent",
+    "aWholeUnsupportedBodyKeepsFallingInsteadOfSleepingOnItsJoints",
+    "aPositionallyMovingOrTurningBodyIsNotQuietJustBecauseVelocityWasClipped"
+  ],
+  "runner": "Existing tools/player-fix-unit.init.gradle includes **/Ragdoll*Test.class; playerFixUnit serial queue requires no change.",
+  "previousCutWork": "The already recorded13anatomical-joint soldier grouping,48intact+16fragment reserve and merged Part collider/center/inertia rebuild remain in place. No additional accepted sharp-cut failure was statically proved in this batch.",
+  "pending": [
+    "Compile and execute the7new cases plus existing RagdollTerrainSupport/JointProjection/JointMath and BlackwatchRagdollRig suites when user permits testing.",
+    "Real normal/heavy Blackwatch punch death and blade death on ordinary ground, half slabs, stairs and edges; inspect separated cut faces and watch the corpse settle.",
+    "Remove a supporting block below a sleeping whole corpse and below one detached fragment; the unsupported component must fall while other supported components stay settled.",
+    "Real airborne kill and angular impulse must continue falling/rotating without support; confirm no joint-based midair sleep.",
+    "Check living knockdown/getup and active consume visuals remain unaffected. This change does not add dead-corpse grabbing.",
+    "No claim that the player-visible fish-like hopping is eliminated until normal-client verification."
+  ],
+  "files": {
+    "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java": {
+      "neoSha256": "08b77de7b4362ae22256bc6ad9f3cb054fb72a526f6f74c897d947d80c593abb",
+      "forgeSha256": "a3571abe53e5fd4c769f81aeb3d44746ef7aa617ee79e4b520f8af055eb990c4"
+    },
+    "src/main/java/com/codex/blacklight/client/renderer/RagdollConstraintMotion.java": {
+      "neoSha256": "6174c2072888d85b01c28bed94beb627b79589ddea2b2023f74838d483cacdc6",
+      "forgeSha256": "6174c2072888d85b01c28bed94beb627b79589ddea2b2023f74838d483cacdc6"
+    },
+    "src/test/java/com/codex/blacklight/client/renderer/RagdollConstraintMotionTest.java": {
+      "neoSha256": "660b2adad08089da254019627adb8266cae5957faffedbc0d682c30b4ee33c5e",
+      "forgeSha256": "660b2adad08089da254019627adb8266cae5957faffedbc0d682c30b4ee33c5e"
+    }
+  }
+}

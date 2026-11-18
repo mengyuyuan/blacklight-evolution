@@ -18,10 +18,7 @@ public final class CombatImpactEffects {
         boolean hammer=move.form==PowerForm.HAMMERFISTS;
         boolean blade=move.form==PowerForm.BLADE;
         com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"swing",p.position(),.75F,WeaponImpact.finisher(move)?.86F:1F);
-        if(hammer){
-            var c=p.position().add(0,1.05,0).add(forward.scale(.8));
-            p.serverLevel().sendParticles(ParticleTypes.POOF,c.x,c.y,c.z,5,.24,.2,.24,.035);
-        }
+
     }
     public static void ground(ServerPlayer p,WeaponMove move,Vec3 forward){
         if(!p.onGround())return;
@@ -34,42 +31,17 @@ public final class CombatImpactEffects {
     public static void ground(ServerPlayer p,WeaponMove move,BlockHitResult hit){
         if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=net.minecraft.core.Direction.UP)return;
         var level=p.serverLevel();var center=hit.getLocation();float radius=(float)(move.quake()?AttackReach.reach(p,move):(move==move.uncharged()?1.65:2.2)*AttackReach.scale(p));
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(center.x,center.y,center.z,radius,true));
-        // Each fragment uses the struck terrain and stays on a supported local surface.
-        for(int ring=0;ring<3;ring++)for(int i=0;i<16;i++){
-            double angle=i*Math.PI/8+ring*.19,dist=radius*(.2+ring*.28);
-            var point=center.add(Math.cos(angle)*dist,0,Math.sin(angle)*dist);
-            var surface=level.clip(new ClipContext(point.add(0,.45,0),point.add(0,-.65,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
-            if(surface.getType()!=HitResult.Type.BLOCK||surface.getDirection()!=net.minecraft.core.Direction.UP)continue;
-            var at=surface.getLocation();var block=level.getBlockState(surface.getBlockPos());
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,block),at.x,at.y+.05,at.z,0,Math.cos(angle)*(.12+ring*.055),.18+ring*.05,Math.sin(angle)*(.12+ring*.055),1);
-            if((i&3)==0)level.sendParticles(ParticleTypes.DUST_PLUME,at.x,at.y+.08,at.z,2,.12,.06,.12,.025);
-            if(ring==1&&i%(move.quake()?2:4)==0){
-                float size=move.quake()?.44F:.27F;
-                var outward=new Vec3(Math.cos(angle)*.15,move.quake()?.36:.25,Math.sin(angle)*.15);
-                com.codex.blacklight.movement.LandingDebrisSystem.fragment(level,at.add(0,size*.6+.05,0),block,outward,size,move.quake()?16:12);
-            }
-        }
-        CombatEnvironmentEffects.disturbLooseItems(p,center,radius,move.quake()?.35:.18);
+        if(!TerrainImpactEffects.emit(p,hit,radius,move.quake()))return;
         com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"ground",center,1F,move.quake()?.9F:1F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
     }
-    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){
-        if(move.form==PowerForm.BLADE){BladeEffects.hit(p,v,move);return;}
+    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){target(p,v,move,WeaponCutContact.Report.NONE);}
+    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move,WeaponCutContact.Report contact){
         boolean hammer=move.form==PowerForm.HAMMERFISTS;
-        boolean bare=p.getData(ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.NONE;
-        boolean finisher=WeaponImpact.finisher(move);
-        // Every confirmed body hit gets a contact burst; size follows weapon weight and finishers.
-        float size=hammer?.8F:move.form==PowerForm.MUSCLE_MASS?.7F:move.form==PowerForm.WHIPFIST?.6F:bare?.38F:.5F;
+        float size=hammer?.8F:move.form==PowerForm.MUSCLE_MASS?.7F:move.form==PowerForm.WHIPFIST?.6F:move.form==PowerForm.BLADE?.65F:.5F;
         var tier=ImpactTier.of(move);size*=tier.effectScale;
-        var c=v.getBoundingBox().getCenter();
-        var eye=p.getEyePosition();
-        var contact=v.getBoundingBox().clip(eye,c).orElse(c).add(eye.subtract(c).normalize().scale(.05));
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(p,new CombatImpactPayload(contact.x,contact.y,contact.z,size,false));
-        int crits=(hammer||bare?6:3)*(tier.ordinal()+1);
-        p.serverLevel().sendParticles(ParticleTypes.CRIT,c.x,c.y,c.z,crits,.18,.24,.18,.08+.04*tier.ordinal());
-        if(tier.atLeast(ImpactTier.HEAVY))p.serverLevel().sendParticles(ParticleTypes.DAMAGE_INDICATOR,c.x,c.y,c.z,tier==ImpactTier.FINISHER?8:4,.2,.3,.2,.12);
-        if(tier==ImpactTier.FINISHER)p.serverLevel().sendParticles(ParticleTypes.SWEEP_ATTACK,contact.x,contact.y,contact.z,1,0,0,0,0);
-
+        var style=hammer||tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH
+                :contact.kind()==WeaponCutContact.Kind.PUNCTURE?com.codex.blacklight.infection.InfectedAttackStyle.PIERCE:com.codex.blacklight.infection.InfectedAttackStyle.TEAR;
+        PlayerHitEffects.emit(p,v,style,size,contact);
     }
 }

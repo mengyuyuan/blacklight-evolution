@@ -24,13 +24,17 @@ public abstract class VehiclePlayerPoseMixin {
     @Shadow protected EntityModel<?> model;
     @WrapMethod(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V")
     private void blacklight$restoreSeat(LivingEntity entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,Operation<Void> original) {
-        if(entity instanceof Player&&entity.getVehicle() instanceof MilitaryVehicle&&model instanceof HumanoidModel<?> humanoid) {
+        if(entity instanceof Player&&(entity.getVehicle() instanceof MilitaryVehicle||entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)&&model instanceof HumanoidModel<?> humanoid) {
             try(var saved=VehicleSeatPose.save(humanoid)){original.call(entity,yaw,partial,stack,buffers,light);}
         }else original.call(entity,yaw,partial,stack,buffers,light);
     }
     @Inject(method="render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at=@At(value="INVOKE",target="Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/world/entity/Entity;FFFFF)V",shift=At.Shift.AFTER))
     private void blacklight$seat(LivingEntity entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,CallbackInfo ci) {
+        if(entity instanceof Player player&&entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft&&model instanceof HumanoidModel<?> airModel){
+            com.codex.blacklight.client.vehicle.HelicopterPose.apply(airModel,craft,entity,partial);
+            VehicleSeatPose.capture(player,airModel);return;
+        }
         if(!(entity instanceof Player)||!(entity.getVehicle() instanceof MilitaryVehicle vehicle)||!(model instanceof HumanoidModel<?> humanoid))return;
         String seat=vehicle.seatOf(entity.getUUID());
         boolean driver=vehicle.definition().seats().stream().anyMatch(s->s.id().equals(seat)&&s.job()==VehicleDefinition.Job.DRIVER);

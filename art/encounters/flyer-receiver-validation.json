@@ -1,0 +1,413 @@
+{
+  "status": "animated_source_pose_receiver_validated_physical_takeover_pending",
+  "scope": "Native picking, arrows, ordinary sword and server Prototype weapon sessions against authored flyer receiving geometry. Projectile-driven native visual matrix. This is not full species acceptance.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "gameTests": 97,
+      "focusedUnitTests": [
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        }
+      ],
+      "receiverFrames": 362,
+      "outgoingRegressionFrames": 902,
+      "maxReceiverBoneError": 0.000029323921510964392,
+      "maxOutgoingBoneError": 0.000008197705181464266,
+      "hits": [
+        {
+          "scene": 0,
+          "age": 20,
+          "tick": 144954,
+          "damage": 60,
+          "bone": "left_hand",
+          "at": {
+            "x": 0.8666804639894314,
+            "y": 85.1007186261988,
+            "z": 0.06742763461920499
+          },
+          "surfaceError": 2.629175706968511e-9
+        },
+        {
+          "scene": 1,
+          "age": 20,
+          "tick": 145031,
+          "damage": 60,
+          "bone": "right_arm",
+          "at": {
+            "x": -0.10174209277491167,
+            "y": 85.20948079787317,
+            "z": -0.9032640852231684
+          },
+          "surfaceError": 4.721797711431769e-8
+        },
+        {
+          "scene": 2,
+          "age": 20,
+          "tick": 145108,
+          "damage": 60,
+          "bone": "head",
+          "at": {
+            "x": 0.10223043513616352,
+            "y": 85.41467670587336,
+            "z": 0.4927871821262445
+          },
+          "surfaceError": 1.6425490956399111e-9
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 144954,
+          "shown": 144954.44000571966,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-left_wing-021-sub1.png"
+        },
+        {
+          "serial": 2,
+          "tick": 145031,
+          "shown": 145031.6600060463,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-right_wing_yaw-021-sub1.png"
+        },
+        {
+          "serial": 3,
+          "tick": 145108,
+          "shown": 145108.3000061512,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 2,
+          "firstImage": "2-head_hit-021.png"
+        }
+      ],
+      "maxEffectDelayTicks": 0.660006046295166,
+      "nativeManifestSha256": "d2cb8069a277b0e2c75206d14ca23fa542a7fd6e69fc02b2cae407df6588c8a3",
+      "outgoingManifestSha256": "e0cbf5ccbb347cb34274bfcbf2f26da19e1836ba7cb6248258e07d91bce5e88a",
+      "reviewSheets": [
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-0.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-1.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-2.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-3.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-4.jpg",
+        "D:/CodexCache/creature-combat-qa/neo-flyer-hurt-frames/incoming-review-5.jpg"
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/AnimatedHurtBody.java",
+          "sha256": "fe720ee0420d49a81778eef9a9a5b7f5055d3d2b4fe246f481c90e544cbe7148"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "08211c8e6b5b8c2348b891d75e2d9c66f1840613e77f47645ea0f2548ec43ab2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java",
+          "sha256": "7033ac2f49ba582fdb6b51c0225dea7d9e5e0180161bf4b5b98410fc33a34586"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CombatTargeting.java",
+          "sha256": "3709fe7375805508b03ab7d01be6b896487bb4e9226de00faf90094352e79bf5"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponCutContact.java",
+          "sha256": "341cf7fde8c398df6dad1b95f9f619cd5af8f84c7f1c24bf196f9d9fcc3e135c"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponCombatSystem.java",
+          "sha256": "f9e7e27ea700da8091f8daf7b622e2cd40f55ceb4c011edd01ac7efc38cf5346"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponImpact.java",
+          "sha256": "7698962f69382aa935953906ff87596eff00d8802d29653d9db8dea27115faa7"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HeavyBlow.java",
+          "sha256": "376532c96dad922ed34ca93f2579437f13368971939d2733094d68efa472670f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HitStop.java",
+          "sha256": "1b1a49f1139268eb854151411631aec9b4c524f873fd8963a86c6abee8cf4af2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ClawCombatSystem.java",
+          "sha256": "c52cee31f4bcc3a00c47666da71b140ef61b9656a31c4f985f629d8eef81842c"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "2525b5b708c801192b38d7fc1708c9fcce950a3d7bf42dd0c7766ad95a0b26d8"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/FlyerPart.java",
+          "sha256": "69f27f2a051da22a4f834a149d7ab9cc2e7e1afe3a19b22e8ebdf3f987824112"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java",
+          "sha256": "35de043de083e9ddff8212168fa78aa3d2bcea7f5147ae317892fc1ff4997bcd"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java",
+          "sha256": "23c5267c97556407132acd30fff5adec93a2aa9e7f6221fd2badd61e718a8b93"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "530a6c555df8640c627a17789a9ba34d28f511031aeec338efeb8a16dbe79c82"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/HydraWoundAnchor.java",
+          "sha256": "a40ae36bad2dc9e6b56be5a9eb5e58d9d93c25ec0609e1cb1fcd031b9dadae1f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/InfectedImpactVisuals.java",
+          "sha256": "5b45ccf200cba6bb70757ec69ac2d47cc81498ab64efaf0c701c3a2e315bd3c9"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "gameTests": 97,
+      "focusedUnitTests": [
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraGrowthTest.xml",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.city.HydraMotionTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.client.renderer.HydraWoundAnchorTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.combat.HydraContactTest.xml",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0
+        },
+        {
+          "name": "TEST-com.codex.blacklight.network.ContactEffectsPayloadTest.xml",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0
+        }
+      ],
+      "receiverFrames": 361,
+      "outgoingRegressionFrames": 920,
+      "maxReceiverBoneError": 0.000010922912697612584,
+      "maxOutgoingBoneError": 0.000009514200043213765,
+      "hits": [
+        {
+          "scene": 0,
+          "age": 20,
+          "tick": 78013,
+          "damage": 60,
+          "bone": "left_hand",
+          "at": {
+            "x": 0.8666804639894314,
+            "y": 85.1007186261988,
+            "z": 0.06742763461920499
+          },
+          "surfaceError": 2.629175706968511e-9
+        },
+        {
+          "scene": 1,
+          "age": 20,
+          "tick": 78090,
+          "damage": 60,
+          "bone": "right_arm",
+          "at": {
+            "x": -0.10174209277491167,
+            "y": 85.20948079787317,
+            "z": -0.9032640852231684
+          },
+          "surfaceError": 4.721797711431769e-8
+        },
+        {
+          "scene": 2,
+          "age": 20,
+          "tick": 78166,
+          "damage": 60,
+          "bone": "head",
+          "at": {
+            "x": 0.10223043513616352,
+            "y": 85.41467670587336,
+            "z": 0.4927871821262445
+          },
+          "surfaceError": 1.6425490956399111e-9
+        }
+      ],
+      "receipts": [
+        {
+          "serial": 1,
+          "tick": 78013,
+          "shown": 78013.18000221252,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 0,
+          "firstImage": "0-left_wing-021.png"
+        },
+        {
+          "serial": 2,
+          "tick": 78090,
+          "shown": 78090.80000269413,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 1,
+          "firstImage": "1-right_wing_yaw-022-sub2.png"
+        },
+        {
+          "serial": 3,
+          "tick": 78166,
+          "shown": 78166.06000304222,
+          "kind": 2,
+          "surfaceCount": 0,
+          "soundCount": 1,
+          "scene": 2,
+          "firstImage": "2-head_hit-021.png"
+        }
+      ],
+      "maxEffectDelayTicks": 0.8000026941299438,
+      "nativeManifestSha256": "7c989ff774bae0afcc2ce19904e25ae249a67b990ee3f1d6826ba9596f13b8c2",
+      "outgoingManifestSha256": "e456da1a6282a3e22fafd2d14de31524af2511fe77077ff7a53ceddb79f3e43a",
+      "reviewSheets": [
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-0.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-1.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-2.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-3.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-4.jpg",
+        "D:/CodexCache/creature-combat-qa/forge-flyer-hurt-frames/incoming-review-5.jpg"
+      ],
+      "files": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/AnimatedHurtBody.java",
+          "sha256": "fe720ee0420d49a81778eef9a9a5b7f5055d3d2b4fe246f481c90e544cbe7148"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/FlyerContact.java",
+          "sha256": "08211c8e6b5b8c2348b891d75e2d9c66f1840613e77f47645ea0f2548ec43ab2"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HydraHurtContact.java",
+          "sha256": "2efa8fe76a90bf4085d75778585cfb213a3032e6046904a6ce4bceaa6f148bfb"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/CombatTargeting.java",
+          "sha256": "4c76a94c1a831323e3cc0a8d49bbd2392013b170dbf0b2f5b9f9b4e992565c41"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponCutContact.java",
+          "sha256": "1dfe05b54ec2ed1de7278a8f5146bd2738de8bd24302093287d007bf2e5ae91d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponCombatSystem.java",
+          "sha256": "87b6d56e74df8b3a7a351eea11c92e7fc57ec3264f53c7422af223fdd808cb6f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponImpact.java",
+          "sha256": "10c7b99295c87c95213aea29f084edab5060908f826255bbe3d026eef5bc3629"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HeavyBlow.java",
+          "sha256": "ff8abd38d24f1eaa0cb95b984543e017de1e76d66a8f05256576d220a7b2f3f7"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HitStop.java",
+          "sha256": "4c0847f8c82782f10a8e3cef6b905cd4e587f1fc3503b929b45b0431ff6e387d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ClawCombatSystem.java",
+          "sha256": "bdcf299c2daef54057843c1e673fc00b28488c31ec20ee6119152c653a98fecd"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/EncounterMob.java",
+          "sha256": "cad951910afcb43064300482b7d8d1e067b61fb7221362ea8086247927b2ff34"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/FlyerPart.java",
+          "sha256": "53d79b3a53efc4eb767b4c6b57cf71718bdb2e4c56321de672f545b6ae58187a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/entity/BlacklightHydra.java",
+          "sha256": "6052692acb22b6809f5d9bd0395c57a1349e9fe186416128a175876066dd87e1"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/mixin/HydraProjectileContactMixin.java",
+          "sha256": "23c5267c97556407132acd30fff5adec93a2aa9e7f6221fd2badd61e718a8b93"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/infection/InfectedAttackEffects.java",
+          "sha256": "df54b6b62754105b2faca0cdac9de978dc37a5fd44c238eb0d8af0168e867e20"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/HydraWoundAnchor.java",
+          "sha256": "a40ae36bad2dc9e6b56be5a9eb5e58d9d93c25ec0609e1cb1fcd031b9dadae1f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/InfectedImpactVisuals.java",
+          "sha256": "6e312b98c71ffa6815287fe7a4e65cd4733b413038f674e73a1585406e1a51ce"
+        }
+      ]
+    }
+  ],
+  "sourceBoundary": "The receiving surfaces are the existing authored Minecraft mesh driven by verified P2 flight/hurt curves. They are not a decoded original P2 regional-health table. Every region shares parent health, armor, immunity and death.",
+  "remaining": [
+    "Paired native frames for real claw/blade/hammer impacts, especially the transition from source flight to generic live ragdoll/knockdown. The server weapon sessions are tested; this visual combination is not yet accepted.",
+    "Server/client contact agreement during physical takeover, grab, consume and lethal mesh cutting remains to be completed. Added proxies alone do not prove these matrices.",
+    "Multiplayer latency, crowded-flight performance, legacy weapon path and mod-body matrices still require acceptance.",
+    "Original incoming sound-patch identification, waveform and timbre; current proof covers contact dispatch timing only."
+  ]
+}

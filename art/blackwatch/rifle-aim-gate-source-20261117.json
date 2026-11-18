@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "status": "implemented_in_both_trees_static_review_only_pending_execution",
+  "problem": "The soldier requested LookControl but fired directly toward the current target without the authored AimingAtTarget gate. A target crossing the gun cone could redirect an active burst immediately.",
+  "source": {
+    "file": "input/startup_fig.p3d.rz",
+    "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779",
+    "decompressed_sha256": "3bfd9ee634601d1b231a36d8e70e9f522c655dc38710c5f8f129731671a06bd2",
+    "records": [
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 301264,
+        "payload": 301276,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04",
+        "end": 317692
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315096,
+        "payload": 315108,
+        "length": 16,
+        "type": "Bank",
+        "kind": "BranchHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "end": 317308
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315136,
+        "payload": 315148,
+        "length": 20,
+        "type": "TargetDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "fields": {
+          "Direction": {
+            "hash": "2822888922154341390",
+            "name": "Magnitude"
+          },
+          "Compare": {
+            "hash": "3935993",
+            "name": "LessThanOrEqual"
+          },
+          "Distance": 30
+        },
+        "schema": "TargetDistanceCondition",
+        "end": 315176
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315176,
+        "payload": 315188,
+        "length": 40,
+        "type": "AimingAtTarget",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "fields": {
+          "Joint": {
+            "hash": "14877062861129453462",
+            "name": "R_Wrist_Grapple"
+          },
+          "Tolerance": 0.10000000149011612,
+          "Is3D": false,
+          "Heading": [
+            0,
+            0,
+            -1
+          ],
+          "Offset": [
+            0,
+            0,
+            0
+          ]
+        },
+        "schema": "AimingAtTargetCondition",
+        "end": 315236
+      },
+      {
+        "source": "startup_fig.p3d.rz",
+        "offset": 315236,
+        "payload": 315248,
+        "length": 48,
+        "type": "TargetHasLoFDistance",
+        "kind": "ConditionHash",
+        "owner": "engage_soldier/#d912518989f17d14/#d912518989f17d14/soldiers/#5d4f3bb282769c04/engage/#d912518989f17d14/attack/shoot/#6b1e2701259883b7",
+        "end": 315304
+      }
+    ],
+    "dll_sha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "evidence_files": {
+      "private/soldier-aiming-condition-vtables.json": "38d33be1eea2613dc4a0dcaf1325c9bd1de3a2620b04fe1fa9ff8a99c099ee58",
+      "private/rapid-runtime-101e5800.txt": "1129b24b0395b5a41333d546305d87cb4519974bfca480339a6706dd17686974",
+      "private/rapid-runtime-103bf140.txt": "e5c7fd13d10884ac0490076bcdd8d87028bf39b30bc1aa0630852f5c17875df8",
+      "work/schema/AimingAtTargetCondition.cs": "e53e2fa42b650a76bcbb49e66c8603d20058dd9934e287371d73a6f5d8e4f80a"
+    }
+  },
+  "native_proof": {
+    "class": ".?AVAimingAtTargetCondition@ai@fightitems@proto@@",
+    "vtable": "0x10dcf934",
+    "evaluate_slot": 9,
+    "evaluate": "0x101e5800",
+    "joint_space": "0x101e590e calls 0x103bf140. It resolves the named joint at 0x103bf266, composes its posed matrix with the actor transform at 0x103bf27e/291, transforms heading and offset at 0x103bf2b4/2d7.",
+    "xz_path": "0x101e5916 branches on Is3D; false path 0x101e5990..0x101e59f8 extracts XZ for both world heading and joint-to-target, normalizes both and computes their dot.",
+    "predicate": "0x101e59fe loads float 1.0 from VA 0x10d936e0, subtracts dot, and 0x101e5a0a..0x101e5a0e rejects only if error > tolerance. Equivalent 1-dot <= 0.10000000149011612 (~25.84 degree half-angle), NOT a 0.1-radian limit.",
+    "scope": "rifleSoldier shoot bank includes <=30 magnitude distance, AimingAtTarget, and other LoF conditions. This change adds its missing aiming condition only; the existing MC 22-block engagement envelope and finite squad cadence are unchanged."
+  },
+  "implementation": [
+    "MilitaryAimControl retains the source XZ dot-error comparison; undefined/non-finite directions fail closed. Yaw interpolation takes the shortest wrapped arc.",
+    "MilitarySoldier rifle/carbine/SAW troopers and team leaders own one FLOAT GUN_AIM_YAW entity-data field. Officers/commanders, launchers, mounted gun paths and close stock strikes keep their existing paths.",
+    "Server heading turns at most 30 degrees per goal tick, inherited from the prior LookControl limit. Stationary feet also turn with bounded yaw; a moving soldier has a 75-degree torso traverse adapter. Neither value is claimed to be a recovered P1 turn rate.",
+    "The gun must be aligned before requesting a squad firing lease. Loss during its aim/fire window releases the lease and starts a new complete aiming window after realignment. Final fire() rechecks alignment before ammunition debit.",
+    "Goal interruption, target identity change, death/control suspension, disarm, reload and load clear the transient yaw. It is not saved as an active action.",
+    "BlackwatchModel uses the same interpolated world bearing relative to interpolated body yaw, without the old .65 multiplier or another yaw smoothing stage. Existing original wrist/recoil deltas and retargeted rigid two-hand grips remain."
+  ],
+  "adaptation_limits": [
+    "This implements the recovered gate against the MC authoritative gun aiming basis; it is not a full port of original posed R_Wrist_Grapple IK. Source wrist/recoil animation adds small presentation deltas after the common basis.",
+    "Existing MC eye-minus-.18 shooting origin remains. This change does not claim all original weapon muzzle offsets or complete soldier decision graph.",
+    "Shared protocol version is parent-owned and must account for the added soldier entity-data field before any client/server release."
+  ],
+  "verification": {
+    "executed": [
+      "static FIG metadata/byte hashes",
+      "static x86 disassembly only; no original code execution",
+      "bounded file/text review and git diff --check"
+    ],
+    "not_executed": [
+      "Java or javac",
+      "Gradle",
+      "unit tests",
+      "GameTests",
+      "client/game",
+      "native DLL execution/emulation",
+      "audio playback"
+    ],
+    "pending_unit": {
+      "class": "MilitaryAimControlTest",
+      "tests": 3,
+      "runner": "playerFixUnit / tools/player-fix-unit.init.gradle (parent integrates include)"
+    },
+    "pending_gametest": {
+      "class": "MilitaryAimGameTest",
+      "tests": [
+        "movingBehindAnActiveRifleStopsRealBulletsUntilTheGunTurnsAndReaims",
+        "removingTheTargetDuringAimClearsTheBearingAndSpendsNoRound"
+      ],
+      "runner": "runGameTestServer with tools/player-military-regression.init.gradle; existing blackwatch_arena; parent schedules isolated military run"
+    },
+    "pending_player_checks": [
+      "On normal streets and steps, pass behind a firing trooper: observe visible turning and a firing pause, then resumed real hits when aligned. Repeat crouched and standing.",
+      "Have a low wall or ally interrupt the muzzle line while turning; no round should bypass existing obstruction/ally checks.",
+      "Grab/disarm/kill the aiming trooper or board a vehicle; no delayed burst or stale gun direction should survive.",
+      "At ordinary range compare officers and launchers: this rifle-bank gate must not accidentally disable their separate actions."
+    ]
+  },
+  "implementation_sha256": {
+    "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": {
+      "neo": "7cb6d7cf1aabf48f105117fee9807de20b2ac8a5d54c44922084efa574221e17",
+      "forge": "b5534bd6dbc33e3338e28f4db51478a17c674413abeb98d9ab3b9723b1363ad8"
+    },
+    "src/main/java/com/codex/blacklight/military/MilitaryAimControl.java": {
+      "neo": "5b83570e94c475cedb8d698d5d0081877c33d0ddc5089cd87341c982a414f021",
+      "forge": "b9fbabdc830f1266cc4057b1f7ae1345e2dd3597b4491db5cd0b5fe14541e8dd"
+    },
+    "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": {
+      "neo": "0dc44e53697a6d23cee7e1c768d48ca682f27e7ad979e44896f5ac025408b63d",
+      "forge": "5874c80a3216726d179dee0cec0b98867b4d45d63323baef1be9bad9110bd60d"
+    },
+    "src/test/java/com/codex/blacklight/military/MilitaryAimControlTest.java": {
+      "neo": "44b6d83fc05875c37432bf49b4c0a22a1ea8507ff516ce2c1957a47b34ed3389",
+      "forge": "44b6d83fc05875c37432bf49b4c0a22a1ea8507ff516ce2c1957a47b34ed3389"
+    },
+    "src/blackwatchTest/java/com/codex/blacklight/gametest/MilitaryAimGameTest.java": {
+      "neo": "45814f7c66de47261e75ae45cf6eb157f0af1c9dbc2c6c3c4ec2d9d072283024",
+      "forge": "751a52bc7e52d604347f4611cfa21b81a3e6873d88bc73d5dc78f1dcbf35d9f5"
+    },
+    "tools/player-military-regression.init.gradle": {
+      "neo": "4ee2a9c819c3da7064c714a841b22303d02bd5f819996729f6e590427f3b2958",
+      "forge": "4ee2a9c819c3da7064c714a841b22303d02bd5f819996729f6e590427f3b2958"
+    }
+  }
+}

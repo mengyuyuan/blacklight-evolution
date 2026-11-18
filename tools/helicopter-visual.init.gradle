@@ -1,0 +1,22 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/helicopterVisual/java')
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    neoForge.runs.client {
+        systemProperty 'blacklight.test.helicopterNavigation',project.hasProperty('helicopterNavigation')?'D:/CodexCache/helicopter-qa/neo-navigation-visual':''
+        systemProperty 'blacklight.test.helicopterPilot',project.hasProperty('helicopterPilot')?'D:/CodexCache/helicopter-qa/neo-pilot-visual':''
+        systemProperty 'blacklight.test.vehicleView','true'
+        systemProperty 'blacklight.test.helicopterVisual',(project.hasProperty('helicopterPilot')||project.hasProperty('helicopterNavigation'))?'':project.hasProperty('helicopterCombat')?'D:/CodexCache/helicopter-qa/neo-combat-visual':'D:/CodexCache/helicopter-qa/neo-visual'
+        systemProperty 'blacklight.test.helicopterCombat',project.hasProperty('helicopterCombat')?'true':'false'
+        systemProperty 'blacklight.test.hiddenRagdoll','true'
+        programArguments.addAll '--width','1100','--height','760'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('silentHelicopterQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

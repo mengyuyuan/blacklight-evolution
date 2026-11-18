@@ -1,6 +1,8 @@
 package com.codex.blacklight.client;
 
 import com.codex.blacklight.entity.MilitaryVehicle;
+import com.codex.blacklight.entity.BlackwatchHelicopter;
+import com.codex.blacklight.client.vehicle.HelicopterControls;
 import com.codex.blacklight.military.vehicle.VehicleControlAuthority;
 import com.codex.blacklight.military.vehicle.VehicleDefinition;
 import com.codex.blacklight.network.VehicleControlPayload;
@@ -25,24 +27,35 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class VehicleControls {
     private static final String CATEGORY="key.categories.blacklight_vehicles";
-    private static final KeyMapping NEXT_SEAT=new KeyMapping("key.blacklight.vehicle_next_seat",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_UNKNOWN,CATEGORY);
-    private static final KeyMapping NEXT_AMMO=new KeyMapping("key.blacklight.vehicle_next_ammo",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_UNKNOWN,CATEGORY);
+    private static final KeyMapping NEXT_SEAT=new KeyMapping("key.blacklight.vehicle_next_seat",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_M,CATEGORY);
+    private static final KeyMapping NEXT_AMMO=new KeyMapping("key.blacklight.vehicle_next_ammo",InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_N,CATEGORY);
     private static UUID vehicleId,leaseId,playerId;
     private static long sequence;
     private static boolean nextAmmo;
     private VehicleControls(){}
-    public static boolean riding(){var p=Minecraft.getInstance().player;return p!=null&&p.getVehicle() instanceof MilitaryVehicle;}
+    public static boolean riding(){var p=Minecraft.getInstance().player;return p!=null&&(p.getVehicle() instanceof MilitaryVehicle||p.getVehicle() instanceof BlackwatchHelicopter);}
+    public static net.minecraft.network.chat.Component ammunitionKey(){return NEXT_AMMO.getTranslatedKeyMessage();}
+    public static boolean ammunitionUnbound(){return NEXT_AMMO.isUnbound();}
+    public static net.minecraft.network.chat.Component seatKey(){return NEXT_SEAT.getTranslatedKeyMessage();}
+    public static boolean seatUnbound(){return NEXT_SEAT.isUnbound();}
     static boolean interacting(){
         var mc=Minecraft.getInstance();
         return mc.player!=null&&mc.player.getMainHandItem().isEmpty()
                 &&mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit
-                &&com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(hit.getEntity())!=null;
+                &&(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(hit.getEntity())!=null||hit.getEntity() instanceof BlackwatchHelicopter);
     }
     public static boolean ownsInput(){return riding()||interacting()&&SkillBindings.down(Minecraft.getInstance().options.keyUse);}
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent event){event.register(NEXT_SEAT);event.register(NEXT_AMMO);}
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){update();}
     public static void update(){
         var mc=Minecraft.getInstance();
+        if(mc.player!=null&&mc.player.getVehicle() instanceof BlackwatchHelicopter craft){
+            if(mc.screen!=null)return;
+            while(NEXT_SEAT.consumeClick())PacketDistributor.sendToServer(new VehicleSeatPayload(craft.getUUID()));
+            while(NEXT_AMMO.consumeClick())HelicopterControls.requestWeaponSwitch();
+            HelicopterControls.update(craft);return;
+        }
+        HelicopterControls.clear();
         if(mc.player==null || mc.level==null || !(mc.player.getVehicle() instanceof MilitaryVehicle vehicle)) {
             vehicleId=null;leaseId=null;playerId=null;sequence=0;nextAmmo=false;
             while(NEXT_SEAT.consumeClick()){}while(NEXT_AMMO.consumeClick()){}return;
@@ -68,7 +81,7 @@ public final class VehicleControls {
         // The gun must converge on what the crosshair covers. The chase camera orbits above the hull,
         // so the player's raw yaw/pitch is parallel to the view ray but offset from the barrel.
         var target=ClientTargetLock.entityTarget();
-        Vec3 aimPoint=target!=null&&ClientTargetLock.visibleInRange(target)?com.codex.blacklight.combat.ExplicitTarget.point(mc.player,target):crosshairPoint(mc,vehicle);
+        Vec3 aimPoint=target!=null&&ClientTargetLock.visibleInRange(target)?ClientTargetLock.focusPoint(target):crosshairPoint(mc,vehicle);
         Vec3 gun=gunOrigin(vehicle,mc.player.getEyePosition());
         float aimYaw=com.codex.blacklight.military.vehicle.VehicleAim.yaw(gun,aimPoint),aimPitch=com.codex.blacklight.military.vehicle.VehicleAim.pitch(gun,aimPoint);
         PacketDistributor.sendToServer(new VehicleControlPayload(vehicleId,lease,sequence++,forward,steering,
@@ -110,10 +123,10 @@ public final class VehicleControls {
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGHEST) public static void interaction(InputEvent.InteractionKeyMappingTriggered event){
         var player=Minecraft.getInstance().player;
-        if(player!=null&&player.getVehicle() instanceof MilitaryVehicle){event.setCanceled(true);event.setSwingHand(false);}
+        if(player!=null&&(player.getVehicle() instanceof MilitaryVehicle||player.getVehicle() instanceof BlackwatchHelicopter)){event.setCanceled(true);event.setSwingHand(false);}
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.HIGHEST) public static void hands(RenderHandEvent event){
         var player=Minecraft.getInstance().player;
-        if(player!=null&&player.getVehicle() instanceof MilitaryVehicle)event.setCanceled(true);
+        if(player!=null&&(player.getVehicle() instanceof MilitaryVehicle||player.getVehicle() instanceof BlackwatchHelicopter))event.setCanceled(true);
     }
 }

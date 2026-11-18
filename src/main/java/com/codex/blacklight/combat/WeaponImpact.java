@@ -26,15 +26,15 @@ public final class WeaponImpact {
                 RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
                         p==null?WeaponCutContact.Report.NONE:WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
         }
-        if(v.level().isClientSide||!v.isAlive())return;
-        HitStop.victim(v,tier.hitstop);
+        if(v.level().isClientSide)return;
+        if(v.isAlive())HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
         if(p!=null)com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)?"heavy":"hit",v.position(),.8F+.15F*tier.ordinal(),pitch);
         if(tier.atLeast(ImpactTier.HEAVY))v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
         if(tier==ImpactTier.FINISHER)v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
-        if(v.level() instanceof net.minecraft.server.level.ServerLevel level){var c=v.getBoundingBox().getCenter();
-            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CRIT,c.x,c.y,c.z,4*(tier.ordinal()+1),.18,.24,.18,.08+.04*tier.ordinal());
-            if(tier.atLeast(ImpactTier.HEAVY))level.sendParticles(net.minecraft.core.particles.ParticleTypes.DAMAGE_INDICATOR,c.x,c.y,c.z,tier==ImpactTier.FINISHER?8:4,.2,.3,.2,.12);}
+        if(p!=null&&AnimatedHurtBody.of(v)==null)PlayerHitEffects.emit(p,v,
+                tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
+                .5F*tier.effectScale,WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
         if(first&&p!=null&&effect!=null)PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(effect,tier.feedback));
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first){apply(p,v,move,direction,first,0F);}
@@ -69,7 +69,7 @@ public final class WeaponImpact {
             v.hurtMarked=true;
             if(v instanceof Mob mob){mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);}
             // Every struck victim reacts; only attacker sound/camera is limited to the first.
-            HitStop.victim(v,tier.hitstop);
+            if(v.isAlive())HitStop.victim(v,tier.hitstop);
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
         WeaponDismemberment.weapon(v,cut);
@@ -85,16 +85,16 @@ public final class WeaponImpact {
             RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
-        if(!blade&&!RagdollImpact.supportedBody(v))ClawPhysicalEffects.onComboTargetHit(p,v,heavy||slam);
-        CombatImpactEffects.target(p,v,move);
+        if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact);
+        var soundPoint=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()?hydra.incomingPoint():v.position();
         if(first){
             float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
-            com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)||heavy||slam?"heavy":"hit",v.position(),.8F+.15F*tier.ordinal(),pitch);
+            com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)||heavy||slam?"heavy":"hit",soundPoint,.8F+.15F*tier.ordinal(),pitch);
             // Layered body: heavier tiers add a low thump, finishers a crushing tail.
-            if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
+            if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
             if(tier==ImpactTier.FINISHER){
-                p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_CRIT,SoundSource.PLAYERS,1F,.7F);
-                p.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
+                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_CRIT,SoundSource.PLAYERS,1F,.7F);
+                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
             }
         }
         if(first&&blade){

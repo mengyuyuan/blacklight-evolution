@@ -12,6 +12,25 @@ public final class ConsumePlacementTrack {
     private record Tracks(Map<String,List<double[]>> contacts,Map<String,List<double[]>> projections,Map<String,List<double[]>> motion,Map<String,List<double[]>> actorMotion) {}
     private static Tracks tracks;
     private ConsumePlacementTrack() {}
+    /** Root travel is shared scene distance; receiver body scale only affects its bind contact. */
+    public static Vec3 sceneActorAnchor(Vec3 origin,float yaw,String key,float t){
+        double[] p=sample(data().actorMotion,key,t,false).orElse(new double[3]);
+        Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);
+        return origin.add(right.scale(p[0]*.9375)).add(forward.scale(p[2]*.9375)).add(0,p[1]*.9375,0);
+    }
+    public static Optional<Vec3> sceneAnchor(Vec3 origin,float yaw,LivingEntity victim,String key,float t){
+        return contactFrame(key,0).map(first->{
+            double scale=ConsumeSequence.receiverScale(victim);
+            double[] from=sample(data().motion,key,0,false).orElse(new double[3]);
+            double[] to=sample(data().motion,key,t,false).orElse(from);
+            double[] pose=contactFrame(key,t).orElse(first);
+            Vec3 local=new Vec3(first[0]*.9375-first[3]*scale+(to[0]-from[0])*.9375,
+                    first[1]*.9375-first[4]*scale+(to[1]-from[1])*.9375,
+                    first[2]*.9375-first[5]*scale+(to[2]-from[2])*.9375);
+            Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);
+            return origin.add(right.scale(local.x)).add(forward.scale(local.z)).add(0,Math.max(-pose[6]*scale,local.y),0);
+        });
+    }
     private static synchronized Tracks data(){if(tracks==null)tracks=load();return tracks;}
     private static Optional<double[]> sample(Map<String,List<double[]>> map,PowerForm form,float t,boolean rotations) {
         return sample(map,ConsumeSequence.key(form),t,rotations);
@@ -86,6 +105,8 @@ public final class ConsumePlacementTrack {
         return anchor(origin,yaw,victim,form,t,ConsumeVariant.DEFAULT);
     }
     public static Optional<Vec3> anchor(Vec3 origin,float yaw,LivingEntity victim,PowerForm form,float t,int variant) {
+        if(form==PowerForm.NONE&&ConsumeVariant.normalize(form,variant)>=ConsumeVariant.HEAD_STOMP)
+            return sceneAnchor(origin,yaw,victim,ConsumeSequence.key(form,variant),t);
         // Establish the scene once. Sampling the animated hand every frame enslaved
         // the receiver's root path to the actor and destroyed the paired choreography.
         // A compressed head stays in the animated palm until release. Baking its
@@ -173,6 +194,10 @@ public final class ConsumePlacementTrack {
         return contactFrame(key,t).map(p->carryContact(victim,key,t,p));
     }
     private static Vec3 carryContact(LivingEntity victim,String key,float t,double[] frame) {
+        if(victim instanceof com.codex.blacklight.entity.EncounterMob flyer&&flyer.kind()==com.codex.blacklight.entity.EncounterKind.FLYER){
+            boolean blade=com.codex.blacklight.registry.ModAttachments.peekData(flyer,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).form()==PowerForm.BLADE.ordinal();
+            return FlyerReceiverPose.center(flyer,key,t,blade?"torso":"head");
+        }
         double scale=ConsumeSequence.humanoid(victim)?ConsumeSequence.receiverScale(victim):Math.clamp(victim.getBbHeight()/1.8,.3,1.5);
         if(rigidReceiver(victim)) {
             boolean quad=ConsumeSequence.quadruped(victim);
@@ -189,11 +214,13 @@ public final class ConsumePlacementTrack {
             Vec3 receiver=carryContact(victim,key,t,p);
             Vec3 local=actor.subtract(receiver);
             Vec3 center=new Vec3(p[10],p[11],p[12]).scale(scale);
+            if(victim instanceof com.codex.blacklight.entity.EncounterMob flyer&&flyer.kind()==com.codex.blacklight.entity.EncounterKind.FLYER)center=FlyerReceiverPose.center(flyer,key,t,"torso");
             if(rigidReceiver(victim)){
                 var q=rigidBody(victim,key,t).transformPosition(new org.joml.Vector3f(0,victim.getBbHeight()*.5F,0));center=new Vec3(q.x,q.y,-q.z);
             }
             Vec3 gap=local.add(center).subtract(new Vec3(p[7],p[8],p[9]).scale(.9375));
             double distance=gap.horizontalDistance(),minimum=.34+victim.getBbWidth()*.5;
+            if(victim instanceof com.codex.blacklight.entity.EncounterMob flyer&&flyer.kind()==com.codex.blacklight.entity.EncounterKind.FLYER)minimum=.34+FlyerReceiverPose.torsoRadius();
             if(Math.abs(gap.y)<.85&&distance<minimum)local=local.add((distance>.02?gap.multiply(1,0,1).scale(1/distance):new Vec3(0,0,1)).scale(minimum-distance));
             Vec3 forward=Vec3.directionFromRotation(0,yaw),right=new Vec3(-forward.z,0,forward.x);
             return origin.add(right.scale(local.x)).add(forward.scale(local.z)).add(0,Math.max(0,local.y),0);
@@ -224,7 +251,7 @@ public final class ConsumePlacementTrack {
         });
     }
     private static Tracks load() {
-        var resource=MotionResources.read("consume-placement.data",4*1024*1024);
+        var resource=MotionResources.read("consume-placement.data",8*1024*1024);
         if(resource.isEmpty())return new Tracks(Map.of(),Map.of(),Map.of(),Map.of());
         try {
             var root=resource.orElseThrow();

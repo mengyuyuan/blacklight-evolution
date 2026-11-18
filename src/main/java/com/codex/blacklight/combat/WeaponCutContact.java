@@ -1,6 +1,7 @@
 package com.codex.blacklight.combat;
 
 import com.codex.blacklight.animation.*;
+import com.codex.blacklight.entity.BlacklightHydra;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.network.RagdollImpactPayload.BladeSpan;
@@ -19,10 +20,14 @@ import java.lang.Math;
  * Authored combat contact authorizes damage; sharp contact separately authorizes cuts. */
 public final class WeaponCutContact {
     public enum Kind { NONE, SLICE, PUNCTURE }
-    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path) {
+    public record Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path,String receivingBone) {
         public Contact {path=List.copyOf(path);}
-        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal){this(region,edge,point,travel,normal,0,List.of());}
-        public Contact path(long id,List<BladeSpan> spans){return new Contact(region,edge,point,travel,normal,id,spans);}
+        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal,long stroke,List<BladeSpan> path){this(region,edge,point,travel,normal,stroke,path,null);}
+        public Contact(int region,String edge,Vec3 point,Vec3 travel,Vec3 normal){this(region,edge,point,travel,normal,0,List.of(),null);}
+        /** Logical receiver from the actual sub-tick skin intersection, not an
+         * anatomical dismemberment bit or a client supplied lock selection. */
+        public Contact onBody(String bone){return new Contact(region,edge,point,travel,normal,stroke,path,bone);}
+        public Contact path(long id,List<BladeSpan> spans){return new Contact(region,edge,point,travel,normal,id,spans,receivingBone);}
     }
     public record Report(Kind kind,List<Contact> contacts){
         public static final Report NONE=new Report(Kind.NONE,List.of());
@@ -41,7 +46,7 @@ public final class WeaponCutContact {
     private record Triangle(String edge,Vec3 a,Vec3 b,Vec3 c,Vec3 root,Vec3 tip,List<Vec3> profile,boolean sharp){
         Vec3 center(){return a.add(b).add(c).scale(1.0/3);}
     }
-    private record Frame(double alpha,List<Triangle> faces) {}
+    private record Frame(double alpha,List<Triangle> faces,List<Vec3> lash) {}
     private record Zone(int bit,AABB box) {}
     private static final Map<PowerForm,List<Face>> GEOMETRY=new EnumMap<>(PowerForm.class);
     private static final Map<PowerForm,List<Face>> BLUNT_GEOMETRY=new EnumMap<>(PowerForm.class);
@@ -73,20 +78,24 @@ public final class WeaponCutContact {
     /** Created once per strike tick, shared across its victims. Nothing here trusts client hit reports. */
     public static Sweep sweep(ServerPlayer player,WeaponMove move,double from,double to,Vec3 oldFeet,float oldYaw,float yaw,WhipCurve whip){
         if(move.quake()||move.groundSpike()||!(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE||move.form==PowerForm.WHIPFIST))return Sweep.EMPTY;
-        var geometry=new ArrayList<>(geometry(move.form));if(geometry.isEmpty()||MotionLibrary.find(move.id).isEmpty())return Sweep.EMPTY;
+        var geometry=new ArrayList<>(geometry(move.form));
+        if(whip==null && (geometry.isEmpty() || MotionLibrary.find(move.id).isEmpty()))return Sweep.EMPTY;
         if(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE)geometry.addAll(bluntGeometry(move.form));
         Kind kind=move.uncharged()==WeaponMove.WHIP_LONGSHOT||move.uncharged()==WeaponMove.WHIP_LUNGE?Kind.PUNCTURE:Kind.SLICE;
         // Eight intervals per tick plus authored whip reversals. No future/recovery frames.
         var alphas=new TreeSet<Double>();for(int i=0;i<=8;i++)alphas.add(i/8.0);
         if(whip!=null&&to>from)for(var sample:whip.samples())if(sample.time()>from&&sample.time()<to)alphas.add((sample.time()-from)/(to-from));
+        float pitch=whip==null?0:WhipCurveContact.aimPitch(player);
         var frames=new ArrayList<Frame>();
         for(double alpha:alphas){
             double time=from+(to-from)*alpha;
             Vec3 feet=oldFeet.lerp(player.position(),alpha);float facing=oldYaw+net.minecraft.util.Mth.wrapDegrees(yaw-oldYaw)*(float)alpha;
             var triangles=new ArrayList<Triangle>();
+            List<Vec3> lash=List.of();
             if(whip!=null){
-                var points=WhipCurveContact.worldPoints(whip,time,feet,facing,player);
+                var points=WhipCurveContact.worldPoints(whip,time,feet,facing,player,pitch);
                 var visible=WhipCurveContact.visiblePoints(points,player.level(),player);
+                lash=visible;
                 // A wall truncating the curve must not manufacture a cutting tip at the wall.
                 if(visible.getLast().distanceToSqr(points.getLast())<1e-8&&visible.size()==points.size()){
                     Vec3 tip=points.getLast(),axis=tip.subtract(points.get(points.size()-2)).normalize();
@@ -113,7 +122,7 @@ public final class WeaponCutContact {
                     triangles.add(offset(transform(actual,transform),feet));
                 }
             }
-            frames.add(new Frame(alpha,List.copyOf(triangles)));
+            frames.add(new Frame(alpha,List.copyOf(triangles),lash));
         }
         // The receiver orders blade samples by absolute tick. A brand-new world reports
         // game time 0, so "one tick ago" must never mint a negative sample time: a span at
@@ -126,6 +135,71 @@ public final class WeaponCutContact {
         private final Kind kind;private final List<Frame> frames;private final long fromTick;
         private Sweep(Kind kind,List<Frame> frames,long fromTick){this.kind=kind;this.frames=frames;this.fromTick=fromTick;}
         public boolean sharp(){return kind!=Kind.NONE;}
+        AABB bounds(AABB search){
+            // Include actual moving blade faces outside the authored wrist window.
+            double minX=search.minX, minY=search.minY, minZ=search.minZ;
+            double maxX=search.maxX, maxY=search.maxY, maxZ=search.maxZ;
+            for(var frame:frames)for(var t:frame.faces){
+                minX=Math.min(minX,Math.min(t.a.x,Math.min(t.b.x,t.c.x)));
+                minY=Math.min(minY,Math.min(t.a.y,Math.min(t.b.y,t.c.y)));
+                minZ=Math.min(minZ,Math.min(t.a.z,Math.min(t.b.z,t.c.z)));
+                maxX=Math.max(maxX,Math.max(t.a.x,Math.max(t.b.x,t.c.x)));
+                maxY=Math.max(maxY,Math.max(t.a.y,Math.max(t.b.y,t.c.y)));
+                maxZ=Math.max(maxZ,Math.max(t.a.z,Math.max(t.b.z,t.c.z)));
+            }
+            return new AABB(minX,minY,minZ,maxX,maxY,maxZ);
+        }
+        HydraHurtContact.Contact lashContact(ServerPlayer player,AnimatedHurtBody body,double radius){
+            for(var frame:frames){
+                if(frame.lash.size()<2)continue;
+                var regions=body.hurtRegions((float)frame.alpha-1);
+                for(int i=1;i<frame.lash.size();i++){
+                    var from=frame.lash.get(i-1);
+                    var to=frame.lash.get(i);
+                    var hull=new AABB(from,to).inflate(radius+1e-6);
+                    ProjectileSphereContact.Hit first=null;
+                    String bone=null;
+                    for(var region:regions){
+                        if(!region.bounds().intersects(hull))continue;
+                        for(var box:region.boxes()){
+                            if(!box.bounds.intersects(hull))continue;
+                            var hit=ProjectileSphereContact.sweep(from,to,radius,box);
+                            if(hit!=null && (first==null || hit.fraction()<first.fraction())
+                                    && CombatTargeting.clearRay(player,hit.center(),hit.point())){
+                                first=hit;
+                                bone=region.bone();
+                            }
+                        }
+                    }
+                    if(first!=null)return new HydraHurtContact.Contact(bone,first.point(),first.normal(),
+                            com.codex.blacklight.infection.InfectedAttackStyle.CRUSH);
+                }
+            }
+            return null;
+        }
+        Vec3 aircraftContact(ServerPlayer actor,List<HydraContact.Box> skin,double lashRadius){
+            for(var frame:frames){
+                for(int i=1;i<frame.lash.size();i++){
+                    var from=frame.lash.get(i-1);
+                    var to=frame.lash.get(i);
+                    var path=new AABB(from,to).inflate(lashRadius+1e-6);
+                    for(var box:skin){
+                        if(!box.bounds.intersects(path))continue;
+                        var hit=ProjectileSphereContact.sweep(from,to,lashRadius,box);
+                        if(hit!=null&&CombatTargeting.clearRay(actor,actor.getEyePosition(),hit.point()))return hit.point();
+                    }
+                }
+                for(var face:frame.faces){
+                    var area=new AABB(face.a,face.b).minmax(new AABB(face.c,face.c)).inflate(1e-6);
+                    for(var box:skin){
+                        if(!area.intersects(box.bounds))continue;
+                        var point=box.triangle(face.a,face.b,face.c);
+                        if(point.isPresent()&&CombatTargeting.clearRay(actor,actor.getEyePosition(),point.get()))return point.get();
+                    }
+                }
+            }
+            return null;
+        }
         public Kind kind(){return kind;}
         /** Receiver-local ribbon samples, including the exit after the last triangle contact. */
         public List<BladeSpan> path(String edge,LivingEntity victim,Vec3 previousPosition){
@@ -145,9 +219,12 @@ public final class WeaponCutContact {
             return trace(attacker,victim,previousPosition,false);
         }
         private Report trace(ServerPlayer attacker,LivingEntity victim,Vec3 previousPosition,boolean sharp){
-            if(kind==Kind.NONE||!RagdollImpact.supportedBody(victim))return Report.NONE;
+            if(kind==Kind.NONE || AnimatedHurtBody.of(victim)==null && !RagdollImpact.supportedBody(victim))return Report.NONE;
             Map<String,Contact> found=new LinkedHashMap<>();
             double scale=bodyScale(victim);
+            boolean generic=AnimatedHurtBody.of(victim)==null && !RagdollImpact.legacyBody(victim);
+            var receiverZones=generic?List.of(new Zone(32,victim.getBoundingBox().move(victim.position().scale(-1)))):zones(victim);
+            Map<Double,List<HydraContact.Region>> hydraPoses=new HashMap<>();
             for(int i=1;i<frames.size();i++){
                 Frame a=frames.get(i-1),b=frames.get(i);
                 if(a.faces().size()!=b.faces().size())continue;
@@ -163,11 +240,23 @@ public final class WeaponCutContact {
                         Vec3 origin=previousPosition.lerp(victim.position(),alpha);
                         float facing=net.minecraft.util.Mth.rotLerp((float)alpha,victim.yBodyRotO,victim.yBodyRot);
                         Vec3 wa=first.a().lerp(last.a(),t),wb=first.b().lerp(last.b(),t),wc=first.c().lerp(last.c(),t);
-                        Vec3 la=local(wa,origin,facing,scale),lb=local(wb,origin,facing,scale),lc=local(wc,origin,facing,scale);
-                        for(var zone:zones(victim)){
+                        if(victim instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()){
+                            String key="32:"+last.edge();if(found.containsKey(key))continue;
+                            var regions=hydraPoses.computeIfAbsent(alpha,k->hydra.hurtRegions(k.floatValue()-1));
+                            var touch=HydraHurtContact.triangle(regions,wa,wb,wc,travel,com.codex.blacklight.infection.InfectedAttackStyle.TEAR);
+                            if(touch!=null&&CombatTargeting.clearRay(attacker,attacker.getEyePosition(),touch.point())){
+                                Vec3 edge=first.tip().lerp(last.tip(),t).subtract(first.root().lerp(last.root(),t));
+                                Vec3 normal=edge.cross(travel).normalize();
+                                if(normal.lengthSqr()<.5)normal=wb.subtract(wa).cross(wc.subtract(wa)).normalize();
+                                found.put(key,new Contact(32,last.edge(),touch.point(),travel,normal).onBody(touch.bone()));
+                            }continue;
+                        }
+                        float zoneYaw=generic?180:facing;
+                        Vec3 la=local(wa,origin,zoneYaw,scale),lb=local(wb,origin,zoneYaw,scale),lc=local(wc,origin,zoneYaw,scale);
+                        for(var zone:receiverZones){
                             String key=zone.bit()+":"+last.edge();if(found.containsKey(key)||!triangleBox(la,lb,lc,zone.box().inflate(.025)))continue;
                             Vec3 localPoint=intersectionCenter(la,lb,lc,zone.box().inflate(.025));
-                            Vec3 point=localPoint.scale(scale).yRot((float)Math.toRadians(180-facing)).add(origin);
+                            Vec3 point=localPoint.scale(scale).yRot((float)Math.toRadians(180-zoneYaw)).add(origin);
                             if(!CombatTargeting.clearRay(attacker,attacker.getEyePosition(),point))continue;
                             // A tessellation diagonal is not the long axis of a blade. Use the
                             // full exported sharp part so adjacent faces cannot invent crossing cuts.
@@ -184,6 +273,10 @@ public final class WeaponCutContact {
     }
     /** Ordinary items have no shared animated mesh: use the actual aimed contact, never a fixed limb. */
     public static Report ordinary(ServerPlayer player,LivingEntity victim){
+        if(victim instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()){
+            var c=hydra.incomingContact();
+            return c==null?Report.NONE:new Report(Kind.SLICE,List.of(new Contact(32,"item-edge",c.point(),player.getLookAngle().scale(.25),new Vec3(0,1,0)).onBody(c.bone())));
+        }
         Vec3 eye=player.getEyePosition(),end=eye.add(player.getLookAngle().scale(4));
         Vec3 hit=victim.getBoundingBox().inflate(.04).clip(eye,end).orElse(null);
         if(hit==null||!CombatTargeting.clearRay(player,eye,hit))return Report.NONE;
@@ -194,6 +287,7 @@ public final class WeaponCutContact {
     /** Accepted blunt contact gets a local wound, but can never authorize a slice. */
     public static Report impact(ServerPlayer player,LivingEntity victim,Vec3 direction){
         if(!RagdollImpact.supportedBody(victim))return Report.NONE;
+        if(victim instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody())return new Report(Kind.NONE,List.of(new Contact(32,"impact",hydra.incomingPoint(),direction.normalize().scale(.25),Vec3.ZERO)));
         Vec3 eye=player.getEyePosition(),center=victim.getBoundingBox().getCenter();
         Vec3 aimed=victim.getBoundingBox().clip(eye,eye.add(player.getLookAngle().scale(4))).orElse(null);
         Vec3 hit=aimed==null?victim.getBoundingBox().clip(eye,center).orElse(center):aimed;
@@ -207,6 +301,7 @@ public final class WeaponCutContact {
     }
     /** Entry surface of the touched anatomical box, in body-local metres, for blood attachment. */
     public static Vec3 woundPoint(LivingEntity victim,Contact contact){
+        if(AnimatedHurtBody.of(victim)!=null)return local(contact.point(),victim.position(),victim.yBodyRot,1);
         double scale=bodyScale(victim);float angle=(float)Math.toRadians(victim.yBodyRot-180);
         Vec3 p=local(contact.point(),victim.position(),victim.yBodyRot,scale);
         Vec3 travel=contact.travel().yRot(angle).normalize();
@@ -355,7 +450,7 @@ public final class WeaponCutContact {
     private static Vec3 reach(ServerPlayer p,Vec3 origin,Vec3 point){var d=point.subtract(origin);return origin.add(d.x*AttackReach.scale(p),d.y,d.z*AttackReach.scale(p));}
     private static Vec3 local(Vec3 p,Vec3 origin,float yaw,double scale){return p.subtract(origin).yRot((float)Math.toRadians(yaw-180)).scale(1/scale);}
     private static Vec3 closest(Vec3 p,AABB b){return new Vec3(Math.clamp(p.x,b.minX,b.maxX),Math.clamp(p.y,b.minY,b.maxY),Math.clamp(p.z,b.minZ,b.maxZ));}
-    private static Vec3 intersectionCenter(Vec3 a,Vec3 b,Vec3 c,AABB box){
+    static Vec3 intersectionCenter(Vec3 a,Vec3 b,Vec3 c,AABB box){
         List<Vec3> polygon=List.of(a,b,c);
         for(int axis=0;axis<3;axis++)for(int side=0;side<2;side++){
             final int index=axis;double boundary=side==0?box.min(axis==0?net.minecraft.core.Direction.Axis.X:axis==1?net.minecraft.core.Direction.Axis.Y:net.minecraft.core.Direction.Axis.Z):box.max(axis==0?net.minecraft.core.Direction.Axis.X:axis==1?net.minecraft.core.Direction.Axis.Y:net.minecraft.core.Direction.Axis.Z);

@@ -1,0 +1,90 @@
+{
+  "date": "2026-11-17",
+  "status": "Authoring and static review complete. Not compiled/installed; current player client untouched.",
+  "privateMeasurement": {
+    "path": "D:/PrototypeReference/p1/private/uav/head-measurements.json",
+    "sha256": "d9e002c0716b44be04ab00343d7a164676db652307999d2ff671a8a65dd41f08"
+  },
+  "change": "Replace incorrect grill-faced box/segmented trim with a solid flattened ellipsoid and the measured smaller rear elliptical barrel; move three struts to native attachment directions. Corresponding wreck generated from exactly the same authored cuboids.",
+  "scope": "Model/art only. Source [-X,Y,Z]*16 proportions and original max head height retained; no runtime, scanner light state, glow mask logic or rotor mechanics changed.",
+  "staticAudit": {
+    "unchangedOtherBones": [
+      "root",
+      "rotor_0",
+      "lamp_green",
+      "lamp_yellow",
+      "lamp_red"
+    ],
+    "torsoCubesRemoved": 3,
+    "torsoCubesAdded": 3,
+    "oldHeadCubes": 24,
+    "newHeadCubes": 51,
+    "textureChangedPixelBounds": [
+      64,
+      32,
+      96,
+      64
+    ],
+    "expectedNewAuthoredTileBounds": [
+      64,
+      32,
+      96,
+      64
+    ],
+    "errors": [],
+    "previewReview": "Both three-view full before/after and oblique head detail viewed; no detached top/foot connection visible. Red lamp intentionally shown in static preview; actual three-state behavior unchanged."
+  },
+  "adaptation": "A solid9x5 cuboid ellipsoid approximates measured86-point cap;7 bands approximate33-point barrel. Square.46px struts replace triangular source rods. Lower ends extend along the measured line down to existing authored inner lipY8.25; this prevents a1px gap while retaining the body model. Procedural crosshatch and termination band are authored. No original texture/mesh copied into deliverables.",
+  "deferred": [
+    "Minecraft renderer/model reload and runtime lighting",
+    "Actual player camera/proportions review",
+    "Wreck fragmentation review in game"
+  ],
+  "files": [
+    {
+      "path": "tools/author_uav_model.py",
+      "sha256": "df25bbdd2fd0600967ebbd1a0dcbbe766ee083fe6c3d6a39d9de2b952d56208d"
+    },
+    {
+      "path": "tools/preview_uav_head.py",
+      "sha256": "b7f924ad4ca0525b8a6438dcfd2b68c4d7708319f57a9b82ee98ee927d118ceb"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/geo/recon_uav_mc.geo.json",
+      "sha256": "81f87b0563e44a2cbc47b7c2aa88f5de337460e4d09fbf134427a4302f47b7e9"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/animations/recon_uav.animation.json",
+      "sha256": "6ce9ca6cf4eb296e182c37bfb8e06827a8d091eae222674b7f751576ff6e074f"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/textures/entity/recon_uav_mc.png",
+      "sha256": "5fef328c714bed8d8b5bfe3a10a5313a4a3531e6726db6ede982f59c0951a18e"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/textures/entity/recon_uav_mc_glowmask.png",
+      "sha256": "0c9132dc930f2b699c9650179ec8e0a068af5e0ca65c7f1624a2e254e4a88d28"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/military/recon-uav-wreck.json",
+      "sha256": "ac6228a4a7eb324806cd41ff2957be6132ea89d894f61a3b60a3db4e900ad64c"
+    },
+    {
+      "path": "src/main/resources/assets/blacklight/textures/entity/recon_uav_wreck.png",
+      "sha256": "fb91f41b1bef68b23a286a2c5e3f11d30e051b0821f0accd22c33890e9a58d51"
+    },
+    {
+      "path": "art/military2/uav-model-source.json",
+      "sha256": "c17648960d1b569914339721f4764260510c69d8ff61183b23443eb9c7f5b64d"
+    },
+    {
+      "path": "art/military2/previews/uav-head-before-after.png",
+      "sha256": "d52a4d3c1e93d93427d9d6ab5f6ecf31cd54b6faa28f4534728ca83fa0694d37"
+    },
+    {
+      "path": "art/military2/previews/uav-head-detail-before-after.png",
+      "sha256": "682ef3cefb53be08d8b6a3b7c3e60cfe239bd7f091e417bccc78a6b591b94ffe"
+    }
+  ],
+  "runtimeCorrection": "Superseded visual-transform assurance: art/military2/uav-gecko-rotation-review-20261117.json proves this prior preview did not reproduce Gecko cube Euler conversion. Head source measurements remain valid; old beam runtime/preview agreement does not."
+}

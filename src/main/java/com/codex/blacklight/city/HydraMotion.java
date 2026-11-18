@@ -24,11 +24,11 @@ public final class HydraMotion {
             if(bones.length!=parents.length||bones.length!=pivots.length)throw new IllegalArgumentException("Hydra rig dimensions");
         }catch(Exception e){throw new IllegalStateException("Invalid hydra motion resource",e);}
     }
-    public static String clip(int action){return switch(action){case 2->"capture";case 3->"combat_slam";case 4,11->"retract";case 5->"emerge";case 6->"dive";case 7->"arrival";case 8->"toss";case 9->"sweep";case 10->"sidesweep";default->"idle";};}
+    public static String clip(int action){return switch(action){case 2->"capture";case 3->"combat_slam";case 4,11->"retract";case 5->"emerge";case 6->"dive";case 7->"arrival";case 8->"toss";case 9->"combat_sweep";case 10->"combat_sidesweep";case 12->"combat_pickup";case 13->"combat_hold";case 14->"combat_throw";default->"idle";};}
     public float[][] sample(int action,float ticks){
         var frames=clips.get(clip(action));float frame=Math.max(0,ticks)*1.5F;
         if(action==11)frame=frames.length-1;
-        if(action==0||action==1)frame%=frames.length-1;else frame=Math.min(frame,frames.length-1);
+        if(action==0||action==1||action==13)frame%=frames.length-1;else frame=Math.min(frame,frames.length-1);
         int lo=(int)frame,hi=Math.min(lo+1,frames.length-1);float f=frame-lo;
         var out=new float[bones.length][6];
         for(int b=0;b<bones.length;b++)for(int k=0;k<6;k++)out[b][k]=frames[lo][b][k]+(frames[hi][b][k]-frames[lo][b][k])*f;

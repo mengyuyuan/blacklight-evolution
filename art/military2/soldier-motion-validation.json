@@ -1,0 +1,1321 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-11-16T10:45:43.083951+08:00",
+  "overallGoalComplete": false,
+  "scope": "Actual horizontal travel drives per-actor walk/run phase; radio keeps the firearm and reaches the earpiece; accepted damage starts a bounded standing reaction; vehicle seats take priority.",
+  "privateSource": {
+    "path": "D:\\PrototypeReference\\p1\\private\\military-motion.json",
+    "sha256": "de70bab58bec146fecdf8e353ac67eefea124fe239c04060fcfb5e3f26313a65",
+    "clips": 11,
+    "copiedToRepositoryOrPackagedByThisCheckpoint": false
+  },
+  "baseline": {
+    "neo": {
+      "src/main/java/com/codex/blacklight/animation/P1MilitaryMotion.java": "022C1F785E3937C6ABD7661D4202653D597C60EED4A18307A946492190BF1258",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchRigPose.java": "10042209818A2F81A7FC432F343633218331AABAD6299D2F6461A089A508E048",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "9874A0F52B87E460EAFBEF59E9CBCDBA55E21F07749AD727564BA3ABB7E3B524",
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "AE085D11F8DC3B2B6FBA04B627E12F21C151E943DF39755AA972FC8BA33C567E",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchLegPose.java": "425F98C8AF01F0C3FD8403A3931DE0B3543676467376AE886116377D164C78E9"
+    },
+    "forge": {
+      "src/main/java/com/codex/blacklight/animation/P1MilitaryMotion.java": "BE5970C8EB7BDF167F0C7265AB260371E24E8038DAF072D176AA50EE530E36F3",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchRigPose.java": "02772B973C71DCD56EC0DD50F80DCE53C109F416392173B07CE4BF0D18B9886E",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "07C5F11BB86AB20D037B0C188F242C71BA4239D4BC776019A3E97C4E99172779",
+      "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "5C5F63322476E61A109EDF836C9559E9AD3F757096654810F1487724BBFE20C4",
+      "src/main/java/com/codex/blacklight/client/model/BlackwatchLegPose.java": "425F98C8AF01F0C3FD8403A3931DE0B3543676467376AE886116377D164C78E9"
+    },
+    "retargetingFailure": "Initial radio support-hand mapping was still tied to the magazine anchor: nearest hand-to-ear distance 9.001543 model pixels; changed gestures to source hand-to-head offsets while preserving existing reload mapping."
+  },
+  "baselineSha256": "7b7acaa87e37f158cd72bf0b0a1f3f523db9ab2bf6f4d56b136492f612a17d66",
+  "rejectedNativeHit": {
+    "path": "D:\\CodexCache\\military-motion-qa\\rejected-hit.json",
+    "sha256": "8a27d435124237040ecb71b76cbb5d9e28828ebf571ae23262b002b7821bee12",
+    "contactSheet": {
+      "path": "D:\\CodexCache\\military-motion-qa\\rejected-hit.jpg",
+      "sha256": "00b8ea7adca16ec277921395c240e26f3aaaef4dfe23e14672a16acceec47df2"
+    },
+    "beforeHeadY": {
+      "neo": 21.738615,
+      "forge": 21.08286
+    },
+    "reason": "Decoded sol_rifle_gethit_head_001 is a full fall, not a standing flinch. Native torso reaches ground while locomotion legs continue.",
+    "resolution": "Use authored standing flinch with bounded recovery; retain source clip only as private reference. Full source knockdown is not claimed."
+  },
+  "sourceCatalog": {
+    "path": "D:\\CodexCache\\military-motion-qa\\source-catalog.jsonl",
+    "sha256": "fe9a33c8565d8606918a888b51b767ae36ac779e0031fc315dfa6b39846d682c"
+  },
+  "correctedFallbackSole": {
+    "beforeMaximumSoleY": {
+      "forge": 24.239326,
+      "neo": 24.30714
+    },
+    "groundPlaneY": 24.05,
+    "resolution": "Lift a penetrating ankle by the complete rotated boot sole depth and solve the existing 6+5 leg chain; hip sockets, upper body and boot orientation remain fixed."
+  },
+  "correctedProjectileFixture": {
+    "reason": "All three spread arrows missed a freely moving actor; fixture now holds only until first real hit and removes arrow spread",
+    "status": "FAIL: java.lang.IllegalStateException: java.lang.IllegalStateException: real incoming arrow triggers synchronized hit clock",
+    "observedHitRows": 151,
+    "minimumHealth": 80.0,
+    "hitClocks": [
+      -1
+    ],
+    "evidenceSha256": "4B18E41BFB1566132BCF820D6A46947A408409C515DD785B1E77F3C5C2F04745"
+  },
+  "correctedAttackerMemoryFixture": {
+    "neo": {
+      "reason": "Real arrow damage passed, but final attacker-memory assertion ran after vanilla forgot the attacker; now capture the attacker while the hit is current",
+      "minimumHealth": 68.96,
+      "hitClocks": [
+        -1,
+        226324,
+        226336,
+        226348
+      ],
+      "evidenceSha256": "527A5508743000FAB16676D120355397D7A216189B539C874EC6BA2AF543BD1C"
+    },
+    "forge": {
+      "reason": "Real arrow damage passed, but final attacker-memory assertion ran after vanilla forgot the attacker; now capture the attacker while the hit is current",
+      "minimumHealth": 72.64,
+      "hitClocks": [
+        -1,
+        139484,
+        139507
+      ],
+      "evidenceSha256": "BC24BE855B8CC079D90DBB1FBFA953B2AA9F32FCB45875E51A1F50F82DBFD37D"
+    }
+  },
+  "limits": [
+    "Source walk/run/radio are retargeted onto the native rig, not a complete 67-joint skin or original-game frame-for-frame reproduction.",
+    "The decoded source head-hit clip ends in a fall and is deliberately not used for standing damage. This checkpoint uses an authored standing flinch, not source knockdown.",
+    "Locomotion removes source root travel from the feet and derives phase from actual client-interpolated horizontal movement. It does not change production navigation urgency or movement speed.",
+    "Native walk/run scenarios use real MOVE orders with movement attributes 0.25 and 0.80, not fixed client bone scripts. The faster actor reaches its target and stops during the run case.",
+    "Five native scenarios use an 80-health soldier, temporary setup NoAI and stationary high-health enemies. The hit actor remains NoAI until its first real accepted hit; three arrows come from Skeleton.performRangedAttack, with fixture-only spread removed before vanilla collision/damage. Production AI and hurt logic are unchanged by this fixture correction.",
+    "Server observations are unique sampled game ticks; client/server scheduling may skip ticks. Captures require the actor to have rendered in the same client tick, not every render frame.",
+    "Eight selected frames per case are reviewed. Leg checks use the actor support plane, not per-foot terrain IK or exhaustive collision/self-intersection verification.",
+    "The vehicle obscures the seated actor in the exterior camera. Actual actor render events verify seat priority and state reset; these images do not prove an unobscured cockpit pose.",
+    "Muted disposable QA records sound events; it is not a subjective sound-quality or volume review.",
+    "Server regressions predate the final client-only hit correction; freshness is checked against server behavior files. Native and unit checks cover the final client files.",
+    "No player world, release JAR, installation or publication in this checkpoint. Task-created private configs are removed from both disposable clients after source captures."
+  ],
+  "remaining": [
+    "Full-body source knockdown and recovery",
+    "Per-foot terrain support and body-weight refinement",
+    "Broader moving-target, terrain and multiplayer choreography",
+    "Fear/retreat and alert-search behavior",
+    "Remaining creatures, detailed models and sound listening in the active overall goal"
+  ],
+  "platforms": {
+    "neo": {
+      "sourceSha256": {
+        "src/main/java/com/codex/blacklight/animation/P1MilitaryMotion.java": "62870ed81df13986017444c473bf028fe067deecd48ab678abdf6b4581aecac1",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchGait.java": "b39605728d3d865253a7223e6ae007a126599d64882aadfe1ca7eb4f6caeb136",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchRigPose.java": "97bfd6f6ed0e802ba54245a85613e826b35400d018f3bfdf6b753ef6cf5a49e7",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchLegPose.java": "72fe31cc3d7e1688208c60769dffd711026e65b2501a109b53cad969c9e073d5",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "23053ba8b6fb3b84ae2c79f86f6ac0617c78563fb5b460dc3ca3439d254c9379",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchReferenceProfile.java": "0fb5738e056bb16c772013b8a04d830d17cd71bf21c7ca0666592137d2091a8b",
+        "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "2280398f0dcb0f80222531d55a27ebab0b1449b8a3acf7baa1f8f6af7f6e45ec",
+        "src/main/java/com/codex/blacklight/military/MilitaryTactics.java": "3addfb1cd767d5aa02c9bb3a64edc39cfb2cc98209e0617c6b911598983ead03",
+        "src/main/java/com/codex/blacklight/military/MilitaryCover.java": "1126fb742335ae75a90f8c05611f3582cd7244b12bcb5923df6ae2ed9a6677a0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "bec98f02ea56ec7356cce1906e21e3ec5b6b240bcce7cccf010183d1d23cccf0",
+        "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java": "1f922851e0352bbadc191a76dda4b9fe28d2892e176b445f158e360d58a7cee0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java": "d539c4939eaef61ed93a60f134561458f700d4d8dcf95cbb8b6898ddb661f4ed",
+        "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java": "c3ad760265e5a46a14039d3e5f039c7e4172803d97a4497f06ad606103bf6728",
+        "src/main/java/com/codex/blacklight/city/MilitaryHomeSystem.java": "5a43a7c66c222e7d50765fc7342899b3354b71538f9cc0ebc986230071a52bb6",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "3dc74b462cc5a4b59f9c88d9f8d756fbb22ad709a1072fe72c8481a0f126512b",
+        "src/test/java/com/codex/blacklight/client/model/P1MilitaryMotionTest.java": "69eade9ca5d07e15516989eb953854d4c8017a83f5c7bc7b0a2848d84b9a046e",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchRigPoseTest.java": "0c2600f2bc15fc58c7e8175b81030c6385354286171b7a4097d2b27bd71b54f9",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchReferenceProfileTest.java": "314a0beaf960bfb080b289b98ccaaf2bb6f05cfab5d5fc98a4da288cd6d9d312",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchGaitTest.java": "ada653a4c4aef2cabc645604cbd706aab8f67f014651c6d0863b1f1cd03ca22a",
+        "src/motionTest/java/com/codex/blacklight/gametest/MilitaryMotionGameTest.java": "ac9cb6d25fda51ef4e1e9d44955cc3d424cd6905982cb6eba7d31dfa5d3fe0ac",
+        "src/motionVisual/java/com/codex/blacklight/client/MilitaryMotionVisual.java": "89c2a1d998ac110d3094ddc75091bd3a19344a81cb53ad3f751b42705d40a54f",
+        "tools/military-motion-test.init.gradle": "9773be9c3dd2bc28e4ffd49a31fcd71a46153a71f981eb763848b99af93a2fcc",
+        "tools/military-motion-server.init.gradle": "17113f85c8c06c391c71505ebb0ecb3f409dbda9f186513244fe927fb309dca2",
+        "tools/military-motion-visual.init.gradle": "98aa4513fde9955fbc05fab6999ff86b4301992ada57543428a3deb281d2eb56"
+      },
+      "unitTests": {
+        "P1MilitaryMotionTest": {
+          "tests": 10,
+          "path": "D:\\CodexCache\\creature-combat-qa\\neo-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.P1MilitaryMotionTest.xml",
+          "sha256": "a4d7cfec6b5d7032fa8e96a6527ff1683b2fb2eea8c21031f5e5b5695530da5f"
+        },
+        "BlackwatchRigPoseTest": {
+          "tests": 9,
+          "path": "D:\\CodexCache\\creature-combat-qa\\neo-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchRigPoseTest.xml",
+          "sha256": "73b432ce551e8780d8e772d0ddbf6368021cd94ec645ae30992d1715f8d5e227"
+        },
+        "BlackwatchReferenceProfileTest": {
+          "tests": 6,
+          "path": "D:\\CodexCache\\creature-combat-qa\\neo-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchReferenceProfileTest.xml",
+          "sha256": "12864ae49c86842f3be2042bd58ec0de4fe92166fe77ee7f2c25ba8110643dae"
+        },
+        "BlackwatchGaitTest": {
+          "tests": 9,
+          "path": "D:\\CodexCache\\creature-combat-qa\\neo-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchGaitTest.xml",
+          "sha256": "ded73f1f8d4526c1738161585e5e1df6a2c409f7633f6669be5c110315bceba6"
+        }
+      },
+      "serverRegressions": {
+        "motionServer": {
+          "requiredScenarios": 2,
+          "path": "D:\\CodexCache\\creature-combat-neo-motionServer.log",
+          "sha256": "88a71aee1f440859f5678224f16015c3af9b4793bd0f1148c6987cb173cd8c99"
+        },
+        "militaryServer": {
+          "requiredScenarios": 18,
+          "path": "D:\\CodexCache\\creature-combat-neo-militaryServer.log",
+          "sha256": "c58affdc1f6ad197950333d68f9e8314a946bdd5813efb4678dfa38cba0d0355"
+        },
+        "coverServer": {
+          "requiredScenarios": 9,
+          "path": "D:\\CodexCache\\creature-combat-neo-coverServer.log",
+          "sha256": "bec8c33310f9710216e55c0e36f7a417dc483cfa702a1c89f5f06262128d2721"
+        },
+        "helicopterServer": {
+          "requiredScenarios": 32,
+          "path": "D:\\CodexCache\\creature-combat-neo-helicopterServer.log",
+          "sha256": "866fb4bb1476b760044d308375e953392348606fd411a4cb343000e857cc73ee"
+        }
+      },
+      "native": {
+        "source": {
+          "cases": {
+            "walk": {
+              "actor": "8dd9d1ec-cb82-4da6-ba2b-e70a06fc3a97",
+              "observedServerTicks": 141,
+              "worldTickSpan": 142,
+              "renderedCaptures": 36,
+              "maximumRunBlend": 0.6390540386486968,
+              "maximumMainGripErrorPixels": 2.7026615e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0004.png",
+                  "sha256": "316e90d1c513c576ee2f3bc72ba61433889cd6341f1adac2348c348efe14bbe2"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0010.png",
+                  "sha256": "abb855ab2db5def4fb6f7e33ebc8a8bd890da75ce4cd6f927bd6dc46a1795442"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0016.png",
+                  "sha256": "47f043aa0d1e560ac0ece21b51d9faa7be4d85b9997d25a995c7ce6cd6583dad"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0023.png",
+                  "sha256": "44c810300cc5c1c088cf04e7b9a074343724ef8eeb16e9c88ffa25b5bfbb9582"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0029.png",
+                  "sha256": "ce98bba94e86a586f59cf889d926ca8e65479fe27aab592e48a8b915ef0bd209"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0033.png",
+                  "sha256": "413979a843cc363eff8c5a515e888c4190ed0d4c25d631ed35215dafdcc8d30a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0034.png",
+                  "sha256": "04e9bedde91a5f8630c447583b52d48744a995dd32ed56b7be58083bb5853f25"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\walk-0035.png",
+                  "sha256": "42e2b84863fea0c8379c555ac7cd84d7708ee7ba1db0f2bd0b3bc9b9b95d1af6"
+                }
+              ],
+              "horizontalDisplacementBlocks": 14.201127719647205
+            },
+            "run": {
+              "actor": "893d62b9-4d55-4a35-bd1f-fc97b1520e5f",
+              "observedServerTicks": 141,
+              "worldTickSpan": 140,
+              "renderedCaptures": 35,
+              "maximumRunBlend": 0.8274380238612461,
+              "maximumMainGripErrorPixels": 2.9224516e-06,
+              "maximumSoleY": 24.050009,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0040.png",
+                  "sha256": "f2edc81ae4f45d48b02e03f3189560e27e664cbd1558aae725c2fd18cbb7d31f"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0046.png",
+                  "sha256": "aa5118423260a4c2dc2bfa68f459f3696c73c0a9b42afa262fa9d07662a87e00"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0047.png",
+                  "sha256": "51f5ac84e95ff98a2ef1b4d53365538b6959f0255624f8f9a26225918f9ac00c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0048.png",
+                  "sha256": "59246a1d50bbaef8a86f409c200b83e79356d45405e7e9f042e1b940cbf511be"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0049.png",
+                  "sha256": "b0b7102620003476a793515c274581a246c778036178a773feb31134cfe76b02"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0050.png",
+                  "sha256": "80c1d7f2b13746f54707014ed6baf5bcb3c6df9e95d6ba606f27d9b216a1f042"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0069.png",
+                  "sha256": "79b50b0c3e79effb2120c011c78c1fb579bc1005c8f5b580e533cababa9be645"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\run-0070.png",
+                  "sha256": "50286bb1ed7cbeb805210448e5d9c37fc4f07c04b2eab7655cada8fd4adac13e"
+                }
+              ],
+              "horizontalDisplacementBlocks": 28.626123337973674
+            },
+            "radio": {
+              "actor": "78ef909c-1463-49b3-816a-ec1a320201e2",
+              "observedServerTicks": 151,
+              "worldTickSpan": 151,
+              "renderedCaptures": 38,
+              "maximumRunBlend": 0.8302756649407598,
+              "maximumMainGripErrorPixels": 3.4385216e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0071.png",
+                  "sha256": "95f51e72264200ba8399537d45ada6a31d770b84ac6a4639c602f4829c5bf8fd"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0076.png",
+                  "sha256": "8a6bd1d5e1d42e9b276f21e87a17aedea5d1627b27e38dd7419390321d656520"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0082.png",
+                  "sha256": "b477deafabd19f12e85ae1441938e8aaa1f04e7deb8802512bb548df70049a4d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0087.png",
+                  "sha256": "ef1467491f0e99dd530343fa3f414f15c4a06f17ffd06dccae4377e3c3c01ab4"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0092.png",
+                  "sha256": "611651e6c8f60787c7b4e2aa9cc6db9403d87e392307344c34e438206777eb4c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0097.png",
+                  "sha256": "55d702cb9a724aad7eac4fa46627e2b2793f3fd414218daa4d9591847de557e6"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0103.png",
+                  "sha256": "e2104fe051e5aeb06c84b75d60858583ebb40eb9a632ad0009bb9420f53b2c08"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\radio-0108.png",
+                  "sha256": "c3ead55dd7410045b025ceeebb7cd58deb87bb00eaff95c3dac74d6f4f9ce668"
+                }
+              ],
+              "minimumHandEarpiecePixels": 0.1336241
+            },
+            "hit": {
+              "actor": "102ebb50-ae4f-4f6d-af57-6e47b77c3ec9",
+              "observedServerTicks": 151,
+              "worldTickSpan": 150,
+              "renderedCaptures": 38,
+              "maximumRunBlend": 0.6897244974846909,
+              "maximumMainGripErrorPixels": 2.5344243e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0115.png",
+                  "sha256": "2fc02d2567edf3a84c5ee2fa3f417f1d3e7ec6bba628c11aeb7c8dabbac83285"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0117.png",
+                  "sha256": "c6abd0a24695fe58e776715fb6147111dd5601f851d026fd7a00641bb3aca1b7"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0119.png",
+                  "sha256": "086765c8b3d010f0487ddd1dc00cfc4a3104bde1057368ebd61dd78697b1ec49"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0121.png",
+                  "sha256": "bab3e09c462e850bf9f3e38265e8d019d8d6824bcaa84a0c77c0c3212be307f0"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0123.png",
+                  "sha256": "967aa63f6da0b040cc7c18d20c9d7db739b253f63e28258ca226ac2a55d0859d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0125.png",
+                  "sha256": "64fda65fe6cf380f0fa9e36b98e495457f8f8e334f4d2081ac6ab590acf39b9e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0145.png",
+                  "sha256": "2b0145d50f39b17f8ee472ff573f2a5469a0234c56245cdca54491609bd4a743"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\hit-0146.png",
+                  "sha256": "79eb676382f4ee7eb919cc2f3aa7336b0bc4dd97f8f26cb8236d47afd78d9e10"
+                }
+              ],
+              "maximumStandingHitHeadY": -1.1128561,
+              "minimumHealth": 72.64,
+              "distinctAcceptedHitTimes": [
+                227127,
+                227150
+              ]
+            },
+            "seat_interrupt": {
+              "actor": "132a9300-acae-42da-bdc8-43257d97e3e7",
+              "observedServerTicks": 101,
+              "worldTickSpan": 100,
+              "renderedCaptures": 25,
+              "maximumRunBlend": 0.0,
+              "maximumMainGripErrorPixels": 2.2523932e-06,
+              "maximumSoleY": 24.05,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0147.png",
+                  "sha256": "059a712f5df99e1263c2d1520a7dc7fa9d80b2f15732b897fe8c9ebb6dda735e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0150.png",
+                  "sha256": "80cff4762e4bff1b213d618274750ed0b7adaeab8336f1b61f9d662c280887eb"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0154.png",
+                  "sha256": "96ce3e7f9aea84bf59a868a428e39f3980e90713ec302a43c77af43f6e560347"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0157.png",
+                  "sha256": "b03ccd4cee9bab16b628fc580a5c2156e472a6f67f173f4e84fec7e090efbe9c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0161.png",
+                  "sha256": "08909bc5abe2db5cf330fb2f1fbcee4c1de2ba5d7821f93b34ba5fcc0db6ab7a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0164.png",
+                  "sha256": "cd03f85650561204a34dc0042a80a4d9676c43c399e35b4de68eb0d379e291e9"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0168.png",
+                  "sha256": "1902e536a7af709a4a5278f3f6efec6007f4f0adf4d54f8b9f987005aa5a9a58"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\seat_interrupt-0171.png",
+                  "sha256": "34f4930e13c19c3a165af343543a19883517b41b6fd2666a3bdc2c5eed701eaa"
+                }
+              ],
+              "renderedSeatFrames": 10
+            }
+          },
+          "buildLog": {
+            "path": "D:\\CodexCache\\creature-combat-neo-motionVisualSource.log",
+            "sha256": "4cbc5cf3e50cb0889772e857259e76c6bd020fdd87e92e1b5a6022b54b065408"
+          },
+          "serverSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\server.json",
+            "sha256": "6cfe3563a61808262ac2d140a20eae36803db7f6cefd9029c41c618b5955bb01"
+          },
+          "renderedSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\frames.json",
+            "sha256": "ec8b83ed8be1c809e80580c90095d0c84c57acb14cc5401a4ea6e9d2e6f790e4"
+          },
+          "reviewManifest": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\review-manifest.json",
+            "sha256": "9434b009af54fe2373b8a318f5df12fe1816e7b1d95c1c3e45ffc15e59173be4"
+          },
+          "reviewSheets": [
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\review-1.jpg",
+              "sha256": "401714f9807ea072d4baea5657c28e3beb2847490f766d1ce3f6947e9e3eeac2"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\review-2.jpg",
+              "sha256": "cb56cd77ab98db950d4189dfa94009ecd9a9929f6749bb7fd6c2fab0153affd1"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-source\\review-3.jpg",
+              "sha256": "75ac1885df8af752345abff991beb96d09d46221706b60490d4da4bf4c2b5347"
+            }
+          ],
+          "soundEvents": [
+            "block.stone.step",
+            "entity.arrow.hit",
+            "entity.skeleton.shoot",
+            "firearm.rifle"
+          ]
+        },
+        "fallback": {
+          "cases": {
+            "walk": {
+              "actor": "4c16c15f-0cd4-4c0f-b66c-2abb1286628a",
+              "observedServerTicks": 141,
+              "worldTickSpan": 148,
+              "renderedCaptures": 37,
+              "maximumRunBlend": 0.6328433731333721,
+              "maximumMainGripErrorPixels": 2.8235243e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0005.png",
+                  "sha256": "163b9eaceae1e8098771129fd18118e4efabf865679950091521941068c2ce8d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0011.png",
+                  "sha256": "258eb175d208c64f980b9f39989703befa5614514ffdc362d9c99b901acbfc17"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0017.png",
+                  "sha256": "05df805cb67b5480a6bc5230567ffb5c165ea426ebc2fee4032c50594d5de684"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0024.png",
+                  "sha256": "517f66b794bc5dea8d0765a98216372fec552b0e39e5c912d77e31ad60287539"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0030.png",
+                  "sha256": "45b99b5a98518d5fcfe4d1090e2c8f9b26821dd4098db1b2f792871f108dde08"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0034.png",
+                  "sha256": "8271da9004936a51b31aaa8c291a43d5a35a2f51b1129f2e024abc3e202d5188"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0035.png",
+                  "sha256": "43285307fd7124e6b3a42397c058b5b0295be0bfafe81b8713a2d794dcce580a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\walk-0036.png",
+                  "sha256": "4a205cf22e46331800af2a19c08c8c504b12c30e6bc0de2d990d27ae9cff2605"
+                }
+              ],
+              "horizontalDisplacementBlocks": 14.747194707409372
+            },
+            "run": {
+              "actor": "0b65a0f1-9039-4152-82bb-974a642823b6",
+              "observedServerTicks": 141,
+              "worldTickSpan": 144,
+              "renderedCaptures": 36,
+              "maximumRunBlend": 0.9275602429657486,
+              "maximumMainGripErrorPixels": 3.2625037e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0040.png",
+                  "sha256": "78ae2c9a1bbdaa80f6c7deff561f9f890c9bc1ac26371c33963ec60e6cbd763c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0047.png",
+                  "sha256": "9115d641883d66731b4fd4bd4b8fc4ead8629a8c2d0bacbe577963b855dbc646"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0048.png",
+                  "sha256": "6422a3e35d9e725eed511b4fd2d5c062c97ebc97dfa6d0483eb10bba40ee8bcd"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0049.png",
+                  "sha256": "59fbfd3a09defefd29731de59a1024d00083ac105b302a443133266790fa7cf6"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0050.png",
+                  "sha256": "c40ee6cb62953f98e27adfdab29190bb190aa0cb1c56e8f6100354185fb2d9cc"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0051.png",
+                  "sha256": "e35c551e545ec4fcc16d773b22c33b0c2c117df274cf30f9ca60a5c00269dbe9"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0071.png",
+                  "sha256": "c16c2d7cf86ff007b90957ef4663bf068887be611889e1a1f7325d3eaa374c92"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\run-0072.png",
+                  "sha256": "eda858c067c5d95ec8cad13322203613ac8a26d349909f43fe20b7143e7c7530"
+                }
+              ],
+              "horizontalDisplacementBlocks": 28.626123337973674
+            },
+            "radio": {
+              "actor": "8ad0a3a4-aaaa-429c-9e2a-c732324de169",
+              "observedServerTicks": 151,
+              "worldTickSpan": 155,
+              "renderedCaptures": 39,
+              "maximumRunBlend": 0.7435880217527617,
+              "maximumMainGripErrorPixels": 2.8535626e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0073.png",
+                  "sha256": "2d64084b4fdd0283187c2a1fa678bf3e331aa3bbee55e2a5965faa0da4f3bc83"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0078.png",
+                  "sha256": "e826156b00ce19c7721a3598395bf40445c0345606fd6337863e26eb92ed57dc"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0084.png",
+                  "sha256": "2cc24ed96cb9229385badf28ab0e8419f7c6b11be0d7806c2b0c890ba5622f01"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0089.png",
+                  "sha256": "9e546583daeb428da0eeeb901e7ce249a8c393b7976a0cbb3eb14c8199560db7"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0095.png",
+                  "sha256": "e4ea27304016971aa2331df98d2e16c2e42ead9216a7ce9610008b53dccfb9c6"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0100.png",
+                  "sha256": "1ccc06a33191eadea94d4842aca15e2f9f9bfbecc426bf64ccde2d879b688b8c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0106.png",
+                  "sha256": "f8160fcaa46203bab105b385ce17f552a53f93124b04aa64342cbd59017c2abb"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\radio-0111.png",
+                  "sha256": "14f48846fe8e5071ec5566042792312734ba4c0bba3f16ec8d9b0d15f6d08ea2"
+                }
+              ],
+              "minimumHandEarpiecePixels": 2.1663643e-06
+            },
+            "hit": {
+              "actor": "f12beb87-555f-42cc-8833-8d20302f7c9f",
+              "observedServerTicks": 151,
+              "worldTickSpan": 155,
+              "renderedCaptures": 38,
+              "maximumRunBlend": 0.812117664469561,
+              "maximumMainGripErrorPixels": 2.9586968e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0117.png",
+                  "sha256": "3d5076aa2fb4c44decbb06c3bc8a146ec2322a29c97a6d0878f7c2e4672afbe1"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0119.png",
+                  "sha256": "34bfea9963fa24ff526b2790a94091eecae978a6e3ed1ca0e9e2320f46d93485"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0121.png",
+                  "sha256": "aba86c301bd23a598384d21625060f0a2fced3c8ef3c2022b6e97874bf298cad"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0124.png",
+                  "sha256": "8ed0765232ce36cd6da63476aa14780973066604d2de1a1628b246dea3b05738"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0126.png",
+                  "sha256": "d334ad9c71f3a75885b358af4436d500c6c696c2784febe790cd1d50354683ac"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0128.png",
+                  "sha256": "19bce87ad2bd9dd38601eb01d2a806aab33267213509cd844f89d602d1c39650"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0148.png",
+                  "sha256": "d1b9ac3b91b092b5b50c839259faa4f8ed7678c150e4063147be92608e6dae5d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\hit-0149.png",
+                  "sha256": "0176613b044cd40c9f4e243450abefed727e95feec5e504b7d37dd98745e19ad"
+                }
+              ],
+              "maximumStandingHitHeadY": -3.51545,
+              "minimumHealth": 72.64,
+              "distinctAcceptedHitTimes": [
+                228013,
+                228036
+              ]
+            },
+            "seat_interrupt": {
+              "actor": "56a9a3d8-dcdd-461d-be1d-264256e24dad",
+              "observedServerTicks": 101,
+              "worldTickSpan": 102,
+              "renderedCaptures": 26,
+              "maximumRunBlend": 0.0,
+              "maximumMainGripErrorPixels": 2.6388102e-06,
+              "maximumSoleY": 24.05,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0150.png",
+                  "sha256": "d9bdfd086c1c0c17ff716b9be8c5f5ecf0f78564a222272cbecd643e4457c42c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0154.png",
+                  "sha256": "d66677dd9928b5398295cc23691cc2980975cf9ac69e88d0078ed599bb33d26b"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0157.png",
+                  "sha256": "582ba5defe145b88fa4785f6f3fdbd10f30272c4f1b9ec364dad713ac17f2cdf"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0161.png",
+                  "sha256": "67aee30079dd74d0192b2822260851091452a6ca356584729adeea7dbedacd9d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0164.png",
+                  "sha256": "174e0a547b51f844ef61801daf6305c6cfcb9c94ddc5826a93493fc326fbb58a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0168.png",
+                  "sha256": "572ad2eb86f0bf84dcc8c753ffc6e50fa2dc21fb920d8d017dff2925bfa42fe1"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0171.png",
+                  "sha256": "572ad2eb86f0bf84dcc8c753ffc6e50fa2dc21fb920d8d017dff2925bfa42fe1"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\seat_interrupt-0175.png",
+                  "sha256": "572ad2eb86f0bf84dcc8c753ffc6e50fa2dc21fb920d8d017dff2925bfa42fe1"
+                }
+              ],
+              "renderedSeatFrames": 10
+            }
+          },
+          "buildLog": {
+            "path": "D:\\CodexCache\\creature-combat-neo-motionVisualFallback.log",
+            "sha256": "04053e8a82d17327327e04e778261b98f4cb6c6eb69ad1cae94a9a407c3ef693"
+          },
+          "serverSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\server.json",
+            "sha256": "583176418e7e6ec68be48519512344272d2ad48309d5957aaaa6458991a41e6c"
+          },
+          "renderedSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\frames.json",
+            "sha256": "122759eda9ceb5d69d8e93eb5d9161c0ba928aec0d250c8ed963e9e312344eab"
+          },
+          "reviewManifest": {
+            "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\review-manifest.json",
+            "sha256": "e12d6ad97ae02cf0d275b0746fe143f17156e031656b22c80d2165e7e92ef212"
+          },
+          "reviewSheets": [
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\review-1.jpg",
+              "sha256": "110ec1bf3bbe72e83210c0b0a1219918fa1b2c1843cb0bde0685028221ccd97f"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\review-2.jpg",
+              "sha256": "2a308effdd3131653d5e1b0f41c669e83af6c8f02ef3d81e64dd1117749ab48f"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\neo-fallback\\review-3.jpg",
+              "sha256": "a5b42b710ab78eb2fddc9aa52b4963d6517b4267291054f5e3c0e12da4b32769"
+            }
+          ],
+          "soundEvents": [
+            "block.stone.step",
+            "entity.arrow.hit",
+            "entity.skeleton.shoot",
+            "firearm.rifle"
+          ]
+        }
+      }
+    },
+    "forge": {
+      "sourceSha256": {
+        "src/main/java/com/codex/blacklight/animation/P1MilitaryMotion.java": "cf9441e558fc2f6fdf07b9a627da5e0c838c1b463cb2e70ad61234a56de23ab4",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchGait.java": "b39605728d3d865253a7223e6ae007a126599d64882aadfe1ca7eb4f6caeb136",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchRigPose.java": "97bfd6f6ed0e802ba54245a85613e826b35400d018f3bfdf6b753ef6cf5a49e7",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchLegPose.java": "72fe31cc3d7e1688208c60769dffd711026e65b2501a109b53cad969c9e073d5",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchModel.java": "310ea658908f53c5afac53a7f9942b7530da55ffc47dca913610655f95696a1a",
+        "src/main/java/com/codex/blacklight/client/model/BlackwatchReferenceProfile.java": "0fb5738e056bb16c772013b8a04d830d17cd71bf21c7ca0666592137d2091a8b",
+        "src/main/java/com/codex/blacklight/entity/MilitarySoldier.java": "cf1f27b34ade5505023e98d1c8ea5e68f3b9b1a77f3001cde62814688faba63a",
+        "src/main/java/com/codex/blacklight/military/MilitaryTactics.java": "3addfb1cd767d5aa02c9bb3a64edc39cfb2cc98209e0617c6b911598983ead03",
+        "src/main/java/com/codex/blacklight/military/MilitaryCover.java": "1126fb742335ae75a90f8c05611f3582cd7244b12bcb5923df6ae2ed9a6677a0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFireControl.java": "bec98f02ea56ec7356cce1906e21e3ec5b6b240bcce7cccf010183d1d23cccf0",
+        "src/main/java/com/codex/blacklight/military/MilitaryGroundNavigation.java": "1f922851e0352bbadc191a76dda4b9fe28d2892e176b445f158e360d58a7cee0",
+        "src/main/java/com/codex/blacklight/military/MilitaryFormationSystem.java": "b75d6427d270fdf47cb9f682f811d7231eb3a9ac0bbab16aec93c9eae0c27ebd",
+        "src/main/java/com/codex/blacklight/military/MilitaryWorkBudget.java": "c3ad760265e5a46a14039d3e5f039c7e4172803d97a4497f06ad606103bf6728",
+        "src/main/java/com/codex/blacklight/city/MilitaryHomeSystem.java": "5a43a7c66c222e7d50765fc7342899b3354b71538f9cc0ebc986230071a52bb6",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "2aa71568ff15a193550cf1b7d16aa0835f40c45ecab3a7885e8edfaad17c0bbb",
+        "src/test/java/com/codex/blacklight/client/model/P1MilitaryMotionTest.java": "69eade9ca5d07e15516989eb953854d4c8017a83f5c7bc7b0a2848d84b9a046e",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchRigPoseTest.java": "a39172f84639f4f8fa8d5f21b2a4cea3b4e12a5492bbb77f4496ee15f074e649",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchReferenceProfileTest.java": "314a0beaf960bfb080b289b98ccaaf2bb6f05cfab5d5fc98a4da288cd6d9d312",
+        "src/test/java/com/codex/blacklight/client/model/BlackwatchGaitTest.java": "ada653a4c4aef2cabc645604cbd706aab8f67f014651c6d0863b1f1cd03ca22a",
+        "src/motionTest/java/com/codex/blacklight/gametest/MilitaryMotionGameTest.java": "9c6b2486a3b4e8148a731650eaf85d4ba6a0036e59cdbfc650e50c9fc3737b68",
+        "src/motionVisual/java/com/codex/blacklight/client/MilitaryMotionVisual.java": "d9261fa3b13ced3bdcb37746734a454cb91c0f0ebc5cb2db4d9b05954c8ae7ca",
+        "tools/military-motion-test.init.gradle": "9773be9c3dd2bc28e4ffd49a31fcd71a46153a71f981eb763848b99af93a2fcc",
+        "tools/military-motion-server.init.gradle": "17113f85c8c06c391c71505ebb0ecb3f409dbda9f186513244fe927fb309dca2",
+        "tools/military-motion-visual.init.gradle": "8a26f92aba4eee906eaf72e9ab3030561c75a94e183a98113c0f61f637ad2325"
+      },
+      "unitTests": {
+        "P1MilitaryMotionTest": {
+          "tests": 10,
+          "path": "D:\\CodexCache\\creature-combat-qa\\forge-render-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.P1MilitaryMotionTest.xml",
+          "sha256": "49903426bb01e236d1c54d5dbd326e3140a8b2079a887e0b5888fafefd1968ab"
+        },
+        "BlackwatchRigPoseTest": {
+          "tests": 9,
+          "path": "D:\\CodexCache\\creature-combat-qa\\forge-render-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchRigPoseTest.xml",
+          "sha256": "cbcfba50bee8a15d029dffcf3310933c7a87cbebecf3ecf470ff1e31c4356681"
+        },
+        "BlackwatchReferenceProfileTest": {
+          "tests": 6,
+          "path": "D:\\CodexCache\\creature-combat-qa\\forge-render-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchReferenceProfileTest.xml",
+          "sha256": "5046cc8e31ef3596150543a8b7a25802047fc9ed6687ec1e2353d8d9584d2eb4"
+        },
+        "BlackwatchGaitTest": {
+          "tests": 9,
+          "path": "D:\\CodexCache\\creature-combat-qa\\forge-render-build\\test-results\\military-motion\\TEST-com.codex.blacklight.client.model.BlackwatchGaitTest.xml",
+          "sha256": "7c72047ee0f6d2bf2ba14b7ec70e0cc3eba9251eacbd0da149a7ca0034edcbfa"
+        }
+      },
+      "serverRegressions": {
+        "motionServer": {
+          "requiredScenarios": 2,
+          "path": "D:\\CodexCache\\creature-combat-forge-motionServer.log",
+          "sha256": "99303c748405a6955662f8451c787f45fa5d2d3e856b62d46436c3064ea4c5f2"
+        },
+        "militaryServer": {
+          "requiredScenarios": 19,
+          "path": "D:\\CodexCache\\creature-combat-forge-militaryServer.log",
+          "sha256": "978cb066551b5148c606569c4e59ca65fd9ab69f6e5623ae5e78dbf9b0282ca3"
+        },
+        "coverServer": {
+          "requiredScenarios": 9,
+          "path": "D:\\CodexCache\\creature-combat-forge-coverServer.log",
+          "sha256": "7e33fc4147a4d37778567478333590c09fe7ff1aa500a2981c000b8020f6c681"
+        },
+        "helicopterServer": {
+          "requiredScenarios": 32,
+          "path": "D:\\CodexCache\\creature-combat-forge-helicopterServer.log",
+          "sha256": "45dcceea4f720751d9bb9b27e4c0534ef5dfc4d56286ec5238776415cb6d858a"
+        }
+      },
+      "native": {
+        "source": {
+          "cases": {
+            "walk": {
+              "actor": "72d6d093-1800-4052-a4f1-251469fd2559",
+              "observedServerTicks": 141,
+              "worldTickSpan": 197,
+              "renderedCaptures": 50,
+              "maximumRunBlend": 0.8209628293139543,
+              "maximumMainGripErrorPixels": 3.9330034e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0005.png",
+                  "sha256": "ae9a9ae3fba090cd5107768a8cf1787a5c2d6d33af073c39c66cd06a05b391de"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0014.png",
+                  "sha256": "77734055f9b8ae6de89fc78ad703de86eb326da8b8a19f3bae2325b858df72c8"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0023.png",
+                  "sha256": "5c042b5e3a1ff7237c5457c8bb266fa6a182d9254b0c0feb000f292e12218647"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0031.png",
+                  "sha256": "413ea21e1bafcded571aecd2db2bc6e89fcb0249576439929558b51ec073cdbc"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0040.png",
+                  "sha256": "e605b05523934e0020563a14ddcd7ade3a627a8f14b0760db1bbb5dd37e7546b"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0047.png",
+                  "sha256": "b3966ae595fdf177f8fb56a362a8040af22ac9556d8965d1184777dfade6ef5a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0048.png",
+                  "sha256": "dfae543ff7342aec8667a519ff69805b0801f8932b1371a979086b10c7b56d9b"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\walk-0049.png",
+                  "sha256": "8873bf905dcb0a989b6650e176b263b29e6f9a05b645e9c7eeae1f8b12002f20"
+                }
+              ],
+              "horizontalDisplacementBlocks": 20.007207151857646
+            },
+            "run": {
+              "actor": "64b8c449-9b88-43ba-be59-e172f3e01fc6",
+              "observedServerTicks": 141,
+              "worldTickSpan": 193,
+              "renderedCaptures": 49,
+              "maximumRunBlend": 0.8951713390479228,
+              "maximumMainGripErrorPixels": 2.6253122e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0054.png",
+                  "sha256": "00e455ebdad195dd2133f130a4d6daab184fc0fcbd56e61754499f4f60817a24"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0061.png",
+                  "sha256": "5c554e0e55605c0fc638a5f8a14a6c3cb60284c22172bbf57bb00e4a1a63532d"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0062.png",
+                  "sha256": "2d100218525708859557cf07c8b06ecfcfbc43159fdaa0da263a198d741f03be"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0063.png",
+                  "sha256": "95f8e2563ddb64e85c5ebe4d725ad5df17492719de645db35c45ccf2cebf2a7e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0064.png",
+                  "sha256": "bd9f311ec1793c3f82948e874dcf1f964f2def353b1f75bcc39c409cb88e1ab4"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0065.png",
+                  "sha256": "2b8d74757d6c693744ad321e91056c73f0508fbfa5e1297fe640eb550128919a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0097.png",
+                  "sha256": "737482114a69d7c4ce636ef7cb3393e50a542e9f9df068dc25a297e2b0d29e92"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\run-0098.png",
+                  "sha256": "ee56933c2b3107c4b1ce3d3cef82ad30a370f6cb2682578c90b0703a265eef84"
+                }
+              ],
+              "horizontalDisplacementBlocks": 28.67238965324675
+            },
+            "radio": {
+              "actor": "2afbf159-d758-4a50-9027-190ce17a2aec",
+              "observedServerTicks": 151,
+              "worldTickSpan": 196,
+              "renderedCaptures": 49,
+              "maximumRunBlend": 0.7472525024997521,
+              "maximumMainGripErrorPixels": 2.6921248e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0099.png",
+                  "sha256": "a2080c6ab4a76a99ef6fc25ab29ed99bd740dbacaff9f114d477a119f7be5b38"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0106.png",
+                  "sha256": "6ca6040481ee388b00c4a8a8a85095ad7f7e7bf2134bb7937aa81978a8e21d90"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0113.png",
+                  "sha256": "7f7582f93e9b1c60dd570f758eb750504df26384b51a3c1673681f3f949bcc7a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0120.png",
+                  "sha256": "dcb83b3ee3c7590cab0eb2bcc02d374b74dc43b853bf20c7b69c6fa347d6ebf7"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0126.png",
+                  "sha256": "3c35130216bf10e1bb55af0cbe1467640d41c5aa32b6cc91e18a37fbf1e34585"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0133.png",
+                  "sha256": "b1c30574243d0bb5f3354d2d94ac1732a93fa29196d60d14534c54f06a800aa1"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0140.png",
+                  "sha256": "7fc5834f3d2531b91c482a2626ff73b97e0dfdb90ae989833aa26b6e6aedbf30"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\radio-0147.png",
+                  "sha256": "d8bfcdc49180be39142eb953d5350a0fcd3d118a0a40f19e5852a9b26fde0544"
+                }
+              ],
+              "minimumHandEarpiecePixels": 0.11128202
+            },
+            "hit": {
+              "actor": "1b55c4f8-3d4e-42f2-97b3-6b88b0458502",
+              "observedServerTicks": 151,
+              "worldTickSpan": 211,
+              "renderedCaptures": 53,
+              "maximumRunBlend": 0.8625058435068377,
+              "maximumMainGripErrorPixels": 3.014752e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0155.png",
+                  "sha256": "cf5e57e363416fdacecfc9aa9e43a46dca024cc29096f4efaba53c57a20e5aa4"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0158.png",
+                  "sha256": "57ca481c962d53ce7825eee60fd25db5a696983f32cb79786f56caf3f337cc08"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0160.png",
+                  "sha256": "e1ab37c08125920cb83a44b282efa3c45c37617c8b95288a127ad19067459a8e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0163.png",
+                  "sha256": "062af095a58790ab18defc81d84e945c765c5eaadd8aa926042f80dc185fd3c2"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0166.png",
+                  "sha256": "7073fdcb922d5b25dbad73958521523e8dacda108e443502cd271d0769690195"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0169.png",
+                  "sha256": "4f5b03d6d10a019fd4be55b9d7954152ad0f784128979cc5d6acb9a6700177e5"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0199.png",
+                  "sha256": "3c14d0d6279cb697c897acc4842ed5f053a335205f4cedd16ae145638f4b278c"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\hit-0200.png",
+                  "sha256": "21ba5c4654e6c959e671cfd45513c338279407343194b57f72dbbf33080216e5"
+                }
+              ],
+              "maximumStandingHitHeadY": -0.8286953,
+              "minimumHealth": 69.94,
+              "distinctAcceptedHitTimes": [
+                140461,
+                140476,
+                140501
+              ]
+            },
+            "seat_interrupt": {
+              "actor": "12a3cd00-bdbc-4a69-9353-4991abe8e4bc",
+              "observedServerTicks": 101,
+              "worldTickSpan": 141,
+              "renderedCaptures": 35,
+              "maximumRunBlend": 0.0,
+              "maximumMainGripErrorPixels": 2.7210026e-06,
+              "maximumSoleY": 24.05,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0201.png",
+                  "sha256": "e2374af5f5f1ac56ebf7bc0148563a4a543c61cadd0665c91de998665239a116"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0206.png",
+                  "sha256": "ff1443e58738a3d2a3a7d3a5f43c82bf85b1fc001696d762194da63e53769159"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0211.png",
+                  "sha256": "e6ac55d72b31552eb8a03d956f601eaf003fb0ef208e85cf79c051258a097cb0"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0216.png",
+                  "sha256": "76f7e5c94e45dde55b372dbc256cc6fb0ae4a2a324ae69313a847f9da28c6086"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0220.png",
+                  "sha256": "33979aa7c352e7ddc1b74924880527e8b61edc04e67ae841f772c2c7f19341ad"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0225.png",
+                  "sha256": "637020f8baa39dce377c840175ad547b4cc181b3df2ea8931ffa73c570352821"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0230.png",
+                  "sha256": "50dc87fc564060c8d21264419c33be3f50279fcd691320eda03a782113924abb"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\seat_interrupt-0235.png",
+                  "sha256": "39adbc062c4c9dd97122400fe80b6dea8a14e6ee6c99e12c62b53b492d300fff"
+                }
+              ],
+              "renderedSeatFrames": 13
+            }
+          },
+          "buildLog": {
+            "path": "D:\\CodexCache\\creature-combat-forge-motionVisualSource.log",
+            "sha256": "71ff73cb6c8f11e4069b079c266e56a9aac5d7e79ee8a40ee10b9781a3fa1d1e"
+          },
+          "serverSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\server.json",
+            "sha256": "471b971f07d9bf3c4aa92f8913f077a105723c8429c3beb74478cb75184aa7c0"
+          },
+          "renderedSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\frames.json",
+            "sha256": "b52b1c4eccb860b72a50c520afe81d5b5e8d5837790884aad0bc07bc9ae2a489"
+          },
+          "reviewManifest": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\review-manifest.json",
+            "sha256": "a0f2e86111c02320a62f422b6ba0ddfaf829646bab785971e5bf37f77bb4f142"
+          },
+          "reviewSheets": [
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\review-1.jpg",
+              "sha256": "c22f11b1b7fbf3056d355bc168504bcdb5179920f048e5ef4ba875a71e063425"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\review-2.jpg",
+              "sha256": "f45dce507f3a9cfad1db4dff644d1f6989ba793900d5f1272257fa871cc5c574"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-source\\review-3.jpg",
+              "sha256": "86de3af6f3cea7685ac13268f09247db1bd0a0f35917b5f8f7ccb32c507765e3"
+            }
+          ],
+          "soundEvents": [
+            "block.stone.step",
+            "entity.arrow.hit",
+            "entity.skeleton.shoot",
+            "firearm.rifle"
+          ]
+        },
+        "fallback": {
+          "cases": {
+            "walk": {
+              "actor": "1a1da3db-1152-4c2b-925c-3471005dc32b",
+              "observedServerTicks": 141,
+              "worldTickSpan": 174,
+              "renderedCaptures": 43,
+              "maximumRunBlend": 0.8296938765163845,
+              "maximumMainGripErrorPixels": 3.0532476e-06,
+              "maximumSoleY": 24.05,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0004.png",
+                  "sha256": "6390e17f0eb38f4125c92cd4e26da9b6c0369cc71cbf80a5ec525bd45e3a64ce"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0012.png",
+                  "sha256": "7adc14e416d7b38dca14a2b2a9c48a152ab01c1e7b8af42c2b7eb94997619199"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0019.png",
+                  "sha256": "b0628329b6ed47dca6780a518dcb746f69d75f6da64d79e2e60f8948e1c2711f"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0027.png",
+                  "sha256": "df5d1743a56388c3ad1d30c1dab862c565d2d12b876e69d78c1543496a5817a7"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0034.png",
+                  "sha256": "1f6cfbc80777786b53e73db27d8aecc50b7629172cb56f42187b4ac37975aed5"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0040.png",
+                  "sha256": "c6d797fb829ef4b244e4bc09f29a1c4db0b15d279adf1251f3a7740c3364bd73"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0041.png",
+                  "sha256": "fc74845dda610a8c8dd7c486751fc030a0bd051fd02ac043c7aebcd07f31b8fe"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\walk-0042.png",
+                  "sha256": "96ebe696d2795b92c4ef9bfbd6756b446f220554ad16aa47ec3c9d8a7950d3e6"
+                }
+              ],
+              "horizontalDisplacementBlocks": 17.60393040859717
+            },
+            "run": {
+              "actor": "17cbe988-66c2-418b-8b4c-d60bf200ef71",
+              "observedServerTicks": 141,
+              "worldTickSpan": 173,
+              "renderedCaptures": 43,
+              "maximumRunBlend": 0.8591418799846842,
+              "maximumMainGripErrorPixels": 2.3023138e-06,
+              "maximumSoleY": 24.050009,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0048.png",
+                  "sha256": "6996ad35779e79d17161ff7664d32775db55ec710aec6ef764e4a88b049e2c1f"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0051.png",
+                  "sha256": "e9a3f432ecb05bee7631c3379c8a83521f31fc330ee9c6ebddbd516569103a88"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0053.png",
+                  "sha256": "a9a73b668195122f3e581b38022344eba652e300491d5fb7f6ddf8215e181e08"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0054.png",
+                  "sha256": "426480d8df7cc86c12fcb36b67f61ff558db659eda0b362469bffc81801983b8"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0055.png",
+                  "sha256": "3f36fedcbf6803a1c3e372f1adf38a9e33719300d41326385641ae957fa2db7e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0056.png",
+                  "sha256": "a582ee55fc292db23e992c1316e2d9b46ed45c39e26519fe5b61cdd6b1befbc7"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0084.png",
+                  "sha256": "5ef7c9ca7e36cd216864ee6dbb7b8e32363a1accd35d6088534075649e551ef4"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\run-0085.png",
+                  "sha256": "bd4f7787b4d5fb2e82685fabf2f7b272e73289010f1b2ba73d3f61db0efb6cd8"
+                }
+              ],
+              "horizontalDisplacementBlocks": 28.67238965324675
+            },
+            "radio": {
+              "actor": "840fdc2b-389c-4eb1-a0a3-4ef280174077",
+              "observedServerTicks": 151,
+              "worldTickSpan": 171,
+              "renderedCaptures": 43,
+              "maximumRunBlend": 0.8709397988962252,
+              "maximumMainGripErrorPixels": 2.6815467e-06,
+              "maximumSoleY": 24.050001,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0086.png",
+                  "sha256": "c90e9628c13ac60da43afeb076477a81f81c395e9c0f8afe5e4bcc4886d51011"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0092.png",
+                  "sha256": "dcf83afc6d7450bbd587e3d30dbb067c7514117e07f945d8315b75e6d81bce3a"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0098.png",
+                  "sha256": "f6ed661b8b013be496daebf71f8e182c943e883f0d665abe0172ab3b4d485346"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0104.png",
+                  "sha256": "2c90a68a91cbf0b6fe184e6db3bbf3983dbe6b9b75923ad636f2d5b218a626e5"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0110.png",
+                  "sha256": "af6975359f08a6df6107e866c45ccf566205b2cf55e2d098f3ce9d1c194cd5a8"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0116.png",
+                  "sha256": "8f82b1f3d28ab24a8a54a8bbee8ccf9625fe15f51db017dea148830955737b30"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0122.png",
+                  "sha256": "3995b9d965a95c61779c09cb8016a094da162d7d15621bbf86929e0a3ed0ebd3"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\radio-0128.png",
+                  "sha256": "ab9fc872a363178710309ccfc3b95aabc81b8cc251800cbdf1935fa57d4626fe"
+                }
+              ],
+              "minimumHandEarpiecePixels": 1.3500156e-06
+            },
+            "hit": {
+              "actor": "63d7f2de-add7-4037-a3f0-3575f8e362c6",
+              "observedServerTicks": 151,
+              "worldTickSpan": 176,
+              "renderedCaptures": 44,
+              "maximumRunBlend": 0.8583767961332626,
+              "maximumMainGripErrorPixels": 2.489163e-06,
+              "maximumSoleY": 24.050003,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0136.png",
+                  "sha256": "7e6e4d2204bb69ea08b2a32a87709effa4273f9d690c277da4b1d98f808839f3"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0138.png",
+                  "sha256": "3639cadd0a71c4ec669bf03a6eea4b66d9e2b663b45bd243c6532abe84a1b74e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0140.png",
+                  "sha256": "c293008366f9d7f4c4b2a7fff1b9e71a1e31b7487ca8a9e15a204cfa66a333c5"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0142.png",
+                  "sha256": "fa064e790e0ae68754b3650fec02eb3a89c02f175a9aed68ea102845c69e67f4"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0144.png",
+                  "sha256": "bfe6e6d54993aa945b60edc82b7cfd65b6b356c9b71600aadde4706f39811cb0"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0146.png",
+                  "sha256": "75535213f4fd40f14c395d1262956f8efff5fe9ee797e56d4f059549519737de"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0171.png",
+                  "sha256": "30c79ffaa23dbafb8f354f5b1b7399d3b1b8ff46c4267210c43b2b49238f10ce"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\hit-0172.png",
+                  "sha256": "4cb70d1fce4b1d8cab6196e58555182a841bc424c15f008ea66c30ebe173f46e"
+                }
+              ],
+              "maximumStandingHitHeadY": -3.5154498,
+              "minimumHealth": 68.96,
+              "distinctAcceptedHitTimes": [
+                141556,
+                141568,
+                141581
+              ]
+            },
+            "seat_interrupt": {
+              "actor": "9f17d928-9208-41a5-812c-178580e3b637",
+              "observedServerTicks": 101,
+              "worldTickSpan": 120,
+              "renderedCaptures": 30,
+              "maximumRunBlend": 0.0,
+              "maximumMainGripErrorPixels": 2.7210026e-06,
+              "maximumSoleY": 24.05,
+              "reviewedImages": [
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0173.png",
+                  "sha256": "ab48c0df1ddd687e307394a2c2d2033a5aa6b5e6bf08b68a4120821780d7f020"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0177.png",
+                  "sha256": "d0c4ea445ab79889484c9ed00d0e645805f47007f33fde49d425d65fe26203ed"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0181.png",
+                  "sha256": "34b3ba1acfed62645444a807837518a60c0b91398188d54c386cbd911febf3fb"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0185.png",
+                  "sha256": "6ead3b341af735e4f3c836378761a07fa950f01c740d3fce03e650f4a04df50e"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0190.png",
+                  "sha256": "d8dbc70a4af76f4664846d5ffd83b44914bce22bf5b02cbe316c1822225ccdf0"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0194.png",
+                  "sha256": "5fcac0efcbaebbae78369fe307012ceaacd110827ed6936baea54a4f74d9b0c5"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0198.png",
+                  "sha256": "7e9ecb135a1f000c80c703492739aaa077ab064d33bf65fb3de785c5515d12c8"
+                },
+                {
+                  "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\seat_interrupt-0202.png",
+                  "sha256": "bae2dbf039425110bc4ad0ed41ed84bb0c202afe09d320cd546d0a6f2863674e"
+                }
+              ],
+              "renderedSeatFrames": 11
+            }
+          },
+          "buildLog": {
+            "path": "D:\\CodexCache\\creature-combat-forge-motionVisualFallback.log",
+            "sha256": "0411e5a5ea78974a48b7e64a3f850b7011c6776ef6c7f72a039bceca2f1feaa5"
+          },
+          "serverSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\server.json",
+            "sha256": "4d386592b331901f699e40a4541bf0fe2c0014d3f9a36d872dfb69742cefdd75"
+          },
+          "renderedSamples": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\frames.json",
+            "sha256": "cfe3f6b4f311c13b695dd05ad0383381ef25e46069fa550c1b036e9168cf517b"
+          },
+          "reviewManifest": {
+            "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\review-manifest.json",
+            "sha256": "cfd58794c01c1b659919a31aabc9b3bf58bb8a42d8577e04b99476d5f410cd4a"
+          },
+          "reviewSheets": [
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\review-1.jpg",
+              "sha256": "2ba08c63f88829097db46e9ad508916bab26684089026672980d97f6181f8660"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\review-2.jpg",
+              "sha256": "a831b734bf9640d71399e8e85903d73e5720f5c1801c89c2a5081d97ef361082"
+            },
+            {
+              "path": "D:\\CodexCache\\military-motion-qa\\forge-fallback\\review-3.jpg",
+              "sha256": "27b71f545d7ac8ca69106afe2a00f7bd61236101e57de8f87b284ee44e47571f"
+            }
+          ],
+          "soundEvents": [
+            "block.stone.step",
+            "entity.arrow.hit",
+            "entity.skeleton.shoot",
+            "firearm.rifle"
+          ]
+        }
+      }
+    }
+  }
+}

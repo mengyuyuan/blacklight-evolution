@@ -1,0 +1,9 @@
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure {
+        include '**/UavReconTest.class'
+        reports.junitXml.outputLocation=layout.buildDirectory.dir('test-results/uav-recon')
+        reports.html.outputLocation=layout.buildDirectory.dir('reports/tests/uav-recon')
+        binaryResultsDirectory=layout.buildDirectory.dir('test-results/uav-recon-binary')
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

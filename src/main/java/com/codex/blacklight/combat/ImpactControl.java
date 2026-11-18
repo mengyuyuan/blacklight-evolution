@@ -18,6 +18,7 @@ public final class ImpactControl {
     private ImpactControl(){}
     /** A confirmed low-health consume opening; uses the existing transient AI and hit-pose controller. */
     public static boolean consumeOpening(Mob mob,float yaw){
+        if(NativeBossBodyControl.ownsPose(mob)){if(!mob.level().isClientSide)cancel(mob);return false;}
         if(mob.level().isClientSide||!mob.isAlive()||mob.isRemoved()||mob instanceof com.codex.blacklight.entity.BlacklightHive
                 ||ConsumeSystem.grappleProtected(mob)||ModAttachments.peekData(mob,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active())return false;
         long now=mob.level().getGameTime();
@@ -33,6 +34,7 @@ public final class ImpactControl {
         publish(mob,new HitReaction(now,40,HitReaction.STAGGER,yaw,ImpactProfile.BODY));return true;
     }
     public static boolean begin(LivingEntity entity,ImpactProfile profile,float yaw){
+        if(NativeBossBodyControl.ownsPose(entity)){if(!entity.level().isClientSide)cancel(entity);return false;}
         if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return false;}
         if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return false;}
         if(ConsumeSystem.grappleProtected(entity)||ModAttachments.peekData(entity, ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY).active())return false;
@@ -90,18 +92,24 @@ public final class ImpactControl {
             soldier.suspendTactics();
         return true;
     }
-    private static void publish(LivingEntity entity,HitReaction state){entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);}
+    private static void publish(LivingEntity entity,HitReaction state){
+        if(state.duration()>0&&entity instanceof com.codex.blacklight.entity.BlacklightMutant mutant&&mutant.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE)mutant.cancelAttack();
+        entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);
+    }
     public static void cancel(LivingEntity entity){
         if(entity instanceof Mob mob)ACTIVE.remove(mob);
         if(entity.isRemoved())return;
         if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
+    private static int controlLimit(Mob mob,Control control){return control.knockdown()&&mob instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE?BruteKnockdown.MAX_CONTROL_TICKS:80;}
     public static boolean stunned(Mob mob){
-        if(mob.level().isClientSide)return false;var control=ACTIVE.get(mob);if(control==null)return false;
+        if(mob.level().isClientSide)return false;
+        if(NativeBossBodyControl.ownsPose(mob)){cancel(mob);return false;}
+        var control=ACTIVE.get(mob);if(control==null)return false;
         var hit=ModAttachments.peekData(mob,ModAttachments.HIT_REACTION,HitReaction.EMPTY);long now=mob.level().getGameTime();
         boolean evolvedLimit=!control.consume(now)&&mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()
                 &&now-control.flightStarted()>=com.codex.blacklight.infection.EvolvedPoise.MAX_CONTROL_TICKS;
-        if(!mob.isAlive()||mob.isRemoved()||hit.duration()<=0||now-control.flightStarted()>80||evolvedLimit
+        if(!mob.isAlive()||mob.isRemoved()||hit.duration()<=0||now-control.flightStarted()>controlLimit(mob,control)||evolvedLimit
                 ||!control.knockdown()&&now-hit.started()>=hit.duration()&&!control.consume(now)){
             cancel(mob);return false;
         }
@@ -109,6 +117,7 @@ public final class ImpactControl {
     }
     @SubscribeEvent public static void tick(EntityTickEvent.Post event){
         if(!(event.getEntity() instanceof Mob mob)||mob.level().isClientSide)return;
+        if(NativeBossBodyControl.ownsPose(mob)){cancel(mob);return;}
         if(mob.isRemoved()){ACTIVE.remove(mob);return;}
         var control=ACTIVE.get(mob);if(control==null)return;
         if(!mob.onGround()&&!control.airborne()){control=new Control(control.knockdown(),control.flightStarted(),true,control.consumeUntil());ACTIVE.put(mob,control);}
@@ -125,6 +134,7 @@ public final class ImpactControl {
             if(age>=hit.duration()){
                 var rise=ReceiverMotions.clip(ReceiverMotions.hitKey(mob,HitReaction.GETUP,ImpactProfile.RISE));
                 int duration=mob instanceof com.codex.blacklight.entity.BlacklightHunter&&rise!=null?Math.round(rise.seconds()*20):16;
+                if(mob instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE)duration=BruteKnockdown.GETUP_TICKS;
                 publish(mob,new HitReaction(now,duration,HitReaction.GETUP,hit.yaw(),ImpactProfile.RISE));
             }
         }else if(hit.kind()==HitReaction.GETUP){
@@ -134,7 +144,7 @@ public final class ImpactControl {
             mob.setDeltaMovement(mob.getDeltaMovement().multiply(.3,1,.3));mob.hurtMarked=true;
             mob.level().playSound(null,mob.blockPosition(),net.minecraft.sounds.SoundEvents.GENERIC_SMALL_FALL,
                     net.minecraft.sounds.SoundSource.HOSTILE,.8F,.65F);
-        }else if(age>=hit.duration()||now-control.flightStarted()>80)recover(mob,control,hit,now);
+        }else if(age>=hit.duration()||now-control.flightStarted()>controlLimit(mob,control))recover(mob,control,hit,now);
     }
     private static void recover(Mob mob,Control control,HitReaction hit,long now){
         if(!control.consume(now)){cancel(mob);return;}

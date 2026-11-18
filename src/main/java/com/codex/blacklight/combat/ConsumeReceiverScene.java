@@ -54,6 +54,9 @@ public final class ConsumeReceiverScene {
             case "claws_head" -> 2.5F; // head crush, FIG 7224
             case "hammer" -> 1.933333F; // head drop, FIG 19280
             case "whip_lash" -> 1.4F; // lash, FIG 37456
+            // New scenes keep their receiver intact through the strikes. These
+            // absorption cues are Minecraft adaptations, separate from deform/hit.
+            case "normal_head_stomp","normal_beatdown","normal_knee_head","stealth_neck","stealth_bearhug","stealth_nelson","stealth_guillotine","stealth_jugular" -> profile(form,false,variant).effectSeconds();
             default -> {
                 var scene=profile(form,false,variant);
                 yield scene==null?ConsumeSequence.splitSeconds(form,false,variant):scene.deformSeconds();

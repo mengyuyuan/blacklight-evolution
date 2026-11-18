@@ -1,0 +1,18 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleItemVisual/java')
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    neoForge.runs.client {
+        systemProperty 'blacklight.test.vehicleItems','D:/CodexCache/vehicle-item-qa/neo'
+        systemProperty 'blacklight.test.hiddenRagdoll','true'
+        programArguments.addAll '--width','1200','--height','900'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('silentVehicleItemQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

@@ -24,11 +24,18 @@ public final class VehicleHud {
     }
     /** Resolve live mappings each frame so remapping and unbound keys stay truthful. */
     public static Component controlHints(net.minecraft.client.KeyMapping[] mappings){
-        return Component.translatable("hud.blacklight.vehicle_controls",
-                keyLabel(mappings,"key.forward"),keyLabel(mappings,"key.left"),
-                keyLabel(mappings,"key.back"),keyLabel(mappings,"key.right"),
-                keyLabel(mappings,"key.jump"),keyLabel(mappings,"key.sneak"),
-                keyLabel(mappings,"key.blacklight.vehicle_next_seat"),keyLabel(mappings,"key.blacklight.vehicle_next_ammo"));
+        return controlHints(mappings,true,true);
+    }
+    public static Component controlHints(net.minecraft.client.KeyMapping[] mappings,boolean driver,boolean weaponOperator){
+        var hints=Component.empty();
+        if(driver)hints.append(Component.translatable("hud.blacklight.vehicle_drive_controls",
+                keyLabel(mappings,"key.forward"),keyLabel(mappings,"key.left"),keyLabel(mappings,"key.back"),
+                keyLabel(mappings,"key.right"),keyLabel(mappings,"key.jump")));
+        else hints.append(Component.translatable("hud.blacklight.vehicle_passenger_controls"));
+        if(weaponOperator)hints.append(" · ").append(Component.translatable("hud.blacklight.vehicle_fire_controls",
+                keyLabel(mappings,"key.attack"),keyLabel(mappings,"key.use"),keyLabel(mappings,"key.blacklight.vehicle_next_ammo")));
+        return hints.append(" · ").append(Component.translatable("hud.blacklight.vehicle_seat_controls",
+                keyLabel(mappings,"key.sneak"),keyLabel(mappings,"key.blacklight.vehicle_next_seat")));
     }
     private static Component keyLabel(net.minecraft.client.KeyMapping[] mappings,String name){
         for(var key:mappings)if(key.getName().equals(name)&&!key.isUnbound())return key.getTranslatedKeyMessage();
@@ -50,12 +57,20 @@ public final class VehicleHud {
     }
     @SubscribeEvent public static void render(RenderGuiEvent.Post event){
         var mc=Minecraft.getInstance();
+        if(mc.player!=null&&mc.player.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft){
+            com.codex.blacklight.client.vehicle.HelicopterControls.hud(event.getGuiGraphics(),craft);return;
+        }
         if(mc.player==null||!(mc.player.getVehicle() instanceof MilitaryVehicle vehicle))return;
         var g=event.getGuiGraphics();
         if(mc.options.hideGui)return;
+        String seat=vehicle.seatOf(mc.player.getUUID());
+        var seatName=Component.translatable("seat.blacklight."+(seat==null?"passenger":seat));
         if(com.codex.blacklight.config.GunplayClientConfig.COMPACT_VEHICLE_HUD.get()&&!ClientClawEvents.targetInfoKey().isDown()){
-            int w=146,x=g.guiWidth()-w-8,y=g.guiHeight()-88;
-            g.fill(x-4,y-4,x+w+4,y+42,0xB00C1116);
+            int w=146,x=g.guiWidth()-w-8,y=g.guiHeight()-100;
+            var seatStatus=Component.translatable("hud.blacklight.vehicle_seat_status",seatName,VehicleControls.seatKey()).getString();
+            g.fill(x-4,y-4,x+w+4,y+54,0xB00C1116);
+            g.drawString(mc.font,mc.font.plainSubstrByWidth(seatStatus,w),x,y,0xFFD6D6D6,false);
+            y+=12;
             g.drawString(mc.font,Component.literal(Math.round(vehicle.health())+" / "+Math.round(vehicle.maxHealth())+" HP"),x,y,0xFFE8EDD9,false);
             g.fill(x,y+12,x+w,y+15,0xFF333A42);g.fill(x,y+12,x+(int)(w*Math.clamp(vehicle.health()/vehicle.maxHealth(),0,1)),y+15,0xFFCA7B65);
             String selected=vehicle.selectedPrimaryWeapon();var def=vehicle.definition().weapons().get(selected);
@@ -63,9 +78,8 @@ public final class VehicleHud {
             g.drawString(mc.font,Component.translatable("hud.blacklight.vehicle_details",ClientClawEvents.targetInfoKey().getTranslatedKeyMessage()),x,y+31,0xFF9FAFB9,false);return;
         }
         int width=layout(g.guiWidth(),g.guiHeight(),0).width();var rows=new ArrayList<Row>();
-        String seat=vehicle.seatOf(mc.player.getUUID());
         var status=Component.translatableWithFallback("hud.blacklight.vehicle_status","HP %s/%s | %s",Math.round(vehicle.health()),Math.round(vehicle.maxHealth()),
-                Component.translatable("seat.blacklight."+(seat==null?"passenger":seat)));
+                seatName);
         add(rows,mc.font,status,width,0xFFE8EDD9);
         String weapon=vehicle.selectedPrimaryWeapon();
         if(!weapon.isEmpty()) {
@@ -82,7 +96,13 @@ public final class VehicleHud {
                         Component.translatable("hud.blacklight.vehicle_ammo",Component.translatable("weapon.blacklight."+secondary.id()),inventory.ammunition(secondary.ammunitionId()))),width,0xFFF7D699);
             }
         }
-        add(rows,mc.font,controlHints(mc.options.keyMappings),width,0xFFD6D6D6);
+        var occupied=vehicle.getPassengers().stream().map(p->vehicle.seatOf(p.getUUID())).filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
+        var permissions=new VehicleControls.SeatInput(vehicle.definition(),seat,occupied);
+        add(rows,mc.font,controlHints(mc.options.keyMappings,permissions.driver(),permissions.weaponOperator()),width,0xFFD6D6D6);
+        if(permissions.driver()&&!permissions.weaponOperator()&&!vehicle.definition().weapons().isEmpty())
+            add(rows,mc.font,Component.translatable("hud.blacklight.vehicle_other_gunner"),width,0xFFBECAC3);
+        if(VehicleControls.seatUnbound()||permissions.weaponOperator()&&VehicleControls.ammunitionUnbound())
+            add(rows,mc.font,Component.translatable("hud.blacklight.vehicle_bind_controls"),width,0xFFF7D699);
         add(rows,mc.font,Component.translatableWithFallback("hud.blacklight.vehicle_supply_hint","Supply: stop, dismount, use ammo / repair parts"),width,0xFFBECAC3);
         var layout=layout(g.guiWidth(),g.guiHeight(),rows.size());
         g.fill(layout.x()-4,layout.y()-4,(int)Math.ceil(layout.x()+layout.width()*layout.scale())+4,(int)Math.ceil(layout.bottom(rows.size()))+4,0xE0121819);

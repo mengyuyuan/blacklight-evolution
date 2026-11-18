@@ -181,6 +181,11 @@ public final class DisguiseSystem {
             default->mob.getType()==id.entityType();
         };
     }
+    /** Called only after a server-side continuous unobstructed viral scan. */
+    public static void detectedByScanner(ServerPlayer player){
+        if(player.isCreative()||player.isSpectator()||!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(player))return;
+        DisguiseAwareness.expose(player,active(player));syncAlert(player);
+    }
     public static boolean fooled(Mob mob,Player p){
         return active(p)&&DisguiseAwareness.exposure(p,true)==0&&factionMatches(mob,p);
     }

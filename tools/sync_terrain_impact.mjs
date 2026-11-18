@@ -1,0 +1,7 @@
+import fs from 'node:fs';
+const a='D:/blacklight-evolution/', b='D:/blacklight-evolution-forge-1.20.1/';
+const files=['src/main/java/com/codex/blacklight/combat/TerrainImpactEffects.java','src/main/java/com/codex/blacklight/combat/CombatImpactEffects.java','src/main/java/com/codex/blacklight/combat/EncounterImpact.java','src/main/java/com/codex/blacklight/client/renderer/TerrainRipple.java','src/encounterTest/java/com/codex/blacklight/gametest/TerrainImpactGameTest.java'];
+function adapt(s){return s.replaceAll('net.neoforged.neoforge.network.PacketDistributor','com.codex.blacklight.forge.PacketDistributor').replaceAll('net.neoforged.neoforge.gametest.','net.minecraftforge.gametest.').replaceAll('Math.clamp(','net.minecraft.util.Mth.clamp(').replaceAll('ParticleTypes.DUST_PLUME','ParticleTypes.POOF').replaceAll('p.getData(ModAttachments.PLAYER_STATE)','ModAttachments.getData(p,ModAttachments.PLAYER_STATE)');}
+for(const f of files) fs.writeFileSync(b+f,adapt(fs.readFileSync(a+f,'utf8')));
+const f='src/main/java/com/codex/blacklight/entity/BlacklightHunter.java';let s=fs.readFileSync(b+f,'utf8');s=s.replace('level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,state),groundImpact.x,groundImpact.y+.08,groundImpact.z,24,.65,.12,.65,.12);','com.codex.blacklight.combat.TerrainImpactEffects.emit(this,hit,2.4F,true);');fs.writeFileSync(b+f,s);
+console.log('Synced shared terrain and impact feedback.');

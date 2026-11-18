@@ -78,6 +78,7 @@ public final class ConsumeBladeContact implements AutoCloseable {
                 // binding: retry all faces until every authored edge is mapped.
                 if(mapped.edges.keySet().containsAll(WeaponCutContact.sharpProfiles(form,joint).keySet()))cache.put(key,mapped);
             }
+            var drawnEdges=new LinkedHashMap<String,List<Vec3>>();
             for(var edge:mapped.edges.entrySet()){
                 var points=new ArrayList<Vec3>();
                 for(var probe:edge.getValue()){
@@ -86,9 +87,10 @@ public final class ConsumeBladeContact implements AutoCloseable {
                 }
                 if(points.size()>=2){
                     if(observer!=null)observer.accept(new Sample(actor.getId(),actor.level().getGameTime()+partial,form,edge.getKey(),List.copyOf(points)));
-                    if(actor.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.CONSUME)AdaptiveRagdoll.consumeBlade(actor,form,edge.getKey(),points,partial);
+                    drawnEdges.put(edge.getKey(),List.copyOf(points));
                 }
             }
+            if(actor.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.CONSUME)AdaptiveRagdoll.consumeBlades(actor,form,drawnEdges,partial);
         }finally{if(previous==null)CURRENT.remove();else CURRENT.set(previous);}
     }
 }

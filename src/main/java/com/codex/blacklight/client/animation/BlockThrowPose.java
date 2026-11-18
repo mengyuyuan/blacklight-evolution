@@ -19,13 +19,13 @@ public final class BlockThrowPose {
   var stride=PlayerMotionController.locomotionPose(p,partial);
   double speed=Math.max(p.getDeltaMovement().horizontalDistance(),com.codex.blacklight.movement.LocomotionVisualState.get(p.getId()).speed());
   // Stationary pickup/charge keeps the complete authored pose, including its legs.
-  float strideWeight=(float)Math.min(1,speed/.08);
+  float strideWeight=a.clipId().endsWith("_slam")?0:(float)Math.min(1,speed/.08);
   pose=CarryPoseLayer.apply(pose,stride,strideWeight);
   // Cache the attached body's grip before wrist fitting. Cargo and both palms
   // follow this same translated frame instead of pulling the waist apart.
   b.grip=pose.copy();
   var block=BlockThrowSystem.held(p);
-  if(block!=null&&block.twoHanded()){
+  if(block!=null&&(block.twoHanded()||a.clipId().endsWith("_slam"))){
    var center=BlockThrowMotion.gripCenter(p,pose,true);var axis=BlockThrowMotion.palm(pose,"L").sub(BlockThrowMotion.palm(pose,"R"));
    if(axis.lengthSquared()>.001F){axis.set(-.46F,0,0);
     var sk=BlacklightSkeleton.get();
@@ -36,7 +36,7 @@ public final class BlockThrowPose {
    }
   }
   // Let the current gait take over progressively during the authored follow-through.
-  if(a.clipId().endsWith("_release")){
+  if(a.clipId().endsWith("_release")||a.clipId().endsWith("_slam")){
    float end=Math.max(0,Math.min(1,(a.duration()-a.seconds(p.level().getGameTime()+partial))/.22F));
    if(end<1)pose=BlacklightPose.interpolatePose(stride,pose,end);
   }

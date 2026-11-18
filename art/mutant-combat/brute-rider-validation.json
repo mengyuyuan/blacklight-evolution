@@ -1,0 +1,805 @@
+{
+  "date": "2026-11-15T17:59:32.798Z",
+  "scope": "Brute planted mounted body and fitted rider support for stable claws/muscle forms; complete hold/consume/release flows in native side and rear views.",
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 914,
+      "cases": [
+        {
+          "name": "muscle_brute_consume",
+          "view": "side",
+          "frames": 227,
+          "check": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 93,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.061814578354955074,
+            "riderMeshSamples": 91,
+            "riderGripSamples": 138,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.004950064420699701,
+            "riderGripMinGap": 0.008017475605011454,
+            "riderGripMaxGap": 0.011563018012395997,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 44,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 104.8386,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.2556117713451382,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/muscle_brute_consume.json",
+            "sha256": "797af99913e54bd747d577574753c4b1cad1765ca0f81c419e4135d65289a71a"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/muscle_brute_consume-review.jpg",
+            "sha256": "472f685937b85c4bee0c5eb6bf1f701a9ac843b498f82773c2156099c2639eb5"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/native-build.log",
+            "sha256": "04eb84deedc98585d82ace14ab6f41c00c95e7719b7f4605618fd77a5d17d0c5"
+          }
+        },
+        {
+          "name": "claws_brute_consume",
+          "view": "side",
+          "frames": 233,
+          "check": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 128,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.007277421445548882,
+            "riderMeshSamples": 128,
+            "riderGripSamples": 176,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.014772624329990429,
+            "riderGripMinGap": 0.008001008020303,
+            "riderGripMaxGap": 0.011510258671746584,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 80,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 43.9261,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.0878884732723236,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/claws_brute_consume.json",
+            "sha256": "0ddda2bbf6bb743043997f76e0f36ceafadec30dc3e9822ff08827c710b22535"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/claws_brute_consume-review.jpg",
+            "sha256": "babdaf66b5a0f79e73dd9799c07c9220fab1e2292e6a6df97fc88d666b996f5e"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/native-build.log",
+            "sha256": "04eb84deedc98585d82ace14ab6f41c00c95e7719b7f4605618fd77a5d17d0c5"
+          }
+        },
+        {
+          "name": "muscle_brute_consume",
+          "view": "rear",
+          "frames": 221,
+          "check": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 85,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.06910439392805134,
+            "riderMeshSamples": 85,
+            "riderGripSamples": 128,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.00863762423396075,
+            "riderGripMinGap": 0.008028585910797581,
+            "riderGripMaxGap": 0.010904263591989566,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 42,
+            "maxConsumeTickGap": 2,
+            "maxConsumeFrameMillis": 100.942,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.24224814176559412,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/muscle_brute_consume.json",
+            "sha256": "375d72f3a457737267f4653b9aa3e75beb5077eea2c387fd6ac9b8f5430b0fc0"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/muscle_brute_consume-review.jpg",
+            "sha256": "4f8a33627b26a3489e15ff5026a031f63147cb30f98f56c825cc5d80c939ffe5"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/native-build.log",
+            "sha256": "e70d465d72fb3c83b10e93781f2b03f323545be037e970201aa3293cf2b1c274"
+          }
+        },
+        {
+          "name": "claws_brute_consume",
+          "view": "rear",
+          "frames": 233,
+          "check": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 127,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.0052748610198496415,
+            "riderMeshSamples": 127,
+            "riderGripSamples": 174,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.012128911353647708,
+            "riderGripMinGap": 0.0080012750625615,
+            "riderGripMaxGap": 0.011711129480504748,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 80,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 47.9173,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.07759884154519445,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/claws_brute_consume.json",
+            "sha256": "b9ec2c687b95d57ebfea09ccb531857579bae98ac26a0663c706ae361374c2a7"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/claws_brute_consume-review.jpg",
+            "sha256": "f6ad19de966cb199c13909a80bab752c88e2fd84d708be57bc8ec6177669680f"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-rear/native-build.log",
+            "sha256": "e70d465d72fb3c83b10e93781f2b03f323545be037e970201aa3293cf2b1c274"
+          }
+        }
+      ],
+      "unitTests": 39,
+      "serverTests": 28,
+      "unitLog": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/unit-check.log",
+        "sha256": "633f97657dfc0ccfbeb8156a099efbcf716d40514dd73ae1f66e138f4fb0c438"
+      },
+      "serverLog": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/server-check.log",
+        "sha256": "293306986d43d1f13edf2975e1a98451239e993b74d3eb77f660cc0c46fc6fa8"
+      },
+      "unitXml": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "27f91e1cede35b71fac4a1da6479b43c76d94532399bc5ff9ecc46278591f049"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "7f4fef1811bd65c97c67f576395bf0a63f08f3ede3aa6c1ff75891824f7ec25e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "761f28602d48039889e8d45ec1c23b74960c69f7637286f9ce363f801e3dba9e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "5a707b6f8b87e0cf39aec74cfa33e4695f61aaca8694454fe887823be9e92124"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "804eab3052601b470444671ba08c485681980dbbe7af6e2f9e8371026b903c1e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "d1feb79ace17a5c12dab86064fad67003dd20d1b5aa4224f17f04c13442a6adf"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-final-side/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "dda3d302314a24cdff2816820c4facf3b0f56bd5518445badf55f19ee83f1057"
+        }
+      ],
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BruteRiderPose.java",
+          "sha256": "cb199401a322b613efc240c1f223cfdbdb26aac9fe1dcd90edfe043030abe23b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteMountedBody.java",
+          "sha256": "5e5c8a2dc0d168d572e0cc21bdfee03ab9b462a2a058a6cdd065e641a31bb860"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/NativeConsumePose.java",
+          "sha256": "fc9efe0f2c673889e3314d081d03c93389e83e2f868f152cea0d337b981b4f8f"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/ConsumeVictimPose.java",
+          "sha256": "8420f03607f7cdfe857f2145d479e9d3594c9ebfb1e2e1d289eee56234b60e74"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "affbf641c82040a92146497abc56c13478dce77a5b2909b564eac495a6ffa0b0"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightBoneIk.java",
+          "sha256": "a6a542d54d02fbb78e6034b47be029892cd5616a460ee88a9bc9d0a334062318"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumeSequence.java",
+          "sha256": "055b3bf78c6505b00099708535392f4ea425c488b0f1aac24964956487bf155e"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumeSystem.java",
+          "sha256": "4c8899725859952e473c20b979d3e6fd25cd3804c386f53800c7d639f04053e0"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "e02e1f8a952095808b36e15ff4d01dcce6eb51491b58f47fcfb147d34f5885c3"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "36627247e5be630591b49645f0dc711d1c6d65d1a502983fd4a0f55eab477cbe"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/form_muscle_mass.json",
+          "sha256": "4981210f17a3d7ae42c354ce92d5adbe360a76f319f52ca346050ad9a4e278e4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/claw_blender.json",
+          "sha256": "4ee07a7f7e7d7682e74a4a72b9ed141f3c4fa4e4ba34a47aa246edefd38fc433"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "0ab0ec7fbc202e9e9092bdf96a917182e10919f6db02ec2d660dd73611e1823a"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditRider.java",
+          "sha256": "a70845808b2b526b8af954fd46cb8a9423602862d0a89f627f0972668520984a"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BruteRiderPoseTest.java",
+          "sha256": "bb3e76c276b0d69d6183fcfb8e5581a259340fe42839ffb6752717edfc674da0"
+        },
+        {
+          "file": "tools/brute-test.init.gradle",
+          "sha256": "3610c509c612a614d306e533596b322af4b0aa221688e6ec2aa714ca0dd317ec"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 926,
+      "cases": [
+        {
+          "name": "muscle_brute_consume",
+          "view": "side",
+          "frames": 229,
+          "check": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 92,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.06029840750634685,
+            "riderMeshSamples": 92,
+            "riderGripSamples": 139,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.0005135998129901509,
+            "riderGripMinGap": 0.008011384010315412,
+            "riderGripMaxGap": 0.010960160856218579,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 45,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 74.1148,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.2507984823565792,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/muscle_brute_consume.json",
+            "sha256": "9733778c06b9c1a1f2c3c7aaa04f367a32c3a23de1664582717b119d44817b4c"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/muscle_brute_consume-review.jpg",
+            "sha256": "2bd8254cf142d57b2984a9feb3e6f14d61bb470ec6d19e2fa956b1c77528ae43"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/native-build.log",
+            "sha256": "2bdb412ca8f96275dd492accc547546bcbbd6b16eb9151d709de4c4ecf11837a"
+          }
+        },
+        {
+          "name": "claws_brute_consume",
+          "view": "side",
+          "frames": 234,
+          "check": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 127,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.0053449769675730785,
+            "riderMeshSamples": 127,
+            "riderGripSamples": 175,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.015755207602276222,
+            "riderGripMinGap": 0.008011245730616769,
+            "riderGripMaxGap": 0.011284672434103263,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 79,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 41.2817,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.08017584532425502,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/claws_brute_consume.json",
+            "sha256": "9a46c4a0e2daf1b8947951587af324006ecee6a0b7b060eae1d53eefbdefe88b"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/claws_brute_consume-review.jpg",
+            "sha256": "ffcccc65ba681ec801058cdd95cb05846c08931d093abc9ff746f60adbbc815f"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/native-build.log",
+            "sha256": "2bdb412ca8f96275dd492accc547546bcbbd6b16eb9151d709de4c4ecf11837a"
+          }
+        },
+        {
+          "name": "muscle_brute_consume",
+          "view": "rear",
+          "frames": 229,
+          "check": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 91,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.048173661033511284,
+            "riderMeshSamples": 91,
+            "riderGripSamples": 138,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.0033667328501353067,
+            "riderGripMinGap": 0.008006768585716695,
+            "riderGripMaxGap": 0.011536460779343172,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 44,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 69.5585,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.2672948653283053,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/muscle_brute_consume.json",
+            "sha256": "3576d2b8ae8e04e5626326b918cb2a6465b6c303c965112f306dc7dfbc3e37d3"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/muscle_brute_consume-review.jpg",
+            "sha256": "59cf7fbab86c89ef8c6c909f833f5fe80a2fa85ee509638f9602afde51b764f6"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/native-build.log",
+            "sha256": "cd2c80d9fc81bbc6fa00773777915789ce06e8ad316084f322d2430b146ec8b3"
+          }
+        },
+        {
+          "name": "claws_brute_consume",
+          "view": "rear",
+          "frames": 234,
+          "check": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 127,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.00858355100065511,
+            "riderMeshSamples": 127,
+            "riderGripSamples": 175,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.015752994841705923,
+            "riderGripMinGap": 0.008003865992494946,
+            "riderGripMaxGap": 0.011535592091912045,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 79,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 38.3509,
+            "passed": true
+          },
+          "freeStrikeMaxDepth": 0.08742025773668051,
+          "data": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/claws_brute_consume.json",
+            "sha256": "f96572a29e97bb6ce9e01f9a1bdbd0b57d6807a78cf97864368c9a5e35af441f"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/claws_brute_consume-review.jpg",
+            "sha256": "78c36eca7095f6a265e570ca57b72d0c11f38850d64ce51bd8a652d11e7357f5"
+          },
+          "log": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-rear/native-build.log",
+            "sha256": "cd2c80d9fc81bbc6fa00773777915789ce06e8ad316084f322d2430b146ec8b3"
+          }
+        }
+      ],
+      "unitTests": 39,
+      "serverTests": 28,
+      "unitLog": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/unit-check.log",
+        "sha256": "bca6ebafcbb3a4fb728094fb477ed217241f6afc99261ec73c1b963d165dfebb"
+      },
+      "serverLog": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/server-check.log",
+        "sha256": "ddaa23892e2ce1bd8eaa37a57e5c8ff987525db8ea85badc4a4746e667d6f09c"
+      },
+      "unitXml": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "887de286d9a97d7a3c0d5e2dc7535b1e125c386783b8fbd8be2c99b025967668"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "dc518405305f9c787ac811cfcb90b81791be52f080bd8103144687b23df2be1f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "a1149e92e4c6d74a1db8fac07a764c27ad2a020c2df80b1fefe5779cc453c126"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "f2101c129b1ef4602011eedf4e446bdd715cbda2beecb08b8cfd88ea7f6c68b4"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "829b1004f9ed57bdefc0d7beea66e6c9f8f37720085375c8abda174079a7e7ef"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "087681ab0cd1b87376785d4151a16993ef1e25d4e419c9c6138f71e4dbd2d144"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-final-side/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "804e34e285f53f77c5d0fad6b6aaa1379b1bed83bc00a42e151c6f6444181237"
+        }
+      ],
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BruteRiderPose.java",
+          "sha256": "cb199401a322b613efc240c1f223cfdbdb26aac9fe1dcd90edfe043030abe23b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteMountedBody.java",
+          "sha256": "5e5c8a2dc0d168d572e0cc21bdfee03ab9b462a2a058a6cdd065e641a31bb860"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/NativeConsumePose.java",
+          "sha256": "547c41ea3cce6fb8e194087d454751fdb2583b243b528275b22f3dc04746a3c3"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/ConsumeVictimPose.java",
+          "sha256": "12a37f9b1de4f3fa9e6ae58855c0d4f6541785984e8e92b02db92840bbc8ed96"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "8071ded0362ba5b652db086526c7d38754d349be2e8cc47d99da2d5aa4f0794b"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightBoneIk.java",
+          "sha256": "02574067646a373d55c9c4ed69e20e10c7dead0950ed8ace9b09d79fcc38efb9"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumeSequence.java",
+          "sha256": "4e1fc98a4284ecbead6980b940bea6ac39a122af9c9eeafa7fe3ec26119efa85"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/ConsumeSystem.java",
+          "sha256": "3e5ecd379b527f85de479ecfb8b71c6f3d1d56490140aed2e2357f7ccd753173"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "e02e1f8a952095808b36e15ff4d01dcce6eb51491b58f47fcfb147d34f5885c3"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "36627247e5be630591b49645f0dc711d1c6d65d1a502983fd4a0f55eab477cbe"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/form_muscle_mass.json",
+          "sha256": "4981210f17a3d7ae42c354ce92d5adbe360a76f319f52ca346050ad9a4e278e4"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/claw_blender.json",
+          "sha256": "4ee07a7f7e7d7682e74a4a72b9ed141f3c4fa4e4ba34a47aa246edefd38fc433"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "ca83451e3f4a3365a4f8797441dfd51924c56b887a3ec8659b20e89c95d3c991"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditRider.java",
+          "sha256": "55e02ef9a554b49938cc1266782f95a42034589843c724fafd2e008702747b90"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/BruteRiderPoseTest.java",
+          "sha256": "bb3e76c276b0d69d6183fcfb8e5581a259340fe42839ffb6752717edfc674da0"
+        },
+        {
+          "file": "tools/brute-test.init.gradle",
+          "sha256": "3610c509c612a614d306e533596b322af4b0aa221688e6ec2aa714ca0dd317ec"
+        }
+      ]
+    }
+  ],
+  "baseline": [
+    {
+      "platform": "neo",
+      "name": "muscle_brute_consume",
+      "data": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-before-side/muscle_brute_consume.json",
+        "sha256": "5d8ce870d822a6e677418e1bd2db2361bfd2d75888697c247f063e19b2d72693"
+      },
+      "sampledHoldMaxGap": {
+        "Tool_L": 0.9157253736114888,
+        "Tool_R": 0.8232722084867009,
+        "Leg_L": 0.9534330734358435,
+        "Leg_R": 0.9508743609694441
+      }
+    },
+    {
+      "platform": "neo",
+      "name": "claws_brute_consume",
+      "data": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-rider-before-side/claws_brute_consume.json",
+        "sha256": "59a88b98dccec93cf81f416ca830deeafbbf62df675dafa649cc164533d5bea8"
+      },
+      "sampledHoldMaxGap": {
+        "Tool_L": 0.9489605684154505,
+        "Tool_R": 0.9014473821618093,
+        "Leg_L": 0.9628953443194831,
+        "Leg_R": 0.9654384305406405
+      }
+    },
+    {
+      "platform": "forge",
+      "name": "muscle_brute_consume",
+      "data": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-before-rear/muscle_brute_consume.json",
+        "sha256": "bf2d91116db09e27f8067e17dd5369efa46a4b5fac15645da3e13e1c3ff49c1b"
+      },
+      "sampledHoldMaxGap": {
+        "Tool_L": 0.9011486209395863,
+        "Tool_R": 0.8136892584843857,
+        "Leg_L": 0.9519424132191829,
+        "Leg_R": 0.9493206105157048
+      }
+    },
+    {
+      "platform": "forge",
+      "name": "claws_brute_consume",
+      "data": {
+        "file": "D:/CodexCache/creature-combat-qa/forge-brute-rider-before-rear/claws_brute_consume.json",
+        "sha256": "763f2c99e7d0d92a4e67e9bfaed42cf982d5403d03192775656ab6267a3b6ce9"
+      },
+      "sampledHoldMaxGap": {
+        "Tool_L": 0.9477606437832221,
+        "Tool_R": 0.8950686683914572,
+        "Leg_L": 0.962884616980659,
+        "Leg_R": 0.9654279999292972
+      }
+    }
+  ],
+  "limits": [
+    "Native distances reference the rendered torso cuboids only; they do not prove clearance from Brute head, arms or legs.",
+    "Grip checks use the minimum signed distance of emitted hand mesh vertices, not a particular palm landmark or articulated fingers. Skin penetration is bounded to 0.02 blocks, not mathematically zero.",
+    "The right strike arm is intentionally free during the authored attack. Its penetration, exact tissue contact/damage timing and complete consume choreography remain unaccepted.",
+    "Hold entry is tested after the real client PhaseEntryBlend reaches one, not a fixed count from the first network-stage row. Initial mount, seat/body fit, all triangle interiors, alternate skins/scales, weapon morph transitions and network latency need broader review.",
+    "Live Brute DOWN/GETUP and physics handoff, remaining hammer idle/charge/jab overlap, other species, military AI, helicopters, fine vehicle/item models and audible mixing remain in the active goal. No release package."
+  ],
+  "review": {
+    "status": "eight_native_side_rear_keyframe_sheets_reviewed",
+    "sheets": 8,
+    "everyFrameManuallyReviewed": false,
+    "fullChoreographyAccepted": false
+  }
+}

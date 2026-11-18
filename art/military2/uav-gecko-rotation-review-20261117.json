@@ -1,0 +1,188 @@
+{
+  "date": "2026-11-17",
+  "status": "Static math, asset generation and visual preview reviewed. No Java/Gradle/game/runtime resource reload.",
+  "playerEvidence": "C:/Users/Administrator/AppData/Local/Temp/codex-clipboard-6bc7e3e6-3bcc-4a8e-abff-dfbc0ae09944.png",
+  "cause": "Authoring mathematical Euler was written directly as Gecko raw cube rotation; X and Z require the opposite sign. Live struts diverged upward and skid segments detached. The old preview applied mathematical Euler directly and masked the defect. Head bone is already fixed at zero; no runtime animation change is needed.",
+  "decoderProof": {
+    "privateFile": "D:\\PrototypeReference\\p1\\private\\uav\\gecko-cube-rotation-static-proof.json",
+    "sha256": "127359c55a3586e5e23108b140eb4bfd447cd50a09537a131e524988e3702e57",
+    "bothLoaders": "Neo Gecko4.9.2 and Forge Gecko4.8.4: constructCube byte113 originX dneg,157..167 pivot mirrorX,178 X angle dneg and187 Y angle dneg; Z angle unchanged. RenderUtil(s).rotateMatrixAroundCube applies Z thenY thenX (method69bytes).",
+    "inputEncoding": "Desired authoring Euler[x,y,z] -> JSON[-x,y,-z]; actual native positive-Y transform receives [-JSON.x,-JSON.y,JSON.z]."
+  },
+  "upperStruts": [
+    {
+      "index": 0,
+      "expectedNativePixels": [
+        [
+          -8.601151740306243,
+          8.25,
+          -6.245283746667747
+        ],
+        [
+          -0.670768,
+          25.17064,
+          -0.540464
+        ]
+      ],
+      "actualGeckoNativePixels": [
+        [
+          -8.601151748560337,
+          8.250000288355142,
+          -6.245283800464254
+        ],
+        [
+          -0.6707680082540972,
+          25.170640288355138,
+          -0.5404640537965077
+        ]
+      ],
+      "oldGeckoNativePixels": [
+        [
+          -0.6707681955032525,
+          8.250000111168468,
+          -0.540464188496506
+        ],
+        [
+          -8.601151935809494,
+          25.170640111168467,
+          -6.245283935164252
+        ]
+      ],
+      "oldEndpointErrorsPixels": [
+        9.769132477296802,
+        9.769133014858214
+      ],
+      "fixedEndpointErrorsPixels": [
+        2.934465579677677e-07,
+        2.9344655472071563e-07
+      ]
+    },
+    {
+      "index": 1,
+      "expectedNativePixels": [
+        [
+          8.606847740306243,
+          8.25,
+          -6.245283746667747
+        ],
+        [
+          0.676464,
+          25.17064,
+          -0.540464
+        ]
+      ],
+      "actualGeckoNativePixels": [
+        [
+          8.606847748560337,
+          8.250000288355142,
+          -6.245283800464254
+        ],
+        [
+          0.6764640082540962,
+          25.170640288355138,
+          -0.5404640537965077
+        ]
+      ],
+      "oldGeckoNativePixels": [
+        [
+          0.6764641955032515,
+          8.250000111168468,
+          -0.540464188496506
+        ],
+        [
+          8.606847935809492,
+          25.170640111168467,
+          -6.245283935164252
+        ]
+      ],
+      "oldEndpointErrorsPixels": [
+        9.769132477296804,
+        9.769133014858214
+      ],
+      "fixedEndpointErrorsPixels": [
+        2.934465579677677e-07,
+        2.934465546957328e-07
+      ]
+    },
+    {
+      "index": 2,
+      "expectedNativePixels": [
+        [
+          0.0,
+          8.25,
+          10.694575614619335
+        ],
+        [
+          0.0,
+          24.894688,
+          1.084752
+        ]
+      ],
+      "actualGeckoNativePixels": [
+        [
+          0.0,
+          8.250000292663225,
+          10.694575668149675
+        ],
+        [
+          0.0,
+          24.894688292663226,
+          1.08475205353034
+        ]
+      ],
+      "oldGeckoNativePixels": [
+        [
+          0.0,
+          8.250000099972764,
+          1.0847522802190328
+        ],
+        [
+          0.0,
+          24.89468809997276,
+          10.69457589483837
+        ]
+      ],
+      "oldEndpointErrorsPixels": [
+        9.609823334400303,
+        9.60982389483837
+      ],
+      "fixedEndpointErrorsPixels": [
+        2.9751850465614455e-07,
+        2.975185065633161e-07
+      ]
+    }
+  ],
+  "skids": {
+    "chains": 6,
+    "segmentsPerChain": 5,
+    "oldMaximumJointGapPixels": 3.099999621873471,
+    "fixedMaximumJointGapPixels": 1.1308132883394099e-06
+  },
+  "wreck": {
+    "cubesCompared": 249,
+    "maximumLiveWreckVertexDifferencePixels": 3.66205343881779e-15,
+    "note": "Old wreck export happened to use the authoring rotation correctly. The updated encoder now consumes the corrected JSON and applies the same baked angles as live Gecko, preserving its intended shape."
+  },
+  "unchangedGeometry": [
+    "head",
+    "rotor_0",
+    "lamp_red",
+    "lamp_green",
+    "lamp_yellow",
+    "root"
+  ],
+  "sourceAdaptation": "Original measured strut endpoint centroids retained, lower endpoints still extended to authored ringY8.25. Author-created cuboids/textures remain approximations of the private P1 mesh; no original asset embedded.",
+  "preview": "Two full3view rows and top-connection closeup use actual decoded Gecko transform. Old V-shaped disconnection reproduces player screenshot; fixed view converges at measured head mount and closes all6skid chains.",
+  "remaining": [
+    "Actual live resource reload, player camera and lighting review are deferred to root integration."
+  ],
+  "files": {
+    "tools/author_uav_model.py": "04e1f64fd87cb159469fb9fe4fdb5a9931b198b22adbc0dcd0e3143faf4274fa",
+    "tools/preview_uav_head.py": "99ecc1569fd9fd7c97aeb6d8494416b34979fb3048070475fdbd91aac0cfed0d",
+    "src/main/resources/assets/blacklight/geo/recon_uav_mc.geo.json": "2ab2c6a433dbf501cc5ac0341bec440056bda2c15c6337195894e65eabb1ebd9",
+    "src/main/resources/assets/blacklight/military/recon-uav-wreck.json": "ac6228a4a7eb324806cd41ff2957be6132ea89d894f61a3b60a3db4e900ad64c",
+    "art/military2/uav-model-source.json": "3df3ed60728cbc471a790f935350309ce98d86707b17a46f3542ef43c3516728",
+    "art/military2/previews/uav-head-before-after.png": "397743eda17f337e1179dacce50da470f34c66a73a292763aaee786111d2d3ae",
+    "art/military2/previews/uav-head-detail-before-after.png": "e21b6f128d765ef313cc5db1bbbb31a19ba85d38473b7cf43120366f89aa397a"
+  }
+}

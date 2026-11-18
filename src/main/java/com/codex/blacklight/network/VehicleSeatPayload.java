@@ -16,6 +16,11 @@ public record VehicleSeatPayload(UUID vehicle) implements CustomPacketPayload {
     private static final WeakHashMap<ServerPlayer,Long> LAST_SWITCH=new WeakHashMap<>();
     public boolean handle(ServerPlayer sender) {
         if (sender==null || vehicle==null || !sender.isAlive() || sender.isRemoved() || sender.isSpectator()) return false;
+        if(sender.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft){
+            if(craft.isRemoved()||craft.level()!=sender.level()||!vehicle.equals(craft.getUUID())||!craft.hasPassenger(sender))return false;
+            long now=sender.level().getGameTime();Long previous=LAST_SWITCH.get(sender);if(previous!=null&&now>=previous&&now-previous<4)return false;
+            LAST_SWITCH.put(sender,now);return craft.pilot().switchSeat(sender);
+        }
         if (!(sender.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle actual)
                 || actual.isRemoved() || actual.level()!=sender.level() || !vehicle.equals(actual.getUUID())
                 || !actual.getPassengers().contains(sender)) return false;

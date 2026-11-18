@@ -1,0 +1,17 @@
+// Real player item-use/event regressions plus the existing native vehicle fixture tests.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/vehicleTest/java')
+    sourceSets.main.java.exclude { entry -> !entry.directory && entry.file.path.replace('\\','/').contains('/src/vehicleTest/') && !['MilitaryVehicleGameTest.java','VehicleTestReadiness.java','VehiclePlacementInteractionGameTest.java','VehicleSupplyGameTest.java'].contains(entry.file.name) }
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    def stageVehiclePlacementClasses=tasks.register('stageVehiclePlacementClasses',Sync){
+        dependsOn tasks.named('classes')
+        from sourceSets.main.output.classesDirs
+        into layout.buildDirectory.dir('vehicle-placement-run-classes')
+    }
+    tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+        dependsOn stageVehiclePlacementClasses
+        doFirst { environment 'MOD_CLASSES', [layout.buildDirectory.dir('vehicle-placement-run-classes').get().asFile,sourceSets.main.output.resourcesDir].collect { 'blacklight%%'+it.absolutePath }.join(File.pathSeparator) }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }
+allprojects { tasks.withType(ProcessResources).configureEach { filteringCharset = 'UTF-8' } }

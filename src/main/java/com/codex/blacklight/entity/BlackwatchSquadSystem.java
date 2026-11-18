@@ -252,7 +252,7 @@ public final class BlackwatchSquadSystem {
         group.squad.remove(member); group.separated.remove(member); group.navigation.remove(member);
     }
 
-    private static BlackwatchSquad.Position position(Vec3 value) {
+    public static BlackwatchSquad.Position position(Vec3 value) {
         return new BlackwatchSquad.Position(value.x, value.y, value.z);
     }
 

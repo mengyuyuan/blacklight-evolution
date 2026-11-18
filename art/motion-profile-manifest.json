@@ -226,6 +226,14 @@
     "blade_rush_charge.json": {
       "bytes": 244749
     },
+    "block_throw_one_slam.json": {
+      "bytes": 700351,
+      "sha256": "ebf48a8d4c6fc7c4b82fc0a99c063eb9bae2a4ed8fc8c31db516041ad899951c"
+    },
+    "block_throw_two_slam.json": {
+      "bytes": 700351,
+      "sha256": "ebf48a8d4c6fc7c4b82fc0a99c063eb9bae2a4ed8fc8c31db516041ad899951c"
+    },
     "bulletdive_drop.json": {
       "bytes": 1086043
     },
@@ -368,12 +376,20 @@
       "bytes": 168217
     },
     "consume-placement.data": {
-      "bytes": 2389563,
-      "sha256": "50dafe7992d30f572a81f749a17680499920b96c7e3fdf74cdcb36ceebd74da0"
+      "bytes": 4195121,
+      "sha256": "b46034f9d0b4340b01f7338acbe9baf3117697bbbe1664bd0575fe3c6de27653"
     },
     "consume-receiver-events.data": {
-      "bytes": 2269,
-      "sha256": "74b90864f7ac5ee2cc373e32b9be84b3a7bf052831c4ca6388a0494d3a305903"
+      "bytes": 5062,
+      "sha256": "2a65f03a0bb579e16b2a08d889ede0002c80aabb19dd18d990346fe6ee18bb26"
+    },
+    "consume_air_throw_actor.json": {
+      "bytes": 218420,
+      "sha256": "e435c7ccebcf297300ec647a78b5b1179fbb2484b6f4ba26f209f0772c8896c6"
+    },
+    "consume_air_throw_victim.json": {
+      "bytes": 218537,
+      "sha256": "8c9b2d75cce86c4b118ced872f527e1de20dc58968aee799a0f37fc08b03589d"
     },
     "consume_blade_actor.json": {
       "bytes": 1129216
@@ -387,11 +403,27 @@
     "consume_capture_victim.json": {
       "bytes": 424328
     },
+    "consume_carry_air_actor.json": {
+      "bytes": 334034,
+      "sha256": "16d5b2ab0e2b53d5e84438d4cebf3faf37bc2158e7a39746e2b8f0eaebfffe34"
+    },
+    "consume_carry_air_victim.json": {
+      "bytes": 334410,
+      "sha256": "c3ebf6adaf80c88a2ca770923e66a224a8cedced68017f107045145ad66c9ff5"
+    },
     "consume_carry_run_actor.json": {
       "bytes": 256453
     },
     "consume_carry_run_victim.json": {
       "bytes": 253957
+    },
+    "consume_carry_sprint_actor.json": {
+      "bytes": 108421,
+      "sha256": "eb4e8c5d783a2c7073e7a3c02da16164198575901abc3347b08dda64d1e7a0ab"
+    },
+    "consume_carry_sprint_victim.json": {
+      "bytes": 108505,
+      "sha256": "c6d1deff2a1bc80937050a4168b2774e9a998c0745cc1b6c0d74b1c80a096a0b"
     },
     "consume_carry_walk_actor.json": {
       "bytes": 357501
@@ -402,6 +434,14 @@
     "consume_claws_actor.json": {
       "bytes": 790158,
       "sha256": "ce662792c3af2583ea12cb2b148d54fbff55288c67791c3d9ac30c55f9ed6b1b"
+    },
+    "consume_claws_head_actor.json": {
+      "bytes": 967833,
+      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
+    },
+    "consume_claws_head_victim.json": {
+      "bytes": 967907,
+      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
     },
     "consume_claws_victim.json": {
       "bytes": 790704,
@@ -421,6 +461,14 @@
     },
     "consume_large_actor.json": {
       "bytes": 1178987
+    },
+    "consume_large_claws_actor.json": {
+      "bytes": 967833,
+      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
+    },
+    "consume_large_claws_victim.json": {
+      "bytes": 967907,
+      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
     },
     "consume_large_hammer_actor.json": {
       "bytes": 1703390
@@ -443,6 +491,14 @@
     "consume_large_whip_victim.json": {
       "bytes": 456348
     },
+    "consume_leg_slam_actor.json": {
+      "bytes": 449732,
+      "sha256": "bc2318769b6e4116380d3a76e9590ed5b208065dbaf4e349054a650673c0d0ab"
+    },
+    "consume_leg_slam_victim.json": {
+      "bytes": 449005,
+      "sha256": "25e775d4f14397f52bc7a3db49b7da5109bc1f925f4b3a1d11e0d78832460652"
+    },
     "consume_muscle_actor.json": {
       "bytes": 541109
     },
@@ -452,12 +508,84 @@
     "consume_normal_actor.json": {
       "bytes": 1447111
     },
+    "consume_normal_beatdown_actor.json": {
+      "bytes": 836391,
+      "sha256": "24dce9fb0043819bd78ed0b54fdbdcf72007c5e1a93c840a99b397dd8a60a5cb"
+    },
+    "consume_normal_beatdown_victim.json": {
+      "bytes": 835690,
+      "sha256": "a1839861f8827b7cb3b03e41a6c30368cf5b19f94dfe9847b7e583199fec09e6"
+    },
+    "consume_normal_head_stomp_actor.json": {
+      "bytes": 719236,
+      "sha256": "683eb9ef8dc6d26077a0c9ac007feae930fd57699fca47aa2c79877491b38863"
+    },
+    "consume_normal_head_stomp_victim.json": {
+      "bytes": 719726,
+      "sha256": "8261800256aa9e2b70b1198fa84afd79c448782788f1fbb902257bcbb9d958dc"
+    },
+    "consume_normal_knee_head_actor.json": {
+      "bytes": 291412,
+      "sha256": "f6be5706dc64b2c99584944ab0eca124cd6b0c101f6462e60c5219a2965baa39"
+    },
+    "consume_normal_knee_head_victim.json": {
+      "bytes": 291468,
+      "sha256": "7868ea07fe5b9e8ce19dc3f76ce93c093988a9eede87fc96180766511272d0fa"
+    },
     "consume_normal_victim.json": {
       "bytes": 1450302
+    },
+    "consume_stealth_bearhug_actor.json": {
+      "bytes": 737436,
+      "sha256": "31db7658ba7d95b144b833ae7ba99c5adde18bcb0624bbf4821cdc413c4cfeef"
+    },
+    "consume_stealth_bearhug_victim.json": {
+      "bytes": 737128,
+      "sha256": "9ef5b0b3c0df9c5d923660a06664a15970a8ed6eae7a22f122b4d386a68f74b9"
+    },
+    "consume_stealth_guillotine_actor.json": {
+      "bytes": 639807,
+      "sha256": "2105c880fedaa9985c4731a685d954e4fdf2d631dea12ef67bd47948845175dc"
+    },
+    "consume_stealth_guillotine_victim.json": {
+      "bytes": 639494,
+      "sha256": "8ddc7325aa0e7d433a8323fc297220c011c7dd212acc7252e515dc184996445b"
+    },
+    "consume_stealth_jugular_actor.json": {
+      "bytes": 591091,
+      "sha256": "a50460bdf6701a6c5783643940cb0dfaa46cd187cb231fe142f763a7504a9a8b"
+    },
+    "consume_stealth_jugular_victim.json": {
+      "bytes": 590546,
+      "sha256": "a74fa470f383b02c9fd3227b5a2be1ee5e54b9a05b93e705b8a1bd0c72989a72"
+    },
+    "consume_stealth_neck_actor.json": {
+      "bytes": 701571,
+      "sha256": "49d42b32e538173fe4a2bb6060af76a39f35a9c2ebabb9425143994da2180475"
+    },
+    "consume_stealth_neck_victim.json": {
+      "bytes": 700702,
+      "sha256": "14cf859d97b0e581fa8076bf1cfaedf884ec1a5c388daa886a08a0a15dcca76c"
+    },
+    "consume_stealth_nelson_actor.json": {
+      "bytes": 633566,
+      "sha256": "e319ae7e219838c54b539b69ad7314aec7fbd6d56ce88e77f339a1c7c981f64e"
+    },
+    "consume_stealth_nelson_victim.json": {
+      "bytes": 633398,
+      "sha256": "ffab9ee4ec01c0c14632163108562e609e78ffa82ea7cc81cc4ca859d0d7310c"
     },
     "consume_whip_actor.json": {
       "bytes": 264827,
       "sha256": "b80ff9db26883be156eb1b2789a671974152c08724974ea0f6a61d9a7df6818a"
+    },
+    "consume_whip_lash_actor.json": {
+      "bytes": 812175,
+      "sha256": "8f55b7cb27d11d76443185aad97fc30b218783d53df56fdcbffff1615e4ae7c2"
+    },
+    "consume_whip_lash_victim.json": {
+      "bytes": 806812,
+      "sha256": "96c3b58b1ee5bfe12ae772cc6674d58e60ff8035c88fd51b70d7fa142092af15"
     },
     "consume_whip_victim.json": {
       "bytes": 264607,
@@ -529,8 +657,16 @@
     "dev_tendril_recovery.json": {
       "bytes": 273144
     },
+    "evolved-poses.data": {
+      "bytes": 4896335,
+      "sha256": "67b9315c7b999fab1bf2d9cf28894990998d133715cc66406c085a7b03626e7c"
+    },
     "grab_whip_native.json": {
       "bytes": 579811
+    },
+    "ground_stomp.json": {
+      "bytes": 475776,
+      "sha256": "5d58c1953b89842216223c0eb038300ecbec4fd2ada153ef2044c3a3319d7449"
     },
     "hammer-scales.data": {
       "bytes": 21861
@@ -765,34 +901,6 @@
     },
     "whip_sweep_charged.json": {
       "bytes": 414068
-    },
-    "evolved-poses.data": {
-      "bytes": 4896335,
-      "sha256": "67b9315c7b999fab1bf2d9cf28894990998d133715cc66406c085a7b03626e7c"
-    },
-    "consume_large_claws_actor.json": {
-      "bytes": 967833,
-      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
-    },
-    "consume_large_claws_victim.json": {
-      "bytes": 967907,
-      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
-    },
-    "consume_claws_head_actor.json": {
-      "bytes": 967833,
-      "sha256": "4d393358cf11ccd6c83d215214322d2ff62f2dd9c04a51b9498fbc97a4d5e43a"
-    },
-    "consume_claws_head_victim.json": {
-      "bytes": 967907,
-      "sha256": "7852ece910babb36d96ec5cc95a792738e28cfcf5621f038661086ed2368d674"
-    },
-    "consume_whip_lash_actor.json": {
-      "bytes": 812175,
-      "sha256": "8f55b7cb27d11d76443185aad97fc30b218783d53df56fdcbffff1615e4ae7c2"
-    },
-    "consume_whip_lash_victim.json": {
-      "bytes": 806812,
-      "sha256": "96c3b58b1ee5bfe12ae772cc6674d58e60ff8035c88fd51b70d7fa142092af15"
     }
   }
 }

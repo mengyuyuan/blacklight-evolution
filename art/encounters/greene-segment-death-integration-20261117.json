@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Code and assets integrated in both loaders; no compilation or runtime acceptance",
+  "source": {
+    "record": "art/encounters/greene-segment-death-source.json",
+    "privateProofSha256": "0ec3f7319701871cde0a50d3b100e3847df469a3b2a48d6b7372b52c5204a964",
+    "geckoStaticProofSha256": "b2c6a6e0ad421a0da1b92dcd62d2f3c1c96ec8df9c7006b1ac29d64e5f606621",
+    "death": "mother_fig Health<=0 -> GrabbedDetach -> ref40 -> per-template Death with CopyDrawable=true -> segment_corpse_death ref46 -> final empty-template Death.",
+    "animation": "mother_segment_1_die has96frames at30fps. First20..66 fits1.533329963684082s with.2666670083999634s blend-in; second66..95 uses.6000000238418579 speed. Total3.1444410108s maps to63 observed MC ticks.",
+    "retraction": "Slug bones retract in the authored clip. No Motion_Root channel exists and the main death chain does not reach the optional ragdoll branch.",
+    "crater": "ManageLifetime slot314aa6574a562515 belongs to Crater, absent from segment templates. It is not used as corpse lifetime."
+  },
+  "implementation": {
+    "break": "Capture named pose, mother position and body yaw before BROKEN and final collapse. Commit broken ownership before addFreshEntity; old damage work stops after reload/restoration/removal callbacks.",
+    "independence": "New nonliving entity has no owner reference, movement, collision response, loot or XP. Later mother movement, pose, collapse and sink cannot drive it.",
+    "pose": "Deep copy107bone rows. Blend from actual break pose into the source death track; recompute reciprocal parent scales after blending. Render only the matching ten Slug cube leaves.",
+    "geometry": "Separate Gecko model resource retains every helper/bind and exactly the30 source-bound segment cubes. It prevents corpse visibility edits from contaminating the live mother baked model.",
+    "facing": "Override both loader-specific GeoEntityRenderer.applyRotations signatures to use saved Entity yaw. The library otherwise supplies zero bodyYaw for non-LivingEntity.",
+    "controllers": "Static inspection of both cached Gecko jars confirms setCustomAnimations still runs with an empty controller set; no fabricated default controller was added.",
+    "culling": "Use current/next posed segment world bounds and explicit16chunk visual distance; the noncolliding.1block registration box must not cull the full skin.",
+    "save": "Persist segment, observed DeathAge and named float-bit channels. Load validates every row, rebuilds relative client start time and resumes remaining observed ticks without unloaded-time catch-up.",
+    "protocol": "Initially added in83/43; current standalone-85-hydra-thermal / forge-1.20.1-45-hydra-thermal includes the registration and renderer. Matching clients required."
+  },
+  "adaptationsAndRemaining": [
+    "Fixed copied world root is an explicit MC presentation adapter. Native corpse physics actor displacement and exact CopyDrawable/share-pose unlink internals are not reproduced.",
+    "Health ownership still leaves the MC attached set immediately on break; exact native handle-generation retirement timing is not proven by zero health or visual death.",
+    "Geometry remains rigid cuboids following original joints, with existing authored materials; original blended skin is not reconstructed.",
+    "Source death emitter and audio metadata is retained but original effects, waveforms and late-spawn scheduling are not ported. No invented ballistic throw or ragdoll replaces the authored death curve.",
+    "Real-client transition continuity, multiple corpses, full-screen presentation and save/unload behavior require later player observation."
+  ],
+  "validation": {
+    "staticOnly": true,
+    "compilation": "not run",
+    "unitTests": "written, not run",
+    "gameTests": "written, not run",
+    "client": "not launched",
+    "installedRelease": "none",
+    "unitMethodsWritten": 4,
+    "gameTestMethodsWritten": 4,
+    "fixtureBoundary": "The submerge-independence case explicitly loads an artificial active sink. Natural63tick corpse death finishes before125tick collapse, so this is not claimed as normal simultaneous playback."
+  },
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/combat/GreeneSegmentDeath.java": "9112cf487ea90b7b026d3779ae15a10d49afcc1d78ab630637f4356aa4b7ef28",
+    "src/main/java/com/codex/blacklight/entity/GreeneSegmentCorpse.java": "03bcf46f5fe36a2e728f93f80bd5b6d3a17cee440c9e970a9adf79daa7f0221f",
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "d52cb5e767cfce6cc685b0204f93d68acd3d187ca2fddfba320a9de685a898fb",
+    "src/main/java/com/codex/blacklight/client/model/GreeneSegmentCorpseModel.java": "644b7b039cd4b87b56ce07394c6a494e8f8464b64a864fa99788a5e9e99bb7dd",
+    "src/main/java/com/codex/blacklight/client/renderer/GreeneSegmentCorpseRenderer.java": "b467cc500fb6351bba4a480452795c779c4a0c1bd31d1f4cc862d444fcac7994",
+    "src/main/java/com/codex/blacklight/registry/EncounterEntities.java": "af79b30163fa0269ebb92073c2c8eaf9e177caf1cc422ece8093fc5fe874d418",
+    "src/main/java/com/codex/blacklight/client/ClientClawEvents.java": "32bdb2522cfc3569757a037c2762212ac15f6a6d56e151713ad0e0aada6607b7",
+    "src/main/java/com/codex/blacklight/network/ModNetwork.java": "5a270132bec5ebdc1af420ab4e1aae6e19297f25e5ebd79b0d41aa52e3c493b0",
+    "src/main/resources/assets/blacklight/geo/elizabeth_greene_segment_corpse.geo.json": "b5b268ca2ba669f7625a51e18be90ad875639c50bb0beb8c3dfbb80242ddeaf9",
+    "src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json": "12b35cd5bf5b74d47515da5dc04cb5e34ade985afa47b88335e622606f02ea90",
+    "src/test/resources/greene-skin-reference.json": "de11f2faa11da5ae80b40a8d4610dbbb9a9e1b67f3f7e652fa427c9c63d34360",
+    "src/test/java/com/codex/blacklight/combat/GreeneSegmentDeathTest.java": "79c4391a924af92b2f3fdec307c6cabcc212f08855f9091d6c3e32dcd5cda6d2",
+    "src/greeneTest/java/com/codex/blacklight/gametest/GreeneSegmentDeathGameTest.java": "ad1527670780a151eb8d6784a4a93cc3e2e235aa4651d7255fa64a5886380038",
+    "tools/build_greene_segment_corpse.py": "b3fde88ad92b2fe8218e955107b7cee0b2af2403e41f26a03bba5b3f2f5e11d4",
+    "tools/rebind_greene_source.py": "aab0478a3db90dea92ff24e1ded2128599c3a0585d371f85fdf4db6234864bff",
+    "art/encounters/greene-segment-death-source.json": "e0e64c4e1d7f70080a5ceea8e9d511fa48564b93c4d675a466d0c0760bb4110b"
+  },
+  "fullGoalComplete": false
+}

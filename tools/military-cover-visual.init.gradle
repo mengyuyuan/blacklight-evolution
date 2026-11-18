@@ -1,0 +1,18 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/coverVisual/java')
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    neoForge.runs.client {
+        systemProperty 'blacklight.test.militaryCover','D:/CodexCache/military-cover-qa/neo-visual'
+        systemProperty 'blacklight.test.hiddenRagdoll','true'
+        programArguments.addAll '--width','1100','--height','760'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('silentCoverQa',true)
+        doLast {
+            def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml')
+            if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')
+        }
+    }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('Hidden QA profile cannot produce a release JAR')} }
+} }

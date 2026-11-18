@@ -25,43 +25,65 @@ class VehicleItemTest(unittest.TestCase):
             (self.assets / "lang" / (language + ".json")).write_text(
                 '{"unrelated.fixture":"retain","hud.blacklight.vehicle":"client-owned format"}', encoding="utf8")
 
-    def test_public_generation_uses_original_inventory_sprites(self):
+    def test_generated_models_are_valid_volumes_with_resolved_faces_and_all_contexts(self):
         builder.generate(self.root, False, False)
         names = [f"{faction}_{kind}_chassis" for faction in ("military", "blackwatch")
                  for kind in ("truck", "apc", "tank")]
         names += ["military_fuel_can", "tank_he_shell", "tank_ap_shell", "autocannon_round", "vehicle_repair_parts"]
-        icons = {}
+        signatures = set()
         for name in names:
             model = json.loads((self.assets / "models/item" / (name + ".json")).read_text(encoding="utf8"))
-            self.assertTrue(all(value.startswith("blacklight:item/") for value in model["textures"].values()),
-                            name + " must use original pixel artwork, not vanilla block faces")
-            self.assertEqual("minecraft:item/generated", model.get("parent"), name + " inventory sprite")
-            texture = self.assets / "textures/item" / (name + ".png")
-            self.assertTrue(texture.is_file(), name)
-            with Image.open(texture) as icon:
-                self.assertEqual((32, 32), icon.size)
-                self.assertEqual("RGBA", icon.mode)
-                self.assertEqual((0, 255), icon.getchannel("A").getextrema())
-                small = icon.resize((16, 16), Image.Resampling.NEAREST)
-                self.assertGreaterEqual(small.getbbox()[3]-small.getbbox()[1], 8, name)
-                icons[name] = small.copy()
-        vehicles = [icons[name].tobytes() for name in names[:6]]
-        self.assertEqual(6, len(set(vehicles)), "all six faction/class sprites remain distinct at 16 px")
-        for faction in ("military", "blackwatch"):
-            for first, second in (("truck", "apc"), ("truck", "tank"), ("apc", "tank")):
-                a = icons[f"{faction}_{first}_chassis"].getchannel("A").tobytes()
-                b = icons[f"{faction}_{second}_chassis"].getchannel("A").tobytes()
-                self.assertGreater(sum(x != y for x, y in zip(a, b)), 12, first+" / "+second)
-                a = icons[f"{faction}_{first}_chassis"].tobytes()
-                b = icons[f"{faction}_{second}_chassis"].tobytes()
-                self.assertGreater(sum(a[i:i+4] != b[i:i+4] for i in range(0, len(a), 4)), 24,
-                                   faction+" "+first+" / "+second+" colored pixels")
-        supplies = names[6:]
-        for index, first in enumerate(supplies):
-            for second in supplies[index+1:]:
-                a, b = icons[first].getchannel("A").tobytes(), icons[second].getchannel("A").tobytes()
-                self.assertGreater(sum(x != y for x, y in zip(a, b)), 24, first+" / "+second+" silhouettes")
+            self.assertEqual("minecraft:block/block", model["parent"])
+            self.assertEqual({"gui", "ground", "fixed", "head", "firstperson_righthand",
+                              "firstperson_lefthand", "thirdperson_righthand", "thirdperson_lefthand"}, set(model["display"]))
+            self.assertTrue(model["elements"], name)
+            signatures.add(json.dumps(model, sort_keys=True))
+            for element in model["elements"]:
+                for low, high in zip(element["from"], element["to"]):
+                    self.assertLess(low, high, (name, element["name"]))
+                    self.assertTrue(-16 <= low <= high <= 32)
+                self.assertEqual({"north", "south", "east", "west", "up", "down"}, set(element["faces"]))
+                for face in element["faces"].values():
+                    self.assertIn(face["texture"][1:], model["textures"])
+                    self.assertTrue(all(0 <= value <= 16 for value in face["uv"]), (name, face))
+                if "rotation" in element:
+                    self.assertIn(element["rotation"]["angle"], [-45, -22.5, 0, 22.5, 45])
+            with Image.open(self.assets / "textures/item" / (name+".png")) as texture:
+                self.assertEqual((32,32) if name.endswith("_chassis") else (128,128), texture.size)
+        self.assertEqual(len(names), len(signatures))
         builder.generate(self.root, False, True)
+
+    def test_miniatures_preserve_production_parts_proportions_and_faction_skin(self):
+        builder.generate(self.root, False, False)
+        atlas=json.loads((self.root/'src/main/resources/assets/minecraft/atlases/blocks.json').read_text('utf8'))
+        source = json.loads((self.assets / "military/vehicle-models.json").read_text("utf8"))
+        for faction in ("military", "blackwatch"):
+            self.assertIn({'type':'minecraft:single','resource':f'blacklight:entity/military_vehicles_{faction}'},atlas['sources'])
+            for kind in ("truck", "apc", "tank"):
+                model = json.loads((self.assets / f"models/item/{faction}_{kind}_chassis.json").read_text("utf8"))
+                self.assertEqual(f"blacklight:entity/military_vehicles_{faction}", model["textures"]["skin"])
+                # The inventory uses stepped wheel profiles. The remaining geometry,
+                # including mirrors, hatches and hinges, shares the world model.
+                parts = [p for p in source["chassis"][kind]["parts"] if "_wheel_" not in p["name"]]
+                names = {p["name"] for p in parts}
+                body = [e for e in model["elements"] if e["name"] in names]
+                self.assertEqual([p["name"] for p in parts], [e["name"] for e in body])
+                ratios = [(e["to"][i]-e["from"][i])/p["box"][i+3]
+                          for p,e in zip(parts,body) for i in range(3)]
+                self.assertLess(max(ratios)-min(ratios), .00002, "body and fittings share one scale")
+                wheels = [e["name"] for e in model["elements"] if e["name"] not in names]
+                self.assertEqual(len(wheels),len(set(wheels)))
+                for side in ("left","right"):
+                    if kind=="truck":
+                        for axle in range(1,4):
+                            prefix=f"{side}_wheel_{axle}_tire_"
+                            self.assertEqual(7 if axle==1 else 14,sum(n.startswith(prefix) for n in wheels))
+                    else:
+                        for i in range(1,7 if kind=="apc" else 8):
+                            self.assertEqual(7,sum(n.startswith(f"track_{side}_road_{i}_tire_") for n in wheels))
+                        if kind=="tank":
+                            self.assertEqual(13,sum(n.startswith(f"track_{side}_sprocket_tooth_") for n in wheels))
+
 
     def test_actual_names_tooltips_and_both_recipe_formats_keep_persisted_ids(self):
         for forge in (False, True):
@@ -125,7 +147,7 @@ class VehicleItemTest(unittest.TestCase):
                 self.assertEqual(11, receipt["models"])
                 self.assertEqual(1, receipt["preserved"]["recipes"])
                 self.assertEqual("exclude_from_game_build", receipt["preserved"]["recipePolicy"])
-                self.assertEqual(38, receipt["outputFiles"])
+                self.assertEqual(39, receipt["outputFiles"])
             folder = self.root / "src/main/resources/data/blacklight" / ("recipes" if forge else "recipe")
             for name in expected_active | {"military_fuel_can"}:
                 recipe = json.loads((folder / (name+".json")).read_text(encoding="utf8"))

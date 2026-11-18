@@ -69,10 +69,18 @@ public final class RagdollImpact {
                 || victim.isInvisible())return;
         var capture=victim.getData(ModAttachments.CONSUME_VISUAL);
         if(capture.active() && capture.stage()!=ConsumeVisual.FLIGHT)return;
+        boolean nativePose=NativeBossBodyControl.ownsPose(victim);
+        if(nativePose){ticks=Math.min(ticks,8);velocity=Vec3.ZERO;}
         if(!Double.isFinite(velocity.lengthSqr()))return;
         if(velocity.lengthSqr()>9)velocity=velocity.normalize().scale(3);
+        if(!refinement&&FlyerPhysics.ownsLive(victim)){
+            var flyer=(com.codex.blacklight.entity.EncounterMob)victim;
+            if(ticks>=12||flyer.flyerPhysics().active())flyer.flyerPhysics().impact(velocity,
+                    cut.contacts().isEmpty()?flyer.incomingPoint():cut.contacts().get(0).point(),ticks,
+                    freezeTicks(false,false,HitStop.remainingTicks(victim),0));
+        }
         var impulses=new java.util.ArrayList<RagdollImpactPayload.CutImpulse>();
-        int mask=victim.getData(ModAttachments.DISMEMBER)&WeaponDismemberment.ALL;
+        int mask=nativePose?0:(victim.getData(ModAttachments.DISMEMBER)&WeaponDismemberment.ALL);
         for(int bit=1;bit<=32;bit<<=1){
             // Every confirmed contact drives its struck joint, including non-lethal hits.
             // Separation remains governed independently by the server's dismember mask.
@@ -112,6 +120,6 @@ public final class RagdollImpact {
             if(wounds.size()==RagdollImpactPayload.MAX_CUT_PLANES)break;
         }
         PacketDistributor.sendToPlayersTrackingEntity(victim,new RagdollImpactPayload(victim.getId(),motion,
-                Math.clamp(ticks,4,80),freezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime()));
+                Math.clamp(ticks,4,80),freezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime(),victim.isDeadOrDying()));
     }
 }

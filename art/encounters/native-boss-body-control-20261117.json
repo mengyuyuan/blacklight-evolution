@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "implemented in both source trees; runtime validation pending",
+  "boundary": "This is a Minecraft ownership adapter, not a claim about recovered P1/P2 immunity or native ragdoll constants. Only living Greene and Goliath are in scope. Other bosses and Flyer retain their prior behavior.",
+  "cause": "Devastator target_control could install an ordinary 40-tick launch through ImpactControl and independently assign launch velocity. WeaponImpact.contact could then deliver a full-body RagdollImpact. AdaptiveRagdoll at EntityRenderDispatcher replaced the drawn skin even though the boss shared native sampler still supplied every authoritative hit surface.",
+  "ownership": {
+    "normal": "Only living, nonremoved EncounterMob of ELIZABETH_GREENE or GOLIATH keeps its native pose against generic controls.",
+    "pairedConsume": "Synchronized CONSUME_VISUAL must have an active consumer, an explicit acquiring/holding/consume/grab-attack/throw stage, and a live nonremoved consumer entity present in the same level. NONE/FLIGHT and stale IDs are not authorization.",
+    "biomassConsume": "Existing BiomassSystem.claimant must return a live ABSORBING player with matching victim ID and actual contact/attachment.",
+    "death": "isAlive false releases this guard. RagdollImpact.supportedBody and the ragdoll_disabled tag were not broadened.",
+    "sourceStages": "Existing Greene collapse/recovery and Goliath native state changes remain in their dedicated pose samplers; they do not require generic ImpactControl."
+  },
+  "entryPoints": [
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+      "methods": [
+        "consumeOpening",
+        "begin",
+        "stunned",
+        "tick"
+      ],
+      "change": "Reject generic control and clear stale generic control/HIT_REACTION. New cancellation only executes on server; client exits without publishing attachment state. Low-health eligibility alone is not an accepted paired scene."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/RagdollImpact.java",
+      "methods": [
+        "send (shared private overload)"
+      ],
+      "change": "Keep wound/flash delivery but cap native-owned feedback to eight ticks, zero generic velocity and clear sever mask. Existing dedicated consumption packet exclusion and corpse path remain intact."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+      "methods": [
+        "active",
+        "accept",
+        "begin",
+        "releaseNativeBoss",
+        "resumeNativeFatal",
+        "tick",
+        "reset",
+        "invalidateModels"
+      ],
+      "change": "Reject full-body takeover including delayed older nonfatal packets. Clear stale BODIES/PENDING/RELEASES/COOLDOWN when native ownership resumes; keep HISTORY and noncapturing Frame so a later corpse starts from the actual visible native pose. Server-confirmed fatal packets arriving before HEALTH are held separately until death is observed."
+    },
+    {
+      "file": "src/main/java/com/codex/blacklight/combat/DevastatorSystem.java",
+      "methods": [
+        "target_control damage branch"
+      ],
+      "change": "Guard the independent generic launch velocity write after damage. This write previously ignored ImpactControl.begin rejection. Damage and contact effects still execute."
+    }
+  ],
+  "fatalPacketOrdering": {
+    "wire": "RagdollImpactPayload adds authoritative boolean fatal after long at in both codecs. Shared server sender uses victim.isDeadOrDying() at the same send as the original level game time. Compatibility constructors default fatal to false; they never infer death from duration, motion or refinement.",
+    "protocol": "Included in this unpublished protocol 77 (Neo) / 37 (Forge) integration; this patch does not change the parent-owned protocol version.",
+    "activation": "Only live native-owned Greene/Goliath defer fatal packets. Death observation on client tick/begin/accept promotes them to the existing PENDING/body path. No four-tick or other guessed network-delay expiry is used. Existing 40-tick PENDING expiry starts only after promotion, while payload at remains the original server contact time.",
+    "startEligibility": "A deferred packet may seed a new body only when !refinement and RagdollDrive.fullImpact. The first qualifying packet precedes retained feedback/refinements; an existing body receives the original arrival order. Short/refinement-only queues never create PENDING. Normal nondeferred body logic is unchanged.",
+    "boundedPackets": "At most eight original packets per deferred entity, matching existing per-entity PENDING budget. A late first qualifying death impulse replaces one excess refinement if needed, so a refinement burst cannot crowd it out. PENDING promotion retains MAX_BODIES eviction policy.",
+    "cleanup": "Clear deferred state on removed entity, level mismatch/world change, model invalidation or a new valid dedicated consumption owner while alive. Native pose cleanup intentionally does not clear the separate fatal cache before HEALTH arrives.",
+    "identity": "No packet copies or transforms are introduced by the queue: List.copyOf copies the container only. Both at and fatal survive sender->codec->queue->Body unchanged. All production new RagdollImpactPayload sites were statically enumerated (shared sender and decoder only)."
+  },
+  "preservedFeedback": "ImpactRagdoll.accept delivers WoundBlood.accept and RagdollDrive.impactFlash before AdaptiveRagdoll.accept; the new client ownership guard therefore does not suppress those effects. Ordinary accepted damage, source hit reactions and existing particle calls are unchanged.",
+  "pendingTests": {
+    "runner": "playerBossServer",
+    "initScript": "tools/player-boss-regression.init.gradle",
+    "sourceSet": "src/greeneTest/java is already included without a class whitelist in both init scripts.",
+    "batch": "native_boss_body",
+    "class": "com.codex.blacklight.gametest.NativeBossBodyControlGameTest",
+    "methods": [
+      "genericLaunchCannotReplaceNativePoseOrBlockDamage",
+      "staleImpactIsClearedButDeathRetainsItsHandoff",
+      "actualConsumeAcquisitionOwnsBodyUntilCancelWithoutChangingOtherSpecies"
+    ],
+    "clientChecks": [
+      "Land a nonlethal Devastator and an ordinary heavy strike on Greene and Goliath, including while their dedicated source collapse/recovery is active. Damage/blood should remain; no generic falling skin or launch should replace the source body.",
+      "Pick/raycast the visible body during and after the hit; animated region and drawn native skin should agree.",
+      "Deliver a delayed old full-impact packet while alive: no body takeover. Cancel a confirmed paired scene: prior physical fragments/offset must not survive into normal native rendering.",
+      "Confirm valid low-health mount/consume and biomass absorption still acquire control, then cancel/release; a later lethal hit must still capture a corpse.",
+      "Delay HEALTH synchronization beyond four ticks while a server-marked fatal impact arrives first. The live native skin must remain authoritative; observing death then starts the corpse with the original impact time. Repeat with refinement before main impact, refinement-only and short-feedback-only packets.",
+      "While fatal handoff is pending, remove the entity, change worlds, or establish a valid live consumption owner; no stale body should reappear. Confirm offscreen death promotion and unchanged first-impact ordering when health arrives before the packet.",
+      "Recheck ordinary soldier knockdown, Flyer physics and other boss behavior to ensure the narrow kind filter remains narrow."
+    ]
+  },
+  "pendingUnitTests": {
+    "initScript": "tools/player-fix-unit.init.gradle",
+    "entry": "Existing include **/Ragdoll*Test.class already selects both classes; no runner modification was needed.",
+    "classes": {
+      "com.codex.blacklight.client.animation.RagdollFatalHandoffTest": [
+        "onlyAuthoritativeDeathIsHeldAndFeedbackCannotStartACorpse",
+        "lateFirstImpactStartsBeforeEarlierRefinementsWithoutChangingTheirClocks",
+        "refinementBurstCannotCrowdOutTheFirstBodyImpulse",
+        "normalDeathThenRefinementKeepsOriginalOrder"
+      ],
+      "com.codex.blacklight.network.RagdollImpactPayloadTest": [
+        "fatalityAndOriginalContactTimeSurviveAdjacentPackets"
+      ]
+    }
+  },
+  "validation": {
+    "completed": [
+      "Read-only call-chain audit",
+      "Static comparison of platform-specific changed entry points",
+      "git diff --check for touched paths in each repository",
+      "New helper byte identity and GameTest normalized platform mirror identity"
+    ],
+    "notRun": [
+      "Gradle",
+      "javac",
+      "unit tests",
+      "GameTest",
+      "client/game",
+      "native emulation",
+      "media playback"
+    ]
+  },
+  "files": {
+    "blacklight-evolution": [
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/NativeBossBodyControl.java",
+        "sha256": "da4f8cbf5a6a2fffc85b65197b13f98c185e2d2e7f826b9588ccf0dc51eef5e7"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+        "sha256": "f5756b4229e89e2d463cd867dc307362e046d4432bdce1e9411296bf2b7adf93"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/RagdollImpact.java",
+        "sha256": "1b164e0f0da2c885bef9d2dd207135281000ed65916bf31ab8e4581826360017"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/DevastatorSystem.java",
+        "sha256": "f5122b2b02cbff17ca246f7fac2d9a24e399ff8334372d243b87aed87624f05f"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+        "sha256": "ba96ddbb0b2f209314f5f757b6881087a3bf4764c226b5b76f7a90f86b43951f"
+      },
+      {
+        "path": "src/greeneTest/java/com/codex/blacklight/gametest/NativeBossBodyControlGameTest.java",
+        "sha256": "89b414a8b63db8740d819e9c25e4a9f32eb7de021dd69d879b5de13dca51ba19"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/network/RagdollImpactPayload.java",
+        "sha256": "886fb6cb46ee01676eabe08ea17186c473c96d98de0e6c2f2b98f5513f458ad9"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/client/animation/RagdollFatalHandoff.java",
+        "sha256": "4ceeaa199fc56a6a8e771b557499c9ab3be21ed5492f015578dbf2ca1178b16e"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/network/RagdollImpactPayloadTest.java",
+        "sha256": "e8559150ea3bd7a144563b94e1e240759062812dafb13d1936eedc4bce091bfd"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/client/animation/RagdollFatalHandoffTest.java",
+        "sha256": "d68bcd7c762869d04b25601c61680a0636518a1f892cbae9864ed81852abb52b"
+      }
+    ],
+    "blacklight-evolution-forge-1.20.1": [
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/NativeBossBodyControl.java",
+        "sha256": "da4f8cbf5a6a2fffc85b65197b13f98c185e2d2e7f826b9588ccf0dc51eef5e7"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+        "sha256": "b83688a9864b7dbf8afee78d2efefbfb40f855d3b540e4ee6dfb0a2104e1c019"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/RagdollImpact.java",
+        "sha256": "1342aded44efb1b14f761b03d15b98bdbdbd5accbaa85fcafd742a4dd33bbcd6"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/combat/DevastatorSystem.java",
+        "sha256": "456402e4dfdc5e7ea1358ef17e6f789e81cf8a09a0d1b2cbb2f4ca170868e420"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+        "sha256": "cfb0cd3161b85690fb8c03d81b63c2b9bb2b06bc5f5623c14a9e4bbebdd66e3f"
+      },
+      {
+        "path": "src/greeneTest/java/com/codex/blacklight/gametest/NativeBossBodyControlGameTest.java",
+        "sha256": "c0dd59ea2efe918b7fe4a0f5f289719ced7de9d08c7953247708a91945eb207d"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/network/RagdollImpactPayload.java",
+        "sha256": "6290c64009f193966c9ed2906e5a67eab31b0af7eb2a03bf708fd4b38a079569"
+      },
+      {
+        "path": "src/main/java/com/codex/blacklight/client/animation/RagdollFatalHandoff.java",
+        "sha256": "4ceeaa199fc56a6a8e771b557499c9ab3be21ed5492f015578dbf2ca1178b16e"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/network/RagdollImpactPayloadTest.java",
+        "sha256": "bb016efa0bd4d8555c9f99c022f9c5a4855292e7c32a553b6bc5a8f9dd6d7544"
+      },
+      {
+        "path": "src/test/java/com/codex/blacklight/client/animation/RagdollFatalHandoffTest.java",
+        "sha256": "d68bcd7c762869d04b25601c61680a0636518a1f892cbae9864ed81852abb52b"
+      }
+    ]
+  }
+}

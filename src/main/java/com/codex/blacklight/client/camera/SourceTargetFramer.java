@@ -18,14 +18,14 @@ final class SourceTargetFramer {
         if(!tracking){yaw=SourceCameraOrbit.yaw(ordinary);pitch=SourceCameraOrbit.pitch(ordinary);tracking=true;}
         boolean multipart=target instanceof LivingEntity living&&com.codex.blacklight.combat.CombatTargeting.multipart(living)
                 &&player instanceof net.minecraft.world.entity.player.Player;
-        AABB targetBounds=multipart?com.codex.blacklight.client.ClientTargetLock.focusBounds(target):target.getBoundingBox();
+        AABB targetBounds=multipart?com.codex.blacklight.client.ClientTargetLock.focusBounds(target,partial):target.getBoundingBox();
         Vec3 targetPosition=multipart?targetBounds.getCenter():target.getPosition(partial);
         Vec3 centre=player.getPosition(partial).add(targetPosition).scale(.5).subtract(camera);
         double reference=centre.horizontalDistanceSqr()>.001?SourceCameraOrbit.yaw(centre):yaw;
         double minYaw=Double.POSITIVE_INFINITY,maxYaw=Double.NEGATIVE_INFINITY,minPitch=90,maxPitch=-90;
         for(var entity:new net.minecraft.world.entity.Entity[]{player,target}) {
             Vec3 shift=entity.getPosition(partial).subtract(entity.position());
-            AABB box=(entity==target?targetBounds:entity.getBoundingBox()).move(shift);
+            AABB box=entity==target&&multipart?targetBounds:(entity==target?targetBounds:entity.getBoundingBox()).move(shift);
             for(int x=0;x<2;x++)for(int y=0;y<2;y++)for(int z=0;z<2;z++) {
                 Vec3 delta=new Vec3(x==0?box.minX:box.maxX,y==0?box.minY:box.maxY,z==0?box.minZ:box.maxZ).subtract(camera);
                 if(delta.lengthSqr()<.01)continue;

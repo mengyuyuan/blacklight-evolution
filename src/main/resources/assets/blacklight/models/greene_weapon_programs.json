@@ -1,0 +1,802 @@
+{
+  "schema": 1,
+  "source": "comparison/mother_fig.p3d.rz",
+  "sha256": "f446c9299ac8f06022b907e0c62b9b75e82f1def2729dc0da90a6f92f8043167",
+  "timing": "Original seconds retained. MC requests fire at server samples in [begin,end); no fabricated 60 Hz substeps or inner shotgun batch.",
+  "selection": "startup_fig on-foot parent XZ<150; ordered zero-weight Nodes select >60 DeathFlower, >40 Rifle, >25 ShotgunBlast, >1 InsectSwarm. Outer encounter scheduling and 175-unit acquisition/launch cap remain MC adapters; anti-vehicle programs require the matching occupied hostile hull.",
+  "deathFlowerTrackGroup": {
+    "offset": 22240,
+    "begin": 0,
+    "end": 0.30000001192092896,
+    "note": "All five nested Shoot windows start at zero and end before this group; Execute offset is added once."
+  },
+  "programs": [
+    {
+      "id": "DEATH_FLOWER",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c",
+      "state": "DeathFlower",
+      "executeOffset": 21916,
+      "shots": [
+        {
+          "slot": 2,
+          "begin": 2.333329916000366,
+          "end": 2.499996915459633,
+          "ammo": "motherVomit_DeathFlower_ammo",
+          "user": "motherVomit_DeathFlower_user_ai",
+          "fixed": true,
+          "space": "JointSpace",
+          "euler": [
+            90,
+            0,
+            0
+          ],
+          "offset": 22304
+        },
+        {
+          "slot": 6,
+          "begin": 2.333329916000366,
+          "end": 2.499996915459633,
+          "ammo": "motherVomit_DeathFlower_ammo",
+          "user": "motherVomit_DeathFlower_user_ai",
+          "fixed": true,
+          "space": "GameObjectSpace",
+          "euler": [
+            90,
+            0,
+            90
+          ],
+          "offset": 22404
+        },
+        {
+          "slot": 4,
+          "begin": 2.333329916000366,
+          "end": 2.499996915459633,
+          "ammo": "motherVomit_DeathFlower_ammo",
+          "user": "motherVomit_DeathFlower_user_ai",
+          "fixed": true,
+          "space": "GameObjectSpace",
+          "euler": [
+            90,
+            0,
+            -90
+          ],
+          "offset": 22504
+        },
+        {
+          "slot": 7,
+          "begin": 2.333329916000366,
+          "end": 2.499996915459633,
+          "ammo": "motherVomit_DeathFlower_ammo",
+          "user": "motherVomit_DeathFlower_user_ai",
+          "fixed": true,
+          "space": "GameObjectSpace",
+          "euler": [
+            90,
+            0,
+            45
+          ],
+          "offset": 22604
+        },
+        {
+          "slot": 3,
+          "begin": 2.333329916000366,
+          "end": 2.499996915459633,
+          "ammo": "motherVomit_DeathFlower_ammo",
+          "user": "motherVomit_DeathFlower_user_ai",
+          "fixed": true,
+          "space": "GameObjectSpace",
+          "euler": [
+            90,
+            0,
+            -45
+          ],
+          "offset": 22704
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 6.133329916000366,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.33333298563957214,
+            "from": 0,
+            "to": 10,
+            "speed": 1,
+            "blendIn": 0.16666699945926666,
+            "blendOut": 0,
+            "offset": 20892
+          },
+          {
+            "at": 0.33333298563957214,
+            "end": 0.6666669845581055,
+            "from": 10,
+            "to": 13,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21020
+          },
+          {
+            "at": 0.6666669845581055,
+            "end": 1,
+            "from": 13,
+            "to": 32,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21148
+          },
+          {
+            "at": 1,
+            "end": 1.5,
+            "from": 32,
+            "to": 36,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21276
+          },
+          {
+            "at": 1.5,
+            "end": 2.166670083999634,
+            "from": 36,
+            "to": 58,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21404
+          },
+          {
+            "at": 2.166670083999634,
+            "end": 2.5,
+            "from": 58,
+            "to": 64,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21532
+          },
+          {
+            "at": 2.5,
+            "end": 2.833329916000366,
+            "from": 64,
+            "to": 85,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0,
+            "offset": 21660
+          },
+          {
+            "at": 2.833329916000366,
+            "end": -1,
+            "from": 85,
+            "to": -1,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.16666699945926666,
+            "offset": 21788
+          }
+        ],
+        "windows": [
+          {
+            "begin": 2.333329916000366,
+            "end": 2.499996915459633,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 2.333329916000366,
+            "end": 2.499996915459633,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 2.333329916000366,
+            "end": 2.499996915459633,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 2.333329916000366,
+            "end": 2.499996915459633,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 2.333329916000366,
+            "end": 2.499996915459633,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "SHOTGUN",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#520855e2eadde5f9",
+      "state": "ShotgunBlast",
+      "executeOffset": 23564,
+      "shots": [
+        {
+          "slot": 9,
+          "begin": 0.33333298563957214,
+          "end": 0.5333329886198044,
+          "ammo": "motherVomit_ShotgunBlast_ammo",
+          "user": "motherVomit_ShotgunBlast_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            0,
+            120,
+            0
+          ],
+          "offset": 23948
+        },
+        {
+          "slot": 8,
+          "begin": 0.56666599214077,
+          "end": 0.7333329916000366,
+          "ammo": "motherVomit_ShotgunBlast_ammo",
+          "user": "motherVomit_ShotgunBlast_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            0,
+            120,
+            0
+          ],
+          "offset": 24048
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 2.333329916000366,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.16666699945926666,
+            "from": 50,
+            "to": 60,
+            "speed": 1,
+            "blendIn": 0.33333298563957214,
+            "blendOut": 0.06666669994592667,
+            "offset": 23120
+          },
+          {
+            "at": 0.16666699945926666,
+            "end": 0.6666669845581055,
+            "from": 60,
+            "to": 90,
+            "speed": 1,
+            "blendIn": 0.06666669994592667,
+            "blendOut": 0.06666669994592667,
+            "offset": 23248
+          },
+          {
+            "at": 0.6666669845581055,
+            "end": 2.333329916000366,
+            "from": 90,
+            "to": 112,
+            "speed": 1,
+            "blendIn": 0.06666669994592667,
+            "blendOut": 0.33333298563957214,
+            "offset": 23376
+          }
+        ],
+        "windows": [
+          {
+            "begin": 0.33333298563957214,
+            "end": 0.5333329886198044,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 0.56666599214077,
+            "end": 0.7333329916000366,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "INSECT_SWARM",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#5f4237b2e81a8ded",
+      "state": "InsectSwarm",
+      "executeOffset": 25532,
+      "shots": [
+        {
+          "slot": 1,
+          "begin": 2,
+          "end": 2.5,
+          "ammo": "motherVomit_InsectSwarm_ammo",
+          "user": "motherVomit_InsectSwarm_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            20,
+            10,
+            0
+          ],
+          "offset": 25972
+        },
+        {
+          "slot": 2,
+          "begin": 2.8333330154418945,
+          "end": 3.0666699409484863,
+          "ammo": "motherVomit_InsectSwarm_ammo",
+          "user": "motherVomit_InsectSwarm_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            20,
+            -10,
+            0
+          ],
+          "offset": 26072
+        },
+        {
+          "slot": 5,
+          "begin": 3.5,
+          "end": 4.066669940948486,
+          "ammo": "motherVomit_InsectSwarm_ammo",
+          "user": "motherVomit_InsectSwarm_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            20,
+            -10,
+            0
+          ],
+          "offset": 26172
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 6.133329916000366,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.33333298563957214,
+            "from": 0,
+            "to": 10,
+            "speed": 1,
+            "blendIn": 0.16666699945926666,
+            "blendOut": 0.06666669994592667,
+            "offset": 24448
+          },
+          {
+            "at": 0.33333298563957214,
+            "end": 0.6666669845581055,
+            "from": 10,
+            "to": 13,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 24576
+          },
+          {
+            "at": 0.6666669845581055,
+            "end": 1,
+            "from": 13,
+            "to": 32,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 24704
+          },
+          {
+            "at": 1,
+            "end": 1.5,
+            "from": 32,
+            "to": 36,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 24832
+          },
+          {
+            "at": 1.5,
+            "end": 2.166670083999634,
+            "from": 36,
+            "to": 58,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 24960
+          },
+          {
+            "at": 2.166670083999634,
+            "end": 2.5,
+            "from": 58,
+            "to": 64,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 25088
+          },
+          {
+            "at": 2.5,
+            "end": 2.833329916000366,
+            "from": 64,
+            "to": 85,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.06666669994592667,
+            "offset": 25216
+          },
+          {
+            "at": 2.833329916000366,
+            "end": -1,
+            "from": 85,
+            "to": -1,
+            "speed": 1,
+            "blendIn": 0,
+            "blendOut": 0.16666699945926666,
+            "offset": 25344
+          }
+        ],
+        "windows": [
+          {
+            "begin": 2,
+            "end": 2.5,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 2.8333330154418945,
+            "end": 3.0666699409484863,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          },
+          {
+            "begin": 3.5,
+            "end": 4.066669940948486,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "RIFLE",
+      "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/rifle",
+      "state": "Rifle",
+      "executeOffset": 27144,
+      "shots": [
+        {
+          "slot": 9,
+          "begin": 0.6666669845581055,
+          "end": 1.6666669845581055,
+          "ammo": "motherVomit_ammo",
+          "user": "motherVomit_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            0,
+            120,
+            0
+          ],
+          "offset": 27528
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 2.7333333333333334,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.5,
+            "from": 40,
+            "to": 60,
+            "speed": 1,
+            "blendIn": 0.33333298563957214,
+            "blendOut": 0.03333330154418945,
+            "offset": 26572
+          },
+          {
+            "at": 0.5,
+            "end": 0.6666669845581055,
+            "from": 60,
+            "to": 72,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 26700
+          },
+          {
+            "at": 0.6666669845581055,
+            "end": 2,
+            "from": 72,
+            "to": 90,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 26828
+          },
+          {
+            "at": 2,
+            "end": -1,
+            "from": 90,
+            "to": 112,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.33333298563957214,
+            "offset": 26956
+          }
+        ],
+        "windows": [
+          {
+            "begin": 0.6666669845581055,
+            "end": 1.6666669845581055,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "ANTI_TANK",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89",
+      "state": null,
+      "executeOffset": 12636,
+      "shots": [
+        {
+          "slot": 10,
+          "begin": 0.6666669845581055,
+          "end": 1.333333969116211,
+          "ammo": "motherVomit_AntiTank_ammo",
+          "user": "motherVomit_AntiAir_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            0,
+            120,
+            0
+          ],
+          "offset": 13224
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 1.8333300352096558,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.33333298563957214,
+            "from": 40,
+            "to": 60,
+            "speed": 1,
+            "blendIn": 0.33333298563957214,
+            "blendOut": 0.03333330154418945,
+            "offset": 12064
+          },
+          {
+            "at": 0.33333298563957214,
+            "end": 0.43333300948143005,
+            "from": 60,
+            "to": 72,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 12192
+          },
+          {
+            "at": 0.43333300948143005,
+            "end": 1.3333300352096558,
+            "from": 72,
+            "to": 90,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 12320
+          },
+          {
+            "at": 1.3333300352096558,
+            "end": 1.8333300352096558,
+            "from": 90,
+            "to": 112,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.33333298563957214,
+            "offset": 12448
+          }
+        ],
+        "windows": [
+          {
+            "begin": 0.6666669845581055,
+            "end": 1.333333969116211,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "ANTI_AIR",
+      "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89",
+      "state": null,
+      "executeOffset": 12636,
+      "shots": [
+        {
+          "slot": 10,
+          "begin": 0.6666669845581055,
+          "end": 1.333333969116211,
+          "ammo": "motherVomit_AntiAir_ammo",
+          "user": "motherVomit_AntiAir_user_ai",
+          "fixed": false,
+          "space": "GameObjectSpace",
+          "euler": [
+            0,
+            120,
+            0
+          ],
+          "offset": 13424
+        }
+      ],
+      "action": {
+        "clip": "VOLLEY",
+        "animation": "mother_vomit",
+        "mode": "greene_weapon",
+        "fps": 30.0,
+        "seconds": 1.8333300352096558,
+        "range": 175,
+        "rangeMode": "adapted",
+        "segments": [
+          {
+            "at": 0,
+            "end": 0.33333298563957214,
+            "from": 40,
+            "to": 60,
+            "speed": 1,
+            "blendIn": 0.33333298563957214,
+            "blendOut": 0.03333330154418945,
+            "offset": 12064
+          },
+          {
+            "at": 0.33333298563957214,
+            "end": 0.43333300948143005,
+            "from": 60,
+            "to": 72,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 12192
+          },
+          {
+            "at": 0.43333300948143005,
+            "end": 1.3333300352096558,
+            "from": 72,
+            "to": 90,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.03333330154418945,
+            "offset": 12320
+          },
+          {
+            "at": 1.3333300352096558,
+            "end": 1.8333300352096558,
+            "from": 90,
+            "to": 112,
+            "speed": 1,
+            "blendIn": 0.03333330154418945,
+            "blendOut": 0.33333298563957214,
+            "offset": 12448
+          }
+        ],
+        "windows": [
+          {
+            "begin": 0.6666669845581055,
+            "end": 1.333333969116211,
+            "radius": 0,
+            "joint": "",
+            "localOffset": [
+              0,
+              0,
+              0
+            ],
+            "damage": 0
+          }
+        ]
+      }
+    }
+  ]
+}

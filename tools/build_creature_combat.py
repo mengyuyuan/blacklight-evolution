@@ -3,7 +3,7 @@ FIG timing is preserved where decoded; cross-state choices, distances and joins 
 No private source paths or raw FIG blobs are shipped.
 """
 from pathlib import Path
-import json,math,bisect
+import json,math,bisect,sys
 R=Path(__file__).resolve().parents[1];A=R/'src/main/resources/assets/blacklight'
 def read(p):return json.loads(p.read_text(encoding='utf8'))
 def sample(anim,bone,t,channel='rotation'):
@@ -47,17 +47,29 @@ p=A/'animations/blacklight_hunter.animation.json';doc=read(p);anims=doc['animati
 # Preserve raw source clips so rerunning this script does not compound retiming.
 anims.setdefault('source_swipe',anims['swipe']);anims.setdefault('source_dodge',anims['dodge'])
 plans={
- 'swipe':[(0,.5,'source_swipe',6,11),(.5,1.366667,'source_swipe',11,37),(1.366667,1.6,'source_swipe',37,48)],
- 'combat_barrage':[(0,.4,'barrage',0,0),(.4,2,'barrage',0,48),(2,2.6,'barrage_end',0,18)],
- 'combat_slam':[(0,.5,'slam',10,25),(.5,.6,'slam',25,30),(.6,.833333,'slam',30,37),(.833333,1.333333,'slam',37,45),(1.333333,1.666667,'slam',45,55),(1.666667,2.4,'slam',55,72)],
- 'combat_leap':[(0,.4,'leap',0,12),(.4,.9,'leap',12,27),(.9,1.1,'air_slash',0,6),(1.1,2.4,'air_slash',6,45)],
+ 'swipe':[(0,.5,'source_swipe',6,11),(.5,1.462963,'source_swipe',11,37),(1.462963,1.82963,'source_swipe',37,48)],
+ 'combat_barrage':[(0,.4,'barrage',0,3),(.4,2.833333,'barrage',3,76)],
+ 'combat_slam':[(0,.5,'slam',10,25),(.5,.733333,'slam',30,37),(.733333,1.233333,'slam',37,45),(1.233333,1.566667,'slam',45,55),(1.566667,2.133333,'slam',55,72)],
+ 'combat_leap':[(0,.4,'leap',0,12),(.4,.9,'leap',12,27),(.9,1.3,'air_slash',4,28),(1.3,1.5,'air_slash',28,34),(1.5,2.4,'air_slash',34,45)],
  'dodge':[(0,1,'source_dodge',0,30),(1,1.2,'source_dodge',30,36)]}
 for name,segments in plans.items():anims[name]=compose(anims,segments)
 p.write_text(json.dumps(doc,indent=2),encoding='utf8')
+# The retired Brawler resource remains a compatibility alias of the canonical Hunter.
+(A/'animations/brawler.animation.json').write_text(p.read_text(encoding='utf8'),encoding='utf8')
 names=list(anims['swipe']['bones']);table={'fps':30,'bones':names,'clips':{}}
-for name in ['idle',*plans]:
+# The independently decoded counter opening is appended by export_hunter_counter.py.
+# Rebuilding the older schedules must not remove its runtime pose-table entry.
+for name in ['idle',*plans,*(['combat_counter'] if 'combat_counter' in anims else [])]:
  clip=anims[name];table['clips'][name]=[[[round(math.radians(x)*(-1 if i<2 else 1),7) for i,x in enumerate(sample(clip,b,f/30))]+sample(clip,b,f/30,'position') for b in names] for f in range(round(clip['animation_length']*30)+1)]
 (A/'models/hunter_combat_motion.json').write_text(json.dumps(table,separators=(',',':')),encoding='utf8')
+provenance=R/'art/hydra/combat-schedule-provenance.json'
+if provenance.exists():
+ report=read(provenance);report['hunter']=plans
+ report['hunterRevision']='2026-11-14: P1 FIG wrist windows; swipe release speed .9; barrage frames 3-76; air slash release speed 2. Contact uses the unchanged authored rig.'
+ provenance.write_text(json.dumps(report,indent=2),encoding='utf8')
+if '--hunter-only' in sys.argv:
+ print('Built Hunter source frame schedules only; Hydra assets unchanged')
+ sys.exit(0)
 p=A/'animations/blacklight_hydra.animation.json';doc=read(p);anims=doc['animations']
 hydra_plan=[(0,1,'slam',5,20),(1,2.5,'slam',20,35),(2.5,2.766667,'slam',35,44),(2.766667,6.666667,'slam',44,52),(6.666667,7.4,'slam',52,73)]
 anims['combat_slam']=compose(anims,hydra_plan);p.write_text(json.dumps(doc,indent=2),encoding='utf8')

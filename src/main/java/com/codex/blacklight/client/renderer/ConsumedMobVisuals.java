@@ -76,7 +76,7 @@ public final class ConsumedMobVisuals {
             return Math.min(.44F,(mob.level().getGameTime()-data.started()+partial)/60F);
         if(data.stage()==com.codex.blacklight.combat.ConsumeVisual.CAPTURE)
             return (mob.level().getGameTime()-data.started()+partial)/60F;
-        if(data.stage()==com.codex.blacklight.combat.ConsumeVisual.HOLD)return .44F;
+        if(com.codex.blacklight.combat.ConsumeVisual.carrying(data.stage()))return .44F;
         if(data.consuming())return .44F+data.progress(mob.level().getGameTime(),partial)*.5F;
         return 1;
     }

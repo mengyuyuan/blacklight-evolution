@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T17:53:05",
+  "status": "radio-designated vehicle target consistency passed; overall goal remains active",
+  "previousCheckpoint": {
+    "file": "art/military-vehicles/helicopter-hull-validation.json",
+    "sha256": "821100264d42d8498b0fd40ff46270d23b1d039ec92f85539f3f8097895939b4"
+  },
+  "sourceBoundary": {
+    "file": "art/military-vehicles/helicopter-hull-source.json",
+    "sha256": "8809c285b172065ed9f4ca7c046aeb7c3749e4c8c57845a21fcbcc709a6e850a",
+    "meaning": "Original engage_apache contains tank/aircraft target branches, aim and line-of-fire conditions. This change repairs the existing Minecraft radio-caller target authority; it is not a claim that the original game radio algorithm has been decoded."
+  },
+  "implementation": [
+    "Ground and aircraft hull impact permission accepts a live aircraft designation only through that aircraft actual operational weapon operator, with normal validTarget/allegiance checks.",
+    "The designation is not copied into the soldier independent target selector. Unrelated soldiers and other crew cannot borrow it; dismount removes access.",
+    "A new valid support call replaces or clears the designation. Current creative/allied/mixed-crew protections still override it.",
+    "Fire eligibility still uses the existing sortie state, sight, phase, ammo and safety gates. Impact allegiance does not depend on remaining ammunition or enabled sortie, allowing the last already-fired rocket to resolve. Remembered designation alone cannot start a new sortie."
+  ],
+  "platforms": {
+    "neo": {
+      "helicopter": {
+        "passed": 47,
+        "file": "D:\\CodexCache\\helicopter-designation-qa\\neo-helicopter-passed.log",
+        "sha256": "c63d1b2cd09fecd6e95af14670a297a73f972ccdd92b9882348a1ea9f8fedcc4",
+        "healthyRadioTargetFirstHits": [
+          {
+            "target": "tank",
+            "weapon": "gun",
+            "hullLoss": 0.3999939,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "rocket",
+            "hullLoss": 20.0,
+            "rounds": 0,
+            "rockets": 0,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "tank",
+            "weapon": "rocket",
+            "hullLoss": 10.0,
+            "rounds": 0,
+            "rockets": 0,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "gun",
+            "hullLoss": 4.0,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          }
+        ],
+        "newScenarios": "Four real healthy-radio-target attacks, including final single rocket against tank and aircraft; two healthy unreported targets never acquired; two operator/revocation/creative/allied/dismount impact-boundary scenarios."
+      },
+      "sharedVehicle": {
+        "passed": 29,
+        "file": "D:\\CodexCache\\helicopter-designation-qa\\neo-sharedVehicle-passed.log",
+        "sha256": "5be93e4d51595f23d7d2bad4b48fc9feb8d08abae6f947a7a90c9451ed5b3892"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "f79987236ce634bb407cecac4250b90e6b46219de599cd79553440123b444b47",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "7eb22807d0bcfa7903e776449ebde54d8a9bd27897d4450b51a355358eb7a4f3",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "ce66cab2bfee69834b4c048d3a74b7870345add23d89049edc00e9dee7909e1b",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "c528699f036bdc72c991f8662b543346232ba8bceb61bfda36e9481e5881b6b1",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "36d01c74aa6bf6fe9eef500b15bc240c69ea1bc401ee1299803799eecefd3147",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    },
+    "forge": {
+      "helicopter": {
+        "passed": 47,
+        "file": "D:\\CodexCache\\helicopter-designation-qa\\forge-helicopter-passed.log",
+        "sha256": "52d21c48e845c46d8ccc947007224fcf7ffce83939044ed2d7ae2dad138d2f4f",
+        "healthyRadioTargetFirstHits": [
+          {
+            "target": "tank",
+            "weapon": "gun",
+            "hullLoss": 0.3999939,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "rocket",
+            "hullLoss": 20.0,
+            "rounds": 0,
+            "rockets": 0,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "tank",
+            "weapon": "rocket",
+            "hullLoss": 10.0,
+            "rounds": 0,
+            "rockets": 0,
+            "actualProjectile": true,
+            "occupantHurt": false
+          },
+          {
+            "target": "helicopter",
+            "weapon": "gun",
+            "hullLoss": 4.0,
+            "rounds": 239,
+            "rockets": 0,
+            "actualProjectile": false,
+            "occupantHurt": false
+          }
+        ],
+        "newScenarios": "Four real healthy-radio-target attacks, including final single rocket against tank and aircraft; two healthy unreported targets never acquired; two operator/revocation/creative/allied/dismount impact-boundary scenarios."
+      },
+      "sharedVehicle": {
+        "passed": 29,
+        "file": "D:\\CodexCache\\helicopter-designation-qa\\forge-sharedVehicle-passed.log",
+        "sha256": "7cc6a8c19450908ddc05847860573a0696a9db384e41e1eab26a46c9ad40ef33"
+      },
+      "files": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "f79987236ce634bb407cecac4250b90e6b46219de599cd79553440123b444b47",
+        "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java": "656628e419219a54e5e417cd8ce79e3275653addc5814da60d7867f8e9e0c615",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "60857a904516e9b66d6d91cde3f331acd2d9f8c02b8612c99ee4591206e9ef1c",
+        "src/main/java/com/codex/blacklight/firearms/VehicleOrdnanceProjectile.java": "7087b9c1f17973ad5037a2962e8d8a26ebbaf23ea9b77a79f234906b18c20375",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterVehicleCombatGameTest.java": "4d4cab612cb1a8a6f2d43cc0c12f64845d6fea04d27c3ce36e54c5a9079784a6",
+        "tools/helicopter-hull-test.init.gradle": "09fe6f28473fceeea5930c76ff1e06ab4c92465ab1ccea5c66b45be87ace83b7"
+      }
+    }
+  },
+  "limitations": [
+    "No client rendering or subjective audio review in this checkpoint; these are native server tests.",
+    "Original weapon selection, Hellfire guidance, detailed source maneuver controllers and multiplayer sessions are not completed by these checks.",
+    "The broad creature, soldier, vehicle modeling, motion and sound objective remains active."
+  ],
+  "deployment": "No release package, installation, commit or user-world edit. Disposable D-drive game-test worlds only."
+}

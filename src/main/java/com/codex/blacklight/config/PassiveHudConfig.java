@@ -5,7 +5,7 @@ public final class PassiveHudConfig {
     public static final ModConfigSpec SPEC;
     public static final ModConfigSpec.BooleanValue SHOW_STACKS,SHOW_ZONE;
     public static final ModConfigSpec.DoubleValue HEALTH_X,HEALTH_Y;
-    public static final ModConfigSpec.BooleanValue CINEMATIC_COMBAT;
+    public static final ModConfigSpec.BooleanValue CINEMATIC_COMBAT,FULLSCREEN_MENU_CURSOR;
     public static final ModConfigSpec.DoubleValue CINEMATIC_STRENGTH;
     static {
         var b = new ModConfigSpec.Builder();
@@ -15,6 +15,7 @@ public final class PassiveHudConfig {
         HEALTH_Y = b.comment("Health HUD vertical placement, 0 = top, 1 = bottom.").defineInRange("healthHudY",0D,0D,1D);
         CINEMATIC_COMBAT=b.comment("Local hit accents: impact flash, zoom blur, colour split, red vignette and FOV punch. Display only.").define("cinematicCombat",true);
         CINEMATIC_STRENGTH=b.comment("Strength of the local hit accents. Also scaled by vanilla Screen Effect and FOV Effect sliders.").defineInRange("cinematicStrength",1D,.25D,1.5D);
+        FULLSCREEN_MENU_CURSOR=b.comment("Draw a software cursor in fullscreen menus, for drivers that hide the native pointer. Windowed mode and camera controls keep their native cursor behavior.").define("fullscreenMenuCursor",true);
         SPEC = b.build();
     }
     private PassiveHudConfig() {}

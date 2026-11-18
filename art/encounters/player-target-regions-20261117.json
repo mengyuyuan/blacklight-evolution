@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "date": "2026-11-17",
+  "state": "Source/code and static inspection only; compilation, unit/GameTests, native code, game/client and player acceptance not run by this branch.",
+  "problem": [
+    "BlackwatchHelicopter is not LivingEntity or MilitaryVehicle: ExplicitTarget previously discarded it before both client choice and server acceptance, although firearm/projectile hurt already supported it.",
+    "GreenePart was resolved to its mother before the lock crossed the network; all three Slugs consequently shared the same nearest mother point.",
+    "Prototype WeaponCombatSystem enumerated only ground vehicle mechanical contacts; helicopter hulls never received its otherwise legal close attack windows."
+  ],
+  "sourceBoundary": {
+    "greene": "The original three independent health children and their actual Slug bones/skin are established; the new Tab cycling/region packet is explicitly MC player interaction, not a claimed original lock algorithm.",
+    "segments": [
+      {
+        "slot": 0,
+        "template": "Mother_Segment_1",
+        "grabSlot": "Segment1",
+        "skin": "mother_segment_1_Slug_01Shape",
+        "sourceNodeOffset": 5144440
+      },
+      {
+        "slot": 1,
+        "template": "Mother_Segment_2",
+        "grabSlot": "Segment2",
+        "skin": "mother_segment_2_Slug_02Shape",
+        "sourceNodeOffset": 5306878
+      },
+      {
+        "slot": 2,
+        "template": "Mother_Segment_3",
+        "grabSlot": "Segment3",
+        "skin": "mother_segment_3_Slug_03Shape",
+        "sourceNodeOffset": 5469316
+      }
+    ],
+    "records": [
+      "art/encounters/greene-segment-shared-pose-source.json",
+      "art/encounters/greene-mother-health-integration-20261117.json",
+      "art/military-vehicles/helicopter-ammo-source.json",
+      "art/military-vehicles/helicopter-live-tactics-source.json",
+      "art/military-vehicles/helicopter-open-strafe-source.json",
+      "art/military-vehicles/helicopter-gun-envelope-source.json"
+    ],
+    "rawSources": [
+      {
+        "path": "D:\\PrototypeReference\\p1\\input\\startup_fig.p3d.rz",
+        "sha256": "96d84271e461cbe4566fb984359653b164257f88392c5bceb213c30f88527779"
+      },
+      {
+        "path": "D:\\PrototypeReference\\p1\\input\\startup_tod.p3d.rz",
+        "sha256": "3a791b79163ec41ad11b7aa52040d2d7820cccd25edea2a34e60a552ec7ffbca"
+      },
+      {
+        "path": "D:\\PrototypeReference\\p1\\helicopter-weapons-complete.json",
+        "sha256": "70955751e9386c6b312918cc0843e6b808d1144dbede5b25181cf012314308fa"
+      },
+      {
+        "path": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+        "sha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6"
+      }
+    ]
+  },
+  "implementation": {
+    "identity": "TargetSelection(persistent parent,region); Greene region0..2 maps weak_0..2, -1 is an ordinary actor or damageable mother core. Request/Ack carry region. Transient TARGET_LOCK_REGION attachment is not persisted across lives; request sequence rejects older same-parent region replies.",
+    "validity": "Mother targetable gate plus intact region and actual nonempty posed skin; core uses coreDamageable, not collapse/exposed alone. Client and server reject removed/dead/allied/protected hulls and invalid region. Selected region visibility and range apply to that same exposed surface.",
+    "cycle": "Tab chooses the crosshair region when present; otherwise the best visible in-view selection. Repeated Tab cycles visible regions with wraparound. Sneak+Tab releases. Other entity locks retain their original toggle-to-release behavior. HUD labels the actual region.",
+    "aim": "Client camera, remote facing, real FirearmAim, existing lockPoint consumers including throws, and prototype melee approach/yaw share the selected region point. Shots and melee still collide physically; no forced distant hit or redirection to a chosen region.",
+    "aircraft": "Aircraft candidate/selection, visible posed airframe points, parent-preserving server lock, ordinary firearm ballistic lead/actual projectile collision and existing protection retained. This is not a newly invented homing-missile system.",
+    "aircraftMelee": {
+      "cuboids": 215,
+      "source": "assets/blacklight/military/helicopter-model.json; same bone offsets and authored child pivots/rotation as HelicopterModel, yaw/bank as HelicopterRenderer. Door slide, gun yaw/pitch, hijack canopy pose included.",
+      "exclusions": "Rotor blade phase is not network authoritative; rotating blades and expendable missile meshes are not structural hull receivers. No enclosing rotor disk/broad airframe box is treated as damage surface.",
+      "gates": "Existing active weapon windows/reach/whip or body-flight sweep, actual nearest posed cuboid surface with .03 block contact tolerance, loaded path and block LOS, one accepted hit per aircraft per ordinary action, occupant allegiance/PvP, player AttackEntityEvent and still-current session check.",
+      "health": "Existing prototype health-unit multiplier, no fabricated native firearm identity or armor coefficient. Permission callback changing actor position/aircraft pose or cancelling the action invalidates the old contact."
+    },
+    "protocol": {
+      "neo": "standalone-87-player-feedback",
+      "forge": "forge-1.20.1-47-player-feedback"
+    }
+  },
+  "readOnlyHelicopterAi": {
+    "wired": "BlackwatchHelicopter PURSUIT/STRAFE -> HelicopterCombat.tick -> HelicopterTactics.tick -> source weighted circle/strafe/simple/hover bank, committed tight/open runs and their line-of-fire/aim envelopes. Actual fire paths retain crew, target hostility and loaded/block line checks.",
+    "sourceBank": "startup_fig engage_apache offset69940: circle50/strafe100/simple30/hover10000; conditional weighted choice, not perpetual highest-weight firing.",
+    "sourceAmmo": "startup_tod AI heli_gunship_30mm_user_ai@288073, heli_gunship_hellfire_user_ai@288958, rapid engage@289588/user_ai@289907 infiniteAmmo field=true; corresponding player profiles false. Verified existing decoded schema record, not inferred from user memory.",
+    "limits": "Current MC support controller has health/crew and observed target/territory/line-of-fire gates; it can return when those fail. Source attack lease and maneuvers do not prove unconditional permanent engagement. Full simpleEngage reaction graph/native steering remain outside the implemented subset. Mission lifetime is being changed by the separate deployment branch, so this record does not freeze its current limit.",
+    "unchangedByThisBranch": [
+      "entity/BlackwatchHelicopter.java",
+      "military/aircraft/HelicopterCombat.java",
+      "military/aircraft/HelicopterTactics.java"
+    ]
+  },
+  "pending": {
+    "unit": "TargetLockRequestStateTest now5 cases, including two new same-parent region latency and invalid-region cases.",
+    "gameTest": "ExplicitTargetLockGameTest contains6 pending real entity cases: firearm aircraft lock+damage/crew protection; cover+death cleanup; three Slug actual rifle debits; break/core/hide gates; near-vs-distant prototype aircraft melee; retained-lock wall protection.",
+    "playerSteps": [
+      "On foot hold a loaded rifle/launcher, aim toward an exposed helicopter and press Tab; verify HUD/camera and actual shots. Compare full cover and allied crew.",
+      "In prototype mode lock an aircraft at distance: ordinary melee must not damage it. Approach an actual nose/door/cabin surface within the move reach, attack, then repeat through a wall.",
+      "Aim at Greene Slug1/2/3, press Tab and cycle; verify HUD name and aim follow that same animated live Slug. Destroy it: its lock clears, it disappears from cycling. Core becomes selectable only after actual damage gate opens. Sneak+Tab releases.",
+      "Repeat first/third person, moving/yaw-banked aircraft, open doors, resize-adjusted Greene, client-server latency, save/load and dimension/respawn. No executed acceptance claimed."
+    ]
+  },
+  "static": {
+    "javaDelimitersChecked": 40,
+    "pythonAst": 3,
+    "byteIdenticalSharedNewFiles": [
+      "combat/TargetSelection.java",
+      "client/TargetLockRequestState.java",
+      "military/aircraft/HelicopterSkinContact.java",
+      "src/test/java/com/codex/blacklight/animation/TargetLockRequestStateTest.java"
+    ],
+    "javaOrGameExecuted": false
+  },
+  "files": [
+    "src/main/java/com/codex/blacklight/combat/ExplicitTarget.java",
+    "src/main/java/com/codex/blacklight/combat/TargetSelection.java",
+    "src/main/java/com/codex/blacklight/combat/CombatTargeting.java",
+    "src/main/java/com/codex/blacklight/client/ClientTargetLock.java",
+    "src/main/java/com/codex/blacklight/client/TargetLockRequestState.java",
+    "src/main/java/com/codex/blacklight/client/TargetLockHud.java",
+    "src/main/java/com/codex/blacklight/client/VehicleControls.java",
+    "src/main/java/com/codex/blacklight/client/PrototypeAnimationController.java",
+    "src/main/java/com/codex/blacklight/firearms/FirearmAim.java",
+    "src/main/java/com/codex/blacklight/combat/WeaponCombatSystem.java",
+    "src/main/java/com/codex/blacklight/combat/ClawCombatSystem.java",
+    "src/main/java/com/codex/blacklight/animation/NativeRootMotion.java",
+    "src/main/java/com/codex/blacklight/network/TargetLockPayload.java",
+    "src/main/java/com/codex/blacklight/network/TargetLockAckPayload.java",
+    "src/main/java/com/codex/blacklight/network/ModNetwork.java",
+    "src/main/java/com/codex/blacklight/registry/ModAttachments.java",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterSkinContact.java",
+    "src/main/java/com/codex/blacklight/military/vehicle/VehicleDamageBridge.java",
+    "src/test/java/com/codex/blacklight/animation/TargetLockRequestStateTest.java",
+    "src/gunplayTest/java/com/codex/blacklight/gametest/ExplicitTargetLockGameTest.java"
+  ]
+}

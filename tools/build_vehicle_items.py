@@ -1,10 +1,11 @@
-"""Generate original 32px inventory artwork, vehicle names and Minecraft-only recipes."""
+"""Generate detailed three-dimensional vehicle items and Minecraft-only recipes."""
 from pathlib import Path
 import argparse
 import io
 import json
 
 from PIL import Image, ImageDraw
+import vehicle_item_models
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -142,6 +143,14 @@ def generate(root,forge,check,recipes_only=False):
     geometry=json.loads((root/'src/main/resources/assets/blacklight/military/vehicle-models.json').read_text(encoding='utf8'))
     results={};lang={'zh_cn':{},'en_us':{}}
     def output(path,value):results[path]=json_bytes(value)
+    if not recipes_only:
+        atlas_path='assets/minecraft/atlases/blocks.json'
+        existing=root/'src/main/resources'/atlas_path
+        atlas=json.loads(existing.read_text('utf8')) if existing.exists() else {'sources':[]}
+        for faction in ('military','blackwatch'):
+            source={'type':'minecraft:single','resource':f'blacklight:entity/military_vehicles_{faction}'}
+            if source not in atlas['sources']:atlas['sources'].append(source)
+        output(atlas_path,atlas)
     def shaped(pattern,keys,result,count=1):
         return {'type':'minecraft:crafting_shaped','pattern':pattern,'key':{k:{'item':v} for k,v in keys.items()},'result':{'item' if forge else 'id':'blacklight:'+result,'count':count}}
     def shapeless(items,result,count=1):
@@ -163,9 +172,9 @@ def generate(root,forge,check,recipes_only=False):
     }
     def sprite(item, palette):
         if recipes_only:return
-        output('assets/blacklight/models/item/'+item+'.json',
-               {'parent':'minecraft:item/generated','textures':{'layer0':'blacklight:item/'+item}})
-        results['assets/blacklight/textures/item/'+item+'.png'] = inventory_icon(item, palette)
+        output('assets/blacklight/models/item/'+item+'.json',vehicle_item_models.model(item,geometry))
+        results['assets/blacklight/textures/item/'+item+'.png'] = (inventory_icon(item,palette)
+            if item.endswith('_chassis') else vehicle_item_models.atlas(item,palette))
     for faction in ('military','blackwatch'):
         for chassis,label,en in [('truck','运输卡车','Transport Truck'),('apc','装甲战斗车','Armored Fighting Vehicle'),('tank','主战坦克','Main Battle Tank')]:
             item=f'{faction}_{chassis}_chassis'
@@ -212,29 +221,24 @@ def generate(root,forge,check,recipes_only=False):
 
 
 def preview(root):
-    rows = [[f'{faction}_{kind}_chassis' for kind in ('truck', 'apc', 'tank')]
-            for faction in ('military', 'blackwatch')]
-    rows.append(['military_fuel_can', 'tank_he_shell', 'tank_ap_shell', 'autocannon_round', 'vehicle_repair_parts'])
-    sheet = Image.new('RGB', (1100, 610), '#252D2F')
-    draw = ImageDraw.Draw(sheet)
-    draw.text((18, 12), 'ORIGINAL INVENTORY SPRITES / 32 px (left) + 16 px (right), nearest pixel enlargement', fill='#E0E3D5')
-    draw.text((18, 30), 'Active: vehicles, ammunition, repair parts. Fuel can: PRESERVED / INACTIVE. Offline asset preview.', fill='#ADB8B1')
-    for row, names in enumerate(rows):
-        for column, item in enumerate(names):
-            x, y = column*220+12, row*180+60
-            draw.rectangle((x, y+25, x+203, y+136), fill='#3A4142')
-            icon = Image.open(root/'src/main/resources/assets/blacklight/textures/item'/(item+'.png')).convert('RGBA')
-            sheet.paste(icon.resize((96, 96), Image.Resampling.NEAREST), (x+5, y+32), icon.resize((96, 96), Image.Resampling.NEAREST))
-            small = icon.resize((16, 16), Image.Resampling.NEAREST).resize((64, 64), Image.Resampling.NEAREST)
-            sheet.paste(small, (x+126, y+48), small)
-            label = item.removesuffix('_chassis') + (' [preserved]' if item=='military_fuel_can' else '')
-            draw.text((x+4, y+4), label, fill='#E0E3D5')
-            draw.text((x+39, y+141), '32 px', fill='#ADB8B1')
-            draw.text((x+142, y+141), '16 px', fill='#ADB8B1')
-    path = root/'art/military-vehicles/previews/inventory-icons.png'
-    path.parent.mkdir(parents=True, exist_ok=True)
-    sheet.save(path)
-    print(path)
+    """Publish a hash-checked native GUI capture; never mistake a UV atlas for an icon."""
+    import hashlib
+    import shutil
+    platform='forge' if 'minecraft_version=1.20.1' in (root/'gradle.properties').read_text() else 'neo'
+    evidence=Path('D:/CodexCache/vehicle-item-qa')/platform
+    status=(evidence/'status.txt').read_text('utf8')
+    if not status.startswith('PASS:'):raise AssertionError('Run tools/vehicle-item-visual.init.gradle successfully first')
+    rows=json.loads((evidence/'baked-models.json').read_text('utf8'))
+    if len(rows)!=11:raise AssertionError('Incomplete native model capture')
+    for row in rows:
+        for resource,digest in row['resourceSha256'].items():
+            namespace,path=resource.split(':',1)
+            asset=root/'src/main/resources/assets'/namespace/path
+            if hashlib.sha256(asset.read_bytes()).hexdigest()!=digest:raise AssertionError('Stale native capture: '+resource)
+    target=root/'art/military-vehicles/previews/inventory-models.png'
+    target.parent.mkdir(parents=True,exist_ok=True)
+    shutil.copyfile(evidence/'inventory-board.png',target)
+    print(target)
 
 
 if __name__=='__main__':
@@ -243,4 +247,6 @@ if __name__=='__main__':
     if args.recipes_only and args.preview:parser.error('--recipes-only cannot write an icon preview')
     generate(ROOT,'minecraft_version=1.20.1' in (ROOT/'gradle.properties').read_text(),args.check,args.recipes_only)
     if args.forge_root:generate(args.forge_root.resolve(),True,args.check,args.recipes_only)
-    if args.preview:preview(ROOT)
+    if args.preview:
+        preview(ROOT)
+        if args.forge_root:preview(args.forge_root.resolve())

@@ -935,12 +935,12 @@
           "name": "left_wheel_1_tire_vertical",
           "bone": "left_wheel_1",
           "box": [
-            -1.3962963,
+            -1.3902963,
             0.0,
-            2.05896371,
-            0.38666667,
+            2.17551371,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -949,10 +949,10 @@
           "bone": "left_wheel_1",
           "box": [
             -1.3962963,
-            0.226625,
+            0.420875,
             1.83233871,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -974,12 +974,12 @@
           "name": "left_wheel_2_tire_vertical",
           "bone": "left_wheel_2",
           "box": [
-            -1.3962963,
+            -1.3902963,
             0.0,
-            -1.8724879,
-            0.38666667,
+            -1.7559379,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -988,10 +988,10 @@
           "bone": "left_wheel_2",
           "box": [
             -1.3962963,
-            0.226625,
+            0.420875,
             -2.0991129,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -1013,12 +1013,12 @@
           "name": "left_wheel_3_tire_vertical",
           "bone": "left_wheel_3",
           "box": [
-            -1.3962963,
+            -1.3902963,
             0.0,
-            -3.13055242,
-            0.38666667,
+            -3.01400242,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -1027,10 +1027,10 @@
           "bone": "left_wheel_3",
           "box": [
             -1.3962963,
-            0.226625,
+            0.420875,
             -3.35717742,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -1052,12 +1052,12 @@
           "name": "right_wheel_1_tire_vertical",
           "bone": "right_wheel_1",
           "box": [
-            1.00962963,
+            1.09602467,
             0.0,
-            2.05896371,
-            0.38666667,
+            2.17551371,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -1065,11 +1065,11 @@
           "name": "right_wheel_1_tire_horizontal",
           "bone": "right_wheel_1",
           "box": [
-            1.00962963,
-            0.226625,
+            1.09002467,
+            0.420875,
             1.83233871,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -1091,12 +1091,12 @@
           "name": "right_wheel_2_tire_vertical",
           "bone": "right_wheel_2",
           "box": [
-            1.00962963,
+            1.09602467,
             0.0,
-            -1.8724879,
-            0.38666667,
+            -1.7559379,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -1104,11 +1104,11 @@
           "name": "right_wheel_2_tire_horizontal",
           "bone": "right_wheel_2",
           "box": [
-            1.00962963,
-            0.226625,
+            1.09002467,
+            0.420875,
             -2.0991129,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -1130,12 +1130,12 @@
           "name": "right_wheel_3_tire_vertical",
           "bone": "right_wheel_3",
           "box": [
-            1.00962963,
+            1.09602467,
             0.0,
-            -3.13055242,
-            0.38666667,
+            -3.01400242,
+            0.29427163,
             1.295,
-            0.84175
+            0.60865
           ],
           "material": "rubber"
         },
@@ -1143,11 +1143,11 @@
           "name": "right_wheel_3_tire_horizontal",
           "bone": "right_wheel_3",
           "box": [
-            1.00962963,
-            0.226625,
+            1.09002467,
+            0.420875,
             -3.35717742,
-            0.38666667,
-            0.84175,
+            0.30627163,
+            0.45325,
             1.295
           ],
           "material": "rubber"
@@ -1281,6 +1281,747 @@
             0.15725806
           ],
           "material": "hazard"
+        },
+        {
+          "name": "left_wheel_1_shoulder_-1",
+          "bone": "left_wheel_1",
+          "box": [
+            -1.3932963,
+            0.110075,
+            1.93593871,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_1_shoulder_1",
+          "bone": "left_wheel_1",
+          "box": [
+            -1.3932963,
+            0.874125,
+            1.93593871,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_shoulder_-1",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.3932963,
+            0.110075,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_shoulder_1",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.3932963,
+            0.874125,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_inner_crown",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.01900579,
+            0.0,
+            -1.7559379,
+            0.29427163,
+            1.295,
+            0.60865
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_inner_belt",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.02500579,
+            0.420875,
+            -2.0991129,
+            0.30627163,
+            0.45325,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_inner_-1",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.02200579,
+            0.110075,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_2_inner_1",
+          "bone": "left_wheel_2",
+          "box": [
+            -1.02200579,
+            0.874125,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_shoulder_-1",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.3932963,
+            0.110075,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_shoulder_1",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.3932963,
+            0.874125,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_inner_crown",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.01900579,
+            0.0,
+            -3.01400242,
+            0.29427163,
+            1.295,
+            0.60865
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_inner_belt",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.02500579,
+            0.420875,
+            -3.35717742,
+            0.30627163,
+            0.45325,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_inner_-1",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.02200579,
+            0.110075,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "left_wheel_3_inner_1",
+          "bone": "left_wheel_3",
+          "box": [
+            -1.02200579,
+            0.874125,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_1_shoulder_-1",
+          "bone": "right_wheel_1",
+          "box": [
+            1.09302467,
+            0.110075,
+            1.93593871,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_1_shoulder_1",
+          "bone": "right_wheel_1",
+          "box": [
+            1.09302467,
+            0.874125,
+            1.93593871,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_shoulder_-1",
+          "bone": "right_wheel_2",
+          "box": [
+            1.09302467,
+            0.110075,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_shoulder_1",
+          "bone": "right_wheel_2",
+          "box": [
+            1.09302467,
+            0.874125,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_inner_crown",
+          "bone": "right_wheel_2",
+          "box": [
+            0.72473416,
+            0.0,
+            -1.7559379,
+            0.29427163,
+            1.295,
+            0.60865
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_inner_belt",
+          "bone": "right_wheel_2",
+          "box": [
+            0.71873416,
+            0.420875,
+            -2.0991129,
+            0.30627163,
+            0.45325,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_inner_-1",
+          "bone": "right_wheel_2",
+          "box": [
+            0.72173416,
+            0.110075,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_2_inner_1",
+          "bone": "right_wheel_2",
+          "box": [
+            0.72173416,
+            0.874125,
+            -1.9955129,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_shoulder_-1",
+          "bone": "right_wheel_3",
+          "box": [
+            1.09302467,
+            0.110075,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_shoulder_1",
+          "bone": "right_wheel_3",
+          "box": [
+            1.09302467,
+            0.874125,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_inner_crown",
+          "bone": "right_wheel_3",
+          "box": [
+            0.72473416,
+            0.0,
+            -3.01400242,
+            0.29427163,
+            1.295,
+            0.60865
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_inner_belt",
+          "bone": "right_wheel_3",
+          "box": [
+            0.71873416,
+            0.420875,
+            -3.35717742,
+            0.30627163,
+            0.45325,
+            1.295
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_inner_-1",
+          "bone": "right_wheel_3",
+          "box": [
+            0.72173416,
+            0.110075,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "right_wheel_3_inner_1",
+          "bone": "right_wheel_3",
+          "box": [
+            0.72173416,
+            0.874125,
+            -3.25357742,
+            0.30027163,
+            0.3108,
+            1.0878
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "canopy_webbing_-1_0",
+          "bone": "body",
+          "box": [
+            -1.3,
+            2.05,
+            -3.29,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_-1_0",
+          "bone": "body",
+          "box": [
+            -1.33,
+            2.08,
+            -3.306,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_-1_1",
+          "bone": "body",
+          "box": [
+            -1.3,
+            2.05,
+            -1.74,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_-1_1",
+          "bone": "body",
+          "box": [
+            -1.33,
+            2.08,
+            -1.756,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_-1_2",
+          "bone": "body",
+          "box": [
+            -1.3,
+            2.05,
+            -0.22,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_-1_2",
+          "bone": "body",
+          "box": [
+            -1.33,
+            2.08,
+            -0.236,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_-1_3",
+          "bone": "body",
+          "box": [
+            -1.3,
+            2.05,
+            0.77,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_-1_3",
+          "bone": "body",
+          "box": [
+            -1.33,
+            2.08,
+            0.754,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "cab_mirror_arm_-1",
+          "bone": "body",
+          "box": [
+            -1.34,
+            2.76,
+            2.64,
+            0.17,
+            0.055,
+            0.065
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cab_mirror_back_-1",
+          "bone": "body",
+          "box": [
+            -1.434,
+            2.64,
+            2.61,
+            0.188,
+            0.31,
+            0.085
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "cab_mirror_glass_-1",
+          "bone": "body",
+          "box": [
+            -1.414,
+            2.674,
+            2.6,
+            0.148,
+            0.241,
+            0.02
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "canopy_webbing_1_0",
+          "bone": "body",
+          "box": [
+            1.256,
+            2.05,
+            -3.29,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_1_0",
+          "bone": "body",
+          "box": [
+            1.286,
+            2.08,
+            -3.306,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_1_1",
+          "bone": "body",
+          "box": [
+            1.256,
+            2.05,
+            -1.74,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_1_1",
+          "bone": "body",
+          "box": [
+            1.286,
+            2.08,
+            -1.756,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_1_2",
+          "bone": "body",
+          "box": [
+            1.256,
+            2.05,
+            -0.22,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_1_2",
+          "bone": "body",
+          "box": [
+            1.286,
+            2.08,
+            -0.236,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "canopy_webbing_1_3",
+          "bone": "body",
+          "box": [
+            1.256,
+            2.05,
+            0.77,
+            0.044,
+            1.23,
+            0.074
+          ],
+          "material": "canvas"
+        },
+        {
+          "name": "canopy_buckle_1_3",
+          "bone": "body",
+          "box": [
+            1.286,
+            2.08,
+            0.754,
+            0.044,
+            0.12,
+            0.106
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "cab_mirror_arm_1",
+          "bone": "body",
+          "box": [
+            1.17,
+            2.76,
+            2.64,
+            0.17,
+            0.055,
+            0.065
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cab_mirror_back_1",
+          "bone": "body",
+          "box": [
+            1.246,
+            2.64,
+            2.61,
+            0.188,
+            0.31,
+            0.085
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "cab_mirror_glass_1",
+          "bone": "body",
+          "box": [
+            1.266,
+            2.674,
+            2.6,
+            0.148,
+            0.241,
+            0.02
+          ],
+          "material": "glass"
+        },
+        {
+          "name": "radiator_slat_0",
+          "bone": "body",
+          "box": [
+            -0.59,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_1",
+          "bone": "body",
+          "box": [
+            -0.41,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_2",
+          "bone": "body",
+          "box": [
+            -0.23,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_3",
+          "bone": "body",
+          "box": [
+            -0.05,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_4",
+          "bone": "body",
+          "box": [
+            0.13,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_5",
+          "bone": "body",
+          "box": [
+            0.31,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "radiator_slat_6",
+          "bone": "body",
+          "box": [
+            0.49,
+            1.397,
+            3.674,
+            0.055,
+            0.248,
+            0.023
+          ],
+          "material": "hub"
         }
       ]
     },
@@ -1901,12 +2642,12 @@
           "name": "track_left_wheel_1_tire_vertical",
           "bone": "track_left_wheel_1",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            -3.0542149,
-            0.5346,
+            -2.95875062,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -1915,10 +2656,10 @@
           "bone": "track_left_wheel_1",
           "box": [
             -1.59794516,
-            0.31526786,
-            -3.2398399,
+            0.474375,
+            -3.23983991,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -1940,12 +2681,12 @@
           "name": "track_left_wheel_2_tire_vertical",
           "bone": "track_left_wheel_2",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            -1.9704218,
-            0.5346,
+            -1.87495752,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -1954,10 +2695,10 @@
           "bone": "track_left_wheel_2",
           "box": [
             -1.59794516,
-            0.31526786,
+            0.474375,
             -2.1560468,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -1979,12 +2720,12 @@
           "name": "track_left_wheel_3_tire_vertical",
           "bone": "track_left_wheel_3",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            -0.88662869,
-            0.5346,
+            -0.79116441,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -1993,10 +2734,10 @@
           "bone": "track_left_wheel_3",
           "box": [
             -1.59794516,
-            0.31526786,
-            -1.07225369,
+            0.474375,
+            -1.0722537,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2018,12 +2759,12 @@
           "name": "track_left_wheel_4_tire_vertical",
           "bone": "track_left_wheel_4",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            0.19716441,
-            0.5346,
+            0.29262869,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2032,10 +2773,10 @@
           "bone": "track_left_wheel_4",
           "box": [
             -1.59794516,
-            0.31526786,
+            0.474375,
             0.01153941,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2057,12 +2798,12 @@
           "name": "track_left_wheel_5_tire_vertical",
           "bone": "track_left_wheel_5",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            1.28095751,
-            0.5346,
+            1.3764218,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2071,10 +2812,10 @@
           "bone": "track_left_wheel_5",
           "box": [
             -1.59794516,
-            0.31526786,
+            0.474375,
             1.09533251,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2096,12 +2837,12 @@
           "name": "track_left_wheel_6_tire_vertical",
           "bone": "track_left_wheel_6",
           "box": [
-            -1.59794516,
+            -1.59194516,
             0.12964286,
-            2.36475062,
-            0.5346,
+            2.4602149,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2110,10 +2851,10 @@
           "bone": "track_left_wheel_6",
           "box": [
             -1.59794516,
-            0.31526786,
+            0.474375,
             2.17912562,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2434,12 +3175,12 @@
           "name": "track_right_wheel_1_tire_vertical",
           "bone": "track_right_wheel_1",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            -3.0542149,
-            0.5346,
+            -2.95875062,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2448,10 +3189,10 @@
           "bone": "track_right_wheel_1",
           "box": [
             1.06334516,
-            0.31526786,
-            -3.2398399,
+            0.474375,
+            -3.23983991,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2473,12 +3214,12 @@
           "name": "track_right_wheel_2_tire_vertical",
           "bone": "track_right_wheel_2",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            -1.9704218,
-            0.5346,
+            -1.87495752,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2487,10 +3228,10 @@
           "bone": "track_right_wheel_2",
           "box": [
             1.06334516,
-            0.31526786,
+            0.474375,
             -2.1560468,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2512,12 +3253,12 @@
           "name": "track_right_wheel_3_tire_vertical",
           "bone": "track_right_wheel_3",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            -0.88662869,
-            0.5346,
+            -0.79116441,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2526,10 +3267,10 @@
           "bone": "track_right_wheel_3",
           "box": [
             1.06334516,
-            0.31526786,
-            -1.07225369,
+            0.474375,
+            -1.0722537,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2551,12 +3292,12 @@
           "name": "track_right_wheel_4_tire_vertical",
           "bone": "track_right_wheel_4",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            0.19716441,
-            0.5346,
+            0.29262869,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2565,10 +3306,10 @@
           "bone": "track_right_wheel_4",
           "box": [
             1.06334516,
-            0.31526786,
+            0.474375,
             0.01153941,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2590,12 +3331,12 @@
           "name": "track_right_wheel_5_tire_vertical",
           "bone": "track_right_wheel_5",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            1.28095751,
-            0.5346,
+            1.3764218,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2604,10 +3345,10 @@
           "bone": "track_right_wheel_5",
           "box": [
             1.06334516,
-            0.31526786,
+            0.474375,
             1.09533251,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2629,12 +3370,12 @@
           "name": "track_right_wheel_6_tire_vertical",
           "bone": "track_right_wheel_6",
           "box": [
-            1.06334516,
+            1.06934516,
             0.12964286,
-            2.36475062,
-            0.5346,
+            2.4602149,
+            0.5226,
             1.06071429,
-            0.68946429
+            0.49853572
           ],
           "material": "rubber"
         },
@@ -2643,10 +3384,10 @@
           "bone": "track_right_wheel_6",
           "box": [
             1.06334516,
-            0.31526786,
+            0.474375,
             2.17912562,
             0.5346,
-            0.68946429,
+            0.37125,
             1.06071429
           ],
           "material": "rubber"
@@ -2706,7 +3447,14 @@
         {
           "name": "upper_hull",
           "bone": "body",
-          "viewports": ["camera_passenger_1", "camera_passenger_2", "camera_passenger_3", "camera_passenger_4", "camera_passenger_5", "camera_passenger_6"],
+          "viewports": [
+            "camera_passenger_1",
+            "camera_passenger_2",
+            "camera_passenger_3",
+            "camera_passenger_4",
+            "camera_passenger_5",
+            "camera_passenger_6"
+          ],
           "box": [
             -1.4583871,
             1.34357143,
@@ -3177,7 +3925,9 @@
         {
           "name": "hatch",
           "bone": "hatch_gunner",
-          "viewports": ["camera_gunner"],
+          "viewports": [
+            "camera_gunner"
+          ],
           "box": [
             -0.51096774,
             2.81678571,
@@ -3256,7 +4006,9 @@
         {
           "name": "glacis_vent_0",
           "bone": "body",
-          "viewports": ["camera_driver"],
+          "viewports": [
+            "camera_driver"
+          ],
           "box": [
             -0.76645161,
             2.12214286,
@@ -3422,6 +4174,526 @@
             0.15689655
           ],
           "material": "hazard"
+        },
+        {
+          "name": "track_left_wheel_1_shoulder_-1",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            -3.15498276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_shoulder_1",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.59494516,
+            0.845625,
+            -3.15498276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_shoulder_-1",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            -2.07118966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_shoulder_1",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.59494516,
+            0.845625,
+            -2.07118966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_shoulder_-1",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            -0.98739655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_shoulder_1",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.59494516,
+            0.845625,
+            -0.98739655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_shoulder_-1",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            0.09639655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_shoulder_1",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.59494516,
+            0.845625,
+            0.09639655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_shoulder_-1",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            1.18018966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_shoulder_1",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.59494516,
+            0.845625,
+            1.18018966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_shoulder_-1",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.59494516,
+            0.21980357,
+            2.26398276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_shoulder_1",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.59494516,
+            0.845625,
+            2.26398276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_shoulder_-1",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.06634516,
+            0.21980357,
+            -3.15498276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_shoulder_1",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.06634516,
+            0.845625,
+            -3.15498276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_shoulder_-1",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.06634516,
+            0.21980357,
+            -2.07118966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_shoulder_1",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.06634516,
+            0.845625,
+            -2.07118966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_shoulder_-1",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.06634516,
+            0.21980357,
+            -0.98739655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_shoulder_1",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.06634516,
+            0.845625,
+            -0.98739655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_shoulder_-1",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.06634516,
+            0.21980357,
+            0.09639655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_shoulder_1",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.06634516,
+            0.845625,
+            0.09639655,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_shoulder_-1",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.06634516,
+            0.21980357,
+            1.18018966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_shoulder_1",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.06634516,
+            0.845625,
+            1.18018966,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_shoulder_-1",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.06634516,
+            0.21980357,
+            2.26398276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_shoulder_1",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.06634516,
+            0.845625,
+            2.26398276,
+            0.5286,
+            0.25457143,
+            0.891
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "ramp_hinge_-1",
+          "bone": "door_rear",
+          "box": [
+            -0.56,
+            1.096,
+            -3.497,
+            0.28,
+            0.12,
+            0.12
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "engine_vent_base_-1",
+          "bone": "body",
+          "box": [
+            -1.23,
+            1.985,
+            -2.98,
+            0.56,
+            0.055,
+            1.11
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "engine_louvre_-1_0",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.92,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_-1_1",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.751,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_-1_2",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.582,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_-1_3",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.413,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_-1_4",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.244,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_-1_5",
+          "bone": "body",
+          "box": [
+            -1.205,
+            2.032,
+            -2.075,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "ramp_hinge_1",
+          "bone": "door_rear",
+          "box": [
+            0.28,
+            1.096,
+            -3.497,
+            0.28,
+            0.12,
+            0.12
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "engine_vent_base_1",
+          "bone": "body",
+          "box": [
+            0.67,
+            1.985,
+            -2.98,
+            0.56,
+            0.055,
+            1.11
+          ],
+          "material": "armor_dark"
+        },
+        {
+          "name": "engine_louvre_1_0",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.92,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_1_1",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.751,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_1_2",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.582,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_1_3",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.413,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_1_4",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.244,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "engine_louvre_1_5",
+          "bone": "body",
+          "box": [
+            0.695,
+            2.032,
+            -2.075,
+            0.51,
+            0.047,
+            0.085
+          ],
+          "material": "hub"
         }
       ]
     },
@@ -4030,12 +5302,12 @@
           "name": "track_left_wheel_1_tire_vertical",
           "bone": "track_left_wheel_1",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            -3.54902473,
-            0.67835294,
+            -3.45066758,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4044,10 +5316,10 @@
           "bone": "track_left_wheel_1",
           "box": [
             -1.93917647,
-            0.32482143,
-            -3.74027473,
+            0.48875,
+            -3.74027472,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4069,12 +5341,12 @@
           "name": "track_left_wheel_2_tire_vertical",
           "bone": "track_left_wheel_2",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            -2.48440934,
-            0.67835294,
+            -2.3860522,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4083,10 +5355,10 @@
           "bone": "track_left_wheel_2",
           "box": [
             -1.93917647,
-            0.32482143,
+            0.48875,
             -2.67565934,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4108,12 +5380,12 @@
           "name": "track_left_wheel_3_tire_vertical",
           "bone": "track_left_wheel_3",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            -1.41979396,
-            0.67835294,
+            -1.32143681,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4122,10 +5394,10 @@
           "bone": "track_left_wheel_3",
           "box": [
             -1.93917647,
-            0.32482143,
-            -1.61104396,
+            0.48875,
+            -1.61104395,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4147,12 +5419,12 @@
           "name": "track_left_wheel_4_tire_vertical",
           "bone": "track_left_wheel_4",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            -0.35517857,
-            0.67835294,
+            -0.25682143,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4161,10 +5433,10 @@
           "bone": "track_left_wheel_4",
           "box": [
             -1.93917647,
-            0.32482143,
+            0.48875,
             -0.54642857,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4186,12 +5458,12 @@
           "name": "track_left_wheel_5_tire_vertical",
           "bone": "track_left_wheel_5",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            0.70943681,
-            0.67835294,
+            0.80779395,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4200,10 +5472,10 @@
           "bone": "track_left_wheel_5",
           "box": [
             -1.93917647,
-            0.32482143,
+            0.48875,
             0.51818681,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4225,12 +5497,12 @@
           "name": "track_left_wheel_6_tire_vertical",
           "bone": "track_left_wheel_6",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            1.7740522,
-            0.67835294,
+            1.87240934,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4239,10 +5511,10 @@
           "bone": "track_left_wheel_6",
           "box": [
             -1.93917647,
-            0.32482143,
+            0.48875,
             1.5828022,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4264,12 +5536,12 @@
           "name": "track_left_wheel_7_tire_vertical",
           "bone": "track_left_wheel_7",
           "box": [
-            -1.93917647,
+            -1.93317647,
             0.13357143,
-            2.83866758,
-            0.67835294,
+            2.93702472,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4278,10 +5550,10 @@
           "bone": "track_left_wheel_7",
           "box": [
             -1.93917647,
-            0.32482143,
+            0.48875,
             2.64741758,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4628,12 +5900,12 @@
           "name": "track_right_wheel_1_tire_vertical",
           "bone": "track_right_wheel_1",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            -3.54902473,
-            0.67835294,
+            -3.45066758,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4642,10 +5914,10 @@
           "bone": "track_right_wheel_1",
           "box": [
             1.26082353,
-            0.32482143,
-            -3.74027473,
+            0.48875,
+            -3.74027472,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4667,12 +5939,12 @@
           "name": "track_right_wheel_2_tire_vertical",
           "bone": "track_right_wheel_2",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            -2.48440934,
-            0.67835294,
+            -2.3860522,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4681,10 +5953,10 @@
           "bone": "track_right_wheel_2",
           "box": [
             1.26082353,
-            0.32482143,
+            0.48875,
             -2.67565934,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4706,12 +5978,12 @@
           "name": "track_right_wheel_3_tire_vertical",
           "bone": "track_right_wheel_3",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            -1.41979396,
-            0.67835294,
+            -1.32143681,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4720,10 +5992,10 @@
           "bone": "track_right_wheel_3",
           "box": [
             1.26082353,
-            0.32482143,
-            -1.61104396,
+            0.48875,
+            -1.61104395,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4745,12 +6017,12 @@
           "name": "track_right_wheel_4_tire_vertical",
           "bone": "track_right_wheel_4",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            -0.35517857,
-            0.67835294,
+            -0.25682143,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4759,10 +6031,10 @@
           "bone": "track_right_wheel_4",
           "box": [
             1.26082353,
-            0.32482143,
+            0.48875,
             -0.54642857,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4784,12 +6056,12 @@
           "name": "track_right_wheel_5_tire_vertical",
           "bone": "track_right_wheel_5",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            0.70943681,
-            0.67835294,
+            0.80779395,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4798,10 +6070,10 @@
           "bone": "track_right_wheel_5",
           "box": [
             1.26082353,
-            0.32482143,
+            0.48875,
             0.51818681,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4823,12 +6095,12 @@
           "name": "track_right_wheel_6_tire_vertical",
           "bone": "track_right_wheel_6",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            1.7740522,
-            0.67835294,
+            1.87240934,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4837,10 +6109,10 @@
           "bone": "track_right_wheel_6",
           "box": [
             1.26082353,
-            0.32482143,
+            0.48875,
             1.5828022,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4862,12 +6134,12 @@
           "name": "track_right_wheel_7_tire_vertical",
           "bone": "track_right_wheel_7",
           "box": [
-            1.26082353,
+            1.26682353,
             0.13357143,
-            2.83866758,
-            0.67835294,
+            2.93702472,
+            0.66635294,
             1.09285714,
-            0.71035714
+            0.51364286
           ],
           "material": "rubber"
         },
@@ -4876,10 +6148,10 @@
           "bone": "track_right_wheel_7",
           "box": [
             1.26082353,
-            0.32482143,
+            0.48875,
             2.64741758,
             0.67835294,
-            0.71035714,
+            0.3825,
             1.09285714
           ],
           "material": "rubber"
@@ -4978,7 +6250,9 @@
         {
           "name": "front_armor_step_2",
           "bone": "body",
-          "viewports": ["camera_driver"],
+          "viewports": [
+            "camera_driver"
+          ],
           "box": [
             -1.68235294,
             1.785,
@@ -5822,6 +7096,526 @@
             0.16
           ],
           "material": "hazard"
+        },
+        {
+          "name": "track_left_wheel_1_shoulder_-1",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            -3.65284615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_1_shoulder_1",
+          "bone": "track_left_wheel_1",
+          "box": [
+            -1.93617647,
+            0.87125,
+            -3.65284615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_shoulder_-1",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            -2.58823077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_2_shoulder_1",
+          "bone": "track_left_wheel_2",
+          "box": [
+            -1.93617647,
+            0.87125,
+            -2.58823077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_shoulder_-1",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            -1.52361538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_3_shoulder_1",
+          "bone": "track_left_wheel_3",
+          "box": [
+            -1.93617647,
+            0.87125,
+            -1.52361538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_shoulder_-1",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            -0.459,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_4_shoulder_1",
+          "bone": "track_left_wheel_4",
+          "box": [
+            -1.93617647,
+            0.87125,
+            -0.459,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_shoulder_-1",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            0.60561538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_5_shoulder_1",
+          "bone": "track_left_wheel_5",
+          "box": [
+            -1.93617647,
+            0.87125,
+            0.60561538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_shoulder_-1",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            1.67023077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_6_shoulder_1",
+          "bone": "track_left_wheel_6",
+          "box": [
+            -1.93617647,
+            0.87125,
+            1.67023077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_7_shoulder_-1",
+          "bone": "track_left_wheel_7",
+          "box": [
+            -1.93617647,
+            0.22646429,
+            2.73484615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_left_wheel_7_shoulder_1",
+          "bone": "track_left_wheel_7",
+          "box": [
+            -1.93617647,
+            0.87125,
+            2.73484615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_shoulder_-1",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.26382353,
+            0.22646429,
+            -3.65284615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_1_shoulder_1",
+          "bone": "track_right_wheel_1",
+          "box": [
+            1.26382353,
+            0.87125,
+            -3.65284615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_shoulder_-1",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.26382353,
+            0.22646429,
+            -2.58823077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_2_shoulder_1",
+          "bone": "track_right_wheel_2",
+          "box": [
+            1.26382353,
+            0.87125,
+            -2.58823077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_shoulder_-1",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.26382353,
+            0.22646429,
+            -1.52361538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_3_shoulder_1",
+          "bone": "track_right_wheel_3",
+          "box": [
+            1.26382353,
+            0.87125,
+            -1.52361538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_shoulder_-1",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.26382353,
+            0.22646429,
+            -0.459,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_4_shoulder_1",
+          "bone": "track_right_wheel_4",
+          "box": [
+            1.26382353,
+            0.87125,
+            -0.459,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_shoulder_-1",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.26382353,
+            0.22646429,
+            0.60561538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_5_shoulder_1",
+          "bone": "track_right_wheel_5",
+          "box": [
+            1.26382353,
+            0.87125,
+            0.60561538,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_shoulder_-1",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.26382353,
+            0.22646429,
+            1.67023077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_6_shoulder_1",
+          "bone": "track_right_wheel_6",
+          "box": [
+            1.26382353,
+            0.87125,
+            1.67023077,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_7_shoulder_-1",
+          "bone": "track_right_wheel_7",
+          "box": [
+            1.26382353,
+            0.22646429,
+            2.73484615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "track_right_wheel_7_shoulder_1",
+          "bone": "track_right_wheel_7",
+          "box": [
+            1.26382353,
+            0.87125,
+            2.73484615,
+            0.67235294,
+            0.26228571,
+            0.918
+          ],
+          "material": "rubber"
+        },
+        {
+          "name": "turret_basket_bracket_-1",
+          "bone": "turret_yaw",
+          "box": [
+            -0.95,
+            2.27,
+            -2.08,
+            0.12,
+            0.17,
+            0.44
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cheek_plate_-1",
+          "bone": "turret_yaw",
+          "box": [
+            -1.315,
+            2.53,
+            -1.37,
+            0.15,
+            0.32,
+            2.1
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "skirt_hinge_-1_0",
+          "bone": "body",
+          "box": [
+            -1.93,
+            1.735,
+            -2.74,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_-1_1",
+          "bone": "body",
+          "box": [
+            -1.93,
+            1.735,
+            -1.56,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_-1_2",
+          "bone": "body",
+          "box": [
+            -1.93,
+            1.735,
+            -0.38,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_-1_3",
+          "bone": "body",
+          "box": [
+            -1.93,
+            1.735,
+            0.8,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "turret_basket_bracket_1",
+          "bone": "turret_yaw",
+          "box": [
+            0.83,
+            2.27,
+            -2.08,
+            0.12,
+            0.17,
+            0.44
+          ],
+          "material": "metal"
+        },
+        {
+          "name": "cheek_plate_1",
+          "bone": "turret_yaw",
+          "box": [
+            1.165,
+            2.53,
+            -1.37,
+            0.15,
+            0.32,
+            2.1
+          ],
+          "material": "armor_light"
+        },
+        {
+          "name": "skirt_hinge_1_0",
+          "bone": "body",
+          "box": [
+            1.86,
+            1.735,
+            -2.74,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_1_1",
+          "bone": "body",
+          "box": [
+            1.86,
+            1.735,
+            -1.56,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_1_2",
+          "bone": "body",
+          "box": [
+            1.86,
+            1.735,
+            -0.38,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
+        },
+        {
+          "name": "skirt_hinge_1_3",
+          "bone": "body",
+          "box": [
+            1.86,
+            1.735,
+            0.8,
+            0.07,
+            0.18,
+            0.29
+          ],
+          "material": "hub"
         }
       ]
     }

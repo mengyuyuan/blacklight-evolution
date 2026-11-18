@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/helicopterTest/java')
+    sourceSets.main.resources.srcDir('src/helicopterTest/resources')
+    tasks.named('test',Test).configure { include '**/Helicopter*Test.class'; include '**/VehicleControlAuthorityTest.class' }
+} }

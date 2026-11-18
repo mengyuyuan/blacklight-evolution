@@ -1,0 +1,1053 @@
+{
+  "schema": 1,
+  "createdLocal": "2026-11-16T21:35:15",
+  "status": "Fixed Hellfire rack, separate outer pod geometry and missile proportions checkpoint; full goal remains active.",
+  "source": {
+    "file": "D:\\blacklight-evolution\\art\\military-vehicles\\helicopter-rack-source.json",
+    "sha256": "85bff872b39eb4f75883f9e4d5cc2c8879eec8395329ea061c7d146c2a3a7047"
+  },
+  "platforms": {
+    "neo": {
+      "unitTests": 61,
+      "nativeHelicopterTests": 68,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-hellfireUnit-passed.log",
+          "sha256": "fd29211f84e4de64eba34281caf4fedd4d50adf6646fefbc68aef5a15a5971e3"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-helicopterHullServer-passed.log",
+          "sha256": "a84f6453352a76329d27f308ede267c8a1b659c34a1506b98783ba5ae3f3cb0f"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-helicopterHullRegression-passed.log",
+          "sha256": "a2b9eed3575ea4ec14701752c1fd31b8ee30f394e949d37537f9a09c58d1dc3e"
+        },
+        "helicopterRackVisual": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-helicopterRackVisual-passed.log",
+          "sha256": "19e6f3ae2e96e810fd3a664e23be0dda004c6989fc19e87e4913cdd37dd18e22"
+        },
+        "helicopterRackDestructionVisual": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-helicopterRackDestructionVisual-passed.log",
+          "sha256": "570f31feb2a2198cb43685e869847bbcfdacb4ba83a021cf599251fee816fff1"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "0f31cb7ccf4a7c095987f561716d9e76d7388a4afb1609bf38e508eb3956d646"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "1dbdd99e92014bf27031f0729b7cbb5ba7fffca587c6503cb7126ea869a2aa7c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "8a1397beffb4ab9cad768d4deca31c11c501f114e684e396ca4811c832c3bcf4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "25a669857a8b6ae2e3e3c6c8b97d7446684376146754b101a9cba852a25180e4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "0265fe5a2c18310ba8d8685931c48814e8348e609e439f579cb8b768bcdaa2d4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "38f5b202a9f131dc59afcde29dcbd90a86c0a113cbb78c01b7d59634286913a8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "18715966f305f7ec3d01839ac25884e4dd9dabf437534226738eb8a7bb7ff82b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "1cf46b0816a16942972d8109dccc2ae0238b0f717026fd86d415f61b3310ce49"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "02312fc8a1be5f745720770c997b811ee6cb2a059a7577c46eb43b31bcd0ee90"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "c204327c7ea07dae260181287bed94fb4cebd35fb40284af9866309a4d7db40c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "ee775d47f45d8825557925fe8d539ae4c2ab484c57ea1acc935555609aaaa9cb"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "edd044df676d01201cd3b9b260bf3b17ef7ec9d0559b039c7704cbfb3918b728"
+        }
+      ],
+      "clients": {
+        "combat": {
+          "frames": 118,
+          "firstHover": 300,
+          "firstShot": 338,
+          "launchSpeed": 0.006544170369000358,
+          "impact": true,
+          "maximumRackError": 7.590676833368455e-07,
+          "rackSamples": 8904,
+          "activeSounds": [
+            "blacklight:firearm.impact",
+            "blacklight:vehicle.coaxial",
+            "blacklight:vehicle.helicopter_rotor",
+            "blacklight:vehicle.helicopter_turbine",
+            "blacklight:vehicle.rocket"
+          ],
+          "evidence": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\evidence.json",
+            "sha256": "dd0f7ada73dca23e905900d487535b16872357b1e8e97275bb46d357d43c3b41"
+          },
+          "reviewSheet": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-combat-review.png",
+            "sha256": "ad68d0355d7dbd5dcadd140691690ca8eab45a9524edfbf413f6f36f5d58291a"
+          },
+          "reviewedFrames": [
+            {
+              "image": "hover-080-STRAFE.png",
+              "age": 80,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-080-STRAFE.png",
+              "sha256": "21ba5c41957ad6ada2f99234471d1aab945d785f9cb7779281e730df2e7ec7b0"
+            },
+            {
+              "image": "hover-110-STRAFE.png",
+              "age": 110,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-110-STRAFE.png",
+              "sha256": "de8b0a460ab8509e2f3db0aac0370bd5ed6e62f7a4dc9a93a91ee7f3f7dadae8"
+            },
+            {
+              "image": "hover-140-STRAFE.png",
+              "age": 140,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-140-STRAFE.png",
+              "sha256": "22e1ed5846695297ea16a42459a62504578695e29e1908ad6633074c814f5ad9"
+            },
+            {
+              "image": "hover-170-STRAFE.png",
+              "age": 170,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-170-STRAFE.png",
+              "sha256": "d66f8379d90990457e8e0b8913ccc176437c7a8930945ea88354ad8576e44f5e"
+            },
+            {
+              "image": "hover-290-STRAFE.png",
+              "age": 290,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-290-STRAFE.png",
+              "sha256": "ff52ffcd9d5b8a49d6dbd327a236ddcb7fb3146ca4e2256aa82442c3129bf521"
+            },
+            {
+              "image": "hover-337-AIM.png",
+              "age": 337,
+              "stage": "AIM",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-337-AIM.png",
+              "sha256": "29a326334405c57d8c1272353c02b262d9b74b86b1c43445e5182979a235ee85"
+            },
+            {
+              "image": "hover-338-FIRE.png",
+              "age": 339,
+              "stage": "FIRE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-338-FIRE.png",
+              "sha256": "55a55f333d397d67c9b6cc14f8e74d53253e6ee7943b7069c70bf8a5c0d4bceb"
+            },
+            {
+              "image": "hover-340-FIRE.png",
+              "age": 340,
+              "stage": "FIRE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-340-FIRE.png",
+              "sha256": "cc6117bcd44b542612a8d162c24fafbae903fd6b41bbb1dbf4fe5236d677eef0"
+            },
+            {
+              "image": "hover-342-RECOVER.png",
+              "age": 342,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-342-RECOVER.png",
+              "sha256": "167744ce26f612ff26dca8bedd4ccb976bf1fc8cca8842694ab13f61d7b41d3a"
+            },
+            {
+              "image": "hover-347-RECOVER.png",
+              "age": 348,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-347-RECOVER.png",
+              "sha256": "f2f6a671d8f69c60227b952b30d0942f170040ebaf29e836804b3b587c294c97"
+            },
+            {
+              "image": "hover-358-RECOVER.png",
+              "age": 358,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-358-RECOVER.png",
+              "sha256": "d4e0ac438bf8ad771c1c16ebb347086b994225fbf7d7d5b21c6304bbca0b9d76"
+            },
+            {
+              "image": "hover-361-RECOVER.png",
+              "age": 361,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-361-RECOVER.png",
+              "sha256": "5f94be1664068431ab730f75765585d05ba8838366ff3e2270bc263e4c018f82"
+            },
+            {
+              "image": "hover-380-STRAFE.png",
+              "age": 380,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-380-STRAFE.png",
+              "sha256": "95be4fb021cbdaad7176bbc61c29cb9f0faf4f0303386582ffb36096862f095c"
+            },
+            {
+              "image": "hover-400-STRAFE.png",
+              "age": 400,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-400-STRAFE.png",
+              "sha256": "ffefc3957dd9d1685b566b84d08d8bdb8529c5aa43457eb299462b034f1ab382"
+            },
+            {
+              "image": "hover-420-STRAFE.png",
+              "age": 420,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-420-STRAFE.png",
+              "sha256": "1c4067971b83fbe86ab2b1f48220c4e0a1a907de76c32920308f6a0214b80c44"
+            },
+            {
+              "image": "hover-430-STRAFE.png",
+              "age": 430,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-frames\\hover-430-STRAFE.png",
+              "sha256": "24821ef783cb1f6af6a61d906ce900950586c3f8bda80fccbe0b67165f147bd3"
+            }
+          ]
+        },
+        "destruction": {
+          "frames": 631,
+          "results": [
+            {
+              "case": "truck",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "apc",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "tank",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "helicopter",
+              "receipts": 1,
+              "removedAt": 43,
+              "expired": true
+            },
+            {
+              "case": "submerged_tank",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            }
+          ],
+          "sounds": [
+            "block.chain.break",
+            "block.fire.ambient",
+            "block.water.ambient",
+            "entity.generic.explode",
+            "firearm.impact",
+            "music.game",
+            "vehicle.helicopter_alarm"
+          ],
+          "evidence": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\evidence.json",
+            "sha256": "22873cb848b41e80fe1772149563042f574fdbdb49c5fa416ee3584723aa1ac3"
+          },
+          "reviewSheet": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\neo-destruction-review.png",
+            "sha256": "026a047e26a83b61be9c8cb51f4dcef12b5aff4bbcc0e0940f0e5b309a642521"
+          },
+          "reviewedFrames": [
+            {
+              "image": "helicopter-000.png",
+              "case": "helicopter",
+              "age": 0,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-000.png",
+              "sha256": "19d756e3622cf16a9ffdffdb18b517b1aabe99a1f159dc4b02ca67fc75077cda"
+            },
+            {
+              "image": "helicopter-020.png",
+              "case": "helicopter",
+              "age": 20,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-020.png",
+              "sha256": "19d756e3622cf16a9ffdffdb18b517b1aabe99a1f159dc4b02ca67fc75077cda"
+            },
+            {
+              "image": "helicopter-028.png",
+              "case": "helicopter",
+              "age": 28,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-028.png",
+              "sha256": "494bcb3531942ecff11b75ecc2bfb1c5e057a042ef8e837f060915c11250eff9"
+            },
+            {
+              "image": "helicopter-044.png",
+              "case": "helicopter",
+              "age": 44,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-044.png",
+              "sha256": "79a3abe3388e7d9df13e7572ed9c22385c2a4315502caf59f283574e1d05c206"
+            },
+            {
+              "image": "helicopter-048.png",
+              "case": "helicopter",
+              "age": 48,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-048.png",
+              "sha256": "fdce982df1faf7c6df14fe32a4b08a964d2f5a8e5c980df59314c046a285e77a"
+            },
+            {
+              "image": "helicopter-056.png",
+              "case": "helicopter",
+              "age": 56,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-056.png",
+              "sha256": "a7c1ccdb1e09a23f0c211c4d68a1c5e439d31085fb90ca400c340acac786f454"
+            },
+            {
+              "image": "helicopter-076.png",
+              "case": "helicopter",
+              "age": 76,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-076.png",
+              "sha256": "8126d9b8bcecea81805d7f8938bf313803e662723477a6f3fa1786e179b548a6"
+            },
+            {
+              "image": "helicopter-104.png",
+              "case": "helicopter",
+              "age": 104,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-104.png",
+              "sha256": "903c151ef44f300a23a71e01daf7e8418403ff3551ae8ae2ddf67846eb5f1f03"
+            },
+            {
+              "image": "helicopter-160.png",
+              "case": "helicopter",
+              "age": 160,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-160.png",
+              "sha256": "4f11772863cde62ad661b388325e71a7003facad7268527bb3a69c60eefabd6c"
+            },
+            {
+              "image": "helicopter-260.png",
+              "case": "helicopter",
+              "age": 260,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-260.png",
+              "sha256": "9b6d0b5e94d6767313971b4b6581cef416adc004388bede505a16d9bfed8bcf6"
+            },
+            {
+              "image": "helicopter-360.png",
+              "case": "helicopter",
+              "age": 360,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-360.png",
+              "sha256": "48f9172906de183d2587a324d7198c9c4c47adfcd366788379c01e9b75e88f5d"
+            },
+            {
+              "image": "helicopter-436.png",
+              "case": "helicopter",
+              "age": 436,
+              "active": 0,
+              "received": 1,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\helicopter-436.png",
+              "sha256": "5dbd060b0698e909004dfd9629d7bf2e37826ad6375d48247a7c813a933f7f25"
+            },
+            {
+              "image": "truck-028.png",
+              "case": "truck",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 78
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\truck-028.png",
+              "sha256": "953e7524699d0b2304fe460768215c9ed000d5c23ca78bca07beb94c6e1bff2c"
+            },
+            {
+              "image": "apc-028.png",
+              "case": "apc",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.99802780337632,
+                "cubes": 138
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\apc-028.png",
+              "sha256": "96307a359d9b03520036c4ca85003a7000aea764fd609f926e5f286bb40ecd0e"
+            },
+            {
+              "image": "tank-028.png",
+              "case": "tank",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.9911188930273,
+                "cubes": 161
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\tank-028.png",
+              "sha256": "e9f2baf687c3bae4074289ebd993abfbd2cf254fd5f09f24a0ff198e2849adac"
+            },
+            {
+              "image": "submerged_tank-028.png",
+              "case": "submerged_tank",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.9911188930273,
+                "cubes": 161
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-neo-frames\\submerged_tank-028.png",
+              "sha256": "9536114b5420ded41f6a0767e223b1750d39c2ea0d1690a336d3b3e5223d203c"
+            }
+          ]
+        }
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterHellfireRack.java": "a028c11332d9756890cc5b4da4fb2b65f2152b253849dfe8db23a12783ace424",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "e05cede84f075162375bd59aba089804e571dda270eaccdec9925a7e754490dd",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "00d31fecfea9bccc70b0232bc7ff922b64d8ca651a022d59d9463f9f8948c7c3",
+        "src/main/java/com/codex/blacklight/client/model/HelicopterModel.java": "8192ca36cccbd82f88ed6a150dce11519f50bec2fd19fb53ff4132567a7f25a1",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "faede638a0061431f3b9b5b94821372fe78a735f6da8b7b7e16d7bc0f10dc0f5",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "b7bdb440fafa68d12647f40465313c341e50251aa7c90fb22ced2cd5b86e5d44",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterHellfireRackTest.java": "542d4c8b45050c020dfb9d625e1761a8717cc6d1b66fd64b50f5849800070cf4",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRackGameTest.java": "b4a17a8f57a0a1c263de286f86337a0d9bf99d3f5be740c80f333d8df995fb8a",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "ecaabbb3771ba55f98f1f3901e3e69cfa508f846f934eacfc26de1a080553505",
+        "src/hoverVisual/java/com/codex/blacklight/client/HelicopterHoverVisual.java": "6e6fc6b0f00c64154b7c730c7a396af09b1dd178f398160b798a52c0ad669239",
+        "src/vehicleDestructionVisual/java/com/codex/blacklight/client/VehicleDestructionVisual.java": "f6136e69d78a2cc9f57ae87c411fdcaafdb2cca43e16b9fbcbca3a32eed68c8f",
+        "tools/build_helicopter.py": "8f0d45fe363c89c4c3c5a2c1c1cc57568ddcc5d9631134decb55e47e18fb35f1",
+        "tools/helicopter-rack-visual.init.gradle": "b1954da68637241d940fd341937112dbdd92085e833e26232cae386976315ef7",
+        "tools/helicopter-rack-destruction.init.gradle": "79cdbc2e962c33bf61f21b5ddeb407cc8affd9b3d2e9f89b9c6e05701684856e",
+        "src/main/resources/assets/blacklight/military/helicopter-model.json": "60deaea4a7edbe5e85f82ce3a7712feeff6a7b0723fa7757f54cfd3fa8984446",
+        "src/main/resources/assets/blacklight/textures/entity/blackwatch_helicopter.png": "5aceff02b9275b44f23d96c422201967ee75bc8f155a4e5d8414f25fffd71a39"
+      }
+    },
+    "forge": {
+      "unitTests": 61,
+      "nativeHelicopterTests": 68,
+      "nativeVehicleRegression": 29,
+      "logs": {
+        "hellfireUnit": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-hellfireUnit-passed.log",
+          "sha256": "c83b8d241da5e226e7eff5c4c53bdfc2b284a20e0596e7800211e5f372426322"
+        },
+        "helicopterHullServer": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-helicopterHullServer-passed.log",
+          "sha256": "236ebb76fc043ab6da7deb08efb861e0a0a3aa9beef569058e6ec6b89b06fd3d"
+        },
+        "helicopterHullRegression": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-helicopterHullRegression-passed.log",
+          "sha256": "ba3cd3309f1a7e95709a03f38e977ba5a960e14f396bc5553681c1d5ce77f71c"
+        },
+        "helicopterRackVisual": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-helicopterRackVisual-passed.log",
+          "sha256": "902182d01ea06fd22eaaaeecb583d9c207953c155c0bb38fa09118d15b936a04"
+        },
+        "helicopterRackDestructionVisual": {
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-helicopterRackDestructionVisual-passed.log",
+          "sha256": "8196c6998d2ae4dc64f06f8a34e0351ea382c80ed8f3a48efe50bab2a2f1c6f2"
+        }
+      },
+      "unitSuites": [
+        {
+          "suite": "com.codex.blacklight.firearms.GunplayFeedbackPayloadTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.firearms.GunplayFeedbackPayloadTest.xml",
+          "sha256": "b9d8715e6f3e665cba3a2a03b3bb5adb87d249ab66eee3f1204982df04fa7da9"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterArmamentTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterArmamentTest.xml",
+          "sha256": "1545a09fd03e849c81afc5dd0308e0e25db1c2b63bf759e3f9a22f68e19682cd"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterAuthorityTest",
+          "tests": 2,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterAuthorityTest.xml",
+          "sha256": "b49631cf6c68200d31f576a04b644aa778e4d077d20e853852d84ac7451cbcff"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterBlastWaveTest.xml",
+          "sha256": "ea0577f2716a327a8515998dd2bc8963048b60fed17ed0f5879aa0b74ec697b4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterFlightTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterFlightTest.xml",
+          "sha256": "fec338b0e88bd8c76a2d56f24ae67eec77877709fb3c0b976e872207833d3810"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterGunCycleTest",
+          "tests": 3,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterGunCycleTest.xml",
+          "sha256": "c9d5704ddf589b32f6af5e3a8303c501f35cda857111c1a65ace0887d2dbe5f8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireAttackTest.xml",
+          "sha256": "9c440e735034d19d7ac76c31a940cbb17fb2029392792a85865084c71edb8a7c"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest",
+          "tests": 4,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterHellfireRackTest.xml",
+          "sha256": "90344cdae4ab6dd0d3b710e677833eafb8476a7a63c5d5ac33f7b3b87b78f67b"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest",
+          "tests": 9,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterMissileFlightTest.xml",
+          "sha256": "83969fdc1079100ec1f7affdbbf0e6d9df1340a83da9c1e1ee86616452c233f4"
+        },
+        {
+          "suite": "com.codex.blacklight.military.aircraft.HelicopterRouteTest",
+          "tests": 8,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.aircraft.HelicopterRouteTest.xml",
+          "sha256": "5b0a98065ca26fc6a8756bd1260ea73a4095646bbb1c8d47d29eb1b6a495ac21"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest",
+          "tests": 11,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleControlAuthorityTest.xml",
+          "sha256": "a8ccddf90f34902c5b8aa803ecaea8ba893a29cb1baa717300a06c30d14fdda8"
+        },
+        {
+          "suite": "com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest",
+          "tests": 6,
+          "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-unit-xml\\TEST-com.codex.blacklight.military.vehicle.VehicleWeaponDefinitionTest.xml",
+          "sha256": "bf778865f646c9403bc5c92e419a5f3aed46cbafc369c9f5ca75a7a9c68af048"
+        }
+      ],
+      "clients": {
+        "combat": {
+          "frames": 107,
+          "firstHover": 300,
+          "firstShot": 326,
+          "launchSpeed": 0.00886745940015645,
+          "impact": true,
+          "maximumRackError": 8.329046437731158e-07,
+          "rackSamples": 8936,
+          "activeSounds": [
+            "blacklight:firearm.impact",
+            "blacklight:vehicle.coaxial",
+            "blacklight:vehicle.helicopter_rotor",
+            "blacklight:vehicle.helicopter_turbine",
+            "blacklight:vehicle.rocket"
+          ],
+          "evidence": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\evidence.json",
+            "sha256": "ff1950b9e3d6fee1edf3465c3044694900473e16ce3d08287b7017005a614605"
+          },
+          "reviewSheet": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-combat-review.png",
+            "sha256": "bbde93a897efd48f1d0bb0c90e0077615564df2c582b76537306244a6cb2f7da"
+          },
+          "reviewedFrames": [
+            {
+              "image": "hover-080-STRAFE.png",
+              "age": 80,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-080-STRAFE.png",
+              "sha256": "92505716df504ed7e206a07bf48d4a0c3b80882d4fc0164014013283f9ac842d"
+            },
+            {
+              "image": "hover-110-STRAFE.png",
+              "age": 110,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-110-STRAFE.png",
+              "sha256": "256772e24fdfb66beb2c42e5af4de9a3e1ca92e9bdb7595efd09e4b5f1a67015"
+            },
+            {
+              "image": "hover-140-STRAFE.png",
+              "age": 140,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-140-STRAFE.png",
+              "sha256": "bf8199f64c51cda92956cf401707e09b6519fbae8244e848868c4dd4e9a1f83b"
+            },
+            {
+              "image": "hover-170-STRAFE.png",
+              "age": 170,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-170-STRAFE.png",
+              "sha256": "8d0b7b1fad28dce76e1ade48e280a7a8e59c335f6b38a6a7b1da54d1e3be82ed"
+            },
+            {
+              "image": "hover-290-STRAFE.png",
+              "age": 290,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-290-STRAFE.png",
+              "sha256": "4be03ce28f0ec9b9d3eaf1c0231824fa3d28a80fd44c42db4e4421ab3e180d75"
+            },
+            {
+              "image": "hover-325-AIM.png",
+              "age": 325,
+              "stage": "AIM",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-325-AIM.png",
+              "sha256": "cd1dbe2589dfd60194762c7fa9971221b12b9ab53e178b86637595a2a352f3c8"
+            },
+            {
+              "image": "hover-326-FIRE.png",
+              "age": 327,
+              "stage": "FIRE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-326-FIRE.png",
+              "sha256": "bd33a6d2a546629757936b0580408e19598f98a6521848c201edab9c02e5a6e9"
+            },
+            {
+              "image": "hover-328-FIRE.png",
+              "age": 328,
+              "stage": "FIRE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-328-FIRE.png",
+              "sha256": "985114607554a3337f6a99c3e5c37982b6dedb259f1094f437714b3673a01558"
+            },
+            {
+              "image": "hover-331-RECOVER.png",
+              "age": 331,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-331-RECOVER.png",
+              "sha256": "3a613e875f517c30e07dcfec44258f5aa077eb44b77a1a30ba8ccef41da13c38"
+            },
+            {
+              "image": "hover-336-RECOVER.png",
+              "age": 336,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-336-RECOVER.png",
+              "sha256": "624278f5d57792c61b875e8a63ebace5431fdba355a5816149c8c28dd0c9c388"
+            },
+            {
+              "image": "hover-346-RECOVER.png",
+              "age": 346,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-346-RECOVER.png",
+              "sha256": "ea5dbff6a8ee48fad4c9edca198dbfc18a05cf979a0e6cb559586a2ad433f59c"
+            },
+            {
+              "image": "hover-350-RECOVER.png",
+              "age": 350,
+              "stage": "RECOVER",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-350-RECOVER.png",
+              "sha256": "53a13899bb302e82332590a5e4259b3180450e1c3783eada6f94c10fb98b3b08"
+            },
+            {
+              "image": "hover-370-STRAFE.png",
+              "age": 371,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-370-STRAFE.png",
+              "sha256": "b8b58422b9b3bd046e8061b51d4fe87587772665b16172215b731fe9ec56d5c3"
+            },
+            {
+              "image": "hover-390-STRAFE.png",
+              "age": 390,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-390-STRAFE.png",
+              "sha256": "bfc25feff86b5307251ffd26484c5cee5eec1c309cf6c847f6ac8ad22d547894"
+            },
+            {
+              "image": "hover-410-STRAFE.png",
+              "age": 410,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-410-STRAFE.png",
+              "sha256": "15c40e0972d93f77bc2e092ac54c72b1d22a3869d37678f11c6b708dc3dbc360"
+            },
+            {
+              "image": "hover-420-STRAFE.png",
+              "age": 420,
+              "stage": "STRAFE",
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-frames\\hover-420-STRAFE.png",
+              "sha256": "e0199464f2b063ec4ed4f4034accc6a50fed514ae079c9e0d672d908e708904c"
+            }
+          ]
+        },
+        "destruction": {
+          "frames": 632,
+          "results": [
+            {
+              "case": "truck",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "apc",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "tank",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            },
+            {
+              "case": "helicopter",
+              "receipts": 1,
+              "removedAt": 43,
+              "expired": true
+            },
+            {
+              "case": "submerged_tank",
+              "receipts": 1,
+              "removedAt": 20,
+              "expired": true
+            }
+          ],
+          "sounds": [
+            "block.chain.break",
+            "block.fire.ambient",
+            "block.water.ambient",
+            "entity.generic.explode",
+            "firearm.impact",
+            "music.game",
+            "vehicle.helicopter_alarm"
+          ],
+          "evidence": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\evidence.json",
+            "sha256": "8694793e1239b148735c55278125beea2947951a693aa4e130e07939b94a7c71"
+          },
+          "reviewSheet": {
+            "file": "D:\\CodexCache\\helicopter-rack-qa\\forge-destruction-review.png",
+            "sha256": "e8ae5223efb9904bd9a2b54741472678638d8fb905c33dce16c30c71b83de5d9"
+          },
+          "reviewedFrames": [
+            {
+              "image": "helicopter-000.png",
+              "case": "helicopter",
+              "age": 0,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-000.png",
+              "sha256": "df44f357fb1bdab3af7283ff3766930f8c83f9fe11f27624b6596b3e493565b3"
+            },
+            {
+              "image": "helicopter-020.png",
+              "case": "helicopter",
+              "age": 20,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-020.png",
+              "sha256": "df44f357fb1bdab3af7283ff3766930f8c83f9fe11f27624b6596b3e493565b3"
+            },
+            {
+              "image": "helicopter-028.png",
+              "case": "helicopter",
+              "age": 28,
+              "active": 0,
+              "received": 0,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-028.png",
+              "sha256": "e3d2d88cce92afa0273caaac87d32aec35a582eafbd5a702a76152a6b61ca649"
+            },
+            {
+              "image": "helicopter-044.png",
+              "case": "helicopter",
+              "age": 44,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-044.png",
+              "sha256": "8ba620e45a7d1843ed5ffd964e844e03e29a0a7e165b98380509c4c08b6437b8"
+            },
+            {
+              "image": "helicopter-048.png",
+              "case": "helicopter",
+              "age": 48,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-048.png",
+              "sha256": "2116a22e6be84c5d6330e709a0f7a2923930c2df6042fb625b1f77fd21c1f838"
+            },
+            {
+              "image": "helicopter-056.png",
+              "case": "helicopter",
+              "age": 56,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-056.png",
+              "sha256": "d7be3d0928b9bd42aec2e94ebb5cbe42bcc7f44b1bd41227e446175fc1179374"
+            },
+            {
+              "image": "helicopter-076.png",
+              "case": "helicopter",
+              "age": 76,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-076.png",
+              "sha256": "05a2b8cc176fcbe169ab9eb41521bbdfeb85962a89e4f5fbd41b42738b117b20"
+            },
+            {
+              "image": "helicopter-104.png",
+              "case": "helicopter",
+              "age": 104,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-104.png",
+              "sha256": "fc9d60d9dcd27b8e5815d8f4356608f25a142a09a75b01be1de2fca6baf7b674"
+            },
+            {
+              "image": "helicopter-160.png",
+              "case": "helicopter",
+              "age": 160,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-160.png",
+              "sha256": "626d8c6ecd1d134ed6905e742dd4b70d25bb58647b97e4fff564679ce52bd386"
+            },
+            {
+              "image": "helicopter-260.png",
+              "case": "helicopter",
+              "age": 260,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-260.png",
+              "sha256": "a158f421655aba500ad17980e1e9eb7892b226bc20f494af471874bee33571e7"
+            },
+            {
+              "image": "helicopter-360.png",
+              "case": "helicopter",
+              "age": 360,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 313
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-360.png",
+              "sha256": "71f7253f0d34479cb1bd40b36bd424c3490a02d543c59dc39655d025e0844ece"
+            },
+            {
+              "image": "helicopter-436.png",
+              "case": "helicopter",
+              "age": 436,
+              "active": 0,
+              "received": 1,
+              "wreck": {},
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\helicopter-436.png",
+              "sha256": "4f0f586a9e390d983bfced20814de4f826101d77f40a86c1fb4e321e31f198c7"
+            },
+            {
+              "image": "truck-028.png",
+              "case": "truck",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 81.0,
+                "cubes": 78
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\truck-028.png",
+              "sha256": "ca9733db91ed507b9a1ac0abb8c146b95814917ec619484dcbcc392a6f2052ba"
+            },
+            {
+              "image": "apc-028.png",
+              "case": "apc",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.99802780337632,
+                "cubes": 138
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\apc-028.png",
+              "sha256": "1dbed59131dbbced1b6433d890ab3ff93544d6995c8a44e9e416ac8aef70d4e6"
+            },
+            {
+              "image": "tank-028.png",
+              "case": "tank",
+              "age": 28,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.9911188930273,
+                "cubes": 161
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\tank-028.png",
+              "sha256": "8e6d4447ee608295be15f7ec222d2ffe95505bc6a66f31bce389b086bbd9fb4b"
+            },
+            {
+              "image": "submerged_tank-027.png",
+              "case": "submerged_tank",
+              "age": 27,
+              "active": 1,
+              "received": 1,
+              "wreck": {
+                "lowest": 80.9911188930273,
+                "cubes": 161
+              },
+              "file": "D:\\CodexCache\\helicopter-rack-qa\\destruction-forge-frames\\submerged_tank-027.png",
+              "sha256": "2410873f0550143f906b12b4af80dc155cf4599ebe78607a7869ba17672ea5d9"
+            }
+          ]
+        }
+      },
+      "code": {
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterHellfireRack.java": "bb6942ad2db60f5f1cb040e6ba0ea944482d7faab671bf86702eb8f6d30d3cbd",
+        "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "e05cede84f075162375bd59aba089804e571dda270eaccdec9925a7e754490dd",
+        "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "ad7e663d29b183410f8b89781444fa27db18f67c3aa374522e577d454cc548f5",
+        "src/main/java/com/codex/blacklight/client/model/HelicopterModel.java": "8192ca36cccbd82f88ed6a150dce11519f50bec2fd19fb53ff4132567a7f25a1",
+        "src/main/java/com/codex/blacklight/client/renderer/OrdnanceRenderer.java": "faede638a0061431f3b9b5b94821372fe78a735f6da8b7b7e16d7bc0f10dc0f5",
+        "src/main/java/com/codex/blacklight/firearms/OrdnanceTrail.java": "b7bdb440fafa68d12647f40465313c341e50251aa7c90fb22ced2cd5b86e5d44",
+        "src/test/java/com/codex/blacklight/military/aircraft/HelicopterHellfireRackTest.java": "2fdb6767f7e12cb3b726ded44c241b384c10e4d3f8fc9d77f9ef13d6ea7cd536",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterRackGameTest.java": "1efcca65dc2ff34519ff88f2b67c28c394e58e4b9010a7c7f17849a8b9ab7401",
+        "src/helicopterTest/java/com/codex/blacklight/gametest/HelicopterPilotGameTest.java": "71f0e205cad2a09ed38149832d1a27e10d68adaf67bd37b1fcc43af02f9bdcd1",
+        "src/hoverVisual/java/com/codex/blacklight/client/HelicopterHoverVisual.java": "7ef38473af2cbba2498f836eb30fb28e920847f80c430807fb7741b78f1291fa",
+        "src/vehicleDestructionVisual/java/com/codex/blacklight/client/VehicleDestructionVisual.java": "417003a45a6b5a4a62ad4a8b2336a45b65ef68ed80f8494b8c97702d10cac7c2",
+        "tools/build_helicopter.py": "98a9979ecf92676b9fb11214e8175c1de7e83f413539febce33c73d649441dcb",
+        "tools/helicopter-rack-visual.init.gradle": "22dcfb18dccffd3848cf1c9e69b1b41a019cc02a5f220160075b9b553ec14456",
+        "tools/helicopter-rack-destruction.init.gradle": "f8ac0682b42f1d1ac7f227c0a9a1092554fd81281ac8330141cbe7cbda96d66b",
+        "src/main/resources/assets/blacklight/military/helicopter-model.json": "60deaea4a7edbe5e85f82ce3a7712feeff6a7b0723fa7757f54cfd3fa8984446",
+        "src/main/resources/assets/blacklight/textures/entity/blackwatch_helicopter.png": "5aceff02b9275b44f23d96c422201967ee75bc8f155a4e5d8414f25fffd71a39"
+      }
+    }
+  },
+  "coverage": [
+    "Four source-informed physical rail positions per side, distinct outer pod mounts, original Hellfire mesh length, AI yaw-zero/player yaw-and-pitch-zero initial heading and current finite magazine order.",
+    "Actual native pilot and server input produce four real missiles from four distinct rail centers despite off-axis camera aim. Actual craft save/load after the second launch preserves next rail and four remaining rounds. No projectile is manufactured by this rack test.",
+    "All existing source-paced hover, real guided hits, hull collision, crew/friendly/event protection, source AI infinite ammunition, finite manual controls, navigation and shared vehicle regression suites pass.",
+    "Both hidden clients render eight AI rail missiles and compare all current-body transformed model centers against actual launch-point math while real AI flies, hovers, launches one guided missile, hits the target and resumes gunfire.",
+    "Fresh native lethal damage exercises truck/APC/tank/helicopter/submerged tank destruction. Helicopter remains in crash flight before final removal. One receipt per vehicle, duplicate suppression, scene cap, wreck expiry and no terrain destruction are checked. Wreck geometry remains above the floor after the added pod/missile fragments."
+  ],
+  "review": {
+    "method": "Native framebuffer screenshots from guarded hidden disposable worlds. Sixteen selected combat frames and sixteen selected destruction frames per platform reviewed; no generated gameplay imagery.",
+    "sound": "Combat SoundManager.isActive records coaxial, rocket, impact, rotor and turbine with physical OpenAL listener gain checked at zero. Destruction records sound events. This is playback/event evidence, not listening or a source-waveform identity claim."
+  },
+  "limits": [
+    "Outer rapid pod geometry exists but its unguided firing controller/input/ammunition/effects are not implemented by this checkpoint.",
+    "The current transport hull, 313 cuboid parts, 1024 atlas and 19-port rapid face are authored adaptations; original topology and final model quality are not claimed.",
+    "Player 240/8 capacity, manual 60-tick cooldown and level rack orientation remain adaptations. Original clip ownership across paired weapons and duplicated D_M1/D_M3 emitter locators remain unresolved.",
+    "Finite magazine order is verified with actual server launches and loaded-slot unit assertions. This checkpoint client scene is AI infinite-ammo; finite player rendered disappearance is not newly exercised in a real client.",
+    "Wreck fragments are visual and do not trigger secondary ammunition explosions. Wreck receipts do not preserve the spent-round state; visible wreck ordnance is an authored generic debris treatment.",
+    "Source original executable, exact original action/FX/audio and dedicated multiplayer not run. Broader creature/soldier/vehicle-item/model/sound goal remains active.",
+    "No release JAR, install, commit or user-world changes."
+  ],
+  "qaDriver": {
+    "file": "D:\\CodexCache\\creature-combat-run.ps1",
+    "sha256": "97a02c5cc12f863eda5e66c3ec16d133efc86da5551d7a7fdb8f981daafb2e4a"
+  }
+}

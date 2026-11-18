@@ -75,6 +75,14 @@ public final class WoundBlood {
         add(entity,region,point.add(normal.scale(.015)),normal,.8F,22,true);
         add(entity,region,point.add(normal.scale(-.015)),normal.scale(-1),.8F,22,true);
     }
+    static void meshSection(LivingEntity entity,int region,String key){
+        reset();if(scene==null||entity.level()!=scene||entity.isInvisible())return;
+        for(int side:new int[]{-1,1}){
+            if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.remove(0);
+            var emitter=new Emitter(entity,region,Vec3.ZERO,Vec3.ZERO,.8F,22,true,scene.getGameTime());
+            emitter.sectionKey=key;emitter.sectionSide=side;EMITTERS.add(emitter);
+        }
+    }
     private static void add(LivingEntity e,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump){
         if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.removeFirst();
         EMITTERS.add(new Emitter(e,region,point,direction,strength,lifetime,stump,scene.getGameTime()));
@@ -115,6 +123,7 @@ public final class WoundBlood {
     }
     private static List<Anchor> anchors(Emitter emitter){
         var e=emitter.entity;
+        if(emitter.sectionKey!=null)return AdaptiveRagdoll.sectionAnchors(e,emitter.region,emitter.sectionKey,emitter.sectionSide);
         if(emitter.consumeStarted!=Long.MIN_VALUE){
             Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,emitter.region,1);
             return List.of(new Anchor(point,emitter.direction,e.getDeltaMovement()));
@@ -130,7 +139,7 @@ public final class WoundBlood {
     }
     private static final class Emitter {
         final LivingEntity entity;final int region,lifetime;final Vec3 point,direction;final float strength;final boolean stump;final long started;
-        boolean emitted;long consumeStarted=Long.MIN_VALUE;
+        boolean emitted;long consumeStarted=Long.MIN_VALUE;String sectionKey;int sectionSide;
         Emitter(LivingEntity entity,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump,long started){
             this.entity=entity;this.region=region;this.point=point;this.direction=direction;this.strength=strength;this.lifetime=lifetime;this.stump=stump;this.started=started;
         }
@@ -166,6 +175,9 @@ public final class WoundBlood {
             var old=CONSUME_HITS.put(e,new ConsumeMark(visual.started(),elapsed));
             int previous=old!=null&&old.started==visual.started()?old.tick:elapsed-1;
             var phase=ConsumeFracture.phase(e,1);
+            // Sharp absorption emits from confirmed mesh caps. An event alone
+            // must not create an unrelated body-center spray when the blade misses.
+            if(phase.style()==ConsumeFracture.Style.SEVER&&AdaptiveRagdoll.active(e))continue;
             var profile=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
             int fallback=Math.round(visual.duration()*com.codex.blacklight.combat.ConsumeSequence.contact(phase.form(),false))-1;
             boolean impact=false;
@@ -183,6 +195,7 @@ public final class WoundBlood {
         CONSUME_HITS.keySet().removeIf(e->!active.contains(e));
     }
     private static boolean available(Emitter emitter){
+        if(emitter.sectionKey!=null)return emitter.entity.level()==scene&&!emitter.entity.isInvisible();
         if(emitter.consumeStarted==Long.MIN_VALUE)return available(emitter.entity);
         var e=emitter.entity;var visual=e.getData(ModAttachments.CONSUME_VISUAL);
         return e.level()==scene&&!e.isInvisible()&&!e.isRemoved()&&visual.consuming()&&visual.started()==emitter.consumeStarted;

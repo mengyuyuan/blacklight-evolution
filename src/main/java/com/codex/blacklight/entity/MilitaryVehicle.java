@@ -42,6 +42,7 @@ public final class MilitaryVehicle extends Entity {
     private long leaseRevision = -1;
     private boolean reconciling;
     private boolean destroyed;
+    private long destructionEpoch;
     private float mechanicalHealth;
     private float turretYaw;
     private float gunPitch;
@@ -50,6 +51,14 @@ public final class MilitaryVehicle extends Entity {
     private String currentHome = "";
     private UUID playerOwner;
     private long primaryShot=-1,secondaryShot=-1;
+    private long driveAt=Long.MIN_VALUE;
+    private float driveLoad;
+    /** This mod's vehicles are fuel-free; dormant fuel inventory must not mute engines. */
+    public boolean engineRunning(){return level().isClientSide?entityData.get(STATE).getBoolean("EngineRunning"):
+            !destroyed&&!isRemoved()&&mechanicalHealth>0&&!controlLocked()&&crewOperational(occupant(VehicleDefinition.Job.DRIVER));}
+    public float driveLoad(){return level().isClientSide?entityData.get(STATE).getFloat("DriveLoad"):
+            driveAt!=Long.MIN_VALUE&&level().getGameTime()-driveAt<=1?driveLoad:0;}
+    public void recordDrive(double distance,float yaw){if(level().isClientSide)return;driveAt=level().getGameTime();driveLoad=VehicleAudioState.load(distance,yaw,definition.maxSpeed());}
     private String lastPrimaryWeapon="";
     private long impactAt=-100;
     private float impactStrength;
@@ -298,7 +307,14 @@ public final class MilitaryVehicle extends Entity {
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) { setBoundingBox(makeBoundingBox()); updateHullPart(); return; }
-        if (destroyed || mechanicalHealth <= 0) { destroyOnce(); return; }
+        // A committed destruction restored from a save is terminal, not a new
+        // damage event. Retire it without sending a second wreck or blast sound.
+        if (destroyed) {
+            long epoch=destructionEpoch;
+            if(level() instanceof net.minecraft.server.level.ServerLevel server)VehicleGarageService.onDestroyed(server,this);
+            if(currentDestruction(epoch))discard();return;
+        }
+        if (mechanicalHealth <= 0) { destroyOnce(); return; }
         reconcileCrew();
         if(controlLocked()){setDeltaMovement(Vec3.ZERO);syncVehicleState();return;}
         Entity driver = occupant(VehicleDefinition.Job.DRIVER);
@@ -399,15 +415,23 @@ public final class MilitaryVehicle extends Entity {
                     (int)Math.ceil(mechanicalHealth),(int)maxHealth()),true);
     }
     private void destroyOnce() {
-        if (destroyed) return;
-        destroyed = true; mechanicalHealth = 0;
-        if(level() instanceof net.minecraft.server.level.ServerLevel effectLevel)
-            com.codex.blacklight.firearms.GunplayEffects.explosion(effectLevel,null,
-                    com.codex.blacklight.firearms.WeaponCatalog.GRENADE,getBoundingBox().getCenter(),new Vec3(0,1,0));
+        if (destroyed || isRemoved()) return;
+        destroyed = true; mechanicalHealth = 0;long epoch=++destructionEpoch;
+        com.codex.blacklight.military.vehicle.VehicleDestructionEffects.emit(this,
+                com.codex.blacklight.military.vehicle.VehicleDestruction.Chassis.ground(chassisId()),
+                faction().id().equals("blackwatch"),turretYaw(),gunPitch(),false);
+        if(!currentDestruction(epoch))return;
         if(level() instanceof net.minecraft.server.level.ServerLevel server)VehicleGarageService.onDestroyed(server,this);
+        if(!currentDestruction(epoch))return;
         if (authority != null) authority.revokeAll(); leases.clear(); previousActions.clear();
-        ejectPassengers(); syncVehicleState(); discard();
+        var passengers=List.copyOf(getPassengers());
+        for(int i=passengers.size()-1;i>=0;i--){
+            passengers.get(i).stopRiding();
+            if(!currentDestruction(epoch))return;
+        }
+        syncVehicleState();if(currentDestruction(epoch))discard();
     }
+    private boolean currentDestruction(long epoch){return destroyed&&destructionEpoch==epoch&&!isRemoved();}
     /** Real safe exit query shared by dismount and the later validated extraction transaction. */
     public Optional<Vec3> safeExit(LivingEntity passenger) {
         double[][] points = {{-definition.width()/2-1,0},{definition.width()/2+1,0},{0,-definition.length()/2-1},{0,definition.length()/2+1}};
@@ -434,6 +458,7 @@ public final class MilitaryVehicle extends Entity {
         tag.putFloat("ImpactLeverX",(float)impactLever.x);tag.putFloat("ImpactLeverZ",(float)impactLever.z);
         tag.putDouble("ContactX",impactPoint.x);tag.putDouble("ContactY",impactPoint.y);tag.putDouble("ContactZ",impactPoint.z);
         tag.put("Dents",VehicleDeformation.write(dents));
+        tag.putBoolean("EngineRunning",engineRunning());tag.putFloat("DriveLoad",engineRunning()?driveLoad():0);
         tag.putString("SelectedPrimary",selectedPrimary);tag.putString("StopReason",stopReason.name());tag.put("Inventory",writeInventory());
         var occupants=new CompoundTag();seats.occupants().forEach(occupants::putUUID);tag.put("Seats",occupants);
         var tokens=new CompoundTag();leases.forEach((id,token)->tokens.putUUID(id.toString(),token));tag.put("Leases",tokens);entityData.set(STATE,tag);
@@ -452,6 +477,7 @@ public final class MilitaryVehicle extends Entity {
     }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         tag.put("VehicleDents",VehicleDeformation.write(dents));
+        tag.putBoolean("VehicleDestructionCommitted",destroyed);
         tag.putInt("VehicleSchemaVersion",1);tag.putString("VehicleChassis",chassisId());tag.putString("VehicleFaction",faction.id());tag.putFloat("VehicleHealth",mechanicalHealth);
         if(playerOwner!=null)tag.putUUID("VehiclePlayerOwner",playerOwner);
         tag.putFloat("VehicleTurretYaw",turretYaw);tag.putFloat("VehicleGunPitch",gunPitch);tag.putString("VehicleSelectedPrimary",selectedPrimary);tag.put("VehicleInventory",writeInventory());
@@ -459,6 +485,9 @@ public final class MilitaryVehicle extends Entity {
         var occupants=new CompoundTag();seats.occupants().forEach(occupants::putUUID);tag.put("VehicleSeatHints",occupants);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
+        // A same-object load replaces the old destruction transaction, including
+        // loads invoked by dismount, sound or damage callbacks.
+        destructionEpoch++;
         // Vanilla supplies no owned vehicle fields for an ordinary new /summon.
         // Any partial vehicle record still takes the strict schema path below.
         if(tag.getAllKeys().stream().noneMatch(key->key.startsWith("Vehicle"))){
@@ -476,6 +505,8 @@ public final class MilitaryVehicle extends Entity {
         seats=new VehicleSeats(definition);authority=null;leases.clear();previousActions.clear();restoredSeatHints.clear();leaseRevision=-1;
         var hints=tag.getCompound("VehicleSeatHints");for(var seat:definition.seats())if(hints.hasUUID(seat.id()))restoredSeatHints.put(hints.getUUID(seat.id()),seat.id());
         playerOwner=tag.hasUUID("VehiclePlayerOwner")?tag.getUUID("VehiclePlayerOwner"):null;
-        destroyed=false;setNoGravity(true);setBoundingBox(makeBoundingBox());syncVehicleState();
+        destroyed=valid&&tag.getBoolean("VehicleDestructionCommitted");
+        if(destroyed)mechanicalHealth=0;
+        setNoGravity(true);setBoundingBox(makeBoundingBox());syncVehicleState();
     }
 }

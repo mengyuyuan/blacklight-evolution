@@ -1,0 +1,17 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/motionVisual/java')
+    sourceSets.main.java.srcDir('src/silentQa/java')
+    sourceSets.main.resources.srcDir('src/silentQa/resources')
+    def mode=project.findProperty('motionMode')?:'source'
+    neoForge.runs.client {
+        systemProperty 'blacklight.test.militaryMotion',"D:/CodexCache/military-motion-qa/neo-$mode"
+        systemProperty 'blacklight.test.expectPrivateMotion',(mode=='source').toString()
+        systemProperty 'blacklight.test.hiddenRagdoll','true'
+        programArguments.addAll '--width','1000','--height','760'
+    }
+    tasks.named('processResources').configure {
+        inputs.property('silentMotionQa',true)
+        doLast {def metadata=new File(destinationDir,'META-INF/neoforge.mods.toml');if(!metadata.getText('UTF-8').contains('blacklight.silent-qa.mixins.json'))metadata.append('\n[[mixins]]\nconfig="blacklight.silent-qa.mixins.json"\n','UTF-8')}
+    }
+    tasks.withType(Jar).configureEach {doFirst {throw new GradleException('Hidden motion QA cannot create a release JAR')}}
+} }

@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-17",
+  "generator": "tools/build_greene_projectile_loops.py",
+  "method": "Existing project sources, circular two-window overlap-add, integer cycle resampling, mean removal, .5 authored peak, 5 ms cosine join bridge and mono Vorbis encoding. Original durations inform loop lengths only.",
+  "attribution": "Biomass derivatives retain Philippe Groarke / Socapex CC BY-SA 3.0; see art/weapon-audio/README.md and Socapex-LICENSES.txt. Fire derives exclusively from project-authored helicopter_jet synthesis.",
+  "validation": "Static PCM/encoded metadata and boundary samples only. No playback, subjective listening, tests, Java, game or native engine execution.",
+  "loops": [
+    {
+      "role": "biomass",
+      "file": "src/main/resources/assets/blacklight/sounds/greene/projectile_biomass_loop.ogg",
+      "sha256": "2dcb82b37330a8c1747583d81a579eae6df5c9dd9de7b9cad5c4f1f97260dfbe",
+      "sources": [
+        {
+          "file": "infection/resonance_charge_1.ogg",
+          "sha256": "45982813783118270073deeb0b635ac901fdab9f855eca252c54bca5bdf3ce46"
+        },
+        {
+          "file": "infection/mend_2.ogg",
+          "sha256": "2640dac83731ef6d10446cb609e395b18d1497d2395f71f64293022093067d3a"
+        },
+        {
+          "file": "infection/tension_3.ogg",
+          "sha256": "c2eb5cf0a83fdc32f22b06e07581e3d588ba1e3d4b69e7e6d507fb6964eef04d"
+        }
+      ],
+      "license": "CC BY-SA 3.0 derived Socapex Foley",
+      "sampleRate": 44100,
+      "channels": 1,
+      "frames": 126802,
+      "seconds": 2.875328798185941,
+      "authoredBoundaryStep": 0.0,
+      "encodedBoundaryStep": 0.0004402771592140198,
+      "encodedPeak": 0.5045611262321472,
+      "encodedRms": 0.06185999738933229
+    },
+    {
+      "role": "fire",
+      "file": "src/main/resources/assets/blacklight/sounds/greene/projectile_fire_loop.ogg",
+      "sha256": "98d19bff1469bdfe0b54b6273f5deaa9428b0112900706aca172a939d0a1f796",
+      "sources": [
+        {
+          "file": "vehicles/helicopter_jet.ogg",
+          "sha256": "fd1e9ef37cfb6d48abdc0336601784adfde0c58895360c707fdfbb20f71249aa"
+        }
+      ],
+      "license": "Existing project-authored synthesis",
+      "sampleRate": 44100,
+      "channels": 1,
+      "frames": 255264,
+      "seconds": 5.788299319727892,
+      "authoredBoundaryStep": 0.0,
+      "encodedBoundaryStep": 0.00034068524837493896,
+      "encodedPeak": 0.5016287565231323,
+      "encodedRms": 0.13801207535772556
+    }
+  ]
+}

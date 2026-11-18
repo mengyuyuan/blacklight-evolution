@@ -14,6 +14,7 @@ public enum InfectedAttackStyle {
     public static InfectedAttackStyle of(Mob attacker,DamageSource source){
         if(source.is(net.minecraft.world.damagesource.DamageTypes.SONIC_BOOM)||attacker instanceof net.minecraft.world.entity.monster.Guardian)return RESONANCE;
         if(source.getDirectEntity() instanceof InfectedTumor||source.getDirectEntity() instanceof BlacklightSpit||source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.ThrownPotion||source.getDirectEntity() instanceof net.minecraft.world.entity.projectile.AbstractHurtingProjectile||attacker instanceof BlacklightHive)return BURST;
+        if(source.getDirectEntity() instanceof HydraDebris)return CRUSH;
         if(source.getDirectEntity() instanceof Projectile)return PIERCE;
         if(attacker instanceof BlacklightInfectedHost host){
             var profile=host.nativeCombat().profile();
@@ -29,8 +30,11 @@ public enum InfectedAttackStyle {
             if(host.speciesId().equals("minecraft:iron_golem")||host.speciesId().equals("minecraft:ravager")||host.speciesId().equals("minecraft:warden"))return CRUSH;
         }
         if(attacker instanceof BlacklightHunter hunter)return hunter.attackMove()==com.codex.blacklight.combat.CreatureAttack.SLAM?CRUSH:TEAR;
+        if(attacker instanceof EncounterMob mob&&(mob.kind()==EncounterKind.JUGGERNAUT||mob.kind()==EncounterKind.FLYER
+                ||mob.kind()==EncounterKind.GOLIATH||mob.greeneCloseImpact()))return CRUSH;
         if(attacker instanceof BlacklightMutant mutant)return mutant.kind()==BlacklightMutant.Kind.BRUTE?CRUSH:mutant.kind()==BlacklightMutant.Kind.SPITTER?BURST:TEAR;
-        if(attacker instanceof BlacklightHydra||attacker instanceof HiveTendril)return PIERCE;
+        if(attacker instanceof BlacklightHydra hydra)return hydra.damageStyle();
+        if(attacker instanceof HiveTendril)return PIERCE;
         if(attacker instanceof net.minecraft.world.entity.monster.Ravager||attacker instanceof net.minecraft.world.entity.animal.IronGolem||attacker instanceof net.minecraft.world.entity.monster.warden.Warden)return CRUSH;
         return TEAR;
     }

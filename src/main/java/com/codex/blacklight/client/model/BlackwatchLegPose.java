@@ -13,13 +13,35 @@ final class BlackwatchLegPose {
     private static final double SOURCE_SCALE=13,GROUND=24.05;
     private record Goal(Vec hip,Vec ankle,Vec knee,Quaterniond boot){}
     private record Leg(Vec hip,Vec thigh,Vec shin,Vec foot){}
+    /** Authored boot pitch can put a toe through the support plane even when its ankle is above it. */
+    static Pose support(Pose base){
+        Leg r=supported(base.rightLegPosition(),base.rightLegRotation(),base.rightKneeRotation(),base.rightFootRotation());
+        Leg l=supported(base.leftLegPosition(),base.leftLegRotation(),base.leftKneeRotation(),base.leftFootRotation());
+        return new Pose(base.right(),base.left(),base.torsoPosition(),base.torsoRotation(),base.carryPosition(),base.carryRotation(),
+                base.headPosition(),base.headRotation(),r.hip,r.thigh,l.hip,l.thigh,r.shin,l.shin,r.foot,l.foot,
+                base.leftHanded(),base.supportWeight(),base.weight());
+    }
+    private static Leg supported(Vec hip,Vec thigh,Vec shin,Vec foot){
+        Quaterniond upper=rotation(thigh),lower=new Quaterniond(upper).mul(rotation(shin)),boot=new Quaterniond(lower).mul(rotation(foot));
+        Vec knee=hip.add(transform(upper,new Vec(0,6,0))),ankle=knee.add(transform(lower,new Vec(0,5,0)));
+        double penetration=ankle.y()+lowestSole(boot)-GROUND;
+        if(penetration<=.00001)return new Leg(hip,thigh,shin,foot);
+        return solve(new Goal(hip,ankle.add(new Vec(0,-penetration,0)),knee,boot),new Vec(0,0,0));
+    }
     static Pose original(Pose base,P1MilitaryMotion.Frame frame,double influence){
+        return original(base,frame,influence,16);
+    }
+    /** Walking is driven by actual distance at the retargeted limb scale, without the source root's world offset. */
+    static Pose locomotion(Pose base,P1MilitaryMotion.Frame frame,double influence){
+        return original(base,frame,influence,SOURCE_SCALE);
+    }
+    private static Pose original(Pose base,P1MilitaryMotion.Frame frame,double influence,double rootScale){
         double weight=Double.isFinite(influence)?Math.max(0,Math.min(1,influence)):0;
         if(weight==0)return base;
         for(String joint:new String[]{"Pelvis","Knee_R","Knee_L","Ankle_R","Ankle_L"})if(frame.joint(joint)==null)return base;
         boolean mirror=base.leftHanded();
-        Vec pelvis=delta(frame,"Pelvis",mirror).mul(weight);
-        Goal right=goal(base,frame,true,mirror,weight,pelvis),left=goal(base,frame,false,mirror,weight,pelvis);
+        Vec pelvis=delta(frame,"Pelvis",mirror,rootScale).mul(weight);
+        Goal right=goal(base,frame,true,mirror,weight,pelvis,rootScale),left=goal(base,frame,false,mirror,weight,pelvis,rootScale);
         // Lower the shared pelvis only enough to keep both fixed-length chains reachable.
         double drop=Math.max(requiredDrop(right),requiredDrop(left));drop=Math.min(6,Math.max(0,drop));
         Vec adjustment=pelvis.add(new Vec(0,drop,0));
@@ -28,7 +50,7 @@ final class BlackwatchLegPose {
                 base.carryPosition(),base.carryRotation(),base.headPosition().add(adjustment),base.headRotation(),
                 r.hip,r.thigh,l.hip,l.thigh,r.shin,l.shin,r.foot,l.foot,base.leftHanded(),base.supportWeight(),base.weight());
     }
-    private static Goal goal(Pose base,P1MilitaryMotion.Frame frame,boolean right,boolean mirror,double weight,Vec pelvis){
+    private static Goal goal(Pose base,P1MilitaryMotion.Frame frame,boolean right,boolean mirror,double weight,Vec pelvis,double rootScale){
         String side=right!=mirror?"R":"L";
         Vec oldHip=right?base.rightLegPosition():base.leftLegPosition();
         Quaterniond oldUpper=rotation(right?base.rightLegRotation():base.leftLegRotation());
@@ -36,8 +58,8 @@ final class BlackwatchLegPose {
         Quaterniond oldBoot=new Quaterniond(oldLower).mul(rotation(right?base.rightFootRotation():base.leftFootRotation()));
         Vec oldKnee=oldHip.add(transform(oldUpper,new Vec(0,6,0)));
         Vec oldAnkle=oldKnee.add(transform(oldLower,new Vec(0,5,0)));
-        Vec sourceAnkle=new Vec(right?-1.9:1.9,23,0).add(delta(frame,"Ankle_"+side,mirror));
-        Vec sourceKnee=new Vec(right?-1.9:1.9,18,0).add(delta(frame,"Knee_"+side,mirror));
+        Vec sourceAnkle=new Vec(right?-1.9:1.9,23,0).add(delta(frame,"Ankle_"+side,mirror,rootScale));
+        Vec sourceKnee=new Vec(right?-1.9:1.9,18,0).add(delta(frame,"Knee_"+side,mirror,rootScale));
         Quaterniond boot=oldBoot.slerp(sourceRotation(frame,"Ankle_"+side,mirror),weight).normalize();
         Vec ankle=mix(oldAnkle,sourceAnkle,weight);
         // Keep the complete sole above the actor's supporting plane, including toe roll.
@@ -59,10 +81,10 @@ final class BlackwatchLegPose {
         Quaterniond thigh=pointDown(knee.sub(hip)),lower=pointDown(ankle.sub(knee));
         return new Leg(hip,angles(thigh),angles(new Quaterniond(thigh).invert().mul(lower)),angles(new Quaterniond(lower).invert().mul(goal.boot)));
     }
-    private static Vec delta(P1MilitaryMotion.Frame frame,String joint,boolean mirror){
+    private static Vec delta(P1MilitaryMotion.Frame frame,String joint,boolean mirror,double rootScale){
         var p=new Vector3d(frame.joint(joint).position()).sub(frame.rest(joint).position());
         var root=new Vector3d(frame.joint("Motion_Root").position()).sub(frame.rest("Motion_Root").position());
-        return new Vec((p.x*SOURCE_SCALE-root.x*16)*(mirror?-1:1),-(p.y-root.y)*SOURCE_SCALE,p.z*SOURCE_SCALE-root.z*16);
+        return new Vec((p.x*SOURCE_SCALE-root.x*rootScale)*(mirror?-1:1),-(p.y-root.y)*SOURCE_SCALE,p.z*SOURCE_SCALE-root.z*rootScale);
     }
     private static Quaterniond sourceRotation(P1MilitaryMotion.Frame frame,String joint,boolean mirror){
         var q=new Quaterniond(frame.joint(joint).rotation()).mul(new Quaterniond(frame.rest(joint).rotation()).invert());

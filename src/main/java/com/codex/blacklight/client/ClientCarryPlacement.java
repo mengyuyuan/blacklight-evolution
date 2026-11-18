@@ -19,28 +19,37 @@ public final class ClientCarryPlacement {
         for(var entity:mc.level.entitiesForRendering()){
             if(!(entity instanceof LivingEntity victim))continue;
             var visual=victim.getData(ModAttachments.CONSUME_VISUAL);
-            if(visual.stage()==ConsumeVisual.CONSUME){
+            if(ConsumeSequence.bruteMount(victim)&&ConsumeSequence.mountedStage(visual.stage())){
+                ConsumeSequence.mountFacing(victim,visual.facing());
+                if(visual.stage()!=ConsumeVisual.MOUNT&&mc.level.getEntity(visual.consumerId()) instanceof LivingEntity rider)
+                    ConsumeSequence.mountFacing(rider,visual.facing());
+                victim.setDeltaMovement(Vec3.ZERO);victim.walkAnimation.setSpeed(0);
+                continue;
+            }
+            if(visual.stage()==ConsumeVisual.CONSUME||visual.stage()==ConsumeVisual.GRAB_ATTACK){
                 victim.setYRot(visual.facing());victim.yRotO=visual.facing();
                 victim.setYHeadRot(visual.facing());victim.yHeadRotO=visual.facing();victim.yBodyRot=visual.facing();victim.yBodyRotO=visual.facing();
                 victim.setDeltaMovement(Vec3.ZERO);victim.walkAnimation.setSpeed(0);
                 continue;
             }
-            if(visual.stage()!=ConsumeVisual.HOLD&&visual.stage()!=ConsumeVisual.THROW)continue;
+            if(visual.stage()!=ConsumeVisual.HOLD&&visual.stage()!=ConsumeVisual.AIR_HOLD&&visual.stage()!=ConsumeVisual.THROW&&visual.stage()!=ConsumeVisual.AIR_THROW)continue;
             var carrier=mc.level.getEntity(visual.consumerId());if(!(carrier instanceof LivingEntity owner))continue;
-            var next=carryAnchor(owner.position(),owner.getYRot(),owner.getXRot(),owner,victim,visual,1);
+            float yaw=visual.stage()==ConsumeVisual.AIR_THROW?visual.facing():owner.getYRot();
+            float previousYaw=visual.stage()==ConsumeVisual.AIR_THROW?visual.facing():owner.yRotO;
+            var next=carryAnchor(owner.position(),yaw,owner.getXRot(),owner,victim,visual,1);
             var offset=next.subtract(victim.position());
             // Never predict through obstacles or bridge a broken/teleported restraint.
             double limit=correctionLimit(owner);
             if(limit<=0||offset.lengthSqr()>limit*limit)continue;
             var allowed=net.minecraft.world.entity.Entity.collideBoundingBox(victim,offset,victim.getBoundingBox(),mc.level,java.util.List.of());
             if(allowed.subtract(offset).lengthSqr()>1e-8)continue;
-            var old=carryAnchor(owner.getPosition(0),owner.yRotO,owner.xRotO,owner,victim,visual,0);
+            var old=carryAnchor(owner.getPosition(0),previousYaw,owner.xRotO,owner,victim,visual,0);
             victim.setPos(next);victim.xo=old.x;victim.yo=old.y;victim.zo=old.z;
             float turn=GrappleMotion.active(visual)?0:180;
             // Retire the stale independent receiver interpolation while the server
             // explicitly assigns this body to its carrier. New release packets resume it.
-            victim.lerpTo(next.x,next.y,next.z,owner.getYRot()+turn,victim.getXRot(),0);
-            victim.setYRot(owner.getYRot()+turn);victim.yRotO=owner.yRotO+turn;
+            victim.lerpTo(next.x,next.y,next.z,yaw+turn,victim.getXRot(),0);
+            victim.setYRot(yaw+turn);victim.yRotO=previousYaw+turn;
             victim.setYHeadRot(victim.getYRot());victim.yHeadRotO=victim.yRotO;victim.yBodyRot=victim.getYRot();victim.yBodyRotO=victim.yRotO;
         }
     }
@@ -48,11 +57,20 @@ public final class ClientCarryPlacement {
     /** Render-time pairing avoids the receiver's network interpolation trailing the actor. */
     public static Vec3 consumeOffset(LivingEntity victim,float partial){
         var visual=victim.getData(ModAttachments.CONSUME_VISUAL);
-        if(visual.stage()!=ConsumeVisual.CONSUME&&visual.stage()!=ConsumeVisual.HOLD)return Vec3.ZERO;
+        if(visual.stage()!=ConsumeVisual.CONSUME&&visual.stage()!=ConsumeVisual.HOLD&&visual.stage()!=ConsumeVisual.AIR_HOLD&&visual.stage()!=ConsumeVisual.AIR_THROW&&visual.stage()!=ConsumeVisual.GRAB_ATTACK)return Vec3.ZERO;
         var carrier=victim.level().getEntity(visual.consumerId());if(!(carrier instanceof LivingEntity owner))return Vec3.ZERO;
         var form=PowerForm.values()[Math.clamp(visual.form(),0,PowerForm.values().length-1)];
         Vec3 current=victim.getPosition(partial);
-        Vec3 goal=visual.stage()==ConsumeVisual.HOLD
+        if(visual.stage()==ConsumeVisual.GRAB_ATTACK){
+            float t=HeldSlamMotion.progress(visual,victim.level().getGameTime(),partial);
+            Vec3 goal=ConsumePlacementTrack.pairedGoal(HeldSlamMotion.victim(visual.origin(),visual.facing(),victim,t),
+                    owner.getPosition(partial),HeldSlamMotion.actor(visual.origin(),visual.facing(),t));
+            Vec3 correction=goal.subtract(current);
+            if(correction.lengthSqr()>4)return Vec3.ZERO;
+            var hit=victim.level().clip(new net.minecraft.world.level.ClipContext(current.add(0,.5,0),goal.add(0,.5,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,victim));
+            return hit.getType()==net.minecraft.world.phys.HitResult.Type.MISS?correction:Vec3.ZERO;
+        }
+        Vec3 goal=ConsumeVisual.holding(visual.stage())||visual.stage()==ConsumeVisual.AIR_THROW
                 ?carryAnchor(owner.getPosition(partial),GrappleMotion.facing(victim,visual,partial),
                     net.minecraft.util.Mth.lerp(partial,owner.xRotO,owner.getXRot()),owner,victim,visual,partial)
                 :ConsumePlacementTrack.anchor(visual.origin(),visual.facing(),victim,form,visual.motionProgress(victim.level().getGameTime(),partial),visual.variant()).orElse(current);

@@ -1,0 +1,371 @@
+{
+  "schema": 1,
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "blocksPerSourceUnit": 0.7562671743552288,
+  "windows": [
+    {
+      "id": 700,
+      "phase": 7,
+      "begin": 0.0,
+      "end": 0.2666670083999634,
+      "executeOffset": 5430148,
+      "offset": 5590904,
+      "sourceDamage": 100.0,
+      "radius": 1.890667935888072,
+      "sourceRadius": 2.5,
+      "shapecast": true,
+      "collisionCountMax": -1,
+      "timeBetweenHits": 0.5,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": -1.0,
+      "chain": [
+        "Forarm_L",
+        "Wrist_L",
+        "Shield_L_2",
+        "Shield_L_3",
+        "Shield_L_1",
+        "Index_Base_L",
+        "Index_L",
+        "Index_L_End",
+        "Middle_Base_L"
+      ]
+    },
+    {
+      "id": 900,
+      "phase": 9,
+      "begin": 0.0,
+      "end": 0.16666699945926666,
+      "executeOffset": 5431412,
+      "offset": 5590904,
+      "sourceDamage": 100.0,
+      "radius": 1.890667935888072,
+      "sourceRadius": 2.5,
+      "shapecast": true,
+      "collisionCountMax": -1,
+      "timeBetweenHits": 0.5,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": -1.0,
+      "chain": [
+        "Forarm_L",
+        "Wrist_L",
+        "Shield_L_2",
+        "Shield_L_3",
+        "Shield_L_1",
+        "Index_Base_L",
+        "Index_L",
+        "Index_L_End",
+        "Middle_Base_L"
+      ]
+    },
+    {
+      "id": 901,
+      "phase": 9,
+      "begin": 0.16666699945926666,
+      "end": 0.23333369940519333,
+      "executeOffset": 5431480,
+      "offset": 5565632,
+      "sourceDamage": 750.0,
+      "radius": 3.0250686974209153,
+      "sourceRadius": 4.0,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    },
+    {
+      "id": 901,
+      "phase": 9,
+      "begin": 0.16666699945926666,
+      "end": 0.23333369940519333,
+      "executeOffset": 5431480,
+      "offset": 5566056,
+      "sourceDamage": 400.0,
+      "radius": 4.915736633308987,
+      "sourceRadius": 6.5,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    },
+    {
+      "id": 1100,
+      "phase": 11,
+      "begin": 0.9333329796791077,
+      "end": 1.4333300590515137,
+      "executeOffset": 5462116,
+      "offset": 5590904,
+      "sourceDamage": 100.0,
+      "radius": 1.890667935888072,
+      "sourceRadius": 2.5,
+      "shapecast": true,
+      "collisionCountMax": -1,
+      "timeBetweenHits": 0.5,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": -1.0,
+      "chain": [
+        "Forarm_L",
+        "Wrist_L",
+        "Shield_L_2",
+        "Shield_L_3",
+        "Shield_L_1",
+        "Index_Base_L",
+        "Index_L",
+        "Index_L_End",
+        "Middle_Base_L"
+      ]
+    },
+    {
+      "id": 1101,
+      "phase": 11,
+      "begin": 1.4333300590515137,
+      "end": 1.466670036315918,
+      "executeOffset": 5462184,
+      "offset": 5565632,
+      "sourceDamage": 750.0,
+      "radius": 3.0250686974209153,
+      "sourceRadius": 4.0,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    },
+    {
+      "id": 1101,
+      "phase": 11,
+      "begin": 1.4333300590515137,
+      "end": 1.466670036315918,
+      "executeOffset": 5462184,
+      "offset": 5566056,
+      "sourceDamage": 400.0,
+      "radius": 4.915736633308987,
+      "sourceRadius": 6.5,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    },
+    {
+      "id": 1200,
+      "phase": 12,
+      "begin": 0.20000000298023224,
+      "end": 0.5333330035209656,
+      "executeOffset": 5420860,
+      "offset": 5590904,
+      "sourceDamage": 100.0,
+      "radius": 1.890667935888072,
+      "sourceRadius": 2.5,
+      "shapecast": true,
+      "collisionCountMax": -1,
+      "timeBetweenHits": 0.5,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": -1.0,
+      "chain": [
+        "Forarm_L",
+        "Wrist_L",
+        "Shield_L_2",
+        "Shield_L_3",
+        "Shield_L_1",
+        "Index_Base_L",
+        "Index_L",
+        "Index_L_End",
+        "Middle_Base_L"
+      ]
+    },
+    {
+      "id": 1201,
+      "phase": 12,
+      "begin": 3.333329916000366,
+      "end": 3.5666699409484863,
+      "executeOffset": 5420928,
+      "offset": 5590904,
+      "sourceDamage": 100.0,
+      "radius": 1.890667935888072,
+      "sourceRadius": 2.5,
+      "shapecast": true,
+      "collisionCountMax": -1,
+      "timeBetweenHits": 0.5,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        1.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": -1.0,
+      "chain": [
+        "Forarm_L",
+        "Wrist_L",
+        "Shield_L_2",
+        "Shield_L_3",
+        "Shield_L_1",
+        "Index_Base_L",
+        "Index_L",
+        "Index_L_End",
+        "Middle_Base_L"
+      ]
+    },
+    {
+      "id": 1202,
+      "phase": 12,
+      "begin": 3.5666699409484863,
+      "end": 3.5999999046325684,
+      "executeOffset": 5420996,
+      "offset": 5565632,
+      "sourceDamage": 750.0,
+      "radius": 3.0250686974209153,
+      "sourceRadius": 4.0,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    },
+    {
+      "id": 1202,
+      "phase": 12,
+      "begin": 3.5666699409484863,
+      "end": 3.5999999046325684,
+      "executeOffset": 5420996,
+      "offset": 5566056,
+      "sourceDamage": 400.0,
+      "radius": 4.915736633308987,
+      "sourceRadius": 6.5,
+      "shapecast": false,
+      "collisionCountMax": -1,
+      "timeBetweenHits": -1.0,
+      "sourceOffset": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "collideWith": 4294967488,
+      "ignoreCollideWith": 0,
+      "sourceBegin": 0.0,
+      "sourceEnd": 0.06666669994592667,
+      "chain": [
+        "Wrist_L"
+      ]
+    }
+  ],
+  "sounds": [
+    {
+      "phase": 9,
+      "at": 0.0,
+      "patch": "0x7c1e3c05364b3441",
+      "instance": "0x7c1e3c05364b3441",
+      "frequency": 1.0,
+      "trigger": "Play",
+      "triggerType": "Retrigger",
+      "stopOnExit": false,
+      "physicsOverride": true,
+      "autoRepeat": false,
+      "offset": 5431320
+    },
+    {
+      "phase": 12,
+      "at": 1.0,
+      "patch": "0x79f9b325a11b9424",
+      "instance": "0x7c1e3c05364b3441",
+      "frequency": 1.0,
+      "trigger": "Play",
+      "triggerType": "Retrigger",
+      "stopOnExit": false,
+      "physicsOverride": true,
+      "autoRepeat": false,
+      "offset": 5421064
+    }
+  ],
+  "soundBoundary": "Native event identity/timing only; P2 audio waveform bank is absent locally. No replacement mob voice or claimed source playback.",
+  "contactBoundary": "Health|HitReaction|Player targets (64-bit mask0x1000000c0). Prop-only5000damage mask0x100 is excluded. Shared inner/outer window ID uses strongest accepted contact once per victim as an explicit MC adapter; no additive750+400 claim. Shapecast uses adjacent20Hz poses and current receiving surfaces, not native physics substeps. Joint-index chain ignores offset exactly as102c4550 chain path; single joints apply source offset.",
+  "pending": [
+    "Native AutoTarget vs FaceDirection lambda steering",
+    "Story_m2 and player-grapple extended pose",
+    "Native leg/head reaction and dismember branches",
+    "Source sound waveform bank and playback",
+    "Prop/WorldCone damage and effect assets",
+    "Native root blending and final support"
+  ]
+}

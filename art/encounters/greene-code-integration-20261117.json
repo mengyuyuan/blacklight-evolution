@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T03:42:17.299185+08:00",
+  "scope": "Greene native bind, source scale, live muzzle and posed receiving integration",
+  "state": "native rig and six weapon programs connected; compile/client acceptance deferred",
+  "staticReview": {
+    "poseGeometryBones": 50,
+    "receivingRegions": 19,
+    "weakRegionsFirst": 3,
+    "sourceClips": 9,
+    "sourceFrames": 1450,
+    "originalAuthoredCuboidsPreserved": 150,
+    "skinCenterFixturesPrepared": 60,
+    "mouthFixturesPrepared": 8,
+    "spineJointFixturesPrepared": 90,
+    "maxExportAffineCoefficientError": 3.674383856377972e-05,
+    "queuedNativeBodyOwnershipGameTests": 3,
+    "queuedFatalPacketUnitChecks": 5
+  },
+  "integration": [
+    "Every Greene move stays in GreeneMotion, including unknown source actions falling back to idle. Legacy procedural head/torso rotations cannot modify inverse-bind leaves.",
+    "Greene client receiving regions use interpolated body origin/yaw matching the displayed actor; authoritative server contact remains current.",
+    "SourceBossPose writes every native helper and inverse-bind leaf with ROT/TRAN/SCL. Contact retains affine shear.",
+    "Multipart region ordering is derived from cube owners on both peers; protocol increased for new regions and helicopter audio fields.",
+    "Six source weapon programs and thirteen Shoot tracks now use actual socket positions/directions, native missile flight and persistent per-socket cooldowns; client, collision and cancellation share the selected program.",
+    "NativeBossBodyControl prevents generic live knockdown/launch/ragdoll takeover for Greene and Goliath while preserving damage, wounds, death and verified consume ownership. Client stale physical bodies and delayed impact packets cannot replace native skin.",
+    "Server-authoritative fatal flag and original contact time survive the wire. Native-boss fatal packets wait for observed death without a guessed timeout; only a non-refinement full impact can initialize the existing body path."
+  ],
+  "originalEvidence": [
+    "art/encounters/greene-native-bind-correction.json",
+    "art/encounters/greene-native-scale-source.json",
+    "art/encounters/greene-weapon-source-20261117.json",
+    "art/encounters/native-boss-body-control-20261117.json"
+  ],
+  "limits": [
+    "No Java compilation, unit/GameTests, original DLL execution, game launch or audio playback.",
+    "Skin owners rigidly approximate original blended weights; visual and player acceptance remain deferred.",
+    "Original AI state producer, weapon accuracy, projectile-template FX/final-action bodies and source force delivery remain unported; explicit MC adapters are documented in the follow-up record.",
+    "Legacy weakpoint ring layout and its MC hold-window controller remain explicit adapters."
+  ],
+  "snapshots": {
+    "src/main/java/com/codex/blacklight/combat/GreeneMotion.java": "e245af38a83ac047e701f16da1eb273c1cebb87b9139e849401f4459147152d0",
+    "src/main/java/com/codex/blacklight/combat/GreeneMouth.java": "1629c744b5d3b38206e7ec07c8cfe4af9642768a74ae14e9e1635f789374aa09",
+    "src/main/java/com/codex/blacklight/client/model/SourceBossPose.java": "9f3bb7ad6e019854e8285621db8f2303e02ca92bf05fe30e5b0a137ef9e37a54",
+    "src/main/java/com/codex/blacklight/entity/EncounterMob.java": "c95de4ee6448b764a97e1ac137cbe1e450e16edcf375b43e795fd44bf22a9216",
+    "src/main/resources/assets/blacklight/geo/elizabeth_greene_mc.geo.json": "ab7491c5699262c945466327078abad5fed69c148e983a5667878fe1f09a2efd",
+    "src/main/resources/assets/blacklight/models/encounter_elizabeth_greene_source.json": "4aa8aa47c53ad3cefa9ff2ae91253215b40316f7254581ba8563ca6df14b9bbb",
+    "src/test/resources/greene-skin-reference.json": "320e497f8271bccc34dadd43e759d64c762a0204fea5a03d39d1ef5ecabae1e3",
+    "tools/rebind_greene_source.py": "b65a43c0e15e86306a650125c08fb7c14e133d1cfe4a4069c29a394d40c6049f",
+    "src/main/java/com/codex/blacklight/combat/NativeBossBodyControl.java": "da4f8cbf5a6a2fffc85b65197b13f98c185e2d2e7f826b9588ccf0dc51eef5e7",
+    "src/main/java/com/codex/blacklight/combat/ImpactControl.java": "f5756b4229e89e2d463cd867dc307362e046d4432bdce1e9411296bf2b7adf93",
+    "src/main/java/com/codex/blacklight/combat/RagdollImpact.java": "1b164e0f0da2c885bef9d2dd207135281000ed65916bf31ab8e4581826360017",
+    "src/main/java/com/codex/blacklight/combat/DevastatorSystem.java": "f5122b2b02cbff17ca246f7fac2d9a24e399ff8334372d243b87aed87624f05f",
+    "src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java": "ba96ddbb0b2f209314f5f757b6881087a3bf4764c226b5b76f7a90f86b43951f",
+    "src/main/java/com/codex/blacklight/network/RagdollImpactPayload.java": "886fb6cb46ee01676eabe08ea17186c473c96d98de0e6c2f2b98f5513f458ad9",
+    "src/main/java/com/codex/blacklight/client/animation/RagdollFatalHandoff.java": "4ceeaa199fc56a6a8e771b557499c9ab3be21ed5492f015578dbf2ca1178b16e"
+  },
+  "followupRecord": "art/encounters/greene-program-integration-20261117.json",
+  "snapshotNote": "Snapshots below retain the rig/body-control checkpoint; followupRecord carries current hashes for files changed by the weapon integration."
+}

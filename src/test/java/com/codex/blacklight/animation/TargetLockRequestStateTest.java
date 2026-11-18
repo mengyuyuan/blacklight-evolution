@@ -5,6 +5,20 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TargetLockRequestStateTest {
+    @Test void aircraftLockToleratesBriefCoverButExpiresOnGameTime() {
+        var state = new TargetLockRequestState();
+        state.request(17);
+        assertTrue(state.retainAircraftSight(true, 50));
+        for (int tick = 51; tick < 61; tick++) {
+            for (int frame = 0; frame < 6; frame++) assertTrue(state.retainAircraftSight(false, tick));
+        }
+        assertFalse(state.retainAircraftSight(false, 61));
+        assertTrue(state.retainAircraftSight(true, 62));
+        assertTrue(state.retainAircraftSight(false, 63));
+        state.request(18);
+        assertTrue(state.retainAircraftSight(false, 80));
+    }
+
     @Test void attachmentDelayCannotExpireAPendingLockAfterEightTicks() {
         var state=new TargetLockRequestState();int request=state.request(17);
         for(int tick=0;tick<60;tick++){assertFalse(state.observeAttachment(-1));assertEquals(17,state.desiredId());}
@@ -24,5 +38,19 @@ class TargetLockRequestStateTest {
         assertTrue(state.acknowledge(rejected,-1));assertEquals(-1,state.desiredId());
         int oldLife=state.request(22);state.resetOwner();int newLife=state.request(31);
         assertFalse(state.acknowledge(oldLife,22));assertTrue(state.acknowledge(newLife,31));
+    }
+    @Test void sameParentRegionSwitchRequiresItsOwnAcknowledgement() {
+        var state=new TargetLockRequestState();int first=state.request(17,0),second=state.request(17,2);
+        assertFalse(state.acknowledge(first,17,0));assertEquals(2,state.desiredRegion());
+        assertFalse(state.observeAttachment(17,0));assertTrue(state.pending());
+        assertTrue(state.acknowledge(second,17,2));assertFalse(state.observeAttachment(17,0));
+        assertEquals(2,state.desiredRegion());assertFalse(state.observeAttachment(17,2));
+        assertTrue(state.observeAttachment(-1,-1));assertEquals(-1,state.desiredRegion());
+    }
+    @Test void invalidRegionCannotBecomeAPredictedOrAcknowledgedSelection() {
+        var state=new TargetLockRequestState();assertThrows(IllegalArgumentException.class,()->state.request(17,3));
+        assertThrows(IllegalArgumentException.class,()->state.request(-1,0));int request=state.request(17,1);
+        assertFalse(state.acknowledge(request,17,8));assertTrue(state.pending());
+        assertTrue(state.acknowledge(request,-1,-1));assertEquals(-1,state.desiredId());
     }
 }

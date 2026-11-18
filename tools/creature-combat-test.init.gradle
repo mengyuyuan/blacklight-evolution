@@ -1,0 +1,6 @@
+// Opt-in disposable server checks; excluded from normal builds.
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/creatureCombatTest/java')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+    tasks.withType(ProcessResources).configureEach { filteringCharset='UTF-8' }
+} }

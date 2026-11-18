@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.codex.blacklight.client.qaparticle",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ParticleProbeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

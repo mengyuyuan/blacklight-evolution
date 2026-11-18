@@ -1,0 +1,11 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/hydraTest/java')
+    sourceSets.main.java.srcDir('src/buildingTest/java')
+    sourceSets.main.java.exclude { entry ->
+        def path=entry.file.path.replace('\\','/')
+        !entry.isDirectory() && ((path.contains('/src/hydraTest/') && entry.name!='HydraReleaseGameTest.java') ||
+                (path.contains('/src/buildingTest/') && entry.name!='HydraFeedingBoundaryGameTest.java'))
+    }
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+} }

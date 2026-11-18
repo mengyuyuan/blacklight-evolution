@@ -1,0 +1,4 @@
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure { include '**/Helicopter*Test.class'; include '**/VehicleControlAuthorityTest.class'; include '**/VehicleWeaponDefinitionTest.class'; include '**/GunplayFeedbackPayloadTest.class' }
+    tasks.withType(Jar).configureEach { doFirst {throw new GradleException('QA cannot produce a release JAR')} }
+} }

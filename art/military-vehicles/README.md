@@ -17,7 +17,13 @@ python tools/build_military_vehicles.py --check
 
 当前卡车 78 个方块、APC 138 个方块、坦克 161 个方块；军方橄榄色和 BW 深灰色使用同一几何与 UV。所有原始 PNG 均由本地色板和确定性的微小像素变化生成，未使用参考图像素。车体长×宽×高分别为卡车 7.5×2.9×3.7、APC 7×3.3×3.3、坦克 8×4×3.4 格；JSON 与预览数组沿用宽/长/高顺序。尺寸已烘焙到几何与挂点，车轮径向保持圆形，武器炮管允许伸出车体。
 
-物品使用 `python tools/build_vehicle_items.py --preview` 生成原创 32px PNG 与 `minecraft:item/generated` 模型；`--check` 只读比较资源、配方和本工具负责的语言条目。当前每端 10 套 active 物品模型/贴图/配方（六车、三弹药、一维修件），另保留 1 套 preserved 燃料罐资源和未来配方。燃料罐注册 ID 和磁盘文件保留，根构建负责排除其配方并取消正常游戏获取；驾驶无需燃油。`previews/inventory-icons.png` 展示真实 32px 与降至 16px 的像素对照，不是游戏截图。六车显示名去掉“空底盘”，持久化 `_chassis` ID 保持兼容。
+物品由 Neo 工程中的 `python -B tools/build_vehicle_items.py --forge-root D:/blacklight-evolution-forge-1.20.1` 同步生成两个版本。当前为 11 个 `minecraft:block/block` 三维物品模型：六种载具缩模继承生产车体的全部部件、UV 和阵营涂装，三个弹药模型有弹壳、底缘、弹头/穿甲杆/弹链，维修箱有独立箱盖、锁扣、提手、套筒、扳手和螺丝刀，保留燃料罐有三根镂空提梁、冲压筋和加注盖。作者代码为 `tools/vehicle_item_models.py`。五个补给物品使用 128px 材质图集；六个旧 32px PNG 仅保留作粒子贴图。车辆实体贴图通过 `assets/minecraft/atlases/blocks.json` 的 single source 加入方块/物品图集，避免粉黑缺失贴图。
+
+`--check` 只读比较全部 39 个生成文件及本工具负责的语言条目；生成器保留原 ID、配方和驾驶无需燃油的规则。每端 10 套正常使用模型（六车、三弹药、一维修件）与 1 套未启用燃料罐模型；配方共 16 份，其中燃料罐配方仍由根构建排除。
+
+`--preview` 现在从专用隐藏、静音客户端捕获中读取真实 GUI 截图，逐项比对加载资源 SHA-256 后输出 `previews/inventory-models.png`，不会把材质图集误当作物品图标。须先运行 `tools/vehicle-item-visual.init.gradle` 的客户端 QA；此配置仅进入主菜单、不打开世界，也禁止生成发布 JAR。`previews/inventory-icons.png` 和 `validation-receipt.json` 属于旧二维图标批次，当前物品证据见 `item-model-validation.json`。
+
+2026-11-16 本批次：生成器 8 项测试通过；两个加载器各加载 11 个生产物品模型并捕获 11 个 GUI 图标、88 个显示变换场景，未发现 missingno。两张物品栏总图与六张显示变换联系表已检查。显示变换使用游戏 ItemRenderer，尚未验证真实玩家手臂握持、地面掉落动画与物品展示框的世界光照。
 
 ## 坐标与客户端接口
 
@@ -37,6 +43,6 @@ python tools/build_military_vehicles.py --check
 
 ## 实际验证与待办
 
-`--check` 验证所有十份派生文件字节确定性；生成过程检查骨骼父子顺序、有限坐标、车体边界、8/8/3 座位与实际炮口末端。Neo 的 `tools/test_build_military_vehicle_dimensions.py` 与 `tools/test_build_vehicle_items.py` 共 11 项公开生成器测试，覆盖运行时几何反解、车库静态净空、席位/视口、APC 驾驶潜望端口高于前甲且位于其后方、轮廓、Blockbench 层级/UV/嵌入图集、配方版本、文案及只读过期资源检查；同一组测试也针对 Forge 的实际生成器运行。`validation-receipt.json` 保存本轮结果与哈希，不能沿用旧尺寸回执。
+`--check` 验证所有十份派生文件字节确定性；生成过程检查骨骼父子顺序、有限坐标、车体边界、8/8/3 座位与实际炮口末端。Neo 的 `tools/test_build_military_vehicle_dimensions.py` 与 `tools/test_build_vehicle_items.py` 共 11 项公开生成器测试，覆盖运行时几何反解、车库静态净空、席位/视口、APC 驾驶潜望端口高于前甲且位于其后方、轮廓、Blockbench 层级/UV/嵌入图集、配方版本、文案及只读过期资源检查；同一组测试也针对 Forge 的实际生成器运行。`validation-receipt.json` 保存该历史尺寸批次结果与哈希；上述 11 项计数不包含后续物品三维化批次，当前物品检查见 `item-model-validation.json`。
 
 离线预览只证明作者源形状与两涂装可生成。Blockbench GUI 打开、真实游戏多视角、乘员姿势、转塔/俯仰、驾驶视角、受损状态、炮口遮挡和两加载器 GL 渲染仍需根代理逐步验证，不能借用旧 M5 的结果。

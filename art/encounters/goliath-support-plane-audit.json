@@ -1,0 +1,564 @@
+{
+  "schema": 1,
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "runtimeSha256": "bfd62e944eaed5762bc791306f54ab4c2ce03705e52180f44d0da5cd7cc7e07d",
+  "factory": {
+    "nodeOffset": 5701838,
+    "fields": [
+      {
+        "name": "volumeFactory.class",
+        "value": "ravenphysics::CollisionCapsuleFactory",
+        "fileOffset": 5701858,
+        "bytes": 41,
+        "encoding": "text32"
+      },
+      {
+        "name": "volumeFactory.version",
+        "value": 1,
+        "fileOffset": 5701899,
+        "bytes": 2,
+        "encoding": "H"
+      },
+      {
+        "name": "volumeFactory.schemaCrc",
+        "value": 2627996214,
+        "fileOffset": 5701901,
+        "bytes": 4,
+        "encoding": "I"
+      },
+      {
+        "name": "material",
+        "value": "FrictionlessFlesh",
+        "fileOffset": 5701905,
+        "bytes": 18,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x4"
+      },
+      {
+        "name": "intersectionProperties",
+        "value": "BehemothCapsule",
+        "fileOffset": 5701923,
+        "bytes": 16,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x8"
+      },
+      {
+        "name": "centre",
+        "value": [
+          0.0,
+          4.0,
+          -2.5
+        ],
+        "fileOffset": 5701939,
+        "bytes": 12,
+        "encoding": "3f",
+        "runtimeMemberOffset": "0x10"
+      },
+      {
+        "name": "axis",
+        "value": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "fileOffset": 5701951,
+        "bytes": 12,
+        "encoding": "3f",
+        "runtimeAccessor": "Custom getter/setter; metadata descriptor offset 0 is not a direct struct member"
+      },
+      {
+        "name": "extent",
+        "value": 0.10000000149011612,
+        "fileOffset": 5701963,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x1c"
+      },
+      {
+        "name": "radius",
+        "value": 7.0,
+        "fileOffset": 5701967,
+        "bytes": 4,
+        "encoding": "f",
+        "runtimeMemberOffset": "0x2c"
+      },
+      {
+        "name": "collisionType",
+        "value": 2,
+        "fileOffset": 5701971,
+        "bytes": 4,
+        "encoding": "i",
+        "runtimeMemberOffset": "0x14"
+      },
+      {
+        "name": "createRigidBody",
+        "value": true,
+        "fileOffset": 5701975,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x18"
+      },
+      {
+        "name": "gravityEnabled",
+        "value": false,
+        "fileOffset": 5701979,
+        "bytes": 4,
+        "encoding": "bool32",
+        "runtimeMemberOffset": "0x19"
+      },
+      {
+        "name": "massProperties",
+        "value": "BehemothMass",
+        "fileOffset": 5701983,
+        "bytes": 13,
+        "encoding": "text8",
+        "runtimeMemberOffset": "0x1c"
+      }
+    ],
+    "collisionTypes": [
+      {
+        "value": 0,
+        "name": "Static"
+      },
+      {
+        "value": 1,
+        "name": "Keyframed"
+      },
+      {
+        "value": 2,
+        "name": "Simulating"
+      }
+    ]
+  },
+  "localKeyframedCommand": {
+    "offsets": [
+      5691928
+    ],
+    "payloadWords": [
+      -1,
+      1
+    ],
+    "adjacentAnimationTrack": 5691980,
+    "clip": "behemoth_com_biped_death_v2",
+    "context": "Command is inside onBegin of node5691860; its Tracks contains the death clip. Full local FIG tree resolves the parent as behemoth/common/0x97e26b247b34278d/0x44325d69b61c1e.",
+    "scope": "Exact command-header scan of this entire Behemoth asset finds one. This is not evidence that external/native mode changes cannot happen during front slam."
+  },
+  "nativeEvidence": [
+    {
+      "name": "Ordinary Puppet pose dispatch",
+      "beginVA": "0x10728e75",
+      "endExclusiveVA": "0x10728ec4",
+      "fileOffset": 7504501,
+      "bytes": 79,
+      "sha256": "9a2b5fc9bdd0d5365f66d48a14eba1514d081db2b584ee980c1ec591c77e4be7",
+      "meaning": "Choreo advance, evaluate, local/world/skin; independent of PoseAnimationBehaviour/NIS."
+    },
+    {
+      "name": "Choreography evaluation finishes by resetting root",
+      "beginVA": "0x10681b03",
+      "endExclusiveVA": "0x10681b20",
+      "fileOffset": 6819587,
+      "bytes": 29,
+      "sha256": "74bd532ff81755be0a68f6f2d7f6b68f172b19ebfcd8ce82db91618ff20beff7",
+      "meaning": "Calls 10680ad0 after curve evaluation."
+    },
+    {
+      "name": "Ordinary root Q/T reset",
+      "beginVA": "0x10680ad0",
+      "endExclusiveVA": "0x10680b80",
+      "fileOffset": 6815440,
+      "bytes": 176,
+      "sha256": "63b75365b21eb52a72f0b3c8316247bf5f57d3b06662a8160150cb3c41abf455",
+      "meaning": "Pose+8 root quaternion = [0,0,0,1]; pose+0xc translation = shared zero vector, then mark local/world/skin dirty. No root SCL overwrite here."
+    },
+    {
+      "name": "Pose dirty dispatch",
+      "beginVA": "0x1088b330",
+      "endExclusiveVA": "0x1088b35a",
+      "fileOffset": 8955696,
+      "bytes": 42,
+      "sha256": "969df3a62083a495ab93e203303a0aeafee357926945759f398230d7a3ad0f65",
+      "meaning": "Local update 1088a2a0 then world/skin 10889720 or 10889b00/10889cc0."
+    },
+    {
+      "name": "Supporting limb constructor",
+      "beginVA": "0x106cdd40",
+      "endExclusiveVA": "0x106cde68",
+      "fileOffset": 7131456,
+      "bytes": 296,
+      "sha256": "c4283405b230e961451d95b56135abe21fdae53c848907fdad7f3a6220f3567f",
+      "meaning": "Support reference matrix copied from identity at 10ec2498."
+    },
+    {
+      "name": "Supporting limb reset",
+      "beginVA": "0x106cdf80",
+      "endExclusiveVA": "0x106cdfd8",
+      "fileOffset": 7132032,
+      "bytes": 88,
+      "sha256": "80a7a89aa3567cb6cf13f902d6e8333589a35041e29617a7bfba089869d6dc51",
+      "meaning": "Definition direction installed and reference matrix reset to identity."
+    },
+    {
+      "name": "Supporting length smoother",
+      "beginVA": "0x106cd0e0",
+      "endExclusiveVA": "0x106cd1a1",
+      "fileOffset": 7128288,
+      "bytes": 193,
+      "sha256": "7915c84d6fa01387d2695015d94830fed64904438ba732b783b4e7e9ecb73e33",
+      "meaning": "Clamp desired-current by maxSpeed*dt; clamp result to min/max, epsilon early return."
+    },
+    {
+      "name": "Physics factory property table",
+      "beginVA": "0x109454a0",
+      "endExclusiveVA": "0x1094563c",
+      "fileOffset": 9717920,
+      "bytes": 412,
+      "sha256": "3a2801271ff4e3b245c6d95b2306dd915128f02531f9ee14c5202da870a93f22",
+      "meaning": "volumeFactory, collisionType, createRigidBody, gravityEnabled, massProperties."
+    },
+    {
+      "name": "Collision volume base table",
+      "beginVA": "0x1094a730",
+      "endExclusiveVA": "0x1094a824",
+      "fileOffset": 9739056,
+      "bytes": 244,
+      "sha256": "b664d7370ade6a86fd8233a759a02b32b452428f8267c0c5f855e96089483dc5",
+      "meaning": "material and intersectionProperties."
+    },
+    {
+      "name": "Capsule property table",
+      "beginVA": "0x1094a880",
+      "endExclusiveVA": "0x1094a9b3",
+      "fileOffset": 9739392,
+      "bytes": 307,
+      "sha256": "d7b9c6e2cf638b98fb0189b21fd8432de18c99e5da0c544cec70b3f18d10d8db",
+      "meaning": "centre, axis, extent, radius; these are NOT Constraint pointA/pointB fields."
+    },
+    {
+      "name": "Collision type enum",
+      "beginVA": "0x10943dd0",
+      "endExclusiveVA": "0x10943def",
+      "fileOffset": 9712080,
+      "bytes": 31,
+      "sha256": "20721a9d5e42d7a116802c897dd7fd6d3f011a3c4f74a2e9f63f404819010903",
+      "meaning": "Three entries at 10f6ce44: Static=0, Keyframed=1, Simulating=2."
+    },
+    {
+      "name": "Factory keyframed flag",
+      "beginVA": "0x109440a0",
+      "endExclusiveVA": "0x109440c3",
+      "fileOffset": 9712800,
+      "bytes": 35,
+      "sha256": "6e631d024ca455c3cdd7c410541517538f1f926bf977654a7310c36883707f28",
+      "meaning": "Only collisionType=1 calls 10942ac0(true); type=2 does not."
+    },
+    {
+      "name": "Body flag constructor tail",
+      "beginVA": "0x10942e37",
+      "endExclusiveVA": "0x10942e46",
+      "fileOffset": 9708087,
+      "bytes": 15,
+      "sha256": "cc998f588f0eb2ffc504d7ee231b155e1c57ce398e69d883dea14c8ace04d128",
+      "meaning": "and 0xfa clears mask 0x4; or 0x1a leaves it clear."
+    },
+    {
+      "name": "Keyframed flag setter",
+      "beginVA": "0x10942ac0",
+      "endExclusiveVA": "0x10942ad1",
+      "fileOffset": 9707200,
+      "bytes": 17,
+      "sha256": "656f943a64a7bb40b36ff38b22c35b4cd2552c84bfa2a7ecdf9688b887c90abc",
+      "meaning": "Writes rigid-body flags bit 0x4."
+    },
+    {
+      "name": "Keyframed flag getter",
+      "beginVA": "0x10938d00",
+      "endExclusiveVA": "0x10938d0b",
+      "fileOffset": 9666816,
+      "bytes": 11,
+      "sha256": "77c2f10a802978dbde66c640b900cb8e6aac65b8dffb473ec333a06f82bf0cec",
+      "meaning": "Returns rigid-body flags bit 0x4."
+    },
+    {
+      "name": "CharacterSolver keyframed input",
+      "beginVA": "0x10726354",
+      "endExclusiveVA": "0x1072639a",
+      "fileOffset": 7493460,
+      "bytes": 70,
+      "sha256": "1c51521584301de6e6fbb06a3744d5ee5f0442c6b018539d5f882f11db4baab0",
+      "meaning": "Reads body getter and passes it to support dispatch."
+    },
+    {
+      "name": "Support restrict-normal flag",
+      "beginVA": "0x107219f9",
+      "endExclusiveVA": "0x10721a41",
+      "fileOffset": 7474681,
+      "bytes": 72,
+      "sha256": "c3187539a05464e7c5d74880bd37630fea06230e9b705c13dc942e2601660f09",
+      "meaning": "Passes inverse of keyframed flag as final argument to 106cf5b0."
+    },
+    {
+      "name": "Successful support correction",
+      "beginVA": "0x106cfe15",
+      "endExclusiveVA": "0x106cff76",
+      "fileOffset": 7139861,
+      "bytes": 353,
+      "sha256": "7fc51cf8fa56ae22781ecb696580f442c76f16cc9ae7751097e653414f948747",
+      "meaning": "contact - rotatedOrigin - direction*restLength - proposedPosition. If restricted, subtract parallel-to-direction component, then add correction."
+    },
+    {
+      "name": "PhysicsBehaviour phase dispatch",
+      "beginVA": "0x107f4110",
+      "endExclusiveVA": "0x107f415c",
+      "fileOffset": 8336656,
+      "bytes": 76,
+      "sha256": "8238f1eaf5deb2317f0b54fb5875627c3efe26897213fe1d3756d8e12b3647ed",
+      "meaning": "Phase0x20 sends actor/pose to physics; other phase calls update-from-physics path."
+    },
+    {
+      "name": "Physics to actor dispatch",
+      "beginVA": "0x107f2a50",
+      "endExclusiveVA": "0x107f2b5c",
+      "fileOffset": 8330832,
+      "bytes": 268,
+      "sha256": "dca80074a36e764d3f6a7a9be0b532d1e01a7367cdab1bda12e3ae32cb505728",
+      "meaning": "Passes owner spatial matrix into 1072a250."
+    },
+    {
+      "name": "Single-root-body matrix delivery",
+      "beginVA": "0x1072a250",
+      "endExclusiveVA": "0x1072a2e0",
+      "fileOffset": 7509584,
+      "bytes": 144,
+      "sha256": "26e50b86570020f88f39b5cc1e61b6bccdf076fdfef339e5daa799e4f1a07270",
+      "meaning": "When body count1 and no nonzero root mapping, writable simulating body matrix copies directly to actor. Other multi-body/ragdoll branch remains conditional."
+    }
+  ],
+  "rootZero": {
+    "address": "0x10ff5534",
+    "origin": "PE .data virtual zero-fill tail, not raw file bytes",
+    "warning": "Zero-fill describes initial image state. No original DLL execution or observed runtime snapshot."
+  },
+  "support": {
+    "direction": [
+      0,
+      -1,
+      0
+    ],
+    "restingLength": 6,
+    "maxLength": 8,
+    "normalFollowsSurface": false,
+    "smoothMaxVelocity": 1000,
+    "smoothEpsilon": 9.999999747378752e-06,
+    "referenceMatrix": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "fixtureRows": [
+      {
+        "proposed": [
+          0.0,
+          10.0,
+          0.0
+        ],
+        "surfacePoint": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "keyframed": [
+          0.0,
+          6.0,
+          0.0
+        ],
+        "simulating": [
+          0.0,
+          10.0,
+          0.0
+        ]
+      },
+      {
+        "proposed": [
+          2.0,
+          12.0,
+          3.0
+        ],
+        "surfacePoint": [
+          2.0,
+          4.0,
+          3.0
+        ],
+        "keyframed": [
+          2.0,
+          10.0,
+          3.0
+        ],
+        "simulating": [
+          2.0,
+          12.0,
+          3.0
+        ]
+      }
+    ],
+    "smoothedAt20Hz": 6,
+    "finding": "Serialized Simulating2 body starts with keyframed bit clear, so the successful support branch removes vertical correction. RestingLength6 is not sufficient evidence of actor Y=6."
+  },
+  "poseComparison": {
+    "method": "Independent root-channel identity rebuild vs referenceRoot * inverse(animatedRoot), original SCL and segment compensation retained.",
+    "referenceRoot": [
+      [
+        1.0,
+        0.0,
+        -0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        -0.0,
+        6.0
+      ],
+      [
+        -0.0,
+        -0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -0.0,
+        1.0
+      ]
+    ],
+    "samples": [
+      {
+        "frame": 0,
+        "jointCount": 82,
+        "maxMatrixError": 1.7763568394002505e-15,
+        "rawAnimatedRootTranslation": [
+          0.0,
+          6.0,
+          0.0
+        ],
+        "rootIdentityWrist": [
+          0.2004507139228071,
+          -3.1483279799413437,
+          -5.986209974635978
+        ],
+        "referenceRebasedWrist": [
+          0.2004507139228071,
+          2.8516720200586563,
+          -5.986209974635978
+        ]
+      },
+      {
+        "frame": 18,
+        "jointCount": 82,
+        "maxMatrixError": 1.7763568394002505e-15,
+        "rawAnimatedRootTranslation": [
+          -1.2666015625,
+          6.0,
+          5.21875
+        ],
+        "rootIdentityWrist": [
+          -1.9212600612378192,
+          -1.8584788389361981,
+          -4.012727918985099
+        ],
+        "referenceRebasedWrist": [
+          -1.9212600612378192,
+          4.141521161063801,
+          -4.012727918985099
+        ]
+      },
+      {
+        "frame": 28,
+        "jointCount": 82,
+        "maxMatrixError": 3.552713678800501e-15,
+        "rawAnimatedRootTranslation": [
+          -1.2666015625,
+          6.0,
+          5.21875
+        ],
+        "rootIdentityWrist": [
+          -4.117213089620837,
+          3.0531913007771236,
+          2.4417953936533916
+        ],
+        "referenceRebasedWrist": [
+          -4.117213089620837,
+          9.053191300777124,
+          2.4417953936533916
+        ]
+      },
+      {
+        "frame": 48,
+        "jointCount": 82,
+        "maxMatrixError": 1.3322676295501878e-15,
+        "rawAnimatedRootTranslation": [
+          0.0,
+          6.0,
+          0.0
+        ],
+        "rootIdentityWrist": [
+          1.8865162207209754,
+          -5.5236678312180905,
+          -11.729208009502882
+        ],
+        "referenceRebasedWrist": [
+          1.8865162207209754,
+          0.47633216878190954,
+          -11.729208009502882
+        ]
+      },
+      {
+        "frame": 60,
+        "jointCount": 82,
+        "maxMatrixError": 1.7763568394002505e-15,
+        "rawAnimatedRootTranslation": [
+          0.0,
+          6.0,
+          0.0
+        ],
+        "rootIdentityWrist": [
+          1.861632019442486,
+          -4.837043751153287,
+          -11.796300559751794
+        ],
+        "referenceRebasedWrist": [
+          1.861632019442486,
+          1.1629562488467133,
+          -11.796300559751794
+        ]
+      }
+    ],
+    "maxMatrixError": 3.552713678800501e-15,
+    "conclusion": "Equal only when native actor transform supplies the same reference-root baseline. This arithmetic proves no native actor height or final support state."
+  },
+  "executionBoundary": {
+    "proven": "Ordinary animation root reset, factory initial mode, successful-contact correction formula, and conditional physics-to-actor matrix delivery.",
+    "unresolved": [
+      "Actual active body mode and rigid-body world matrix at front-slam frame48 after game/physics scheduling and external events.",
+      "Support-query result and any active character/physics constraint response on the same frame.",
+      "Final post-fixup joint/skin matrices and terrain plane on that frame."
+    ],
+    "noInference": "No wrist/arm lift, shrink, assumed whole-actor +6, or radius-based correction follows from these fields. Capsule dimensions alone are not a settled physics-state capture."
+  },
+  "implementation": "Static helper/decoder and evidence only. Production geometry, pose, receiving body and effect anchors remain unchanged.",
+  "validation": "Python static byte decoding/matrix arithmetic only; no Java/Gradle/tests/client, original DLL loading/execution or audio playback."
+}

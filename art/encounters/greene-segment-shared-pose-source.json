@@ -1,0 +1,992 @@
+{
+  "schema": 1,
+  "state": "Source shared-pose segment binding replaces authored ring; no compilation or gameplay/visual validation performed.",
+  "source": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+  "sourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+  "scalePixelsPerSourceUnit": 7.167352101048183,
+  "sourceCoordinateSystem": "All three segment skin buffers are in the same bind world as mother_core; their named skeletons contain byte-identical 56 joint records. No grab-slot offset is added.",
+  "script": {
+    "figOffset": 66452,
+    "function": "P4 MotherSpawnSegments",
+    "attachInstructions": "098..104",
+    "sharePoseInstructions": "105..108",
+    "physicsEnableInstructions": "109..112",
+    "exclusionGroupInstructions": "113..116",
+    "sequence": "Spawn Mother_Segment_i at core position/orientation; attach to Segment+i with empty child joint, mode 0; go_SharePose(core, child); phys_EnablePhysics(child,true); phys_SetExclusionGroup(child,coreGroup). RestoreSegments/P5 repeats attach and SharePose."
+  },
+  "replacement": {
+    "removedLegacyRingCubes": 42,
+    "sourceBoundSegmentCubes": 30,
+    "unchangedAuthoredCoreCubes": 108
+  },
+  "geometryPolicy": "For each actual source palette joint, the cuboid bounds all vertices of triangles incident to at least one vertex whose maximum skin weight is that joint. The three jaws remain separate. Only measured boxes and native pose channels are exported; original triangles/UVs/textures are not copied.",
+  "axes": "geometry = diag(-1,1,1) * sourceBind * existingPixelsPerSourceUnit; runtime model mirrors geometry X back. Core cuboids and all existing texture pixels remain unchanged.",
+  "segments": [
+    {
+      "segment": 0,
+      "template": "Mother_Segment_1",
+      "grabSlot": "Segment1",
+      "skin": {
+        "name": "mother_segment_1_Slug_01Shape",
+        "nodeOffset": 5144440,
+        "vertices": 1954,
+        "palette": [
+          "Slug_01_Jaw_3",
+          "Slug_01_Head",
+          "Slug_01_Jaw_1",
+          "Slug_01_Spine_5",
+          "Slug_01_Jaw_2",
+          "Slug_01_Spine_4",
+          "Slug_01_Spine_3",
+          "Slug_01_Spine_2",
+          "Slug_01_Spine_1",
+          "Slug_01_Spine_Base"
+        ],
+        "weightSums": {
+          "Slug_01_Jaw_3": 373.57781982421875,
+          "Slug_01_Head": 194.58482360839844,
+          "Slug_01_Jaw_1": 489.5077209472656,
+          "Slug_01_Spine_5": 138.67132568359375,
+          "Slug_01_Jaw_2": 350.8495178222656,
+          "Slug_01_Spine_4": 131.9809112548828,
+          "Slug_01_Spine_3": 108.30287170410156,
+          "Slug_01_Spine_2": 80.65250396728516,
+          "Slug_01_Spine_1": 31.589134216308594,
+          "Slug_01_Spine_Base": 54.283416748046875
+        },
+        "layout": "Interleaved descriptor position float3, weights float3 plus fourth=1-sum, palette indices byte4; no palette remapping by joint name guesses."
+      },
+      "skeleton": "mother_segment_1_skeleton",
+      "skeletonOffset": 4274022,
+      "sameCoreSkeletonJoints": 56,
+      "maxBindMatrixDifference": 0.0,
+      "sourceBindBounds": [
+        [
+          -0.02023516409099102,
+          -0.33528783917427063,
+          -1.2279071807861328
+        ],
+        [
+          5.029623508453369,
+          13.47614860534668,
+          3.334139823913574
+        ]
+      ],
+      "regions": [
+        {
+          "leaf": "weak_0_Slug_01_Jaw_3",
+          "sourceJoint": "Slug_01_Jaw_3",
+          "dominantVertices": 380,
+          "supportVertices": 419,
+          "supportTriangles": 715,
+          "sourceBindBounds": [
+            [
+              -0.02023516409099102,
+              9.528413772583008,
+              -0.7308513522148132
+            ],
+            [
+              1.9586164951324463,
+              12.948206901550293,
+              1.1153877973556519
+            ]
+          ],
+          "sourceBindJoint": [
+            1.9355364749008617,
+            10.848599273904563,
+            0.34115523300310036
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Head",
+          "sourceJoint": "Slug_01_Head",
+          "dominantVertices": 179,
+          "supportVertices": 301,
+          "supportTriangles": 406,
+          "sourceBindBounds": [
+            [
+              0.28054532408714294,
+              9.915842056274414,
+              -1.0205641984939575
+            ],
+            [
+              3.7066283226013184,
+              12.01124382019043,
+              2.199296712875366
+            ]
+          ],
+          "sourceBindJoint": [
+            1.9355362106764877,
+            10.84859980614989,
+            0.3411553775181046
+          ],
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_0_Slug_01_Jaw_1",
+          "sourceJoint": "Slug_01_Jaw_1",
+          "dominantVertices": 488,
+          "supportVertices": 530,
+          "supportTriangles": 889,
+          "sourceBindBounds": [
+            [
+              1.659036636352539,
+              10.319893836975098,
+              -0.9573689699172974
+            ],
+            [
+              3.7066283226013184,
+              13.47614860534668,
+              0.8902117609977722
+            ]
+          ],
+          "sourceBindJoint": [
+            1.9355364749008617,
+            10.848599273904563,
+            0.34115523300310036
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_5",
+          "sourceJoint": "Slug_01_Spine_5",
+          "dominantVertices": 159,
+          "supportVertices": 242,
+          "supportTriangles": 391,
+          "sourceBindBounds": [
+            [
+              0.2921767830848694,
+              8.059188842773438,
+              -1.0205641984939575
+            ],
+            [
+              4.039248943328857,
+              10.954535484313965,
+              2.487975597381592
+            ]
+          ],
+          "sourceBindJoint": [
+            2.0276486898849693,
+            8.853092338800176,
+            0.4384557175844393
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Jaw_2",
+          "sourceJoint": "Slug_01_Jaw_2",
+          "dominantVertices": 338,
+          "supportVertices": 373,
+          "supportTriangles": 639,
+          "sourceBindBounds": [
+            [
+              0.7842336893081665,
+              10.372682571411133,
+              0.6861591339111328
+            ],
+            [
+              2.6841671466827393,
+              13.13658618927002,
+              2.197338104248047
+            ]
+          ],
+          "sourceBindJoint": [
+            1.9355364749008617,
+            10.848599273904563,
+            0.34115523300310036
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_4",
+          "sourceJoint": "Slug_01_Spine_4",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              0.7841116189956665,
+              6.203999042510986,
+              -1.0399712324142456
+            ],
+            [
+              4.3001933097839355,
+              8.817567825317383,
+              2.7324583530426025
+            ]
+          ],
+          "sourceBindJoint": [
+            2.1418777209730018,
+            6.641985857294749,
+            0.556289508950378
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_3",
+          "sourceJoint": "Slug_01_Spine_3",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              0.8333874344825745,
+              3.401560068130493,
+              -1.1295300722122192
+            ],
+            [
+              4.7522454261779785,
+              7.0861382484436035,
+              3.0444109439849854
+            ]
+          ],
+          "sourceBindJoint": [
+            2.2496432473970644,
+            4.430277737090486,
+            0.6687998317911071
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_2",
+          "sourceJoint": "Slug_01_Spine_2",
+          "dominantVertices": 82,
+          "supportVertices": 164,
+          "supportTriangles": 240,
+          "sourceBindBounds": [
+            [
+              0.7299822568893433,
+              0.8175351023674011,
+              -1.1295300722122192
+            ],
+            [
+              5.029623508453369,
+              4.989714622497559,
+              3.334139823913574
+            ]
+          ],
+          "sourceBindJoint": [
+            2.3311469230700865,
+            2.2164523086915624,
+            0.7596875608874095
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_1",
+          "sourceJoint": "Slug_01_Spine_1",
+          "dominantVertices": 41,
+          "supportVertices": 123,
+          "supportTriangles": 160,
+          "sourceBindBounds": [
+            [
+              0.7299822568893433,
+              -0.33528783917427063,
+              -1.2279071807861328
+            ],
+            [
+              5.029623508453369,
+              2.3523502349853516,
+              3.334139823913574
+            ]
+          ],
+          "sourceBindJoint": [
+            2.364587566314546,
+            0.3565444988829436,
+            0.8071726435364969
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_Base",
+          "sourceJoint": "Slug_01_Spine_Base",
+          "dominantVertices": 41,
+          "supportVertices": 82,
+          "supportTriangles": 80,
+          "sourceBindBounds": [
+            [
+              0.8271294832229614,
+              -0.33528783917427063,
+              -1.2279071807861328
+            ],
+            [
+              5.029623508453369,
+              1.0484570264816284,
+              3.334139823913574
+            ]
+          ],
+          "sourceBindJoint": [
+            2.3645875453948975,
+            -0.726473331451416,
+            0.8187738656997681
+          ],
+          "authoredUvCube": 1
+        }
+      ]
+    },
+    {
+      "segment": 1,
+      "template": "Mother_Segment_2",
+      "grabSlot": "Segment2",
+      "skin": {
+        "name": "mother_segment_2_Slug_02Shape",
+        "nodeOffset": 5306878,
+        "vertices": 1954,
+        "palette": [
+          "Slug_02_Spine_1",
+          "Slug_02_Spine_2",
+          "Slug_02_Spine_Base",
+          "Slug_02_Spine_3",
+          "Slug_02_Spine_4",
+          "Slug_02_Spine_5",
+          "Slug_02_Head",
+          "Slug_02_Jaw_1",
+          "Slug_02_Jaw_2",
+          "Slug_02_Jaw_3"
+        ],
+        "weightSums": {
+          "Slug_02_Spine_1": 31.588899612426758,
+          "Slug_02_Spine_2": 80.65249633789062,
+          "Slug_02_Spine_Base": 54.28390121459961,
+          "Slug_02_Spine_3": 108.30320739746094,
+          "Slug_02_Spine_4": 131.98049926757812,
+          "Slug_02_Spine_5": 138.6710968017578,
+          "Slug_02_Head": 194.58306884765625,
+          "Slug_02_Jaw_1": 489.5082092285156,
+          "Slug_02_Jaw_2": 350.8506164550781,
+          "Slug_02_Jaw_3": 373.5780334472656
+        },
+        "layout": "Interleaved descriptor position float3, weights float3 plus fourth=1-sum, palette indices byte4; no palette remapping by joint name guesses."
+      },
+      "skeleton": "mother_segment_2_skeleton",
+      "skeletonOffset": 4282454,
+      "sameCoreSkeletonJoints": 56,
+      "maxBindMatrixDifference": 0.0,
+      "sourceBindBounds": [
+        [
+          -5.028621196746826,
+          -0.21739614009857178,
+          -2.77836537361145
+        ],
+        [
+          0.0643296167254448,
+          13.616023063659668,
+          1.7459914684295654
+        ]
+      ],
+      "regions": [
+        {
+          "leaf": "weak_1_Slug_02_Spine_1",
+          "sourceJoint": "Slug_02_Spine_1",
+          "dominantVertices": 41,
+          "supportVertices": 123,
+          "supportTriangles": 160,
+          "sourceBindBounds": [
+            [
+              -5.028621196746826,
+              -0.21739614009857178,
+              -2.77836537361145
+            ],
+            [
+              -0.8701319694519043,
+              2.5124504566192627,
+              1.7459914684295654
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.5268477175609583,
+            0.35654449696159185,
+            -0.33683541271196016
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_2",
+          "sourceJoint": "Slug_02_Spine_2",
+          "dominantVertices": 82,
+          "supportVertices": 164,
+          "supportTriangles": 240,
+          "sourceBindBounds": [
+            [
+              -5.019866943359375,
+              0.9407075047492981,
+              -2.7385966777801514
+            ],
+            [
+              -0.8595359325408936,
+              5.1475701332092285,
+              1.7026318311691284
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.5075453043520866,
+            2.216452423184478,
+            -0.28205825560298764
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_Base",
+          "sourceJoint": "Slug_02_Spine_Base",
+          "dominantVertices": 41,
+          "supportVertices": 82,
+          "supportTriangles": 80,
+          "sourceBindBounds": [
+            [
+              -5.028621196746826,
+              -0.21739614009857178,
+              -2.77836537361145
+            ],
+            [
+              -0.8732085227966309,
+              1.209836483001709,
+              1.7459914684295654
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.523699998855591,
+            -0.726473331451416,
+            -0.348001629114151
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_3",
+          "sourceJoint": "Slug_02_Spine_3",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              -4.742849349975586,
+              3.5223052501678467,
+              -2.542409658432007
+            ],
+            [
+              -0.8595359325408936,
+              7.2347612380981445,
+              1.7026318311691284
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.453759641725357,
+            4.430278110453745,
+            -0.1724660944166083
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_4",
+          "sourceJoint": "Slug_02_Spine_4",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              -4.330872058868408,
+              6.322372913360596,
+              -2.2431960105895996
+            ],
+            [
+              -0.789209246635437,
+              8.967519760131836,
+              1.5215998888015747
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.3805636361731093,
+            6.641986703544516,
+            -0.03493664721963777
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_5",
+          "sourceJoint": "Slug_02_Spine_5",
+          "dominantVertices": 159,
+          "supportVertices": 242,
+          "supportTriangles": 391,
+          "sourceBindBounds": [
+            [
+              -4.046799659729004,
+              8.177987098693848,
+              -2.0091989040374756
+            ],
+            [
+              -0.27350518107414246,
+              11.082653999328613,
+              1.485090732574463
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.3025909768389052,
+            8.853093894305708,
+            0.10947032481771357
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Head",
+          "sourceJoint": "Slug_02_Head",
+          "dominantVertices": 179,
+          "supportVertices": 301,
+          "supportTriangles": 406,
+          "sourceBindBounds": [
+            [
+              -3.685478687286377,
+              10.029791831970215,
+              -1.7327384948730469
+            ],
+            [
+              -0.26026254892349243,
+              12.146717071533203,
+              1.485090732574463
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.240333996412285,
+            10.848600291972765,
+            0.22811311166719989
+          ],
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_1_Slug_02_Jaw_1",
+          "sourceJoint": "Slug_02_Jaw_1",
+          "dominantVertices": 488,
+          "supportVertices": 530,
+          "supportTriangles": 889,
+          "sourceBindBounds": [
+            [
+              -3.685478687286377,
+              10.460738182067871,
+              -0.41292381286621094
+            ],
+            [
+              -1.6055315732955933,
+              13.616023063659668,
+              1.4320859909057617
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.240333996412285,
+            10.848600291972765,
+            0.22811311166719989
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_1_Slug_02_Jaw_2",
+          "sourceJoint": "Slug_02_Jaw_2",
+          "dominantVertices": 338,
+          "supportVertices": 373,
+          "supportTriangles": 639,
+          "sourceBindBounds": [
+            [
+              -2.675717830657959,
+              10.4942626953125,
+              -1.7327384948730469
+            ],
+            [
+              -0.774403989315033,
+              13.26191234588623,
+              -0.24070344865322113
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.240333996412285,
+            10.848600291972765,
+            0.22811311166719989
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_1_Slug_02_Jaw_3",
+          "sourceJoint": "Slug_02_Jaw_3",
+          "dominantVertices": 380,
+          "supportVertices": 419,
+          "supportTriangles": 715,
+          "sourceBindBounds": [
+            [
+              -1.9355065822601318,
+              9.645848274230957,
+              -0.6782384514808655
+            ],
+            [
+              0.0643296167254448,
+              13.064821243286133,
+              1.1802241802215576
+            ]
+          ],
+          "sourceBindJoint": [
+            -2.240333996412285,
+            10.848600291972765,
+            0.22811311166719989
+          ],
+          "authoredUvCube": 7
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "template": "Mother_Segment_3",
+      "grabSlot": "Segment3",
+      "skin": {
+        "name": "mother_segment_3_Slug_03Shape",
+        "nodeOffset": 5469316,
+        "vertices": 1954,
+        "palette": [
+          "Slug_03_Spine_Base",
+          "Slug_03_Spine_1",
+          "Slug_03_Spine_2",
+          "Slug_03_Spine_3",
+          "Slug_03_Spine_4",
+          "Slug_03_Spine_5",
+          "Slug_03_Head",
+          "Slug_03_Jaw_2",
+          "Slug_03_Jaw_3",
+          "Slug_03_Jaw_1"
+        ],
+        "weightSums": {
+          "Slug_03_Spine_Base": 54.28390121459961,
+          "Slug_03_Spine_1": 31.58890151977539,
+          "Slug_03_Spine_2": 80.65249633789062,
+          "Slug_03_Spine_3": 108.3031997680664,
+          "Slug_03_Spine_4": 131.98049926757812,
+          "Slug_03_Spine_5": 138.6710968017578,
+          "Slug_03_Head": 194.59397888183594,
+          "Slug_03_Jaw_2": 350.75042724609375,
+          "Slug_03_Jaw_3": 373.5780334472656,
+          "Slug_03_Jaw_1": 489.59747314453125
+        },
+        "layout": "Interleaved descriptor position float3, weights float3 plus fourth=1-sum, palette indices byte4; no palette remapping by joint name guesses."
+      },
+      "skeleton": "mother_segment_3_skeleton",
+      "skeletonOffset": 4290886,
+      "sameCoreSkeletonJoints": 56,
+      "maxBindMatrixDifference": 0.0,
+      "sourceBindBounds": [
+        [
+          -3.0353472232818604,
+          -0.3700677454471588,
+          0.05395087972283363
+        ],
+        [
+          1.6901555061340332,
+          13.492340087890625,
+          4.4311370849609375
+        ]
+      ],
+      "regions": [
+        {
+          "leaf": "weak_2_Slug_03_Spine_Base",
+          "sourceJoint": "Slug_03_Spine_Base",
+          "dominantVertices": 41,
+          "supportVertices": 82,
+          "supportTriangles": 80,
+          "sourceBindBounds": [
+            [
+              -3.0353472232818604,
+              -0.3700677454471588,
+              0.3099972605705261
+            ],
+            [
+              1.5672173500061035,
+              1.0842264890670776,
+              4.4311370849609375
+            ]
+          ],
+          "sourceBindJoint": [
+            -0.15586641430854797,
+            -0.726473331451416,
+            2.1778461933135986
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_1",
+          "sourceJoint": "Slug_03_Spine_1",
+          "dominantVertices": 41,
+          "supportVertices": 123,
+          "supportTriangles": 160,
+          "sourceBindBounds": [
+            [
+              -3.0353472232818604,
+              -0.3700677454471588,
+              0.3099972605705261
+            ],
+            [
+              1.5672173500061035,
+              2.368971586227417,
+              4.4311370849609375
+            ]
+          ],
+          "sourceBindJoint": [
+            -0.14460748442346866,
+            0.35654437865544386,
+            2.1806438791371336
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_2",
+          "sourceJoint": "Slug_03_Spine_2",
+          "dominantVertices": 82,
+          "supportVertices": 164,
+          "supportTriangles": 240,
+          "sourceBindBounds": [
+            [
+              -3.014765501022339,
+              0.9105666875839233,
+              0.3230247497558594
+            ],
+            [
+              1.6030932664871216,
+              4.987315654754639,
+              4.4311370849609375
+            ]
+          ],
+          "sourceBindJoint": [
+            -0.09045971250370989,
+            2.21645219120584,
+            2.159641062342828
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_3",
+          "sourceJoint": "Slug_03_Spine_3",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              -2.6747398376464844,
+              3.476810932159424,
+              0.3490798771381378
+            ],
+            [
+              1.6030932664871216,
+              7.131687641143799,
+              4.231832981109619
+            ]
+          ],
+          "sourceBindJoint": [
+            0.017399994231908786,
+            4.430277626775366,
+            2.102459942812224
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_4",
+          "sourceJoint": "Slug_03_Spine_4",
+          "dominantVertices": 123,
+          "supportVertices": 205,
+          "supportTriangles": 320,
+          "sourceBindBounds": [
+            [
+              -2.275540351867676,
+              6.2729058265686035,
+              0.35497480630874634
+            ],
+            [
+              1.6901555061340332,
+              8.901284217834473,
+              3.8426811695098877
+            ]
+          ],
+          "sourceBindJoint": [
+            0.1525772144568575,
+            6.6419864614355015,
+            2.0250060077720695
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_5",
+          "sourceJoint": "Slug_03_Spine_5",
+          "dominantVertices": 159,
+          "supportVertices": 242,
+          "supportTriangles": 391,
+          "sourceBindBounds": [
+            [
+              -1.909564733505249,
+              8.108049392700195,
+              0.19593322277069092
+            ],
+            [
+              1.6901555061340332,
+              11.063919067382812,
+              3.7286715507507324
+            ]
+          ],
+          "sourceBindJoint": [
+            0.2944795030615306,
+            8.85309246122669,
+            1.9425631164154415
+          ],
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Head",
+          "sourceJoint": "Slug_03_Head",
+          "dominantVertices": 179,
+          "supportVertices": 301,
+          "supportTriangles": 406,
+          "sourceBindBounds": [
+            [
+              -1.520865559577942,
+              10.037123680114746,
+              0.16559089720249176
+            ],
+            [
+              1.6860735416412354,
+              12.027234077453613,
+              3.4943156242370605
+            ]
+          ],
+          "sourceBindJoint": [
+            0.4111209276473743,
+            10.848599450726933,
+            1.8766325250643296
+          ],
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_2",
+          "sourceJoint": "Slug_03_Jaw_2",
+          "dominantVertices": 338,
+          "supportVertices": 373,
+          "supportTriangles": 639,
+          "sourceBindBounds": [
+            [
+              -1.4422547817230225,
+              10.501105308532715,
+              0.490507036447525
+            ],
+            [
+              0.2539237439632416,
+              13.238875389099121,
+              2.250234842300415
+            ]
+          ],
+          "sourceBindJoint": [
+            0.4111209276473743,
+            10.848599450726933,
+            1.8766325250643296
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_3",
+          "sourceJoint": "Slug_03_Jaw_3",
+          "dominantVertices": 380,
+          "supportVertices": 419,
+          "supportTriangles": 715,
+          "sourceBindBounds": [
+            [
+              -0.04443305730819702,
+              9.631717681884766,
+              0.05395087972283363
+            ],
+            [
+              1.6395539045333862,
+              13.042619705200195,
+              1.838226556777954
+            ]
+          ],
+          "sourceBindJoint": [
+            0.4111209276473743,
+            10.848599450726933,
+            1.8766325250643296
+          ],
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_1",
+          "sourceJoint": "Slug_03_Jaw_1",
+          "dominantVertices": 488,
+          "supportVertices": 530,
+          "supportTriangles": 889,
+          "sourceBindBounds": [
+            [
+              -0.4842672646045685,
+              10.315667152404785,
+              1.8459566831588745
+            ],
+            [
+              1.6004867553710938,
+              13.492340087890625,
+              3.572882652282715
+            ]
+          ],
+          "sourceBindJoint": [
+            0.4111209276473743,
+            10.848599450726933,
+            1.8766325250643296
+          ],
+          "authoredUvCube": 7
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "clip": "idle",
+      "frames": 166,
+      "maxAffineCoefficientError": 0.00014577980283281278
+    },
+    {
+      "clip": "HOWL",
+      "frames": 123,
+      "maxAffineCoefficientError": 0.00014614354632414006
+    },
+    {
+      "clip": "ORBS",
+      "frames": 185,
+      "maxAffineCoefficientError": 0.00014528285607617875
+    },
+    {
+      "clip": "VOLLEY",
+      "frames": 185,
+      "maxAffineCoefficientError": 0.00014528285607617875
+    },
+    {
+      "clip": "exposed",
+      "frames": 210,
+      "maxAffineCoefficientError": 0.000132812101433899
+    },
+    {
+      "clip": "hit",
+      "frames": 31,
+      "maxAffineCoefficientError": 0.00010774471655672357
+    },
+    {
+      "clip": "exit",
+      "frames": 45,
+      "maxAffineCoefficientError": 0.00013538672675217356
+    },
+    {
+      "clip": "enter",
+      "frames": 245,
+      "maxAffineCoefficientError": 0.00014459641850805838
+    },
+    {
+      "clip": "death",
+      "frames": 260,
+      "maxAffineCoefficientError": 0.00011985505720346623
+    },
+    {
+      "clip": "segment_death",
+      "frames": 96,
+      "maxAffineCoefficientError": 0.000145584664933196
+    }
+  ],
+  "limits": [
+    "No Java, Gradle, unit/GameTests, game/client or visual acceptance run.",
+    "Rigid bounding cuboids can overfill curved native surfaces and do not implement weighted vertex blending.",
+    "Segment detach/dead-body presentation remains separate work; this change corrects attached live segment geometry and pose."
+  ]
+}

@@ -1,0 +1,1128 @@
+{
+  "date": "2026-11-15T19:15:11.542Z",
+  "scope": "Brute knee articulation, grounded push/crouch rise, and eight-tick physical-to-authored handoff within the existing 32-tick GETUP phase.",
+  "changes": [
+    "Two knee hinges move the existing lower-leg geometry. The rig has 11 bones and 152 cuboids; upper-body damage contact retains 120 cuboids. The installation asserted every flattened cube, including UVs, unchanged.",
+    "The authored pose rests on lower-body geometry, solves rigid elbow flexion against a support plane, pushes the chest up and unfolds the knees. Bone lengths and fist geometry are not scaled.",
+    "Live GETUP hands control to the authored rig after eight ticks; physical skin and terrain correction stay active until the original 32-tick control phase ends. Death and captured-body paths retain their separate behavior.",
+    "Native QA measures actual rendered forearm and lower-body vertices on flat ground. Shape error removes only the shared translation used for terrain support, and independently checks orientation.",
+    "Regression recording covers actual pig throws on flat and specified step/wall terrain, standing hammer hit, lethal blade hit and two mounted consume flows."
+  ],
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 1393,
+      "unitTests": 51,
+      "serverTests": 33,
+      "model": {
+        "bones": 11,
+        "cuboids": 152,
+        "contactCuboids": 120,
+        "texture": "02575facf8ce6d5dfb18f5eec98c9a3bd5246b796cccebecb1c9b0f4b1ab0e77"
+      },
+      "flows": [
+        {
+          "case": "thrown_brute_connected_survive",
+          "frames": 230,
+          "checks": {
+            "case": "thrown_brute_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 1.1102230246251565e-16,
+            "jointSamples": 82,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 5.962828694880445e-8,
+            "rawHandoffPositionError": 5.962828694880445e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": 0.0006564706563949585,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0006563998758792877,
+            "renderedMeshSamples": 82,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 3,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 26,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 5.962828694880445e-8,
+            "afterControlAngleError": 0.0006905339694324072,
+            "getupAuthoredFrames": 36,
+            "getupAuthoredShapeGap": 2.1335316853684132e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 18,
+            "getupHandFloorGap": 0.004672970622777939,
+            "getupLowerBodyFloorGap": 0.010007128119468689,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/thrown_brute_connected_survive.json",
+            "sha256": "4df96af87841a17dce3adfe8f5cde6c01dc1ca801166f0484e9e0e707f54b107"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/thrown_brute_connected_survive-review.jpg",
+            "sha256": "0023a6a3a761c04d440fbb27acd823941673fe34799a7e5d903427e0ba971a49",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "thrown_brute_step_connected_survive",
+          "frames": 233,
+          "checks": {
+            "case": "thrown_brute_step_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.220446049250313e-16,
+            "jointSamples": 86,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 5.963419602762394e-8,
+            "rawHandoffPositionError": 5.963419602762394e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.0022735893726348877,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00014824047684669495,
+            "renderedMeshSamples": 86,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 6,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 27,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 5.967190942878311e-8,
+            "afterControlAngleError": 0,
+            "getupAuthoredFrames": 36,
+            "getupAuthoredShapeGap": 2.2419528064198844e-7,
+            "getupAuthoredAngleError": 0.0013810679594443316,
+            "getupPlantedSamples": 0,
+            "getupHandFloorGap": 0,
+            "getupLowerBodyFloorGap": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "terrain": "steps_and_wall",
+            "terrainFrames": 86,
+            "terrainPenetratingFrames": 0,
+            "maxTerrainPenetration": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/thrown_brute_step_connected_survive.json",
+            "sha256": "2e22dcd31ca4939ac2830a34294e3d1c1ca12a63ed9dea5917835b6ee10d67e3"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/thrown_brute_step_connected_survive-review.jpg",
+            "sha256": "c83e37d6108d0150da0c2398f7e1b40a095ca1bf0cc42e47d0f756616d191b06",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "hammer_brute_survive",
+          "frames": 232,
+          "checks": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.7877000570297241,
+            "actorRecoveryFistClearance": 0.011249840259552002,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.011249840259552002,
+            "actorTerrainFrames": 106,
+            "actorTerrainPenetration": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/hammer_brute_survive.json",
+            "sha256": "de22e475b47be1537b355762bc5300b0d23dbed213b13367a2d530c1e5d8ee95"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/hammer_brute_survive-review.jpg",
+            "sha256": "8bdf084daf2071990b0f4586b7a39b31cc7166b43069bfae43c43ffc7e564636",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "blade_brute_lethal",
+          "frames": 233,
+          "checks": {
+            "case": "blade_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 10,
+            "maxComponents": 9,
+            "lastChanceUsed": true,
+            "expectedSplit": true,
+            "maxAcceptedEdges": 2,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.220446049250313e-16,
+            "jointSamples": 98,
+            "minFloorClearance": 0.0010000000000047748,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00004512976670412172,
+            "renderedMeshSamples": 98,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 2,
+            "maxFrozenHorizontalMotion": 0,
+            "damagePassed": true,
+            "splitObserved": true,
+            "maxTorsoPieces": 2,
+            "maxTorsoCapVertices": 184,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 2,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/blade_brute_lethal.json",
+            "sha256": "ada7ac4635f7e32b06d274f085248bcaee1589a5067351825519018d412e39fe"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/blade_brute_lethal-review.jpg",
+            "sha256": "fb371b96dc99123a2b7b74d16a2e85a09e39c3062ede39c2885e620b8e9c59e5",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "muscle_brute_consume",
+          "frames": 232,
+          "checks": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 94,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.07793676029920604,
+            "riderMeshSamples": 93,
+            "riderGripSamples": 141,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0,
+            "riderGripMinGap": 0.0079983343359257,
+            "riderGripMaxGap": 0.010760904524047678,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 45,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 47.7084,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/muscle_brute_consume.json",
+            "sha256": "530aa8edb86daa6be087a1e4984d5e4695b11a38ee0dbe63ff5a2ff8f99e7e9e"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/muscle_brute_consume-review.jpg",
+            "sha256": "4e005322a721712280cf0f9a4cec98049b757a40a43b558f32bb4f4a7db70fe4",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "claws_brute_consume",
+          "frames": 233,
+          "checks": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 127,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.0054851777637003885,
+            "riderMeshSamples": 127,
+            "riderGripSamples": 174,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.011245414987206458,
+            "riderGripMinGap": 0.008010546565056315,
+            "riderGripMaxGap": 0.011810362494238572,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 80,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 42.3562,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/claws_brute_consume.json",
+            "sha256": "851d5f5d4c830734a2858dd36bdfdd9dfc76c4bb1220bf0a540d1fb328619351"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/claws_brute_consume-review.jpg",
+            "sha256": "8a9c2bf65785947e056bef687c9ddd031d93768f62ed0638a069effbb6f7c5d6",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        }
+      ],
+      "baselineComparison": {
+        "scope": "Same flat throw fixture, GETUP age 8–32. Raw position gap includes uniform terrain translation; new checks separately report translation-independent shape error.",
+        "before": {
+          "frames": 35,
+          "maxPositionGap": 3.2622035979467716,
+          "maxAngleError": 3.1370048204532175
+        },
+        "after": {
+          "frames": 36,
+          "maxPositionGap": 2.1335316853684132e-7,
+          "maxAngleError": 0.000976562509701277
+        },
+        "baselineRows": {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-recovery-final/thrown_brute_connected_survive.json",
+          "sha256": "ab285bf299ea5052cb001735f0c7d69b77f45eba56d91348637f14b8fb327014"
+        }
+      },
+      "sources": [
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/BruteKnockdown.java",
+          "sha256": "230684e51f7bbdbfaab8dbb4fd60ef78c7810240525bdcac4ea5ffb82e724e9d"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "1eb15edc7650416844da28d7d502888b20240a776ef365cb0c7a5721219d5410"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/BruteFlinch.java",
+          "sha256": "9f26cd3d112fe788f3303dfbc4a77044fea89cdce9c9499bd2c5ad79a47263d1"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/CreaturePoseTable.java",
+          "sha256": "0ad2ab4ea664a7e2c1513bfe7bedecb10de755914f4cfadef539260f31dbec3c"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+          "sha256": "e13c166a3bc411ea923d7134319ccf3f73818f8ad8e353a15adf58ed5c7c654a"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "907ab63aaa23891d8a16c71add1f65751c64ac221e3935e99532bf51c4673a6c"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "8e7e411a15ec854661ab19ab42892d8dfad67d6aa11e6ae419cc8ebfb51d8e9f"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "b2dc7e044dc04d3622773e3ab5ccbc5f7ff21acdc758b1502534bf319d243f8f"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "affbf641c82040a92146497abc56c13478dce77a5b2909b564eac495a6ffa0b0"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "f5397d8224778e087ad0e6af6e5711ce3b9b95a289b1d353088a4bbf8282ab36"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "f0192cd9769fdde1194d7de47c93c67fa85717e467b8ba268a506f32f97aaa63"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "a4db6ee1550d87605640183b0a87dd1da8da20a5d124d7915dcbb0dcdbfeaae3"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/textures/entity/blacklight_brute_mc.png",
+          "sha256": "02575facf8ce6d5dfb18f5eec98c9a3bd5246b796cccebecb1c9b0f4b1ab0e77"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "5df86a8cf3b25ac3623572ac22904762751cf8c8a188563d90204e0a19972095"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditRider.java",
+          "sha256": "a70845808b2b526b8af954fd46cb8a9423602862d0a89f627f0972668520984a"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/bruteTest/java/com/codex/blacklight/gametest/BruteKnockdownGameTest.java",
+          "sha256": "9ee084b8907386817ff243541b91b10b47b643979427bbac70cb68f0dfdc4c16"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/test/java/com/codex/blacklight/combat/BruteKnockdownTest.java",
+          "sha256": "7827119aaf3a89ef4646025c5bf187298859c83f6da7ef27e53bee2cb7f65c20"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/test/java/com/codex/blacklight/client/renderer/RagdollRecoveryTest.java",
+          "sha256": "b6f9580850e0838d55430214c538a82fce7c133ebac506bd322287d7a169bc23"
+        },
+        {
+          "file": "D:/blacklight-evolution/tools/brute-test.init.gradle",
+          "sha256": "5a43c62c9a42673968e3e38f850b3a7c05c0100519292734a67e76c729ac58e7"
+        },
+        {
+          "file": "D:/blacklight-evolution/tools/build_mutant_combat.mjs",
+          "sha256": "eb8c09d5a0b21678c0d3d65e45ca45e41943a12addda991b93882e88f0c945f2"
+        },
+        {
+          "file": "D:/blacklight-evolution/tools/detail_brute_model.mjs",
+          "sha256": "bb6828ff31f9ec88dc63cabe28e4dfd582e8bb1bf5fc57e92b3b222d9a28ef2d"
+        },
+        {
+          "file": "D:/blacklight-evolution/art/mutant-combat/brute-model.json",
+          "sha256": "28d3ade457ae5d31426c984b44222071bb788a215fa31858ae08f8991b752edc"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/native-build.log",
+          "sha256": "1c24ac180db36fb17caaae1e2ab878f8c97d6e475986ee101c88ce8b429a2703"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/native-debug.log",
+          "sha256": "dfac8c51b00980e3d2640b5b7a543b20e80ff8e4b9f87b98b5e6b94b70a7c79f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/unit-check.log",
+          "sha256": "8b8f09b276da74e9333d25586e4207070f0be9a7b365ca10aeb7b9b1d793b3b8"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/server-check.log",
+          "sha256": "c9d1aa037ca85d61711bf33378f30cd2ab773f8862513a59c8bc2e90785a3e3a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/capture-status.txt",
+          "sha256": "fc5b3f3e2b20cf4046dafc659e75222ca81d7b89b6a00f466df37a47dad7dabd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/reviewed-sheets.json",
+          "sha256": "f19dd2c2787c488f7a451501842834a13a55cf83aa5cf0b652d03812ec2852d2"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "bc9351b23328a4d7a21c1aa9738d538bee021252f8aae99e90e8a91491360f8b"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "sha256": "a8b9cf1a4d764753555dd5e06d00319077ddf492b26fbed3ee704b50949c065e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "393fc0b320f41c4c29bb34ef1d41c6abc9e4d20e0b1c2684211b09f7870ca9c8"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "98aac7d4f1d03a7838180bf7071a224bd9af0ad836e1d6959d98d1a75b4791bc"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteKnockdownTest.xml",
+          "sha256": "0ccc3f4fbd0c88fc614f54fd483463e410906f05f99dd333360602f68a071a92"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "c73c7f31a4fb4de6452ef259ab8f4a44ec221141b250d2c6b7d39f8794dd735a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "742fc5b525807f0656155d6ec9a4922f6e66bb3ded42e0340a4802b7b823131a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "84bb929b5737c07657bf7a780814acb851dcadd49d141c55c749975fe2f9492b"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "29b1c319ee954c1eaa7bcb39c017048e470598c51fef175fde6c48004981d588"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 1394,
+      "unitTests": 51,
+      "serverTests": 33,
+      "model": {
+        "bones": 11,
+        "cuboids": 152,
+        "contactCuboids": 120,
+        "texture": "02575facf8ce6d5dfb18f5eec98c9a3bd5246b796cccebecb1c9b0f4b1ab0e77"
+      },
+      "flows": [
+        {
+          "case": "thrown_brute_connected_survive",
+          "frames": 229,
+          "checks": {
+            "case": "thrown_brute_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 1.1102230246251565e-16,
+            "jointSamples": 83,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 2.9805960180909736e-8,
+            "rawHandoffPositionError": 2.9805960180909736e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.0017828643321990967,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00003910437226295471,
+            "renderedMeshSamples": 83,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 5,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 25,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 2.981687062016931e-8,
+            "afterControlAngleError": 0,
+            "getupAuthoredFrames": 35,
+            "getupAuthoredShapeGap": 2.1800436854579257e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 18,
+            "getupHandFloorGap": 0.0033068284392356873,
+            "getupLowerBodyFloorGap": 0.01278283567910421,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/thrown_brute_connected_survive.json",
+            "sha256": "06234b79fca1ff6f30bbeae0130b1b338dbb4096684c7d8c95269b004110e454"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/thrown_brute_connected_survive-review.jpg",
+            "sha256": "6155291f84106d441ceba4eebd9dceb0c60e8298490644cff174be06e4d309a4",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "thrown_brute_step_connected_survive",
+          "frames": 233,
+          "checks": {
+            "case": "thrown_brute_step_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.220446049250313e-16,
+            "jointSamples": 87,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 2.9861380942577536e-8,
+            "rawHandoffPositionError": 2.9861380942577536e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.001923099160194397,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00004044175148010254,
+            "renderedMeshSamples": 87,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 6,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 27,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 5,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 5.962101351568216e-8,
+            "afterControlAngleError": 0,
+            "getupAuthoredFrames": 35,
+            "getupAuthoredShapeGap": 2.288229695411494e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 0,
+            "getupHandFloorGap": 0,
+            "getupLowerBodyFloorGap": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "terrain": "steps_and_wall",
+            "terrainFrames": 87,
+            "terrainPenetratingFrames": 0,
+            "maxTerrainPenetration": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/thrown_brute_step_connected_survive.json",
+            "sha256": "18670a8f6063601e788b5dfdcad2cc193586a52837b3e625d95fd3b2be983a4d"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/thrown_brute_step_connected_survive-review.jpg",
+            "sha256": "244b9603e1c44f8cb57d8f81bb61c8a5ca0037a182b652c564a156b2e1100f7a",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "hammer_brute_survive",
+          "frames": 233,
+          "checks": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.7850197553634644,
+            "actorRecoveryFistClearance": 0.011250197887420654,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.011250197887420654,
+            "actorTerrainFrames": 106,
+            "actorTerrainPenetration": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/hammer_brute_survive.json",
+            "sha256": "cddc52e28115f23e1ed49571820e6b368a116a3d22b50f197ffcccdb0611f7b3"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/hammer_brute_survive-review.jpg",
+            "sha256": "a5f1f48fae5e02a293a5e01ec26a1cb858bf5131bade3f45f86698eb542067f1",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "blade_brute_lethal",
+          "frames": 233,
+          "checks": {
+            "case": "blade_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 10,
+            "maxComponents": 9,
+            "lastChanceUsed": true,
+            "expectedSplit": true,
+            "maxAcceptedEdges": 2,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.7755575615628914e-17,
+            "jointSamples": 98,
+            "minFloorClearance": 0.0010000000000047748,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0001555359949350077,
+            "renderedMeshSamples": 98,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 2,
+            "maxFrozenHorizontalMotion": 0,
+            "damagePassed": true,
+            "splitObserved": true,
+            "maxTorsoPieces": 2,
+            "maxTorsoCapVertices": 184,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 2,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/blade_brute_lethal.json",
+            "sha256": "03ef23bcef360f7e810a4855a0a9eb9415ba9d7af72bad2f5f287d813119a782"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/blade_brute_lethal-review.jpg",
+            "sha256": "c90de6b88e0ab4c23277b2447cc53ed7b06d26a52e9c17905291b285788e87e7",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "muscle_brute_consume",
+          "frames": 233,
+          "checks": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 92,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.05575196938812743,
+            "riderMeshSamples": 92,
+            "riderGripSamples": 139,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.0008976400509867755,
+            "riderGripMinGap": 0.008064888119698035,
+            "riderGripMaxGap": 0.010201250281977223,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 45,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 46.3386,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/muscle_brute_consume.json",
+            "sha256": "a99c7b0967be7f2f269a16cf4a664166694fc5a2a0c69b3ca5b799c41514bf7c"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/muscle_brute_consume-review.jpg",
+            "sha256": "9ae61c21f1e3f6cf292632802b33313ba786f1b46eecf0aa18f4b1160b5f2891",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "claws_brute_consume",
+          "frames": 233,
+          "checks": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 128,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.006279241829216353,
+            "riderMeshSamples": 126,
+            "riderGripSamples": 173,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.005830439077146893,
+            "riderGripMinGap": 0.008001471313966536,
+            "riderGripMaxGap": 0.012263965606695015,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 79,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 44.9355,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/claws_brute_consume.json",
+            "sha256": "e4c61b4ee93eac50f902d4e31730257b8a95cb8665551c41d5471dd8df4f9d71"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/claws_brute_consume-review.jpg",
+            "sha256": "b744c337cac62014ab85ee33f5430a820f2d8bf86edda148ab7942ab2955fde7",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        }
+      ],
+      "baselineComparison": {
+        "scope": "Same flat throw fixture, GETUP age 8–32. Raw position gap includes uniform terrain translation; new checks separately report translation-independent shape error.",
+        "before": {
+          "frames": 36,
+          "maxPositionGap": 2.9207666965795,
+          "maxAngleError": 3.069245149799996
+        },
+        "after": {
+          "frames": 35,
+          "maxPositionGap": 0.0027829346231888477,
+          "maxAngleError": 0.000976562509701277
+        },
+        "baselineRows": {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-recovery-final/thrown_brute_connected_survive.json",
+          "sha256": "3e4ab59e64199914f166bf683573c94fc61703835d1d1ad4e3899662f7d4b0c0"
+        }
+      },
+      "sources": [
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/BruteKnockdown.java",
+          "sha256": "230684e51f7bbdbfaab8dbb4fd60ef78c7810240525bdcac4ea5ffb82e724e9d"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "1eb15edc7650416844da28d7d502888b20240a776ef365cb0c7a5721219d5410"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/BruteFlinch.java",
+          "sha256": "9f26cd3d112fe788f3303dfbc4a77044fea89cdce9c9499bd2c5ad79a47263d1"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/CreaturePoseTable.java",
+          "sha256": "d8011d9be75e707df03f4fbb8b7c2a205851534e7f369031d67b298077ed6752"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/ImpactControl.java",
+          "sha256": "d35c0e5ac4da5577dbf8525ebb17064a923dc7e545506cba63e46d4b447e309f"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "907ab63aaa23891d8a16c71add1f65751c64ac221e3935e99532bf51c4673a6c"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "c3f38bfe405c5fee435a8b0061cc94e4d53464c659ff63f428a134c877407a34"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "b2dc7e044dc04d3622773e3ab5ccbc5f7ff21acdc758b1502534bf319d243f8f"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/model/BlacklightCreatureModel.java",
+          "sha256": "8071ded0362ba5b652db086526c7d38754d349be2e8cc47d99da2d5aa4f0794b"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "f5397d8224778e087ad0e6af6e5711ce3b9b95a289b1d353088a4bbf8282ab36"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "f0192cd9769fdde1194d7de47c93c67fa85717e467b8ba268a506f32f97aaa63"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "a4db6ee1550d87605640183b0a87dd1da8da20a5d124d7915dcbb0dcdbfeaae3"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/textures/entity/blacklight_brute_mc.png",
+          "sha256": "02575facf8ce6d5dfb18f5eec98c9a3bd5246b796cccebecb1c9b0f4b1ab0e77"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "9c714cdc09a854027c1747f419ad71fe820332094e352935fe7db2e52f36bdd9"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditRider.java",
+          "sha256": "55e02ef9a554b49938cc1266782f95a42034589843c724fafd2e008702747b90"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/bruteTest/java/com/codex/blacklight/gametest/BruteKnockdownGameTest.java",
+          "sha256": "7c4332b2b34c4d1af5f49cd48c11f90ab49f23e481711af9bfdda0a8fa182959"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/test/java/com/codex/blacklight/combat/BruteKnockdownTest.java",
+          "sha256": "7827119aaf3a89ef4646025c5bf187298859c83f6da7ef27e53bee2cb7f65c20"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/test/java/com/codex/blacklight/client/renderer/RagdollRecoveryTest.java",
+          "sha256": "b6f9580850e0838d55430214c538a82fce7c133ebac506bd322287d7a169bc23"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/tools/brute-test.init.gradle",
+          "sha256": "5a43c62c9a42673968e3e38f850b3a7c05c0100519292734a67e76c729ac58e7"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/tools/build_mutant_combat.mjs",
+          "sha256": "eb8c09d5a0b21678c0d3d65e45ca45e41943a12addda991b93882e88f0c945f2"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/tools/detail_brute_model.mjs",
+          "sha256": "bb6828ff31f9ec88dc63cabe28e4dfd582e8bb1bf5fc57e92b3b222d9a28ef2d"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/art/mutant-combat/brute-model.json",
+          "sha256": "28d3ade457ae5d31426c984b44222071bb788a215fa31858ae08f8991b752edc"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/native-build.log",
+          "sha256": "f5b0d3ade9e23fb8652b2a20682d6c41944421550eadb4e20f751d2258bd9007"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/native-debug.log",
+          "sha256": "165530edc0a32ad05ba58b09385462c9e1279fe11056d0ca58e833c7d501a768"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/unit-check.log",
+          "sha256": "228b1409a3d4af95ef8649f5c9438a49654a3e81c166c2e7c347fd1273a8536a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/server-check.log",
+          "sha256": "4b47640e8b82eada352eda72ac9a4edaa56e78f4ce2b0c3b5c574a7cf75f5d21"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/capture-status.txt",
+          "sha256": "fc5b3f3e2b20cf4046dafc659e75222ca81d7b89b6a00f466df37a47dad7dabd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/reviewed-sheets.json",
+          "sha256": "c6ad970556a6c906579760b99943189483186a202e8197a03d58a503f4d004c1"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "7814a91515f042094b36d7e70b01c44118d06a0c359944a6a55606826d1b7038"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "sha256": "db44378ee3642a3fa4ab5b815ba7381b2f79b24b2912ed3e64b873098b7ace6e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "b15bf56f7227954631149778a6b54cf0187a232004e6276b90b26856f1ae3b97"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "ad1cf23c658e61abea5dd98a9da22a92cc0c623b737966c17ede6ea16c1759e5"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.BruteKnockdownTest.xml",
+          "sha256": "905abc6c91da45457bae3c9cae6c595da3de97885d7b7f5a7cce3b07724cf070"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "28d8b5f6ec90aa8a891600809a4219599d9c4b6db3295d1d02de8b31a101eb05"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "7160213505e7a76a3314a6fab8a2827bc65dd2b54f959f62e0d618a605ed3ef6"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "3477be8d409bb236960bf5d3c3044d3572d8cc5907d8303f1d1344d398b0938e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "f4d07f979212e7485bd6ebb46590a8789eea2e3d4254ab7b7ae98826a185ecf1"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "This is bounded grounded-rise acceptance, not final choreography or overall model polish. Sliding toward the server position, initial prone support, body weight and self-contact still need refinement.",
+    "Independent knees and elbows are present. Ankles and fingers remain rigid; the lowest forearm surface is not proof of anatomical palm/finger contact.",
+    "Exact hand and lower-body support is accepted only on the recorded flat fixture during GETUP progress 0.4–0.78. The step/wall fixture checks terrain penetration and rig handoff, not per-limb inverse kinematics on arbitrary uneven terrain.",
+    "Native terrain checks sample rendered vertices rather than every triangle interior. Twenty selected frames per flow are reviewed; not every captured frame is manually reviewed.",
+    "Death during GETUP and interruption have server coverage from the previous checkpoint, but this recording does not visually accept those transitions. Side/rear impact, offscreen recovery, ceilings, water, falls and network latency remain open.",
+    "Mounted support, initial mount, seat/knee surfaces, attack contact, alternate skins/scales and full consume choreography remain open. Static hammer overlap, other species, military soldiers/helicopters, fine vehicle/item models and audible mix remain in the active goal. No release package or commit."
+  ],
+  "totalFrames": 2787,
+  "reviewedSheets": 12,
+  "everyCapturedFrameManuallyReviewed": false
+}

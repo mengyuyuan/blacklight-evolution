@@ -9,6 +9,12 @@ public final class MilitaryFireControl {
     public static final int IDLE=0, AIM=1, FIRE=2, RELOAD=3, RECOVER=4, MELEE=5;
     // startup_fig offsets 1322756, 1323176, 1323772: range, hit window, reservation.
     public static final double MELEE_RANGE=2.5;
+    // startup_fig @315136: rifle/saw/sniper shoot bank, Magnitude <= 30.
+    // Soldier AI keeps its existing world-unit:block 1:1 adapter (as for melee).
+    // Its retargeted arms and stride have different scales; neither is a world scale.
+    public static final double RIFLE_RANGE=30;
+    // Other weapon banks retain their existing Minecraft engagement envelope.
+    public static final double OTHER_RANGED_RANGE=22;
     public static final int MELEE_HIT_BEGIN=9, MELEE_HIT_END=10, MELEE_TICKS=20, MELEE_COOLDOWN=80;
 
     public record Plan(int aimTicks,int fireTicks,int recoveryTicks) {

@@ -1,0 +1,9 @@
+allprojects { afterEvaluate {
+    tasks.named('test',Test).configure {
+        include '**/P1MilitaryMotionTest.class'; include '**/BlackwatchRigPoseTest.class'; include '**/BlackwatchReferenceProfileTest.class'; include '**/BlackwatchGaitTest.class'
+        systemProperty 'blacklight.test.p1MilitaryMotion','D:/PrototypeReference/p1/private/military-motion.json'
+        reports.junitXml.outputLocation=layout.buildDirectory.dir('test-results/military-motion')
+        reports.html.outputLocation=layout.buildDirectory.dir('reports/tests/military-motion')
+        binaryResultsDirectory=layout.buildDirectory.dir('test-results/military-motion-binary')
+    }
+} }

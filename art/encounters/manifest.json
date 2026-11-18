@@ -1,0 +1,1257 @@
+{
+  "source": "Existing project models and authored encounter drafts. Greene r6 uses the supplied original only for proportion reference, and the accepted Supreme Hunter for cuboid anatomy/material style.",
+  "entities": [
+    {
+      "id": "leader_hunter",
+      "name": "领袖猎手",
+      "width": 1.5,
+      "height": 3.2,
+      "status": "retired_draft"
+    },
+    {
+      "id": "brawler",
+      "name": "格斗者",
+      "width": 1.3,
+      "height": 2.5,
+      "status": "alias_of_blacklight_hunter"
+    },
+    {
+      "id": "juggernaut",
+      "name": "主宰",
+      "width": 2.2,
+      "height": 3.6,
+      "status": "active"
+    },
+    {
+      "id": "goliath",
+      "name": "歌利亚",
+      "width": 4.5,
+      "height": 8,
+      "status": "active"
+    },
+    {
+      "id": "flyer",
+      "name": "飞行感染体",
+      "width": 1.6,
+      "height": 1.2,
+      "status": "active"
+    },
+    {
+      "id": "elizabeth_greene",
+      "name": "伊丽莎白·格林",
+      "width": 5.5,
+      "height": 8,
+      "status": "active"
+    },
+    {
+      "id": "alex_mercer",
+      "name": "阿历克斯·墨瑟",
+      "width": 0.8,
+      "height": 2.1,
+      "status": "retired_draft"
+    },
+    {
+      "id": "roland",
+      "name": "罗兰",
+      "width": 0.8,
+      "height": 2.1,
+      "status": "retired_draft"
+    },
+    {
+      "id": "archer",
+      "name": "卡伦·阿彻",
+      "width": 0.75,
+      "height": 2,
+      "status": "retired_draft"
+    },
+    {
+      "id": "galloway",
+      "name": "萨布丽娜·加洛韦",
+      "width": 0.8,
+      "height": 2.1,
+      "status": "retired_draft"
+    },
+    {
+      "id": "koenig",
+      "name": "安东·柯尼格",
+      "width": 0.75,
+      "height": 2,
+      "status": "retired_draft"
+    },
+    {
+      "id": "captain_cross",
+      "name": "罗伯特·克罗斯",
+      "width": 0.75,
+      "height": 2,
+      "status": "retired_draft"
+    },
+    {
+      "id": "super_soldier",
+      "name": "超级士兵",
+      "width": 1,
+      "height": 2.4,
+      "status": "active"
+    },
+    {
+      "id": "recon_uav",
+      "name": "病毒侦察无人机",
+      "width": 1.5,
+      "height": 0.65,
+      "status": "active"
+    }
+  ],
+  "animationClock": "EncounterMove server tick / EncounterPose",
+  "modelAudit": [
+    {
+      "id": "alex_mercer",
+      "bones": 24,
+      "cuboids": 84,
+      "textureSize": 512,
+      "atlasUsedHeight": 83,
+      "features": [
+        "Layered black hood/jacket, pale shirt, red lining and separate denim legs",
+        "Hand-rooted four-claw, plated hammer and tapered blade variants"
+      ],
+      "geometrySha256": "3ca9caa0b47713c53b5c2fda0d3f83853f37c60ea904be548a9ca12db88ad098"
+    },
+    {
+      "id": "roland",
+      "bones": 22,
+      "cuboids": 58,
+      "textureSize": 512,
+      "atlasUsedHeight": 61,
+      "features": [
+        "Evolved operative clothing with separate cuffs, pockets and blade growth"
+      ],
+      "geometrySha256": "09f56a834b135aeeff11038788890dec55f7d1232ff0a49df3a192cf2d40462c"
+    },
+    {
+      "id": "archer",
+      "bones": 23,
+      "cuboids": 80,
+      "textureSize": 512,
+      "atlasUsedHeight": 80,
+      "features": [
+        "P2 evolved_e3 / Archer: short dark hair, long white coat, blue collar/ID and paired cleavers"
+      ],
+      "geometrySha256": "472e9f41c33876fb96900022e9c385db5bb6c9334f09d47d142a21613364e3be"
+    },
+    {
+      "id": "galloway",
+      "bones": 22,
+      "cuboids": 70,
+      "textureSize": 512,
+      "atlasUsedHeight": 72,
+      "features": [
+        "Female tailored jacket, blouse, skirt panels and tied auburn hair",
+        "Heavy arm retained for the current mod move set; not a claim of her canonical weapon"
+      ],
+      "geometrySha256": "17c899057735378879a5a8dbf135469b5bac8de1043d2c7a9977c73492f99090"
+    },
+    {
+      "id": "koenig",
+      "bones": 23,
+      "cuboids": 86,
+      "textureSize": 512,
+      "atlasUsedHeight": 83,
+      "features": [
+        "P2 evolved_m1 / Koenig: balding grey beard, short lab coat, ID and paired cleavers"
+      ],
+      "geometrySha256": "f57a418bce3e0b6e004f4db1d093bf618a433d20546cff72f8aa15f800904776"
+    },
+    {
+      "id": "captain_cross",
+      "bones": 21,
+      "cuboids": 85,
+      "textureSize": 512,
+      "atlasUsedHeight": 78,
+      "features": [
+        "P1 specialist: uncovered swept hair, high dark collar, diagonal zipper, belt pouches and right-arm launcher"
+      ],
+      "geometrySha256": "94e9ae44f0707b25560b969cdccc07299c4d99cbb133ddebdcfb0e140721224e"
+    },
+    {
+      "id": "super_soldier",
+      "bones": 21,
+      "cuboids": 82,
+      "textureSize": 512,
+      "atlasUsedHeight": 78,
+      "features": [
+        "P1 SuperSoldier: sealed cage-like respirator, pale shoulder panels, reinforced webbing and broad torso"
+      ],
+      "geometrySha256": "499101b02ab78a7e03c9d6f3534d6170bdfdabc378be842eb5dee069a6415c74"
+    },
+    {
+      "id": "recon_uav",
+      "bones": 6,
+      "cuboids": 70,
+      "textureSize": 512,
+      "atlasUsedHeight": 79,
+      "features": [
+        "P2 uav001: three ducted fans around a vertical center post, triangular struts and underslung sensor",
+        "Three independently animated rotor groups, replacing the invented quadcopter"
+      ],
+      "geometrySha256": "7b7d963cb37067954c71bfa0fe0ff1454a7cc0d993dd01d820e764c5ba1a977c"
+    },
+    {
+      "id": "brawler",
+      "bones": 13,
+      "cuboids": 51,
+      "textureSize": 256,
+      "reusedExistingModel": true
+    },
+    {
+      "id": "elizabeth_greene",
+      "bones": 8,
+      "cuboids": 148,
+      "textureSize": 512,
+      "geometrySha256": "57566e10ff6182291791eac59af9e5cac353baf7ff0d9cf78f6317f663552339",
+      "features": [
+        "Asymmetric muscle crown and embedded host",
+        "Vertebral column, sweeping lateral horns and separate tapered weakpoints",
+        "Authored anatomical cuboids with existing Supreme Hunter material pixels"
+      ]
+    },
+    {
+      "id": "leader_hunter",
+      "revision": "supreme-style-authored-r6",
+      "bones": 22,
+      "cuboids": 97,
+      "textureSize": 512,
+      "atlasUsedHeight": 84,
+      "geometrySha256": "99c793ce44c31d9436e9d7c6db096ef52e7a0fc1bb43425dac42c18abd1edac7",
+      "textureSha256": "f462b24f1ad07d1080e5690391f6877a48242ce8a863e43742fd7f56ac09ff73",
+      "reference": "P1 LeaderHunter/source-reference.png",
+      "features": [
+        "Long low ape torso, pronounced scapulae and forward knuckles",
+        "Separate deltoids, biceps, forearm ridge, bent rear legs and jaw",
+        "Grey Hunter hide at the accepted material texel scale; no beveled frame boxes"
+      ]
+    },
+    {
+      "id": "juggernaut",
+      "revision": "supreme-style-authored-r6",
+      "bones": 22,
+      "cuboids": 92,
+      "textureSize": 512,
+      "atlasUsedHeight": 113,
+      "geometrySha256": "a744ed1b44abc756d8a091d15561ab3adf6dd8b886c42aacf1b018dacbbbfba6",
+      "textureSha256": "054ac4b95b48f9cbb2c7c096ce083649488d73edd35bd77c528f0ac72e2ec327",
+      "reference": "P2 infected3_hammerer/source-reference.png",
+      "features": [
+        "Protruding layered belly, oblique chest folds and short weight-bearing legs",
+        "Irregular individual fist plates, curled claws and dorsal growths",
+        "Project Hunter skin/muscle materials; no flat belly or fist frames"
+      ]
+    },
+    {
+      "id": "goliath",
+      "revision": "supreme-style-authored-r6",
+      "bones": 24,
+      "cuboids": 95,
+      "textureSize": 512,
+      "atlasUsedHeight": 410,
+      "geometrySha256": "8add4097bb4a3b2e200f3d1530534ce76fe534c34a0c2885bf76e8354e42619d",
+      "textureSha256": "b205882b34d7fa1dfd8179186af4271142e41a585265f513212c6cbf8a086165",
+      "reference": "P2 behemoth/source-reference.png",
+      "features": [
+        "Massive layered chest over narrow waist and visible articulated legs",
+        "Asymmetric plated right fist with separate knuckles/thumb and opposite long claws",
+        "Small high head; shin armor follows anatomy while server weakpoint centers remain unchanged"
+      ]
+    },
+    {
+      "id": "flyer",
+      "revision": "supreme-style-authored-r6",
+      "bones": 9,
+      "cuboids": 63,
+      "textureSize": 512,
+      "atlasUsedHeight": 36,
+      "geometrySha256": "c34bdf406ccc86f5b6e2862443cbbfb5927ee9446862cd99b64e707cc31086de",
+      "textureSha256": "4db355f5637aa7b6b42844e4c9c0d183dd8cb9a8cf6f2dc450cceb8df3342fd3",
+      "reference": "P2 flyer/source-reference.png",
+      "features": [
+        "Pale hooked skull, compact ribcage and articulated trailing talons",
+        "Continuous stepped patagium joins five tapering wing fingers",
+        "Thin membrane cuboids and bone spars use the accepted pixel material scale"
+      ]
+    }
+  ],
+  "authoredRevision": "supreme-style-authored-r6",
+  "modelStatus": "Greene and four nonhumanoid r6 models visually reviewed in game. Original Brawler and Supreme assets retained. Human encounter drafts and original-game fidelity work remain unfinished.",
+  "references": [
+    {
+      "url": "https://d-conceptart.blogspot.com/2012/07/prototype-2.html",
+      "scope": "Dejan Ostojic concept silhouettes, visual reference only; no downloaded textures/meshes shipped"
+    },
+    {
+      "url": "https://www.trueachievements.com/n7229/meet-the-important-prototype-2-npcs",
+      "scope": "Koenig lab-coat character reference"
+    },
+    {
+      "url": "https://prototype.fandom.com/wiki/Sabrina_Galloway",
+      "scope": "Correct Sabrina Galloway identity, not the previous invented male name"
+    },
+    {
+      "url": "https://prototype.fandom.com/wiki/Gentek",
+      "scope": "Karen Archer identity"
+    }
+  ],
+  "materialProvenance": [
+    {
+      "source": "textures/entity/hunter_mc.png",
+      "sha256": "4279ec308b38834b79c8aea1d3352d0b1255accff3dfae6e8670f2814a5ea066"
+    },
+    {
+      "source": "textures/entity/supreme_hunter_block.png",
+      "sha256": "7b36becb39f88f8cd4cf7a41ebce88300fa2cec646a9eb8c10efdff73414c24c"
+    }
+  ],
+  "styleReference": "Use the existing Hunter and Supreme Hunter geometry, silhouette, UV work and materials as the visual standard. Matching cube counts or texture dimensions alone does not meet that standard.",
+  "resourceAliases": [
+    {
+      "target": "geo/brawler_mc.geo.json",
+      "source": "geo/blacklight_hunter_mc.geo.json",
+      "sha256": "e5ab3673cd3be85e39ee365a5a4e688178d6e2710e3e5066dee3c51aab610ddd"
+    },
+    {
+      "target": "textures/entity/brawler_mc.png",
+      "source": "textures/entity/hunter_mc.png",
+      "sha256": "4279ec308b38834b79c8aea1d3352d0b1255accff3dfae6e8670f2814a5ea066"
+    },
+    {
+      "target": "animations/brawler.animation.json",
+      "source": "animations/blacklight_hunter.animation.json",
+      "sha256": "60d59deae62f07f6d8677c89f95851827c166f8f0148fce0cc22a273f0271646"
+    }
+  ],
+  "existingModelBaselines": [
+    {
+      "source": "geo/blacklight_hunter_mc.geo.json",
+      "sha256": "e5ab3673cd3be85e39ee365a5a4e688178d6e2710e3e5066dee3c51aab610ddd"
+    },
+    {
+      "source": "textures/entity/hunter_mc.png",
+      "sha256": "4279ec308b38834b79c8aea1d3352d0b1255accff3dfae6e8670f2814a5ea066"
+    },
+    {
+      "source": "animations/blacklight_hunter.animation.json",
+      "sha256": "60d59deae62f07f6d8677c89f95851827c166f8f0148fce0cc22a273f0271646"
+    },
+    {
+      "source": "models/hunter_combat_motion.json",
+      "sha256": "1e92a3598b9e18a50af16f18053bbfcf76d69fa457d99f4421b6f546669cab06"
+    },
+    {
+      "source": "models/supreme_hunter_block.json",
+      "sha256": "c51f4b7cb4d138280b46141988a60f0d44927d487a74f8aa17b9dbf1557b00b2"
+    },
+    {
+      "source": "textures/entity/supreme_hunter_block.png",
+      "sha256": "7b36becb39f88f8cd4cf7a41ebce88300fa2cec646a9eb8c10efdff73414c24c"
+    }
+  ],
+  "motionReference": {
+    "source": "Brawler uses its existing calibrated Hunter clips. Other encounter locomotion follows actual movement; combat samples the synchronized server action clock with anatomical poses.",
+    "targets": [
+      "leader_hunter",
+      "juggernaut",
+      "goliath"
+    ],
+    "brawler": "Uses hunter_combat_motion.json without another retarget. Double attack repeats the original swipe at the existing two contact times. Slam and leap use the existing Brawler clips.",
+    "scope": "Species decisions account for recharge, threats, crowding, summons and phase. These authored behaviors and poses are Minecraft adaptations, not a complete reconstruction of the original game."
+  },
+  "extractedReferenceAudit": {
+    "date": "2026-11-14",
+    "revision": "supreme-style-authored-r6",
+    "method": "Original P1/P2 decoded previews inform silhouettes only. Greene and four monsters are individually authored cuboids using the accepted project Hunter/Supreme material style. Rejected r5 continuous Greene mesh and native texture are no longer shipped.",
+    "limitations": [
+      "Static bind-pose previews are not original gameplay screenshots or original animation verification.",
+      "Some rigid source parts are displayed in their local coordinate system.",
+      "Roland and Galloway source identity remains unconfirmed; generic evolved package names are not sufficient evidence.",
+      "A passing asset test does not establish visual fidelity or user acceptance."
+    ],
+    "entries": [
+      {
+        "entity": "leader_hunter",
+        "game": 1,
+        "package": "LeaderHunter",
+        "packageSha256": "dc6402c3a07b7a8ddfbf393754da287f6ec948c8e1f14f8ac83ef8366a67e322",
+        "archiveEntry": null,
+        "preview": "D:/PrototypeReference/p1/reference-models/LeaderHunter/source-reference.png",
+        "decodedSourceSha256": "6fd78db43b551dcfc9c84217a086f53374dd920552e881bae0b814e8d976fccf",
+        "observation": "Low grey ape silhouette, long forearms, forward knuckles and bent rear legs.",
+        "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+      },
+      {
+        "entity": "juggernaut",
+        "game": 2,
+        "package": "infected3_hammerer",
+        "packageSha256": "67401526f28f0f1e3e8b387aa731791368b445ba18f3c67cf0c35b1f3bec2127",
+        "archiveEntry": "art/packages/missions/infected3_hammerer/infected3_hammerer.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/infected3_hammerer/source-reference.png",
+        "observation": "Protruding belly, vertical maw, paired massive fists and dorsal growths.",
+        "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+      },
+      {
+        "entity": "goliath",
+        "game": 2,
+        "package": "behemoth",
+        "packageSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+        "archiveEntry": "art/packages/missions/behemoth/behemoth.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/behemoth/source-reference.png",
+        "observation": "Small head, oversized chest, giant lobed right fist and opposite claw arm.",
+        "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+      },
+      {
+        "entity": "flyer",
+        "game": 2,
+        "package": "flyer",
+        "packageSha256": "a5a528705863763c2509b1329cf3cfc8134145bc26a61dd3d2636298d21b27fc",
+        "archiveEntry": "art/packages/missions/flyer/flyer.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/flyer/source-reference.png",
+        "observation": "Pale hooked skull, compact body and elongated wing fingers.",
+        "status": "r6 authored geometry: four client views and action scenes reviewed; user aesthetic approval remains open"
+      },
+      {
+        "entity": "elizabeth_greene",
+        "game": 1,
+        "package": "mother",
+        "packageSha256": "337de53fcaae0a4bdf55f25f117dd113407921b2d46891ff81e62f240099003a",
+        "archiveEntry": null,
+        "preview": "D:/PrototypeReference/p1/reference-models/mother_core/source-reference.png",
+        "decodedSourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+        "observation": "Original references show an asymmetric crown, small inner human host, spine and separate slugs; these proportions inform authored cuboids.",
+        "status": "r6 authored cuboids replace rejected continuous r5. Five client views and five action/weakpoint scenarios reviewed; user aesthetic approval remains open"
+      },
+      {
+        "entity": "captain_cross",
+        "game": 1,
+        "package": "specialist",
+        "packageSha256": "7c38260ad2fe03ce8f1940fb3274a4ca420aaa8b5f10c481f2d148194be59bbb",
+        "archiveEntry": null,
+        "preview": "D:/PrototypeReference/p1/reference-models/specialist/source-reference.png",
+        "decodedSourceSha256": "cb9865baa82d299b6023d29b9e0ed0cc2d2e543d973ab70e4691bb4246a14ede",
+        "observation": "Exposed short hair, high collar, diagonal zipper, tactical pouches and forearm launcher.",
+        "status": "source-informed authored adaptation; visual fidelity review ongoing"
+      },
+      {
+        "entity": "super_soldier",
+        "game": 1,
+        "package": "SuperSoldier",
+        "packageSha256": "c1c354b9020da576f8ffdccee9ff9ed198b2fbe4ac033b613e208d9aa17a907e",
+        "archiveEntry": null,
+        "preview": "D:/PrototypeReference/p1/reference-models/SuperSoldier/source-reference.png",
+        "decodedSourceSha256": "f8c546f085c42fbc3b7e3e30be3e54b1a805ef0da0d56e04b2ba63cbdfa35e3d",
+        "observation": "Caged respirator, pale panels, dark webbing and reinforced arms.",
+        "status": "source-informed authored adaptation; visual fidelity review ongoing"
+      },
+      {
+        "entity": "archer",
+        "game": 2,
+        "package": "evolved_e3",
+        "packageSha256": "c5b611a3c62d78ca4a13d6968d686629c7f1d3ef823af060f43d0519571e8abb",
+        "archiveEntry": "art/packages/missions/evolved_e3/evolved_e3.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/evolved_e3/source-reference.png",
+        "observation": "Archer named inside source shapes: short dark hair, long white coat, blue collar, ID and paired cleavers.",
+        "status": "source-informed authored adaptation; visual fidelity review ongoing"
+      },
+      {
+        "entity": "koenig",
+        "game": 2,
+        "package": "evolved_m1",
+        "packageSha256": "c83f0c7011bae4dd85d932b335e51a9d5f4e7db810266c5e59ac19dee396ad33",
+        "archiveEntry": "art/packages/missions/evolved_m1/evolved_m1.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/evolved_m1/source-reference.png",
+        "observation": "Koenig named inside source shapes: balding grey beard, white coat, ID and paired cleavers.",
+        "status": "source-informed authored adaptation; visual fidelity review ongoing"
+      },
+      {
+        "entity": "recon_uav",
+        "game": 2,
+        "package": "uav",
+        "packageSha256": "a43f3a22f2ee6df4b0e3251e9e43d9b00dff461fb53121d13bfe77bf888c1715",
+        "archiveEntry": "art/packages/missions/uav/uav.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/uav/source-reference.png",
+        "observation": "Three ducted fans, vertical post, underslung sensor; replaces invented quadcopter.",
+        "status": "source-informed authored adaptation; visual fidelity review ongoing"
+      },
+      {
+        "entity": "alex_mercer",
+        "game": 2,
+        "package": "alex_boss",
+        "packageSha256": "4918d11fe4532af83a67add69a9e3dbd236e486d6c163d50984d875486e71f6b",
+        "archiveEntry": "art/packages/missions/alex_boss/alex_boss.p3d",
+        "preview": "D:/PrototypeReference/p2/reference-models/alex_boss/source-reference.png",
+        "observation": "Original inspected; current model is still an earlier authored draft awaiting source-based revision.",
+        "status": "reference inspected, remodel pending"
+      }
+    ]
+  },
+  "greeneSurface": {
+    "revision": "supreme-style-authored-r6",
+    "method": "Named anatomical cuboids authored from the supplied reference silhouette; no copied source mesh, source textures or voxelization.",
+    "styleReference": "Existing Supreme Hunter block anatomy and its authored material atlas",
+    "styleTextureSha256": "7b36becb39f88f8cd4cf7a41ebce88300fa2cec646a9eb8c10efdff73414c24c",
+    "originalReference": "D:/PrototypeReference/p1/reference-models/mother_core/source-reference.png",
+    "geometrySha256": "57566e10ff6182291791eac59af9e5cac353baf7ff0d9cf78f6317f663552339",
+    "textureSha256": "3b16398e7882d43a86a459eabcea76feef7ee52078f195cd34010ab2518ebb01",
+    "cuboids": 148,
+    "atlasSize": 512,
+    "atlasUsedHeight": 311,
+    "authoredParts": [
+      {
+        "name": "spinal_cord",
+        "bone": "root",
+        "material": "muscle"
+      },
+      {
+        "name": "vertebra_0",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_0",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_0_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_0_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_1",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_1_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_1_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_2",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_2",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_2_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_2_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_3",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_3",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_3_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_3_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_4",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_4",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_4_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_4_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_5",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_5",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_5_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_5_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "vertebra_6",
+        "bone": "root",
+        "material": "fold"
+      },
+      {
+        "name": "vertebra_front_6",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_6_-1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "transverse_6_1",
+        "bone": "root",
+        "material": "hide"
+      },
+      {
+        "name": "rear_cranium",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "crown_left",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "crown_right",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "left_temple",
+        "bone": "torso",
+        "material": "hide"
+      },
+      {
+        "name": "left_frontal",
+        "bone": "torso",
+        "material": "scar"
+      },
+      {
+        "name": "left_cheek",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "left_hanging_lobe",
+        "bone": "torso",
+        "material": "hide"
+      },
+      {
+        "name": "left_lower_scar",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "right_mass",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "right_cheek",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "right_jowl",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "bottom_fold",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "bottom_flesh",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "rear_left",
+        "bone": "torso",
+        "material": "hide"
+      },
+      {
+        "name": "rear_right",
+        "bone": "torso",
+        "material": "hide"
+      },
+      {
+        "name": "rear_nape",
+        "bone": "torso",
+        "material": "scar"
+      },
+      {
+        "name": "front_left_upper",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "front_left_lower",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "front_right_lobe",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "front_forehead",
+        "bone": "torso",
+        "material": "tissue"
+      },
+      {
+        "name": "host_recess",
+        "bone": "torso",
+        "material": "joint"
+      },
+      {
+        "name": "left_upper_fold",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "left_lower_fold",
+        "bone": "torso",
+        "material": "scar"
+      },
+      {
+        "name": "right_upper_fold",
+        "bone": "torso",
+        "material": "scar"
+      },
+      {
+        "name": "right_lower_fold",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "lower_fascicle_-1_0",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "lower_fascicle_-1_1",
+        "bone": "torso",
+        "material": "sinew"
+      },
+      {
+        "name": "lower_fascicle_-1_2",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "lower_fascicle_1_0",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "lower_fascicle_1_1",
+        "bone": "torso",
+        "material": "sinew"
+      },
+      {
+        "name": "lower_fascicle_1_2",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "crown_furrow_0",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "crown_furrow_1",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "crown_furrow_2",
+        "bone": "torso",
+        "material": "fold"
+      },
+      {
+        "name": "left_lobe_sinew",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "right_lobe_sinew",
+        "bone": "torso",
+        "material": "sinew"
+      },
+      {
+        "name": "rear_tendon",
+        "bone": "torso",
+        "material": "muscle"
+      },
+      {
+        "name": "host_neck",
+        "bone": "head",
+        "material": "scar"
+      },
+      {
+        "name": "host_skull",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_hair",
+        "bone": "head",
+        "material": "fold"
+      },
+      {
+        "name": "host_hair_back",
+        "bone": "head",
+        "material": "fold"
+      },
+      {
+        "name": "host_brow",
+        "bone": "head",
+        "material": "fold"
+      },
+      {
+        "name": "host_nose",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_mouth",
+        "bone": "head",
+        "material": "joint"
+      },
+      {
+        "name": "host_ribcage",
+        "bone": "head",
+        "material": "scar"
+      },
+      {
+        "name": "host_sternum",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_-1_0",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_-1_1",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_-1_2",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_1_0",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_1_1",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_rib_1_2",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_waist",
+        "bone": "head",
+        "material": "muscle"
+      },
+      {
+        "name": "host_fused_lower",
+        "bone": "head",
+        "material": "scar"
+      },
+      {
+        "name": "host_left_upper",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_left_forearm",
+        "bone": "head",
+        "material": "scar"
+      },
+      {
+        "name": "host_left_hand",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_right_upper",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "host_right_forearm",
+        "bone": "head",
+        "material": "scar"
+      },
+      {
+        "name": "host_right_hand",
+        "bone": "head",
+        "material": "skin"
+      },
+      {
+        "name": "lateral_tendril_0_0",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_0_0",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_0_1",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_0_1",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_0_2",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "lateral_tendril_1_0",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_1_0",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_1_1",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_1_1",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_1_2",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "lateral_tendril_2_0",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_2_0",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_2_1",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "tendril_tissue_2_1",
+        "bone": "left_arm",
+        "material": "muscle"
+      },
+      {
+        "name": "lateral_tendril_2_2",
+        "bone": "left_arm",
+        "material": "fold"
+      },
+      {
+        "name": "right_drape",
+        "bone": "right_arm",
+        "material": "fold"
+      },
+      {
+        "name": "right_drape_tip",
+        "bone": "right_arm",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_base",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_trunk",
+        "bone": "weak_0",
+        "material": "muscle"
+      },
+      {
+        "name": "weak_0_upper",
+        "bone": "weak_0",
+        "material": "scar"
+      },
+      {
+        "name": "weak_0_lower_hide_-1",
+        "bone": "weak_0",
+        "material": "hide"
+      },
+      {
+        "name": "weak_0_upper_hide_-1",
+        "bone": "weak_0",
+        "material": "hide"
+      },
+      {
+        "name": "weak_0_crown_-1",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_crown_red_-1",
+        "bone": "weak_0",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_0_lower_hide_1",
+        "bone": "weak_0",
+        "material": "hide"
+      },
+      {
+        "name": "weak_0_upper_hide_1",
+        "bone": "weak_0",
+        "material": "hide"
+      },
+      {
+        "name": "weak_0_crown_1",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_crown_red_1",
+        "bone": "weak_0",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_0_front_fold_0",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_front_fold_1",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_0_front_fold_2",
+        "bone": "weak_0",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_base",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_trunk",
+        "bone": "weak_1",
+        "material": "muscle"
+      },
+      {
+        "name": "weak_1_upper",
+        "bone": "weak_1",
+        "material": "scar"
+      },
+      {
+        "name": "weak_1_lower_hide_-1",
+        "bone": "weak_1",
+        "material": "hide"
+      },
+      {
+        "name": "weak_1_upper_hide_-1",
+        "bone": "weak_1",
+        "material": "hide"
+      },
+      {
+        "name": "weak_1_crown_-1",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_crown_red_-1",
+        "bone": "weak_1",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_1_lower_hide_1",
+        "bone": "weak_1",
+        "material": "hide"
+      },
+      {
+        "name": "weak_1_upper_hide_1",
+        "bone": "weak_1",
+        "material": "hide"
+      },
+      {
+        "name": "weak_1_crown_1",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_crown_red_1",
+        "bone": "weak_1",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_1_front_fold_0",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_front_fold_1",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_1_front_fold_2",
+        "bone": "weak_1",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_base",
+        "bone": "weak_2",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_trunk",
+        "bone": "weak_2",
+        "material": "muscle"
+      },
+      {
+        "name": "weak_2_upper",
+        "bone": "weak_2",
+        "material": "scar"
+      },
+      {
+        "name": "weak_2_lower_hide_-1",
+        "bone": "weak_2",
+        "material": "hide"
+      },
+      {
+        "name": "weak_2_upper_hide_-1",
+        "bone": "weak_2",
+        "material": "hide"
+      },
+      {
+        "name": "weak_2_crown_-1",
+        "bone": "weak_2",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_crown_red_-1",
+        "bone": "weak_2",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_2_lower_hide_1",
+        "bone": "weak_2",
+        "material": "hide"
+      },
+      {
+        "name": "weak_2_upper_hide_1",
+        "bone": "weak_2",
+        "material": "hide"
+      },
+      {
+        "name": "weak_2_crown_1",
+        "bone": "weak_2",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_crown_red_1",
+        "bone": "weak_2",
+        "material": "sinew"
+      },
+      {
+        "name": "weak_2_front_fold_0",
+        "bone": "weak_2",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_front_fold_1",
+        "bone": "weak_2",
+        "material": "fold"
+      },
+      {
+        "name": "weak_2_front_fold_2",
+        "bone": "weak_2",
+        "material": "fold"
+      }
+    ],
+    "reviewStatus": "Five client views including old Supreme comparison and five action/weakpoint scenarios reviewed (54 captured frames). User aesthetic approval remains open; source rise/burrow motion is not integrated.",
+    "review": {
+      "passed": true,
+      "scenes": 5,
+      "frames": 54,
+      "contactWindow": "Five consecutive 20 Hz game ticks around every authored strike/release, including repeated strikes",
+      "digest": "d96b3105a8f556f7308ff265b52ae0b28cb0591b1a2af6a97227595b1d48897d",
+      "failed": []
+    }
+  },
+  "monsterStyleRevision": "supreme-style-authored-r6",
+  "aiRevision": "species-tactics-r7",
+  "activeSpawnEggCount": 25
+}

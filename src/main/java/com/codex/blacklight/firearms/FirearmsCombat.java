@@ -7,6 +7,30 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
 
 public final class FirearmsCombat {
+    /** Damage policy is checked on the parent after picking: friendly bodies still stop a bullet. */
+    public static boolean bulletCandidate(LivingEntity owner,Entity entity){
+        if(entity==owner||entity.isRemoved()||!entity.isPickable())return false;
+        if(entity instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return craft.health()>0;
+        var target=com.codex.blacklight.combat.CombatTargeting.resolveTarget(entity);
+        return target!=null&&target!=owner&&target.isAlive()&&!target.isRemoved()
+                &&(entity!=target||com.codex.blacklight.combat.AnimatedHurtBody.of(target)==null
+                    ||!com.codex.blacklight.combat.CombatTargeting.multipart(target));
+    }
+    public static EntityHitResult firstBulletBody(ServerLevel level,LivingEntity owner,Vec3 from,Vec3 to){
+        var query=new AABB(from,to).inflate(.3);
+        var nearest=ProjectileUtil.getEntityHitResult(level,owner,from,to,query,
+                e->!(e instanceof com.codex.blacklight.entity.BlackwatchHelicopter)&&bulletCandidate(owner,e));
+        double distance=nearest==null?Double.POSITIVE_INFINITY:from.distanceToSqr(nearest.getLocation());
+        for(var craft:level.getEntitiesOfClass(com.codex.blacklight.entity.BlackwatchHelicopter.class,query,
+                c->c!=owner.getRootVehicle()&&bulletCandidate(owner,c))){
+            var point=com.codex.blacklight.military.aircraft.HelicopterSkinContact.raycast(craft,from,to);
+            if(point.isPresent()&&from.distanceToSqr(point.get())<distance){
+                nearest=new EntityHitResult(craft,point.get());
+                distance=from.distanceToSqr(point.get());
+            }
+        }
+        return nearest;
+    }
     public static boolean holdingFirearm(LivingEntity owner){return owner!=null&&(owner.getMainHandItem().getItem() instanceof FirearmItem||owner.getOffhandItem().getItem() instanceof FirearmItem);}
     public static boolean protectedTarget(LivingEntity owner,LivingEntity target){
         return target==owner||owner!=null&&owner.isAlliedTo(target)||target instanceof Player p&&(p.isCreative()||p.isSpectator());
@@ -24,16 +48,29 @@ public final class FirearmsCombat {
             Vec3 end=start.add(direction.normalize().scale(definition.range()));
             var wall=level.clip(new ClipContext(start,end,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));
             if(wall.getType()!=HitResult.Type.MISS)end=wall.getLocation();
-            var hit=ProjectileUtil.getEntityHitResult(level,owner,start,end,new AABB(start,end).inflate(.3),e->e!=owner&&e instanceof LivingEntity living&&living.isAlive()&&e.isPickable());
+            var hit=firstBulletBody(level,owner,start,end);
             if(hit!=null){
+                Vec3 rayEnd=end;
                 end=hit.getLocation();
-                if(hit.getEntity() instanceof LivingEntity target&&!protectedTarget(owner,target)){
+                if(hit.getEntity() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft
+                        &&!com.codex.blacklight.military.vehicle.VehicleDamageBridge.protectedAircraft(owner,craft))
+                    craft.hurt(owner.damageSources().mobProjectile(owner,owner),definition.damage()*scale);
+                var target=com.codex.blacklight.combat.CombatTargeting.resolveTarget(hit.getEntity());
+                if(target!=null&&!protectedTarget(owner,target)
+                        &&(!(owner instanceof Player attacker)||!(target instanceof Player playerTarget)
+                            ||level.getServer().isPvpAllowed()&&attacker.canHarmPlayer(playerTarget))){
                     float damage=definition.damage()*scale;
                     if(owner instanceof com.codex.blacklight.entity.MilitarySoldier soldier
                             &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH
                             &&target instanceof com.codex.blacklight.entity.BlacklightCommonInfected)damage*=4;
-                    if(!(target instanceof net.minecraft.server.level.ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,damage,4))
-                        target.hurt(owner.damageSources().mobProjectile(owner,owner),damage);
+                    if(!(target instanceof net.minecraft.server.level.ServerPlayer defender)||!com.codex.blacklight.power.ProjectileDefenseSystem.hitscan(defender,start,end,damage,4)){
+                        var source=owner.damageSources().mobProjectile(owner,owner);
+                        var body=com.codex.blacklight.combat.AnimatedHurtBody.of(target);
+                        if(body!=null){
+                            var contact=com.codex.blacklight.combat.HydraHurtContact.ray(body.hurtRegions(0),start,rayEnd,com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
+                            if(contact!=null)body.hurtAt(source,damage,contact);
+                        }else hit.getEntity().hurt(source,damage);
+                    }
                 }
             }
             if(hit==null&&wall.getType()==HitResult.Type.BLOCK)FirearmBlockDamage.bullet(owner,definition,wall);

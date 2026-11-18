@@ -230,7 +230,7 @@ public final class PrototypeMovementEffects {
                     1, 0.0D, 0.0D, 0.0D, 0.0D);
         }
         if (intensity > 0.58F) {
-            level.sendParticles(ParticleTypes.DUST_PLUME, foot.x,
+            level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(), foot.x,
                     player.getY() + 0.06D, foot.z, 1,
                     0.08D, 0.02D, 0.08D, 0.012D);
             level.sendParticles(ParticleTypes.SMALL_GUST, tail.x,
@@ -363,7 +363,7 @@ public final class PrototypeMovementEffects {
         level.sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + 0.12D, player.getZ(),
                 Math.max(5, debrisTotal / 2), radius * 0.46D, 0.12D,
                 radius * 0.46D, 0.055D + impact.intensity() * 0.025D);
-        level.sendParticles(ParticleTypes.DUST_PLUME,
+        level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),
                 player.getX(), player.getY() + 0.09D, player.getZ(),
                 1 + rings, radius * 0.24D, 0.06D, radius * 0.24D, 0.025D);
         if (strength != LandingImpact.Strength.LIGHT) {

@@ -1,0 +1,494 @@
+{
+  "date": "2026-11-15T16:50:54.076Z",
+  "scope": "Shared grounded hammer pose and actual projected fist contact. Native released charged-quake on flat ground, with Brute survival and subsequent jab kill; ordinary quake and slab contact checked on the server. This is not full creature or arbitrary-terrain acceptance.",
+  "baseline": {
+    "file": "D:/CodexCache/creature-combat-qa/neo-hammer-floor-before/hammer_brute_survive.json",
+    "sha256": "d0325332b70f8e6018e4e270e984dadd6bbb3ce146ae45342f703017898059d6",
+    "measurements": {
+      "releasedFrames": 106,
+      "minimumFistClearance": -1.93484365940094,
+      "minimumRecoveryHeadClearance": -0.13180740177631378,
+      "minimumRecoveryFistClearance": -1.8354663848876953,
+      "entityHeightRange": [
+        251,
+        251
+      ],
+      "clips": [
+        "hammer_quake_charged"
+      ]
+    }
+  },
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 466,
+      "cases": [
+        {
+          "name": "hammer_brute_survive",
+          "frames": 233,
+          "check": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.7903124690055847,
+            "actorRecoveryFistClearance": 0.011250346899032593,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.01124998927116394,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "measurements": {
+            "releasedFrames": 106,
+            "minimumFistClearance": 0.01124998927116394,
+            "minimumRecoveryHeadClearance": 0.7903124690055847,
+            "minimumRecoveryFistClearance": 0.011250346899032593,
+            "entityHeightRange": [
+              251,
+              251
+            ],
+            "clips": [
+              "hammer_quake_charged"
+            ]
+          },
+          "damageFrame": {
+            "tick": 82,
+            "clipSeconds": 1.3,
+            "rightFistClearance": 0.011278942227363586,
+            "image": "hammer_brute_survive_0071.png"
+          },
+          "file": "D:/CodexCache/creature-combat-qa/neo-hammer-contact-frames/hammer_brute_survive.json",
+          "sha256": "56f3ffa720682839e48351d001de08145f958e39e9d4b36c43d096a65234c49d",
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-hammer-contact-frames/hammer_brute_survive-review.jpg",
+            "sha256": "6da09a92b254b35aeaa6e6920b09507a4fbd1038027fbba87908ab38d1a9d692"
+          }
+        },
+        {
+          "name": "hammer_brute_lethal",
+          "frames": 233,
+          "check": {
+            "case": "hammer_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": true,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 1.1102230246251565e-16,
+            "jointSamples": 56,
+            "minFloorClearance": 0.001042736882340023,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0011485043217192015,
+            "renderedMeshSamples": 56,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 2,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 50,
+            "actorRecoveryHeadClearance": 0.8160089254379272,
+            "actorRecoveryFistClearance": 0.011250108480453491,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.01124998927116394,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "measurements": {
+            "releasedFrames": 106,
+            "minimumFistClearance": 0.01124998927116394,
+            "minimumRecoveryHeadClearance": 0.8160089254379272,
+            "minimumRecoveryFistClearance": 0.011250108480453491,
+            "entityHeightRange": [
+              251,
+              251
+            ],
+            "clips": [
+              "hammer_quake_charged"
+            ]
+          },
+          "file": "D:/CodexCache/creature-combat-qa/neo-hammer-contact-frames/hammer_brute_lethal.json",
+          "sha256": "ce39eaeaca417e57417f700bede1456142f0b63c512c2905061fe074f5b5dbfe",
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-hammer-contact-frames/hammer_brute_lethal-review.jpg",
+            "sha256": "cbf183a14b3e4a9d100fc7265a37e0bd6526e789020bb4a9f4200ebe2b965c91"
+          }
+        }
+      ],
+      "unitTests": 5,
+      "units": [
+        {
+          "tests": 3,
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.animation.HammerGroundContactTest.xml",
+          "sha256": "3ec93f11f2c9d9128e0e9bb9df71863bf9a668ada6378df004ca18644d03054f"
+        },
+        {
+          "tests": 2,
+          "file": "D:/CodexCache/creature-combat-qa/neo-build/test-results/test/TEST-com.codex.blacklight.client.animation.HammerGroundPoseTest.xml",
+          "sha256": "4f3e598d6ff9ee014447ac3d78bc8e338ede54e0e78a74313907cf9ad366b92c"
+        }
+      ],
+      "server": {
+        "tests": 25,
+        "newGroundTests": 4,
+        "file": "D:/CodexCache/creature-combat-neo-bruteServer.log",
+        "sha256": "1e22ac77eeea84963371168bc4d170d02851ddbb6124fa919a0dbf25d9985281"
+      },
+      "native": {
+        "file": "D:/CodexCache/creature-combat-neo-genericRagdollVisual.log",
+        "sha256": "8a322faaf4c9bc63eed53261ccb057f714fc76963f61a98c93f687d0b510c430",
+        "debug": {
+          "file": "D:/CodexCache/creature-combat-qa/neo-hammer-contact-frames/native-debug.log",
+          "sha256": "33d969348623c9df0831097fb19f3c5020ac1384d1c4ba9af68df1ec46be1054"
+        },
+        "groundEvents": [
+          "[1611月2026 00:47:57.633] [Server thread/DEBUG] [com.codex.blacklight.BlacklightNeoMod/]: Hammer ground contact move=hammer_quake_charged tick=27 block=MutableBlockPos{x=-1, y=250, z=1} surface=(-0.6498236680292007, 251.0, 1.9772606454079864)",
+          "[1611月2026 00:48:08.570] [Server thread/DEBUG] [com.codex.blacklight.BlacklightNeoMod/]: Hammer ground contact move=hammer_quake_charged tick=27 block=MutableBlockPos{x=-1, y=250, z=2} surface=(-0.6477126192997686, 251.0, 2.345936283692579)"
+        ]
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HammerGroundPose.java",
+          "sha256": "5451942620a559e361ad2d50fa0044e3c34e5bf4bdf4f4244a68fd22032c5532"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HammerQuakeContact.java",
+          "sha256": "96c93daf4e252fe85d2ea1ff184a47aa64b206e7eaae30a041d88269f9749f31"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/HammerGroundContact.java",
+          "sha256": "775693712279fc529db0f09219e3e97dbf83304f251a9744064af2172a8f763a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+          "sha256": "161295b88ff5bd57174ed6c5910ed61818e99aec1fe85f3a023a59ea6d433394"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/WeaponScaleRenderer.java",
+          "sha256": "67abb4fddbde8b3deebd78aa0f6af0e4bda313f64be9d27e4f351d233bec4513"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponAttackScales.java",
+          "sha256": "de490ceb20efc0856ee7055ffb4d752f54530fd4bff85ac851115a0758e3dd61"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/form_hammerfists.json",
+          "sha256": "75252283503f24b5a7e8336857c1c207c41eedfdef0268050476d638c2f7dcc8"
+        },
+        {
+          "file": "art/motion-profile/hammer_quake.json",
+          "sha256": "bbf942c8b0713667a3636439a138cd659f8acf26a393e50ea72f4c798756e516"
+        },
+        {
+          "file": "art/motion-profile/hammer_quake_charged.json",
+          "sha256": "039d4685722dddd92a086827d64c3e73343fd58325a05b8ba8125f230f892917"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HammerGroundContactTest.java",
+          "sha256": "d3d60675f5b5f7627bc978d3c983b07595dfcd7f8d0080dad6fb0fc7b38d01b6"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HammerGroundPoseTest.java",
+          "sha256": "e531724c7e5d029bf8bbf0348131f8a006e45f3b261bfb4fcffe16022c518b3f"
+        },
+        {
+          "file": "src/bruteTest/java/com/codex/blacklight/gametest/HammerQuakeGroundGameTest.java",
+          "sha256": "b1b4a8b5d3319adbfc2f3fd54222a2851492dc5a2278ed709d0d2cf248501a25"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "2abfb57ec8b7848eecc946103507bc0a52da062bed5c01a731b1c97138020711"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditActorFloor.java",
+          "sha256": "8336a1d970a7b711d6161a00996ade659e6299ab01eeb73adb5685d721834c10"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 466,
+      "cases": [
+        {
+          "name": "hammer_brute_survive",
+          "frames": 233,
+          "check": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.82600337266922,
+            "actorRecoveryFistClearance": 0.011250019073486328,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.011250019073486328,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "measurements": {
+            "releasedFrames": 106,
+            "minimumFistClearance": 0.011250019073486328,
+            "minimumRecoveryHeadClearance": 0.82600337266922,
+            "minimumRecoveryFistClearance": 0.011250019073486328,
+            "entityHeightRange": [
+              251,
+              251
+            ],
+            "clips": [
+              "hammer_quake_charged"
+            ]
+          },
+          "damageFrame": {
+            "tick": 82,
+            "clipSeconds": 1.3,
+            "rightFistClearance": 0.01127597689628601,
+            "image": "hammer_brute_survive_0071.png"
+          },
+          "file": "D:/CodexCache/creature-combat-qa/forge-hammer-contact-frames/hammer_brute_survive.json",
+          "sha256": "a65b46bebc93b63e7f097bc26175877e70cb20c1beee37396821fb50967eba1b",
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-hammer-contact-frames/hammer_brute_survive-review.jpg",
+            "sha256": "094021c3e49a16ec612001fea089221ccef2cb49a2b28124d8019cb91ec2817c"
+          }
+        },
+        {
+          "name": "hammer_brute_lethal",
+          "frames": 233,
+          "check": {
+            "case": "hammer_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": true,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 1.1102230246251565e-16,
+            "jointSamples": 56,
+            "minFloorClearance": 0.0010317514162920816,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.001031781057832859,
+            "renderedMeshSamples": 56,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 4,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.801633894443512,
+            "actorRecoveryFistClearance": 0.011250197887420654,
+            "actorAttackFrames": 107,
+            "actorFullFistClearance": 0.011250197887420654,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "measurements": {
+            "releasedFrames": 107,
+            "minimumFistClearance": 0.011250197887420654,
+            "minimumRecoveryHeadClearance": 0.801633894443512,
+            "minimumRecoveryFistClearance": 0.011250197887420654,
+            "entityHeightRange": [
+              251,
+              251
+            ],
+            "clips": [
+              "hammer_quake_charged"
+            ]
+          },
+          "file": "D:/CodexCache/creature-combat-qa/forge-hammer-contact-frames/hammer_brute_lethal.json",
+          "sha256": "65fe623ae3c774e1a6236ceb7dfebe02c708bc8fbf9b1f97e0f00db00aa343a7",
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-hammer-contact-frames/hammer_brute_lethal-review.jpg",
+            "sha256": "eb25a6054f7bf8c602573b8a85b721793c1745477abf4df08ea9d5ae18c0e264"
+          }
+        }
+      ],
+      "unitTests": 5,
+      "units": [
+        {
+          "tests": 3,
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.animation.HammerGroundContactTest.xml",
+          "sha256": "a10135a5baf0664ba4d956ae5bdf5235a33fb6d056ecef0d0916a4ba0df10676"
+        },
+        {
+          "tests": 2,
+          "file": "D:/CodexCache/creature-combat-qa/forge-render-build/test-results/test/TEST-com.codex.blacklight.client.animation.HammerGroundPoseTest.xml",
+          "sha256": "28390fe5f8c142e052684efde69b4b1bd1c58e24290ab79384772a30c9d017e8"
+        }
+      ],
+      "server": {
+        "tests": 25,
+        "newGroundTests": 4,
+        "file": "D:/CodexCache/creature-combat-forge-bruteServer.log",
+        "sha256": "4257ff980c6a0d23f43112f1becf39b216c422413cc13f10827edd85bb050d69"
+      },
+      "native": {
+        "file": "D:/CodexCache/creature-combat-forge-genericRagdollVisual.log",
+        "sha256": "82975367a6862ff24d66dae36a6c6781b4d2e27230f4f76d619f047084028916",
+        "debug": {
+          "file": "D:/CodexCache/creature-combat-qa/forge-hammer-contact-frames/native-debug.log",
+          "sha256": "6fac82e9b6d1931cf9c3820ee26bb561df7c50378aa9ca08d6cb2e7e627d655d"
+        },
+        "groundEvents": [
+          "[1611��2026 00:48:34.731] [Server thread/DEBUG] [com.codex.blacklight.BlacklightNeoMod/]: Hammer ground contact move=hammer_quake_charged tick=27 block=MutableBlockPos{x=-1, y=250, z=1} surface=(-0.6498236680292007, 251.0, 1.9772606454079864)",
+          "[1611��2026 00:48:45.708] [Server thread/DEBUG] [com.codex.blacklight.BlacklightNeoMod/]: Hammer ground contact move=hammer_quake_charged tick=27 block=MutableBlockPos{x=-1, y=250, z=2} surface=(-0.6477126192997686, 251.0, 2.345936283692579)"
+        ]
+      },
+      "sources": [
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HammerGroundPose.java",
+          "sha256": "5451942620a559e361ad2d50fa0044e3c34e5bf4bdf4f4244a68fd22032c5532"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/HammerQuakeContact.java",
+          "sha256": "96c93daf4e252fe85d2ea1ff184a47aa64b206e7eaae30a041d88269f9749f31"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/HammerGroundContact.java",
+          "sha256": "775693712279fc529db0f09219e3e97dbf83304f251a9744064af2172a8f763a"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/animation/BlacklightRenderPose.java",
+          "sha256": "e45331055051a091768c47f2ac2751e52767b689c774aa4f6d6683f65d6d061d"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/client/renderer/WeaponScaleRenderer.java",
+          "sha256": "3383a82dbfa8f7533b6040665c1c69fc6a8ae85c895ecac0a6a61df18deb6bba"
+        },
+        {
+          "file": "src/main/java/com/codex/blacklight/combat/WeaponAttackScales.java",
+          "sha256": "de490ceb20efc0856ee7055ffb4d752f54530fd4bff85ac851115a0758e3dd61"
+        },
+        {
+          "file": "src/main/resources/assets/blacklight/models/form_hammerfists.json",
+          "sha256": "75252283503f24b5a7e8336857c1c207c41eedfdef0268050476d638c2f7dcc8"
+        },
+        {
+          "file": "art/motion-profile/hammer_quake.json",
+          "sha256": "bbf942c8b0713667a3636439a138cd659f8acf26a393e50ea72f4c798756e516"
+        },
+        {
+          "file": "art/motion-profile/hammer_quake_charged.json",
+          "sha256": "039d4685722dddd92a086827d64c3e73343fd58325a05b8ba8125f230f892917"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HammerGroundContactTest.java",
+          "sha256": "d3d60675f5b5f7627bc978d3c983b07595dfcd7f8d0080dad6fb0fc7b38d01b6"
+        },
+        {
+          "file": "src/test/java/com/codex/blacklight/client/animation/HammerGroundPoseTest.java",
+          "sha256": "e531724c7e5d029bf8bbf0348131f8a006e45f3b261bfb4fcffe16022c518b3f"
+        },
+        {
+          "file": "src/bruteTest/java/com/codex/blacklight/gametest/HammerQuakeGroundGameTest.java",
+          "sha256": "0cb80ea72e631927bad1bf16a9a4db534f452e3c9c21fb4b3d5f0e2bf1701365"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "a7231123955d95bdcebe650019696aa55eafa38e6c568acf3e6931d1b4ea1f16"
+        },
+        {
+          "file": "src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAuditActorFloor.java",
+          "sha256": "f5f6af56f3b6961cc5cdb72237db0b420f40d6826df9c0b1dd5f8812b922d3be"
+        }
+      ]
+    }
+  ],
+  "pending": [
+    "Support probes sample solid top faces within feet +/-1.25 blocks, using the uncorrected fist footprint. Partial ledges, front steps, changed footprint, walls and constrained spaces need further verification.",
+    "Native capture covers the released charged quake; ordinary quake is covered by pose sampling and server contact tests, not a dedicated native recording.",
+    "Charge, other attacks and the existing lower-leg/foot mesh below the entity origin are outside the released-quake constraint.",
+    "Modded skins, multiplayer latency, audible mixing, final choreography and all remaining creature and military requirements remain open."
+  ],
+  "review": {
+    "status": "four_native_keyframe_sheets_reviewed",
+    "sheets": 4,
+    "everyFrameManuallyReviewed": false,
+    "flatReleasedChargedQuakeAccepted": true,
+    "arbitraryTerrainAccepted": false
+  }
+}

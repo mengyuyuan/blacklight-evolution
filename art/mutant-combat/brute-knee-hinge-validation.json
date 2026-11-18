@@ -1,0 +1,1130 @@
+{
+  "date": "2026-11-15T19:42:05.882Z",
+  "scope": "Brute knee hinge constraints during physical fall/death, plus pelvis-centered horizontal get-up placement. This reduces a measured recovery slide and rejects final choreography acceptance.",
+  "changes": [
+    "Each directly connected Brute thigh/shin pair uses an anatomical X hinge with -155 to 0 degree flexion. Constraint math accounts for the captured bone orientations and current parent rotation, preserves the joint pivot and projects relative angular velocity onto the permitted axis.",
+    "The generic solver remains in use for other joint types and species. Severed connections do not receive hinge constraints. Render QA independently reconstructs each measured knee from captured bone frames.",
+    "The get-up compensates the feet-origin root rotation around the actual model hip pivots. Horizontal pelvis position remains over its idle position throughout the authored rise; mesh support still determines height.",
+    "Five new hinge tests cover arbitrary capture/body rotations, backward bend, sideways swing, quaternion sign/singular cases, angular velocity at stops and preserved joint pivots. One additional get-up test samples the horizontal pelvis position across the full rise."
+  ],
+  "diagnostics": [
+    {
+      "case": "thrown_brute_connected_survive",
+      "beforeKnees": {
+        "frames": 83,
+        "minAngle": -1.5707181022427614,
+        "maxAngle": 2.787911503078906,
+        "maxSwing": 0.19193354865883197
+      },
+      "rows": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-before/thrown_brute_connected_survive.json",
+        "sha256": "9b79b2d8e85c9df9919d2feba4dc0f0c82d3a0491679ad73a3fcb4e0304e4657"
+      }
+    },
+    {
+      "case": "blade_brute_lethal",
+      "beforeKnees": {
+        "frames": 97,
+        "minAngle": -1.9282850854571834,
+        "maxAngle": 0,
+        "maxSwing": 1.3475702865276513
+      },
+      "rows": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-before/blade_brute_lethal.json",
+        "sha256": "810a24afe701eeb1b9f7f008412667c37253eaeaceda3963d529db7d06455dbe"
+      }
+    },
+    {
+      "scope": "Hinge-only intermediate run did not reduce the early slide; this motivated the separate hip-pivot correction.",
+      "rows": {
+        "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-draft/thrown_brute_connected_survive.json",
+        "sha256": "a6cbdd7eceeb94a266da9009222436f2f23230d8c2d7eb5ffd33ee68c10c8bf1"
+      },
+      "entry": {
+        "frames": 12,
+        "initialTorsoHorizontalError": 3.1134527646177195,
+        "torsoHorizontalTravel": 2.9745466202096615
+      }
+    }
+  ],
+  "platforms": [
+    {
+      "platform": "neo",
+      "frames": 1395,
+      "unitTests": 57,
+      "flows": [
+        {
+          "case": "thrown_brute_connected_survive",
+          "frames": 228,
+          "checks": {
+            "case": "thrown_brute_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 8.881784197001252e-16,
+            "jointSamples": 81,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 1.3170890159654386e-9,
+            "rawHandoffPositionError": 1.3170890159654386e-9,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.0027782171964645386,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0004737148235847144,
+            "renderedMeshSamples": 81,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 4,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 24,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 5.963419602762394e-8,
+            "afterControlAngleError": 0,
+            "getupAuthoredFrames": 35,
+            "getupAuthoredShapeGap": 2.100543290872811e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 18,
+            "getupHandFloorGap": 0.0027931295335292816,
+            "getupLowerBodyFloorGap": 0.013777558943218082,
+            "kneeFrames": 81,
+            "minKneeAngle": -1.57070764982417,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0.0012978671651785588,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/thrown_brute_connected_survive.json",
+            "sha256": "0cbee7c29088ac4295858d6b7e21a97732e133f5cf2ed0839d09f67c0aecea89"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/thrown_brute_connected_survive-review.jpg",
+            "sha256": "29e45f47600b2b991d895237b2c8e4b2f7599b88f8ea2011e39dd7e2d71004f9",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "thrown_brute_step_connected_survive",
+          "frames": 234,
+          "checks": {
+            "case": "thrown_brute_step_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 8.881784197001252e-16,
+            "jointSamples": 86,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 2.986138102567768e-8,
+            "rawHandoffPositionError": 2.986138102567768e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.002362653613090515,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00014293938875198364,
+            "renderedMeshSamples": 86,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 6,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 27,
+            "getupFrames": 48,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 48,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 2.986138102567768e-8,
+            "afterControlAngleError": 0,
+            "getupAuthoredFrames": 36,
+            "getupAuthoredShapeGap": 2.327689214658135e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 0,
+            "getupHandFloorGap": 0,
+            "getupLowerBodyFloorGap": 0,
+            "kneeFrames": 86,
+            "minKneeAngle": -1.5707567930519881,
+            "maxKneeAngle": 2.980232949312267e-8,
+            "maxKneeSwing": 0.0005834589391141631,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "terrain": "steps_and_wall",
+            "terrainFrames": 86,
+            "terrainPenetratingFrames": 0,
+            "maxTerrainPenetration": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/thrown_brute_step_connected_survive.json",
+            "sha256": "bfb1b541a277d0043720db8b8b58b6c2c25e0d20ef8606a68ac76ccfeb0d15eb"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/thrown_brute_step_connected_survive-review.jpg",
+            "sha256": "dc58078c732224105d4bb73f08e06f052428610a0e36ea3840999e5e24335935",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "hammer_brute_survive",
+          "frames": 234,
+          "checks": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 50,
+            "actorRecoveryHeadClearance": 0.8059054017066956,
+            "actorRecoveryFistClearance": 0.01125020906329155,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.01125020906329155,
+            "actorTerrainFrames": 106,
+            "actorTerrainPenetration": 0,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/hammer_brute_survive.json",
+            "sha256": "0fa5fdd11439086f23a7fd7753677681fb91fe187b20e2d7055b4c0ee8eb8871"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/hammer_brute_survive-review.jpg",
+            "sha256": "111daff5b010e8179468761103d0cce9aaedc7e4efe68f84fafd579939bc09dc",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "blade_brute_lethal",
+          "frames": 233,
+          "checks": {
+            "case": "blade_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 10,
+            "maxComponents": 7,
+            "lastChanceUsed": true,
+            "expectedSplit": true,
+            "maxAcceptedEdges": 2,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.220446049250313e-16,
+            "jointSamples": 97,
+            "minFloorClearance": 0.0010000000000047748,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0010000000000047748,
+            "renderedMeshSamples": 97,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 1,
+            "maxFrozenHorizontalMotion": 0,
+            "kneeFrames": 97,
+            "minKneeAngle": -2.3105149658824384,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0.003601023911869125,
+            "damagePassed": true,
+            "splitObserved": true,
+            "maxTorsoPieces": 2,
+            "maxTorsoCapVertices": 216,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 2,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/blade_brute_lethal.json",
+            "sha256": "8df25aa0a7f72d05817ebba995c3f383f442d52332775e6eb5ecca9854697b6b"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/blade_brute_lethal-review.jpg",
+            "sha256": "0d2c03c38be7badf11d10b9a1e70a25d4f8eada7667454bedba26f71121fded5",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "muscle_brute_consume",
+          "frames": 232,
+          "checks": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 93,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.06910455877661725,
+            "riderMeshSamples": 93,
+            "riderGripSamples": 141,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.00043626817058453615,
+            "riderGripMinGap": 0.008001745939255234,
+            "riderGripMaxGap": 0.012023744152047874,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 45,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 48.6135,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/muscle_brute_consume.json",
+            "sha256": "09d2211316ef1c9018bd89f27854d8b195b679349eebe1708376b95762a736b1"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/muscle_brute_consume-review.jpg",
+            "sha256": "bc8f6ba41c485481a1b781e8a18fd6e2f4b38c4aacfcf4e57d3d8f8135666aea",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "claws_brute_consume",
+          "frames": 234,
+          "checks": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 126,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.006904229068458445,
+            "riderMeshSamples": 126,
+            "riderGripSamples": 173,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.005069529971839369,
+            "riderGripMinGap": 0.007448991970893146,
+            "riderGripMaxGap": 0.011612880686181729,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 79,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 41.9102,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/claws_brute_consume.json",
+            "sha256": "33ae00ccdd753bfd2d95db98da85a1755380ba596cc0c38be9f88f413029a676"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/claws_brute_consume-review.jpg",
+            "sha256": "90977e135d567e7eaa4d686b30257e3d6df9e16250ca6428b74cc07d81beb41e",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        }
+      ],
+      "earlyGetup": {
+        "scope": "Actual torso center, horizontal components, sampled GETUP age 0–8; frame times differ slightly between runs.",
+        "before": {
+          "frames": 12,
+          "initialTorsoHorizontalError": 3.1351356834964865,
+          "torsoHorizontalTravel": 2.9139883859805646
+        },
+        "after": {
+          "frames": 12,
+          "initialTorsoHorizontalError": 1.4952296138399312,
+          "torsoHorizontalTravel": 1.402647780641454
+        },
+        "baselineRows": {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-ground-rise-final/thrown_brute_connected_survive.json",
+          "sha256": "4df96af87841a17dce3adfe8f5cde6c01dc1ca801166f0484e9e0e707f54b107"
+        }
+      },
+      "sources": [
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "f2857bbdd9027a3e05543adcbd343593e6fb535ccc9e622ae709a11a42a0ea23"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/renderer/RagdollHinge.java",
+          "sha256": "d5d6da23da34a6796f8daab1da858144fe6730b6495f589817a34ee4cf7e95fc"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "b2dc7e044dc04d3622773e3ab5ccbc5f7ff21acdc758b1502534bf319d243f8f"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/BruteKnockdown.java",
+          "sha256": "6c57243cc910ef7515abcc5ee95d61b458a06db346edc2bd72a3f49536acaaf7"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "8d9cd35f493a464acdd2ea2e1f566e0c67811a657ea4c962c8b9ce4f28341fb3"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "907ab63aaa23891d8a16c71add1f65751c64ac221e3935e99532bf51c4673a6c"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "a4db6ee1550d87605640183b0a87dd1da8da20a5d124d7915dcbb0dcdbfeaae3"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "f5397d8224778e087ad0e6af6e5711ce3b9b95a289b1d353088a4bbf8282ab36"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "f0192cd9769fdde1194d7de47c93c67fa85717e467b8ba268a506f32f97aaa63"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "d5970ad8134e2e8962ff61fc098f007513a7b2535d358c2b70ede8c8f8cb5193"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/test/java/com/codex/blacklight/client/renderer/RagdollHingeTest.java",
+          "sha256": "dd9b05ca743c249632338f7496679601daf2ea86e681f677d6c5d35ce2c42f6c"
+        },
+        {
+          "file": "D:/blacklight-evolution/src/test/java/com/codex/blacklight/combat/BruteKnockdownTest.java",
+          "sha256": "49e4980ca1f3bfa91b8f8c9f4801a381d1ba3edde0c3da7a367ff649218c2dbe"
+        },
+        {
+          "file": "D:/blacklight-evolution/tools/brute-test.init.gradle",
+          "sha256": "c7299b6928d5b73341c47f4956eef25fa77077c3f44fe56750a8dbdd4adbb38b"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/native-build.log",
+          "sha256": "c8af56906129e101cebda687477a18c2e1490ea821572ce1737460598087c580"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/native-debug.log",
+          "sha256": "8a883bb7a5394acaa1047c26bae46a4def1f3fe4b7f39d7e38f67d9619fdc1c2"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/unit-check.log",
+          "sha256": "f976b9dfe07178fa50675ecd1293126e249f775429da8ac92468b697503f0401"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/capture-status.txt",
+          "sha256": "fc5b3f3e2b20cf4046dafc659e75222ca81d7b89b6a00f466df37a47dad7dabd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/reviewed-sheets.json",
+          "sha256": "863059b0a9b0a64dfb41c2b27f7ff35ede76ddcc0bd33ec10cb2f989e5702376"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "b30a830c86e8b873034bda9a9c8dcf6c3e2e11697072d2d829ff8189ba56a541"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.client.renderer.RagdollHingeTest.xml",
+          "sha256": "bdfa03ef537962d71a438cb2cbf2f8835034d98f2c35d9d3986949a8c322bc2f"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "sha256": "b76987abf3b97da771db463255e4b75f0a01b350256986028770a0373bd971e5"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "901d67416c3aa0a6f1670044b33f90242049d26f9dcde02ad255cf4ead70829b"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "d9c26908e4b3941f91e1a42873a18da25f58441b591eb082852f4aa75fd580cc"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.BruteKnockdownTest.xml",
+          "sha256": "220e20e2f0707a737fe8dd578f4f8c0ddecb4cdff66788a428a44898aef6da52"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "99dbcf8120b6aa90ee56959a80ef0eee9c0a81569ddf296015bb52e10a3fda68"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "59d0f9aa4bab7dc6530a70d1361a4a9154253282f7cd40016ac1fd6d66d64502"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "8869fa4aba1ea208151b3a9222a3dbb553d8bbee5a4ed4be053112fd158d957d"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/neo-brute-knee-final/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "793592dd052ced256cdd132b51ad992010ac51be0d5e1ecdc8d33d0ea62273da"
+        }
+      ]
+    },
+    {
+      "platform": "forge",
+      "frames": 1396,
+      "unitTests": 57,
+      "flows": [
+        {
+          "case": "thrown_brute_connected_survive",
+          "frames": 230,
+          "checks": {
+            "case": "thrown_brute_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 8.881784197001252e-16,
+            "jointSamples": 82,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 2.8219076853019942e-8,
+            "rawHandoffPositionError": 2.8219076853019942e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": 0.0012712180614471436,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.0005895897771495129,
+            "renderedMeshSamples": 82,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 3,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 26,
+            "getupFrames": 47,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 47,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 2.986047331594191e-8,
+            "afterControlAngleError": 0.0006905339694324072,
+            "getupAuthoredFrames": 35,
+            "getupAuthoredShapeGap": 2.3032286013430527e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 17,
+            "getupHandFloorGap": 0.005075516179203987,
+            "getupLowerBodyFloorGap": 0.010000955313444138,
+            "kneeFrames": 82,
+            "minKneeAngle": -1.5683192717679801,
+            "maxKneeAngle": 5.960466609167268e-8,
+            "maxKneeSwing": 0.001446857062199893,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/thrown_brute_connected_survive.json",
+            "sha256": "98112744235a2bbfdc3750ff41b7a1dc56880427f4348e37fcdce961ced73262"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/thrown_brute_connected_survive-review.jpg",
+            "sha256": "11eaaecd7d65e14d07aca262d6b53db575a6700791810efcd453aa7ad78e98ce",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "thrown_brute_step_connected_survive",
+          "frames": 233,
+          "checks": {
+            "case": "thrown_brute_step_connected_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 49967,
+            "maxCuts": 0,
+            "maxComponents": 1,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 1.1102230246251565e-16,
+            "jointSamples": 86,
+            "recoveryPassed": true,
+            "nativeFramesAfterRecovery": true,
+            "handoffPositionError": 2.9864104321733225e-8,
+            "rawHandoffPositionError": 2.9864104321733225e-8,
+            "handoffAngleError": 0,
+            "minFloorClearance": -0.0014413297176361084,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00021546910772940464,
+            "renderedMeshSamples": 86,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 7,
+            "maxFrozenHorizontalMotion": 0,
+            "downFrames": 27,
+            "getupFrames": 47,
+            "physicalFramesAfterControl": 4,
+            "getupClockSamples": 47,
+            "getupClockErrors": 0,
+            "downClockErrors": 0,
+            "afterControlPositionError": 8.943121691848624e-8,
+            "afterControlAngleError": 0.0006905339694324072,
+            "getupAuthoredFrames": 35,
+            "getupAuthoredShapeGap": 2.569146424952863e-7,
+            "getupAuthoredAngleError": 0.000976562509701277,
+            "getupPlantedSamples": 0,
+            "getupHandFloorGap": 0,
+            "getupLowerBodyFloorGap": 0,
+            "kneeFrames": 86,
+            "minKneeAngle": -1.5691533582029835,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0.0007004254317091716,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 1,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 1,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "terrain": "steps_and_wall",
+            "terrainFrames": 86,
+            "terrainPenetratingFrames": 0,
+            "maxTerrainPenetration": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/thrown_brute_step_connected_survive.json",
+            "sha256": "85e64a05c3c0d99df73fa385a60f64d67440e931ca836de9c68d8dcac64ceab6"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/thrown_brute_step_connected_survive-review.jpg",
+            "sha256": "dc39994a19c9b3bd0b7ef01c328f32d462b14c1019ff2e9f6a8ab053dc4c9f24",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "hammer_brute_survive",
+          "frames": 233,
+          "checks": {
+            "case": "hammer_brute_survive",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 300,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "actorRecoveryFrames": 49,
+            "actorRecoveryHeadClearance": 0.8135409951210022,
+            "actorRecoveryFistClearance": 0.011250004172325134,
+            "actorAttackFrames": 106,
+            "actorFullFistClearance": 0.011250004172325134,
+            "actorTerrainFrames": 106,
+            "actorTerrainPenetration": 0,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/hammer_brute_survive.json",
+            "sha256": "2547a774e45368362720676469feb84d7bd9e88a8ec1cbc9ecbd7a2b21f079f1"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/hammer_brute_survive-review.jpg",
+            "sha256": "7bb071aa021a277c65ed5cfcfa0169eda508233f89d477150075293703f6e503",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "blade_brute_lethal",
+          "frames": 234,
+          "checks": {
+            "case": "blade_brute_lethal",
+            "mounted": false,
+            "consumeCommitted": false,
+            "minHealth": 0,
+            "maxCuts": 10,
+            "maxComponents": 9,
+            "lastChanceUsed": true,
+            "expectedSplit": true,
+            "maxAcceptedEdges": 2,
+            "bodyInstances": 1,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 2.7755575615628914e-17,
+            "jointSamples": 100,
+            "minFloorClearance": 0.0010000000000047748,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "minRenderedMeshClearance": 0.00018318904105285583,
+            "renderedMeshSamples": 100,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 3,
+            "maxFrozenHorizontalMotion": 0,
+            "kneeFrames": 100,
+            "minKneeAngle": -2.3855836749056167,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0.003647489839920603,
+            "damagePassed": true,
+            "splitObserved": true,
+            "maxTorsoPieces": 2,
+            "maxTorsoCapVertices": 184,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 2,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 0,
+            "maxConsumeTickGap": 0,
+            "maxConsumeFrameMillis": 0,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/blade_brute_lethal.json",
+            "sha256": "f6f7a5446439465b61a96f53d60fdf793f009a7f0f33be6d582bb52f7dca3d43"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/blade_brute_lethal-review.jpg",
+            "sha256": "7bece2c106f0b3350e67932029826139fdb47f3c5d2b6c3daaa0c7d204079171",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "muscle_brute_consume",
+          "frames": 233,
+          "checks": {
+            "case": "muscle_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 97,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.07087085621237765,
+            "riderMeshSamples": 95,
+            "riderGripSamples": 144,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.0008970714163402047,
+            "riderGripMinGap": 0.008028866052628036,
+            "riderGripMaxGap": 0.010604434525254183,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 46,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 46.3587,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/muscle_brute_consume.json",
+            "sha256": "77752cb552be911b3f80211e6190400120256f76406ec7ec2f134e225b06c657"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/muscle_brute_consume-review.jpg",
+            "sha256": "c2756340dbadf9a56fc2caaf2cb7043588d663d2e702f27ee231f2ab58e06eaf",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        },
+        {
+          "case": "claws_brute_consume",
+          "frames": 233,
+          "checks": {
+            "case": "claws_brute_consume",
+            "mounted": true,
+            "consumeCommitted": true,
+            "minHealth": 0,
+            "maxCuts": 0,
+            "maxComponents": 0,
+            "lastChanceUsed": false,
+            "expectedSplit": false,
+            "maxAcceptedEdges": 0,
+            "bodyInstances": 0,
+            "cutsPreserved": true,
+            "maxRenderJointGap": 0,
+            "jointSamples": 0,
+            "floorPenetrationFrames": 0,
+            "floorPassed": true,
+            "renderedMeshSamples": 0,
+            "renderedMeshPenetrations": 0,
+            "frozenFrames": 0,
+            "maxFrozenHorizontalMotion": 0,
+            "mountSamples": 125,
+            "mountBodyYawError": 0,
+            "mountActorYawError": 0,
+            "mountAnchorError": 0.009330058755576687,
+            "riderMeshSamples": 125,
+            "riderGripSamples": 171,
+            "riderSupportDepth": 0,
+            "riderSkinDepth": 0.008948967287842738,
+            "riderGripMinGap": 0.007951153124221955,
+            "riderGripMaxGap": 0.01123241785199909,
+            "kneeFrames": 0,
+            "minKneeAngle": 0,
+            "maxKneeAngle": 0,
+            "maxKneeSwing": 0,
+            "damagePassed": true,
+            "splitObserved": false,
+            "maxTorsoPieces": 0,
+            "maxTorsoCapVertices": 0,
+            "materialIncisions": 0,
+            "maxSubstantialTorsoPieces": 0,
+            "pigTorsoSeparation": false,
+            "prematureGrabBodies": 0,
+            "maxConsumeBladeEdges": 0,
+            "maxConsumeGeneration": 0,
+            "consumeFrames": 79,
+            "maxConsumeTickGap": 1,
+            "maxConsumeFrameMillis": 44.2119,
+            "passed": true
+          },
+          "rows": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/claws_brute_consume.json",
+            "sha256": "58bdb1f2f77fc697c3decb18febbc21ef52f0848f4e69e9210ba1b63676fbcb3"
+          },
+          "sheet": {
+            "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/claws_brute_consume-review.jpg",
+            "sha256": "7c20f1a860a4b01e23ca9af3beb7312c3ae87070f7d7f2aac8f81671ec52aa51",
+            "selectedFrames": 20,
+            "reviewed": true
+          }
+        }
+      ],
+      "earlyGetup": {
+        "scope": "Actual torso center, horizontal components, sampled GETUP age 0–8; frame times differ slightly between runs.",
+        "before": {
+          "frames": 12,
+          "initialTorsoHorizontalError": 2.8653066254103257,
+          "torsoHorizontalTravel": 2.7033336433501716
+        },
+        "after": {
+          "frames": 12,
+          "initialTorsoHorizontalError": 1.2242570877359653,
+          "torsoHorizontalTravel": 1.184543688041078
+        },
+        "baselineRows": {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-ground-rise-final/thrown_brute_connected_survive.json",
+          "sha256": "06234b79fca1ff6f30bbeae0130b1b338dbb4096684c7d8c95269b004110e454"
+        }
+      },
+      "sources": [
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/renderer/AdaptiveRagdoll.java",
+          "sha256": "7b7b431a2d1cb4fe2be0e7bbbc56ee2402a5922c475765bb2a7da49c4ab19702"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/renderer/RagdollHinge.java",
+          "sha256": "d5d6da23da34a6796f8daab1da858144fe6730b6495f589817a34ee4cf7e95fc"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/renderer/RagdollRecovery.java",
+          "sha256": "b2dc7e044dc04d3622773e3ab5ccbc5f7ff21acdc758b1502534bf319d243f8f"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/BruteKnockdown.java",
+          "sha256": "6c57243cc910ef7515abcc5ee95d61b458a06db346edc2bd72a3f49536acaaf7"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/combat/BruteContact.java",
+          "sha256": "8d9cd35f493a464acdd2ea2e1f566e0c67811a657ea4c962c8b9ce4f28341fb3"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/java/com/codex/blacklight/client/animation/BruteHitPose.java",
+          "sha256": "907ab63aaa23891d8a16c71add1f65751c64ac221e3935e99532bf51c4673a6c"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/geo/blacklight_brute_mc.geo.json",
+          "sha256": "a4db6ee1550d87605640183b0a87dd1da8da20a5d124d7915dcbb0dcdbfeaae3"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/models/brute_combat_motion.json",
+          "sha256": "f5397d8224778e087ad0e6af6e5711ce3b9b95a289b1d353088a4bbf8282ab36"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/main/resources/assets/blacklight/animations/blacklight_brute.animation.json",
+          "sha256": "f0192cd9769fdde1194d7de47c93c67fa85717e467b8ba268a506f32f97aaa63"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/ragdollVisualTest/java/com/codex/blacklight/client/RagdollVisualAudit.java",
+          "sha256": "25e479186f0d328880361a987083aac365cb122c9da8136d0801be568ff6abf7"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/test/java/com/codex/blacklight/client/renderer/RagdollHingeTest.java",
+          "sha256": "dd9b05ca743c249632338f7496679601daf2ea86e681f677d6c5d35ce2c42f6c"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/src/test/java/com/codex/blacklight/combat/BruteKnockdownTest.java",
+          "sha256": "49e4980ca1f3bfa91b8f8c9f4801a381d1ba3edde0c3da7a367ff649218c2dbe"
+        },
+        {
+          "file": "D:/blacklight-evolution-forge-1.20.1/tools/brute-test.init.gradle",
+          "sha256": "c7299b6928d5b73341c47f4956eef25fa77077c3f44fe56750a8dbdd4adbb38b"
+        }
+      ],
+      "evidence": [
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/native-build.log",
+          "sha256": "e1581737711f45805dd401bf6ef2b925e713d33d0f0238fa9df996d9d328f7e4"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/native-debug.log",
+          "sha256": "a4fde3b6f7fadc772bbad4135d2062c31cdd648dab96979ddf5c705850fd5804"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/unit-check.log",
+          "sha256": "d8d5658d489f5728e9fd3094b500d3600a32394554ce818a620c847b70eeaefd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/capture-status.txt",
+          "sha256": "fc5b3f3e2b20cf4046dafc659e75222ca81d7b89b6a00f466df37a47dad7dabd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/reviewed-sheets.json",
+          "sha256": "687e6966c3d1b48f0453571b82faa46449d95ac3b926e0689d6a7c9d6c246fcd"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.client.animation.BruteRiderPoseTest.xml",
+          "sha256": "859ce964984c3c9ed025257c0a0e13e0bbc6864c91811b6dabee807fbbbd2e6d"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.client.renderer.RagdollHingeTest.xml",
+          "sha256": "a00a9215f5411bc7442bce219e558d277f34258aa2d6f9b609c509e24879c832"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.client.renderer.RagdollRecoveryTest.xml",
+          "sha256": "05fd9ff0b08bcf248c902cb0d31dfede3c860bb04e080c0623694a443ce42e8a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.BruteContactTest.xml",
+          "sha256": "918cc0a3a2eb9f6ce737587e99b11e0974687d10b278f2766f8232aafa2a282a"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.BruteFlinchTest.xml",
+          "sha256": "7cc3f37731cd400754bc18a89c64eaa6ebeb62b843cea291b203411be3108a56"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.BruteKnockdownTest.xml",
+          "sha256": "afe0f06f89d96b791a404ed4be98cb0f4b4d1d5ec6bde3e3c1697a1b31cf9261"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.ContactEffectsQueueTest.xml",
+          "sha256": "7511f937ebaab1a84393f92aeac06d98a933163f00505210f7eb32643555367e"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.MutantCombatTest.xml",
+          "sha256": "cfc3093e2b374add800a78fe2bf41819b890caed6aeb7e4c3a8f4f61ae3c74f6"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.SpitterMouthTest.xml",
+          "sha256": "d18a2b69411b5748c4a7c4f1f34a5e1d8411e1ea88f47d34fcda3fa308dcad13"
+        },
+        {
+          "file": "D:/CodexCache/creature-combat-qa/forge-brute-knee-final/TEST-com.codex.blacklight.combat.StalkerContactTest.xml",
+          "sha256": "977dcf881ccab681eeb34d5d7d512a011ee05d42a5f2f8300027f055bea5be52"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "The measured early slide is reduced, not eliminated. Physical bodies can still move away from the authoritative entity; this change does not synchronize client ragdoll placement back into gameplay coordinates.",
+    "Only Brute knees receive anatomical hinge limits. Hips, shoulders, elbows and other species retain their existing physics constraints; final body weight, self-contact, ankle/finger articulation and palm support remain open.",
+    "Native knee-angle acceptance covers the recorded connected living knockdowns and attached knees in the death fixture. Standing flinch and the two mounted consume recordings have no physical knee samples and are only visual regression fixtures.",
+    "Terrain acceptance is bounded to the specified flat and slab/wall cases and sampled mesh vertices. Arbitrary terrain, side/rear impacts, native death during GETUP, offscreen recovery and multiplayer latency remain unverified.",
+    "The slab/wall recording still shows a brief whole-body lift during early recovery. Zero sampled penetration does not establish planted limbs or natural weight on that terrain.",
+    "Only selected contact sheets were manually reviewed, not every captured frame. Silent QA does not establish audible mix quality.",
+    "No new server tests were required for this client physics/pose change. The prior 33-case server result remains a historical checkpoint; it is not reported as a fresh run here. All remaining species, military AI/helicopters, fine vehicle/item models and audio remain in the active goal. No release or commit."
+  ],
+  "totalFrames": 2791,
+  "reviewedSheets": 12,
+  "finalGetupChoreographyAccepted": false
+}

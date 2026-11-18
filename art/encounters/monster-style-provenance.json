@@ -1,0 +1,1845 @@
+{
+  "revision": "supreme-style-authored-r6",
+  "method": "Named anatomy authored individually from supplied P1/P2 silhouette references. No uniform bevel shells, voxelization or source meshes/textures.",
+  "styleReference": "Existing accepted Hunter and Supreme Hunter geometry/material scale",
+  "styleBaselines": [
+    {
+      "file": "textures/entity/hunter_mc.png",
+      "sha256": "4279ec308b38834b79c8aea1d3352d0b1255accff3dfae6e8670f2814a5ea066"
+    },
+    {
+      "file": "textures/entity/supreme_hunter_block.png",
+      "sha256": "7b36becb39f88f8cd4cf7a41ebce88300fa2cec646a9eb8c10efdff73414c24c"
+    }
+  ],
+  "models": [
+    {
+      "id": "leader_hunter",
+      "revision": "supreme-style-authored-r6",
+      "bones": 22,
+      "cuboids": 97,
+      "textureSize": 512,
+      "atlasUsedHeight": 84,
+      "geometrySha256": "99c793ce44c31d9436e9d7c6db096ef52e7a0fc1bb43425dac42c18abd1edac7",
+      "textureSha256": "f462b24f1ad07d1080e5690391f6877a48242ce8a863e43742fd7f56ac09ff73",
+      "reference": "P1 LeaderHunter/source-reference.png",
+      "features": [
+        "Long low ape torso, pronounced scapulae and forward knuckles",
+        "Separate deltoids, biceps, forearm ridge, bent rear legs and jaw",
+        "Grey Hunter hide at the accepted material texel scale; no beveled frame boxes"
+      ],
+      "parts": [
+        {
+          "name": "ribcage",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "rear_trunk",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "lumbar_back",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_pectoral",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_scapula",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_lat",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_abdominal_0",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "right_abdominal_1",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "right_abdominal_2",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "right_humerus",
+          "bone": "right_arm",
+          "material": "skin"
+        },
+        {
+          "name": "right_radius",
+          "bone": "right_forearm",
+          "material": "skin"
+        },
+        {
+          "name": "right_elbow",
+          "bone": "right_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "right_deltoid",
+          "bone": "right_arm",
+          "material": "skin"
+        },
+        {
+          "name": "right_biceps",
+          "bone": "right_arm",
+          "material": "skin"
+        },
+        {
+          "name": "right_forearm_ridge",
+          "bone": "right_forearm",
+          "material": "skin"
+        },
+        {
+          "name": "right_palm",
+          "bone": "right_hand",
+          "material": "fold"
+        },
+        {
+          "name": "right_wrist",
+          "bone": "right_hand",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_0_knuckle",
+          "bone": "right_finger_0",
+          "material": "skin"
+        },
+        {
+          "name": "right_finger_0_digit",
+          "bone": "right_finger_0",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_0_claw",
+          "bone": "right_finger_0",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_1_knuckle",
+          "bone": "right_finger_1",
+          "material": "skin"
+        },
+        {
+          "name": "right_finger_1_digit",
+          "bone": "right_finger_1",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_1_claw",
+          "bone": "right_finger_1",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_2_knuckle",
+          "bone": "right_finger_2",
+          "material": "skin"
+        },
+        {
+          "name": "right_finger_2_digit",
+          "bone": "right_finger_2",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_2_claw",
+          "bone": "right_finger_2",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_3_knuckle",
+          "bone": "right_finger_3",
+          "material": "skin"
+        },
+        {
+          "name": "right_finger_3_digit",
+          "bone": "right_finger_3",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_3_claw",
+          "bone": "right_finger_3",
+          "material": "dark"
+        },
+        {
+          "name": "right_thigh",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_quadriceps",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_tibia",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_kneecap",
+          "bone": "right_shin",
+          "material": "plate"
+        },
+        {
+          "name": "right_foot",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_toe_0",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_1",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_2",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_pectoral",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_scapula",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_lat",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_abdominal_0",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "left_abdominal_1",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "left_abdominal_2",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "left_humerus",
+          "bone": "left_arm",
+          "material": "skin"
+        },
+        {
+          "name": "left_radius",
+          "bone": "left_forearm",
+          "material": "skin"
+        },
+        {
+          "name": "left_elbow",
+          "bone": "left_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "left_deltoid",
+          "bone": "left_arm",
+          "material": "skin"
+        },
+        {
+          "name": "left_biceps",
+          "bone": "left_arm",
+          "material": "skin"
+        },
+        {
+          "name": "left_forearm_ridge",
+          "bone": "left_forearm",
+          "material": "skin"
+        },
+        {
+          "name": "left_palm",
+          "bone": "left_hand",
+          "material": "fold"
+        },
+        {
+          "name": "left_wrist",
+          "bone": "left_hand",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_0_knuckle",
+          "bone": "left_finger_0",
+          "material": "skin"
+        },
+        {
+          "name": "left_finger_0_digit",
+          "bone": "left_finger_0",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_0_claw",
+          "bone": "left_finger_0",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_1_knuckle",
+          "bone": "left_finger_1",
+          "material": "skin"
+        },
+        {
+          "name": "left_finger_1_digit",
+          "bone": "left_finger_1",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_1_claw",
+          "bone": "left_finger_1",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_2_knuckle",
+          "bone": "left_finger_2",
+          "material": "skin"
+        },
+        {
+          "name": "left_finger_2_digit",
+          "bone": "left_finger_2",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_2_claw",
+          "bone": "left_finger_2",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_3_knuckle",
+          "bone": "left_finger_3",
+          "material": "skin"
+        },
+        {
+          "name": "left_finger_3_digit",
+          "bone": "left_finger_3",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_3_claw",
+          "bone": "left_finger_3",
+          "material": "dark"
+        },
+        {
+          "name": "left_thigh",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_quadriceps",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_tibia",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_kneecap",
+          "bone": "left_shin",
+          "material": "plate"
+        },
+        {
+          "name": "left_foot",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_toe_0",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_1",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_2",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "cranial_vault",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "maw_shadow",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "brow_ridge_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_-1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "brow_ridge_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "mandible",
+          "bone": "jaw",
+          "material": "fold"
+        },
+        {
+          "name": "lower_gum",
+          "bone": "jaw",
+          "material": "scar"
+        },
+        {
+          "name": "upper_tooth_0",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_0",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_1",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_1",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_2",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_2",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_3",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_3",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_4",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_4",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_5",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_5",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "sagittal_ridge",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "upper_muzzle",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "nostril_-1",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "nostril_1",
+          "bone": "head",
+          "material": "dark"
+        }
+      ]
+    },
+    {
+      "id": "juggernaut",
+      "revision": "supreme-style-authored-r6",
+      "bones": 22,
+      "cuboids": 92,
+      "textureSize": 512,
+      "atlasUsedHeight": 113,
+      "geometrySha256": "a744ed1b44abc756d8a091d15561ab3adf6dd8b886c42aacf1b018dacbbbfba6",
+      "textureSha256": "054ac4b95b48f9cbb2c7c096ce083649488d73edd35bd77c528f0ac72e2ec327",
+      "reference": "P2 infected3_hammerer/source-reference.png",
+      "features": [
+        "Protruding layered belly, oblique chest folds and short weight-bearing legs",
+        "Irregular individual fist plates, curled claws and dorsal growths",
+        "Project Hunter skin/muscle materials; no flat belly or fist frames"
+      ],
+      "parts": [
+        {
+          "name": "upper_ribcage",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "abdomen",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "lower_belly",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "upper_belly",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_flank",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_pectoral",
+          "bone": "torso",
+          "material": "scar"
+        },
+        {
+          "name": "right_abdominal_fold",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "right_clavicle",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_humerus",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_radius",
+          "bone": "right_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "right_elbow",
+          "bone": "right_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "right_shoulder_growth",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_upper_tendon",
+          "bone": "right_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "right_fist_core",
+          "bone": "right_hand",
+          "material": "fold"
+        },
+        {
+          "name": "right_knuckle_plate_0",
+          "bone": "right_hand",
+          "material": "plate"
+        },
+        {
+          "name": "right_knuckle_plate_1",
+          "bone": "right_hand",
+          "material": "plate"
+        },
+        {
+          "name": "right_knuckle_plate_2",
+          "bone": "right_hand",
+          "material": "plate"
+        },
+        {
+          "name": "right_forearm_plate",
+          "bone": "right_forearm",
+          "material": "plate"
+        },
+        {
+          "name": "right_ulna_growth",
+          "bone": "right_forearm",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_0_first",
+          "bone": "right_finger_0",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_0_hook",
+          "bone": "right_finger_0",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_1_first",
+          "bone": "right_finger_1",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_1_hook",
+          "bone": "right_finger_1",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_2_first",
+          "bone": "right_finger_2",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_2_hook",
+          "bone": "right_finger_2",
+          "material": "dark"
+        },
+        {
+          "name": "right_finger_3_first",
+          "bone": "right_finger_3",
+          "material": "fold"
+        },
+        {
+          "name": "right_finger_3_hook",
+          "bone": "right_finger_3",
+          "material": "dark"
+        },
+        {
+          "name": "right_thigh",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_quadriceps",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_tibia",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_kneecap",
+          "bone": "right_shin",
+          "material": "plate"
+        },
+        {
+          "name": "right_foot",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_toe_0",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_1",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_2",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_flank",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_pectoral",
+          "bone": "torso",
+          "material": "scar"
+        },
+        {
+          "name": "left_abdominal_fold",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "left_clavicle",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_humerus",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_radius",
+          "bone": "left_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "left_elbow",
+          "bone": "left_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "left_shoulder_growth",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_upper_tendon",
+          "bone": "left_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "left_fist_core",
+          "bone": "left_hand",
+          "material": "fold"
+        },
+        {
+          "name": "left_knuckle_plate_0",
+          "bone": "left_hand",
+          "material": "plate"
+        },
+        {
+          "name": "left_knuckle_plate_1",
+          "bone": "left_hand",
+          "material": "plate"
+        },
+        {
+          "name": "left_knuckle_plate_2",
+          "bone": "left_hand",
+          "material": "plate"
+        },
+        {
+          "name": "left_forearm_plate",
+          "bone": "left_forearm",
+          "material": "plate"
+        },
+        {
+          "name": "left_ulna_growth",
+          "bone": "left_forearm",
+          "material": "plate"
+        },
+        {
+          "name": "left_finger_0_first",
+          "bone": "left_finger_0",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_0_hook",
+          "bone": "left_finger_0",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_1_first",
+          "bone": "left_finger_1",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_1_hook",
+          "bone": "left_finger_1",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_2_first",
+          "bone": "left_finger_2",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_2_hook",
+          "bone": "left_finger_2",
+          "material": "dark"
+        },
+        {
+          "name": "left_finger_3_first",
+          "bone": "left_finger_3",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_3_hook",
+          "bone": "left_finger_3",
+          "material": "dark"
+        },
+        {
+          "name": "left_thigh",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_quadriceps",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_tibia",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_kneecap",
+          "bone": "left_shin",
+          "material": "plate"
+        },
+        {
+          "name": "left_foot",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_toe_0",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_1",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_2",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "dorsal_growth_0",
+          "bone": "torso",
+          "material": "plate"
+        },
+        {
+          "name": "dorsal_growth_1",
+          "bone": "torso",
+          "material": "plate"
+        },
+        {
+          "name": "dorsal_growth_2",
+          "bone": "torso",
+          "material": "plate"
+        },
+        {
+          "name": "dorsal_growth_3",
+          "bone": "torso",
+          "material": "plate"
+        },
+        {
+          "name": "cranial_vault",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "maw_shadow",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "brow_ridge_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_-1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "brow_ridge_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "mandible",
+          "bone": "jaw",
+          "material": "fold"
+        },
+        {
+          "name": "lower_gum",
+          "bone": "jaw",
+          "material": "scar"
+        },
+        {
+          "name": "upper_tooth_0",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_0",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_1",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_1",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_2",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_2",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_3",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_3",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_4",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_4",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_5",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_5",
+          "bone": "jaw",
+          "material": "bone"
+        }
+      ]
+    },
+    {
+      "id": "goliath",
+      "revision": "supreme-style-authored-r6",
+      "bones": 24,
+      "cuboids": 95,
+      "textureSize": 512,
+      "atlasUsedHeight": 410,
+      "geometrySha256": "8add4097bb4a3b2e200f3d1530534ce76fe534c34a0c2885bf76e8354e42619d",
+      "textureSha256": "b205882b34d7fa1dfd8179186af4271142e41a585265f513212c6cbf8a086165",
+      "reference": "P2 behemoth/source-reference.png",
+      "features": [
+        "Massive layered chest over narrow waist and visible articulated legs",
+        "Asymmetric plated right fist with separate knuckles/thumb and opposite long claws",
+        "Small high head; shin armor follows anatomy while server weakpoint centers remain unchanged"
+      ],
+      "parts": [
+        {
+          "name": "upper_ribcage",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "lower_ribcage",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "waist",
+          "bone": "torso",
+          "material": "muscle"
+        },
+        {
+          "name": "right_pectoral",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_clavicle",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_lat",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_scapula",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "right_abdominal_0",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_abdominal_1",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_abdominal_2",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "right_pectoral_sinew",
+          "bone": "torso",
+          "material": "muscle"
+        },
+        {
+          "name": "right_humerus",
+          "bone": "right_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "right_radius",
+          "bone": "right_forearm",
+          "material": "muscle"
+        },
+        {
+          "name": "right_elbow",
+          "bone": "right_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "right_deltoid",
+          "bone": "right_arm",
+          "material": "skin"
+        },
+        {
+          "name": "right_biceps",
+          "bone": "right_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "giant_fist_palm",
+          "bone": "right_hand",
+          "material": "dark"
+        },
+        {
+          "name": "giant_fist_dorsal",
+          "bone": "right_hand",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_0_knuckle",
+          "bone": "right_finger_0",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_0_curl",
+          "bone": "right_finger_0",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_1_knuckle",
+          "bone": "right_finger_1",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_1_curl",
+          "bone": "right_finger_1",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_2_knuckle",
+          "bone": "right_finger_2",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_2_curl",
+          "bone": "right_finger_2",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_3_knuckle",
+          "bone": "right_finger_3",
+          "material": "plate"
+        },
+        {
+          "name": "right_finger_3_curl",
+          "bone": "right_finger_3",
+          "material": "plate"
+        },
+        {
+          "name": "giant_thumb",
+          "bone": "right_hand",
+          "material": "plate"
+        },
+        {
+          "name": "giant_wrist_plate",
+          "bone": "right_forearm",
+          "material": "plate"
+        },
+        {
+          "name": "giant_fist_split",
+          "bone": "right_hand",
+          "material": "muscle"
+        },
+        {
+          "name": "right_thigh",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_quadriceps",
+          "bone": "right_leg",
+          "material": "skin"
+        },
+        {
+          "name": "right_tibia",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_kneecap",
+          "bone": "right_shin",
+          "material": "plate"
+        },
+        {
+          "name": "right_foot",
+          "bone": "right_shin",
+          "material": "fold"
+        },
+        {
+          "name": "right_toe_0",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_1",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_toe_2",
+          "bone": "right_shin",
+          "material": "dark"
+        },
+        {
+          "name": "right_shin_armor",
+          "bone": "weak_0",
+          "material": "plate"
+        },
+        {
+          "name": "right_shin_armor_side",
+          "bone": "weak_0",
+          "material": "plate"
+        },
+        {
+          "name": "right_shin_tissue",
+          "bone": "weak_0",
+          "material": "muscle"
+        },
+        {
+          "name": "left_pectoral",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_clavicle",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_lat",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_scapula",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "left_abdominal_0",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_abdominal_1",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_abdominal_2",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "left_pectoral_sinew",
+          "bone": "torso",
+          "material": "muscle"
+        },
+        {
+          "name": "left_humerus",
+          "bone": "left_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "left_radius",
+          "bone": "left_forearm",
+          "material": "muscle"
+        },
+        {
+          "name": "left_elbow",
+          "bone": "left_forearm",
+          "material": "fold"
+        },
+        {
+          "name": "left_deltoid",
+          "bone": "left_arm",
+          "material": "skin"
+        },
+        {
+          "name": "left_biceps",
+          "bone": "left_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "small_hand",
+          "bone": "left_hand",
+          "material": "fold"
+        },
+        {
+          "name": "left_finger_0_first",
+          "bone": "left_finger_0",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_0_tip",
+          "bone": "left_finger_0",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_1_first",
+          "bone": "left_finger_1",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_1_tip",
+          "bone": "left_finger_1",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_2_first",
+          "bone": "left_finger_2",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_2_tip",
+          "bone": "left_finger_2",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_3_first",
+          "bone": "left_finger_3",
+          "material": "bone"
+        },
+        {
+          "name": "left_finger_3_tip",
+          "bone": "left_finger_3",
+          "material": "bone"
+        },
+        {
+          "name": "left_thigh",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_quadriceps",
+          "bone": "left_leg",
+          "material": "skin"
+        },
+        {
+          "name": "left_tibia",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_kneecap",
+          "bone": "left_shin",
+          "material": "plate"
+        },
+        {
+          "name": "left_foot",
+          "bone": "left_shin",
+          "material": "fold"
+        },
+        {
+          "name": "left_toe_0",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_1",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_toe_2",
+          "bone": "left_shin",
+          "material": "dark"
+        },
+        {
+          "name": "left_shin_armor",
+          "bone": "weak_1",
+          "material": "plate"
+        },
+        {
+          "name": "left_shin_armor_side",
+          "bone": "weak_1",
+          "material": "plate"
+        },
+        {
+          "name": "left_shin_tissue",
+          "bone": "weak_1",
+          "material": "muscle"
+        },
+        {
+          "name": "cranial_vault",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "maw_shadow",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "brow_ridge_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_-1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_-1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "brow_ridge_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "jaw_hinge_1",
+          "bone": "head",
+          "material": "skin"
+        },
+        {
+          "name": "muzzle_1",
+          "bone": "head",
+          "material": "fold"
+        },
+        {
+          "name": "mandible",
+          "bone": "jaw",
+          "material": "fold"
+        },
+        {
+          "name": "lower_gum",
+          "bone": "jaw",
+          "material": "scar"
+        },
+        {
+          "name": "upper_tooth_0",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_0",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_1",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_1",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_2",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_2",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_3",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_3",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_4",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_4",
+          "bone": "jaw",
+          "material": "bone"
+        },
+        {
+          "name": "upper_tooth_5",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "lower_tooth_5",
+          "bone": "jaw",
+          "material": "bone"
+        }
+      ]
+    },
+    {
+      "id": "flyer",
+      "revision": "supreme-style-authored-r6",
+      "bones": 9,
+      "cuboids": 63,
+      "textureSize": 512,
+      "atlasUsedHeight": 36,
+      "geometrySha256": "c34bdf406ccc86f5b6e2862443cbbfb5927ee9446862cd99b64e707cc31086de",
+      "textureSha256": "4db355f5637aa7b6b42844e4c9c0d183dd8cb9a8cf6f2dc450cceb8df3342fd3",
+      "reference": "P2 flyer/source-reference.png",
+      "features": [
+        "Pale hooked skull, compact ribcage and articulated trailing talons",
+        "Continuous stepped patagium joins five tapering wing fingers",
+        "Thin membrane cuboids and bone spars use the accepted pixel material scale"
+      ],
+      "parts": [
+        {
+          "name": "thorax",
+          "bone": "torso",
+          "material": "skin"
+        },
+        {
+          "name": "breastbone",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "dorsal_plate",
+          "bone": "torso",
+          "material": "fold"
+        },
+        {
+          "name": "skull",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "beak_root",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "beak_hook",
+          "bone": "head",
+          "material": "bone"
+        },
+        {
+          "name": "beak_tip",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "lower_beak",
+          "bone": "jaw",
+          "material": "fold"
+        },
+        {
+          "name": "right_eye_socket",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "right_humerus",
+          "bone": "right_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "right_radius",
+          "bone": "right_arm",
+          "material": "bone"
+        },
+        {
+          "name": "right_upper_membrane",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_outer_membrane",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_wing_digit_0",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_wing_tip_0",
+          "bone": "right_arm",
+          "material": "dark"
+        },
+        {
+          "name": "right_trailing_membrane_0",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_wing_digit_1",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_wing_tip_1",
+          "bone": "right_arm",
+          "material": "dark"
+        },
+        {
+          "name": "right_trailing_membrane_1",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_wing_digit_2",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_wing_tip_2",
+          "bone": "right_arm",
+          "material": "dark"
+        },
+        {
+          "name": "right_trailing_membrane_2",
+          "bone": "right_arm",
+          "material": "fold"
+        },
+        {
+          "name": "right_wing_digit_3",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_wing_tip_3",
+          "bone": "right_arm",
+          "material": "dark"
+        },
+        {
+          "name": "right_wing_digit_4",
+          "bone": "right_arm",
+          "material": "plate"
+        },
+        {
+          "name": "right_wing_tip_4",
+          "bone": "right_arm",
+          "material": "dark"
+        },
+        {
+          "name": "right_femur",
+          "bone": "right_leg",
+          "material": "fold"
+        },
+        {
+          "name": "right_ankle",
+          "bone": "right_leg",
+          "material": "bone"
+        },
+        {
+          "name": "right_talon_0",
+          "bone": "right_leg",
+          "material": "bone"
+        },
+        {
+          "name": "right_talon_1",
+          "bone": "right_leg",
+          "material": "bone"
+        },
+        {
+          "name": "right_talon_2",
+          "bone": "right_leg",
+          "material": "bone"
+        },
+        {
+          "name": "right_rib_0",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "right_rib_1",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "right_rib_2",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "left_eye_socket",
+          "bone": "head",
+          "material": "dark"
+        },
+        {
+          "name": "left_humerus",
+          "bone": "left_arm",
+          "material": "muscle"
+        },
+        {
+          "name": "left_radius",
+          "bone": "left_arm",
+          "material": "bone"
+        },
+        {
+          "name": "left_upper_membrane",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_outer_membrane",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_wing_digit_0",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_wing_tip_0",
+          "bone": "left_arm",
+          "material": "dark"
+        },
+        {
+          "name": "left_trailing_membrane_0",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_wing_digit_1",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_wing_tip_1",
+          "bone": "left_arm",
+          "material": "dark"
+        },
+        {
+          "name": "left_trailing_membrane_1",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_wing_digit_2",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_wing_tip_2",
+          "bone": "left_arm",
+          "material": "dark"
+        },
+        {
+          "name": "left_trailing_membrane_2",
+          "bone": "left_arm",
+          "material": "fold"
+        },
+        {
+          "name": "left_wing_digit_3",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_wing_tip_3",
+          "bone": "left_arm",
+          "material": "dark"
+        },
+        {
+          "name": "left_wing_digit_4",
+          "bone": "left_arm",
+          "material": "plate"
+        },
+        {
+          "name": "left_wing_tip_4",
+          "bone": "left_arm",
+          "material": "dark"
+        },
+        {
+          "name": "left_femur",
+          "bone": "left_leg",
+          "material": "fold"
+        },
+        {
+          "name": "left_ankle",
+          "bone": "left_leg",
+          "material": "bone"
+        },
+        {
+          "name": "left_talon_0",
+          "bone": "left_leg",
+          "material": "bone"
+        },
+        {
+          "name": "left_talon_1",
+          "bone": "left_leg",
+          "material": "bone"
+        },
+        {
+          "name": "left_talon_2",
+          "bone": "left_leg",
+          "material": "bone"
+        },
+        {
+          "name": "left_rib_0",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "left_rib_1",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "left_rib_2",
+          "bone": "torso",
+          "material": "bone"
+        },
+        {
+          "name": "tail_0",
+          "bone": "tail",
+          "material": "plate"
+        },
+        {
+          "name": "tail_1",
+          "bone": "tail",
+          "material": "plate"
+        },
+        {
+          "name": "tail_2",
+          "bone": "tail",
+          "material": "plate"
+        }
+      ]
+    }
+  ],
+  "reviewStatus": "Sixteen in-game gallery views and fifteen action/weakpoint scenes reviewed. 132 captured frames; bounded anatomical combat replaces unsuitable Supreme attack retargets. User aesthetic approval and original-game motion matching remain open.",
+  "review": {
+    "captureDigest": "43b8de0282e6b54f932dbbee271e1b5bddfed91d300aa3c858d52cddbc7d4f68",
+    "scenes": 15,
+    "frames": 132,
+    "unitChecks": {
+      "neo1211": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "forge1201": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "report": "D:/CodexCache/encounter-qa/visual-review.json"
+  }
+}

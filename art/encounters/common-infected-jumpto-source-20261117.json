@@ -1,0 +1,315 @@
+{
+  "date": "2026-11-17",
+  "state": "implemented in both source trees; no build, unit/GameTest or player acceptance executed",
+  "scope": "Common infected jump_attack airborne tracking. The earlier no-homing assumption is corrected by independent P1 static evidence. This does not claim complete original clips, launch controller or AI selection.",
+  "source": {
+    "game": "Prototype 1",
+    "fig": "D:\\PrototypeReference\\p1\\input\\comparison\\infected2_all_fig.p3d.rz",
+    "figSha256": "c6699a17e82e5940d7efd8eb6fe931f6e81c0cd4d7d9e5c7c5bafb541e7cda4f",
+    "runtime": "D:\\PrototypeReference\\p1\\input\\prototypeenginef.dll",
+    "runtimeSha256": "8cba8da3412df4f49cd61d02445e87a0cda551dea4f2fc1e66b19c1bfe28a760",
+    "branch": "infected2/opening/surface/ground/attacks/jump_attack/jump_attack/pose/release",
+    "trackOffset": 13028,
+    "payloadOffset": 13040,
+    "payloadBytes": 100,
+    "offsetMeaning": "Offsets in decompressed P3D/FIG bytes; not positions in the compressed RZ.",
+    "fieldOrderProof": "JumpToTrack RTTI .?AVJumpToTrack@motion@fightitems@proto@@ at 10ff6e84, vtable 10db8bac. Property registration 10185f80 and every setter were independently read; field order consumes all 100 payload bytes including base flags. Bool fields use four serialized bytes; chargeType is an eight-byte enum hash.",
+    "fields": [
+      {
+        "name": "unknown",
+        "at": 13040,
+        "value": 0
+      },
+      {
+        "name": "timeBegin",
+        "at": 13044,
+        "value": 0.0
+      },
+      {
+        "name": "timeEnd",
+        "at": 13048,
+        "value": -1.0
+      },
+      {
+        "name": "useTarget",
+        "at": 13052,
+        "value": 1
+      },
+      {
+        "name": "chargeType",
+        "at": 13056,
+        "value": 4122290943349627157
+      },
+      {
+        "name": "distanceMin",
+        "at": 13064,
+        "value": 5.0
+      },
+      {
+        "name": "distanceMax",
+        "at": 13068,
+        "value": 5.0
+      },
+      {
+        "name": "useDistanceWhenUsingTarget",
+        "at": 13072,
+        "value": 0
+      },
+      {
+        "name": "minInitialVelocityMin",
+        "at": 13076,
+        "value": 5.0
+      },
+      {
+        "name": "minInitialVelocityMax",
+        "at": 13080,
+        "value": 5.0
+      },
+      {
+        "name": "maxInitialVelocityMin",
+        "at": 13084,
+        "value": 17.0
+      },
+      {
+        "name": "maxInitialVelocityMax",
+        "at": 13088,
+        "value": 17.0
+      },
+      {
+        "name": "trackingMin",
+        "at": 13092,
+        "value": 50.0
+      },
+      {
+        "name": "trackingMax",
+        "at": 13096,
+        "value": 50.0
+      },
+      {
+        "name": "minSpeedTracking",
+        "at": 13100,
+        "value": -100.0
+      },
+      {
+        "name": "launchAngle",
+        "at": 13104,
+        "value": 57.0
+      },
+      {
+        "name": "minLaunchAngle",
+        "at": 13108,
+        "value": 0.0
+      },
+      {
+        "name": "gravity",
+        "at": 13112,
+        "value": 30.0
+      },
+      {
+        "name": "offset",
+        "at": 13116,
+        "value": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "priority",
+        "at": 13128,
+        "value": 0
+      },
+      {
+        "name": "blendInTime",
+        "at": 13132,
+        "value": 0.0
+      },
+      {
+        "name": "blendOutTime",
+        "at": 13136,
+        "value": 0.33333298563957214
+      }
+    ],
+    "setters": {
+      "useTarget": "10185930 -> +65",
+      "distanceMin/Max": "10185950/10185970 -> +28/+24",
+      "useDistanceWhenUsingTarget": "10185990 -> +64",
+      "minInitialVelocityMin/Max": "101859a0/101859c0 -> +40/+3c",
+      "maxInitialVelocityMin/Max": "101859e0/10185a00 -> +38/+34",
+      "trackingMin/Max": "10185a20/10185a40 multiply degrees-to-radians then +58/+54",
+      "minSpeedTracking": "10185a60 -> +48",
+      "launchAngle/minLaunchAngle": "10185a80/10185aa0 multiply degrees-to-radians then +30/+44",
+      "gravity": "10185ac0 -> +2c"
+    },
+    "privateEvidence": [
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-refs-112546f0.txt",
+        "sha256": "c11c22cef014e8381c545b524824ef738405afae5db282c02489390fb681c5d4"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10185b80.txt",
+        "sha256": "8ad6e150a9e9ecfa20d7b23f808c7795bee04ad5accb179da10676d6f49a0ee9"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e1670.txt",
+        "sha256": "e1fc3b08ceac03b1793df8f1c3f90f295d40e07aff8a8f82555544605809692c"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e22d0.txt",
+        "sha256": "d3d6a1884b745d3b9d8643f2fe62a352612838629ce051e93e5400ab43dd866a"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e2b60.txt",
+        "sha256": "65f41fde7a00f35350e69adb92d1ded794e399ae0e7432b21626b6337a3459ae"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101265b0.txt",
+        "sha256": "3a331e64b12adc48289d8c217868ef960b276d04695ad9695aed18deaf0405b4"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-10126500.txt",
+        "sha256": "bd2b2d302eb118da132571f6f7de5b7290a8a3c1852948c43464529c97556169"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-101262f0.txt",
+        "sha256": "e337e51f9968ac6a0b0f64947b371459996736add98edddae612a9e7e2c431f4"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e2510.txt",
+        "sha256": "9ce347951388bc46a8b9fe6ffa3bcb04605b8059afa90260491ede194dba7cac"
+      },
+      {
+        "file": "D:\\PrototypeReference\\p1\\private\\rapid-runtime-100e17a0.txt",
+        "sha256": "bbe70267f1a9ca1cb1c72b4b9d334baffebf88cd0d275dda6e7fa3cea6808079"
+      }
+    ]
+  },
+  "runtimeProof": [
+    {
+      "address": "100e1670, specifically 100e1723",
+      "meaning": "New JumpToAction initializes its tracking latch at +70 to true."
+    },
+    {
+      "address": "100e22e4..100e2301",
+      "meaning": "Tracking compares current vertical direction times current speed against minSpeedTracking; below threshold clears +70 and returns."
+    },
+    {
+      "address": "100e2328..100e237b",
+      "meaning": "Reads target motion and target-position query for the retained target handle. The MC target-center and grounded velocity adapter is explicit below."
+    },
+    {
+      "address": "100e2431..100e247f",
+      "meaning": "Lerps trackingMin/Max using charge; this FIG sets both to 50. Calls 101265b0 with current direction, current speed, delta time, rate, dot cutoff 0, prediction true, no fallback flag."
+    },
+    {
+      "address": "101262f0, 10126500",
+      "meaning": "Quadratic intercept uses a=dot(vTarget,vTarget)-speed^2, b=2*dot(target-self,vTarget), c=distance^2; positive root t=2*c/(sqrt(b*b-4*a*c)-b) produces target+vTarget*t. Nonpositive solution falls back to target position."
+    },
+    {
+      "address": "1012671f..10126815, 10126861..10126918",
+      "meaning": "Predicted direction dot current direction must exceed zero. Otherwise false is returned without turning. For a valid direction the rotation angle is at most rate*dt and the direction is normalized; no speed is added."
+    },
+    {
+      "address": "100e2489",
+      "meaning": "Return value becomes tracking latch +70; passing the target does not allow a later U-turn/reacquisition in the same action."
+    },
+    {
+      "address": "100e2bc1..100e2c26",
+      "meaning": "Action update first applies tracking, then multiplies direction by current speed, subtracts gravity*dt from Y and normalizes/stores new speed."
+    }
+  ],
+  "implemented": [
+    "One committed target throughout the leap, now with finite 3D airborne tracking instead of hard-locked trajectory.",
+    "50 degrees/second becomes 2.5 degrees per 20 Hz tick; current speed is preserved and native-style intercept prediction is bounded by the angular limit.",
+    "Passing the target (predicted dot <= 0) latches tracking off; no target swap, restart or repeated leap loop is introduced.",
+    "The block-person body yaw follows horizontal flight direction. Wrist contact interpolates previous/current yaw with the same Mth.rotLerp path as the renderer, including crossing +/-180.",
+    "Next-step swept bounds plus collision-query border require every covered chunk to be loaded. Unknown terrain stops velocity and aborts. Side/ceiling obstacles, new line-of-sight cover, protected/vehicle targets abort the action before damage."
+  ],
+  "minecraftAdaptations": [
+    "Target position is its receiving AABB center; grounded target velocity has its residual MC gravity component removed. This is not claimed to reproduce native position-query submode 2.",
+    "Source minSpeedTracking=-100 is expressed as -5 blocks/tick using one source distance unit to one block for this speed gate. Existing jump initial velocity, MC gravity/drag, fixed entry range and timeout remain the previous explicit adapters. Full native launch-angle/speed/gravity code is NOT ported by this patch.",
+    "Line-of-sight, consumption/vehicle invalidation and loaded-chunk checks are MC safety rules, not claimed to be recovered native JumpTo abort rules. Vanilla collision owns actual movement; the AI never calls move or teleports for tracking.",
+    "Native tracking changes 3D velocity. Keeping the upright authored block-person facing aligned to horizontal velocity and using its right wrist is an MC rig adaptation.",
+    "No new source animation or sound asset was imported. Release hash f690459128de52ce and land hash 617db94293869beb are absent from the 24 clips in the current infected2_all package; full source clip resolution and landing bone retarget remain pending."
+  ],
+  "pendingValidation": {
+    "unitClass": "com.codex.blacklight.infection.CommonInfectedLeapTest",
+    "newUnitMethods": [
+      "nativeAirTrackingTurnsInThreeDimensionsWithoutAddingSpeed",
+      "nativeTrackingLeadsMotionAndStaysOffAfterPassingTheTarget",
+      "sidestepCannotInstantlyRedirectFlightAndInvalidMotionCannotPropagate",
+      "turningWristUsesTheSameShortestYawPathAsRendering"
+    ],
+    "unitEntry": "tools/player-fix-unit.init.gradle already includes CommonInfectedLeapTest.class",
+    "gameTestClass": "com.codex.blacklight.gametest.CommonInfectedLeapGameTest",
+    "changedOrNewGameMethods": [
+      "sourceAirTrackingBendsTowardASidestepWithoutSnappingToIt",
+      "coverAddedInFlightCancelsTrackingAndDamage"
+    ],
+    "supersededAssumption": "sidestepAfterAimCutoffIsNotFollowedByAnAirborneTurn was replaced, because the original source explicitly tracks while airborne.",
+    "gameEntry": "tools/player-creature-regression.init.gradle / playerCreatureServer already selects this class",
+    "playerChecks": [
+      "On outdoor ground, small sideways movement bends the flying infected gradually; a large late sidestep can still evade it.",
+      "Move behind it after release: no U-turn. Add a wall during flight, enter a vehicle or become consumption-protected: no late wrist damage.",
+      "Repeat at stairs, slabs, low beams and loaded-chunk edges; confirm safe landing/cancellation without loading unknown columns or repeated jumping.",
+      "Watch a network client near +/-180 facing: the rendered wrist and server hit sweep should follow the same short yaw path."
+    ]
+  },
+  "staticValidation": [
+    "Source payload length/field inspection against original runtime registration and setter addresses",
+    "Changed helper and unit test byte identity, actual AI-goal block identity, and normalized GameTest mirror",
+    "Scoped git diff --check in both source trees"
+  ],
+  "notRun": [
+    "Gradle",
+    "javac",
+    "unit tests",
+    "GameTests",
+    "game/client",
+    "native DLL execution/emulation",
+    "media playback"
+  ],
+  "files": {
+    "blacklight-evolution": [
+      {
+        "file": "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java",
+        "sha256": "51ccb88ceaaf563b6052f57577a8e8ce3e8fce535704ab66d2b19dd043f84f45"
+      },
+      {
+        "file": "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java",
+        "sha256": "c0e9484b41b05c4861913cd5d4d94943597ef2e9a77c013effad3529ac16e48b"
+      },
+      {
+        "file": "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java",
+        "sha256": "c2e31827603e32568849cb35d7a535ebb1cec12fde17ef589272793964f520eb"
+      },
+      {
+        "file": "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java",
+        "sha256": "49ce39837619fae58d4fb9548fc6ca8987d82c7efbf54989fbc028a520d8dbd2"
+      }
+    ],
+    "blacklight-evolution-forge-1.20.1": [
+      {
+        "file": "src/main/java/com/codex/blacklight/infection/CommonInfectedLeap.java",
+        "sha256": "51ccb88ceaaf563b6052f57577a8e8ce3e8fce535704ab66d2b19dd043f84f45"
+      },
+      {
+        "file": "src/main/java/com/codex/blacklight/entity/BlacklightCommonInfected.java",
+        "sha256": "7ce056c92f6eb6f99f066e44a43dc5c1dc96c7efe750222fa851eee81ee317ec"
+      },
+      {
+        "file": "src/test/java/com/codex/blacklight/infection/CommonInfectedLeapTest.java",
+        "sha256": "c2e31827603e32568849cb35d7a535ebb1cec12fde17ef589272793964f520eb"
+      },
+      {
+        "file": "src/feedbackTest/java/com/codex/blacklight/gametest/CommonInfectedLeapGameTest.java",
+        "sha256": "a1b9f356431e5c98805743caba25459502fd6b861baa7baa881261651d1e0d32"
+      }
+    ]
+  },
+  "launchContinuation": "art/encounters/common-infected-launch-source-20261117.json closes initial-speed/gravity/driver gaps after this tracking implementation snapshot; the files hashes below are that earlier snapshot.",
+  "rootExitContinuation": {
+    "record": "art/encounters/common-infected-root-exit-source-20261117.json",
+    "meaning": "Later static proof identifies .333333 as root-motion driver weight, not skeletal pose blending. Bounded horizontal MC exit now integrated; this document retains its earlier historical file snapshots."
+  }
+}

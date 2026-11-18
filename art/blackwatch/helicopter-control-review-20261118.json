@@ -1,0 +1,25 @@
+{
+  "port": "neo",
+  "log": "D:/CodexCache/work/helicopter-final-verified-neo-20261118.log",
+  "releaseJarInstalled": false,
+  "gameFailures": 0,
+  "clientRelaunched": false,
+  "unitFailures": 0,
+  "playerSavesModified": false,
+  "unitErrors": 0,
+  "unitTests": 145,
+  "gameTests": 26,
+  "physicalTabAndHudVerified": false,
+  "date": "2026-11-18",
+  "productionSha256": {
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterManualAim.java": "A887CDE0529F410963B7211F03F7AA8618268467FD5ABD9462483A664C58292B",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterSupplies.java": "E8CC8A3A05243DE4FCB6652669B335DB07BB5A03A89D0FBE0164D68F6C9E564C",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterPilot.java": "820BA474517C2B4926300771860BC3FF95DA1446EBA5A2D960F8119E50E5DEB5",
+    "src/main/java/com/codex/blacklight/entity/BlackwatchHelicopter.java": "3538F6CE7FF8CB9A3E8AF5FAE9D2463C1B6C29051182F208935F76179D347958",
+    "src/main/java/com/codex/blacklight/client/vehicle/HelicopterControls.java": "C462AED825E6DF0481A213E7A33C0BEE0610F1728EE63C124B40F16695BB1B7E",
+    "src/main/java/com/codex/blacklight/combat/ExplicitTarget.java": "89971CCE0715FDAA661B56E22D2FEEDB520A97222A10C10CE62887B898FCBCCE",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterCombat.java": "C0288791CCE7169AFECAD2B5DA45F7DC3579C866435D2F8BE3C40C6B75199DD9",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterFlight.java": "0A63EC86AD5A3C2FE699016117182AFFD91A1A39BEDB04FB01DB18B44490BFDC",
+    "src/main/java/com/codex/blacklight/military/aircraft/HelicopterMovementClearance.java": "600240FBDD620AC6BC8A39491D9945C1D4799AFEADA2D266DB5B084689D83464"
+  }
+}

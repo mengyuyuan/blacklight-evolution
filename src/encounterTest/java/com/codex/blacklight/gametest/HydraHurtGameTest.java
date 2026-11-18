@@ -1,0 +1,136 @@
+package com.codex.blacklight.gametest;
+
+import com.codex.blacklight.combat.*;
+import com.codex.blacklight.entity.*;
+import com.codex.blacklight.registry.*;
+import com.codex.blacklight.power.PowerForm;
+import com.mojang.authlib.GameProfile;
+import java.util.*;
+import net.minecraft.gametest.framework.*;
+import net.minecraft.server.level.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.projectile.*;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.*;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
+import net.neoforged.neoforge.gametest.*;
+
+/** Native pick/projectile and real weapon sessions against animated receiver surfaces. */
+@GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
+public final class HydraHurtGameTest {
+    private static BlacklightHydra hydra(GameTestHelper h){
+        var m=ModEntities.BLACKLIGHT_HYDRA.get().create(h.getLevel());m.setNoAi(true);m.setNoGravity(true);m.setBodySize(2);
+        m.setPos(h.absoluteVec(new Vec3(14,5,12)));m.setYRot(0);m.yBodyRot=0;m.yBodyRotO=0;h.getLevel().addFreshEntity(m);m.updateParts();return m;
+    }
+    private static ServerPlayer player(GameTestHelper h){
+        var profile=new GameProfile(UUID.randomUUID(),"HydraReceiverQA");
+        var p=new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(h.getLevel(),profile).connection;p.setNoGravity(true);h.getLevel().addNewPlayer(p);return p;
+    }
+    private static HydraContact.Region head(BlacklightHydra m){return m.hurtRegions(0).stream().filter(r->r.bone().equals("head")).findFirst().orElseThrow();}
+    private static void aim(ServerPlayer p,Vec3 eye,Vec3 at){
+        p.setPos(eye.add(0,-p.getEyeHeight(),0));var d=at.subtract(eye);p.setYRot((float)Math.toDegrees(Math.atan2(-d.x,d.z)));p.setXRot((float)-Math.toDegrees(Math.atan2(d.y,d.horizontalDistance())));p.yBodyRot=p.yBodyRotO=p.getYRot();p.yRotO=p.getYRot();
+    }
+    private static void cleanup(BlacklightHydra m,ServerPlayer p){WeaponCombatSystem.cancel(p);m.discard();p.serverLevel().removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}
+    private static EntityHitResult pick(ServerPlayer p,Vec3 a,Vec3 b,java.util.function.Predicate<Entity> filter){return ProjectileUtil.getEntityHitResult(p,a,b,new AABB(a,b).inflate(.1),filter,a.distanceToSqr(b));}
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_ray",timeoutTicks=30)
+    public static void nativeHeadRayDamageAndSharedInvulnerability(GameTestHelper h){
+        var m=hydra(h);var p=player(h);
+        try{
+            var center=head(m).boxes().get(0).center;var from=center.add(3,0,0);aim(p,from,center);
+            var hit=pick(p,from,center,e->e instanceof HydraPart part&&part.getParent()==m);
+            h.assertTrue(hit!=null,"native ray selects animated head outside root");
+            h.assertTrue(m.getBoundingBox().clip(from,center).isEmpty(),"fixture misses the obsolete root column");
+            var part=(HydraPart)hit.getEntity();float hp=m.getHealth();
+            h.assertTrue(part.hurt(p.damageSources().playerAttack(p),4),"native part forwards accepted damage");
+            h.assertTrue(m.getHealth()<hp&&m.incomingEffects()==1,"one real health change and one local receipt");
+            h.assertTrue(m.incomingPoint().distanceTo(hit.getLocation())<.001,"blood originates at exact ray entry");
+            h.assertTrue(!part.hurt(p.damageSources().playerAttack(p),4)&&m.incomingEffects()==1,"overlap cannot bypass parent immunity");
+            int id=m.getId();for(int i=0;i<m.getParts().length;i++)h.assertTrue(m.getParts()[i].getId()==id+i+1&&!m.getParts()[i].shouldBeSaved(),"deterministic proxies never save as extra creatures");
+            h.succeed();
+        }finally{cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_projectile",timeoutTicks=30)
+    public static void actualArrowHitsExtendedHeadAndEmitsOnce(GameTestHelper h){
+        var m=hydra(h);var p=player(h);var arrow=EntityType.ARROW.create(h.getLevel());
+        try{
+            var center=head(m).boxes().get(0).center;var from=center.add(4,0,0);aim(p,from.add(1,0,0),center);
+            arrow.setPos(from);arrow.setOwner(p);arrow.setNoGravity(true);arrow.setDeltaMovement(center.subtract(from).normalize().scale(5));arrow.setBaseDamage(2);h.getLevel().addFreshEntity(arrow);
+            float hp=m.getHealth();arrow.tick();h.assertTrue(m.getHealth()<hp&&m.incomingEffects()==1,"native arrow tick damages the visible head exactly once");
+            h.assertTrue(head(m).boxes().stream().anyMatch(b->b.nearest(m.incomingPoint()).distanceToSqr(m.incomingPoint())<.0001),"projectile receipt lies on actual head");h.succeed();
+        }finally{arrow.discard();cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_slow",timeoutTicks=30)
+    public static void slowUnownedArrowUsesTheSameNativeRayOnLaterTicks(GameTestHelper h){
+        var m=hydra(h);var p=player(h);var arrow=EntityType.ARROW.create(h.getLevel());
+        try{
+            m.setBodySize(1.6F);m.updateParts();var center=head(m).boxes().get(0).center;
+            arrow.setPos(center.add(5,0,0));arrow.setNoGravity(true);arrow.setDeltaMovement(-1.5,0,0);arrow.setBaseDamage(2);h.getLevel().addFreshEntity(arrow);
+            for(int t=0;t<6&&!arrow.isRemoved();t++){
+                var source=m.damageSources().arrow(arrow,arrow);var hit=ProjectileUtil.getEntityHitResult(h.getLevel(),arrow,arrow.position(),arrow.position().add(arrow.getDeltaMovement()),arrow.getBoundingBox().expandTowards(arrow.getDeltaMovement()).inflate(1),e->e instanceof HydraPart);
+                if(hit!=null){var part=(HydraPart)hit.getEntity();com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Slow Hydra arrow tick={} part={} position={} speed={} selected={} receiver={}",t,part.slot,arrow.position(),arrow.getDeltaMovement(),hit.getLocation(),HydraHurtContact.nativeHit(m,part.slot,source));}
+                arrow.tick();
+            }
+            h.assertTrue(m.incomingEffects()==1,"later slow arrow tick accepted once, final position="+arrow.position()+" speed="+arrow.getDeltaMovement());h.succeed();
+        }finally{arrow.discard();cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_sword",timeoutTicks=30)
+    public static void vanillaSwordAttackUsesNativePartAndConfirmedWound(GameTestHelper h){
+        var m=hydra(h);var p=player(h);
+        try{
+            var center=head(m).boxes().get(0).center;aim(p,center.add(3,0,0),center);p.setItemSlot(EquipmentSlot.MAINHAND,Items.IRON_SWORD.getDefaultInstance());
+            for(int i=0;i<25;i++)p.tick();aim(p,center.add(3,0,0),center);
+            var hit=pick(p,p.getEyePosition(),center,e->e instanceof HydraPart part&&part.getParent()==m);h.assertTrue(hit!=null,"native sword can select head");
+            float hp=m.getHealth();p.attack(hit.getEntity());h.assertTrue(m.getHealth()<hp&&m.incomingEffects()==1,"real Player.attack reaches shared parent damage and local feedback");
+            h.assertTrue(m.incomingPoint().distanceTo(hit.getLocation())<.001,"sword feedback uses aimed surface");h.succeed();
+        }finally{cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_miss",timeoutTicks=30)
+    public static void emptyBroadCornerDoesNotOccludeAnotherEntity(GameTestHelper h){
+        var m=hydra(h);var p=player(h);net.minecraft.world.entity.animal.Cow behind=null;
+        try{
+            Vec3 from=null,to=null;
+            outer:for(var part:m.getParts()){
+                var b=part.getBoundingBox();for(double fx:new double[]{.01,.99})for(double fy:new double[]{.01,.99}){
+                    var a=new Vec3(b.minX+b.getXsize()*fx,b.minY+b.getYsize()*fy,b.minZ-.2);var z=new Vec3(a.x,a.y,b.maxZ+.2);
+                    if(Arrays.stream(m.getParts()).allMatch(q->q.clip(a,z).isEmpty())){from=a;to=z;break outer;}
+                }
+            }
+            h.assertTrue(from!=null,"fixture crosses a broad proxy through an actual empty corner");
+            aim(p,from,to);h.assertTrue(pick(p,from,to,e->e instanceof HydraPart part&&part.getParent()==m)==null,"native picking rejects empty corner");
+            h.assertTrue(ProjectileUtil.getEntityHitResult(h.getLevel(),p,from,to,new AABB(from,to).inflate(.1),e->e instanceof HydraPart part&&part.getParent()==m)==null,"projectile overload also rejects empty corner before arrows bounce off it");
+            behind=EntityType.COW.create(h.getLevel());behind.setNoAi(true);behind.setNoGravity(true);behind.setPos(to.add(0,-.5,1));h.getLevel().addFreshEntity(behind);
+            var cow=behind;var hit=pick(p,from,to.add(0,0,2),e->e==cow||e instanceof HydraPart part&&part.getParent()==m);
+            h.assertTrue(hit!=null&&hit.getEntity()==cow,"transparent corner retains native nearest-target ordering");h.succeed();
+        }finally{if(behind!=null)behind.discard();cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_block",timeoutTicks=30)
+    public static void wallAndInvulnerabilityCannotEmitBlood(GameTestHelper h){
+        var m=hydra(h);var p=player(h);net.minecraft.core.BlockPos wall=null;
+        try{
+            var center=head(m).boxes().get(0).center;var from=center.add(3,0,0);aim(p,from,center);
+            var hit=pick(p,from,center,e->e instanceof HydraPart part&&part.getParent()==m);h.assertTrue(hit!=null,"head visible before obstruction");
+            var part=(HydraPart)hit.getEntity();float hp=m.getHealth();m.setInvulnerable(true);
+            h.assertTrue(!part.hurt(p.damageSources().playerAttack(p),8)&&m.incomingEffects()==0,"immune contact has no blood");m.setInvulnerable(false);
+            wall=net.minecraft.core.BlockPos.containing(from.lerp(hit.getLocation(),.5));h.getLevel().setBlock(wall,Blocks.STONE.defaultBlockState(),2);
+            h.assertTrue(!part.hurt(p.damageSources().playerAttack(p),8)&&m.getHealth()==hp&&m.incomingEffects()==0,"wall blocks damage and feedback");h.succeed();
+        }finally{if(wall!=null)h.getLevel().setBlock(wall,Blocks.AIR.defaultBlockState(),2);cleanup(m,p);}
+    }
+    @GameTest(template="blackwatch_facility_arena",batch="hydra_incoming_forms",timeoutTicks=60)
+    public static void clawsBladeAndHammerReachVisibleHead(GameTestHelper h) throws Exception {
+        var m=hydra(h);var p=player(h);boolean old=WeaponCombatSystem.actorHitstop(false);
+        try{
+            var state=p.getData(ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);
+            var start=WeaponCombatSystem.class.getDeclaredMethod("start",ServerPlayer.class,WeaponMove.class,boolean.class,WeaponMove.Input.class,float.class);start.setAccessible(true);
+            for(var move:new WeaponMove[]{WeaponMove.CLAW_AUTO1,WeaponMove.BLADE_CUT,WeaponMove.HAMMER_JAB}){
+                WeaponCombatSystem.cancel(p);state.unlock(move.form);state.activate(move.form);m.setHealth(m.getMaxHealth());m.invulnerableTime=0;
+                var center=head(m).boxes().get(0).center;aim(p,center.add(0,0,2.2),center);p.setOnGround(true);p.tickCount+=100;
+                int effects=m.incomingEffects();start.invoke(null,p,move,false,WeaponMove.Input.ATTACK,0F);int began=p.tickCount;
+                for(int t=0;t<=move.duration+3;t++){p.tickCount=began+t;p.setOnGround(true);WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));}
+                h.assertTrue(m.getHealth()<m.getMaxHealth()&&m.incomingEffects()>effects,"real "+move.id+" session reaches actual head");
+                h.assertTrue(m.incomingPoint().distanceTo(m.position())>3,"weapon feedback stays on extended body");
+            }h.succeed();
+        }finally{WeaponCombatSystem.actorHitstop(old);cleanup(m,p);}
+    }
+}

@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir('src/encounterTest/java')
+    sourceSets.main.java.exclude { entry -> !entry.isDirectory() && entry.file.path.replace('\\','/').contains('/src/encounterTest/') && entry.name!='HydraHurtGameTest.java' }
+    sourceSets.main.resources.srcDir('src/blackwatchTest/resources')
+} }

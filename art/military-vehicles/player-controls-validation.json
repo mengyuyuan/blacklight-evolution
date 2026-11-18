@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "recordedLocal": "2026-11-17T00:41:49+08:00",
+  "scope": "Fullscreen menu cursor and real-player helicopter input investigation",
+  "implementation": {
+    "cursor": "Software pointer in fullscreen ScreenEvent.Render.Post; exact window-coordinate hotspot; native cursor restored in windowed mode and on focus loss without releasing captured camera",
+    "configuration": "blacklight-client.toml: fullscreenMenuCursor=true",
+    "flightControllerChanged": false,
+    "temporaryInputTracingRemoved": true
+  },
+  "sources": [
+    {
+      "path": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\client\\FullscreenMenuCursor.java",
+      "sha256": "728bc2d97f899ff7ab204e44d2c39e5496f997a9cc8699d11552603e4880362e"
+    },
+    {
+      "path": "D:\\blacklight-evolution\\src\\main\\java\\com\\codex\\blacklight\\config\\PassiveHudConfig.java",
+      "sha256": "2c6bcc8c9a1ede9c267de8acb664334b894cdf97832b328a445ef3f021551abd"
+    },
+    {
+      "path": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\client\\FullscreenMenuCursor.java",
+      "sha256": "b63af29892eb7cfdcba22f093dd98ddf3a004f6add5f01f3ca93c3cd2a79d1ed"
+    },
+    {
+      "path": "D:\\blacklight-evolution-forge-1.20.1\\src\\main\\java\\com\\codex\\blacklight\\config\\PassiveHudConfig.java",
+      "sha256": "8ff8e0b0ebd27df4544e8b3b5501b6f633beb39e07ad953bc78a1e89899f6ff8"
+    }
+  ],
+  "verification": {
+    "neo": "Normal visible NeoForge 1.21.1 client compiled and launched with the new cursor; no silent QA mixin",
+    "forge": "compileJava BUILD SUCCESSFUL (19s), D:/CodexCache/creature-combat-forge-compileJava.log",
+    "isolatedSave": "Copy of the player save under D:/CodexCache/controls-review/saves/controls-copy; original save not modified by investigation",
+    "actualPlayerFeedback": [
+      "现在可以移动和转向",
+      "箭头可见，驾驶也正常"
+    ],
+    "liveTelemetry": "Driver slot=0, valid lease, rotor=1.0 and clear airframe. Actual W/S/A/D reached the server and changed position/heading."
+  },
+  "followUp": {
+    "recurredAfterSwitchingOut": true,
+    "recoveredAgain": true,
+    "userHypothesis": "可能是输入法的问题",
+    "diagnosis": "IME interception is consistent with the observation, but no native IME interception trace was captured; do not claim an aircraft-physics fix.",
+    "upstreamEvidence": "https://raw.githubusercontent.com/glfw/glfw/3.3.9/src/win32_window.c (VK_PROCESSKEY branch ignores IME-filtered key messages)"
+  },
+  "limitations": [
+    "Forge cursor was compiled, not tested interactively on this machine.",
+    "Full-project gameplay/model/audio/source-fidelity goal remains active.",
+    "No release jar installed or published."
+  ]
+}

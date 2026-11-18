@@ -44,6 +44,7 @@ public final class ConsumeVictimPose {
         var matrix=new org.joml.Matrix4f();
         var visual=entity.getData(ModAttachments.CONSUME_VISUAL);
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter&&NativeReceiverPose.available(entity,partial))return matrix;
+        if(com.codex.blacklight.combat.ConsumeSequence.bruteMount(entity)&&com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))return matrix;
         if(com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))
             return matrix.rotateY((float)Math.toRadians(-entity.yBodyRot)).translate(0,h*.65F,0)
                     .rotateX(p.bend()*.16F).rotateZ(p.twist()*.20F).translate(0,-h*.65F,0).rotateY((float)Math.toRadians(entity.yBodyRot));

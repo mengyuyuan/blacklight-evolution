@@ -47,6 +47,7 @@ public final class BlacklightNeoMod {
         NeoForge.EVENT_BUS.register(com.codex.blacklight.city.CityTravel.class);
         ModAttachments.register(modBus);
         ModEntities.register(modBus);
+        com.codex.blacklight.registry.EncounterEntities.register(modBus);
         ModEffects.register(modBus);
         ModItems.register(modBus);
         com.codex.blacklight.military.vehicle.VehicleRegistry.register(modBus);
@@ -57,6 +58,7 @@ public final class BlacklightNeoMod {
         ModParticles.register(modBus);
         com.codex.blacklight.registry.ModWeaponSounds.register(modBus);
         com.codex.blacklight.firearms.GunplaySounds.register(modBus);
+        com.codex.blacklight.military.vehicle.VehicleSounds.register(modBus);
         com.codex.blacklight.registry.ModInfectedSounds.register(modBus);
         modBus.addListener(ModNetwork::register);
         modBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event)->event.enqueueWork(()->{
