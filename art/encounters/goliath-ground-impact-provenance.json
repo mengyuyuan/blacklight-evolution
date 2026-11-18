@@ -1,0 +1,305 @@
+{
+  "schema": 1,
+  "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+  "sourceSha256": "3737ff61e7042391bf12c95c2018e034f52a1945983d0a7053608a01d69240c7",
+  "runtimeSha256": "bfd62e944eaed5762bc791306f54ab4c2ce03705e52180f44d0da5cd7cc7e07d",
+  "groupOffset": 5467984,
+  "groupConditions": [
+    "Onscreen"
+  ],
+  "records": [
+    {
+      "offset": 5468052,
+      "payloadBytes": 112,
+      "payloadSha256": "7934451665504f54556cdc043e0d979aa6946565be19fb4a6434a73727e50d1a",
+      "localBegin": 0.03333330154418945,
+      "fields": {
+        "atTick": 39,
+        "position": [
+          2.5,
+          0.0,
+          -13.0
+        ],
+        "direction": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "minAngle": 5.0,
+        "maxAngle": 15.0,
+        "startDistance": 0.0,
+        "length": 17.0,
+        "minDecals": 5,
+        "maxDecals": 10,
+        "minDecalScale": 6.0,
+        "maxDecalScale": 6.0
+      },
+      "references": {
+        "damageType": {
+          "hash": "419e0b59d25d5619",
+          "name": "Crush"
+        },
+        "attackType": {
+          "hash": "004e39cf41ea1fd6",
+          "name": "None"
+        },
+        "hitType": {
+          "hash": "0000000000000000",
+          "name": null
+        },
+        "effectType": {
+          "hash": "fe101117339310e9",
+          "name": null
+        }
+      }
+    },
+    {
+      "offset": 5468184,
+      "payloadBytes": 112,
+      "payloadSha256": "0dc1653b2071b8b13be33e0e4aeeca33acd4c42b3d1eb725c7bd22f891a98e13",
+      "localBegin": 0.06666669994592667,
+      "fields": {
+        "atTick": 40,
+        "position": [
+          2.5,
+          0.0,
+          -13.0
+        ],
+        "direction": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "minAngle": 15.0,
+        "maxAngle": 25.0,
+        "startDistance": 0.0,
+        "length": 17.0,
+        "minDecals": 5,
+        "maxDecals": 10,
+        "minDecalScale": 8.0,
+        "maxDecalScale": 8.0
+      },
+      "references": {
+        "damageType": {
+          "hash": "419e0b59d25d5619",
+          "name": "Crush"
+        },
+        "attackType": {
+          "hash": "004e39cf41ea1fd6",
+          "name": "None"
+        },
+        "hitType": {
+          "hash": "0000000000000000",
+          "name": null
+        },
+        "effectType": {
+          "hash": "fe101117339310e9",
+          "name": null
+        }
+      }
+    },
+    {
+      "offset": 5468316,
+      "payloadBytes": 112,
+      "payloadSha256": "ff50cb2b62df5f0da868429e61be5458275e67f4122908d8906ee931498dc80b",
+      "localBegin": 0.1166670024394989,
+      "fields": {
+        "atTick": 41,
+        "position": [
+          2.5,
+          0.0,
+          -13.0
+        ],
+        "direction": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "up": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "minAngle": 25.0,
+        "maxAngle": 35.0,
+        "startDistance": 5.0,
+        "length": 20.0,
+        "minDecals": 5,
+        "maxDecals": 10,
+        "minDecalScale": 10.0,
+        "maxDecalScale": 10.0
+      },
+      "references": {
+        "damageType": {
+          "hash": "419e0b59d25d5619",
+          "name": "Crush"
+        },
+        "attackType": {
+          "hash": "004e39cf41ea1fd6",
+          "name": "None"
+        },
+        "hitType": {
+          "hash": "0000000000000000",
+          "name": null
+        },
+        "effectType": {
+          "hash": "d73a95a702c2c0c2",
+          "name": null
+        }
+      }
+    }
+  ],
+  "nativeEvidence": [
+    {
+      "name": "WorldConeDamage property table",
+      "beginVA": "0x1042cc50",
+      "endExclusiveVA": "0x1042cfb2",
+      "fileOffset": 4374608,
+      "bytes": 866,
+      "sha256": "1ab62b439b6b323686236dec17d8e2c22a8a9607ab292a50ff9cd03a6d42deed",
+      "meaning": "timeBegin,position,direction,up,minAngle,maxAngle,startDistance,length,minDecals,maxDecals,minDecalScale,maxDecalScale,damageType,attackType,hitType,effectType"
+    },
+    {
+      "name": "Position setter",
+      "beginVA": "0x100bbf40",
+      "endExclusiveVA": "0x100bbf5a",
+      "fileOffset": 766784,
+      "bytes": 26,
+      "sha256": "4d4e1a854bd02f3649bf65bf14acfe6b4559724d724866225c70620835e527c7",
+      "meaning": "position -> runtime +0x18"
+    },
+    {
+      "name": "Direction setter",
+      "beginVA": "0x1028afb0",
+      "endExclusiveVA": "0x1028afca",
+      "fileOffset": 2663344,
+      "bytes": 26,
+      "sha256": "a0409a88cba5f4a8774036512b086e196b93b492c3c278be1983cbfab8a229f8",
+      "meaning": "direction -> runtime +0xc"
+    },
+    {
+      "name": "Up setter",
+      "beginVA": "0x10285e80",
+      "endExclusiveVA": "0x10285e9a",
+      "fileOffset": 2642560,
+      "bytes": 26,
+      "sha256": "0a0198c48395a1a9899e2f26f990d84eb428b24d82058d86b9bef11e17fe5314",
+      "meaning": "up -> runtime +0x24"
+    },
+    {
+      "name": "Minimum angle setter",
+      "beginVA": "0x104b9130",
+      "endExclusiveVA": "0x104b9148",
+      "fileOffset": 4949296,
+      "bytes": 24,
+      "sha256": "0182263d8f3942d9c5dc32285a8038a6c9fd53428dfc35564637f676e4d39aa4",
+      "meaning": "Degrees converted to radians, stored +0x4c"
+    },
+    {
+      "name": "Maximum angle setter",
+      "beginVA": "0x104a10a0",
+      "endExclusiveVA": "0x104a10b8",
+      "fileOffset": 4850848,
+      "bytes": 24,
+      "sha256": "c8664108207a710cd93cd108ae22ac01c5ec049dd2b58691eae3fba40f379f1a",
+      "meaning": "Degrees converted to radians, stored +0x44"
+    },
+    {
+      "name": "WorldConeDamage instance",
+      "beginVA": "0x103decf0",
+      "endExclusiveVA": "0x103ded35",
+      "fileOffset": 4055280,
+      "bytes": 69,
+      "sha256": "f2db73e40ed8e3984b637006a40f060e659df7b9080826be352532747ffa7745",
+      "meaning": "Stores actor handle and track; vtable 0x10be0d48"
+    },
+    {
+      "name": "Inclusive random count",
+      "beginVA": "0x102bcaa0",
+      "endExclusiveVA": "0x102bcaf5",
+      "fileOffset": 2866848,
+      "bytes": 85,
+      "sha256": "ea4918952ed4f63494d4aaaa550da153b59cea85f0b949f90ac2576b9cff023e",
+      "meaning": "Modulo max-min+1 then adds min; decal count includes both 5 and 10"
+    },
+    {
+      "name": "WorldConeDamage execution",
+      "beginVA": "0x100f7200",
+      "endExclusiveVA": "0x100f7708",
+      "fileOffset": 1009152,
+      "bytes": 1288,
+      "sha256": "f4d47a8ee030b09dbd2fd5b01cffd45246d1880d51d77e5536db814852702c95",
+      "meaning": "Executes once for action state 0; random decal count, uniformly sampled polar angle, phase plus evenly spaced azimuth and jitter +/-0.2 radians. startDistance shifts along sampled ray; length extends from that shifted origin."
+    },
+    {
+      "name": "World collision contact",
+      "beginVA": "0x104c4c80",
+      "endExclusiveVA": "0x104c4f40",
+      "fileOffset": 4997248,
+      "bytes": 704,
+      "sha256": "906c469b2a5c92fb430d9ea6e3c90cd9d79f582961141f7e91a30d29ee8be1b8",
+      "meaning": "Raycasts against world, calculates first contact and dispatches world damage/effect request 0x10164fd0 only on collision"
+    }
+  ],
+  "implementation": {
+    "resource": "D:\\blacklight-evolution\\src\\main\\resources\\assets\\blacklight\\models\\goliath_ground_impact.json",
+    "entryPoint": "GoliathGroundImpact.tick(EncounterMob,int age)",
+    "schedule": "Quantized to 20 Hz at ticks 39,40,41, once per source event per attack. No replay after its source tick.",
+    "sampling": "5..10 rays; native angle/length/start-distance values. Isotropic azimuth basis handles the original parallel direction/up vectors; random generator identity is an MC adapter.",
+    "presentation": "One aggregate feedback packet per pulse containing only actual upward block-face ray contacts; source decal scale sizes the feedback flash in MC units, not a hurt radius. Existing material audio/debris replace source world decals. Wall hits stop rays; they are not projected through to ground.",
+    "bounds": "Before raycast, every crossed XZ chunk and the entire segment bounds including 0.001 voxel-traversal margin must be loaded and within world border. Only actual nonfluid MODEL surfaces are used."
+  },
+  "geometricChecks": {
+    "expectedModelAnchoredConeCenterWorldYaw0": [
+      1.890667935888072,
+      4.537603046131373,
+      9.831473266617975
+    ],
+    "flatGroundContactDistanceFromConeAxis": [
+      {
+        "pulse": 0,
+        "min": 0.39698882611719555,
+        "max": 1.2158470717839038
+      },
+      {
+        "pulse": 1,
+        "min": 1.2158470717839038,
+        "max": 2.115919050078509
+      },
+      {
+        "pulse": 2,
+        "min": 2.115919050078509,
+        "max": 3.1772638583045287
+      }
+    ]
+  },
+  "groundingEvidence": {
+    "referenceMotionRootY": 6.0,
+    "sourceGroundRestingHeight": 6,
+    "frontSlam48SourceJointY": {
+      "Ball_L": 0.25480369397179214,
+      "Ball_R": 0.14974536152490303,
+      "Ankle_L": 0.5762421025623139,
+      "Ankle_R": 0.5706089851601299,
+      "Wrist_L": 0.47633216878191037
+    },
+    "finding": "A uniform actor/mesh lift would also lift the already low feet. CharacterSolver updates actor/support/collision state, not a dedicated giant-fist branch. Final post-fixup inputs and actor-to-ground transform remain unresolved; no wrist/mesh correction follows from this effect."
+  },
+  "boundaries": [
+    "Source Hit damage windows remain separate; WorldConeDamage does not justify an added MC damage pulse here.",
+    "Original Onscreen culling is replaced by the existing nearby-client presentation path.",
+    "Complete original damage/decal/material request dispatch and external actor solver are not reproduced.",
+    "Giant authored fist support/volume gap and complete original Goliath phases/attacks remain open."
+  ],
+  "validation": "Original binary/hash checks and static decoding only. No Java compilation/tests, GameTest, client or DLL execution."
+}

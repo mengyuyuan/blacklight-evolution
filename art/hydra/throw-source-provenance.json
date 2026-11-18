@@ -1,0 +1,629 @@
+{
+  "source": "D:/PrototypeReference/p1/input/comparison/Hydra_fig.p3d.rz",
+  "sha256": "6a9c1ab979ee6ee36b88a8fd2d3510094dec4a5095f006667735cf0f12c5d27e",
+  "schema": "https://github.com/Elan-S/EditP3D/tree/6966de776f7650e4f5a9150ebe4cf9377f7933d3/Gibbed.Prototype.FileFormats/FightData/Nixson.Prototype.Fight/Prototype1/Track",
+  "spawn": {
+    "offset": 33588,
+    "unknown": 0,
+    "time": 2.700000047683716,
+    "template": "#6ba4d7fb7c85d683",
+    "object": "#f477ca990d266fce",
+    "suffix": true,
+    "initial": "initial",
+    "playback": "#0",
+    "space": "#db45247a1074bc1d",
+    "joint": "#8ca72201fd0a471d",
+    "offsetPosition": [
+      0,
+      0,
+      0
+    ],
+    "orientation": [
+      0,
+      0,
+      0
+    ],
+    "attached": true,
+    "detach": false,
+    "ai": false,
+    "tag": "#0",
+    "slot": "#9139b991c1dd9d0d",
+    "copy": false,
+    "inheritVelocity": false,
+    "velocity": [
+      0,
+      0,
+      0
+    ],
+    "angular": [
+      0,
+      0,
+      0
+    ],
+    "collisionDelay": 0.5,
+    "sleeping": false,
+    "manageLifetime": true,
+    "manageThrown": false,
+    "inheritTarget": false,
+    "charge": "#393551c5ab2a1915",
+    "parentScale": false,
+    "setScale": true,
+    "scale": [
+      2,
+      2,
+      2
+    ],
+    "probability": 1,
+    "originator": false,
+    "damageOriginator": true,
+    "targetLocks": false,
+    "scenario": false,
+    "tint": false,
+    "package": true,
+    "colour": [
+      0.5019609928131104,
+      0.5019609928131104,
+      0.5019609928131104,
+      1
+    ],
+    "cacheCollider": true
+  },
+  "throws": [
+    {
+      "offset": 15784,
+      "class": "human",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 20,
+      "damageMax": 40,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 16092,
+      "class": "tiny",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 20,
+      "damageMax": 40,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 16400,
+      "class": "small",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 60,
+      "damageMax": 120,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 16708,
+      "class": "regular",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 150,
+      "damageMax": 250,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 17016,
+      "class": "large",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 275,
+      "damageMax": 350,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 17324,
+      "class": "extraLarge",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 400,
+      "damageMax": 500,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    },
+    {
+      "offset": 17592,
+      "class": "huge",
+      "unknown": 0,
+      "time": 0,
+      "slot": "#9139b991c1dd9d0d",
+      "direction": [
+        0,
+        0.10000000149011612,
+        -1
+      ],
+      "distanceMin": 100,
+      "distanceMax": 100,
+      "velocityMin": 25,
+      "velocityMax": 30,
+      "trackingMin": 10,
+      "trackingMax": 10,
+      "spinMin": 270,
+      "spinMax": 500,
+      "arcRange": 45,
+      "arcMax": 90,
+      "damageMin": 550,
+      "damageMax": 700,
+      "impulseMin": 1000,
+      "impulseMax": 2000,
+      "friendlyFire": 1,
+      "useTarget": true,
+      "targetVehicle": false,
+      "randomOffset": 0,
+      "priority": -5,
+      "hitType": "#0"
+    }
+  ],
+  "selected": [
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 11532,
+      "payload": 11544,
+      "length": 20,
+      "type": "Spawn",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/throw/throw/throw/throw",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 1.2666699886322021,
+        "TimeEnd": -1,
+        "BranchRef": {
+          "name": "",
+          "index": 79
+        }
+      },
+      "schema": "SpawnTrack",
+      "end": 11592
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 11936,
+      "payload": 11948,
+      "length": 92,
+      "type": "AutoTarget",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/throw/throw/throw/throw",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 0,
+        "TimeEnd": 1.1666699647903442,
+        "TurningVelocity": 200,
+        "UseInput": false,
+        "UseCamera": false,
+        "Direction": [
+          0,
+          0,
+          -1
+        ],
+        "Arc": 120,
+        "MaxDistance": 20,
+        "CheckArc": false,
+        "CheckDistance": false,
+        "OrientOffsetFromTarget": 0,
+        "TargetFilter": 2,
+        "TargetOverrides": 0,
+        "MinPriorityTargetClass": {
+          "hash": "16840447804245826439",
+          "name": "autoMin"
+        },
+        "MaxPriorityTargetClass": {
+          "hash": "16840447804246351257",
+          "name": "autoMax"
+        },
+        "Priority": -5,
+        "BlendInTime": 0,
+        "BlendOutTime": 0
+      },
+      "schema": "AutoTargetTrack",
+      "end": 12048
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 12916,
+      "payload": 12928,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/throw/throw/throw/throw/blend/#6cdb4e19948378b6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 2.166670083999634,
+        "Animation": {
+          "hash": "17025841871185826132",
+          "name": "hyd_obj_throw"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 90,
+        "EndFrame": 155,
+        "Cyclic": {
+          "hash": "10033482136886568568",
+          "name": "NotCyclic"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": false,
+        "HasRootRotation": false,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 0.30000001192092896,
+        "Priority": 0,
+        "BlendInTime": 0.20000000298023224,
+        "BlendOutTime": 0
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 13044
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 13044,
+      "payload": 13056,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/throw/throw/throw/throw/blend/#6cdb4e19948378b6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": 2.166670083999634,
+        "Animation": {
+          "hash": "3642528128019777439",
+          "name": "hyd_obj_throw_closed"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 90,
+        "EndFrame": 155,
+        "Cyclic": {
+          "hash": "10033482136886568568",
+          "name": "NotCyclic"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": false,
+        "HasRootRotation": false,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 0.699999988079071,
+        "Priority": 0,
+        "BlendInTime": 0.20000000298023224,
+        "BlendOutTime": 0
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 13172
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 18980,
+      "payload": 18992,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/idle/pose/adjust/pose/#6cdb4e19948378b6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "17025841871185826132",
+          "name": "hyd_obj_throw"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 12,
+        "EndFrame": 85,
+        "Cyclic": {
+          "hash": "10033482136886568568",
+          "name": "NotCyclic"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": false,
+        "HasRootRotation": false,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 0.30000001192092896,
+        "Priority": 0,
+        "BlendInTime": 0.20000000298023224,
+        "BlendOutTime": 0.20000000298023224
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 19108
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 19108,
+      "payload": 19120,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/holding/idle/pose/adjust/pose/#6cdb4e19948378b6",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "3642528128019777439",
+          "name": "hyd_obj_throw_closed"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 12,
+        "EndFrame": 85,
+        "Cyclic": {
+          "hash": "10033482136886568568",
+          "name": "NotCyclic"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": false,
+        "HasRootRotation": false,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 0.699999988079071,
+        "Priority": 0,
+        "BlendInTime": 0.20000000298023224,
+        "BlendOutTime": 0.20000000298023224
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 19236
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 33460,
+      "payload": 33472,
+      "length": 108,
+      "type": "PuppetAnimation",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/#655b51ef270a9061/#fc46c3d3263bf10c/#f416eaa305b4bec1",
+      "fields": {
+        "Unknown1": 0,
+        "TimeBegin": 0,
+        "TimeEnd": -1,
+        "Animation": {
+          "hash": "7305728211769667490",
+          "name": "hyd_grab_concrete"
+        },
+        "Speed": 1,
+        "RandomSpeedVariation": 0,
+        "InitFrame": 0,
+        "StartFrame": 0,
+        "EndFrame": -1,
+        "Cyclic": {
+          "hash": "11831687089686836166",
+          "name": "FromAnimation"
+        },
+        "SyncFrame": false,
+        "PhaseMatch": false,
+        "ReuseExistingDriver": false,
+        "SyncPhase": {
+          "hash": "3349652082457766725",
+          "name": "Legacy"
+        },
+        "SyncPhaseMinFrame": 0,
+        "SyncPhaseMaxFrame": -1,
+        "HasRootTranslation": true,
+        "HasRootRotation": true,
+        "Partition": {
+          "hash": "0",
+          "name": "#0"
+        },
+        "Weight": 1,
+        "Priority": 0,
+        "BlendInTime": 0,
+        "BlendOutTime": 0.23333300650119781
+      },
+      "schema": "PuppetAnimationTrack",
+      "end": 33588
+    },
+    {
+      "source": "comparison/Hydra_fig.p3d.rz",
+      "offset": 34044,
+      "payload": 34056,
+      "length": 32,
+      "type": "VariableIntSet",
+      "kind": "TrackHash",
+      "owner": "hydra/opening/outside/#655b51ef270a9061/#fc46c3d3263bf10c/#f416eaa305b4bec1",
+      "fields": {
+        "Unknown1": 1,
+        "TimeBegin": 2.700000047683716,
+        "Variable": {
+          "hash": "10452048911608228525",
+          "name": "#910d231b976aaaad"
+        },
+        "Operator": {
+          "hash": "61",
+          "name": "#3d"
+        },
+        "Value": 35,
+        "Persistent": false
+      },
+      "schema": "VariableIntSetTrack",
+      "end": 34096
+    }
+  ],
+  "verified": "SpawnObject at 2.7 seconds, Holding slot, scale 2. Concrete branch sets opening variable to 35; <40 animation branch weights .3 open/.7 closed. Throw animation frames 90..155; target turn stops 1.16667 seconds. Throw tracks consumed exactly (112 bytes each).",
+  "limitation": "Spawn track 11532 at 1.26667 seconds references branch index 79. Index resolution has not been proven; this release cue is an explicit working inference, not a claim of engine-equivalent execution. Sound waveform matching and source AI decision tree remain unverified.",
+  "mcAdaptation": "Retarget existing MC cuboid rig, 20-tick held telegraph, 32-block range, speed 1.375/tick, gravity .045/tick, damage 1.4x Hydra attack attribute. Spawned visual terrain prop samples full cube material but never mines or drops items. Exact oriented-cube contact sweeps replace source prop physics. Native damage acceptance gates tissue feedback."
+}

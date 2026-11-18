@@ -1,0 +1,1036 @@
+{
+  "schema": 1,
+  "notice": "Decoded source events. FIG node scheduling and Minecraft units are adaptations, not an original-engine port.",
+  "actions": {
+    "elizabeth_greene:HOWL": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "clip": "HOWL",
+      "animation": "mother_scream",
+      "fps": 30,
+      "seconds": 7.166666666666667,
+      "segments": [
+        {
+          "at": 0,
+          "end": 0.5,
+          "from": 0,
+          "to": 7,
+          "speed": 1,
+          "blendIn": 0.20000000298023224,
+          "blendOut": 1,
+          "offset": 15848,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/windup"
+        },
+        {
+          "at": 0.5,
+          "end": 1,
+          "from": 7,
+          "to": 10,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 1,
+          "offset": 15976,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/windup"
+        },
+        {
+          "at": 1,
+          "end": 2,
+          "from": 10,
+          "to": 24,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 1,
+          "offset": 16104,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/windup"
+        },
+        {
+          "at": 2,
+          "end": 3.333329916000366,
+          "from": 24,
+          "to": 30,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 1,
+          "offset": 16232,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/windup"
+        },
+        {
+          "at": 3.333329916000366,
+          "end": 6,
+          "from": 30,
+          "to": 70,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 16816,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/roar"
+        },
+        {
+          "at": 6,
+          "end": -1,
+          "from": 70,
+          "to": 105,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.33333298563957214,
+          "offset": 16944,
+          "owner": "mother_core/opening/outside/attacks/#523cabf028eb90/pose/roar"
+        }
+      ],
+      "windows": [
+        {
+          "begin": 3.333329916000366,
+          "end": 3.9999969005584717,
+          "radius": 8,
+          "damage": 5000,
+          "impulse": [
+            0,
+            10000,
+            -50000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 17116
+        },
+        {
+          "begin": 3.9666629433631897,
+          "end": 4.566659927368164,
+          "radius": 12,
+          "damage": 4000,
+          "impulse": [
+            0,
+            8000,
+            -35000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 17412
+        },
+        {
+          "begin": 4.4999998807907104,
+          "end": 4.9999998807907104,
+          "radius": 16,
+          "damage": 2500,
+          "impulse": [
+            0,
+            6000,
+            -25000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 17708
+        },
+        {
+          "begin": 4.8999998569488525,
+          "end": 5.666659832000732,
+          "radius": 20,
+          "damage": 2500,
+          "impulse": [
+            0,
+            4000,
+            -15000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 18004
+        },
+        {
+          "begin": 5.599999904632568,
+          "end": 6.13332986831665,
+          "radius": 25,
+          "damage": 2500,
+          "impulse": [
+            0,
+            3000,
+            -10000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 18300
+        },
+        {
+          "begin": 6,
+          "end": 6.666659832000732,
+          "radius": 30,
+          "damage": 2500,
+          "impulse": [
+            0,
+            2000,
+            -8000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 18596
+        },
+        {
+          "begin": 6.566659927368164,
+          "end": 7,
+          "radius": 40,
+          "damage": 2500,
+          "impulse": [
+            0,
+            2000,
+            -8000
+          ],
+          "localOffset": [
+            0,
+            2,
+            0
+          ],
+          "offset": 18892
+        }
+      ],
+      "range": 40,
+      "mode": "radial_wave",
+      "units": "Original range, radii and local offsets remain in P1 source units. World geometry multiplies by the preserved Greene model pixelsPerSourceUnit/16, shared with root Move. Damage and impulses remain Minecraft tuning.",
+      "spatialUnits": "source_model",
+      "spatialModel": "elizabeth_greene"
+    },
+    "elizabeth_greene:VOLLEY": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "clip": "VOLLEY",
+      "animation": "mother_vomit",
+      "fps": 30,
+      "seconds": 6.133329916000366,
+      "segments": [
+        {
+          "at": 0,
+          "end": 0.33333298563957214,
+          "from": 0,
+          "to": 10,
+          "speed": 1,
+          "blendIn": 0.16666699945926666,
+          "blendOut": 0,
+          "offset": 20892,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 0.33333298563957214,
+          "end": 0.6666669845581055,
+          "from": 10,
+          "to": 13,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21020,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 0.6666669845581055,
+          "end": 1,
+          "from": 13,
+          "to": 32,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21148,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 1,
+          "end": 1.5,
+          "from": 32,
+          "to": 36,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21276,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 1.5,
+          "end": 2.166670083999634,
+          "from": 36,
+          "to": 58,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21404,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 2.166670083999634,
+          "end": 2.5,
+          "from": 58,
+          "to": 64,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21532,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 2.5,
+          "end": 2.833329916000366,
+          "from": 64,
+          "to": 85,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 21660,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        },
+        {
+          "at": 2.833329916000366,
+          "end": -1,
+          "from": 85,
+          "to": -1,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.16666699945926666,
+          "offset": 21788,
+          "owner": "mother_core/opening/outside/attacks/#fc7f04ceefd03173/shoot/#685d5070bf562e9c"
+        }
+      ],
+      "windows": [
+        {
+          "begin": 2.333329916000366,
+          "end": 2.333329916000366,
+          "offset": 21916
+        }
+      ],
+      "range": 32,
+      "mode": "projectile",
+      "rangeSource": "Minecraft acquisition bound; original NPC acquisition not yet decoded"
+    },
+    "elizabeth_greene:ORBS": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "clip": "ORBS",
+      "animation": "mother_vomit",
+      "fps": 30,
+      "seconds": 1.8333300352096558,
+      "segments": [
+        {
+          "at": 0,
+          "end": 0.33333298563957214,
+          "from": 40,
+          "to": 60,
+          "speed": 1,
+          "blendIn": 0.33333298563957214,
+          "blendOut": 0.03333330154418945,
+          "offset": 12064,
+          "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89"
+        },
+        {
+          "at": 0.33333298563957214,
+          "end": 0.43333300948143005,
+          "from": 60,
+          "to": 72,
+          "speed": 1,
+          "blendIn": 0.03333330154418945,
+          "blendOut": 0.03333330154418945,
+          "offset": 12192,
+          "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89"
+        },
+        {
+          "at": 0.43333300948143005,
+          "end": 1.3333300352096558,
+          "from": 72,
+          "to": 90,
+          "speed": 1,
+          "blendIn": 0.03333330154418945,
+          "blendOut": 0.03333330154418945,
+          "offset": 12320,
+          "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89"
+        },
+        {
+          "at": 1.3333300352096558,
+          "end": 1.8333300352096558,
+          "from": 90,
+          "to": 112,
+          "speed": 1,
+          "blendIn": 0.03333330154418945,
+          "blendOut": 0.33333298563957214,
+          "offset": 12448,
+          "owner": "mother_core/opening/outside/attacks/#6a161751d18c9d89"
+        }
+      ],
+      "windows": [
+        {
+          "begin": 0.6666669845581055,
+          "end": 0.6666669845581055,
+          "offset": 12636
+        }
+      ],
+      "range": 32,
+      "mode": "projectile",
+      "rangeSource": "Minecraft acquisition bound; original NPC acquisition not yet decoded"
+    },
+    "leader_hunter:CLAW": {
+      "source": "comparison/LeaderHunter_fig.p3d.rz",
+      "clip": "CLAW",
+      "animation": "leader_attack_2",
+      "fps": 30,
+      "seconds": 1.2666663189729055,
+      "segments": [
+        {
+          "at": 0,
+          "end": 0.33333298563957214,
+          "from": 0,
+          "to": 10,
+          "speed": 1,
+          "blendIn": 0.20000000298023224,
+          "blendOut": 0,
+          "offset": 25364,
+          "owner": "leader_hunter/opening/surface/ground/attacks/#e433f908f0cd27b2/#e433f908f0cd27b2/#d16ecd93eedfb80d/pose/charge"
+        },
+        {
+          "at": 0.33333298563957214,
+          "end": 0.8333329856395721,
+          "from": 10,
+          "to": 31,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.20000000298023224,
+          "offset": 26028,
+          "owner": "leader_hunter/opening/surface/ground/attacks/#e433f908f0cd27b2/#e433f908f0cd27b2/#d16ecd93eedfb80d/pose/release"
+        },
+        {
+          "at": 0.8333329856395721,
+          "end": -1,
+          "from": 48,
+          "to": -1,
+          "speed": 1,
+          "blendIn": 0.20000000298023224,
+          "blendOut": 0.20000000298023224,
+          "offset": 27264,
+          "owner": "leader_hunter/opening/surface/ground/attacks/#e433f908f0cd27b2/#e433f908f0cd27b2/#d16ecd93eedfb80d/pose/#ad1c5658a265ccb8"
+        }
+      ],
+      "windows": [
+        {
+          "begin": 0.33333298563957214,
+          "end": 0.6666659712791443,
+          "radius": 1,
+          "joint": "Wrist_R",
+          "offset": 26408,
+          "localOffset": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "begin": 0.33333298563957214,
+          "end": 0.6666659712791443,
+          "radius": 1,
+          "joint": "Elbow_R",
+          "offset": 26704,
+          "localOffset": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "range": 3.75,
+      "mode": "joint_sweep",
+      "rangeMode": "horizontal",
+      "turning": [
+        {
+          "begin": 0,
+          "end": 0.1333329975605011,
+          "degreesPerSecond": 360,
+          "checkDistance": true,
+          "maxDistance": 5,
+          "offset": 25836
+        }
+      ],
+      "rangeSource": "TargetDistance condition: XZ < 3.75",
+      "recoverySourceNote": "Negative TimeEnd retains remaining clip frames; terminal branch scheduling still needs original runtime comparison"
+    },
+    "elizabeth_greene:EXPOSED": {
+      "source": "comparison/mother_fig.p3d.rz",
+      "clip": "exposed",
+      "animation": "mother_reveal_body",
+      "fps": 24,
+      "seconds": 12.458333084980657,
+      "segments": [
+        {
+          "at": 0,
+          "end": -1,
+          "from": 15,
+          "to": 60,
+          "speed": 0.30000001192092896,
+          "blendIn": 0,
+          "blendOut": 0.10000000149011612,
+          "offset": 9560,
+          "owner": "mother_core/opening/outside/#b8e759eedc70d6c/#500a97569e7430ce"
+        },
+        {
+          "at": 6.249999751647323,
+          "end": -1,
+          "from": 60,
+          "to": 150,
+          "speed": 1,
+          "blendIn": 0.10000000149011612,
+          "blendOut": 0.20000000298023224,
+          "offset": 11484,
+          "owner": "mother_core/opening/outside/#b8e759eedc70d6c/down"
+        },
+        {
+          "at": 9.999999751647323,
+          "end": -1,
+          "from": 150,
+          "to": -1,
+          "speed": 1,
+          "blendIn": 0.20000000298023224,
+          "blendOut": 0,
+          "offset": 10784,
+          "owner": "mother_core/opening/outside/#b8e759eedc70d6c/#49a9c35dda28ad17"
+        }
+      ],
+      "windows": [],
+      "range": 0,
+      "mode": "recovery",
+      "rangeSource": "Not an attack",
+      "schedulingNote": "Preserves source frame ranges and speed. MC advances each uncapped branch after one clip span; original dynamic down-state exit conditions are not yet ported."
+    },
+    "juggernaut:HAMMER": {
+      "clip": "HAMMER",
+      "animation": "infected3_com_2hit_combo",
+      "seconds": 3.433333333333333,
+      "fps": 30,
+      "range": 4.5,
+      "rangeMode": "contact_preview",
+      "mode": "juggernaut_fists",
+      "segments": [
+        {
+          "at": 0,
+          "end": 1,
+          "from": 0,
+          "to": 30,
+          "speed": 1,
+          "blendIn": 0.1,
+          "blendOut": 0
+        },
+        {
+          "at": 1,
+          "end": 1.3333333333333333,
+          "from": 30,
+          "to": 34,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 1.3333333333333333,
+          "end": 1.6,
+          "from": 34,
+          "to": 42,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 1.6,
+          "end": 1.7333333333333334,
+          "from": 42,
+          "to": 46,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 1.7333333333333334,
+          "end": 2.2666666666666666,
+          "from": 46,
+          "to": 62,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 2.2666666666666666,
+          "end": 2.6,
+          "from": 62,
+          "to": 65,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 2.6,
+          "end": 3.433333333333333,
+          "from": 65,
+          "to": 90,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.16666666666666666
+        }
+      ],
+      "windows": [
+        {
+          "begin": 0.6966666666666667,
+          "end": 0.8966666666666667,
+          "radius": 0.55,
+          "joint": "Wrist_L",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 350
+        },
+        {
+          "begin": 1.8633333333333333,
+          "end": 2.13,
+          "radius": 0.55,
+          "joint": "Wrist_R",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 350
+        }
+      ],
+      "turning": [
+        {
+          "begin": 0,
+          "end": 0.4,
+          "degreesPerSecond": 180,
+          "checkDistance": true,
+          "maxDistance": 5
+        },
+        {
+          "begin": 1.3333333333333333,
+          "end": 1.6,
+          "degreesPerSecond": 180,
+          "checkDistance": true,
+          "maxDistance": 5
+        }
+      ]
+    },
+    "juggernaut:SLAM": {
+      "clip": "SLAM",
+      "animation": "infected3_com_2hand_slam",
+      "seconds": 3.7666666666666666,
+      "fps": 30,
+      "range": 4.5,
+      "rangeMode": "contact_preview",
+      "mode": "juggernaut_fists",
+      "segments": [
+        {
+          "at": 0,
+          "end": 1.8,
+          "from": 0,
+          "to": 54,
+          "speed": 1,
+          "blendIn": 0.1,
+          "blendOut": 0
+        },
+        {
+          "at": 1.8,
+          "end": 1.9666666666666666,
+          "from": 54,
+          "to": 59,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 1.9666666666666666,
+          "end": 2.6666666666666665,
+          "from": 59,
+          "to": 80,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 2.6666666666666665,
+          "end": 3.7666666666666666,
+          "from": 80,
+          "to": 113,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.2
+        }
+      ],
+      "windows": [
+        {
+          "begin": 2.066666666666667,
+          "end": 2.2,
+          "radius": 0.55,
+          "joint": "Wrist_L",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 350
+        },
+        {
+          "begin": 2.066666666666667,
+          "end": 2.2,
+          "radius": 0.55,
+          "joint": "Wrist_R",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 350
+        }
+      ],
+      "turning": [
+        {
+          "begin": 0,
+          "end": 1,
+          "degreesPerSecond": 90,
+          "checkDistance": true,
+          "maxDistance": 5
+        }
+      ]
+    },
+    "juggernaut:GUARD": {
+      "clip": "GUARD",
+      "animation": "infected3_com_block",
+      "seconds": 2.6666666666666665,
+      "fps": 30,
+      "range": 4.5,
+      "rangeMode": "contact_preview",
+      "mode": "juggernaut_fists",
+      "segments": [
+        {
+          "at": 0,
+          "end": 0.6666666666666666,
+          "from": 0,
+          "to": 15,
+          "speed": 1,
+          "blendIn": 0.1,
+          "blendOut": 0
+        },
+        {
+          "at": 0.6666666666666666,
+          "end": 1.6666666666666667,
+          "from": 15,
+          "to": 45,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0
+        },
+        {
+          "at": 1.6666666666666667,
+          "end": 2.6666666666666665,
+          "from": 45,
+          "to": 75,
+          "speed": 1,
+          "blendIn": 0,
+          "blendOut": 0.1
+        }
+      ],
+      "windows": [],
+      "turning": []
+    },
+    "juggernaut:EXPOSED": {
+      "clip": "exposed",
+      "animation": "infected3_com_stuned",
+      "seconds": 3.5,
+      "fps": 30,
+      "range": 4.5,
+      "rangeMode": "contact_preview",
+      "mode": "juggernaut_fists",
+      "segments": [
+        {
+          "at": 0,
+          "end": 1.3333333333333333,
+          "from": 0,
+          "to": 40,
+          "speed": 1,
+          "blendIn": 0.15,
+          "blendOut": 0
+        },
+        {
+          "at": 1.3333333333333333,
+          "end": 2.6666666666666665,
+          "from": 0,
+          "to": 40,
+          "speed": 1,
+          "blendIn": 0.1,
+          "blendOut": 0
+        },
+        {
+          "at": 2.6666666666666665,
+          "end": 3.5,
+          "from": 0,
+          "to": 25,
+          "speed": 1,
+          "blendIn": 0.1,
+          "blendOut": 0.2
+        }
+      ],
+      "windows": [],
+      "turning": []
+    },
+    "goliath:HAMMER": {
+      "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+      "clip": "HAMMER",
+      "animation": "behemoth_com_biped_front_slam_to_biped",
+      "fps": 30,
+      "seconds": 3.9,
+      "segments": [
+        {
+          "at": 0.0,
+          "end": 1.5,
+          "from": 0.0,
+          "to": 42.0,
+          "speed": 0.9333333333333332,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.1,
+          "blendOut": 0,
+          "offset": 5465588
+        },
+        {
+          "at": 1.5,
+          "end": 1.9,
+          "from": 42.0,
+          "to": 48.0,
+          "speed": 0.4999999925494195,
+          "sourceSpeed": 1.0,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 5466152
+        },
+        {
+          "at": 1.9,
+          "end": 2.1,
+          "from": 48.0,
+          "to": 52.0,
+          "speed": 0.6666666567325593,
+          "sourceSpeed": 1.0,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 5466740
+        },
+        {
+          "at": 2.1,
+          "end": 2.9,
+          "from": 52.0,
+          "to": 60.0,
+          "speed": 0.3333333345750968,
+          "sourceSpeed": 1.0,
+          "blendIn": 0,
+          "blendOut": 0,
+          "offset": 5466892
+        },
+        {
+          "at": 2.9,
+          "end": 3.9,
+          "from": 60.0,
+          "to": 88.0,
+          "speed": 0.9333333333333333,
+          "sourceSpeed": 1.0,
+          "blendIn": 0,
+          "blendOut": 0.2,
+          "offset": 5468692
+        }
+      ],
+      "windows": [
+        {
+          "begin": 1.9,
+          "end": 1.933333,
+          "radius": 2.6469351102433007,
+          "localOffset": [
+            -0.7562671743552288,
+            1.5125343487104577,
+            -0.7562671743552288
+          ],
+          "damage": 750.0,
+          "joint": "Motion_Root",
+          "sourceRadius": 3.5,
+          "sourceLocalOffset": [
+            1.0,
+            -4.0,
+            -1.0
+          ],
+          "offset": 5467068
+        },
+        {
+          "begin": 1.9,
+          "end": 1.933333,
+          "radius": 5.2938702204866015,
+          "localOffset": [
+            -0.7562671743552288,
+            1.5125343487104577,
+            -0.7562671743552288
+          ],
+          "damage": 400.0,
+          "joint": "Motion_Root",
+          "sourceRadius": 7.0,
+          "sourceLocalOffset": [
+            1.0,
+            -4.0,
+            -1.0
+          ],
+          "offset": 5467492
+        }
+      ],
+      "range": 5.2938702204866015,
+      "rangeMode": "contact_preview",
+      "mode": "goliath_slam",
+      "turning": [
+        {
+          "begin": 0.699999988079071,
+          "end": 1.5,
+          "degreesPerSecond": 90.0,
+          "checkDistance": false,
+          "maxDistance": 50.0
+        },
+        {
+          "begin": 1.5,
+          "end": 1.9,
+          "degreesPerSecond": 120.0,
+          "checkDistance": false,
+          "maxDistance": 50.0
+        }
+      ],
+      "boundary": "Decoded P2 animation/Hit prefixes; bounded sequential branch adapter. Damage is tuned for MC; strongest touched sphere only, never additive. Root travel is removed with the same Motion_Root rebase as the skin. Rebound authored skin now uses complete source joint transforms, including articulated translations. MC AI selection/cover remain; not full P2 AI. Native visual/receiving acceptance and authored hand volume fitting remain pending."
+    },
+    "goliath:CHARGE": {
+      "source": "D:\\PrototypeReference\\p2\\input\\p2\\behemoth.p3d",
+      "clip": "CHARGE",
+      "animation": "behemoth_com_biped_bullrush",
+      "fps": 30,
+      "seconds": 4.7533336512247715,
+      "segments": [
+        {
+          "at": 0.0,
+          "end": 1.6666666666666667,
+          "from": 5.0,
+          "to": 55.0,
+          "speed": 1.0,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.20000000298023224,
+          "blendOut": 0.10000000149011612,
+          "offset": 5422816
+        },
+        {
+          "at": 1.6666666666666667,
+          "end": 2.033333333333333,
+          "from": 55.0,
+          "to": 66.0,
+          "speed": 1.0,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.0,
+          "blendOut": 0.0,
+          "offset": 5423876
+        },
+        {
+          "at": 2.033333333333333,
+          "end": 2.7000003178914387,
+          "from": 66.0,
+          "to": 85.0,
+          "speed": 0.9499995470049156,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.0,
+          "blendOut": 0.0,
+          "offset": 5424300
+        },
+        {
+          "at": 2.7000003178914387,
+          "end": 3.153333651224772,
+          "from": 85.0,
+          "to": 102.0,
+          "speed": 1.25,
+          "sourceSpeed": 1.25,
+          "blendIn": 0.0,
+          "blendOut": 0.0,
+          "offset": 5426040
+        },
+        {
+          "at": 3.153333651224772,
+          "end": 3.653333651224772,
+          "from": 102.0,
+          "to": 117.0,
+          "speed": 1.0,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.0,
+          "blendOut": 0.10000000149011612,
+          "offset": 5427252
+        },
+        {
+          "at": 3.653333651224772,
+          "end": 4.7533336512247715,
+          "from": 117.0,
+          "to": 150.0,
+          "speed": 1.0,
+          "sourceSpeed": 1.0,
+          "blendIn": 0.10000000149011612,
+          "blendOut": 0.20000000298023224,
+          "offset": 5428304
+        }
+      ],
+      "windows": [
+        {
+          "begin": 2.7000003178914387,
+          "end": 3.153333651224772,
+          "radius": 3.0250686974209153,
+          "sourceRadius": 4.0,
+          "joint": "Elbow_L",
+          "jointEnd": "Wrist_L",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 750,
+          "offset": 5425008
+        },
+        {
+          "begin": 3.153333651224772,
+          "end": 3.653333651224772,
+          "radius": 2.2688015230656866,
+          "sourceRadius": 3.0,
+          "joint": "Elbow_L",
+          "jointEnd": "Wrist_L",
+          "localOffset": [
+            0,
+            0,
+            0
+          ],
+          "damage": 750,
+          "offset": 5427404
+        }
+      ],
+      "turning": [
+        {
+          "begin": 0.0,
+          "end": 1.6666666666666667,
+          "degreesPerSecond": 120.0,
+          "checkDistance": false,
+          "maxDistance": 100.0
+        },
+        {
+          "begin": 2.7000003178914387,
+          "end": 3.153333651224772,
+          "degreesPerSecond": 45.0,
+          "checkDistance": false,
+          "maxDistance": 100.0
+        }
+      ],
+      "mode": "goliath_charge",
+      "range": 12,
+      "rangeMode": "adapted",
+      "boundary": "Legacy nominal one-cycle/special-return clock retained for independent source fixtures and lookup compatibility only. Live GoliathCharge.State uses decoded native loop/exit predicates and both return clips. AI selection, gravity/collision and per-target damage tuning remain Minecraft adapters. Native Hit is a joint-index sphere chain, not whole-body AABB or capsule; root travel is applied once by the actor."
+    }
+  }
+}
