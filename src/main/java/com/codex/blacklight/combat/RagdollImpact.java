@@ -35,11 +35,13 @@ public final class RagdollImpact {
         var item=player.getMainHandItem();
         var victim=event.getEntity();
         if(!supportedBody(victim))return;
-        if(item.isEmpty()&&victim.isDeadOrDying()&&!CombatTargeting.anchoredBody(victim)
-                &&event.getSource().is(net.minecraft.world.damagesource.DamageTypes.PLAYER_ATTACK)){
+        if(item.isEmpty()&&event.getSource().is(net.minecraft.world.damagesource.DamageTypes.PLAYER_ATTACK)){
             var direction=player.getLookAngle();
-            send(victim,FatalWeaponImpact.FIST.motion,60,false,FatalWeaponImpact.FIST.launch(victim.getDeltaMovement(),direction,1,false,false),
-                    WeaponCutContact.impact(player,victim,direction));
+            var contact=WeaponCutContact.impact(player,victim,direction);
+            if(AnimatedHurtBody.of(victim)==null)
+                PlayerHitEffects.emit(player,victim,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,.48F,contact,FleshStrike.FIST,false);
+            if(victim.isDeadOrDying()&&!CombatTargeting.anchoredBody(victim))
+                send(victim,FatalWeaponImpact.FIST.motion,60,false,FatalWeaponImpact.FIST.launch(victim.getDeltaMovement(),direction,1,false,false),contact);
             return;
         }
         if(!item.is(net.minecraft.tags.ItemTags.SWORDS)&&!item.is(net.minecraft.tags.ItemTags.AXES))return;

@@ -724,6 +724,7 @@ public final class WeaponCombatSystem {
                 if(hydraHit==null && !preciseOnly && whip!=null && !bodyFlight)
                     hydraHit=cutting.lashContact(p,body,whip.collisionRadius());
                 if(hydraHit==null)continue;
+                hydraHit=hydraHit.withStrike(FleshStrike.of(s.form,s.move),s.fullyCharged);
             }
             int resistance=v.invulnerableTime;
             var last=LAST_CONTACT.get(v);

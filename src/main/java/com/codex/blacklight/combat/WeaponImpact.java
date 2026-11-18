@@ -97,7 +97,7 @@ public final class WeaponImpact {
             RagdollImpact.send(v,style==null?profile.motion():style.motion,physicalTicks,sharp,launch,impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
-        if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact);
+        if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact,fullyCharged);
         var soundPoint=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()?hydra.incomingPoint():v.position();
         if(first){
             float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};

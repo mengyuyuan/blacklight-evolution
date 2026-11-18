@@ -10,6 +10,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ContactEffectsPayloadTest {
     private static RegistryFriendlyByteBuf buffer(){return new RegistryFriendlyByteBuf(Unpooled.buffer(),RegistryAccess.EMPTY);}
+    @Test void playerStrikeRetainsContactTypeAndChargeOnTheOriginalWireLayout(){
+        var style=com.codex.blacklight.infection.InfectedAttackStyle.TEAR;
+        for(var strike:com.codex.blacklight.combat.FleshStrike.values())for(boolean charged:new boolean[]{false,true}){
+            int appearance=InfectedImpactPayload.appearance(style,strike,charged);
+            var packet=new InfectedImpactPayload(12,13,appearance,1,81,2,0,1,0,.6F,72);
+            var b=buffer();try{
+                InfectedImpactPayload.STREAM_CODEC.encode(b,packet);
+                var decoded=InfectedImpactPayload.STREAM_CODEC.decode(b);
+                assertEquals(style.ordinal(),decoded.style());
+                assertEquals(strike,decoded.strike());
+                assertEquals(charged&&strike!=com.codex.blacklight.combat.FleshStrike.GENERIC,decoded.charged());
+                assertFalse(b.isReadable());
+            }finally{b.release();}
+        }
+        for(int legacy=0;legacy<=5;legacy++){
+            var packet=new InfectedImpactPayload(1,2,legacy,0,0,0,0,1,0,1,3);
+            assertEquals(legacy,packet.style());assertEquals(0,packet.strike().id);assertFalse(packet.charged());
+        }
+    }
     @Test void allContactKindsRoundTripTogetherWithTimeMaterialsAndSound(){
         var tissue=new InfectedImpactPayload(12,13,0,1,81,2,0,1,0,.6F,72);
         for(int kind=0;kind<=ContactEffectsPayload.SOUND;kind++){
