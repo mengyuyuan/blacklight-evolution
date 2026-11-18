@@ -120,6 +120,34 @@ public final class RagdollVisualAudit {
     static ThreadPoolExecutor writer;static volatile String imageError;static int dropped;
     static final Map<KeyMapping,com.mojang.blaze3d.platform.InputConstants.Key> bindings=new IdentityHashMap<>();
     static boolean active(){return initialized&&!done&&!failed;}
+    private static Vec3 trackedTorso;
+    private record Audible(double time, net.minecraft.client.resources.sounds.SoundInstance sound) {}
+    private static final java.util.Queue<Audible> weaponAudio=new java.util.concurrent.ConcurrentLinkedQueue<>();
+    @SubscribeEvent public static void recordSound(net.minecraftforge.client.event.sound.PlaySoundEvent event) {
+        if (!CLOSEUP || !active() || !ready || Minecraft.getInstance().level==null) return;
+        var sound=event.getSound();
+        if (sound==null) return;
+        String path=sound.getLocation().getPath();
+        if ((sound.getLocation().getNamespace().equals("blacklight") && path.startsWith("weapon."))
+                || (sound.getLocation().getNamespace().equals("minecraft") && path.startsWith("block.") && path.endsWith(".fall")))
+            weaponAudio.add(new Audible(Minecraft.getInstance().level.getGameTime()+Minecraft.getInstance().getFrameTime(),sound));
+    }
+    private static JsonArray resolvedAudio() {
+        var rows=new JsonArray();
+        for (Audible cue; (cue=weaponAudio.poll())!=null;) {
+            var entry=new JsonObject();
+            entry.addProperty("time",cue.time());
+            entry.addProperty("event",cue.sound().getLocation().toString());
+            var sample=cue.sound().getSound();
+            if (sample!=null) {
+                entry.addProperty("clip",sample.getLocation().toString());
+                entry.addProperty("pitch",cue.sound().getPitch());
+                entry.addProperty("volume",cue.sound().getVolume());
+            }
+            rows.add(entry);
+        }
+        return rows;
+    }
     static Case current(){return CASES.get(index);}
     @SubscribeEvent(priority=EventPriority.LOWEST) public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(failed||System.getProperty(PROPERTY,"").isBlank())return;
@@ -205,6 +233,7 @@ public final class RagdollVisualAudit {
             if(tick>=220){
                 checkCase();
                 Files.writeString(output.resolve(c.name()+".json"),new GsonBuilder().setPrettyPrinting().create().toJson(rows));rows.asList().clear();
+                if(CLOSEUP)Files.writeString(output.resolve(c.name()+"-audio.json"),new Gson().toJson(resolvedAudio()));
                 synchronized(contactTrace){Files.writeString(output.resolve(c.name()+"-contact.json"),new GsonBuilder().setPrettyPrinting().create().toJson(contactTrace));contactTrace.asList().clear();}
                 if(++index>=CASES.size()){
                     done=true;writer.shutdown();com.codex.blacklight.client.renderer.ConsumeBladeContact.observer=null;ClientWeaponCombat.setFixtureOwnsInput(false);bindings.forEach(KeyMapping::setKey);KeyMapping.resetMapping();mc.options.hideGui=false;
@@ -292,6 +321,17 @@ public final class RagdollVisualAudit {
                 if(sample.has("contactSpray")&&effect.equals(sample.get("contactSpray").getAsString())
                         &&sample.get("contactCharged").getAsBoolean()==c.name().contains("_charged_"))sawSpray=true;
             }
+            boolean posed=false,marked=false;
+            for(var element:rows){
+                var sample=element.getAsJsonObject();
+                if(sample.has("strikeRecoil")){
+                    var pose=sample.getAsJsonObject("strikeRecoil");
+                    posed|=Math.abs(pose.get("twist").getAsDouble())>.13 || Math.abs(pose.get("pitch").getAsDouble())>.2;
+                }
+                marked|=sample.has("stampVertices") && sample.get("stampVertices").getAsInt()>=4;
+            }
+            if(c.name().endsWith("_survive")) {result.addProperty("strikeRecoil",posed);passed&=posed;}
+            if(c.name().endsWith("_lethal")) {result.addProperty("renderedContactMark",marked);passed&=marked;}
             result.addProperty("confirmedContactSpray",sawSpray);
             passed&=sawSpray;
         }
@@ -464,7 +504,7 @@ public final class RagdollVisualAudit {
         checks.add(result);
     }
     static void setup()throws ReflectiveOperationException{
-        ready=false;tick=frame=0;previousFrameNanos=0;var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();var c=current();var uuid=mc.player.getUUID();
+        ready=false;trackedTorso=null;weaponAudio.clear();tick=frame=0;previousFrameNanos=0;var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();var c=current();var uuid=mc.player.getUUID();
         partIds.clear();
         drawnBlades.clear();
         // Each isolated fixture starts with clean blood, so old splats cannot be
@@ -581,7 +621,13 @@ public final class RagdollVisualAudit {
         Vec3 at=new Vec3(.5,251.8,current().name().startsWith("thrown_")?6:3),eye=at.add(view.equals("side")?6*side:4*side,2.4,view.equals("rear")?4.4:view.equals("side")?0:-4.4),look=at.subtract(eye);
         if(CLOSEUP){
             at=new Vec3(.5,current().name().contains("_charged_")?252.48:252.10,1.65);
-            eye=at.add(-3.85,.58,-.65);
+            if(trackedTorso!=null) {
+                // Keep the departing body and its eventual landing in the shot.
+                double travel=trackedTorso.distanceTo(at);
+                double pan=Math.min(.88,Math.max(0,(travel-.8)*.38));
+                at=at.lerp(trackedTorso,pan);
+                eye=at.add(-3.85-Math.min(1.55,travel*.25),.68,-.65);
+            } else eye=at.add(-3.85,.58,-.65);
             look=at.subtract(eye);
         }
         var a=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)e.getCamera();a.blacklight$setPosition(eye);
@@ -618,6 +664,10 @@ public final class RagdollVisualAudit {
             var blades=new JsonObject();for(var entry:drawnBlades.entrySet()){var sample=entry.getValue();var value=new JsonObject();value.addProperty("time",sample.time());var points=new JsonArray();sample.points().forEach(p->points.add(vector(p)));value.add("points",points);blades.add(entry.getKey(),value);}row.add("drawnBlades",blades);
             row.addProperty("move",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.WEAPON_VISUAL).toString());row.addProperty("grab",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE));row.addProperty("lastChance",lastChance);
             var recoveryVictim=mc.level.getEntity(victimId);
+            if (recoveryVictim instanceof LivingEntity victim && current().name().endsWith("_zombie_survive")) {
+                var recoil=com.codex.blacklight.client.animation.FleshRecoil.sample(victim,row.get("partial").getAsFloat());
+                if(recoil!=null)row.add("strikeRecoil",new Gson().toJsonTree(recoil));
+            }
             if(recoveryVictim instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE){
                 row.addProperty("noAi",brute.isNoAi());row.addProperty("brutePhysical",com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(brute));
                 var hit=ModAttachments.peekData(brute,ModAttachments.HIT_REACTION,HitReaction.EMPTY);row.addProperty("hitKind",hit.kind());row.addProperty("hitStarted",hit.started());row.addProperty("hitDuration",hit.duration());
@@ -641,7 +691,15 @@ public final class RagdollVisualAudit {
             for(var entry:bodies.entrySet())if(entry.getKey() instanceof LivingEntity l&&l.getId()==victimId){
                 var body=entry.getValue();row.addProperty("bodyStarted",(Long)field(body,"started"));row.addProperty("cuts",(Integer)field(body,"appliedCuts"));row.addProperty("components",(Integer)field(body,"components"));
                 if(current().name().endsWith("_zombie_lethal")&&field(body,"fatalImpact") instanceof FatalWeaponImpact style){
+                    var torso=field(body,"root");
+                    var rendered=(Vec3)field(torso,"renderedPosition");
+                    trackedTorso=rendered!=null?rendered:(Vec3)field(torso,"pos");
                     row.addProperty("fatalStyle",style.name());
+                    int stampVertices=0;
+                    for(var part:(List<?>)field(body,"parts"))
+                        stampVertices+=((List<?>)field(part,"markedSkin")).size();
+                    row.addProperty("stampVertices",stampVertices);
+                    row.addProperty("landingPlayed",(Boolean)field(body,"landingPlayed"));
                     double displacement=0;
                     for(var p:(List<?>)field(body,"parts")){
                         var mesh=(List<?>)field(p,"mesh");
@@ -774,7 +832,7 @@ public final class RagdollVisualAudit {
             String name=current().name()+String.format(Locale.ROOT,"_%04d.png",frame++);row.addProperty("image",name);rows.add(row);
             if(CLOSEUP){
                 int start=current().name().contains("_charged_")?112:37;
-                if(tick<start||tick>start+43){row.remove("image");return;}
+                if(tick<start||tick>start+61){row.remove("image");return;}
             }
             var image=Screenshot.takeScreenshot(mc.getMainRenderTarget());
             try{writer.execute(()->{try(image){image.writeToFile(output.resolve(name));}catch(Exception e){imageError=e.toString();}});row.addProperty("imageQueued",true);}

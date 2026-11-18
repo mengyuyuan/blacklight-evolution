@@ -371,8 +371,67 @@ public final class AdaptiveRagdoll {
     private record Imprint(FatalWeaponImpact style,Vec3 point,Vec3 direction,double radius){
         Vec3 apply(Vec3 vertex){return style.displace(vertex,point,direction,radius);}
     }
+    /** Project a pixel-art wound onto the captured skin. All fragments use the same
+     * original point and axes, so a fracture splits the mark along the real seam. */
+    private record StrikeMark(Vec3 center, Vec3 normal, Vec3 across, Vec3 up, double width, RenderType type) {
+        static StrikeMark attach(Part part, Vec3 contact, Vec3 travel, FatalWeaponImpact style, double radius) {
+            Vec3 surface = contact, normal = travel.scale(-1);
+            double nearest = Double.POSITIVE_INFINITY;
+            for (int i=0; i+3<part.mesh.size(); i+=4) {
+                var quad = part.mesh.subList(i,i+4);
+                var face = quad.get(0);
+                Vec3 n = face.n.normalize();
+                if (n.lengthSqr()<.5) continue;
+                // Penalize exit faces if the hit lands exactly on a shared edge.
+                double distance = bounds(quad).distanceToSqr(contact) + .0001*Math.max(0,n.dot(travel));
+                if (distance>=nearest) continue;
+                nearest = distance;
+                surface = contact.subtract(n.scale(contact.subtract(face.p).dot(n)));
+                normal = n;
+            }
+            Vec3 across = (Math.abs(normal.y)>.85 ? new Vec3(0,0,1) : new Vec3(0,1,0)).cross(normal).normalize();
+            Vec3 up = normal.cross(across);
+            String material = switch(style) {
+                case FIST -> "bruise";
+                case WHIP -> "welt";
+                case HAMMER, HAMMER_BREAK -> "crush";
+                default -> "rupture";
+            };
+            double extent = radius*switch(style) { case FIST -> .8; case WHIP -> 1.36; default -> 1.18; };
+            var texture = new net.minecraft.resources.ResourceLocation("blacklight","textures/entity/impact/"+material+".png");
+            return new StrikeMark(surface,normal,across,up,Math.max(.16,extent),RenderType.entityCutoutNoCull(texture));
+        }
+
+        List<Vertex> project(Part part) {
+            var result = new ArrayList<Vertex>();
+            for (int i=0; i+3<part.mesh.size(); i+=4) {
+                var quad = part.mesh.subList(i,i+4);
+                var first = quad.get(0);
+                if (first.n.dot(normal)<.45 || Math.abs(first.p.subtract(center).dot(first.n))>width*.22
+                        || bounds(quad).distanceToSqr(center)>width*width*.55) continue;
+                for (var v : quad) {
+                    Vec3 delta = v.p.subtract(center);
+                    Vec3 p = part.skinPoint(v).add(v.n.scale(.003));
+                    result.add(new Vertex(v.key,type,p,v.n,(float)(.5+delta.dot(across)/width),
+                            (float)(.5-delta.dot(up)/width),-1,v.overlay,v.light));
+                }
+            }
+            return result;
+        }
+    }
     private static final class Part {
         Imprint imprint;
+        StrikeMark mark;
+        private int markRevision=-1;
+        private List<Vertex> markedSkin=List.of();
+        List<Vertex> impactMark() {
+            if (mark!=null && meshRevision!=markRevision) {
+                markedSkin=mark.project(this);
+                markRevision=meshRevision;
+            }
+            return markedSkin;
+        }
+        double landingSpeed;
         Vec3 skinPoint(Vertex vertex){return imprint==null?vertex.p:imprint.apply(vertex.p);}
         final RagdollPoseHistory poses=new RagdollPoseHistory();
         final Set<String> finishedCuts=new HashSet<>();
@@ -416,6 +475,7 @@ public final class AdaptiveRagdoll {
         }
         void inherit(Part source){
             imprint=source.imprint;
+            mark=source.mark;
             finishedCuts.addAll(source.finishedCuts);
             source.consumePaths.forEach((key,path)->consumePaths.put(key,path.copy()));consumeCutTicks.putAll(source.consumeCutTicks);
             sectionContacts.putAll(source.sectionContacts);
@@ -464,6 +524,7 @@ public final class AdaptiveRagdoll {
             return clip(new Vec3(0,-.025,0)).y>-.025+1e-5;
         }
         void step(){
+            landingSpeed=0;
             if(still>=RagdollConstraintMotion.SLEEP_STEPS)return;
             rotation.rotateXYZ(spin.x*.5F,spin.y*.5F,spin.z*.5F).normalize();
             floorContact();
@@ -471,6 +532,7 @@ public final class AdaptiveRagdoll {
             velocity=RagdollDrive.limit(velocity.scale(water?.82:.975).add(0,(water?-.005:-.04)*(1-flow),0),1.5);
             Vec3 requested=velocity.scale(.5),allowed=move(requested);
             boolean x=Math.abs(allowed.x-requested.x)>1e-5,y=Math.abs(allowed.y-requested.y)>1e-5,z=Math.abs(allowed.z-requested.z)>1e-5;
+            if(y && requested.y<0 && !water) landingSpeed=-velocity.y;
             if(x||y||z){double bounce=velocity.lengthSqr()>.04?.15:0;velocity=new Vec3(x?-velocity.x*bounce:velocity.x*.72,y?-velocity.y*bounce:velocity.y*.72,z?-velocity.z*bounce:velocity.z*.72);spin.mul(.65F);}
         }
         void finishConstraints(boolean supported){
@@ -1153,6 +1215,25 @@ public final class AdaptiveRagdoll {
             }
         }
         FatalWeaponImpact fatalImpact;
+        boolean landingPlayed;
+        void landing(Part part) {
+            if (landingPlayed || fatalImpact==null || part.landingSpeed<.32 || part.half.length()<.14) return;
+            var floor = part.floorBelow(part.pos,part.extent());
+            if (floor.getType()!=HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP) return;
+            var point = floor.getLocation();
+            var block = scene.getBlockState(floor.getBlockPos());
+            if (block.isAir() || !scene.getFluidState(floor.getBlockPos().above()).isEmpty()) return;
+            landingPlayed=true;
+            float force=(float)Math.min(1,part.landingSpeed);
+            scene.playLocalSound(point.x,point.y,point.z,block.getSoundType().getFallSound(),
+                    net.minecraft.sounds.SoundSource.NEUTRAL,.42F+.45F*force,.75F,false);
+            var chips=new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,block);
+            for(int i=0;i<3+(int)(5*force);i++) {
+                double angle=scene.random.nextDouble()*Math.PI*2, speed=.06+.12*force;
+                scene.addParticle(chips,point.x+.12*Math.cos(angle),point.y+.04,point.z+.12*Math.sin(angle),
+                        speed*Math.cos(angle),.05+.12*force,speed*Math.sin(angle));
+            }
+        }
         void fatalContact(FatalWeaponImpact style,Part struck,Vec3 contact,Vec3 direction){
             fatalImpact=style;
             var inverse=new Quaternionf(struck.rotation).conjugate();
@@ -1165,6 +1246,7 @@ public final class AdaptiveRagdoll {
             // Keep the original cutting mesh for any subsequent swept lash samples.
             // All fragments inherit the same local imprint when a real edge crosses it.
             struck.imprint=new Imprint(style,at,axis,radius);
+            struck.mark=StrikeMark.attach(struck,at,axis,style,radius);
             if(style==FatalWeaponImpact.HAMMER_BREAK||style==FatalWeaponImpact.MUSCLE_BURST){
                 // Break off the impacted section of this part only. The existing clipper
                 // closes the exposed surfaces and hands both fragments to terrain physics.
@@ -1184,8 +1266,22 @@ public final class AdaptiveRagdoll {
             Vec3 velocity=new Vec3(hit.vx(),hit.vy(),hit.vz());var frame=RagdollDrive.frame(entity,1);
             var style=hit.fatal()&&!hit.refinement()&&fatalImpact==null?FatalWeaponImpact.fromMotion(hit.motion()):null;
             double transfer=style!=null?style.bodyTransfer:soft?.12:.26;
-            var roll=style==null?Vec3.ZERO:new Vec3(velocity.z,0,-velocity.x).normalize()
-                    .scale(style.turn*Math.min(1,velocity.length()));
+            Vec3 roll=Vec3.ZERO;
+            if (style!=null) {
+                Vec3 hinge=new Vec3(velocity.z,0,-velocity.x).normalize();
+                if (style==FatalWeaponImpact.WHIP) {
+                    double side=0;
+                    if (!hit.wounds().isEmpty()) {
+                        var wound=hit.wounds().get(0);
+                        side=RagdollDrive.transform(frame,wound.point()).subtract(root.pos).dot(hinge);
+                    }
+                    if (Math.abs(side)<.015) side=(entity.getId()%2==0?1:-1);
+                    hinge=hinge.scale(.34).add(0,Math.copySign(.94,side),0);
+                } else if (style==FatalWeaponImpact.HAMMER || style==FatalWeaponImpact.HAMMER_BREAK) {
+                    hinge=hinge.scale(-1);
+                }
+                roll=hinge.scale(style.turn*Math.min(1,velocity.length()));
+            }
             for(var p:parts){
                 p.still=0;
                 p.velocity=p.velocity.add(velocity.scale(transfer));
@@ -1250,6 +1346,7 @@ public final class AdaptiveRagdoll {
                     }
                     if(p.flow>0)p.velocity=RagdollDrive.pull(p.pos,p.velocity,sink,p.flow,.5);
                     p.stepOrigin=p.pos;p.stepRotation.set(p.rotation);p.step();
+                    if (dead && !captured) landing(p);
                     p.predictedPosition=p.pos;p.predictedRotation.set(p.rotation);
                 }
                 for(int i=0;i<6;i++){
@@ -1349,9 +1446,10 @@ public final class AdaptiveRagdoll {
                 var turn=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);var at=connected.positions()[i];
                 p.renderedPosition=at;p.renderedRotation=new Quaternionf(turn);p.renderedPartial=partial;p.renderedAt=scene.getGameTime();
                 int light=LevelRenderer.getLightColor(scene,BlockPos.containing(at));
-                var skins=new ArrayList<List<Vertex>>();skins.add(p.mesh);skins.addAll(p.incisions.values());
+                var mark=p.impactMark();
+                var skins=new ArrayList<List<Vertex>>();skins.add(p.mesh);skins.addAll(p.incisions.values());skins.add(mark);
                 for(var skin:skins)for(var v:skin){
-                    Vec3 point=transform(matrix,at.add(rotate(p.skinPoint(v).subtract(p.center).scale(p.scale),turn)).subtract(offset));
+                    Vec3 point=transform(matrix,at.add(rotate((skin==mark?v.p:p.skinPoint(v)).subtract(p.center).scale(p.scale),turn)).subtract(offset));
                     Vec3 normal=vec(normalMatrix.transform(rotate(v.n,turn).toVector3f())).normalize();
                     int color=v.color;
                     if(p.flow>0){int r=(color>>>16)&255,g=(color>>>8)&255,b=color&255;color=(color&0xff000000)|((int)(r*(1-p.flow*.45F))<<16)|((int)(g*(1-p.flow*.85F))<<8)|(int)(b*(1-p.flow*.8F));}

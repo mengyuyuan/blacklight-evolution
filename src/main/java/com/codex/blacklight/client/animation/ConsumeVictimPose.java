@@ -280,6 +280,15 @@ public final class ConsumeVictimPose {
     }
     public static void epic(LivingEntity entity,BlacklightPose pose,float partial) {
         if(!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()) {
+            var recoil = FleshRecoil.sample(entity, partial);
+            if (recoil != null && !ImpactRagdoll.active(entity) && !com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)) {
+                pose.orElseEmpty("Torso").rotation().rotateXYZ(recoil.pitch()*.45F,recoil.twist()*.48F,recoil.roll()*.42F);
+                pose.orElseEmpty("Chest").rotation().rotateXYZ(recoil.pitch()*.55F,recoil.twist()*.52F,recoil.roll()*.58F);
+                pose.orElseEmpty("Head").rotation().rotateX(recoil.head());
+                pose.orElseEmpty("Arm_R").rotation().rotateZ(-.54F*recoil.brace());
+                pose.orElseEmpty("Arm_L").rotation().rotateZ(.56F*recoil.brace());
+                return;
+            }
             var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
             if(w>0){
                 float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.65F:-.22F)*w;
@@ -311,10 +320,48 @@ public final class ConsumeVictimPose {
             pose.orElseEmpty("Leg_"+side).rotation().rotationXYZ(p.kick()*.95F,0,0);
         }
     }
+    private static void strikePose(EntityModel<?> model, Map<ModelPart,PartPose> saved, FleshRecoil.Pose pose) {
+        float pitch = pose.pitch(), twist = pose.twist(), roll = pose.roll();
+        if (model instanceof HumanoidModel<?> h) {
+            // Vanilla humanoid shoulders, head and body are siblings. Rotate their
+            // anchor points about the same waist or the head floats off a bent torso.
+            var waist = new org.joml.Quaternionf().rotationZYX(roll, twist, pitch);
+            for (var part : List.of(h.body, h.head, h.hat, h.leftArm, h.rightArm)) {
+                saved.putIfAbsent(part, part.storePose());
+                var anchor = waist.transform(new org.joml.Vector3f(part.x, part.y-10, part.z));
+                part.setPos(anchor.x, anchor.y+10+pose.dip(), anchor.z);
+                rotate(saved, part, pitch, twist, roll);
+            }
+            rotate(saved, h.head, pose.head(), -.28F*twist, -.22F*roll);
+            rotate(saved, h.hat, pose.head(), -.28F*twist, -.22F*roll);
+            rotate(saved, h.rightArm, -.65F*pose.brace(), 0, -.45F*pose.brace());
+            rotate(saved, h.leftArm, -.42F*pose.brace(), 0, .55F*pose.brace());
+            rotate(saved, h.rightLeg, .22F*pose.brace(), 0, .09F*roll);
+            rotate(saved, h.leftLeg, -.26F*pose.brace(), 0, .09F*roll);
+        } else if (model instanceof HierarchicalModel<?> h) {
+            var root = h.root();
+            if (root.hasChild("body")) rotate(saved,root.getChild("body"),pitch*.58F,twist*.62F,roll*.60F);
+            if (root.hasChild("head")) rotate(saved,root.getChild("head"),pose.head(),twist*.47F,roll*.55F);
+        } else if (model instanceof AgeableModelAccessor a) {
+            for (var head : a.blacklight$heads()) rotate(saved,head,pose.head(),twist*.6F,roll*.6F);
+            int i = 0;
+            for (var part : a.blacklight$body()) {
+                if (i++ == 0) rotate(saved,part,pitch*.48F,twist*.46F,roll*.5F);
+                else rotate(saved,part,(i%2==0?.34F:-.22F)*pose.brace(),0,roll*.2F);
+            }
+        }
+    }
     private static void hit(EntityModel<?> model,LivingEntity entity,float partial) {
         // A full physical receiver captures its own current species pose. Adding a scripted
         // flinch first changes the skin under the authoritative blade path before handoff.
         if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity))return;
+        var recoil = FleshRecoil.sample(entity, partial);
+        if (recoil != null && !ImpactRagdoll.active(entity)) {
+            var saved = new IdentityHashMap<ModelPart,PartPose>();
+            SAVED.put(model, saved);
+            strikePose(model, saved, recoil);
+            return;
+        }
         var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
         if(w<=0)return;
         float bend=(hit.kind()==com.codex.blacklight.combat.HitReaction.SLAM?.60F:-.24F)*w;
