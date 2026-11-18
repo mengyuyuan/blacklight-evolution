@@ -171,7 +171,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
         if(incomingContact==null||amount<=0)return;
         var c=incomingContact;lastIncomingPoint=c.point();lastIncomingTick=level().getGameTime();incomingEffects++;
         var n=c.normal();var attacker=source.getEntity();
-        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.style().ordinal(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,.65F,level().getGameTime()*31+getId());
+        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,.65F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
         ContactEffects.body(this,tissue,c.style()==InfectedAttackStyle.CRUSH,sound);
     }

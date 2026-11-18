@@ -12,7 +12,17 @@ import net.minecraft.world.phys.*;
 
 /** Receive damage on the same authored cuboids as the visible body. No regional damage bonus. */
 public final class HydraHurtContact {
-    public record Contact(String bone,Vec3 point,Vec3 normal,InfectedAttackStyle style) {}
+    public record Contact(String bone,Vec3 point,Vec3 normal,InfectedAttackStyle style,FleshStrike strike,boolean charged) {
+        public Contact(String bone,Vec3 point,Vec3 normal,InfectedAttackStyle style){
+            this(bone,point,normal,style,FleshStrike.GENERIC,false);
+        }
+        Contact withStrike(FleshStrike weapon,boolean fullCharge){
+            return new Contact(bone,point,normal,style,weapon,fullCharge);
+        }
+        public int appearance(){
+            return com.codex.blacklight.network.InfectedImpactPayload.appearance(style,strike,charged);
+        }
+    }
     public static Contact nativeHit(AnimatedHurtBody body,int slot,DamageSource source){
         var hydra=(LivingEntity)body;var regions=body.hurtRegions(0);if(slot<0||slot>=regions.size())return null;
         var region=regions.get(slot);var direct=source.getDirectEntity();Vec3 from,to;
@@ -30,7 +40,10 @@ public final class HydraHurtContact {
         var normal=from.subtract(point).normalize();if(normal.lengthSqr()<.01)normal=new Vec3(0,1,0);
         InfectedAttackStyle style=direct instanceof Projectile?InfectedAttackStyle.PIERCE:direct instanceof Mob mob?InfectedAttackStyle.of(mob,source):InfectedAttackStyle.CRUSH;
         if(direct instanceof LivingEntity living&&(living.getMainHandItem().is(net.minecraft.tags.ItemTags.SWORDS)||living.getMainHandItem().is(net.minecraft.tags.ItemTags.AXES)))style=InfectedAttackStyle.TEAR;
-        return new Contact(region.bone(),point,normal,style);
+        var hit=new Contact(region.bone(),point,normal,style);
+        if(direct instanceof Player player&&player.getMainHandItem().isEmpty()
+                &&source.is(net.minecraft.world.damagesource.DamageTypes.PLAYER_ATTACK))return hit.withStrike(FleshStrike.FIST,false);
+        return hit;
     }
     public static boolean clear(LivingEntity h,Vec3 from,Vec3 to){
         return h.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,h)).getType()==HitResult.Type.MISS;
@@ -73,7 +86,7 @@ public final class HydraHurtContact {
                         .mapToDouble(b->b.nearest(c.point()).distanceToSqr(c.point())).min().orElse(Double.MAX_VALUE)));
                 if(nearest.isEmpty())continue;bone=nearest.orElseThrow().bone();
             }
-            return new Contact(bone,c.point(),c.travel().normalize().scale(-1),(report.kind()==WeaponCutContact.Kind.NONE||report.kind()==WeaponCutContact.Kind.BLUNT)?InfectedAttackStyle.CRUSH:InfectedAttackStyle.TEAR);
+            return new Contact(bone,c.point(),c.travel().normalize().scale(-1),FleshStrike.EDGE.style(report.kind()));
         }return null;
     }
     /** Shared weapon-session receiver. Sharp weapons require their actual moving triangles. */

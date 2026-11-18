@@ -146,7 +146,11 @@ public final class WoundBlood {
         }
         void tick(){
             int age=(int)(scene.getGameTime()-started);if(emitted&&age>5&&(age&1)!=0)return;
-            float decay=1-age/(float)lifetime;int count=!emitted?(stump?5:8):stump?2:1;
+            float decay=1-age/(float)lifetime;
+            // The very short blunt wound already has a weapon-shaped contact spray.
+            // Only a few secondary drops need to survive long enough to hit terrain.
+            int initialDrops=stump?5:lifetime<=6?2:8;
+            int count=emitted?(stump?2:1):initialDrops;
             for(var anchor:anchors(this)){
                 var random=scene.random;Vec3 normal=anchor.direction.normalize();
                 Vec3 tangent=normal.cross(Math.abs(normal.y)<.85?new Vec3(0,1,0):new Vec3(1,0,0)).normalize(),up=normal.cross(tangent);
@@ -222,8 +226,14 @@ public final class WoundBlood {
             Vec3 along=axis.scale(net.minecraft.util.Mth.clamp(velocity.length()*.42,radius,radius*7));
             Vec3 front=point.add(along).subtract(camera),back=point.subtract(along).subtract(camera);
             int light=LevelRenderer.getLightColor(scene,BlockPos.containing(point));int alpha=(int)(230*Math.min(1,(32-age)/7F));
-            vertex(out,stack,front.subtract(across),normal,red,alpha,light);vertex(out,stack,front.add(across),normal,red,alpha,light);
-            vertex(out,stack,back.add(across.scale(.45)),normal,red,alpha/2,light);vertex(out,stack,back.subtract(across.scale(.45)),normal,red,alpha/2,light);
+            // A pointed trailing end and rounded leading edge keep close droplets
+            // readable against the sky even when their velocity is nearly horizontal.
+            var shoulder=point.subtract(camera).add(along.scale(.42));
+            var left=shoulder.subtract(across);var right=shoulder.add(across);
+            vertex(out,stack,back,normal,red,alpha/2,light);vertex(out,stack,left,normal,red,alpha,light);
+            vertex(out,stack,right,normal,red,alpha,light);vertex(out,stack,back,normal,red,alpha/2,light);
+            vertex(out,stack,left,normal,red,alpha,light);vertex(out,stack,front.subtract(across.scale(.42)),normal,red,alpha,light);
+            vertex(out,stack,front.add(across.scale(.42)),normal,red,alpha,light);vertex(out,stack,right,normal,red,alpha,light);
         }
     }
     private record Splat(Vec3 center,Vec3 normal,List<Vec3> rim,BlockPos block,int red,long started) {}

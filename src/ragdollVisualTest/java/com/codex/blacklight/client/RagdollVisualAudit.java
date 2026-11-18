@@ -76,6 +76,8 @@ public final class RagdollVisualAudit {
             new Case("claws_skeleton",PowerForm.CLAWS,"minecraft:skeleton",false,false),
             new Case("claws_cow_survive",PowerForm.CLAWS,"minecraft:cow",false,false),
             new Case("claws_cow_miss",PowerForm.CLAWS,"minecraft:cow",false,false),
+            new Case("fist_zombie_survive",PowerForm.NONE,"minecraft:zombie",false,false),
+            new Case("whip_zombie_survive",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
             new Case("fist_zombie_lethal",PowerForm.NONE,"minecraft:zombie",false,false),
             new Case("whip_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
             new Case("hammer_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
@@ -104,6 +106,7 @@ public final class RagdollVisualAudit {
     static int index,tick,frame;static volatile int victimId=-1;static volatile float health;static volatile boolean lastChance;
     static long previousFrameNanos;
     static boolean terrainProbe(){return TERRAIN||current().name().startsWith("thrown_")&&current().name().contains("_step_");}
+    static final boolean CLOSEUP="closeup".equals(System.getenv("BLACKLIGHT_QA_RAGDOLL_CAMERA"));
     static final boolean TERRAIN="steps".equals(System.getenv("BLACKLIGHT_QA_RAGDOLL_TERRAIN"));
     static final Map<BlockPos,List<AABB>> terrainShapes=new HashMap<>();
     static double penetration;static int terrainVertices;static Vec3 worstPoint;
@@ -151,11 +154,12 @@ public final class RagdollVisualAudit {
                 // fixture's requested resolution; never change the user's client.
                 if(mc.getWindow().isFullscreen())mc.getWindow().toggleFullScreen();
                 if(!Boolean.getBoolean("blacklight.test.hiddenRagdoll"))org.lwjgl.glfw.GLFW.glfwRestoreWindow(mc.getWindow().getWindow());
-                org.lwjgl.glfw.GLFW.glfwSetWindowSize(mc.getWindow().getWindow(),960,640);
+                org.lwjgl.glfw.GLFW.glfwSetWindowSize(mc.getWindow().getWindow(),CLOSEUP?2560:960,CLOSEUP?1440:640);
                 Files.writeString(output.resolve("capture-status.txt"),"Running "+CASES.size()+" cases");
                 writer=new ThreadPoolExecutor(2,2,0,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(24),r->{var t=new Thread(r,"ragdoll-qa-images");t.setDaemon(true);return t;});
+                if(CLOSEUP)writer.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
                 for(var key:List.of(mc.options.keyAttack,mc.options.keyUse)){bindings.put(key,key.getKey());key.setKey(com.mojang.blaze3d.platform.InputConstants.UNKNOWN);key.setDown(false);}
-                KeyMapping.resetMapping();mc.options.pauseOnLostFocus=false;mc.options.framerateLimit().set(30);mc.options.hideGui=true;mc.options.fov().set(net.minecraft.util.Mth.clamp(Integer.getInteger("blacklight.test.ragdollFov",55),30,80));mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
+                KeyMapping.resetMapping();mc.options.pauseOnLostFocus=false;mc.options.framerateLimit().set(30);mc.options.hideGui=true;mc.options.fov().set(net.minecraft.util.Mth.clamp(Integer.getInteger("blacklight.test.ragdollFov",CLOSEUP?39:55),30,80));mc.options.setCameraType(CameraType.THIRD_PERSON_BACK);
                 mc.setScreen(null);mc.mouseHandler.releaseMouse();mc.getWindow().setTitle("Blacklight Ragdoll QA - frame capture");
                 com.codex.blacklight.client.renderer.ConsumeBladeContact.observer=sample->{if(mc.player!=null&&sample.actor()==mc.player.getId())drawnBlades.put(sample.edge(),sample);};
                 ClientWeaponCombat.setFixtureOwnsInput(true);initialized=true;setup();return;
@@ -274,6 +278,22 @@ public final class RagdollVisualAudit {
             result.addProperty("expectedFatalStyle",expected.name());
             result.addProperty("maxSkinDisplacement",deformation);
             passed&=deformation>.001&&bodies.size()==1&&((expected==FatalWeaponImpact.HAMMER_BREAK||expected==FatalWeaponImpact.MUSCLE_BURST)?cuts>0&&components>=2:cuts==0&&components==1);
+        }
+        if(c.name().contains("_zombie_")){
+            String effect=switch(c.form()){
+                case WHIPFIST -> "LASH";
+                case HAMMERFISTS -> "HAMMER";
+                case MUSCLE_MASS -> "MUSCLE";
+                default -> "FIST";
+            };
+            boolean sawSpray=false;
+            for(var element:rows){
+                var sample=element.getAsJsonObject();
+                if(sample.has("contactSpray")&&effect.equals(sample.get("contactSpray").getAsString())
+                        &&sample.get("contactCharged").getAsBoolean()==c.name().contains("_charged_"))sawSpray=true;
+            }
+            result.addProperty("confirmedContactSpray",sawSpray);
+            passed&=sawSpray;
         }
         double floorClearance=Double.POSITIVE_INFINITY;int penetrations=0;
         for(var e:rows){var r=e.getAsJsonObject();if(r.has("floorClearance")){double clearance=r.get("floorClearance").getAsDouble();floorClearance=Math.min(floorClearance,clearance);if(clearance<-.02)penetrations++;}}
@@ -459,7 +479,7 @@ public final class RagdollVisualAudit {
                 ConsumeSystem.cancel(p);WeaponCombatSystem.cancel(p);WeaponCombatSystem.cancelHeldInput(p);CombatTargeting.requestLock(p,-1);
                 for(var e:level.getEntitiesOfClass(Entity.class,new AABB(-20,240,-20,20,280,30),e->!(e instanceof net.minecraft.world.entity.player.Player)))e.discard();
                 for(int x=-10;x<=10;x++)for(int z=-10;z<=20;z++){
-                    level.setBlockAndUpdate(new BlockPos(x,250,z),((x+z)%5==0?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE).defaultBlockState());
+                    level.setBlockAndUpdate(new BlockPos(x,250,z),(CLOSEUP?Blocks.LIGHT_GRAY_CONCRETE:(x+z)%5==0?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE).defaultBlockState());
                     for(int y=251;y<258;y++)level.setBlockAndUpdate(new BlockPos(x,y,z),Blocks.AIR.defaultBlockState());
                 }
                 if(TERRAIN)for(int x=-2;x<=2;x++)for(int z=3;z<=6;z++){
@@ -470,6 +490,10 @@ public final class RagdollVisualAudit {
                 if(c.name().contains("_frontslab_"))for(int x=-4;x<=4;x++)for(int z=2;z<=6;z++)level.setBlockAndUpdate(new BlockPos(x,251,z),Blocks.SMOOTH_STONE_SLAB.defaultBlockState());
                 if(c.name().contains("_sideblock_"))for(int z=1;z<=3;z++)level.setBlockAndUpdate(new BlockPos(-1,251,z),Blocks.STONE_BRICKS.defaultBlockState());
                 if(c.name().contains("_ledge_"))for(int x=-10;x<=10;x++)for(int z=3;z<=20;z++)level.setBlockAndUpdate(new BlockPos(x,250,z),Blocks.AIR.defaultBlockState());
+                if(CLOSEUP){
+                    level.setBlockAndUpdate(new BlockPos(0,254,1),Blocks.LIGHT.defaultBlockState());
+                    level.setBlockAndUpdate(new BlockPos(-2,253,2),Blocks.LIGHT.defaultBlockState());
+                }
                 level.setDayTime(18000);level.setWeatherParameters(6000,0,false,false);
                 var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.unlock(c.form());state.activate(c.form());state.addBiomass(1000);
                 com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);
@@ -555,6 +579,11 @@ public final class RagdollVisualAudit {
         int side=Integer.getInteger("blacklight.test.ragdollCameraSide",1)<0?-1:1;
         String view=System.getenv().getOrDefault("BLACKLIGHT_QA_RAGDOLL_CAMERA","front");
         Vec3 at=new Vec3(.5,251.8,current().name().startsWith("thrown_")?6:3),eye=at.add(view.equals("side")?6*side:4*side,2.4,view.equals("rear")?4.4:view.equals("side")?0:-4.4),look=at.subtract(eye);
+        if(CLOSEUP){
+            at=new Vec3(.5,current().name().contains("_charged_")?252.48:252.10,1.65);
+            eye=at.add(-3.85,.58,-.65);
+            look=at.subtract(eye);
+        }
         var a=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)e.getCamera();a.blacklight$setPosition(eye);
         e.setYaw((float)Math.toDegrees(Math.atan2(-look.x,look.z)));
         e.setPitch((float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance())));e.setRoll(0);
@@ -573,6 +602,17 @@ public final class RagdollVisualAudit {
         try{
             terrainShapes.clear();penetration=0;terrainVertices=0;worstPoint=null;
             var mc=Minecraft.getInstance();var row=new JsonObject();row.addProperty("frame",frame);row.addProperty("tick",tick);row.addProperty("health",health);row.addProperty("gameTime",mc.level.getGameTime());
+            if(current().name().contains("_zombie_")){
+                var impacts=com.codex.blacklight.client.renderer.InfectedImpactVisuals.class.getDeclaredField("ACTIVE");
+                impacts.setAccessible(true);
+                for(var impact:(Collection<?>)impacts.get(null)){
+                    var packet=(com.codex.blacklight.network.InfectedImpactPayload)field(impact,"data");
+                    if(packet.attacker()==mc.player.getId()&&packet.victim()==victimId){
+                        row.addProperty("contactSpray",packet.strike().name());
+                        row.addProperty("contactCharged",packet.charged());
+                    }
+                }
+            }
             long nowNanos=System.nanoTime();if(previousFrameNanos!=0)row.addProperty("frameMillis",(nowNanos-previousFrameNanos)/1e6);previousFrameNanos=nowNanos;
             row.addProperty("partial",mc.getFrameTime());
             var blades=new JsonObject();for(var entry:drawnBlades.entrySet()){var sample=entry.getValue();var value=new JsonObject();value.addProperty("time",sample.time());var points=new JsonArray();sample.points().forEach(p->points.add(vector(p)));value.add("points",points);blades.add(entry.getKey(),value);}row.add("drawnBlades",blades);
@@ -685,6 +725,14 @@ public final class RagdollVisualAudit {
                     q.addProperty("volume",skinVolume((List<?>)field(part,"mesh"),(Vec3)field(part,"center")));
                     if(frozen)frozenMotion=Math.max(frozenMotion,pos.subtract((Vec3)field(part,"old")).horizontalDistance());
                     var oldRotation=new JsonArray();oldRotation.add(oldTurn.x);oldRotation.add(oldTurn.y);oldRotation.add(oldTurn.z);oldRotation.add(oldTurn.w);q.add("oldRotation",oldRotation);
+                    // Measure the same post-impact skin the renderer submitted. The
+                    // undeformed bind vertices can lie outside a whip imprint.
+                    var drawnMesh=(List<?>)field(part,"mesh");
+                    java.lang.reflect.Method skin=null;
+                    if(!drawnMesh.isEmpty()&&field(part,"imprint")!=null){
+                        skin=part.getClass().getDeclaredMethod("skinPoint",drawnMesh.get(0).getClass());
+                        skin.setAccessible(true);
+                    }
                     var turn=new JsonArray();turn.add(rotation.x);turn.add(rotation.y);turn.add(rotation.z);turn.add(rotation.w);q.add("rotation",turn);q.add("half",vector((Vec3)field(part,"half")));q.addProperty("scale",(Float)field(part,"scale"));
                     if((Long)field(part,"renderedAt")==mc.level.getGameTime()&&(Float)field(part,"flow")<=.995F
                             &&Math.abs((Float)field(part,"renderedPartial")-row.get("partial").getAsFloat())<1e-5){
@@ -692,7 +740,7 @@ public final class RagdollVisualAudit {
                         var center=(Vec3)field(part,"center");float scale=(Float)field(part,"scale");
                         double bottom=Double.POSITIVE_INFINITY;boolean onPlatform=true;
                         for(var vertex:(List<?>)field(part,"mesh")){
-                            var local=((Vec3)field(vertex,"p")).subtract(center).scale(scale);var offset=drawnTurn.transform(local.toVector3f());
+                            var local=((Vec3)(skin==null?field(vertex,"p"):skin.invoke(part,vertex))).subtract(center).scale(scale);var offset=drawnTurn.transform(local.toVector3f());
                             var world=drawn.add(offset.x,offset.y,offset.z);if(terrainProbe())probeTerrain(world,mc.level);bottom=Math.min(bottom,world.y);
                             onPlatform&=world.x>=-10&&world.x<=11&&world.z>=-10&&world.z<=21;
                         }
@@ -704,13 +752,13 @@ public final class RagdollVisualAudit {
                     if((Double)field(body,"poseTime")>(Long)field(body,"started")){
                         var half=(Vec3)field(part,"half");float scale=(Float)field(part,"scale");double bottom=Double.POSITIVE_INFINITY;boolean onPlatform=true;
                         for(var vertex:(List<?>)field(part,"mesh")){
-                            var local=((Vec3)field(vertex,"p")).subtract((Vec3)field(part,"center")).scale(scale);
+                            var local=((Vec3)(skin==null?field(vertex,"p"):skin.invoke(part,vertex))).subtract((Vec3)field(part,"center")).scale(scale);
                             var offset=rotation.transform(local.toVector3f());var world=pos.add(offset.x,offset.y,offset.z);
                             onPlatform&=world.x>=-10&&world.x<=11&&world.z>=-10&&world.z<=21;bottom=Math.min(bottom,world.y);
                         }
                         if(onPlatform)floorClearance=Math.min(floorClearance,bottom-251);
                     }
-                    int woundVertices=0;for(var skin:((Map<?,?>)field(part,"incisions")).values())woundVertices+=((List<?>)skin).size();q.addProperty("woundVertices",woundVertices);pieces.add(q);
+                    int woundVertices=0;for(var incision:((Map<?,?>)field(part,"incisions")).values())woundVertices+=((List<?>)incision).size();q.addProperty("woundVertices",woundVertices);pieces.add(q);
                 }row.add("pieces",pieces);
                 Vec3 commonShift=null;double shapeGap=0;
                 for(var item:pieces){var piece=item.getAsJsonObject();if(!piece.has("renderPos"))continue;
@@ -724,6 +772,10 @@ public final class RagdollVisualAudit {
             }
             if(terrainProbe()){row.addProperty("terrainPenetration",penetration);row.addProperty("terrainVertices",terrainVertices);if(worstPoint!=null)row.add("terrainWorstPoint",vector(worstPoint));}
             String name=current().name()+String.format(Locale.ROOT,"_%04d.png",frame++);row.addProperty("image",name);rows.add(row);
+            if(CLOSEUP){
+                int start=current().name().contains("_charged_")?112:37;
+                if(tick<start||tick>start+43){row.remove("image");return;}
+            }
             var image=Screenshot.takeScreenshot(mc.getMainRenderTarget());
             try{writer.execute(()->{try(image){image.writeToFile(output.resolve(name));}catch(Exception e){imageError=e.toString();}});row.addProperty("imageQueued",true);}
             catch(RejectedExecutionException e){image.close();dropped++;row.remove("image");row.addProperty("imageQueued",false);}

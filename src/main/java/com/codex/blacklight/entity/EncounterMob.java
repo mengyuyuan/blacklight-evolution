@@ -200,7 +200,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(incomingContact==null||amount<=0)return;
         var c=incomingContact;lastIncomingPoint=c.point();lastIncomingTick=level().getGameTime();incomingEffects++;
         var n=c.normal();var attacker=source.getEntity();
-        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.style().ordinal(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
+        var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
         if(kind==EncounterKind.ELIZABETH_GREENE){
             int slot=c.bone()!=null&&c.bone().startsWith("weak_")?Integer.parseInt(c.bone().substring(5,6)):3;

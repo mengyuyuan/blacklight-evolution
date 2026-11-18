@@ -35,14 +35,25 @@ public final class CombatImpactEffects {
         com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"ground",center,1F,move.quake()?.9F:1F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
     }
-    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){target(p,v,move,WeaponCutContact.Report.NONE);}
+    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){
+        target(p,v,move,WeaponCutContact.Report.NONE,false);
+    }
     public static void target(ServerPlayer p,LivingEntity v,WeaponMove move,WeaponCutContact.Report contact){
-        boolean hammer=move.form==PowerForm.HAMMERFISTS;
-        float size=hammer?.8F:move.form==PowerForm.MUSCLE_MASS?.7F:move.form==PowerForm.WHIPFIST?.6F:move.form==PowerForm.BLADE?.65F:.5F;
-        var tier=ImpactTier.of(move);size*=tier.effectScale;
-        var blunt=hammer||move.form==PowerForm.MUSCLE_MASS||move.shared()||contact.kind()==WeaponCutContact.Kind.BLUNT;
-        var style=blunt||(tier.atLeast(ImpactTier.HEAVY)&&move.form!=PowerForm.WHIPFIST)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH
-                :contact.kind()==WeaponCutContact.Kind.PUNCTURE?com.codex.blacklight.infection.InfectedAttackStyle.PIERCE:com.codex.blacklight.infection.InfectedAttackStyle.TEAR;
-        PlayerHitEffects.emit(p,v,style,size,contact);
+        target(p,v,move,contact,false);
+    }
+    public static void target(ServerPlayer p,LivingEntity v,WeaponMove move,WeaponCutContact.Report contact,boolean fullyCharged){
+        var strike=FleshStrike.of(ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower(),move);
+        float size=switch(strike){
+            case FIST -> .48F;
+            case LASH -> .6F;
+            case HAMMER -> .8F;
+            case MUSCLE -> .7F;
+            case EDGE -> move.form==PowerForm.BLADE?.65F:.5F;
+            default -> .5F;
+        };
+        var kind=contact.kind();
+        if(contact.contacts().isEmpty()&&(strike==FleshStrike.EDGE||strike==FleshStrike.LASH))
+            kind=WeaponCutContact.contactKind(move);
+        PlayerHitEffects.emit(p,v,strike.style(kind),size*ImpactTier.of(move).effectScale,contact,strike,fullyCharged);
     }
 }
