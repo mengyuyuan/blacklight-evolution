@@ -6,6 +6,7 @@ import com.codex.blacklight.client.animation.RagdollFatalHandoff;
 import com.codex.blacklight.combat.RagdollImpact;
 import com.codex.blacklight.mixin.client.ModelPartChildrenAccessor;
 import com.codex.blacklight.network.RagdollImpactPayload;
+import com.codex.blacklight.combat.FatalWeaponImpact;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
@@ -367,7 +368,12 @@ public final class AdaptiveRagdoll {
         @Override public VertexConsumer setNormal(float x,float y,float z){if(direct!=null)direct.normal(x,y,z).endVertex();else n=new Vec3(x,y,z);return this;}
     }
 
+    private record Imprint(FatalWeaponImpact style,Vec3 point,Vec3 direction,double radius){
+        Vec3 apply(Vec3 vertex){return style.displace(vertex,point,direction,radius);}
+    }
     private static final class Part {
+        Imprint imprint;
+        Vec3 skinPoint(Vertex vertex){return imprint==null?vertex.p:imprint.apply(vertex.p);}
         final RagdollPoseHistory poses=new RagdollPoseHistory();
         final Set<String> finishedCuts=new HashSet<>();
         final Map<String,List<Vertex>> incisions=new LinkedHashMap<>();
@@ -409,6 +415,7 @@ public final class AdaptiveRagdoll {
             return parent.contains(attachment());
         }
         void inherit(Part source){
+            imprint=source.imprint;
             finishedCuts.addAll(source.finishedCuts);
             source.consumePaths.forEach((key,path)->consumePaths.put(key,path.copy()));consumeCutTicks.putAll(source.consumeCutTicks);
             sectionContacts.putAll(source.sectionContacts);
@@ -494,7 +501,7 @@ public final class AdaptiveRagdoll {
             }
             if(boxes.isEmpty())return 0;
             var skin=new ArrayList<Vec3>(mesh.size());
-            for(var vertex:mesh)skin.add(at.add(rotate(vertex.p.subtract(center).scale(scale),turn)));
+            for(var vertex:mesh)skin.add(at.add(rotate(skinPoint(vertex).subtract(center).scale(scale),turn)));
             return RagdollTerrainSupport.lift(skin,boxes);
         }
         Vec3 renderPosition(float partial,Quaternionf turn){
@@ -502,7 +509,7 @@ public final class AdaptiveRagdoll {
             // Clear physical endpoints do not imply a clear interpolated rotation.
             // Only lift actual skin below the support, not empty corners of its box.
             if(floor.getType()==HitResult.Type.BLOCK&&floor.getDirection()==net.minecraft.core.Direction.UP&&at.y-extent.y<floor.getLocation().y)
-                at=at.add(0,meshFloorLift(mesh,v->v.p,center,turn,scale,at.y,floor.getLocation().y),0);
+                at=at.add(0,meshFloorLift(mesh,this::skinPoint,center,turn,scale,at.y,floor.getLocation().y),0);
             return at;
         }
     }
@@ -1145,14 +1152,49 @@ public final class AdaptiveRagdoll {
                 bruteRecovery=false;recoveryDuration=RagdollRecovery.DURATION;expires=RagdollRecovery.releaseDeadline(now,expires,hit.duration()<=0);
             }
         }
+        FatalWeaponImpact fatalImpact;
+        void fatalContact(FatalWeaponImpact style,Part struck,Vec3 contact,Vec3 direction){
+            fatalImpact=style;
+            var inverse=new Quaternionf(struck.rotation).conjugate();
+            var at=struck.center.add(rotate(contact.subtract(struck.pos),inverse));
+            var axis=rotate(direction.normalize(),inverse);
+            if(axis.lengthSqr()<.5)return;
+            var box=bounds(struck.mesh);
+            at=closest(at,box);
+            double radius=Math.min(1.6,Math.max(.22,struck.half.length()*1.8));
+            // Keep the original cutting mesh for any subsequent swept lash samples.
+            // All fragments inherit the same local imprint when a real edge crosses it.
+            struck.imprint=new Imprint(style,at,axis,radius);
+            if(style==FatalWeaponImpact.HAMMER_BREAK||style==FatalWeaponImpact.MUSCLE_BURST){
+                // Break off the impacted section of this part only. The existing clipper
+                // closes the exposed surfaces and hands both fragments to terrain physics.
+                var plane=new Boundary(at.lerp(struck.center,.49),axis,1,null,"fatal-impact");
+                if(cutAt(plane,0,radius,List.of(),struck)){
+                    rebuildJoints();
+                    separateCuts();
+                }
+            }
+        }
         void impulse(RagdollImpactPayload hit){
             boolean soft=!RagdollDrive.fullImpact(hit);
             long now=scene.getGameTime(),contactTime=hit.at()<0?now:hit.at();
             freezeUntil=Math.max(freezeUntil,Math.min(now+8,contactTime+net.minecraft.util.Mth.clamp(hit.freeze(),0,8)));
             if(!soft){light=false;expires=freezeUntil+hit.ticks();}
-            if((entity.isDeadOrDying()||hit.severMask()!=0)&&deadAt<0)deadAt=now;
+            if((hit.fatal()||entity.isDeadOrDying()||hit.severMask()!=0)&&deadAt<0)deadAt=now;
             Vec3 velocity=new Vec3(hit.vx(),hit.vy(),hit.vz());var frame=RagdollDrive.frame(entity,1);
-            for(var p:parts){p.still=0;p.velocity=p.velocity.add(velocity.scale(soft?.12:.26));}
+            var style=hit.fatal()&&!hit.refinement()&&fatalImpact==null?FatalWeaponImpact.fromMotion(hit.motion()):null;
+            double transfer=style!=null?style.bodyTransfer:soft?.12:.26;
+            var roll=style==null?Vec3.ZERO:new Vec3(velocity.z,0,-velocity.x).normalize()
+                    .scale(style.turn*Math.min(1,velocity.length()));
+            for(var p:parts){
+                p.still=0;
+                p.velocity=p.velocity.add(velocity.scale(transfer));
+                if(style!=null){
+                    // Start the connected skeleton rolling as one body, before constraints run.
+                    p.velocity=p.velocity.add(RagdollDrive.limit(roll.cross(p.pos.subtract(root.pos)),.6));
+                    p.spin.add(localAngularImpulse(roll,p.rotation).toVector3f());
+                }
+            }
             for(var wound:hit.wounds()){
                 Vec3 at=RagdollDrive.transform(frame,wound.point());Part struck=null;double distance=Double.POSITIVE_INFINITY;
                 for(var p:parts){
@@ -1166,8 +1208,17 @@ public final class AdaptiveRagdoll {
                 kick=RagdollDrive.limit(kick.scale(soft?.3:.65),.9);struck.velocity=struck.velocity.add(kick);
                 Vec3 angular=at.subtract(struck.pos).cross(kick).scale(.7/Math.max(.04,struck.half.lengthSqr()));
                 struck.spin.add(localAngularImpulse(RagdollDrive.limit(angular,.45),struck.rotation).toVector3f());
-                // A wound supplies momentum, not permission to tear off the whole bone.
-                // Only a valid mesh plane in cut() can separate connected tissue.
+                if(style!=null&&fatalImpact==null){
+                    // Cuts carry part of the world-space launch. Recover the original
+                    // contact travel independently of the launch of the complete body.
+                    Vec3 travel=kick;
+                    for(var sample:hit.cuts())if(sample.region()==wound.region()){
+                        travel=new Vec3(sample.x(),sample.y(),sample.z()).subtract(velocity.scale(.5));break;
+                    }
+                    if(travel.lengthSqr()<1e-6)travel=struck.pos.subtract(at);
+                    if(style==FatalWeaponImpact.HAMMER_BREAK&&velocity.y<-.2)travel=travel.normalize().add(0,-.7,0);
+                    fatalContact(style,struck,at,travel);
+                }
             }
         }
         void tick(){
@@ -1254,7 +1305,7 @@ public final class AdaptiveRagdoll {
             var skins=new LinkedHashMap<Integer,List<Vec3>>();
             for(int i=0;i<parts.size();i++){
                 var p=parts.get(i);var skin=skins.computeIfAbsent(result.components()[i],key->new ArrayList<>());
-                for(var v:p.mesh)skin.add(result.positions()[i].add(rotate(v.p.subtract(p.center).scale(p.scale),poses.get(i).rotation())));
+                for(var v:p.mesh)skin.add(result.positions()[i].add(rotate(p.skinPoint(v).subtract(p.center).scale(p.scale),poses.get(i).rotation())));
             }
             var fallback=new HashSet<Integer>();
             for(var entry:skins.entrySet()){
@@ -1276,7 +1327,7 @@ public final class AdaptiveRagdoll {
                 for(int i=0;i<parts.size();i++)if(fallback.contains(result.components()[i])){
                     var p=parts.get(i);var turn=poses.get(i).rotation();var at=result.positions()[i];var floor=p.floorBelow(at,p.extent(turn));
                     if(floor.getType()==HitResult.Type.BLOCK&&floor.getDirection()==net.minecraft.core.Direction.UP)
-                        lift[i]=collision?Math.max(0,floor.getLocation().y+.001+p.extent(turn).y-at.y):meshFloorLift(p.mesh,v->v.p,p.center,turn,p.scale,at.y,floor.getLocation().y);
+                        lift[i]=collision?Math.max(0,floor.getLocation().y+.001+p.extent(turn).y-at.y):meshFloorLift(p.mesh,p::skinPoint,p.center,turn,p.scale,at.y,floor.getLocation().y);
                     lift[i]=Math.max(lift[i],p.terrainSupport(at,turn));
                 }
                 result.lift(lift);
@@ -1300,7 +1351,7 @@ public final class AdaptiveRagdoll {
                 int light=LevelRenderer.getLightColor(scene,BlockPos.containing(at));
                 var skins=new ArrayList<List<Vertex>>();skins.add(p.mesh);skins.addAll(p.incisions.values());
                 for(var skin:skins)for(var v:skin){
-                    Vec3 point=transform(matrix,at.add(rotate(v.p.subtract(p.center).scale(p.scale),turn)).subtract(offset));
+                    Vec3 point=transform(matrix,at.add(rotate(p.skinPoint(v).subtract(p.center).scale(p.scale),turn)).subtract(offset));
                     Vec3 normal=vec(normalMatrix.transform(rotate(v.n,turn).toVector3f())).normalize();
                     int color=v.color;
                     if(p.flow>0){int r=(color>>>16)&255,g=(color>>>8)&255,b=color&255;color=(color&0xff000000)|((int)(r*(1-p.flow*.45F))<<16)|((int)(g*(1-p.flow*.85F))<<8)|(int)(b*(1-p.flow*.8F));}

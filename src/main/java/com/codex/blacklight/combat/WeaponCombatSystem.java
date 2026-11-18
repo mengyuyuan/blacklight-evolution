@@ -38,7 +38,7 @@ public final class WeaponCombatSystem {
         final Map<UUID,Integer> closeSweepHits=new HashMap<>();
         final Map<UUID,PendingCut> pendingCuts=new LinkedHashMap<>();
         final Set<UUID> hit=new HashSet<>();int hitstop,hitstopHeld;long hitstopStarted;boolean effect,charging,released,queuedHeld,jumpQueued,tookOff,lifted,impactEffect,groundEffect,locked;
-        WeaponMove.Input input,queued,early;boolean earlyHeld;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
+        WeaponMove.Input input,queued,early;boolean earlyHeld,fullyCharged;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
         Vec3 previousFeet;LivingEntity target,queuedTarget;Entity mechanicalTarget;final Map<UUID,List<AABB>> previousTargets=new HashMap<>();
         Entity focus(){return mechanicalTarget!=null?mechanicalTarget:target;}
         int targetId(){Entity focus=focus();return focus==null?-1:focus.getId();}
@@ -335,7 +335,7 @@ public final class WeaponCombatSystem {
                     if(launcher!=null){move=launcher;releaseTime=0;}
                 }
                 start(p,move,false,s.input,releaseTime);
-                var released=ACTIVE.get(p);released.jumpQueued=s.jumpQueued;released.queued=s.queued;released.queuedHeld=s.queuedHeld;released.queuedTarget=s.queuedTarget;released.early=s.early;released.earlyHeld=s.earlyHeld;
+                var released=ACTIVE.get(p);released.fullyCharged=full;released.jumpQueued=s.jumpQueued;released.queued=s.queued;released.queuedHeld=s.queuedHeld;released.queuedTarget=s.queuedTarget;released.early=s.early;released.earlyHeld=s.earlyHeld;
                 // Some source moves strengthen the same release clip instead of
                 // selecting a second animation. Preserve their actual held charge.
                 if(move==WeaponMove.AIR_KICK||move==WeaponMove.AIR_PAIN||move==WeaponMove.CLAW_POUNCE||move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP||move==WeaponMove.HAMMER_RAM||move==WeaponMove.BLADE_RUSH)
@@ -751,7 +751,7 @@ public final class WeaponCombatSystem {
             if(accepted){
                 LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));
                 s.hit.add(v.getUUID());if(close)s.closeSweepHits.put(v.getUUID(),pulse);
-                if(cutting.sharp()){
+                if(cutting.sharp()&&cutting.kind()!=WeaponCutContact.Kind.BLUNT){
                     var edges=new HashSet<String>();for(var c:cut.contacts())edges.add(c.region()+":"+c.edge());
                     var blades=new LinkedHashMap<String,WeaponCutContact.Contact>();for(var c:cut.contacts())blades.putIfAbsent(c.edge(),c);
                     s.pendingCuts.put(v.getUUID(),new PendingCut(v,v.isDeadOrDying(),v.position(),Math.min(s.move.duration,s.move.end+3),edges,blades));
@@ -762,7 +762,7 @@ public final class WeaponCombatSystem {
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}
                 }else if(!resistsControl&&!CombatTargeting.anchoredBody(v)&&(s.move.quake()||s.move.airCombo())){v.setDeltaMovement(v.getDeltaMovement().add(0,s.move==WeaponMove.AIR_AUTO4?-.6:.3,0));v.hurtMarked=true;}
                 var push=s.move.quake()?v.position().subtract(p.position()).multiply(1,0,1).normalize():s.direction;
-                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,impact);
+                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,impact,s.fullyCharged);
                 if(s.hit.size()==1)beginHitstop(p,s,ImpactTier.of(s.move));
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){
                     s.impactEffect=true;hammerSplash(p,s,v);

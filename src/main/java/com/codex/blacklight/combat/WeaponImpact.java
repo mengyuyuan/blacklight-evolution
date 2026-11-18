@@ -42,6 +42,9 @@ public final class WeaponImpact {
         apply(p,v,move,direction,first,charge,WeaponCutContact.Report.NONE);
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut) {
+        apply(p,v,move,direction,first,charge,cut,false);
+    }
+    static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut,boolean fullyCharged) {
         // A confirmed ordinary hit still has impact feedback when no sharp face touched.
         // Keep that fallback separate from the report allowed to authorize dismemberment.
         var impact=cut.contacts().isEmpty()?WeaponCutContact.impact(p,v,direction):cut;
@@ -73,7 +76,8 @@ public final class WeaponImpact {
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
         WeaponDismemberment.weapon(v,cut);
-        boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS||move.form==PowerForm.WHIPFIST;
+        boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS
+                ||move.form==PowerForm.WHIPFIST&&WeaponCutContact.contactKind(move)!=WeaponCutContact.Kind.BLUNT;
         if(sharp&&v.isDeadOrDying()&&RagdollImpact.supportedBody(v)){
             // Capture connected skin once, including blade-back contacts before an edge crosses it.
             // This adapter flag does not sever anything; only confirmed planes may do that.
@@ -82,7 +86,15 @@ public final class WeaponImpact {
         if(controlled||!v.isAlive()||!impact.contacts().isEmpty()){
             // Light cuts retain directional flinch; heavy cuts and lethal hits take over the body.
             int physicalTicks=!v.isAlive()?60:canFall?profile.stun():8;
-            RagdollImpact.send(v,profile.motion(),physicalTicks,sharp,HitStop.launchVelocity(v),impact,tier.hitstop);
+            var launch=HitStop.launchVelocity(v);
+            var style=v.isDeadOrDying() && RagdollImpact.supportedBody(v) && !CombatTargeting.anchoredBody(v)
+                    ?FatalWeaponImpact.forStrike(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower(),move):null;
+            if(style==FatalWeaponImpact.MUSCLE&&fullyCharged&&ConsumeSequence.humanoid(v))style=FatalWeaponImpact.MUSCLE_BURST;
+            if(style!=null){
+                var travel=style==FatalWeaponImpact.WHIP && !impact.contacts().isEmpty()?impact.direction():direction;
+                launch=style.launch(launch,travel,mass*resistance*tier.force,profile.motion()==ImpactProfile.UP,profile.lift()<0);
+            }
+            RagdollImpact.send(v,style==null?profile.motion():style.motion,physicalTicks,sharp,launch,impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
         if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact);

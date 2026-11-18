@@ -33,9 +33,16 @@ public final class RagdollImpact {
         if(event.getNewDamage()<=0 || !(event.getSource().getDirectEntity() instanceof net.minecraft.server.level.ServerPlayer player)
                 || com.codex.blacklight.mode.PrototypeModeSystem.isActive(player))return;
         var item=player.getMainHandItem();
-        if(!item.is(net.minecraft.tags.ItemTags.SWORDS)&&!item.is(net.minecraft.tags.ItemTags.AXES))return;
         var victim=event.getEntity();
         if(!supportedBody(victim))return;
+        if(item.isEmpty()&&victim.isDeadOrDying()&&!CombatTargeting.anchoredBody(victim)
+                &&event.getSource().is(net.minecraft.world.damagesource.DamageTypes.PLAYER_ATTACK)){
+            var direction=player.getLookAngle();
+            send(victim,FatalWeaponImpact.FIST.motion,60,false,FatalWeaponImpact.FIST.launch(victim.getDeltaMovement(),direction,1,false,false),
+                    WeaponCutContact.impact(player,victim,direction));
+            return;
+        }
+        if(!item.is(net.minecraft.tags.ItemTags.SWORDS)&&!item.is(net.minecraft.tags.ItemTags.AXES))return;
         var cut=WeaponCutContact.ordinary(player,victim);
         if(cut.contacts().isEmpty())cut=WeaponCutContact.impact(player,victim,player.getLookAngle());
         WeaponDismemberment.weapon(victim,cut);

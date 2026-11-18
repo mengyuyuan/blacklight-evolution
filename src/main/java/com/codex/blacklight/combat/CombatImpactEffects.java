@@ -40,7 +40,8 @@ public final class CombatImpactEffects {
         boolean hammer=move.form==PowerForm.HAMMERFISTS;
         float size=hammer?.8F:move.form==PowerForm.MUSCLE_MASS?.7F:move.form==PowerForm.WHIPFIST?.6F:move.form==PowerForm.BLADE?.65F:.5F;
         var tier=ImpactTier.of(move);size*=tier.effectScale;
-        var style=hammer||tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH
+        var blunt=hammer||move.form==PowerForm.MUSCLE_MASS||move.shared()||contact.kind()==WeaponCutContact.Kind.BLUNT;
+        var style=blunt||(tier.atLeast(ImpactTier.HEAVY)&&move.form!=PowerForm.WHIPFIST)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH
                 :contact.kind()==WeaponCutContact.Kind.PUNCTURE?com.codex.blacklight.infection.InfectedAttackStyle.PIERCE:com.codex.blacklight.infection.InfectedAttackStyle.TEAR;
         PlayerHitEffects.emit(p,v,style,size,contact);
     }

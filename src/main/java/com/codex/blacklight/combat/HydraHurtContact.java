@@ -73,7 +73,7 @@ public final class HydraHurtContact {
                         .mapToDouble(b->b.nearest(c.point()).distanceToSqr(c.point())).min().orElse(Double.MAX_VALUE)));
                 if(nearest.isEmpty())continue;bone=nearest.orElseThrow().bone();
             }
-            return new Contact(bone,c.point(),c.travel().normalize().scale(-1),report.kind()==WeaponCutContact.Kind.NONE?InfectedAttackStyle.CRUSH:InfectedAttackStyle.TEAR);
+            return new Contact(bone,c.point(),c.travel().normalize().scale(-1),(report.kind()==WeaponCutContact.Kind.NONE||report.kind()==WeaponCutContact.Kind.BLUNT)?InfectedAttackStyle.CRUSH:InfectedAttackStyle.TEAR);
         }return null;
     }
     /** Shared weapon-session receiver. Sharp weapons require their actual moving triangles. */
