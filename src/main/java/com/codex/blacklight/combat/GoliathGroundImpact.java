@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.phys.*;
 import org.joml.Vector3f;
 
-/** Source front-slam cone rays; Minecraft presentation only, no extra damage. */
+/** Source front-slam cone rays drive the ground feedback and pavement contacts. */
 public final class GoliathGroundImpact {
     record Pulse(int atTick,float[] position,float[] direction,float[] up,float minAngle,float maxAngle,
                  float startDistance,float length,int minDecals,int maxDecals,float minDecalScale,float maxDecalScale) {}
     record Ray(Vec3 from,Vec3 to,float feedbackSize) {}
-    private record Stamp(long started,int mask) {}
+    private record Stamp(long started,int mask,Set<Long> columns) {}
     private static final Pulse[] PULSES;
     private static final float SCALE;
     private static final Map<EncounterMob,Stamp> FIRED=new WeakHashMap<>();
@@ -43,9 +43,12 @@ public final class GoliathGroundImpact {
         if(!(mob.level() instanceof ServerLevel level)||mob.kind()!=EncounterKind.GOLIATH||mob.move()!=EncounterMove.HAMMER||!mob.isAlive())return;
         int index=pulseIndex(age);if(index<0)return;
         long started=level.getGameTime()-age;var prior=FIRED.get(mob);int mask=prior!=null&&prior.started==started?prior.mask:0;
-        if((mask&(1<<index))!=0)return;FIRED.put(mob,new Stamp(started,mask|(1<<index)));
+        if((mask&(1<<index))!=0)return;
+        var columns=mask==0?new HashSet<Long>():prior.columns;
+        FIRED.put(mob,new Stamp(started,mask|(1<<index),columns));
         var surfaces=new ArrayList<TerrainImpactEffects.Surface>();float size=0;int order=0;
-        for(var ray:rays(index,age,mob.position(),mob.getYRot(),mob.getRandom(),GoliathPresentation.SCALE)){
+        var rays=rays(index,age,mob.position(),mob.getYRot(),mob.getRandom(),GoliathPresentation.SCALE);
+        for(var ray:rays){
             int sample=order++;
             if(!available(level,ray.from,ray.to))continue;
             var hit=level.clip(new ClipContext(ray.from,ray.to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,mob));
@@ -59,10 +62,13 @@ public final class GoliathGroundImpact {
         }
         // One contact packet/sound per batch, with material and positions from
         // those actual rays. No synthetic rings around the boss's feet.
-        if(!surfaces.isEmpty())ContactEffects.ground(mob,surfaces.get(0).hit(),size,true,List.copyOf(surfaces));
+        if(!surfaces.isEmpty()){
+            ContactEffects.ground(mob,surfaces.get(0).hit(),size,true,List.copyOf(surfaces));
+            GoliathTerrainImpact.ground(mob,surfaces,index,columns,rays.get(0).from());
+        }
     }
 
-    private static boolean available(ServerLevel level,Vec3 from,Vec3 to){
+    static boolean available(ServerLevel level,Vec3 from,Vec3 to){
         // Vanilla voxel traversal extends ray endpoints by a small epsilon.
         // Include that margin so a boundary ray cannot fetch an unchecked chunk.
         var bounds=new AABB(from,to).inflate(.001);var border=level.getWorldBorder();

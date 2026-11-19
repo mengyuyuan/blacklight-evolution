@@ -82,7 +82,7 @@ public final class BlacklightInfectionSystem {
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state);
         com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);
         player.displayClientMessage(Component.translatable("message.blacklight.infected"), false);
-        player.displayClientMessage(Component.translatable("message.blacklight.awakening_guide"), false);
+        player.displayClientMessage(com.codex.blacklight.world.SurvivalGuide.consumeHint(), false);
         if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
             com.codex.blacklight.power.GrowthSystem.award(serverPlayer, "awakening");
         }

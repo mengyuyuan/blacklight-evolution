@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:hive_breaker",
+  "display": {
+    "icon": {
+      "item": "blacklight:mother_intel"
+    },
+    "title": {
+      "translate": "survival.blacklight.map.mother_plaza"
+    },
+    "description": {
+      "translate": "survival.blacklight.read.mother_plaza"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:mother_intel"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

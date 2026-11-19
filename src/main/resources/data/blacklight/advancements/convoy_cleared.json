@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "blacklight:convoy_manifest"
+    },
+    "title": {
+      "translate": "survival.blacklight.convoy_cleared"
+    },
+    "description": {
+      "translate": "survival.blacklight.convoy_cleared.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "blacklight:convoy_manifest"
+}

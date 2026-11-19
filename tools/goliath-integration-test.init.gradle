@@ -15,6 +15,7 @@ allprojects {
     def structureFolder = plugins.hasPlugin('net.neoforged.moddev') ? 'structure' : 'structures'
     def structures = [
         "src/helicopterTest/resources/data/blacklight/${structureFolder}/helicopter_arena.nbt",
+        "src/blackwatchTest/resources/data/blacklight/${structureFolder}/blackwatch_facility_arena.nbt",
         "src/blackwatchTest/resources/data/blacklight/${structureFolder}/blackwatch_arena.nbt"
     ]
     def generatedJava = layout.buildDirectory.dir('generated/goliathIntegration/java')

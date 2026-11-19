@@ -30,17 +30,23 @@ public record TargetSelection(Entity target,int region) {
     }
     /** The vanilla crosshair only picks entities within interaction reach.
      * Inspect the first actual skin on the longer lock ray before scoring nearby targets. */
-    public static TargetSelection aimedGoliath(Player player,List<Entity> candidates,Vec3 from,Vec3 to,float partial,double range){
+    public static TargetSelection aimedBoss(Player player,List<Entity> candidates,Vec3 from,Vec3 to,float partial,double range){
         double closest=Double.POSITIVE_INFINITY;
         TargetSelection picked=null;
         for(var entity:candidates){
-            if(!(entity instanceof EncounterMob mob) || mob.kind()!=EncounterKind.GOLIATH)continue;
+            if(!(entity instanceof EncounterMob mob) || (mob.kind()!=EncounterKind.GOLIATH && mob.kind()!=EncounterKind.ELIZABETH_GREENE))continue;
             var hit=HydraHurtContact.ray(mob.hurtRegions(partial),from,to,com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
             if(hit==null)continue;
             double distance=from.distanceToSqr(hit.point());
             if(distance>=closest || !CombatTargeting.clearRay(player,from,hit.point()))continue;
-            var part=GoliathLockPart.forSkin(hit.bone());
-            var selection=new TargetSelection(mob,part==null?-1:part.ordinal());
+            int slot;
+            if(mob.kind()==EncounterKind.ELIZABETH_GREENE){
+                slot=hit.bone().startsWith("weak_")?Integer.parseInt(hit.bone().substring(5)):-1;
+            }else{
+                var part=GoliathLockPart.forSkin(hit.bone());
+                slot=part==null?-1:part.ordinal();
+            }
+            var selection=new TargetSelection(mob,slot);
             if(!selection.visibleWithinRange(player,range)){
                 // The torso and plated left arm have no independent P2 subtarget.
                 // Aim at the visible joint on this actor closest to the crosshair.
@@ -53,7 +59,7 @@ public record TargetSelection(Entity target,int region) {
             picked=selection;
         }
         if(picked!=null)for(var entity:candidates){
-            if(entity==picked.target || entity instanceof EncounterMob mob && mob.kind()==EncounterKind.GOLIATH)continue;
+            if(entity==picked.target || entity instanceof EncounterMob mob && (mob.kind()==EncounterKind.GOLIATH || mob.kind()==EncounterKind.ELIZABETH_GREENE))continue;
             var interception=entity.getBoundingBox().clip(from,to);
             if(interception.isPresent() && from.distanceToSqr(interception.get())<closest)return null;
         }
@@ -114,6 +120,16 @@ public record TargetSelection(Entity target,int region) {
             return point!=null?point:surface.joint();
         }
         if(!regional() || target instanceof EncounterMob mob && mob.kind()==EncounterKind.GOLIATH)return ExplicitTarget.point(player,target);
+        if(region>=0){
+            var mob=(EncounterMob)target;
+            var skin=mob.hurtRegions(partial);
+            var visible=GreeneContact.focus(skin,region,player,Double.MAX_VALUE);
+            if(visible!=null)return visible;
+            // Keep a retained lock on its own limb behind cover. Attack
+            // paths independently check reach, skin and block visibility.
+            return skin.get(region).boxes().stream().map(b->b.nearest(player.getEyePosition()))
+                    .min(Comparator.comparingDouble(player.getEyePosition()::distanceToSqr)).orElse(target.position());
+        }
         var visible=points(player);if(!visible.isEmpty())return visible.get(0);
         return boxes().stream().map(b->b.nearest(player.getEyePosition()))
                 .min(Comparator.comparingDouble(player.getEyePosition()::distanceToSqr)).orElse(target.position());
@@ -128,6 +144,7 @@ public record TargetSelection(Entity target,int region) {
         if(!regional())return ExplicitTarget.visibleWithinRange(player,target,range);
         var part=goliathPart();
         if(part!=null)return GoliathContact.lockSurface((EncounterMob)target,part,0).focus(player,range)!=null;
+        if(region>=0)return GreeneContact.focus(((EncounterMob)target).hurtRegions(0),region,player,range)!=null;
         return points(player).stream().anyMatch(p->player.getEyePosition().distanceToSqr(p)<=range*range+1e-6);
     }
     public String label(){

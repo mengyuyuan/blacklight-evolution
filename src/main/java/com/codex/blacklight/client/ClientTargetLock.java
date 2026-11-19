@@ -50,7 +50,7 @@ public final class ClientTargetLock {
         if(p==null)return target.getBoundingBox().getCenter();
         var selected=selection(target);
         if(target instanceof LivingEntity living&&!CombatTargeting.multipart(living))return selected.point(p);
-        if(selected.goliathPart()==null)partial=0;
+        if(!selected.regional()||selected.region()<0)partial=0;
         long tick=p.level().getGameTime();var eye=p.getEyePosition();var position=target.position();
         var cached=cachedFocus;
         if(cached!=null&&cached.player==p&&cached.target==target&&cached.region==lockedRegion&&cached.tick==tick&&cached.partial==partial
@@ -60,7 +60,8 @@ public final class ClientTargetLock {
         return point;
     }
     public static Vec3 renderedFocus(Entity target,float partial){
-        if(selection(target).goliathPart()!=null)return focusPoint(target,partial);
+        var selected=selection(target);
+        if(selected.regional()&&selected.region()>=0)return focusPoint(target,partial);
         return focusPoint(target).add(target.getPosition(partial).subtract(target.position()));
     }
     public static net.minecraft.world.phys.AABB focusBounds(Entity target,float partial){
@@ -122,7 +123,7 @@ public final class ClientTargetLock {
             var camera=mc.gameRenderer.getMainCamera();
             Vec3 origin=camera.getPosition(),view=Vec3.directionFromRotation(camera.getXRot(),camera.getYRot());
             var candidates=ExplicitTarget.candidates(player,range());
-            chosen=TargetSelection.aimedGoliath(player,candidates,origin,origin.add(view.scale(range())),mc.getFrameTime(),range());
+            chosen=TargetSelection.aimedBoss(player,candidates,origin,origin.add(view.scale(range())),mc.getFrameTime(),range());
             if(chosen!=null){select(chosen);return;}
             double best=Double.NEGATIVE_INFINITY;
             for(var entity:candidates)for(var candidate:TargetSelection.choices(player,entity)){
