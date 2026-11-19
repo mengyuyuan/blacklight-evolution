@@ -30,6 +30,22 @@ public final class GreeneOpeningGameTest {
         var state=mob.greeneBattle().save();state.putBoolean("OpeningPending",false);mob.greeneBattle().load(state);
     }
 
+    @GameTest(template="blackwatch_arena",timeoutTicks=30)
+    public static void plazaTransferTracksMotherAtHerBuriedPosition(GameTestHelper h){
+        arena(h);
+        var mother=actor(h);
+        double buried=mother.getY()-GreeneBattleCycle.SOURCE_DEPTH*GreeneMotion.table().sourceUnitBlocks();
+        mother.preparePlazaOpening();
+        h.assertTrue(Math.abs(mother.getY()-buried)<.00001 && mother.greeneStage()==GreeneBattleCycle.EMERGE_WAIT,
+                "the initial spawn position and pose must already be underground when tracking begins");
+        add(h,mother);
+        h.runAfterDelay(3,()->{
+            h.assertTrue(Math.abs(mother.getY()-buried)<.00001 && !mother.greeneBattle().openingPending(),
+                    "the first server tick must not sink the mother again");
+            done(h,mother);
+        });
+    }
+
     @GameTest(template="blackwatch_arena",timeoutTicks=195)
     public static void freshSpawnRisesFromItsPlacedSurfaceWithoutRepeatWaveChildren(GameTestHelper h){
         arena(h);var mob=actor(h);Vec3 placed=mob.position();add(h,mob);

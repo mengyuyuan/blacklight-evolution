@@ -11,7 +11,7 @@
         }
       ],
       "structure_overrides": [
-        "blacklight:city_military_bases"
+        "blacklight:city_military_bases", "blacklight:mother_plaza"
       ],
       "lakes": false,
       "features": false

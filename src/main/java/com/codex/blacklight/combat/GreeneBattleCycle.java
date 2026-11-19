@@ -171,11 +171,14 @@ public final class GreeneBattleCycle {
         emergeElapsed=0;nextHydra=1;hydrasSpawned=false;brood.onCombatStarted();enter(EMERGE_WAIT);
     }
     /** Mission75836 calls MotherSpawn, attaches the three segments, then
-     * MotherEmerge("justCore") before its15s HUD wait. Defer placement until
-     * the first real tick: constructors still have the temporary world origin.
+     * MotherEmerge("justCore") before its15s HUD wait. The host transfer supplies
+     * a final surface before tracking. Other spawn paths supply it on their first tick.
      * This first wave must not borrow repeat-emergence Hydra scheduling. */
-    private void beginOpening(){
-        openingPending=false;choosePlayer();surfaceY=owner.getY();surfaceY=surface(.001);goalY=surfaceY;
+    public void beginOpeningAtSurface(){
+        if(owner.level().isClientSide || !openingPending)return;
+        openingPending=false;choosePlayer();surfaceY=owner.getY();
+        // Start one model pixel above the feet so vanilla's initial 0.1% ray step stays outside the floor.
+        surfaceY=surface(1.0/16);goalY=surfaceY;
         coreDamageable=false;emergeElapsed=-1;hydrasSpawned=false;nextHydra=1;
         owner.cancelAttack();takeRoot();
         owner.setPos(owner.getX(),surfaceY-SOURCE_DEPTH*scale(),owner.getZ());enter(EMERGE_WAIT);
@@ -198,6 +201,7 @@ public final class GreeneBattleCycle {
     }
     public void attackStarted(){if(stage==EMERGING&&canAttack())finishEmerge();}
     private void finishEmerge(){
+        owner.settlePlazaOpening();
         handoffAge=age;handoffAt=owner.level().getGameTime();releaseRoot();enter(GUARDED);
     }
     private void enter(int next){
@@ -208,7 +212,7 @@ public final class GreeneBattleCycle {
     public void tick(){
         if(owner.level().isClientSide)return;
         initializeNew();if(!live()){dispose();return;}refreshHealthScale();
-        if(openingPending){beginOpening();return;}
+        if(openingPending){beginOpeningAtSurface();return;}
         long now=owner.level().getGameTime();if(lastTick==now)return;lastTick=now;
         age++;if(exposed()){exposureAge++;if(recoveryRemaining>0)recoveryRemaining--;}
         processFloor();processStun();if(!live()){dispose();return;}

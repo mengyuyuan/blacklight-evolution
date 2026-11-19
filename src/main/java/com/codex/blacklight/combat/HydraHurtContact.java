@@ -65,9 +65,19 @@ public final class HydraHurtContact {
     public static Contact ray(List<HydraContact.Region> regions,Vec3 from,Vec3 to,InfectedAttackStyle style){
         if(!Double.isFinite(from.lengthSqr())||!Double.isFinite(to.lengthSqr())||from.distanceToSqr(to)<1e-12)return null;
         Contact best=null;double distance=Double.POSITIVE_INFINITY;Vec3 normal=from.subtract(to).normalize();
-        for(var region:regions)for(var box:region.boxes()){
-            var point=box.clip(from,to);if(point.isEmpty())continue;double d=from.distanceToSqr(point.get());
-            if(d<distance){distance=d;best=new Contact(region.bone(),point.get(),normal,style);}
+        var path=new AABB(from,to).inflate(1e-6);
+        for(var region:regions){
+            if(!region.bounds().intersects(path))continue;
+            for(var box:region.boxes()){
+                if(!box.bounds.intersects(path))continue;
+                var point=box.clip(from,to);
+                if(point.isEmpty())continue;
+                double d=from.distanceToSqr(point.get());
+                if(d<distance){
+                    distance=d;
+                    best=new Contact(region.bone(),point.get(),normal,style);
+                }
+            }
         }
         return best;
     }

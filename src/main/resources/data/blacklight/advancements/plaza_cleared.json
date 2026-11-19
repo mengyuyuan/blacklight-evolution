@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "blacklight:mother_intel"
+    },
+    "title": {
+      "translate": "survival.blacklight.plaza_cleared"
+    },
+    "description": {
+      "translate": "survival.blacklight.plaza_cleared.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "blacklight:mother_intel"
+}
