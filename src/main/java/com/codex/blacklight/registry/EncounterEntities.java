@@ -1,6 +1,7 @@
 package com.codex.blacklight.registry;
 
 import com.codex.blacklight.entity.*;
+import com.codex.blacklight.world.GreeneHost;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.*;
@@ -28,6 +29,7 @@ public final class EncounterEntities {
     public static final DeferredHolder<Item,Item> LEGACY_BRAWLER_EGG=legacyEgg("brawler",LEGACY_BRAWLER,0x381e22,0x9c7161);
     public static final DeferredHolder<EntityType<?>,EntityType<MilitaryUav>> UAV=ENTITIES.register("recon_uav",()->EntityType.Builder.<MilitaryUav>of(MilitaryUav::new,MobCategory.MONSTER).sized(1.95F,1.76F).clientTrackingRange(14).updateInterval(1).build("recon_uav"));
     public static final DeferredHolder<EntityType<?>,EntityType<EncounterProjectile>> PROJECTILE=ENTITIES.register("encounter_projectile",()->EntityType.Builder.<EncounterProjectile>of(EncounterProjectile::new,MobCategory.MISC).sized(.3F,.3F).clientTrackingRange(12).updateInterval(1).build("encounter_projectile"));
+    public static final DeferredHolder<EntityType<?>,EntityType<GreeneHost>> GREENE_HOST=ENTITIES.register("greene_host",()->EntityType.Builder.<GreeneHost>of(GreeneHost::new,MobCategory.CREATURE).sized(.6F,1.82F).clientTrackingRange(14).build("greene_host"));
     public static final DeferredHolder<EntityType<?>,EntityType<GreeneProjectile>> GREENE_PROJECTILE=ENTITIES.register("greene_projectile",()->EntityType.Builder.<GreeneProjectile>of(GreeneProjectile::new,MobCategory.MISC).sized(.3F,.3F).clientTrackingRange(12).updateInterval(1).build("greene_projectile"));
     public static final DeferredHolder<EntityType<?>,EntityType<GreeneSegmentCorpse>> GREENE_SEGMENT_CORPSE=ENTITIES.register("greene_segment_corpse",()->EntityType.Builder.<GreeneSegmentCorpse>of(GreeneSegmentCorpse::new,MobCategory.MISC).sized(.1F,.1F).clientTrackingRange(16).updateInterval(1).build("greene_segment_corpse"));
     public static final DeferredHolder<Item,Item> UAV_EGG=ITEMS.register("recon_uav_spawn_egg",()->new net.neoforged.neoforge.common.DeferredSpawnEggItem(UAV,0x293638,0xd73333,new Item.Properties()));
@@ -50,6 +52,7 @@ public final class EncounterEntities {
     private static final DeferredHolder<CreativeModeTab,CreativeModeTab> TAB=TABS.register("encounters",()->CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.blacklight.encounters")).icon(()->new ItemStack(EGGS.get(0).get())).displayItems((p,o)->allSpawnEggs().forEach(o::accept)).build());
     public static void register(IEventBus bus){ENTITIES.register(bus);ITEMS.register(bus);TABS.register(bus);bus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event)->{
         CREATURES.forEach((kind,type)->event.put(type.get(),EncounterMob.attributes(kind).build()));event.put(UAV.get(),MilitaryUav.attributes().build());
+        event.put(GREENE_HOST.get(),Mob.createMobAttributes().build());
         event.put(LEGACY_BRAWLER.get(),BlacklightHunter.attributes().build());
     });}
     private EncounterEntities(){}

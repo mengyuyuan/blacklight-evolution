@@ -19,6 +19,9 @@ public final class ModWorldgen {
     public static final Supplier<StructurePieceType> CITY_MILITARY_PIECE=PIECES.register("city_military_piece",()->(context,tag)->new com.codex.blacklight.city.CityMilitaryPiece(tag));
     public static final Supplier<StructurePieceType> VEHICLE_GARAGE_PIECE=PIECES.register("vehicle_garage_piece",()->(context,tag)->new com.codex.blacklight.city.VehicleGaragePiece(tag));
     public static final Supplier<StructurePieceType> COLOSSAL_HIVE_PIECE=PIECES.register("colossal_hive_piece",()->(context,tag)->new ColossalHivePiece(tag));
-    static {FEATURES.register("hive",()->new HiveFeature(NoneFeatureConfiguration.CODEC));}
-    public static void register(IEventBus bus){FEATURES.register(bus);STRUCTURES.register(bus);PIECES.register(bus);}
+    private static final DeferredRegister<net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType<?>> PLACEMENTS=DeferredRegister.create(Registries.STRUCTURE_PLACEMENT,"blacklight");
+        public static final Supplier<net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType<com.codex.blacklight.city.MotherPlazaStructure.Placement>> PLAZA_LOCATION=PLACEMENTS.register("futian_plaza",()->()->com.codex.blacklight.city.MotherPlazaStructure.Placement.CODEC);
+        public static final Supplier<StructureType<com.codex.blacklight.city.MotherPlazaStructure>> MOTHER_PLAZA=STRUCTURES.register("mother_plaza",()->()->com.codex.blacklight.city.MotherPlazaStructure.CODEC);
+        static {FEATURES.register("hive",()->new HiveFeature(NoneFeatureConfiguration.CODEC));}
+    public static void register(IEventBus bus){FEATURES.register(bus);STRUCTURES.register(bus);PIECES.register(bus);PLACEMENTS.register(bus);}
 }

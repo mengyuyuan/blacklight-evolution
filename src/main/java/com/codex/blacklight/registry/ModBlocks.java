@@ -12,6 +12,9 @@ public final class ModBlocks {
     private static final DeferredRegister.Blocks BLOCKS=DeferredRegister.createBlocks("blacklight");
     public static final DeferredBlock<Block> BUILDING_BIOMASS=BLOCKS.register("building_biomass",()->new com.codex.blacklight.world.BuildingBiomassBlock(BlockBehaviour.Properties.of().strength(3F,6F).sound(SoundType.SLIME_BLOCK).noOcclusion().noLootTable()));
     public static final DeferredBlock<Block> BUILDING_CORE=BLOCKS.register("building_infection_core",()->new com.codex.blacklight.world.BuildingInfectionCoreBlock(BlockBehaviour.Properties.of().strength(5,8).sound(SoundType.SLIME_BLOCK).noOcclusion()));
+    public static final DeferredBlock<Block> ENCOUNTER_CONSOLE = BLOCKS.register("encounter_console", () ->
+            new com.codex.blacklight.world.BossSiteBlock(BlockBehaviour.Properties.of().strength(-1F, 3600000F)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(SoundType.METAL).noLootTable()));
     public static final DeferredBlock<Block> HIVE_FLESH=BLOCKS.register("hive_flesh",()->new com.codex.blacklight.world.TissueSourceBlock(BlockBehaviour.Properties.of().strength(3,6).sound(SoundType.SLIME_BLOCK)));
     public static final DeferredBlock<Block> HIVE_CARAPACE=BLOCKS.registerSimpleBlock("hive_carapace",BlockBehaviour.Properties.of().strength(5,12).sound(SoundType.NETHER_WOOD));
     public static final DeferredBlock<Block> HIVE_SAC=BLOCKS.registerSimpleBlock("hive_sac",BlockBehaviour.Properties.of().strength(2,4).sound(SoundType.SLIME_BLOCK).lightLevel(s->5));

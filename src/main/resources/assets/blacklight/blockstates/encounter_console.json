@@ -1,0 +1,44 @@
+{
+  "variants": {
+    "facing=north,mother=false": {
+      "model": "blacklight:block/command_terminal",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=north,mother=true": {
+      "model": "blacklight:block/pump_panel",
+      "y": 0,
+      "uvlock": true
+    },
+    "facing=east,mother=false": {
+      "model": "blacklight:block/command_terminal",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=east,mother=true": {
+      "model": "blacklight:block/pump_panel",
+      "y": 90,
+      "uvlock": true
+    },
+    "facing=south,mother=false": {
+      "model": "blacklight:block/command_terminal",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=south,mother=true": {
+      "model": "blacklight:block/pump_panel",
+      "y": 180,
+      "uvlock": true
+    },
+    "facing=west,mother=false": {
+      "model": "blacklight:block/command_terminal",
+      "y": 270,
+      "uvlock": true
+    },
+    "facing=west,mother=true": {
+      "model": "blacklight:block/pump_panel",
+      "y": 270,
+      "uvlock": true
+    }
+  }
+}

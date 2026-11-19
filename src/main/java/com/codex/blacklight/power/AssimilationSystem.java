@@ -84,6 +84,13 @@ public final class AssimilationSystem {
         p.syncData(ModAttachments.PLAYER_STATE);GrowthSystem.consumed(p,target);
         if(heal)CriticalMassSystem.healFromConsume(p,reward.healing());
         PrototypeMetabolism.feed(p,target);
+        if(target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+                && soldier.commandRole()==com.codex.blacklight.military.MilitaryRole.COMMANDER
+                && target.getRandom().nextInt(3)==0){
+            var key=new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.BLOODTOX_COMMAND_KEY.get());
+            if(!p.getInventory().add(key)) p.drop(key,false,true);
+            p.displayClientMessage(Component.translatable("survival.blacklight.command_acquired"),false);
+        }
         return true;
     }
     /** Shares the consume settlement marker, but does not grant consume-only progression. */

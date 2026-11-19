@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:sealed_sample",
+  "display": {
+    "icon": {
+      "id": "blacklight:convoy_manifest"
+    },
+    "title": {
+      "translate": "survival.blacklight.map.lost_convoy"
+    },
+    "description": {
+      "translate": "survival.blacklight.read.lost_convoy"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:convoy_manifest"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

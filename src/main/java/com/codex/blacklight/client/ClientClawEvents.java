@@ -102,6 +102,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.UAV.get(),com.codex.blacklight.client.renderer.UavRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_HOST.get(),com.codex.blacklight.client.renderer.GreeneHostRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SEGMENT_CORPSE.get(),com.codex.blacklight.client.renderer.GreeneSegmentCorpseRenderer::new);
         event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
         event.registerEntityRenderer(ModEntities.HELLFIRE_BLAST.get(),net.minecraft.client.renderer.entity.NoopRenderer::new);
@@ -156,10 +157,17 @@ public final class ClientClawEvents {
         input.up = false; input.down = false; input.left = false; input.right = false;
     }
 
+    static boolean aimsAtConsole(Minecraft mc) {
+        return mc.hitResult instanceof net.minecraft.world.phys.BlockHitResult hit
+                && hit.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK
+                && PrototypeSurvivalLock.canOperateConsole(mc.player, hit.getBlockPos());
+    }
+
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         Minecraft minecraft = Minecraft.getInstance();
-        if(VehicleControls.riding()&&!TARGET_LOCK.matches(event.getKey(),event.getScanCode())||VehicleControls.interacting()&&minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))return;
+        if (VehicleControls.riding() && !TARGET_LOCK.matches(event.getKey(),event.getScanCode())
+                || minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()) && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         if(minecraft.screen==null && (minecraft.options.keyAttack.matches(event.getKey(),event.getScanCode()) || minecraft.options.keyUse.matches(event.getKey(),event.getScanCode()))){
             ClientWeaponCombat.poll();tickGrabButtons();
         }
@@ -242,7 +250,8 @@ public final class ClientClawEvents {
     public static void onRawMouseButton(InputEvent.MouseButton.Pre event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
-        if(VehicleControls.riding()||VehicleControls.interacting()&&SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))return;
+        if (VehicleControls.riding() || SkillBindings.mouse(minecraft.options.keyUse,event.getButton())
+                && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         if(event.getAction()==GLFW.GLFW_PRESS){
             boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
                     .filter(key->DeveloperTools.enabled() || key!=CLAW_TUNER && key!=ANIMATION_TUNER)
@@ -556,7 +565,7 @@ public final class ClientClawEvents {
     public static void onAttack(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null) return;
-        if(VehicleControls.riding()||VehicleControls.interacting()&&event.isUseItem())return;
+        if (VehicleControls.riding() || event.isUseItem() && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
         if(ClientWeaponCombat.active()) {event.setSwingHand(false);event.setCanceled(true);ClientWeaponCombat.poll();return;}
         if(state.isPrototypeMode()&&minecraft.player.getData(ModAttachments.CONSUMING)) {

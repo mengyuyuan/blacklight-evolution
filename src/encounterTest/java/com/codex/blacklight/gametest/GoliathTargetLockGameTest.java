@@ -113,7 +113,7 @@ public final class GoliathTargetLockGameTest {
                     var end=from.add(selected.point(player).subtract(from).normalize().scale(40));
                     var hit=HydraHurtContact.ray(mob.hurtRegions(0),from,end,InfectedAttackStyle.PIERCE);
                     if(hit==null || GoliathLockPart.forSkin(hit.bone())!=selected.goliathPart())continue;
-                    acquired=selected.equals(TargetSelection.aimedGoliath(player,List.of(mob),from,end,0,64));
+                    acquired=selected.equals(TargetSelection.aimedBoss(player,List.of(mob),from,end,0,64));
                 }
                 h.assertTrue(acquired,"real distant crosshair picks "+selected.goliathPart());
             }
