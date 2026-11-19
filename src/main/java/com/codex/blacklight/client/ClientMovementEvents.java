@@ -125,7 +125,9 @@ public final class ClientMovementEvents {
         int sideways=(mappingDown(minecraft,minecraft.options.keyRight)?1:0)-(mappingDown(minecraft,minecraft.options.keyLeft)?1:0);
         // Deliver the direction before the attack packet, even when both keys
         // were pressed between ticks. Preserve traversal's own jump/sprint edges.
-        PacketDistributor.sendToServer(new MovementInputPayload(lastJumpHeld,false,forward,sideways,lastSprinting,lastDetach,cameraYaw(minecraft)));
+        boolean jumpHeld=ModAttachments.getData(minecraft.player,ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES
+                ?mappingDown(minecraft,minecraft.options.keyJump):lastJumpHeld;
+        PacketDistributor.sendToServer(new MovementInputPayload(jumpHeld,false,forward,sideways,lastSprinting,lastDetach,cameraYaw(minecraft)));
     }
 
     /** Camera-relative intent is independent of action input ownership. */
@@ -486,6 +488,8 @@ public final class ClientMovementEvents {
      */
     private static void playLocalLaunchAnimation(Minecraft minecraft) {
         if(minecraft.player==null)return;
+        var action=ModAttachments.getData(minecraft.player,ModAttachments.PLAYER_ACTION);
+        if(action.clipId().startsWith("spines_")&&action.active(PlayerMotionController.actionTime(minecraft.player,0)))return;
         PlayerMotionController.pause(minecraft.player,false);
         PlayerMotionController.request(minecraft.player,PlayerAction.JUMP_RISE,0);
     }

@@ -57,6 +57,14 @@ public final class NativeRootMotion {
         return advance > Math.max(0, available) ? step.subtract(toward.scale(advance - Math.max(0, available))) : step;
     }
 
+    /** Only Coord's horizontal travel belongs to physics; the body clip contains the hop. */
+    public static void hammerComboStep(ServerPlayer player,com.codex.blacklight.combat.WeaponVisual visual,float yaw) {
+        double now=player.level().getGameTime();
+        var current=WeaponMotionClock.sample(visual,now);
+        var previous=WeaponMotionClock.sample(visual,now-1);
+        if(current!=null&&previous!=null)
+            apply(player,clipStep(MotionLibrary.clip(current.key()),previous.seconds(),current.seconds(),yaw));
+    }
     public static void weapon(ServerPlayer player, WeaponMove move, int elapsedTick, float offset, float yaw) {
         var visual = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);
         // These actions already have authoritative flight/approach/ballistic velocity.
@@ -65,8 +73,16 @@ public final class NativeRootMotion {
                 () -> new IllegalStateException("Missing independent motion: " + move.id));
         float previous = weaponClock(elapsedTick - 1, offset, definition.transitionSeconds());
         float current = weaponClock(elapsedTick, offset, definition.transitionSeconds());
-        var step = clipStep(MotionLibrary.clip(move.id), previous, current, yaw)
-                .scale(travelScale(move));
+        Vec3 step;
+        if (com.codex.blacklight.combat.HammerQuakeContact.owns(move)) {
+            // The support foot and the pelvis were retargeted together. Move on that
+            // clip's horizontal track at the same FIG frame as the visible legs.
+            step=clipStep(MotionLibrary.clip("hammer_ground_stroke"),MotionLibrary.hammerReleaseSeconds(previous),
+                    MotionLibrary.hammerReleaseSeconds(current),yaw);
+            step=com.codex.blacklight.combat.HammerQuakeContact.limitWallAdvance(player,move,step,yaw);
+        } else {
+            step=clipStep(MotionLibrary.clip(move.id),previous,current,yaw).scale(travelScale(move));
+        }
         if (!move.rush() && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {

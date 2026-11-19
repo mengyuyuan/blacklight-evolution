@@ -7,6 +7,10 @@ import org.joml.Vector3f;
 public final class WeaponAttackScales {
     public record Shape(float fx,float fy,float fz,float px,float py,float pz) {
         public static final Shape IDENTITY=new Shape(1,1,1,1,1,1);
+        /** Conservative viewmodel bounds for the same deformation used by the mesh. */
+        public float maximumScale(){
+            return Math.max(1F,Math.max(Math.max(fx,Math.max(fy,fz)),Math.max(px,Math.max(py,pz))));
+        }
         public Shape blend(Shape b,float t) {
             t=Math.max(0,Math.min(1,t));
             return new Shape(fx+(b.fx-fx)*t,fy+(b.fy-fy)*t,fz+(b.fz-fz)*t,

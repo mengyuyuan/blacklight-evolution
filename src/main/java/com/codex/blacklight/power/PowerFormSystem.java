@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 /** Selection is server-authoritative; unavailable and busy forms cannot be selected by packets. */
 public final class PowerFormSystem {
-    private static final PowerForm[] FORMS = {PowerForm.NONE, PowerForm.CLAWS, PowerForm.HAMMERFISTS, PowerForm.BLADE, PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS};
+    private static final PowerForm[] FORMS = {PowerForm.NONE, PowerForm.CLAWS, PowerForm.HAMMERFISTS, PowerForm.BLADE, PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS,PowerForm.BACKSPINES};
     private PowerFormSystem() {}
     public static boolean supported(PowerForm form) {
         if(form==PowerForm.BIOMASS||UtilityPowerSystem.supported(form))return true;
@@ -45,6 +45,7 @@ public final class PowerFormSystem {
         if(visible)com.codex.blacklight.disguise.DisguiseSystem.visiblePower(player);
         if(UtilityPowerSystem.supported(form))UtilityPowerSystem.toggle(player,form);
         else if (!state.activate(form)) return false;
+        if(form==PowerForm.BACKSPINES)com.codex.blacklight.animation.PlayerActions.get().playVisual(player,"spines_scapula_deploy",0);
         combat.markTransformToggled(player.tickCount);
         if(weapon)com.codex.blacklight.registry.ModWeaponSounds.play(player,form,"morph",player.position(),.7F,1F);
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state); com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);

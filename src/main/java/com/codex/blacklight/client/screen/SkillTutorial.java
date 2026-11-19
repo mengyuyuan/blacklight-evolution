@@ -34,6 +34,7 @@ public record SkillTutorial(String family,String clip,PowerForm form,String inst
             case "claws","damage" -> of("claws","claw_auto1",PowerForm.CLAWS,"key.blacklight.cycle_form","key.attack","key.use");
             case "blade" -> of("blade","blade_cut",PowerForm.BLADE,"key.blacklight.cycle_form","key.attack","key.use");
             case "hammerfists" -> of("hammer","hammer_quake",PowerForm.HAMMERFISTS,"key.blacklight.cycle_form","key.attack","key.use");
+            case "backspines" -> of("backspines","spines_ground_return_throw",PowerForm.BACKSPINES,"key.attack","key.use");
             case "whipfist" -> of("whip","whip_lash",PowerForm.WHIPFIST,"key.blacklight.cycle_form","key.attack","key.use","key.blacklight.grab");
             case "muscle_mass" -> of("muscle","muscle_jab",PowerForm.MUSCLE_MASS,"key.blacklight.cycle_form","key.attack","key.use");
             case "armor","shield" -> of(id,"basic_run",PowerForm.NONE,"key.blacklight.cycle_form","key.blacklight.defense");

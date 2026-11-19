@@ -264,7 +264,189 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.3333333333333333
+      "release": 0.3333333333333333,
+      "projectScaleEnvelope": {
+        "evidence": {
+          "status": "project_authored_adaptation",
+          "bodyReference": "P1 alex_hammer_4hit_combo ground Special, frames 211-270; landing starts at 243. The source wrist is 1.2266 wide and 1.6240 long at contact.",
+          "amplitudeReference": "Amplified for the rigid MC fist using the right forearm and wrist peaks of alex_hammer_devastator.",
+          "scope": "Right hand on the light-to-heavy finisher only. Charge, hold through ground contact, retract on recovery."
+        },
+        "charge": [
+          {
+            "time": 0,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.3333333333333333,
+            "values": [
+              1.3,
+              1.3,
+              1.3,
+              1.55,
+              1.62,
+              1.55,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.85,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "attack": [
+          {
+            "time": 0,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.3333333333333333,
+            "values": [
+              1.3,
+              1.3,
+              1.3,
+              1.55,
+              1.62,
+              1.55,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 0.64,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1.04,
+            "values": [
+              1.92578125,
+              1.92578125,
+              1.92578125,
+              2.435546875,
+              2.435546875,
+              2.435546875,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1.36,
+            "values": [
+              1.28,
+              1.28,
+              1.28,
+              1.42,
+              1.46,
+              1.42,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "time": 1.6666666666666667,
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
     },
     "blade_cut": {
       "folder": "alex_blades",

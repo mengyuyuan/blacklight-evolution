@@ -17,10 +17,14 @@ public final class ModWeaponSounds {
     private static final Map<String,Supplier<SoundEvent>> EVENTS=new HashMap<>();
     static {
         for(String form:List.of("none","claws","blade","hammerfists","whipfist","muscle_mass"))
-            for(String cue:List.of("swing","hit","heavy","ground","morph")){
-                String id="weapon."+form+"."+cue;
-                EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
-            }
+            registerWeaponCues(form,List.of("swing","hit","heavy","ground","morph"));
+        registerWeaponCues("backspines",List.of("draw","swing","heavy","morph"));
+    }
+    private static void registerWeaponCues(String form,List<String> cues){
+        for(String cue:cues){
+            String id="weapon."+form+"."+cue;
+            EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
+        }
     }
     static {
         for(String form:List.of("armor","shield"))

@@ -46,6 +46,7 @@ public final class PlayerMotionController {
         Clock override, preview;
         long revision = -1, suppressedRevision = -1;
         long anchorRevision = Long.MIN_VALUE, anchorStarted; double anchorBias, anchorLast; long anchorNanos;
+        float previousSpineStride, spineStride;
         String locomotion;
         LocomotionPhase phase;
         long diagnosticsAt=Long.MIN_VALUE;
@@ -57,7 +58,8 @@ public final class PlayerMotionController {
         final CombatPoseTransition combat=new CombatPoseTransition();
         final CommittedPoseInterval interval=new CommittedPoseInterval();
         final CombatFacingTransition facing=new CombatFacingTransition();
-        BlacklightPose from,last;
+        BlacklightPose from,last,spineDrawFrom;
+        String previousAction="";
     }
     private PlayerMotionController() {}
     public static BlacklightSkeleton skeleton() { return BlacklightSkeleton.get(); }
@@ -227,6 +229,19 @@ public final class PlayerMotionController {
         if(!available(entity))return new BlacklightPose();
         var runtime=state(entity);
         if(runtime.preview!=null)return utilityPose(entity,partial);
+        var visual=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
+        if (entity.onGround() && !visual.charging()
+                && com.codex.blacklight.combat.HammerQuakeContact.owns(visual.spec())) {
+            var strike=WeaponMotionClock.sample(visual,now(entity,partial));
+            if(strike.seconds()>=visual.spec().start/20F) {
+                // The fist contact solver, hitstop and mesh must sample the same instant.
+                // A cached pair of tick endpoints can still straddle the frame the server froze.
+                var pose=samplePose(strike.key(),strike.seconds(),false);
+                com.codex.blacklight.client.animation.NativeUtilityPose.apply(entity,pose,partial);
+                pose=com.codex.blacklight.client.animation.SovereignFlightPose.apply(entity,pose,partial);
+                return com.codex.blacklight.client.animation.DefenseImpactPose.apply(entity,pose,partial);
+            }
+        }
         var raw=runtime.interval.ready()?runtime.interval.sample(partial):utilityPose(entity,partial);
         return com.codex.blacklight.client.animation.DefenseImpactPose.apply(entity,runtime.combat.sample(raw,partial),partial);
     }
@@ -252,7 +267,11 @@ public final class PlayerMotionController {
         var action=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
         BlacklightPose base = locomotion(entity, runtime, now, partial);
         if (runtime.preview != null) return samplePose(runtime.preview.key, runtime.preview.time(now), false);
-        if(runtime.phase==LocomotionPhase.CHARGING&&com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).spec()==null)
+        boolean shooting=action.clipId().startsWith("spines_")&&action.active(actionTime(entity,partial));
+        if(shooting&&RooftopRig.groundShot(action.clipId())&&(!entity.onGround()
+                ||runtime.phase!=null&&runtime.phase!=LocomotionPhase.IDLE&&!runtime.phase.isGroundMovement()))return base;
+        if(shooting&&runtime.override!=null&&runtime.override.key.startsWith("basic_"))runtime.override=null;
+        if(!shooting&&runtime.phase==LocomotionPhase.CHARGING&&com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).spec()==null)
             return base;
         var activeWeapon=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL).spec();
         if(activeWeapon!=null&&(activeWeapon.id.startsWith("dev_")||activeWeapon==com.codex.blacklight.combat.WeaponMove.BULLETDIVE_DROP))
@@ -292,7 +311,33 @@ public final class PlayerMotionController {
         if (action.revision() != runtime.suppressedRevision && action.active(actionNow)
                 && !isLocomotionAction(action.clipId())) {
             float actionSeconds=action.seconds(actionNow);
-            var sampled=samplePose(action.clipId(),actionSeconds,action.looping());
+            float poseSeconds=actionSeconds;
+            if(action.heldTime()>=0&&action.clipId().startsWith("spines_air_")&&action.clipId().endsWith("_draw")){
+                double heldTicks=Math.max(0,actionNow-action.started());
+                poseSeconds=.5F+(float)(heldTicks%10)/20;
+            }
+            var sampled=samplePose(action.clipId(),poseSeconds,action.looping());
+            if(action.clipId().startsWith("spines_light")){
+                if(runtime.spineDrawFrom!=null&&actionSeconds<.10F)
+                    sampled=BlacklightPose.interpolatePose(runtime.spineDrawFrom,sampled,actionSeconds/.10F);
+                if(action.clipId().contains("_flight_")){
+                    if(entity.onGround())return NativeLandingPose.blendUpper(base,sampled,1);
+                    float envelope=net.minecraft.util.Mth.clamp(Math.min(actionSeconds/.10F,(action.duration()-actionSeconds)/.16F),0,1);
+                    return BlacklightPose.interpolatePose(base,sampled,envelope);
+                }
+                return !entity.onGround()?NativeLandingPose.blendUpper(base,sampled,1):scapulaStride(entity,runtime,base,sampled);
+            }
+            if(action.clipId().startsWith("spines_ground")||action.clipId().startsWith("spines_air")){
+                if(runtime.spineDrawFrom!=null&&action.clipId().equals(runtime.previousAction)&&actionSeconds<.10F)
+                    sampled=BlacklightPose.interpolatePose(runtime.spineDrawFrom,sampled,actionSeconds/.10F);
+                if(action.clipId().startsWith("spines_ground"))return entity.onGround()?scapulaStride(entity,runtime,base,sampled):base;
+                if(!action.clipId().endsWith("_draw")){
+                    float exit=net.minecraft.util.Mth.clamp((action.duration()-actionSeconds)/.16F,0,1);
+                    return BlacklightPose.interpolatePose(base,sampled,exit);
+                }
+                return NativeLandingPose.blendUpper(base,sampled,ScapulaVolley.ease(actionSeconds/.12F));
+            }
+            if(action.clipId().startsWith("spines_scapula_land")&&!entity.onGround())return base;
             if(action.clipId().equals("basic_dodge_roll")){
                 NativeLandingPose.stripHorizontalRoot(sampled);
                 float enter=net.minecraft.util.Mth.clamp(actionSeconds/.1F,0,1),exit=net.minecraft.util.Mth.clamp((action.duration()-actionSeconds)/.2F,0,1);
@@ -327,6 +372,11 @@ public final class PlayerMotionController {
             return action.clipId().startsWith("legacy_claw_") ? sampled : BlacklightPose.interpolatePose(base, sampled, blend);
         }
         return base;
+    }
+    private static BlacklightPose scapulaStride(LivingEntity entity,Runtime runtime,BlacklightPose base,BlacklightPose shot){
+        if(!movingGrounded(entity,runtime))return shot;
+        float speed=(float)Math.max(entity.getDeltaMovement().horizontalDistance(),LocomotionVisualState.get(entity.getId()).speed());
+        return BlacklightPose.interpolatePose(shot,NativeLandingPose.blendUpper(base,shot,1),Math.min(.85F,speed*4));
     }
     private static boolean movingGrounded(LivingEntity entity,Runtime runtime) {
         return entity.onGround()&&(runtime.phase!=null&&runtime.phase.isGroundMovement()
@@ -371,6 +421,16 @@ public final class PlayerMotionController {
                         :velocity.y>.035?LocomotionPhase.RISE:LocomotionPhase.FALL;
             var snapshot=LocomotionVisualState.get(entity.getId());
             if(runtime.gait.key()==null)speed=Math.max(velocity.horizontalDistance(),Math.max(0,snapshot.speed()));
+            runtime.previousSpineStride=runtime.spineStride;
+            boolean backspines=ModAttachments.getData(player,ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES;
+            boolean grounded=entity.onGround()&&!entity.isPassenger();
+            // Local recoil also moves the entity. Only player-driven travel should replace the recoil step.
+            boolean stepping=!(player instanceof net.minecraft.client.player.LocalPlayer local)
+                    ||Math.abs(local.input.forwardImpulse)+Math.abs(local.input.leftImpulse)>.01F;
+            float desired=grounded&&stepping&&backspines?net.minecraft.util.Mth.clamp((float)((speed-.002)/.045),0,1):0;
+            runtime.spineStride=net.minecraft.util.Mth.approach(runtime.spineStride,desired,.32F);
+            if(backspines&&grounded&&stepping&&speed>.012&&phase==LocomotionPhase.IDLE)
+                phase=player.isSprinting()?LocomotionPhase.RUN:LocomotionPhase.WALK;
             wall=ClientWallMotion.modeFor(player);
             double right=TraversalMotionSelector.rightward(velocity.x,velocity.z,entity.yBodyRot);
             var surface=WallPoseState.get(entity);
@@ -408,7 +468,8 @@ public final class PlayerMotionController {
                             case LAND_HEAVY -> "basic_land_heavy";case LAND_DEVASTATING -> "basic_land_devastating";
                             default -> switch(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE).getActivePower()) {
                                 case CLAWS -> "basic_idle_claw";case BLADE -> "basic_idle_blade";
-                                case HAMMERFISTS -> "basic_idle_hammer";case WHIPFIST -> "basic_idle_whip";default -> "basic_idle";
+                                case HAMMERFISTS -> "basic_idle_hammer";case WHIPFIST -> "basic_idle_whip";
+                                case BACKSPINES -> "basic_idle_claw";default -> "basic_idle";
                             };
                         };
             }
@@ -447,6 +508,11 @@ public final class PlayerMotionController {
         }
         return renderLocomotion(entity,runtime,partial);
     }
+    public static float spineStride(LivingEntity entity,float partial) {
+        var runtime=state(entity);
+        return net.minecraft.util.Mth.lerp(partial,runtime.previousSpineStride,runtime.spineStride);
+    }
+
     private static BlacklightPose renderLocomotion(LivingEntity entity,Runtime runtime,float partial) {
         String key=runtime.gait.key();
         boolean looping=runtime.gait.looping();
@@ -502,6 +568,16 @@ public final class PlayerMotionController {
         runtime.facing.commit(identity,entity.tickCount,
                 com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,0),
                 com.codex.blacklight.client.animation.BlacklightRenderPose.rawFacing(entity,1),transition);
+        String next=action.clipId();
+        if(!next.equals(runtime.previousAction)){
+            // A buffered heavy may arrive on any recovery frame. Carry that actual
+            // visible pose into the draw before the foot plant, without delaying release.
+            boolean spineEntry=next.endsWith("_draw")||runtime.previousAction.startsWith("spines_")
+                    &&(next.startsWith("spines_light")||next.startsWith("spines_air_")||next.endsWith("_throw"));
+            runtime.spineDrawFrom=next.startsWith("spines_")&&spineEntry&&runtime.interval.ready()
+                    ?runtime.interval.sample(1):null;
+            runtime.previousAction=next;
+        }
         runtime.interval.commit(entity.tickCount,partial->utilityPose(entity,(float)partial));
         runtime.combat.commit(identity,entity.tickCount,renderLocomotion(entity,runtime,0),runtime.interval.sample(1),transition);
     }

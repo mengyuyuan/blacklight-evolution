@@ -28,12 +28,13 @@ public final class CombatImpactEffects {
         ground(p,move,hit);
     }
     /** The physical fist sweep supplies its actual block surface, including slabs and slopes. */
-    public static void ground(ServerPlayer p,WeaponMove move,BlockHitResult hit){
-        if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=net.minecraft.core.Direction.UP)return;
+    public static boolean ground(ServerPlayer p,WeaponMove move,BlockHitResult hit){
+        if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=net.minecraft.core.Direction.UP)return false;
         var level=p.serverLevel();var center=hit.getLocation();float radius=(float)(move.quake()?AttackReach.reach(p,move):(move==move.uncharged()?1.65:2.2)*AttackReach.scale(p));
-        if(!TerrainImpactEffects.emit(p,hit,radius,move.quake()))return;
+        if(!TerrainImpactEffects.emit(p,hit,radius,move.quake()))return false;
         com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"ground",center,1F,move.quake()?.9F:1F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
+        return true;
     }
     public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){
         target(p,v,move,WeaponCutContact.Report.NONE,false);

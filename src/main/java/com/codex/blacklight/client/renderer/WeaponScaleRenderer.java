@@ -22,17 +22,20 @@ public final class WeaponScaleRenderer {
         if(!p.isAlive()||p.isRemoved()||!player.isPrototypeMode()||form==PowerForm.NONE){STATES.remove(p);return identity();}
         double now=p.level().getGameTime()+(double)partial;
         var s=STATES.get(p);
-        if(s==null||s.form!=form||s.level!=p.level()||now<s.lastTime){s=new State();s.form=form;s.level=p.level();STATES.put(p,s);}
+        if(s==null||s.form!=form||s.level!=p.level()){s=new State();s.form=form;s.level=p.level();STATES.put(p,s);}
         var visual=ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL);var move=visual.spec();
         var sample=move!=null&&move.form==form?WeaponMotionClock.sample(visual,now):null;
         Action action=sample==null?null:new Action(visual.move(),visual.started(),sample.key());
-        if(!Objects.equals(s.action,action)){s.from=s.last;s.action=action;s.changed=now;}
+        if(!Objects.equals(s.action,action)){s.from=s.last;s.action=action;s.changed=now;s.lastTime=now;}
         float blend=(float)Math.max(0,Math.min(1,(now-s.changed)/2));blend=blend*blend*(3-2*blend);
         var result=identity();
         for(int i=0;i<2;i++){
             var target=sample==null?WeaponAttackScales.Shape.IDENTITY:WeaponAttackScales.sample(sample.key(),sample.seconds(),i==1);
             result[i]=s.from[i].blend(target,blend);
         }
-        s.last=result;s.lastTime=now;return result;
+        // Trail and model passes can request an earlier fraction of the same tick.
+        // Sampling it must not reset growth or replace the latest transition endpoint.
+        if(now>=s.lastTime){s.last=result;s.lastTime=now;}
+        return result;
     }
 }
