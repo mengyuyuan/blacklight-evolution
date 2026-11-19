@@ -2,6 +2,7 @@ package com.codex.blacklight.power;
 
 import com.codex.blacklight.combat.*;
 import com.codex.blacklight.entity.BiomassHusk;
+import com.codex.blacklight.world.GreeneHost;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.server.level.ServerPlayer;
@@ -124,7 +125,8 @@ public final class BiomassSystem {
             if(p.level().getGameTime()>=rejected.until())REJECTED.remove(p);
             else if(rejected.target().equals(victim.getUUID()))return false;
         }
-        return !(victim instanceof BiomassHusk)&&ConsumeSystem.eligibleBiomass(victim)
+        return !(victim instanceof BiomassHusk) && (!(victim instanceof GreeneHost host) || host.stage()==GreeneHost.SPENT)
+                && ConsumeSystem.eligibleBiomass(victim)
                 // Death recovery must be possible without first fighting in a helpless form.
                 // Mature organs and protected bosses still retain their physical assimilation gate.
                 &&(state(p).active()&&state(p).fatal()?AssimilationSystem.ready(victim):ConsumeSystem.healthReady(p,victim))
@@ -140,10 +142,10 @@ public final class BiomassSystem {
     }
     /** A claim is transient and valid only while its live player is absorbing nearby. */
     public static Player claimant(Entity victim){
-        if(!(victim instanceof Mob))return null;
+        if(!(victim instanceof Mob mob)||!mob.isAlive()||mob.isRemoved())return null;
         for(var p:victim.level().players()){if(!com.codex.blacklight.registry.ModAttachments.available(p))continue;var s=state(p);
             if(p.isAlive()&&s.phase()==BiomassState.ABSORBING&&s.victim()==victim.getId()
-                    &&(inContact(p,(LivingEntity)victim)||p instanceof ServerPlayer server&&BiomassAttachment.attached(server,(Mob)victim)))return p;
+                    &&BiomassAttachment.claimInReach(p,mob))return p;
         }return null;
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post e){
@@ -215,6 +217,7 @@ public final class BiomassSystem {
                 publish(p,s.crawl(now));return;
             }
             if(!AssimilationSystem.settle(p,target,consumeReward,false)){publish(p,s.crawl(now));return;}
+            if(target instanceof GreeneHost host)host.absorbedBy(p);
             target.setInvisible(true);
             Vec3 destination=BiomassReformation.completionPosition(p,target.position());
             p.teleportTo(destination.x,destination.y,destination.z);

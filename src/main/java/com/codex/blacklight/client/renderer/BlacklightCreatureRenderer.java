@@ -43,6 +43,14 @@ public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity
         super.renderCubesOfBone(stack,bone,out,light,overlay,color);
     }
     @Override public void render(T entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffer,int light){
+        if(entity instanceof com.codex.blacklight.entity.EncounterMob greene && greene.plazaTruck().isPresent()){
+            var path=com.codex.blacklight.combat.PlazaLash.points(greene,partial);
+            if(path.length>1){
+                var origin=greene.getPosition(partial);
+                for(int i=0;i<path.length;i++) path[i]=path[i].subtract(origin);
+                BiomassGeometry.strand(stack,buffer.getBuffer(RenderType.entityCutoutNoCull(BiomassGeometry.TEXTURE)),light,path,.38,.09);
+            }
+        }
         var visual=entity.getData(ModAttachments.CONSUME_VISUAL);float progress=visual.progress(entity.level().getGameTime(),partial);
         var placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(entity,partial);
         stack.pushPose();if(visual.active())stack.translate(placement.x,placement.y,placement.z);

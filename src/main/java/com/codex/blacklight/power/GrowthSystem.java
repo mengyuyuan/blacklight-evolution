@@ -48,7 +48,11 @@ public final class GrowthSystem {
     }
     public static void award(ServerPlayer p,String id){
         var advancement=p.server.getAdvancements().get(ResourceLocation.fromNamespaceAndPath("blacklight",id));
-        if(advancement!=null)p.getAdvancements().award(advancement,"done");
+        if (advancement == null || !p.getAdvancements().award(advancement, "done")) return;
+        if (id.equals("first_consume"))
+            p.displayClientMessage(Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades")), false);
+        if (id.equals("first_evolution"))
+            p.displayClientMessage(Component.translatable("survival.blacklight.branch"), false);
     }
     public static void updateHealth(ServerPlayer p){
         AssimilationSystem.updateCrest(p);

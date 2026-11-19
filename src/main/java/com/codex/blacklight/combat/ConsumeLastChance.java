@@ -23,6 +23,7 @@ public final class ConsumeLastChance {
     private static final ThreadLocal<Set<Mob>> EXECUTING=ThreadLocal.withInitial(()->Collections.newSetFromMap(new IdentityHashMap<>()));
     private ConsumeLastChance() {}
 
+    public static boolean executing(Mob target){return EXECUTING.get().contains(target);}
     public static boolean used(Mob target){return target.getPersistentData().getBoolean(USED);}
     /** Infection replaces an entity; it must not renew its spent opportunity. */
     public static void inherit(Mob source,Mob replacement){if(used(source))replacement.getPersistentData().putBoolean(USED,true);}

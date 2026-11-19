@@ -206,6 +206,11 @@ if (['compatLiveTest', 'hydraReleaseTest', 'hiveFeedingTest', 'wallTraversalTest
 }
 
 // Currency settlement regression tests, excluded from production artifacts.
+if (project.hasProperty('survivalRouteTest')) {
+    sourceSets.main.java.srcDir('src/survivalTest/java')
+    sourceSets.main.resources.srcDir('src/survivalTest/resources')
+}
+
 if (project.hasProperty('infectionScalingTest')) sourceSets.main.java.srcDir('src/statScalingTest/java')
 
 if (project.hasProperty('combatRewardTest')) {

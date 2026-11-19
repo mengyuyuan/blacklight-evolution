@@ -1,5 +1,7 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.world.BossSiteData;
+
 import com.codex.blacklight.combat.*;
 import com.codex.blacklight.infection.BlacklightInfectionSystem;
 import com.codex.blacklight.registry.*;
@@ -39,6 +41,28 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     private static final EntityDataAccessor<Integer> GREENE_CLOSE_SIDE=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> GREENE_CLOSE_START=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.LONG);
     private final GreeneWeaponController greeneWeapons=new GreeneWeaponController(this);
+    public void settlePlazaOpening() {
+        // The native rise accepts a small tolerance below the surface. Vanilla gravity must resume above the paving.
+        if(!greeneClose.opening() || !getPersistentData().contains("PlazaSurface")) return;
+        var pad=net.minecraft.core.BlockPos.of(getPersistentData().getLong("PlazaSurface"));
+        if(Math.abs(getY()-pad.getY())<1 && level().getBlockState(pad.below()).isFaceSturdy(level(),pad.below(),net.minecraft.core.Direction.UP))
+            setPos(getX(),pad.getY()+.001,getZ());
+    }
+    public void preparePlazaOpening() {
+        // This host already supplied its final surface. Tracking must begin with the underground position.
+        greeneBattle.beginOpeningAtSurface();
+        greeneClose.prepareOpening();
+        bar.setVisible(false);
+        defenseBar.setVisible(false);
+    }
+    private static final EntityDataAccessor<java.util.Optional<net.minecraft.core.BlockPos>> PLAZA_TARGET=
+            SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.OPTIONAL_BLOCK_POS);
+    public java.util.Optional<net.minecraft.core.BlockPos> plazaTruck(){ return entityData.get(PLAZA_TARGET); }
+    public void trackPlazaTruck(boolean active){
+        var nbt=getPersistentData();
+        var target=active && nbt.contains("BlacklightBossConsole")?net.minecraft.core.BlockPos.of(nbt.getLong("BlacklightBossConsole")):null;
+        entityData.set(PLAZA_TARGET,java.util.Optional.ofNullable(target));
+    }
     private final GreeneCloseCombat greeneClose=new GreeneCloseCombat(this);
     private boolean greeneCloseImpact;
     public GreeneCloseAttack.Side greeneCloseSide(){int side=entityData.get(GREENE_CLOSE_SIDE);return side<0||side>=GreeneCloseAttack.Side.values().length?null:GreeneCloseAttack.Side.values()[side];}
@@ -323,10 +347,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     }
     public boolean broken(int slot){return (entityData.get(BROKEN)&(1<<slot))!=0;}
     public static AttributeSupplier.Builder attributes(EncounterKind kind){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,kind.health).add(Attributes.ATTACK_DAMAGE,kind.damage).add(Attributes.MOVEMENT_SPEED,kind.speed).add(Attributes.FOLLOW_RANGE,kind==EncounterKind.ELIZABETH_GREENE?GreeneMissileFlight.RANGE:32).add(Attributes.KNOCKBACK_RESISTANCE,kind.boss?.85:.4);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(PLAZA_TARGET,java.util.Optional.empty());b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);}
     @Override protected void registerGoals(){goalSelector.addGoal(0,new FloatGoal(this));goalSelector.addGoal(2,new FightGoal());goalSelector.addGoal(7,new WaterAvoidingRandomStrollGoal(this,.65));targetSelector.addGoal(1,new HurtByTargetGoal(this));targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,15,true,false,this::enemy));}
     public boolean enemy(LivingEntity target){
-        if(target==null||target==this||!target.isAlive()||target.isRemoved()||target.level()!=level()||isAlliedTo(target))return false;
+        if(target instanceof com.codex.blacklight.world.GreeneHost||target==null||target==this||!target.isAlive()||target.isRemoved()||target.level()!=level()||isAlliedTo(target))return false;
         if(target instanceof Player p)return !p.isCreative()&&!p.isSpectator()&&!com.codex.blacklight.disguise.DisguiseSystem.fooled(this,p)&&(kind==null||!kind.military||BlacklightInfectionSystem.isInfected(p)||getLastHurtByMob()==p);
         if(!(target instanceof Mob))return false;
         return kind!=null&&kind.military?BlacklightInfectionSystem.isInfected(target)||getLastHurtByMob()==target:!BlacklightInfectionSystem.isInfected(target);
@@ -337,7 +361,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     }return super.isAlliedTo(other);}
     private boolean disabled(){return !kind.enabled()||!isAlive()||isNoAi()||isPassenger()||ImpactControl.stunned(this)||ModAttachments.peekData(this,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active()||com.codex.blacklight.power.BiomassSystem.claimant(this)!=null||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL;}
     public boolean begin(EncounterMove move,LivingEntity target){
-        if(kind==EncounterKind.ELIZABETH_GREENE&&!greeneBattle.canAttack())return false;
+        if(kind==EncounterKind.ELIZABETH_GREENE&&(!greeneBattle.canAttack()||greeneClose.opening()))return false;
         if(kind==EncounterKind.ELIZABETH_GREENE&&(move==EncounterMove.VOLLEY||move==EncounterMove.ORBS)){
             Entity body=GreeneWeaponTarget.body(target);var mechanical=GreeneWeaponTarget.mechanicalProgram(body);
             if(move==EncounterMove.ORBS&&mechanical==null)return false;
@@ -361,6 +385,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         else playSound(kind.military?SoundEvents.IRON_GOLEM_ATTACK:SoundEvents.RAVAGER_ROAR,.7F,kind.height>4?.55F:1.05F);return true;
     }
     public boolean beginGreene(GreeneWeaponProgram program,Entity target){
+        if(greeneClose.opening()) return false;
         if(kind!=EncounterKind.ELIZABETH_GREENE||program==null||!greeneBattle.canAttack())return false;
         EncounterMove action=program.antiVehicle()?EncounterMove.ORBS:EncounterMove.VOLLEY;
         if(level().isClientSide||disabled()||move()!=EncounterMove.NONE||cooldown>0||exposed()||!moveReady(action)
@@ -583,7 +608,12 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         }
         var obstruction=GoliathCharge.obstruction(goliathChargeSnapshot(),available,horizontalBlocked);
         if(obstruction==GoliathCharge.Obstruction.CANCEL){cancelAttack();return;}
-        if(obstruction==GoliathCharge.Obstruction.EXPOSE){crashGoliathCharge(age);return;}
+        if(obstruction==GoliathCharge.Obstruction.EXPOSE){
+            Vec3 blockedTravel=nextPos.subtract(position());
+            crashGoliathCharge(age);
+            GoliathTerrainImpact.wall(this,blockedTravel);
+            return;
+        }
         // A clipped windup/return consumes this tick's root request. It must not
         // become a charge collision or accumulate a displacement for later.
         blocked=false;
@@ -789,6 +819,9 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public Vec3 lastGroundPoint(){return lastGroundPoint;}
     public int lastGroundAge(){return lastGroundAge;}public int groundImpacts(){return groundImpacts;}
     private void updateBossBars(){
+        if(kind==EncounterKind.ELIZABETH_GREENE && greeneClose.opening() && !greeneBattle.targetable()){
+            bar.setVisible(false);defenseBar.setVisible(false);return;
+        }
         bar.setProgress(Math.max(0,Math.min(1,getHealth()/getMaxHealth())));bar.setVisible(kind.enabled()&&kind.boss&&isAlive());
         if(!kind.enabled()){defenseBar.setVisible(false);return;}
         bar.setOverlay(BossEvent.BossBarOverlay.NOTCHED_10);
@@ -933,6 +966,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(source.getEntity() instanceof LivingEntity attacker&&isAlliedTo(attacker))return false;
         if(kind!=EncounterKind.ELIZABETH_GREENE&&!super.hurt(source,amount*.15F))return false;
         float healthDamage=kind==EncounterKind.ELIZABETH_GREENE?(float)Math.min(Float.MAX_VALUE,(double)amount*com.codex.blacklight.power.CombatScale.units(this)):amount;
+        BossSiteData.participant(this, source.getEntity());
+        if(kind==EncounterKind.ELIZABETH_GREENE && greeneClose.counterOpening(slot)) cooldown=Math.max(cooldown,24);
         armorHit[slot]=level().getGameTime();armor[slot]=Math.max(0,armor[slot]-healthDamage);
         if(kind==EncounterKind.ELIZABETH_GREENE){
             if(source.getEntity() instanceof LivingEntity attacker){setLastHurtByMob(attacker);lastThreatAt=level().getGameTime();}
@@ -992,6 +1027,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             }
         }
         boolean accepted=super.hurt(source,amount*scale);
+        if (accepted) BossSiteData.participant(this, source.getEntity());
         if(accepted&&!level().isClientSide&&kind==EncounterKind.ELIZABETH_GREENE&&greeneStage()==GreeneMotion.DOWN)entityData.set(GREENE_HIT,level().getGameTime());
         if(accepted&&!level().isClientSide&&kind==EncounterKind.FLYER&&isAlive())flight.hurt(source.getSourcePosition());
         if(accepted&&!level().isClientSide&&guardContact){
@@ -1037,9 +1073,15 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         // Successful own damage already goes through the normal incoming-hit
         // event. Health redirection is not three separate physical collisions.
         else if(redirected)confirmedIncoming(source,amount);
+        if (own || redirected) BossSiteData.participant(this, source.getEntity());
         return own||redirected;
     }
+    @Override public void die(DamageSource source) {
+        super.die(source);
+        if (dead) BossSiteData.defeated(this, source.getEntity());
+    }
     @Override public void remove(Entity.RemovalReason reason){
+        if (reason.shouldDestroy()) BossSiteData.removed(this);
         if(kind==EncounterKind.ELIZABETH_GREENE)greeneStateEpoch++;
         if(kind==EncounterKind.ELIZABETH_GREENE&&greeneBattle!=null&&reason.shouldDestroy())greeneBattle.dispose();
         super.remove(reason);
@@ -1065,6 +1107,16 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     @Override public net.neoforged.neoforge.entity.PartEntity<?>[] getParts(){return greeneParts!=null&&greeneParts.length>0?greeneParts:flyerParts!=null&&flyerParts.length>0?flyerParts:parts;}
     @Override public boolean isPickable(){return !animatedHurtBody()&&super.isPickable();}
     @Override public boolean isPushable(){return kind!=EncounterKind.ELIZABETH_GREENE&&super.isPushable();}
+    @Override protected void doPush(Entity other){
+        // The stationary Mother's root box also covers every walkable gap
+        // between the Slugs. Only her current, intact skin can shove a bystander.
+        if(kind==EncounterKind.ELIZABETH_GREENE){
+            var body=other.getBoundingBox();
+            if(hurtRegions(0).stream().noneMatch(r->r.bounds().intersects(body)
+                    &&r.boxes().stream().anyMatch(b->b.touches(body))))return;
+        }
+        super.doPush(other);
+    }
     @Override public void knockback(double strength,double x,double z){if(kind!=EncounterKind.ELIZABETH_GREENE)super.knockback(strength,x,z);}
     @Override public void setId(int id){super.setId(id);if(parts!=null)for(int i=0;i<parts.length;i++)parts[i].setId(id+i+1);if(flyerParts!=null)for(int i=0;i<flyerParts.length;i++)flyerParts[i].setId(id+i+1);if(greeneParts!=null)for(int i=0;i<greeneParts.length;i++)greeneParts[i].setId(id+i+1);}
     @Override public void startSeenByPlayer(ServerPlayer p){super.startSeenByPlayer(p);if(kind.boss){bar.addPlayer(p);if(kind!=EncounterKind.ALEX_MERCER)defenseBar.addPlayer(p);}}

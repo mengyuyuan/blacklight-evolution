@@ -18,6 +18,13 @@ public final class ModItems {
     private static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BlacklightNeoMod.MOD_ID);
 
+    public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> CONVOY_MANIFEST = ITEMS.register("convoy_manifest",
+            () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "lost_convoy"));
+    public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> MOTHER_INTEL = ITEMS.register("mother_intel",
+            () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "mother_plaza"));
+    public static final DeferredItem<Item> BLOODTOX_COMMAND_KEY = ITEMS.register("bloodtox_command_key",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)));
+
     public static final DeferredItem<BlacklightSampleItem> BLACKLIGHT_SAMPLE = ITEMS.registerItem(
             "blacklight_sample", BlacklightSampleItem::new,
             new Item.Properties().stacksTo(4).rarity(Rarity.EPIC).fireResistant());
@@ -73,6 +80,7 @@ public final class ModItems {
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(SUPREME_PARASITE_SYRINGE.get());
                         output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(LIVING_HIVE_TISSUE.get());
+                        output.accept(CONVOY_MANIFEST.get()); output.accept(MOTHER_INTEL.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
                         output.accept(BUILDING_CORE.get());

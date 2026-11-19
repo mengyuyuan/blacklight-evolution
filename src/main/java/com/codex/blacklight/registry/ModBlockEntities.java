@@ -12,6 +12,8 @@ public final class ModBlockEntities {
     private static final DeferredRegister<BlockEntityType<?>> TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE,"blacklight");
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<BuildingHeartBlockEntity>> BUILDING_HEART =
             TYPES.register("building_heart",()->BlockEntityType.Builder.of(BuildingHeartBlockEntity::new,ModBlocks.BUILDING_CORE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<com.codex.blacklight.world.PumpStation>> PUMP =
+            TYPES.register("pump_station",()->BlockEntityType.Builder.of(com.codex.blacklight.world.PumpStation::new,ModBlocks.ENCOUNTER_CONSOLE.get()).build(null));
     private ModBlockEntities() {}
     public static void register(IEventBus bus) { TYPES.register(bus); }
 }

@@ -1,5 +1,8 @@
 package com.codex.blacklight.mode;
 
+import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.world.BossSiteBlock;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -18,13 +21,23 @@ public final class PrototypeSurvivalLock {
     private PrototypeSurvivalLock() {
     }
 
-    /** Explicit placement tools keep ordinary use input while Prototype combat owns empty hands. */
+    /** Mission reports and placement tools retain their use action in Prototype mode. */
     public static boolean placementItem(Player player,net.minecraft.world.item.ItemStack stack){
-        return com.codex.blacklight.military.vehicle.VehicleRegistry.isVehicleTool(stack)
+        return stack.getItem() instanceof com.codex.blacklight.item.EncounterDossierItem
+                || com.codex.blacklight.military.vehicle.VehicleRegistry.isVehicleTool(stack)
                 ||player.isCreative()&&stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
     }
     public static boolean holdingPlacementItem(Player player){
         return player!=null&&(placementItem(player,player.getMainHandItem())||placementItem(player,player.getOffhandItem()));
+    }
+
+    /** Allow the encounter console while prototype combat owns ordinary empty-hand use. */
+    public static boolean canOperateConsole(Player player, BlockPos pos) {
+        if(player==null || player.isSpectator() || player.isPassenger()) return false;
+        var state=player.level().getBlockState(pos);
+        if(!(state.getBlock() instanceof BossSiteBlock) || player.getData(ModAttachments.CONSUMING)) return false;
+        return (player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty())
+                || state.getValue(BossSiteBlock.MOTHER) && BossSiteBlock.hasPumpKey(player);
     }
 
     /** Disabling pickup leaves the dropped item intact; enabling it keeps vanilla ownership/delay rules. */
@@ -45,7 +58,7 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (!isLocked(event.getEntity())) return;
+        if (!isLocked(event.getEntity()) || canOperateConsole(event.getEntity(),event.getPos())) return;
         if(!event.getEntity().isSpectator()&&holdingPlacementItem(event.getEntity())){
             if(!placementItem(event.getEntity(),event.getItemStack())){
                 // Vanilla tries the main hand first. Yield without using it so the offhand tool can run.

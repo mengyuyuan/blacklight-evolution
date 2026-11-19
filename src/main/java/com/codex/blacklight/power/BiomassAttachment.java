@@ -1,9 +1,11 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.entity.GreenePart;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import java.util.Map;
 import java.util.UUID;
@@ -35,11 +37,30 @@ public final class BiomassAttachment {
         return true;
     }
 
-    public static boolean attached(ServerPlayer player,Mob target){
+    /** The consumer owns the claim while it follows the part. Hit selection may itself consult this claim. */
+    static boolean claimInReach(Player player, Mob target) {
+        var contact=player.getBoundingBox().inflate(1.15,.65,1.15);
+        var parts=target.isMultipartEntity()?target.getParts():null;
+        if(parts==null||parts.length==0)
+            return com.codex.blacklight.combat.CombatTargeting.hitboxes(target).stream().anyMatch(contact::intersects);
+        if(player instanceof ServerPlayer server)return anchorInRange(server,target);
+        // Remote clients receive the victim ID but do not own an attachment/offset.
+        for(var part:parts) if(part!=null&&!part.isRemoved()&&(!(part instanceof GreenePart surface)||surface.hasSurface())
+                &&contact.intersects(part.getBoundingBox()))return true;
+        return false;
+    }
+
+    private static boolean anchorInRange(ServerPlayer player,Mob target){
         var anchor=ANCHORS.get(player);
         return anchor!=null&&anchor.victim().equals(target.getUUID())&&target.level()==player.level()
-                &&!anchor.part().isRemoved()&&anchor.part().isPickable()
+                &&!anchor.part().isRemoved()&&(!(anchor.part() instanceof GreenePart part)||part.hasSurface())
                 &&com.codex.blacklight.combat.CombatTargeting.distanceSquared(player.position(),anchor.part().getBoundingBox())<=256;
+    }
+
+    public static boolean attached(ServerPlayer player,Mob target){
+        if(!anchorInRange(player,target))return false;
+        var part=ANCHORS.get(player).part();
+        return part instanceof GreenePart || part.isPickable();
     }
 
     public static boolean follow(ServerPlayer player,Mob target){

@@ -84,7 +84,16 @@ public final class FirearmBlockDamage {
         return CommonHooks.canEntityDestroy(level,at,owner);
     }
     private static BlockDamageLedger ledger(ServerLevel level){return LEDGERS.computeIfAbsent(level,ignored->new BlockDamageLedger(512,200));}
+    public static boolean mobImpact(ServerLevel level,net.minecraft.world.entity.Mob owner,BlockPos at,BlockState state,float impact){
+        if(!valid(owner)||owner.level()!=level||!loaded(level,at)||level.getBlockState(at)!=state
+                ||state.hasBlockEntity()||!state.getFluidState().isEmpty()
+                ||!level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_MOBGRIEFING))return false;
+        return apply(level,owner,at,impact,false);
+    }
     private static boolean apply(ServerLevel level,LivingEntity owner,BlockPos at,float impact){
+        return apply(level,owner,at,impact,!(owner instanceof ServerPlayer player&&player.isCreative()));
+    }
+    private static boolean apply(ServerLevel level,LivingEntity owner,BlockPos at,float impact,boolean drops){
         if(impact<=0||!loaded(level,at))return false;
         var state=level.getBlockState(at);var material=material(level,at,state);
         float capacity=BlockDamagePolicy.durability(material,state.getDestroySpeed(level,at));
@@ -94,7 +103,7 @@ public final class FirearmBlockDamage {
         var ledger=ledger(level);var result=ledger.hit(at.asLong(),Block.getId(state),impact,capacity,level.getGameTime());
         flush(level,ledger);
         if(result.broken()){
-            boolean broken=level.destroyBlock(at,!(owner instanceof ServerPlayer player&&player.isCreative()),owner);
+            boolean broken=level.destroyBlock(at,drops,owner);
             if(broken&&state.is(com.codex.blacklight.registry.MilitaryFacilityBlocks.COMMAND_TERMINAL.get())&&owner instanceof ServerPlayer player)
                 com.codex.blacklight.city.MilitaryCampaignSystem.actualPlayerBreak(player,at);
             return broken;
