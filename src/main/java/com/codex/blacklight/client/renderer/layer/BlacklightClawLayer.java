@@ -22,6 +22,7 @@ import net.minecraft.world.InteractionHand;
 
 /** Renders directly on Blacklight's animated shoulder and elbow joints; no held-item transform is involved. */
 public final class BlacklightClawLayer extends net.minecraft.client.renderer.entity.layers.RenderLayer<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> {
+    private final BackspineRack backspines=new BackspineRack();
     public BlacklightClawLayer(net.minecraft.client.renderer.entity.RenderLayerParent<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> parent){
         super(parent);
         com.codex.blacklight.combat.WeaponAttackScales.preload();
@@ -37,6 +38,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         stack.pushPose();
         try {
             com.codex.blacklight.client.renderer.BlacklightBoneRendering.skeletonFrame(stack);
+            backspines.render(player,stack,buffer,light,poses,partial);
             renderSkeleton(player,stack,buffer,light,poses,age,yaw,pitch,partial);
         }finally{stack.popPose();}
     }

@@ -20,6 +20,7 @@ public final class BlacklightRenderPose {
         var skeleton = PlayerMotionController.skeleton();
         var pose = PlayerMotionController.pose(entity, partial);
         if(entity instanceof net.minecraft.world.entity.player.Player p){var throwing=BlockThrowPose.sample(p,partial);if(throwing!=null)return throwing;}
+        braceLean(entity,pose,partial);
         NativeHeadLook.apply(entity,pose,partial);
         if (!NativeHitPose.apply(entity, skeleton, pose, partial)) ConsumeVictimPose.epic(entity, pose, partial);
         boolean actorOwns=NativeConsumePose.actor(entity, pose, partial);
@@ -58,9 +59,9 @@ public final class BlacklightRenderPose {
         var weapon=ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);
         if(wall==null&&entity.onGround()&&weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_RAM
                 &&!weapon.charging())HammerGroundContact.apply(pose);
-        if(wall==null&&entity.onGround()&&!weapon.charging()
-                &&(weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_QUAKE||weapon.spec()==com.codex.blacklight.combat.WeaponMove.HAMMER_QUAKE_CHARGED)){
-            var clock=WeaponMotionClock.sample(weapon,entity.level().getGameTime()+partial);
+        if(wall==null&&!weapon.charging()&&weapon.spec()!=null
+                &&(weapon.spec().hammerComboSlam()||entity.onGround()&&com.codex.blacklight.combat.HammerQuakeContact.owns(weapon.spec()))){
+            var clock=WeaponMotionClock.sample(weapon,entity.level().getGameTime()+(double)partial);
             if(clock!=null){
                 var shapes=entity instanceof net.minecraft.client.player.AbstractClientPlayer player
                         ?com.codex.blacklight.client.renderer.WeaponScaleRenderer.sample(player,partial)
@@ -76,6 +77,23 @@ public final class BlacklightRenderPose {
             GrabHoldPose.apply(entity,skeleton,pose,partial);
         return pose;
     }
+    private static void braceLean(LivingEntity entity,BlacklightPose pose,float partial){
+        var action=ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+        String key=action.clipId();
+        if(!key.startsWith("spines_")||!key.endsWith("_draw")||!action.active(PlayerMotionController.actionTime(entity,partial)))return;
+        var travel=new net.minecraft.world.phys.Vec3(entity.getX()-entity.xo,0,entity.getZ()-entity.zo);
+        var local=travel.yRot((float)Math.toRadians(entity.getYRot()));
+        float drive=(float)Math.tanh(local.z*7),side=(float)Math.tanh(local.x*7);
+        float turn=net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.wrapDegrees(entity.yHeadRot-entity.yHeadRotO)/35,-1,1);
+        pose.orElseEmpty("Torso").rotation().rotateX(-.19F*drive).rotateZ(.14F*side+.09F*turn);
+        pose.orElseEmpty("Chest").rotation().rotateY(-.12F*turn);
+        pose.orElseEmpty("Head").rotation().rotateX(.09F*drive);
+        if(key.startsWith("spines_air_")){
+            pose.orElseEmpty("Thigh_L").rotation().rotateX(-.095F*drive).rotateZ(.065F*side);
+            pose.orElseEmpty("Thigh_R").rotation().rotateX(.085F*drive).rotateZ(.06F*side);
+            pose.orElseEmpty("Leg_R").rotation().rotateX(-.055F*drive);
+        }
+    }
     public static float facing(LivingEntity entity,float partial) {
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
@@ -85,6 +103,9 @@ public final class BlacklightRenderPose {
     }
     public static float rawFacing(LivingEntity entity,float partial) {
         var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
+        if(dodge.clipId().startsWith("spines_")&&!dodge.clipId().startsWith("spines_scapula")
+                &&dodge.active(PlayerMotionController.actionTime(entity,partial)))
+            return net.minecraft.util.Mth.rotLerp(partial,entity.yHeadRotO,entity.yHeadRot);
         if(dodge.clipId().equals("basic_dodge_roll")&&dodge.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(entity,partial)))return dodge.yaw();
         float body=net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var weapon=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.WEAPON_VISUAL);

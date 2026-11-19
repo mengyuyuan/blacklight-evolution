@@ -11,7 +11,7 @@ public final class WeaponMorphTimeline {
     private boolean longTransform;
     public WeaponMorphTimeline(PowerForm initialForm,double now) {
         target=from=initialForm;onset=now;duration=0;
-        if(WeaponMorphTiming.weapon(initialForm))initial[initialForm.ordinal()]=1;
+        if(WeaponMorphTiming.hasMorph(initialForm))initial[initialForm.ordinal()]=1;
     }
     public void retarget(PowerForm next,double now,double requestedOnset,float ticks,boolean longTransform) {
         float carriedFlow=flow(now);
@@ -37,7 +37,7 @@ public final class WeaponMorphTimeline {
         float phase=phase(now),in=smooth(phase),out=smooth(phase/.72F);
         var result=new float[initial.length];
         for(var form:PowerForm.values()) {
-            if(!WeaponMorphTiming.weapon(form))continue;
+            if(!WeaponMorphTiming.hasMorph(form))continue;
             float start=initial[form.ordinal()];
             result[form.ordinal()]=form==target?start+(1-start)*in:start*(1-out);
         }

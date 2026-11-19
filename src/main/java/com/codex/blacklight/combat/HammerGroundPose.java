@@ -53,14 +53,18 @@ public final class HammerGroundPose {
     public static void quakeRecovery(BlacklightPose pose,String key,float seconds,
                                      WeaponAttackScales.Shape right,WeaponAttackScales.Shape left){
         if(!key.equals("hammer_quake")&&!key.equals("hammer_quake_charged"))return;
-        float end=com.codex.blacklight.combat.LocalWeaponMotion.find(key).map(d->d.contactEndTick()/20F).orElse(1.05F);
-        float weight=Math.max(0,Math.min(1,(seconds-end)/.2F));if(weight<=0)return;
-        weight=weight*weight*(3-2*weight);
+        float end=LocalWeaponMotion.find(key).orElseThrow().contactEndTick()/20F;
+        float weight=smoothStep((seconds-end)/.2F);
+        if(weight<=0)return;
         var original=pose.copy();apply(pose,right,left);
         if(weight<1){
             var blended=BlacklightPose.interpolatePose(original,pose,weight);
             for(String bone:List.of("Torso","Arm_R","Arm_L"))pose.getJointTransformData().put(bone,blended.orElseEmpty(bone).copy());
         }
+    }
+    private static float smoothStep(float t){
+        t=Math.max(0,Math.min(1,t));
+        return t*t*(3-2*t);
     }
     private static void apply(BlacklightPose pose,WeaponAttackScales.Shape right,WeaponAttackScales.Shape leftScale){
         stabilize(pose,right,leftScale,.012F,.012F,1,false);
@@ -77,11 +81,25 @@ public final class HammerGroundPose {
     private static void stabilize(BlacklightPose pose,WeaponAttackScales.Shape right,WeaponAttackScales.Shape leftScale,
                                   float unfold,boolean seatAtSurface,Clearance ground){
         var rightHand=handEnvelope(false,right);var leftHand=handEnvelope(true,leftScale);
-        boolean rightTouch=seatAtSurface&&ground.at(pose,false,rightHand)<0;
-        boolean leftTouch=seatAtSurface&&ground.at(pose,true,leftHand)<0;
+        float rightGap=ground.at(pose,false,rightHand),leftGap=ground.at(pose,true,leftHand);
         var rig=BlacklightSkeleton.get();
-        float penetration=Math.max(-ground.at(pose,false,rightHand),-ground.at(pose,true,leftHand));
-        if(penetration>0){
+        if(unfold==0){
+            // The retargeted stroke already carries the shoulder rotation. Correct only
+            // surface penetration along the terrain normal, so a nearly vertical elbow
+            // cannot flip the correction axis at impact.
+            for(boolean left:new boolean[]{false,true}){
+                float gap=left?leftGap:rightGap;
+                if(gap>=0||!Float.isFinite(gap))continue;
+                var bone=left?rig.armL:rig.armR;
+                var parent=rig.getBoundTransformFor(pose,bone.parent()).mul(bone.getLocalTransform());
+                var adjusted=pose.orElseEmpty(bone.getName()).copy();
+                adjusted.translation().add(parent.invert().transformDirection(new Vector3f(0,-gap,0)));
+                pose.getJointTransformData().put(bone.getName(),adjusted);
+            }
+            return;
+        }
+        float penetration=-Math.min(rightGap,leftGap);
+        if(penetration>0&&unfold>0){
             // The source recovery folds a narrow human torso nearly onto the
             // floor. Unfold the spine for the much wider Minecraft fists while
             // leaving the hip and both legs at their authored planted positions.
@@ -96,43 +114,56 @@ public final class HammerGroundPose {
             }
         }
         for(boolean left:new boolean[]{false,true}){
-            var hand=left?leftHand:rightHand;float floor=0;
+            var hand=left?leftHand:rightHand;
             float initial=ground.at(pose,left,hand);
-            if(initial>=floor&&!(left?leftTouch:rightTouch))continue;
-            boolean raise=initial<floor;float sign=raise?1:-1;
+            if(!Float.isFinite(initial))continue;
+            // After the torso unfolds, a grazing fist may already be clear. Ease it
+            // onto the surface as penetration grows instead of snapping down on first contact.
+            float seat=seatAtSurface?smoothStep(-(left?leftGap:rightGap)/.29F):0;
+            if(initial>=0&&seat==0)continue;
+            boolean raise=initial<0;
+            float sign=raise?1:-1;
             String name=left?"Arm_L":"Arm_R";
             var original=pose.orElseEmpty(name).copy();
             var parent=rig.getBoundTransformFor(pose,rig.searchJointByName(name).parent());
             var bind=rig.searchJointByName(name).getLocalTransform();
             var world=new Matrix4f(parent).mul(bind).mul(original.toMatrix());
+            var inverse=new Matrix4f(parent).mul(bind).invert();
             var pivot=world.getTranslation(new Vector3f());
             var elbow=rig.getBoundTransformFor(pose,rig.searchJointByName(left?"Hand_L":"Hand_R")).getTranslation(new Vector3f());
             // Raise around the shoulder using the arm's horizontal direction.
             var horizontal=elbow.sub(pivot);horizontal.y=0;
             if(horizontal.lengthSquared()<1e-6F)horizontal.set(left?-1:1,0,0);
             var axis=horizontal.normalize().cross(new Vector3f(0,1,0)).normalize();
-            var inverse=new Matrix4f(parent).mul(bind).invert();
             float best=initial;var bestPose=original;
             for(int degrees=2;degrees<=180;degrees+=2){
                 var correction=new Matrix4f().translation(pivot).rotate((float)Math.toRadians(degrees*sign),axis).translate(-pivot.x,-pivot.y,-pivot.z);
                 var candidate=BoneTransform.fromMatrix(new Matrix4f(inverse).mul(correction).mul(world));
                 pose.getJointTransformData().put(name,candidate);
                 float low=ground.at(pose,left,hand);
-                if(raise?low>best:low>=floor&&low<best){best=low;bestPose=candidate;}
-                if(raise?low>=floor:low<=floor){
+                if(raise?low>best:low>=0&&low<best){best=low;bestPose=candidate;}
+                if(raise?low>=0:low<=0){
                     float a=degrees-2,b=degrees;
                     for(int step=0;step<10;step++){
                         float mid=(a+b)*.5F;
                         var refine=new Matrix4f().translation(pivot).rotate((float)Math.toRadians(mid*sign),axis).translate(-pivot.x,-pivot.y,-pivot.z);
                         var refined=BoneTransform.fromMatrix(new Matrix4f(inverse).mul(refine).mul(world));
                         pose.getJointTransformData().put(name,refined);
-                        if(ground.at(pose,left,hand)>=floor){bestPose=refined;if(raise)b=mid;else a=mid;}
+                        if(ground.at(pose,left,hand)>=0){bestPose=refined;if(raise)b=mid;else a=mid;}
                         else if(raise)a=mid;else b=mid;
                     }
                     break;
                 }
             }
+            if(!raise)bestPose=BoneTransform.blend(original,bestPose,seat);
             pose.getJointTransformData().put(name,bestPose);
+            // At the bottom of a deep strike the shoulder pivot itself can be too low
+            // for arm rotation alone. Clear the remaining gap along model-space up.
+            float clearance=ground.at(pose,left,hand);
+            if(seatAtSurface&&clearance<-.0001F){
+                var lift=inverse.transformDirection(new Vector3f(0,-clearance,0));
+                bestPose.translation().add(lift);
+            }
         }
     }
 
@@ -187,9 +218,15 @@ public final class HammerGroundPose {
     public static boolean quake(String key){return key.equals("hammer_quake")||key.equals("hammer_quake_charged");}
     public static void quake(net.minecraft.world.entity.LivingEntity actor,BlacklightPose pose,String key,float seconds,
                              net.minecraft.world.phys.Vec3 feet,float yaw,WeaponAttackScales.Shape right,WeaponAttackScales.Shape left){
+        if(key.equals("hammer_combo_special")||key.equals("hammer_combo_special_charged")){
+            var landing=LocalWeaponMotion.find(key).orElseThrow().landing().orElseThrow();
+            if(seconds>=landing.impactTime())
+                stabilize(pose,right,left,.35F,true,new GroundSupport(actor,feet,yaw));
+            return;
+        }
         if(!quake(key)||!actor.onGround())return;
-        // A large fist can require torso clearance before the nominal recovery cue.
-        stabilize(pose,right,left,1,true,new GroundSupport(actor,feet,yaw));
+        // Adapt the arms to the actual surface. The authored pelvis and spine carry the strike.
+        stabilize(pose,right,left,0,true,new GroundSupport(actor,feet,yaw));
     }
     /** All fist vertices in model space, after the same nonuniform scale as the renderer. */
     public static java.util.List<Vector3f> fist(BlacklightPose pose,WeaponAttackScales.Shape shape,boolean left){

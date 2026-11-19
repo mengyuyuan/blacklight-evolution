@@ -32,6 +32,9 @@ public final class NativePlayerActionBackend implements PlayerActionBackend {
         publish(player, id, MotionLibrary.transition(id), Math.max(0, clipOffsetSeconds), false);
     }
 
+    public static void playVisualFromTick(ServerPlayer player,String key,int tick){
+        publish(player,MotionLibrary.canonical(key),0,tick/20F,false);
+    }
     private static void publish(ServerPlayer player, String id, float transition, float offset, boolean loop) {
         float duration = LandingMotionPolicy.leaseDuration(id,MotionLibrary.duration(id));
         var previous = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_ACTION);

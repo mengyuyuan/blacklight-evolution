@@ -77,7 +77,37 @@ public final class MotionLibrary {
     /** Blocks per game tick at the source clip's authored forward/tangent stride. */
     public static float nominalSpeed(String id) { return definition(id).orElseThrow().nominalSpeed(); }
     public static BlacklightPose pose(String id, float seconds, boolean loop) {
-        return BlacklightSkeleton.get().localPose(clip(id), seconds, loop);
+        if (id.equals("hammer_quake_charge") || id.equals("hammer_quake") || id.equals("hammer_quake_charged")) {
+            boolean charge=id.equals("hammer_quake_charge");
+            float frame=hammerSourceFrame(seconds,charge);
+            var rig=BlacklightSkeleton.get();
+            var source=clip("hammer_ground_stroke");
+            var stroke=rig.localPose(source,frame/30F,false);
+            if(id.equals("hammer_quake") && seconds>=.10F && seconds<.10F+1F/30) {
+                var windup=rig.localPose(source,3F/30,false);
+                return BlacklightPose.interpolatePose(windup,stroke,(seconds-.10F)*30);
+            }
+            if(!charge && seconds>3.10F) {
+                var idle=rig.localPose(clip("basic_idle_hammer"),seconds-3.10F,true);
+                return BlacklightPose.interpolatePose(stroke,idle,net.minecraft.util.Mth.clamp((seconds-3.10F)/.20F,0,1));
+            }
+            return stroke;
+        }
+        var body=BlacklightSkeleton.get().localPose(clip(id),seconds,loop);
+        return id.startsWith("spines_")?ScapulaCycle.pose(id,seconds,body):body;
+    }
+    static float hammerReleaseSeconds(float seconds) {
+        return hammerSourceFrame(seconds,false)/30F;
+    }
+    // P1 drop_swing FIG runs one P3D clip at different speeds for windup, hold,
+    // release and transition_to_idle. The independent ground-hit clock is in game seconds.
+    private static float hammerSourceFrame(float seconds,boolean charge) {
+        if(seconds<.10F)return Math.max(0,seconds)*30;
+        if(charge)return 3+7*Math.min(1,(seconds-.10F)/(2F/3));
+        if(seconds<.60F)return 10+(seconds-.10F)*90;
+        if(seconds<43F/30)return 55+(seconds-.60F)*(41F/(25F/30));
+        if(seconds<2.10F)return 96+(seconds-43F/30)*36;
+        return 120+50*Math.min(1,(seconds-2.10F)/(35F/30));
     }
     public static boolean looping(String id) {
         String key = canonical(id);
@@ -87,7 +117,7 @@ public final class MotionLibrary {
                 || key.startsWith("basic_wall_climb") || key.equals("basic_wall_cling")
                 || key.startsWith("basic_glide") || key.endsWith("grab_hold") || key.equals("grab_blade_hold");
     }
-    private static Optional<Definition> definition(String id) { return CLIPS.computeIfAbsent(canonical(id), MotionLibrary::read); }
+    private static Optional<Definition> definition(String id) { return CLIPS.computeIfAbsent(ScapulaCycle.sourceKey(canonical(id)), MotionLibrary::read); }
     private static final java.util.Set<String> WARMED = ConcurrentHashMap.newKeySet();
     private static final java.util.concurrent.ExecutorService WARMER = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
         var thread = new Thread(r, "blacklight-motion-warm"); thread.setDaemon(true); thread.setPriority(Thread.MIN_PRIORITY); return thread;

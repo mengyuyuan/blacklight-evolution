@@ -1118,5 +1118,16 @@
   "tooltip.blacklight.helicopter_70mm_rocket": "Main-hand right-click a landed, stationary player helicopter (also during rotor startup): 1 item = 1 rocket (75 per pod).",
   "message.blacklight.helicopter_place_clear_pad": "Requires a loaded, dry, flat pad with clear hull and rotor space (about 15 x 15). The aircraft extends forward from the clicked rear anchor.",
   "message.blacklight.helicopter_supply_grounded": "Approach a player-owned helicopter resting on dry ground and stop it before reloading. Rotor startup does not block supplies.",
-  "message.blacklight.helicopter_supply_full": "This helicopter magazine is full; no ammunition was consumed."
+  "message.blacklight.helicopter_supply_full": "This helicopter magazine is full; no ammunition was consumed.",
+  "power.blacklight.backspines": "Scapular Quill",
+  "upgrade.blacklight.backspines": "Scapular Quill",
+  "entity.blacklight.backspine_quill": "Flying Falx",
+  "upgrade.blacklight.backspines.desc": "Grow shoulder quills for ranged attacks.",
+  "screen.blacklight.wheel.backspines": "Alternating fire · Charged volley",
+  "tutorial.blacklight.backspines.steps": "Alternate shoulders with each shot. Tap through three throws for a lunging shot, or hold attack for a low-high double. Tap use on the ground for a two-beat shoulder strike. Hold for a simultaneous paired shot. Follow the first light with a turning slam or the second with a cleave. In midair, tap use to fire three quills straight ahead in a fan. Hold through the jump arc until the shoulder veins pulse red, then release five quills into a forward roll. Move and turn while aiming.",
+  "tutorial.blacklight.backspines.controls": "%1$s fire · %2$s heavy",
+  "subtitle.blacklight.weapon.backspines.morph": "Shoulder tissue unfolds",
+  "subtitle.blacklight.weapon.backspines.draw": "Shoulder quill strains",
+  "subtitle.blacklight.weapon.backspines.swing": "Shoulder quill snaps free",
+  "subtitle.blacklight.weapon.backspines.heavy": "Heavy quill launches"
 }

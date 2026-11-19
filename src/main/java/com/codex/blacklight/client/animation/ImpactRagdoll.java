@@ -167,7 +167,7 @@ public final class ImpactRagdoll {
         if(!(mc.level.getEntity(hit.entityId()) instanceof LivingEntity e)||!RagdollImpact.supportedBody(e)||e.isInvisible())return;
         if(!Double.isFinite(hit.vx()+hit.vy()+hit.vz())||new Vec3(hit.vx(),hit.vy(),hit.vz()).lengthSqr()>9.01)return;
         if(!hit.planes().isEmpty())com.codex.blacklight.registry.ModAttachments.setData(e, ModAttachments.DISMEMBER,com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.DISMEMBER)|WeaponDismemberment.MESH_CUT);
-        com.codex.blacklight.client.renderer.WoundBlood.accept(e,hit);
+        if(!com.codex.blacklight.combat.QuillImpact.isQuill(hit.motion()))com.codex.blacklight.client.renderer.WoundBlood.accept(e,hit);
         RagdollDrive.impactFlash(e,hit);
         com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Ragdoll received victim={} id={} health={} ticks={} freeze={} adapter={}",e.getType().getDescriptionId(),e.getId(),e.getHealth(),hit.ticks(),hit.freeze(),com.codex.blacklight.client.renderer.AdaptiveRagdoll.supports(e)?"generic":e instanceof net.minecraft.world.entity.animal.Pig?"pig":"humanoid");
         if(com.codex.blacklight.client.renderer.AdaptiveRagdoll.supports(e)){

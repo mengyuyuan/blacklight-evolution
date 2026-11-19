@@ -118,12 +118,13 @@ public final class RagdollImpact {
         var woundedEdges=new java.util.HashSet<String>();float localYaw=(float)Math.toRadians(victim.yBodyRot-180);
         for(var contact:woundContacts.contacts()){
             if(!woundedEdges.add(contact.edge()))continue;
-            Vec3 point=WeaponCutContact.woundPoint(victim,contact);
+            boolean quill=QuillImpact.isQuill(motion);
+            Vec3 point=quill?contact.point().subtract(victim.position()).yRot(localYaw):WeaponCutContact.woundPoint(victim,contact);
             Vec3 travel=contact.travel().yRot(localYaw).normalize();
             if(travel.lengthSqr()<.5)continue;
             // The entry wound faces outward; the blade's travel carries the spray sideways.
             Vec3 out=point.subtract(new Vec3(0,victim.getBbHeight()*.5,0)).normalize();
-            Vec3 direction=out.scale(.65).add(travel.scale(.8)).add(0,.12,0).normalize();
+            Vec3 direction=quill?travel:out.scale(.65).add(travel.scale(.8)).add(0,.12,0).normalize();
             float strength=(float)net.minecraft.util.Mth.clamp((sharp?.65:.4)+contact.travel().length()*.3+(victim.isDeadOrDying()?.35:0),.35,1.8);
             wounds.add(new RagdollImpactPayload.Wound(contact.region(),point,direction,strength));
             if(wounds.size()==RagdollImpactPayload.MAX_CUT_PLANES)break;

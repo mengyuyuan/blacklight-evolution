@@ -17,7 +17,7 @@ import net.minecraftforge.event.TickEvent;
 public final class WeaponMorphTracker {
     public record Part(PowerForm form,BiomassSurface.Frame surface) { }
     public record Sample(PowerForm from,PowerForm target,float phase,float flow,boolean transitioning,
-                         boolean longTransform,List<Part> parts,double materialTime) {
+                         boolean longTransform,List<Part> parts,float shoulder,double materialTime) {
         public BiomassSurface.Frame frame(PowerForm form) {
             for(var part:parts)if(part.form()==form)return part.surface();
             return BiomassSurface.Frame.stable(0);
@@ -44,11 +44,11 @@ public final class WeaponMorphTracker {
         double now=player.level().getGameTime()+partial;
         if (!player.isAlive() || !ModAttachments.available(player)) {
             STATES.remove(player);
-            return new Sample(PowerForm.NONE, PowerForm.NONE, 1, 0, false, false, List.of(), now);
+            return new Sample(PowerForm.NONE, PowerForm.NONE, 1, 0, false, false, List.of(), 0, now);
         }
         var state=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         boolean enabled=state.isInfected()&&state.isPrototypeMode()&&player.isAlive()&&!player.isSpectator();
-        var form=enabled&&WeaponMorphTiming.weapon(state.getActivePower())?state.getActivePower():PowerForm.NONE;
+        var form=enabled&&WeaponMorphTiming.hasMorph(state.getActivePower())?state.getActivePower():PowerForm.NONE;
         var observed=STATES.get(player);
         if(observed==null){observed=new Observed(form,now);STATES.put(player,observed);}
         if(!enabled) {
@@ -61,13 +61,15 @@ public final class WeaponMorphTracker {
         observed.lastTime=now;
         var morph=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.POWER_MORPH);
         boolean longVisible=enabled&&WeaponMorphTiming.weapon(form)&&morph.formId()==form.ordinal()&&morph.visible(player,partial);
-        boolean combatVisible=ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()!=null;
+        var action=ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+        boolean combatVisible=ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()!=null||
+                form==PowerForm.BACKSPINES&&action.active(now)&&action.clipId().startsWith("spines_")&&!action.clipId().startsWith("spines_scapula");
         boolean changed=observed.timeline.target()!=form;
         boolean newLong=longVisible&&observed.lastLong!=morph.started();
         if(changed||newLong) {
             float ticks=longVisible?WeaponMorphTiming.SWITCH_TICKS:form==PowerForm.NONE?WeaponMorphTiming.RETRACT_TICKS
                     :observed.timeline.target()==PowerForm.NONE?WeaponMorphTiming.QUICK_TICKS:WeaponMorphTiming.SWITCH_TICKS;
-            if(!longVisible&&ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec()!=null)ticks=Math.min(ticks,5F);
+            if(!longVisible&&combatVisible)ticks=Math.min(ticks,5F);
             double onset=longVisible?morph.started()+WeaponMorphTiming.onset(form):now;
             observed.timeline.retarget(form,now,onset,ticks,longVisible);
             if(longVisible)observed.lastLong=morph.started();
@@ -85,7 +87,7 @@ public final class WeaponMorphTracker {
         var weights=timeline.weights(now);var parts=new ArrayList<Part>(3);
         for(var candidate:PowerForm.values())if(WeaponMorphTiming.weapon(candidate)&&weights[candidate.ordinal()]>.00001F)
             parts.add(new Part(candidate,new BiomassSurface.Frame(weights[candidate.ordinal()],phase,flow,candidate!=form)));
-        return new Sample(timeline.from(),form,phase,flow,timeline.transitioning(now),timeline.longTransform(),List.copyOf(parts),now);
+        return new Sample(timeline.from(),form,phase,flow,timeline.transitioning(now),timeline.longTransform(),List.copyOf(parts),weights[PowerForm.BACKSPINES.ordinal()],now);
     }
     @SubscribeEvent public static void tick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
