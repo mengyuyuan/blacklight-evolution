@@ -111,7 +111,10 @@ public final class ConsumedMobVisuals {
         }
     }
     private static void vertex(PoseStack stack, VertexConsumer out, int light, Vec3 p, Vec3 n, int color) {
-        out.addVertex(stack.last(), (float)p.x, (float)p.y, (float)p.z).setColor(color).setUv(.5F,.5F)
+        vertex(stack,out,light,p,n,color,.5F,.5F);
+    }
+    public static void vertex(PoseStack stack, VertexConsumer out, int light, Vec3 p, Vec3 n, int color,float u,float v) {
+        out.addVertex(stack.last(), (float)p.x, (float)p.y, (float)p.z).setColor(color).setUv(u,v)
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(stack.last(),(float)n.x,(float)n.y,(float)n.z);
     }
 }

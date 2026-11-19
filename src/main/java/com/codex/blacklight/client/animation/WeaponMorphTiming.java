@@ -19,6 +19,9 @@ public final class WeaponMorphTiming {
         return form==PowerForm.CLAWS||form==PowerForm.BLADE||form==PowerForm.HAMMERFISTS
                 ||form==PowerForm.MUSCLE_MASS||form==PowerForm.WHIPFIST;
     }
+    public static boolean hasMorph(PowerForm form) {
+        return weapon(form)||form==PowerForm.BACKSPINES;
+    }
     public static boolean arm(PowerForm form,boolean left) {
         return weapon(form)&&(!left||form==PowerForm.CLAWS||form==PowerForm.HAMMERFISTS||form==PowerForm.MUSCLE_MASS);
     }

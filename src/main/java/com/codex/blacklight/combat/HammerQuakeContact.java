@@ -25,6 +25,10 @@ public final class HammerQuakeContact {
         HammerGroundPose.quake(p,pose,move.id,seconds,feet,yaw,WeaponAttackScales.sample(move.id,seconds,false),WeaponAttackScales.sample(move.id,seconds,true));
         return pose;
     }
+    /** Find the solid top face touched by the landed combo's enlarged right fist. */
+    public static BlockHitResult comboLanding(ServerPlayer p,WeaponMove move,float seconds,float yaw){
+        return projectedContact(p,move,seconds,p.position(),yaw,null);
+    }
     private static BlockHitResult projectedContact(ServerPlayer p,WeaponMove move,float seconds,Vec3 feet,float yaw,BlockHitResult requested){
         var pose=projectedPose(p,move,seconds,feet,yaw);
         var world=new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).scale(.9375F*p.getScale());
@@ -33,10 +37,10 @@ public final class HammerQuakeContact {
             var point=world.transformPosition(local);var at=feet.add(point.x,point.y,point.z);
             // The solver stops just above the face. This small contact skin does
             // not allow a fist hovering over a ledge to emit a remote ground hit.
-            if(Math.abs(at.y-requested.getLocation().y)>.065)continue;
+            if(requested!=null&&Math.abs(at.y-requested.getLocation().y)>.065)continue;
             var hit=p.level().clip(new ClipContext(at.add(0,.035,0),at.add(0,-.065,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
             if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=Direction.UP||hit.isInside())continue;
-            double distance=hit.getLocation().distanceToSqr(requested.getLocation());
+            double distance=hit.getLocation().distanceToSqr(requested==null?at:requested.getLocation());
             if(distance<nearest){nearest=distance;result=hit;}
         }
         return result;

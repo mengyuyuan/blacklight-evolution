@@ -56,9 +56,9 @@ public final class AdaptiveRagdoll {
             new ArrayBlockingQueue<>(32),r->{var t=new Thread(r,"blacklight-cut-geometry");t.setDaemon(true);return t;});
     private record Pending(List<RagdollImpactPayload> hits,long at) {}
     private record History(double time,Map<Object,Node> nodes) {}
-    private record Node(Object key,Object parent,Vec3 pivot,Quaternionf rotation,int region) {}
+    record Node(Object key,Object parent,Vec3 pivot,Quaternionf rotation,int region) {}
     private AdaptiveRagdoll() {}
-    public static void invalidateModels(){PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();}
+    public static void invalidateModels(){PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();}
     /** Preserve a small terrain accommodation when the native renderer takes over,
      * then settle smoothly to that renderer's own pose. Never move gameplay state. */
     public static Vec3 recoveryOffset(LivingEntity entity,float partial){
@@ -93,7 +93,7 @@ public final class AdaptiveRagdoll {
     }
     private static void reset(){
         var level=Minecraft.getInstance().level;
-        if(scene!=level){scene=level;PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();}
+        if(scene!=level){scene=level;PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();}
     }
     private static void releaseNativeBoss(LivingEntity e){
         BODIES.remove(e);PENDING.remove(e);RELEASES.remove(e);COOLDOWN.remove(e);
@@ -117,6 +117,7 @@ public final class AdaptiveRagdoll {
     }
     public static void accept(LivingEntity e,RagdollImpactPayload hit){
         reset();if(scene==null||!supports(e)||e.isInvisible())return;
+        var quill=QuillWounds.accept(e,hit);
         if(com.codex.blacklight.combat.NativeBossBodyControl.ownsPose(e)){
             releaseNativeBoss(e);
             if(hit.fatal())NATIVE_FATAL.computeIfAbsent(e,key->new RagdollFatalHandoff()).add(hit);
@@ -126,7 +127,7 @@ public final class AdaptiveRagdoll {
         RELEASES.remove(e);
         if(com.codex.blacklight.combat.FlyerPhysics.ownsLive(e))return;
         var body=BODIES.get(e);
-        if(body!=null)body.receive(hit);
+        if(body!=null){if(quill!=null)body.strikeQuill(quill);body.receive(hit);}
         else if(RagdollDrive.fullImpact(hit)){
             var pending=PENDING.get(e);
             if(pending!=null){if(pending.hits.size()<8)pending.hits.add(hit);}
@@ -149,7 +150,7 @@ public final class AdaptiveRagdoll {
         }
         var player=Minecraft.getInstance().player;
         if(player==null||player.distanceToSqr(e)>64*64)return null;
-        return new Frame(e,stack,buffers,partial,active(e));
+        return new Frame(e,stack,buffers,partial,active(e)||!COOLDOWN.containsKey(e)&&QuillWounds.has(e));
     }
     static void consumeBlades(LivingEntity actor,com.codex.blacklight.power.PowerForm form,Map<String,List<Vec3>> edges,float partial){
         for(var body:BODIES.values()){
@@ -309,6 +310,16 @@ public final class AdaptiveRagdoll {
                 if(!overflow&&!vertices.isEmpty()){
                     for(var v:untouched)v.emit(output.getBuffer(v.type),v.p,v.n,v.color,v.overlay,v.light);
                     var body=BODIES.get(entity);
+                    if(body==null&&QuillWounds.has(entity)){
+                        vertices=QuillWounds.decorate(entity,vertices,nodes,partial);
+                        if(!active(entity)){
+                            var normal=new Matrix3f(inverseNormal).invert();
+                            for(var v:vertices)v.emit(output.getBuffer(v.type),transform(entry,v.p.subtract(origin)),
+                                    vec(normal.transform(v.n.toVector3f())).normalize(),v.color,v.overlay,v.light);
+                            if(history==null||time-history.time>.05)HISTORY.put(entity,new History(time,new LinkedHashMap<>(nodes)));
+                            return;
+                        }
+                    }
                     if(body==null){
                         var pending=PENDING.remove(entity);
                         body=new Body(entity,vertices,nodes,parents,history,partial,pending==null?null:pending.hits.getFirst());
@@ -336,7 +347,7 @@ public final class AdaptiveRagdoll {
         }
     }
 
-    private static final class Vertex {
+    static final class Vertex {
         final Object key;final RenderType type;final Vec3 p,n;final float u,v;final int color,overlay,light;
         Vertex(Object key,RenderType type,Vec3 p,Vec3 n,float u,float v,int color,int overlay,int light){
             this.key=key;this.type=type;this.p=p;this.n=n;this.u=u;this.v=v;this.color=color;this.overlay=overlay;this.light=light;
@@ -895,6 +906,24 @@ public final class AdaptiveRagdoll {
         Vec3 sectionPosition(Part part,Vec3 point,Map<Part,RagdollPoseHistory.Pose> poses){
             var pose=poses.get(part);return pose==null?point:pose.position().add(rotate(point.subtract(part.center).scale(pose.scale()),pose.rotation()));
         }
+        void strikeQuill(QuillWounds.Mark mark){
+            var connected=connectedPose(1).positions();
+            var pose=new IdentityHashMap<Object,Node>();var skin=new ArrayList<Vertex>();
+            for(int i=0;i<parts.size();i++){
+                var p=parts.get(i);var at=connected[i];
+                pose.put(p,new Node(p,null,at,p.rotation,p.bind.region));
+                for(var v:p.mesh)skin.add(v.world(p,at.add(rotate(v.p.subtract(p.center).scale(p.scale),p.rotation)),rotate(v.n,p.rotation)));
+            }
+            var changed=QuillWounds.fresh(entity,skin,pose,mark);
+            if(!(mark.key instanceof Part struck)||struck.scale<.001)return;
+            // A live body may recover onto its native rig after this physical skin is baked.
+            mark.key=null;
+            var at=pose.get(struck).pivot;var inv=new Quaternionf(struck.rotation).conjugate();
+            struck.mesh.clear();
+            for(var v:changed)if(v.key==struck)struck.mesh.add(v.world(struck.key,
+                    struck.center.add(rotate(v.p.subtract(at),inv).scale(1/struck.scale)),rotate(v.n,inv)));
+            struck.meshRevision++;
+        }
         void receive(RagdollImpactPayload hit){
             int before=appliedCuts;
             if(hit.sharp()&&hit.severMask()!=0)cut(hit);
@@ -1213,6 +1242,26 @@ public final class AdaptiveRagdoll {
             }
         }
         FatalWeaponImpact fatalImpact;
+        Vec3 quillRollAxis=Vec3.ZERO,quillLocalUp=Vec3.ZERO;
+        long quillRollUntil;
+        // Four planted feet can dissipate the initial impulse in the first solver step.
+        // Transfer the remainder of a lethal quill's angular impulse across the connected rig.
+        void rollAfterQuill(long now){
+            if(now>quillRollUntil||quillRollAxis.lengthSqr()<.5)return;
+            if(rotate(quillLocalUp,root.rotation).y<.28){quillRollAxis=Vec3.ZERO;return;}
+            double speed=Math.min(.50,.13*(quillRollUntil-now+1));
+            for(var p:parts){
+                p.still=0;
+                Vec3 axis=localAngularImpulse(quillRollAxis,p.rotation);
+                double shortfall=Math.max(0,speed-vec(p.spin).dot(axis));
+                p.spin.add(axis.scale(Math.min(.28,shortfall)).toVector3f());
+                Vec3 tangent=quillRollAxis.cross(p.pos.subtract(root.pos));
+                if(tangent.lengthSqr()>.001){
+                    double current=p.velocity.subtract(root.velocity).dot(tangent)/tangent.lengthSqr();
+                    p.velocity=p.velocity.add(RagdollDrive.limit(tangent.scale(Math.max(0,speed-current)),.19));
+                }
+            }
+        }
         boolean landingPlayed;
         void landing(Part part) {
             if (landingPlayed || fatalImpact==null || part.landingSpeed<.32 || part.half.length()<.14) return;
@@ -1263,8 +1312,10 @@ public final class AdaptiveRagdoll {
             if((hit.fatal()||entity.isDeadOrDying()||hit.severMask()!=0)&&deadAt<0)deadAt=now;
             Vec3 velocity=new Vec3(hit.vx(),hit.vy(),hit.vz());var frame=RagdollDrive.frame(entity,1);
             var style=hit.fatal()&&!hit.refinement()&&fatalImpact==null?FatalWeaponImpact.fromMotion(hit.motion()):null;
-            double transfer=style!=null?style.bodyTransfer:soft?.12:.26;
-            Vec3 roll=Vec3.ZERO;
+            boolean throughBody=hit.fatal()&&hit.motion()==com.codex.blacklight.combat.QuillImpact.HEAVY;
+            double transfer=style!=null?style.bodyTransfer:throughBody?.63:soft?.12:.26;
+            double turn=style!=null?style.turn:throughBody?.52:0;
+            var roll=new Vec3(velocity.z,0,-velocity.x).normalize().scale(turn*Math.min(1,velocity.length()));
             if (style!=null) {
                 Vec3 hinge=new Vec3(velocity.z,0,-velocity.x).normalize();
                 if (style==FatalWeaponImpact.WHIP) {
@@ -1280,10 +1331,15 @@ public final class AdaptiveRagdoll {
                 }
                 roll=hinge.scale(style.turn*Math.min(1,velocity.length()));
             }
+            if(throughBody&&velocity.horizontalDistanceSqr()>.001){
+                quillRollAxis=roll.normalize();
+                quillLocalUp=rotate(new Vec3(0,1,0),new Quaternionf(root.rotation).conjugate());
+                quillRollUntil=scene.getGameTime()+10;
+            }
             for(var p:parts){
                 p.still=0;
                 p.velocity=p.velocity.add(velocity.scale(transfer));
-                if(style!=null){
+                if(turn>0){
                     // Start the connected skeleton rolling as one body, before constraints run.
                     p.velocity=p.velocity.add(RagdollDrive.limit(roll.cross(p.pos.subtract(root.pos)),.6));
                     p.spin.add(localAngularImpulse(roll,p.rotation).toVector3f());
@@ -1326,6 +1382,7 @@ public final class AdaptiveRagdoll {
             // A hit captured after this tick first simulates at now + 1. Include
             // the deadline so a one-tick hitstop actually holds one physics step.
             if(now<=freezeUntil){for(var p:parts)p.floorContact();recordPoses(now);return;}
+            if(dead&&!captured)rollAfterQuill(now);
             if(dead&&!captured&&parts.stream().allMatch(p->p.still>=RagdollConstraintMotion.SLEEP_STEPS)){
                 var supported=supportedParts();boolean asleep=true;
                 for(int i=0;i<parts.size();i++)if(!supported[i]){parts.get(i).still=0;asleep=false;}

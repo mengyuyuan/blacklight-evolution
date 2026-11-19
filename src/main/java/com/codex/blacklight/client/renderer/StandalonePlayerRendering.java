@@ -34,6 +34,8 @@ public final class StandalonePlayerRendering {
         if(com.codex.blacklight.power.BiomassSystem.active(player)){event.setCanceled(true);return;}
         var form=player.getData(ModAttachments.PLAYER_STATE).getActivePower();
         var morph=WeaponMorphTracker.sample(player,event.getPartialTick());
+        if(morph.shoulder()>.001F&&event.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND)
+            com.codex.blacklight.client.renderer.layer.BackspineRack.firstPerson(player,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight(),event.getPartialTick(),morph);
         boolean biological=com.codex.blacklight.client.animation.WeaponMorphTiming.weapon(form)||morph.visible(false)||morph.visible(true);
         boolean armored=UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,event.getPartialTick())>0;
         boolean shielded=UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,event.getPartialTick())>0;

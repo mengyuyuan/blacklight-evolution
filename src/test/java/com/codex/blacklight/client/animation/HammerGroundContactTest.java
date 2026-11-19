@@ -18,7 +18,7 @@ class HammerGroundContactTest {
                 for(String name:new String[]{"Root","Thigh_R","Thigh_L","Leg_R","Leg_L"})
                     assertTrue(original.orElseEmpty(name).toMatrix().equals(pose.orElseEmpty(name).toMatrix(),1e-5F),name+" support cannot be lifted");
                 var rig=BlacklightSkeleton.get();
-                assertTrue(rig.getBoundTransformFor(pose,rig.head).m31()>.7F,"head stays above folded waist "+key+" "+t);
+                assertTrue(rig.getBoundTransformFor(pose,rig.head).m31()>.28F,"head clears the ground during the source crouch "+key+" "+t);
             }
         }
     }

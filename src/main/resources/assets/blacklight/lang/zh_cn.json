@@ -1118,5 +1118,16 @@
   "tooltip.blacklight.helicopter_70mm_rocket": "主手持弹药，右键已落地停稳的玩家直升机（启动旋翼时也可装填）：每件装入1枚火箭弹，左右弹舱各75枚。",
   "message.blacklight.helicopter_place_clear_pad": "需要已加载、干燥平坦且机身和旋翼无阻挡的空地（约15×15）。点击停机位尾端，飞机向前展开。",
   "message.blacklight.helicopter_supply_grounded": "请靠近玩家拥有的直升机，在干燥地面落地停稳后补弹；旋翼启动时也可装填。",
-  "message.blacklight.helicopter_supply_full": "对应直升机弹仓已满，未消耗弹药。"
+  "message.blacklight.helicopter_supply_full": "对应直升机弹仓已满，未消耗弹药。",
+  "power.blacklight.backspines": "肩胛棘刺",
+  "upgrade.blacklight.backspines": "肩胛棘刺",
+  "entity.blacklight.backspine_quill": "飞镰",
+  "upgrade.blacklight.backspines.desc": "肩部生长棘刺，可远程连射。",
+  "screen.blacklight.wheel.backspines": "交替射刺 · 蓄力齐射",
+  "tutorial.blacklight.backspines.steps": "左右肩逐发交替，连点三下踏步直射，按住攻击键以低、高双发收尾。地面点按使用键打出双肩两段重击，按住蓄满后双肩同时齐射。第一段轻击接回身砸，第二段轻击接横扫贯穿。空中点按使用键向前扇射三刺。长按时沿跳跃弧线蓄力，肩部血管亮红搏动，松手齐射五刺并向前翻身。地面和空中均可移动、转身瞄准。",
+  "tutorial.blacklight.backspines.controls": "%1$s 连射 · %2$s 重掷",
+  "subtitle.blacklight.weapon.backspines.morph": "肩背筋膜展开",
+  "subtitle.blacklight.weapon.backspines.draw": "肩刺绷紧",
+  "subtitle.blacklight.weapon.backspines.swing": "肩刺弹射",
+  "subtitle.blacklight.weapon.backspines.heavy": "重刺破空"
 }

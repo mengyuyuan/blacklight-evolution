@@ -29,7 +29,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
     private Matrix3f[] skinNormals;
     private boolean rightBiological,leftBiological;
     private AbstractClientPlayer renderedPlayer;
-    private float renderPartial;
+    private float renderPartial,footSkinWeight;
     private final Vector3f vertexPoint=new Vector3f(), vertexOther=new Vector3f(), vertexPosition=new Vector3f(), vertexNormal=new Vector3f(), vertexFirstNormal=new Vector3f();
     public BlacklightPlayerModel(ModelPart root, boolean slim) {
         super(root, slim);
@@ -70,6 +70,18 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         resetNativeVisibility(player);
         float partial=renderPartial;
         pose(BlacklightRenderPose.sample(player,partial));
+        footSkinWeight=0;
+        if(player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES)
+            footSkinWeight=com.codex.blacklight.client.renderer.RoofPerformance.projectPlayer(player,partial,matrices);
+        else if(player.onGround()){
+            var attack=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
+            if(com.codex.blacklight.combat.HammerQuakeContact.owns(attack.spec())){
+                var clock=com.codex.blacklight.animation.WeaponMotionClock.sample(attack,player.level().getGameTime()+(double)partial);
+                if(clock!=null)footSkinWeight=attack.charging()
+                        ?net.minecraft.util.Mth.clamp(clock.seconds()/.06F,0,1)
+                        :net.minecraft.util.Mth.clamp((1.36F-clock.seconds())/.045F,0,1);
+            }
+        }
         mercerFrame=MercerPlayerMesh.active(player)?MercerPlayerMesh.get().sample(player,partial,matrices):null;
         var ysmFrame=com.codex.blacklight.client.compat.YsmAppearanceBridge.frame(player);
         if(ysmFrame!=null)mercerFrame=ysmFrame;
@@ -210,6 +222,11 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         // Clothing inflation uses the base skin's weight, keeping copied layers attached.
         float modelY=piece.y+Math.clamp(p.y*16-piece.y,piece.from,piece.to);
         var weight=BlacklightSkinWeights.sample(piece.anatomy,modelY,piece.bone.equals("neck"));
+        if(footSkinWeight>0&&modelY>21&&(piece.anatomy==ConsumeAnatomy.RIGHT_LEG||piece.anatomy==ConsumeAnatomy.LEFT_LEG)){
+            String side=piece.anatomy==ConsumeAnatomy.RIGHT_LEG?"_R":"_L";
+            float w=net.minecraft.util.Mth.clamp((modelY-21)/2,0,1);
+            weight=new BlacklightSkinWeights.Blend("Leg"+side,"Knee"+side,w*w*(3-2*w)*footSkinWeight);
+        }
         var skeleton=PlayerMotionController.skeleton();
         int first=skeleton.searchJointByName(weight.first()).getId(),second=skeleton.searchJointByName(weight.second()).getId();
         p.set(-p.x,1.501F-p.y,p.z);
