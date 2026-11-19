@@ -39,6 +39,15 @@
           ]
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "blacklight:convoy_manifest"
+        }
+      ]
     }
   ]
 }

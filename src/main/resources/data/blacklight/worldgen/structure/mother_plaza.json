@@ -1,0 +1,6 @@
+{
+  "type": "blacklight:mother_plaza",
+  "biomes": "blacklight:city",
+  "step": "surface_structures",
+  "spawn_overrides": {}
+}

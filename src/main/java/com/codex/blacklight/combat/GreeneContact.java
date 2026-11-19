@@ -47,5 +47,42 @@ public final class GreeneContact {
             result.add(new HydraContact.Region(bone,boxes,bounds));
         }return List.copyOf(result);
     }
+
+    /** Aim into a visible patch of the requested Slug. A nearest corner can
+     * graze past its skin, or sit behind the Mother's own plated torso. */
+    static Vec3 focus(List<HydraContact.Region> skin,int slot,net.minecraft.world.entity.player.Player player,double range){
+        var limb=skin.get(slot);
+        var eye=player.getEyePosition();
+        var boxes=new ArrayList<>(limb.boxes());
+        boxes.sort(Comparator.comparingDouble(b->b.nearest(eye).distanceToSqr(eye)));
+        Vec3 best=null;
+        double limit=range*range+1e-6;
+        for(var box:boxes){
+            var near=box.nearest(eye);
+            if(near.distanceToSqr(eye)>limit)break;
+            // Use the closest reachable visible surface for both lock and reach.
+            // Moving a little inside the patch also avoids a tangent-only pick.
+            var hit=visiblePatch(skin,limb,player,eye,near.lerp(box.center,.12));
+            if(hit==null)hit=visiblePatch(skin,limb,player,eye,box.center);
+            if(hit!=null&&eye.distanceToSqr(hit)<=limit){
+                best=hit;limit=eye.distanceToSqr(hit);continue;
+            }
+            for(var corner:box.points){
+                hit=visiblePatch(skin,limb,player,eye,corner.lerp(box.center,.18));
+                if(hit!=null&&eye.distanceToSqr(hit)<=limit){
+                    best=hit;limit=eye.distanceToSqr(hit);
+                }
+            }
+        }
+        return best;
+    }
+    private static Vec3 visiblePatch(List<HydraContact.Region> skin,HydraContact.Region limb,
+                                     net.minecraft.world.entity.player.Player player,Vec3 eye,Vec3 inside){
+        var hit=HydraHurtContact.ray(skin,eye,inside,com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
+        if(hit==null||!hit.bone().equals(limb.bone())||!CombatTargeting.clearRay(player,eye,hit.point()))return null;
+        // Inside the moving arm, its first contact is exactly the player's eye.
+        // Keep a forward direction for the crosshair, reach ray and weapon arc.
+        return hit.point().distanceToSqr(eye)<1e-10?inside:hit.point();
+    }
     private GreeneContact(){}
 }

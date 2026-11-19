@@ -38,7 +38,8 @@ public final class ClientWeaponCombat {
         var mc=Minecraft.getInstance();if(mc.player==null||mc.screen!=null||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(mc.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(mc.player))return false;
         var state=mc.player.getData(ModAttachments.PLAYER_STATE);
         return !com.codex.blacklight.city.HydraTransport.active(mc.player)&&new PersonalCombatInput(state.isInfected(),state.isPrototypeMode(),state.getActivePower(),
-                mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty(),mc.player.getData(ModAttachments.CONSUMING),VehicleControls.ownsInput()).active();
+                mc.player.getMainHandItem().isEmpty()&&mc.player.getOffhandItem().isEmpty(),mc.player.getData(ModAttachments.CONSUMING),
+                VehicleControls.ownsInput() || SkillBindings.down(mc.options.keyUse) && ClientClawEvents.aimsAtConsole(mc)).active();
     }
     public static void poll(){
         if(fixtureOwnsInput)return;

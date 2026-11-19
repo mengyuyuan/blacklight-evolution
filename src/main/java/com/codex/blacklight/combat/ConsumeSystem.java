@@ -653,7 +653,10 @@ public final class ConsumeSystem {
             if(hunter.parasite())com.codex.blacklight.power.ParasiteSystem.consumedInfectedHunter(player);
             hunter.beginConsumeRemains();
         }
-        else target.discard();
+        else {
+            if(target instanceof com.codex.blacklight.world.GreeneHost host) host.absorbedBy(player);
+            target.discard();
+        }
         // Locomotion owns the base layer; the client samples the remaining source
         // pose independently, even after the receiver entity has disappeared.
         play(player,PlayerAction.CLAW_IDLE);
