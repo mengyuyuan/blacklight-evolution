@@ -107,7 +107,7 @@ public final class PrototypeMovementSystem {
             // Recovery frames yield to an explicit dodge: the move's contacts are spent.
             WeaponCombatSystem.cancel(player);
         }
-        if (WeaponCombatSystem.busy(player)) {
+        if (WeaponCombatSystem.busy(player)&&!com.codex.blacklight.combat.BackspineCombat.busy(player)) {
             movement.jumpInput().cancelPendingCharge();
             WeaponCombatSystem.movementInput(player, jumpHeld && !wasJumpHeld);
             // Keep current movement intent for after the action, but do not queue
@@ -140,8 +140,10 @@ public final class PrototypeMovementSystem {
                 player.setDeltaMovement(0,player.getDeltaMovement().y,0);
                 player.hurtMarked=true;
             }
-            play(player, PlayerAction.CHARGED_JUMP);
-            PacketDistributor.sendToPlayer(player, new ClawAnimationPayload(ClawAnimationPayload.Animation.CHARGED_JUMP));
+            if(!com.codex.blacklight.combat.BackspineCombat.busy(player)){
+                play(player, PlayerAction.CHARGED_JUMP);
+                PacketDistributor.sendToPlayer(player, new ClawAnimationPayload(ClawAnimationPayload.Animation.CHARGED_JUMP));
+            }
         }
         syncCharge(player,movement.chargeTicks());
         BlacklightNeoMod.LOGGER.debug("Started charged jump for {}",
@@ -210,13 +212,15 @@ public final class PrototypeMovementSystem {
         LandingImpact.Observation landing = movement.observeLanding(
                 player.onGround(), player.getDeltaMovement().y, player.getY());
         if (WeaponCombatSystem.busy(player)) {
+            boolean canJump=com.codex.blacklight.combat.BackspineCombat.busy(player);
             movement.cancelHop();
-            movement.jumpInput().cancelPendingCharge();
+            if(canJump)tickChargedJump(player,movement);
+            else movement.jumpInput().cancelPendingCharge();
             // Weapon actions own their Coord (or their explicit airborne velocity).
             // Consume landing/input edges without a delayed jump, air dash, landing
             // animation, sprint impulse or wall attachment stealing that ownership.
             if (player.onGround()) movement.land();
-            if (movement.chargeTicks() > 0) {
+            if (!canJump&&movement.chargeTicks() > 0) {
                 movement.cancelCharge();
                 unpauseServerAnimator(player);
             }
@@ -227,7 +231,7 @@ public final class PrototypeMovementSystem {
             movement.setRunningAnimation(false);
             movement.updateSprintCollision(false);
             movement.wallTraversal().reset();
-            syncCharge(player,0);
+            if(!canJump)syncCharge(player,0);
             syncWallMotion(player, movement.wallTraversal());
             movement.finishInputTick();
             return;
@@ -804,7 +808,7 @@ public final class PrototypeMovementSystem {
 
     /** Releases a charge pose through the selected presentation engine. */
     private static void unpauseServerAnimator(ServerPlayer player) {
-        PlayerActions.get().resume(player);
+        if(!player.getData(ModAttachments.PLAYER_ACTION).clipId().startsWith("spines_"))PlayerActions.get().resume(player);
     }
 
     /** Draws two animated biological helices around the legs while maximum charge is held. */
@@ -831,6 +835,8 @@ public final class PrototypeMovementSystem {
     private static void play(ServerPlayer player,
                              PlayerAction animation) {
         if (animation == null) return;
+        if((animation==PlayerAction.JUMP_RISE||animation==PlayerAction.JUMP_FALL)
+                &&com.codex.blacklight.combat.BackspineCombat.busy(player))return;
         PlayerActions.get().play(player, animation, 0.08F);
     }
 }

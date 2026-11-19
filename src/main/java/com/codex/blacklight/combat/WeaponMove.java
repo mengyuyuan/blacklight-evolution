@@ -103,7 +103,7 @@ public enum WeaponMove {
     }
     public static WeaponMove byId(int id){return id<0||id>=values().length?null:values()[id];}
     public static boolean supports(PowerForm form){return form==PowerForm.NONE||form==PowerForm.CLAWS||form==PowerForm.BLADE||form==PowerForm.HAMMERFISTS||form==PowerForm.WHIPFIST||form==PowerForm.MUSCLE_MASS;}
-    public static boolean controls(PowerForm form,boolean emptyHands){return supports(form)&&(form!=PowerForm.NONE||emptyHands);}
+    public static boolean controls(PowerForm form,boolean emptyHands){return form==PowerForm.BACKSPINES||supports(form)&&(form!=PowerForm.NONE||emptyHands);}
     public float damageFor(PowerForm active){return damage*(active==PowerForm.NONE?.65F:active==PowerForm.MUSCLE_MASS&&shared()&&!id.startsWith("dev_")&&this!=BULLETDIVE_DROP?2F:1F);}
     public enum Input { ATTACK, SPECIAL, GROUND_POUND, CLAP, PAIN;
         public boolean chord(){return this!=ATTACK&&this!=SPECIAL;}
@@ -112,6 +112,7 @@ public enum WeaponMove {
     public boolean accepts(PowerForm active){return form==active||shared()&&supports(active)||active==PowerForm.NONE&&form==PowerForm.MUSCLE_MASS;}
     public boolean aerial(){return name().startsWith("AIR_")||name().startsWith("DEV_AIR_")||this==BULLETDIVE_DROP||this==CLAW_POUNCE||this==BLADE_DIVE||this==HAMMER_DROP||uncharged()==WHIP_AIR||this==MUSCLE_AIR||this==HAMMER_RAM||uncharged()==HAMMER_COMBO_SPECIAL;}
     public boolean airCombo(){return this==AIR_AUTO1||this==AIR_AUTO2||this==AIR_AUTO3||this==AIR_AUTO4;}
+    public boolean hammerComboSlam(){return this==HAMMER_COMBO_SPECIAL||this==HAMMER_COMBO_SPECIAL_CHARGED;}
     public boolean landingAttack(){return this==BLADE_DIVE||this==HAMMER_DROP||this==HAMMER_RAM||this==AIR_GROUND_POUND||uncharged()==HAMMER_COMBO_SPECIAL;}
     public boolean closeSweeper(){return uncharged()==WHIP_SWEEP;}
     public int sweeperPulse(int tick){return !closeSweeper()||tick<start||tick>=end?-1:Math.min(8,(tick-start)*9/Math.max(1,end-start));}

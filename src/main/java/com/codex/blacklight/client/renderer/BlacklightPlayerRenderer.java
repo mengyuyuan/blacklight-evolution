@@ -6,6 +6,7 @@ import com.codex.blacklight.client.renderer.layer.UtilityPowerLayer;
 import com.codex.blacklight.client.PrototypeAnimationController;
 import com.codex.blacklight.client.animation.NativeConsumePose;
 import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.power.PowerForm;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -96,12 +97,12 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             var matrices=com.codex.blacklight.animation.PlayerMotionController.skeleton().getPoseMatrices(pose);
             var frame=new org.joml.Matrix4f(com.mojang.blaze3d.systems.RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
             var side=left?com.codex.blacklight.client.tuning.ClawTransformSettings.HandSide.LEFT:com.codex.blacklight.client.tuning.ClawTransformSettings.HandSide.RIGHT;
-            var hammer=HammerScaleRenderer.sample(player,partial)[left?1:0];
+            var hammer=WeaponScaleRenderer.sample(player,partial)[left?1:0];
             var view=com.codex.blacklight.client.animation.FirstPersonPose.convertArm(matrices,form,plated,false,
                     com.codex.blacklight.client.animation.NativeShieldGrip.matrix(player,partial),
                     (float)com.codex.blacklight.client.tuning.ClawTransformSettings.limbWidth(side),
                     (float)com.codex.blacklight.client.tuning.ClawTransformSettings.talonLength(side),
-                    com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix(),frame,Math.max(1,Math.max(hammer.fist(),hammer.forearm())),left,
+                    com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix(),frame,form==PowerForm.HAMMERFISTS?hammer.maximumScale():1F,left,
                     morph.parts().stream().map(WeaponMorphTracker.Part::form).toList(),.045F*morph.flow());
             VIEWS.put(player,new RenderedView(view,player.level().getGameTime()+partial));
             biological.renderFirstPerson(player,stack,buffers,light,view.matrices(),partial,left?1:0);

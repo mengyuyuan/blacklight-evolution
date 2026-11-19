@@ -1726,5 +1726,32 @@
     "sounds": [
       "blacklight:hydra/death_debris_loop"
     ]
+  },
+  "weapon.backspines.morph": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.morph",
+    "sounds": [
+      {
+        "name": "blacklight:weapon.claws.morph",
+        "type": "event"
+      }
+    ]
+  },
+  "weapon.backspines.draw": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.draw",
+    "sounds": [
+      "blacklight:weapon/backspines/draw"
+    ]
+  },
+  "weapon.backspines.swing": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.swing",
+    "sounds": [
+      "blacklight:weapon/backspines/swing"
+    ]
+  },
+  "weapon.backspines.heavy": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.heavy",
+    "sounds": [
+      "blacklight:weapon/backspines/heavy"
+    ]
   }
 }

@@ -13,6 +13,13 @@
     "source": "native model motion / mechanic diagram",
     "sha256": "3e7598f4f3c6bb4d5cb278122e011bf53e7378003d4a3e023a9573eb1c47a5f1"
   },
+  "backspines": {
+    "file": "backspines.gif",
+    "frames": 69,
+    "duration_ms": 3450,
+    "source": "native game capture / alternating and charged shoulder quills",
+    "sha256": "142651ffaa4604b81aba654547304f61814ff7eec01929eb59961761afe377f7"
+  },
   "barrage": {
     "file": "barrage.gif",
     "frames": 95,

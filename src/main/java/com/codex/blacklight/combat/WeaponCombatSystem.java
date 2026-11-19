@@ -54,7 +54,7 @@ public final class WeaponCombatSystem {
         var s=ACTIVE.get(p);if(s==null||!s.move.groundSpike()||s.charging||s.traveling)return false;
         int age=p.tickCount-s.started;return age>=0&&age<s.move.start&&p.tickCount-s.created<=s.move.start+2;
     }
-    public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p);}
+    public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p)||BackspineCombat.busy(p);}
     public static boolean active(ServerPlayer p){return ACTIVE.containsKey(p);}
     /** Ticks since the current session was created, or -1 without one. */
     public static int sessionAge(ServerPlayer p){var s=ACTIVE.get(p);return s==null?-1:p.tickCount-s.created;}
@@ -73,7 +73,7 @@ public final class WeaponCombatSystem {
     public static void prepareFormSwitch(ServerPlayer p){
         cancel(p);BUTTONS.remove(p);
     }
-    public static boolean canSkillInterrupt(ServerPlayer p){var s=ACTIVE.get(p);return s==null||s.hit.isEmpty()&&(s.charging||p.tickCount-s.created<=2);}
+    public static boolean canSkillInterrupt(ServerPlayer p){if(BackspineCombat.busy(p))return false;var s=ACTIVE.get(p);return s==null||s.hit.isEmpty()&&(s.charging||p.tickCount-s.created<=2);}
     /** Physical traversal input remains available even while EF suppresses Input.jumping. */
     public static void movementInput(ServerPlayer p,boolean jumpPressed){
         var s=ACTIVE.get(p);
@@ -87,11 +87,12 @@ public final class WeaponCombatSystem {
         cancel(p);p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.22).add(0,.75,0));p.hurtMarked=true;
         if(queued!=null)beginInput(p,WeaponMove.choose(s.form,queued,true,false,false),queued,held);
     }
-    private static boolean canRequest(ServerPlayer p){
+    static boolean canRequest(ServerPlayer p){return canRequest(p,false);}
+    static boolean canRequest(ServerPlayer p,boolean allowJumpCharge){
         if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return false;
         if(DevastatorSystem.busy(p))return false;
         var state=p.getData(ModAttachments.PLAYER_STATE);var movement=p.getData(ModAttachments.MOVEMENT_STATE);
-        return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!p.getData(ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&movement.chargeTicks()==0;
+        return p.isAlive()&&!p.isSpectator()&&!p.isPassenger()&&state.isInfected()&&state.isPrototypeMode()&&WeaponMove.controls(state.getActivePower(),p.getMainHandItem().isEmpty()&&p.getOffhandItem().isEmpty())&&!p.getData(ModAttachments.CONSUMING)&&!movement.wallTraversal().attached()&&(allowJumpCharge||movement.chargeTicks()==0);
     }
     /** A hit/terrain callback may kill, transform, travel or replace the actor's
      * action synchronously. An old stack frame never owns the replacement. */
@@ -116,6 +117,7 @@ public final class WeaponCombatSystem {
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
         if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return;
+        if(!action&&!DevastatorSystem.busy(p)&&BackspineCombat.input(p,attack,special))return;
         if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
@@ -135,6 +137,7 @@ public final class WeaponCombatSystem {
         if(intent!=null&&keys.pressedSince(old.keys)&&!(old.keys.intent()!=null&&old.keys.intent().chord()))requestInternal(p,intent,true);
     }
     public static void cancelHeldInput(ServerPlayer p){
+        BackspineCombat.cancel(p);
         DevastatorSystem.cancel(p);
         BUTTONS.remove(p);
         var active=ACTIVE.get(p);if(active!=null&&active.charging)cancel(p);
@@ -264,6 +267,7 @@ public final class WeaponCombatSystem {
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event){
         if(!(event.getEntity() instanceof ServerPlayer p))return;
         if(com.codex.blacklight.city.HydraTransport.active(p)){cancel(p);cancelHeldInput(p);return;}
+        BackspineCombat.tick(p);
         if(p.onGround())AIR_HITS.remove(p);
         var s=ACTIVE.get(p);if(s==null)return;
         var state=p.getData(ModAttachments.PLAYER_STATE);
@@ -296,6 +300,10 @@ public final class WeaponCombatSystem {
                 p.setDeltaMovement(horizontal.x,Math.clamp(delta.y*.35,-.95,.7),horizontal.z);
             }else p.setDeltaMovement(v.x*.85,Math.max(v.y,-.04),v.z*.85);
             p.hurtMarked=true;
+        }
+        if(s.move.hammerComboSlam()){
+            var visual=p.getData(ModAttachments.WEAPON_VISUAL);
+            com.codex.blacklight.animation.NativeRootMotion.hammerComboStep(p,visual,s.yaw);
         }
         if(s.charging){
             if(s.move.aerial()&&!s.move.landingAttack()&&p.onGround()){cancel(p);return;}
@@ -351,6 +359,10 @@ public final class WeaponCombatSystem {
             var landing=LocalWeaponMotion.find(s.move.id).flatMap(LocalWeaponMotion.Definition::landing);
             float impact=landing.map(LocalWeaponMotion.Landing::impactTime).orElse(s.move.start/20f);
             int descent=LocalWeaponMotion.find(s.move.id).flatMap(LocalWeaponMotion.Definition::charge).map(c->Math.round(c.releaseTime()*20)+2).orElse(4);
+            // The P1 finisher lifts the legs and pelvis while Motion_Root stays level.
+            // On a floor, play that short hop once. Over a ledge, wait for actual landing.
+            boolean posedHop=s.move.hammerComboSlam();
+            if(posedHop)descent=(int)Math.ceil(impact*20);
             if(s.landed<0){
                 if(p.isInWater()||p.isInLava()||t>160){cancel(p);return;}
                 p.fallDistance=0;
@@ -369,17 +381,17 @@ public final class WeaponCombatSystem {
                     p.setDeltaMovement(s.direction.scale(s.travelSpeed).add(0,s.ballisticY,0));p.hurtMarked=true;
                     s.previousFeet=p.position();return;
                 }
-                if(!freeToss&&(s.move==WeaponMove.HAMMER_RAM||s.move.uncharged()==WeaponMove.HAMMER_COMBO_SPECIAL)&&!s.tookOff){
-                    s.tookOff=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(s.move==WeaponMove.HAMMER_RAM?.65:.18).add(0,.7,0));p.hurtMarked=true;
+                if(!freeToss&&s.move==WeaponMove.HAMMER_RAM&&!s.tookOff){
+                    s.tookOff=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.65).add(0,.7,0));p.hurtMarked=true;
                 }
-                if(t<descent&&!p.onGround()&&airTargetAvailable(p,s)){
+                if(!posedHop&&t<descent&&!p.onGround()&&airTargetAvailable(p,s)){
                     var delta=s.aimPoint(p).subtract(p.position()).multiply(1,0,1);double distance=delta.length();
                     var horizontal=distance>.001?delta.scale(Math.min(.8,distance*.3)/distance):Vec3.ZERO;
                     // Native blade/hammer anticipation is longer than a five-block fall.
                     // Keep approaching in the air until the authored downward strike starts.
                     p.setDeltaMovement(horizontal.x,Math.max(p.getDeltaMovement().y,-.06),horizontal.z);p.hurtMarked=true;
                 }
-                if(t>=descent&&!p.onGround()){
+                if(!posedHop&&t>=descent&&!p.onGround()){
                     double down=Math.min(1.6,.35+(t-descent)*CombatMotion.gravity(s.move));var horizontal=Vec3.ZERO;
                     if(CombatMotion.directionalDive(s.move)){
                         // The attack can cover ground without a victim. Preserve the
@@ -407,7 +419,14 @@ public final class WeaponCombatSystem {
             t=p.tickCount-s.started;
         }
         boolean physicalQuake=HammerQuakeContact.owns(s.move);
-        if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
+        if(s.move.hammerComboSlam()){
+            if(!s.groundEffect&&s.landed>=0&&t>=s.move.start&&t<s.move.end){
+                var definition=LocalWeaponMotion.find(s.move.id).orElseThrow();
+                float seconds=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t,s.clipOffset,definition.transitionSeconds());
+                var ground=HammerQuakeContact.comboLanding(p,s.move,seconds,s.yaw);
+                if(ground!=null)s.groundEffect=CombatImpactEffects.ground(p,s.move,ground);
+            }
+        }else if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
             s.groundEffect=true;CombatImpactEffects.ground(p,s.move,s.direction);
         }
         com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw);
@@ -617,7 +636,9 @@ public final class WeaponCombatSystem {
         if(!preciseOnly)CombatEnvironmentEffects.contact(p,s.move,tick,s.yaw,s.clipOffset,s.terrainContacts);
         if(!currentSession(p,s))return;
         boolean bodyFlight=s.mobilityStarted>=0&&!p.onGround()&&(CombatMotion.freeFlight(s.move)||s.move==WeaponMove.HAMMER_RAM);
-        if(s.move.quake()&&!p.onGround()&&!bodyFlight)return;
+        // Movement packets can briefly clear onGround after the finisher's fist hits a block.
+        boolean groundContact=s.move.hammerComboSlam()?s.groundEffect:p.onGround();
+        if(s.move.quake()&&!groundContact&&!bodyFlight)return;
         var direction=strikeDirection(s.move,s.yaw,tick);
         double arc=s.move.frenzy()?s.move.arc/2+18:s.move.form==com.codex.blacklight.power.PowerForm.WHIPFIST?s.move.arc/Math.max(1,s.move.end-s.move.start-1)+18:s.move.arc;
         var local=LocalWeaponMotion.find(s.move.id);
@@ -971,6 +992,7 @@ public final class WeaponCombatSystem {
         return false;
     }
     public static void cancel(ServerPlayer p){
+        BackspineCombat.cancel(p);
         DevastatorSystem.cancel(p);
         CHAINS.remove(p);
         finish(p);

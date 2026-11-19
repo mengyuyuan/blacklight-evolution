@@ -25,6 +25,39 @@ public final class HammerQuakeContact {
         HammerGroundPose.quake(p,pose,move.id,seconds,feet,yaw,WeaponAttackScales.sample(move.id,seconds,false),WeaponAttackScales.sample(move.id,seconds,true));
         return pose;
     }
+    private static final class StrikeReach {
+        static final double PLAIN=forwardReach(WeaponMove.HAMMER_QUAKE);
+        static final double CHARGED=forwardReach(WeaponMove.HAMMER_QUAKE_CHARGED);
+        private static double forwardReach(WeaponMove move){
+            var motion=LocalWeaponMotion.find(move.id).orElseThrow();
+            double reach=0;
+            for(int tick=move.start;tick<move.end;tick++){
+                float seconds=tick/20F-motion.transitionSeconds();
+                var pose=MotionLibrary.pose(move.id,seconds,false);
+                var shape=WeaponAttackScales.sample(move.id,seconds,false);
+                for(var vertex:HammerGroundPose.fist(pose,shape,false))
+                    reach=Math.max(reach,-vertex.z);
+            }
+            return reach*.9375;
+        }
+    }
+    /** Leave landing space for the enlarged fist when the authored stride approaches a wall. */
+    public static Vec3 limitWallAdvance(ServerPlayer player,WeaponMove move,Vec3 step,float yaw){
+        var forward=Vec3.directionFromRotation(0,yaw);
+        double advance=step.dot(forward);
+        if(advance<=0)return step;
+        double reach=(move==WeaponMove.HAMMER_QUAKE?StrikeReach.PLAIN:StrikeReach.CHARGED)*player.getScale();
+        var start=player.position().add(0,player.getBbHeight()*.8,0);
+        var hit=player.level().clip(new ClipContext(start,start.add(forward.scale(reach+advance)),
+                ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player));
+        if(hit.getType()!=HitResult.Type.BLOCK)return step;
+        double available=Math.max(0,start.distanceTo(hit.getLocation())-reach-.01);
+        return available>=advance?step:step.subtract(forward.scale(advance-available));
+    }
+    /** Find the solid top face touched by the landed combo's enlarged right fist. */
+    public static BlockHitResult comboLanding(ServerPlayer p,WeaponMove move,float seconds,float yaw){
+        return projectedContact(p,move,seconds,p.position(),yaw,null);
+    }
     private static BlockHitResult projectedContact(ServerPlayer p,WeaponMove move,float seconds,Vec3 feet,float yaw,BlockHitResult requested){
         var pose=projectedPose(p,move,seconds,feet,yaw);
         var world=new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).scale(.9375F*p.getScale());
@@ -33,10 +66,10 @@ public final class HammerQuakeContact {
             var point=world.transformPosition(local);var at=feet.add(point.x,point.y,point.z);
             // The solver stops just above the face. This small contact skin does
             // not allow a fist hovering over a ledge to emit a remote ground hit.
-            if(Math.abs(at.y-requested.getLocation().y)>.065)continue;
+            if(requested!=null&&Math.abs(at.y-requested.getLocation().y)>.065)continue;
             var hit=p.level().clip(new ClipContext(at.add(0,.035,0),at.add(0,-.065,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
             if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=Direction.UP||hit.isInside())continue;
-            double distance=hit.getLocation().distanceToSqr(requested.getLocation());
+            double distance=hit.getLocation().distanceToSqr(requested==null?at:requested.getLocation());
             if(distance<nearest){nearest=distance;result=hit;}
         }
         return result;
