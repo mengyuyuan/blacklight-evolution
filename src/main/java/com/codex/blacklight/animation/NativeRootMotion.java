@@ -79,6 +79,7 @@ public final class NativeRootMotion {
             // clip's horizontal track at the same FIG frame as the visible legs.
             step=clipStep(MotionLibrary.clip("hammer_ground_stroke"),MotionLibrary.hammerReleaseSeconds(previous),
                     MotionLibrary.hammerReleaseSeconds(current),yaw);
+            step=com.codex.blacklight.combat.HammerQuakeContact.limitWallAdvance(player,move,step,yaw);
         } else {
             step=clipStep(MotionLibrary.clip(move.id),previous,current,yaw).scale(travelScale(move));
         }
