@@ -10,6 +10,9 @@ import net.minecraftforge.eventbus.api.IEventBus;
 /** Physical infection terrain and Hive tissue; nutrient nodes can be severed by mining. */
 public final class ModBlocks {
     private static final DeferredRegister<Block> BLOCKS=DeferredRegister.create(net.minecraftforge.registries.ForgeRegistries.BLOCKS,"blacklight");
+    public static final RegistryObject<Block> ENCOUNTER_CONSOLE = BLOCKS.register("encounter_console", () ->
+            new com.codex.blacklight.world.BossSiteBlock(BlockBehaviour.Properties.of().strength(-1F, 3600000F)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(SoundType.METAL).noLootTable()));
     public static final RegistryObject<Block> HIVE_FLESH=BLOCKS.register("hive_flesh",()->new com.codex.blacklight.world.TissueSourceBlock(BlockBehaviour.Properties.of().strength(3,6).sound(SoundType.SLIME_BLOCK)));
     public static final RegistryObject<Block> HIVE_CARAPACE=BLOCKS.register("hive_carapace",()->new Block(BlockBehaviour.Properties.of().strength(5,12).sound(SoundType.NETHER_WOOD)));
     public static final RegistryObject<Block> HIVE_SAC=BLOCKS.register("hive_sac",()->new Block(BlockBehaviour.Properties.of().strength(2,4).sound(SoundType.SLIME_BLOCK).lightLevel(s->5)));

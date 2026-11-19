@@ -54,7 +54,7 @@ public final class GoliathObstructionGameTest {
     }
     @GameTest(template="blackwatch_arena",batch="goliath_active_wall",timeoutTicks=125)
     public static void actualForwardChargeCollisionStillExposesTheBoss(GameTestHelper h){
-        var s=scene(h);boolean[] wall={false},done={false};
+        var s=scene(h);boolean[] wall={false},done={false};int[] wallZ={0};
         h.runAfterDelay(25,()->h.assertTrue(s.actor.begin(EncounterMove.CHARGE,s.target),"unobstructed charge starts"));
         h.onEachTick(()->{
             if(done[0])return;
@@ -63,10 +63,13 @@ public final class GoliathObstructionGameTest {
                 for(int x=(int)Math.floor(body.minX)-2;x<=(int)Math.ceil(body.maxX)+2;x++)
                     for(int y=(int)Math.floor(body.minY);y<=(int)Math.ceil(body.maxY)+2;y++)
                         h.getLevel().setBlockAndUpdate(new BlockPos(x,y,z),Blocks.STONE.defaultBlockState());
-                wall[0]=true;
+                wallZ[0]=z;wall[0]=true;
             }
             if(wall[0]&&s.actor.exposed()){
                 done[0]=true;h.assertTrue(s.actor.move()==EncounterMove.NONE&&s.actor.goliathChargeSnapshot().phase()==-1,"physical impact during cycle clears the committed charge");
+                var center=BlockPos.containing(s.actor.getX(),s.actor.getY()+1.6,wallZ[0]);
+                h.assertTrue(h.getLevel().getBlockState(center).isAir(),"the collision opens the middle of the stone wall");
+                h.assertTrue(h.getLevel().getBlockState(center.above(5)).is(Blocks.STONE),"untouched upper storey remains");
                 finish(h,s);
             }
         });

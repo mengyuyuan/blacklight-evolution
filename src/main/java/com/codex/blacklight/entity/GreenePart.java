@@ -20,7 +20,8 @@ public final class GreenePart extends PartEntity<EncounterMob> {
     @Override protected void defineSynchedData(){}
     @Override protected void readAdditionalSaveData(CompoundTag tag){}
     @Override protected void addAdditionalSaveData(CompoundTag tag){}
-    @Override public boolean isPickable(){return getParent().isAlive()&&!getParent().isRemoved()&&(getParent().kind()!=EncounterKind.ELIZABETH_GREENE||getParent().greeneBattle().targetable())&&(slot>=getParent().kind().weakParts()||!getParent().broken(slot))&&!ConsumeControl.protectedEntity(getParent());}
+    public boolean hasSurface(){return getParent().isAlive()&&!getParent().isRemoved()&&(getParent().kind()!=EncounterKind.ELIZABETH_GREENE||getParent().greeneBattle().targetable())&&(slot>=getParent().kind().weakParts()||!getParent().broken(slot));}
+    @Override public boolean isPickable(){return hasSurface()&&!ConsumeControl.protectedEntity(getParent());}
     @Override public boolean isPushable(){return false;}
     @Override public Entity getRootVehicle(){return getParent()==null?this:getParent().getRootVehicle();}
     @Override public boolean hurt(DamageSource source,float amount){if(!isPickable()||level().isClientSide)return false;var contact=HydraHurtContact.nativeHit(getParent(),slot,source);return contact!=null&&getParent().hurtAt(source,amount,contact);}
