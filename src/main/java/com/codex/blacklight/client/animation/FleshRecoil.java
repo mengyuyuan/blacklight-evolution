@@ -9,8 +9,10 @@ import java.util.WeakHashMap;
 
 /** Reaction to a confirmed strike, evaluated in victim space on the render clock. */
 public final class FleshRecoil {
-    private record Contact(FleshStrike strike, double start, float side, float facing, float strength) {}
-    public record Pose(float pitch, float twist, float roll, float head, float brace, float dip) {}
+    private record Contact(FleshStrike strike, double start, float side, float facing, float strength, int region) {}
+    public record Pose(float pitch, float twist, float roll, float head, float brace, float dip, float leg, float arm) {
+        Pose(float pitch,float twist,float roll,float head,float brace,float dip){this(pitch,twist,roll,head,brace,dip,0,0);}
+    }
     private static final WeakHashMap<LivingEntity, Contact> contacts = new WeakHashMap<>();
 
     private FleshRecoil() {}
@@ -31,7 +33,10 @@ public final class FleshRecoil {
         float strength = Math.min(1.35F, .44F + receipt.size() * .67F + (receipt.charged() ? .10F : 0));
         var previous = contacts.get(victim);
         if (previous != null && previous.start == start && previous.strength >= strength) return;
-        contacts.put(victim, new Contact(strike, start, side, facing, strength));
+        int region=receipt.region();
+        if(region==2 || region==8)side=-1;
+        if(region==4 || region==16)side=1;
+        contacts.put(victim,new Contact(strike,start,side,facing,strength,region));
     }
 
     public static Pose sample(LivingEntity victim, float partial) {
@@ -63,7 +68,9 @@ public final class FleshRecoil {
             case QUILL -> new Pose(-.26F*pitch, .22F*turn, .13F*turn, -.32F*pitch, .23F*weight, .42F*weight);
             case FIST -> new Pose(-.32F*pitch, .20F*turn, .09F*turn, -.52F*pitch, .36F*weight, .8F*weight);
             case LASH -> new Pose(.18F*pitch, 1.03F*turn, .52F*turn, .30F*pitch, .94F*weight, 1.4F*weight);
-            case HAMMER -> new Pose(.96F*pitch, .17F*turn, .17F*turn, .48F*pitch, .76F*weight, 3.4F*weight);
+            case HAMMER -> new Pose(.76F*pitch, .18F*turn, .30F*turn, .42F*pitch, .62F*weight,
+                    ((contact.region&24)!=0?4.5F:2.6F)*weight,(contact.region&24)!=0?weight*contact.side:0,
+                    (contact.region&6)!=0?weight*contact.side:0);
             default -> new Pose(-.82F*pitch, .28F*turn, .24F*turn, -.43F*pitch, 1.02F*weight, -.6F*weight);
         };
     }

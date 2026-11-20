@@ -3,7 +3,7 @@ package com.codex.blacklight.combat;
 /** Per-move outcomes. The victim controller owns flight, landing and recovery. */
 public record ImpactProfile(int kind,int motion,int stun,double push,double lift,boolean knockdown) {
     public static final int BODY=0,LEFT=1,RIGHT=2,BACKHAND=3,UP=4,FALL=5,DOWN=6,RISE=7;
-    public static final int CLAW_RIP=8;
+    public static final int CLAW_RIP=8, HAMMER_BUCKLE=18;
     public static ImpactProfile of(WeaponMove move){
         var m=move.uncharged();boolean charged=m!=move;
         if(m==WeaponMove.CLAW_POUNCE)

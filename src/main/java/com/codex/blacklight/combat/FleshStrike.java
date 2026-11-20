@@ -36,6 +36,18 @@ public enum FleshStrike {
         };
     }
 
+    static net.minecraft.world.phys.Vec3 fistSpray(WeaponMove move,net.minecraft.world.phys.Vec3 outward){
+        var face=outward.normalize();
+        var side=new net.minecraft.world.phys.Vec3(-face.z,0,face.x).normalize();
+        return switch(move){
+            case MUSCLE_JAB,AIR_AUTO1,AIR_AUTO3 -> face.add(side.scale(.42)).add(0,.11,0).normalize();
+            case MUSCLE_CROSS,AIR_AUTO2,COMBO_BACKHAND -> face.subtract(side.scale(.62)).add(0,.10,0).normalize();
+            case MUSCLE_UPPERCUT,COMBO_FLOAT,COMBO_KNEE -> face.scale(.55).add(0,.92,0).normalize();
+            case COMBO_AXE,COMBO_AXE_HANDLE,AIR_AUTO4,AIR_GROUND_POUND,COMBO_GROUND_POUND -> face.scale(.68).add(0,-.83,0).normalize();
+            default -> face;
+        };
+    }
+
     /** A cutting edge throws the sheet along its stroke while the skin opens outwards. */
     static net.minecraft.world.phys.Vec3 cutSpray(net.minecraft.world.phys.Vec3 travel, net.minecraft.world.phys.Vec3 outward) {
         var face=outward.normalize();

@@ -101,6 +101,7 @@
     "client.SeveredHeldItemMixin",
     "client.SeveredHeadLayerMixin",
     "client.GeoRagdollMixin",
+    "client.CrushDeathParticlesMixin",
     "client.OptionalTheBoysBodyRenderMixin"
   ],
   "injectors": {

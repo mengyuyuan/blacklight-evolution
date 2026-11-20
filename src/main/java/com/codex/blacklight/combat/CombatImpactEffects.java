@@ -64,7 +64,7 @@ public final class CombatImpactEffects {
     public static void target(ServerPlayer p,LivingEntity v,WeaponMove move,WeaponCutContact.Report contact,boolean fullyCharged){
         var strike=FleshStrike.of(ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower(),move);
         float size=switch(strike){
-            case FIST -> .48F;
+            case FIST -> .66F;
             case LASH -> .6F;
             case HAMMER -> .8F;
             case MUSCLE -> .7F;
@@ -75,6 +75,6 @@ public final class CombatImpactEffects {
         var kind=contact.kind();
         if(contact.contacts().isEmpty()&&(strike==FleshStrike.EDGE||strike==FleshStrike.CLAW||strike==FleshStrike.LASH))
             kind=WeaponCutContact.contactKind(move);
-        PlayerHitEffects.emit(p,v,strike.style(kind),size*ImpactTier.of(move).effectScale,contact,strike,fullyCharged);
+        PlayerHitEffects.emit(p,v,strike.style(kind),size*ImpactTier.of(move).effectScale,contact,strike,fullyCharged,move);
     }
 }

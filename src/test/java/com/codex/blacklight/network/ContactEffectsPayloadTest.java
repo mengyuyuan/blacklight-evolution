@@ -29,6 +29,13 @@ class ContactEffectsPayloadTest {
             assertEquals(legacy,packet.style());assertEquals(0,packet.strike().id);assertFalse(packet.charged());
         }
     }
+    @Test void hammerReceiptPreservesTheStruckPartWithoutChangingItsMaterialOrCharge(){
+        int base=InfectedImpactPayload.appearance(com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,com.codex.blacklight.combat.FleshStrike.HAMMER,true);
+        for(int region:new int[]{0,1,2,4,8,16,32}){
+            var packet=new InfectedImpactPayload(1,2,InfectedImpactPayload.hammerRegion(base,region),1,2,3,0,1,0,1,9);
+            assertEquals(region,packet.region());assertTrue(packet.charged());assertEquals(com.codex.blacklight.combat.FleshStrike.HAMMER,packet.strike());
+        }
+    }
     @Test void allContactKindsRoundTripTogetherWithTimeMaterialsAndSound(){
         var tissue=new InfectedImpactPayload(12,13,0,1,81,2,0,1,0,.6F,72);
         for(int kind=0;kind<=ContactEffectsPayload.SOUND;kind++){

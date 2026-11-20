@@ -59,7 +59,11 @@ public final class WeaponImpact {
     static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge,WeaponCutContact.Report cut,boolean fullyCharged) {
         // A confirmed ordinary hit still has impact feedback when no sharp face touched.
         // Keep that fallback separate from the report allowed to authorize dismemberment.
-        var impact=cut.contacts().isEmpty()?WeaponCutContact.impact(p,v,direction):cut;
+        var impact=cut;
+        if(impact.contacts().isEmpty()){
+            boolean aimed=move.form==PowerForm.HAMMERFISTS && !move.quake() || move.form==PowerForm.MUSCLE_MASS;
+            impact=aimed?WeaponCutContact.aimedBlunt(p,v,direction):WeaponCutContact.impact(p,v,direction);
+        }
         var profile=ImpactProfile.of(move);var tier=ImpactTier.of(move);
         boolean slam=profile.kind()==HitReaction.SLAM||move.quake();
         boolean heavy=profile.kind()!=HitReaction.STAGGER;
@@ -101,12 +105,20 @@ public final class WeaponImpact {
             var launch=HitStop.launchVelocity(v);
             var style=v.isDeadOrDying() && RagdollImpact.supportedBody(v) && !CombatTargeting.anchoredBody(v)
                     ?FatalWeaponImpact.forStrike(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower(),move):null;
-            if(style==FatalWeaponImpact.MUSCLE&&fullyCharged&&ConsumeSequence.humanoid(v))style=FatalWeaponImpact.MUSCLE_BURST;
+            if(style==FatalWeaponImpact.MUSCLE && fullyCharged && PlayerHitEffects.fleshBody(v)
+                    && !impact.contacts().isEmpty() && !PlayerHitEffects.metalAt(v,impact.contacts().get(0).point()))
+                style=FatalWeaponImpact.MUSCLE_BURST;
+            if(style==FatalWeaponImpact.HAMMER_BREAK && (HammerQuakeContact.owns(move)||move.hammerComboSlam()))
+                style=impact.contacts().stream().anyMatch(hit->hit.edge().equals("hammer-floor-press"))
+                        ?FatalWeaponImpact.HAMMER_PRESS:FatalWeaponImpact.HAMMER;
             if(style!=null){
                 var travel=style==FatalWeaponImpact.WHIP && !impact.contacts().isEmpty()?impact.direction():direction;
-                launch=style.launch(launch,travel,mass*resistance*tier.force,profile.motion()==ImpactProfile.UP,profile.lift()<0);
+                launch=style.launch(launch,travel,mass*resistance*tier.force,profile.motion()==ImpactProfile.UP,profile.lift()<0||style==FatalWeaponImpact.HAMMER_PRESS);
             }
-            RagdollImpact.send(v,style==null?profile.motion():style.motion,physicalTicks,sharp,launch,impact,tier.hitstop);
+            int motion=style==null?profile.motion():style.motion;
+            if(v.isAlive() && controlled && canFall && move.form==PowerForm.HAMMERFISTS && !move.quake())
+                motion=ImpactProfile.HAMMER_BUCKLE;
+            RagdollImpact.send(v,motion,physicalTicks,sharp,launch,impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
         if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact,fullyCharged);

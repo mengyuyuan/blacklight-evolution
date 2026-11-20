@@ -39,6 +39,7 @@ public final class WeaponCombatSystem {
         final Map<UUID,PendingCut> pendingCuts=new LinkedHashMap<>();
         final Set<UUID> hit=new HashSet<>();int hitstop,hitstopHeld;long hitstopStarted;boolean effect,charging,released,queuedHeld,jumpQueued,tookOff,lifted,impactEffect,groundEffect,locked;
         WeaponMove.Input input,queued,early;boolean earlyHeld,fullyCharged;int landed=-1,contact=-1,flight=-1,travelStarted,travelBudget,stuckTicks;boolean pounceCommitted,traveling;float chargePower;double travelSpeed;Vec3 lastTargetPosition;
+        Vec3 hammerFloor;
         Vec3 previousFeet;LivingEntity target,queuedTarget;Entity mechanicalTarget;final Map<UUID,List<AABB>> previousTargets=new HashMap<>();
         Entity focus(){return mechanicalTarget!=null?mechanicalTarget:target;}
         int targetId(){Entity focus=focus();return focus==null?-1:focus.getId();}
@@ -433,7 +434,10 @@ public final class WeaponCombatSystem {
                 var definition=LocalWeaponMotion.find(s.move.id).orElseThrow();
                 float seconds=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t,s.clipOffset,definition.transitionSeconds());
                 var ground=HammerQuakeContact.comboLanding(p,s.move,seconds,s.yaw);
-                if(ground!=null)s.groundEffect=CombatImpactEffects.ground(p,s.move,ground);
+                if(ground!=null){
+                    s.hammerFloor=ground.getLocation();
+                    s.groundEffect=CombatImpactEffects.ground(p,s.move,ground);
+                }
             }
         }else if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
             s.groundEffect=true;CombatImpactEffects.ground(p,s.move,s.direction);
@@ -442,6 +446,7 @@ public final class WeaponCombatSystem {
         if(physicalQuake&&!s.groundEffect&&t<s.move.end){
             var ground=HammerQuakeContact.sweep(p,s.move,t,s.clipOffset,safeFeet(p,s),s.previousYaw,s.yaw);
             if(ground!=null){
+                s.hammerFloor=ground.getLocation();
                 s.groundEffect=true;s.effect=true;
                 CombatImpactEffects.ground(p,s.move,ground);
                 strike(p,s,t);
@@ -784,6 +789,8 @@ public final class WeaponCombatSystem {
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}
                 }else if(!resistsControl&&!CombatTargeting.anchoredBody(v)&&(s.move.quake()||s.move.airCombo())){v.setDeltaMovement(v.getDeltaMovement().add(0,s.move==WeaponMove.AIR_AUTO4?-.6:.3,0));v.hurtMarked=true;}
                 var push=s.move.quake()?v.position().subtract(p.position()).multiply(1,0,1).normalize():s.direction;
+                if(s.hammerFloor!=null && impact.contacts().isEmpty())
+                    impact=WeaponCutContact.hammerPress(v,s.hammerFloor,AttackReach.scale(p));
                 WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,impact,s.fullyCharged);
                 if(s.hit.size()==1)beginHitstop(p,s,ImpactTier.of(s.move));
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){

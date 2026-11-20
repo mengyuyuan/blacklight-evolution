@@ -7,7 +7,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Ballistic drops that survive the short contact spray and can actually reach a surface. */
 enum BloodFlight {
-    BRUISE(3, .17, .095, .06), CUT(7, .35, .15, .035), RAKE(5, .29, .11, .045),
+    BRUISE(5, .24, .13, .065), CUT(7, .35, .15, .035), RAKE(5, .29, .11, .045),
     LASH(5, .42, .07, .045), CRUSH(9, .20, .28, .11), DRIVE(6, .36, .14, .075),
     ENTRY(3, .23, .048, .025), BURST(9, .32, .25, .14);
 

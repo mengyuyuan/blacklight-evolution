@@ -42,6 +42,10 @@ public final class PlayerHitEffects {
         emit(player,target,style,size,report,FleshStrike.GENERIC,false);
     }
     public static void emit(ServerPlayer player,LivingEntity target,InfectedAttackStyle style,float size,WeaponCutContact.Report report,FleshStrike strike,boolean charged){
+        emit(player,target,style,size,report,strike,charged,null);
+    }
+    static void emit(ServerPlayer player,LivingEntity target,InfectedAttackStyle style,float size,
+                     WeaponCutContact.Report report,FleshStrike strike,boolean charged,WeaponMove move){
         if(player.level().isClientSide||target.level()!=player.level())return;
         if (report == null || report.contacts().isEmpty()) {
             var box = target.getBoundingBox();
@@ -59,8 +63,10 @@ public final class PlayerHitEffects {
             if (report.kind()==WeaponCutContact.Kind.SLICE && !metalAt(target,hit.point()))
                 normal=FleshStrike.cutSpray(hit.travel(),hit.point().subtract(target.getBoundingBox().getCenter()));
             if ((metalAt(target,hit.point()) || normal.lengthSqr() < 1e-8) && hit.normal().lengthSqr() > 1e-8) normal = hit.normal();
+            if(strike==FleshStrike.FIST && move!=null && !metalAt(target,hit.point()))normal=FleshStrike.fistSpray(move,normal);
+            if(strike==FleshStrike.HAMMER && hit.edge().equals("hammer-floor-press"))style=InfectedAttackStyle.BURST;
             int index = emitted.size();
-            surface(player, target, style, index == 0 ? size : size * .56F, strike, charged && index == 0, hit.point(), normal, index);
+            surface(player, target, style, index == 0 ? size : size * .56F, strike, charged && index == 0, hit.point(), normal, index, hit.region());
             emitted.add(hit);
             if (emitted.size() == limit) break;
         }
@@ -68,6 +74,10 @@ public final class PlayerHitEffects {
 
     static void surface(ServerPlayer player, LivingEntity target, InfectedAttackStyle style, float size,
                         FleshStrike strike, boolean charged, Vec3 point, Vec3 normal, int index) {
+        surface(player,target,style,size,strike,charged,point,normal,index,0);
+    }
+    private static void surface(ServerPlayer player,LivingEntity target,InfectedAttackStyle style,float size,
+                                FleshStrike strike,boolean charged,Vec3 point,Vec3 normal,int index,int region){
         if(!Double.isFinite(point.x+point.y+point.z+normal.x+normal.y+normal.z))return;
         if(normal.lengthSqr()<1e-8)normal=new Vec3(0,1,0);else normal=normal.normalize();
         if(metalAt(target,point)){
@@ -75,7 +85,7 @@ public final class PlayerHitEffects {
                     new CombatImpactPayload(point.x,point.y,point.z,size,false,false,(float)normal.x,(float)normal.y,(float)normal.z));
         }else{
             PacketDistributor.sendToPlayersNear(player.serverLevel(),null,point.x,point.y,point.z,80,
-                    new InfectedImpactPayload(player.getId(),target.getId(),InfectedImpactPayload.appearance(style,strike,charged),point.x,point.y,point.z,
+                    new InfectedImpactPayload(player.getId(),target.getId(),InfectedImpactPayload.hammerRegion(InfectedImpactPayload.appearance(style,strike,charged),region),point.x,point.y,point.z,
                             (float)normal.x,(float)normal.y,(float)normal.z,size,player.level().getGameTime()*31+target.getId()*73L+player.getId()+index*101L));
         }
     }

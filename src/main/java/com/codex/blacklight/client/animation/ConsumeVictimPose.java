@@ -294,6 +294,13 @@ public final class ConsumeVictimPose {
                 pose.orElseEmpty("Head").rotation().rotateX(recoil.head());
                 pose.orElseEmpty("Arm_R").rotation().rotateZ(-.54F*recoil.brace());
                 pose.orElseEmpty("Arm_L").rotation().rotateZ(.56F*recoil.brace());
+                if(recoil.leg()!=0){
+                    String side=recoil.leg()>0?"L":"R";
+                    pose.orElseEmpty("Thigh_"+side).rotation().rotateX(-.55F*Math.abs(recoil.leg()));
+                    pose.orElseEmpty("Leg_"+side).rotation().rotateX(.94F*Math.abs(recoil.leg()));
+                }
+                if(recoil.arm()!=0)pose.orElseEmpty(recoil.arm()>0?"Arm_L":"Arm_R").rotation()
+                        .rotateXYZ(.74F*Math.abs(recoil.arm()),0,-.36F*recoil.arm());
                 return;
             }
             var hit=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.HIT_REACTION);float w=hit.weight(entity.level().getGameTime(),partial);
@@ -345,6 +352,8 @@ public final class ConsumeVictimPose {
             rotate(saved, h.leftArm, -.42F*pose.brace(), 0, .55F*pose.brace());
             rotate(saved, h.rightLeg, .22F*pose.brace(), 0, .09F*roll);
             rotate(saved, h.leftLeg, -.26F*pose.brace(), 0, .09F*roll);
+            if(pose.leg()!=0)rotate(saved,pose.leg()>0?h.leftLeg:h.rightLeg,-.88F*Math.abs(pose.leg()),0,.26F*pose.leg());
+            if(pose.arm()!=0)rotate(saved,pose.arm()>0?h.leftArm:h.rightArm,.79F*Math.abs(pose.arm()),0,-.40F*pose.arm());
             followClothing(h, saved);
         } else if (model instanceof HierarchicalModel<?> h) {
             var root = h.root();

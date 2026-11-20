@@ -82,8 +82,15 @@ public final class RagdollVisualAudit {
             new Case("whip_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
             new Case("hammer_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
             new Case("hammer_charged_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
+            new Case("muscle_arm_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
+            new Case("muscle_leg_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("muscle_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("muscle_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
+            new Case("hammer_press_zombie",PowerForm.HAMMERFISTS,"minecraft:zombie",false,true),
+            new Case("hammer_press_chicken",PowerForm.HAMMERFISTS,"minecraft:chicken",false,true),
+            new Case("hammer_press_iron",PowerForm.HAMMERFISTS,"minecraft:iron_golem",false,true),
+            new Case("hammer_leg_zombie_survive",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
+            new Case("hammer_arm_zombie_survive",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
             new Case("hammer_zombie",PowerForm.HAMMERFISTS,"minecraft:zombie",false,true),
             new Case("claws_consume",PowerForm.CLAWS,"minecraft:villager",true,false),
             new Case("blade_consume",PowerForm.BLADE,"minecraft:villager",true,false),
@@ -198,7 +205,8 @@ public final class RagdollVisualAudit {
             var c=current();
             // Initial aim belongs to this fixture; mounted heading belongs to the production scene.
             if(!ConsumeSequence.mountedStage(ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE))){
-            mc.player.setYRot(0);mc.player.yRotO=0;mc.player.setXRot(0);mc.player.xRotO=0;
+            mc.player.setYRot(0);mc.player.yRotO=0;float pitch=c.name().startsWith("hammer_leg_")?52:c.name().contains("_leg_")?39:c.name().contains("_arm_")?20:0;
+            mc.player.setXRot(pitch);mc.player.xRotO=pitch;
             com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.MOVEMENT_STATE).setCameraYaw(0);
             }
             if(tick==40){
@@ -220,7 +228,7 @@ public final class RagdollVisualAudit {
                 if(v instanceof LivingEntity l&&l.isAlive()){
                     // The first rush carries the actor past its target. Reset the test
                     // stance before the next input; damage still uses the normal sweep.
-                    p.connection.teleport(l.getX(),251,l.getZ()-(c.name().equals("hammer_brute_lethal")?1.35:2),0,0);p.setDeltaMovement(Vec3.ZERO);
+                    p.connection.teleport(l.getX()+(c.name().startsWith("muscle_arm_")?.28:0),251,l.getZ()-(c.name().equals("hammer_brute_lethal")?1.35:2),0,0);p.setDeltaMovement(Vec3.ZERO);
                 }
             });
             if(c.name().endsWith("_lethal")&&tick==(c.name().equals("hammer_brute_lethal")?145:115))PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
@@ -295,9 +303,33 @@ public final class RagdollVisualAudit {
         // partial cut can retain a bridge, and two blades can meet the same cut.
         if(c.name().equals("claws_cow"))passed&=edgeCount==4&&cuts>0&&components>=2&&bodies.size()==1&&monotonic;
         if(c.name().equals("claws_skeleton"))passed&=minimum==0&&components>=2&&bodies.size()==1&&monotonic;
-        if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts>0&&components>=2&&bodies.size()==1&&monotonic;
+        if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts==0&&components==1&&bodies.size()==1&&monotonic;
+        if(c.name().startsWith("hammer_press_")){
+            int compressed=0,parts=0;
+            for(var el:rows){var sample=el.getAsJsonObject();if(sample.has("pressedParts")){
+                compressed=Math.max(compressed,sample.get("pressedParts").getAsInt());parts=Math.max(parts,sample.getAsJsonArray("pieces").size());
+            }}
+            result.addProperty("pressedParts",compressed);result.addProperty("bodyParts",parts);
+            if(c.type().equals("minecraft:chicken")){
+                double gap=Double.POSITIVE_INFINITY;
+                for(var el:rows){var sample=el.getAsJsonObject();
+                    if(sample.has("pressedParts")&&sample.get("pressedParts").getAsInt()>0&&sample.has("renderMeshFloorClearance")){
+                        gap=sample.get("renderMeshFloorClearance").getAsDouble();break;
+                    }}
+                if(Double.isFinite(gap))result.addProperty("firstPressedFloorGap",gap);
+                passed&=gap>=-.02&&gap<.035;
+            }
+            passed&=minimum==0&&components==1&&compressed>0&&(c.type().equals("minecraft:chicken")?compressed==parts:compressed<parts);
+        }
+        if(c.name().startsWith("hammer_arm_")||c.name().startsWith("hammer_leg_")){
+            String limb=c.name().startsWith("hammer_arm_")?"arm":"leg";
+            double movement=0;
+            for(var el:rows){var sample=el.getAsJsonObject();if(sample.has("strikeRecoil"))
+                movement=Math.max(movement,Math.abs(sample.getAsJsonObject("strikeRecoil").get(limb).getAsDouble()));}
+            result.addProperty("limbResponse",movement);passed&=movement>.15;
+        }
         if(c.name().endsWith("_zombie_lethal")){
-            var expected=c.name().equals("muscle_charged_zombie_lethal")?FatalWeaponImpact.MUSCLE_BURST:c.name().equals("hammer_charged_zombie_lethal")?FatalWeaponImpact.HAMMER_BREAK:FatalWeaponImpact.forForm(c.form());
+            var expected=c.form()==PowerForm.MUSCLE_MASS&&c.name().contains("_charged_")?FatalWeaponImpact.MUSCLE_BURST:c.name().equals("hammer_charged_zombie_lethal")?FatalWeaponImpact.HAMMER_BREAK:FatalWeaponImpact.forForm(c.form());
             double deformation=0;
             for(var element:rows){
                 var sample=element.getAsJsonObject();
@@ -306,7 +338,17 @@ public final class RagdollVisualAudit {
             }
             result.addProperty("expectedFatalStyle",expected.name());
             result.addProperty("maxSkinDisplacement",deformation);
-            passed&=deformation>.001&&bodies.size()==1&&((expected==FatalWeaponImpact.HAMMER_BREAK||expected==FatalWeaponImpact.MUSCLE_BURST)?cuts>0&&components>=2:cuts==0&&components==1);
+            if(expected==FatalWeaponImpact.MUSCLE_BURST){
+                boolean localLoss=rows.asList().stream().map(e->e.getAsJsonObject()).anyMatch(e->e.has("rupturedRegion")&&e.get("rupturedRegion").getAsInt()>0);
+                boolean mist=rows.asList().stream().anyMatch(e->e.getAsJsonObject().has("ruptureMist"));
+                int region=0;
+                for(var el:rows){var r=el.getAsJsonObject();if(r.has("rupturedRegion"))region|=r.get("rupturedRegion").getAsInt();}
+                if(c.name().contains("_arm_"))passed&=(region&6)!=0;
+                if(c.name().contains("_leg_"))passed&=(region&24)!=0;
+                result.addProperty("lostRegion",region);
+                result.addProperty("localTissueLoss",localLoss);result.addProperty("ruptureMist",mist);
+                passed&=localLoss&&mist&&cuts==1&&components==1&&bodies.size()==1;
+            }else passed&=deformation>.001&&bodies.size()==1&&(expected==FatalWeaponImpact.HAMMER_BREAK?cuts>0&&components>=2:cuts==0&&components==1);
         }
         if(c.name().contains("_zombie_")){
             String effect=switch(c.form()){
@@ -571,6 +613,11 @@ public final class RagdollVisualAudit {
                     projectile.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
                     level.addFreshEntity(projectile);
                 }
+                if(c.name().startsWith("hammer_arm_"))v.moveTo(.11,251,2.2,facing,0);
+                if(c.name().startsWith("hammer_press_")){
+                    v.moveTo(.54,251,1.52,facing,0);
+                    v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(6);
+                }
                 if(c.name().contains("_connected_"))v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(10000);
                 level.addFreshEntity(v);v.setHealth(c.name().endsWith("_survive")?v.getMaxHealth():c.consume()||c.name().endsWith("_lethal")?1:Math.min(v.getMaxHealth(),8));victimId=v.getId();health=v.getHealth();
                 standingProbe=(Mob)type.create(level);standingProbe.moveTo(v.getX(),v.getY(),v.getZ(),facing,0);standingProbe.yBodyRot=standingProbe.yBodyRotO=facing;
@@ -653,8 +700,12 @@ public final class RagdollVisualAudit {
                 impacts.setAccessible(true);
                 for(var impact:(Collection<?>)impacts.get(null)){
                     var packet=(com.codex.blacklight.network.InfectedImpactPayload)field(impact,"data");
+                    if(packet.strike()==FleshStrike.MUSCLE && packet.style()==com.codex.blacklight.infection.InfectedAttackStyle.BURST.ordinal())
+                        row.addProperty("ruptureMist",true);
                     if(packet.attacker()==mc.player.getId()&&packet.victim()==victimId){
                         row.addProperty("contactSpray",packet.strike().name());
+                        row.addProperty("contactRegion",packet.region());
+                        row.add("contactPoint",vector(new Vec3(packet.x(),packet.y(),packet.z())));
                         row.addProperty("contactCharged",packet.charged());
                     }
                 }
@@ -690,7 +741,13 @@ public final class RagdollVisualAudit {
             var bodies=(Map<?,?>)f.get(null);
             for(var entry:bodies.entrySet())if(entry.getKey() instanceof LivingEntity l&&l.getId()==victimId){
                 var body=entry.getValue();row.addProperty("bodyStarted",(Long)field(body,"started"));row.addProperty("cuts",(Integer)field(body,"appliedCuts"));row.addProperty("components",(Integer)field(body,"components"));
+                if(current().name().startsWith("hammer_press_")){
+                    int pressed=0;
+                    for(var part:(List<?>)field(body,"parts"))if((Double)field(part,"thickness")<.5)pressed++;
+                    row.addProperty("pressedParts",pressed);
+                }
                 if(current().name().endsWith("_zombie_lethal")&&field(body,"fatalImpact") instanceof FatalWeaponImpact style){
+                    row.addProperty("rupturedRegion",(Integer)field(body,"rupturedRegion"));
                     var torso=field(body,"root");
                     var rendered=(Vec3)field(torso,"renderedPosition");
                     trackedTorso=rendered!=null?rendered:(Vec3)field(torso,"pos");
