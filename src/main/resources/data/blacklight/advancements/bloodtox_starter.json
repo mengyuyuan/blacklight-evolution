@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:convoy_cleared",
+  "display": {
+    "icon": {
+      "item": "blacklight:bloodtox_starter"
+    },
+    "title": {
+      "translate": "item.blacklight.bloodtox_starter"
+    },
+    "description": {
+      "translate": "survival.blacklight.journal.bloodtox_starter"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:bloodtox_starter"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

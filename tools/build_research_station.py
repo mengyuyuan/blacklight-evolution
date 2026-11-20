@@ -83,6 +83,13 @@ for x in (2, 4):
     put(x, 2, 3, 'brewing_stand', {'has_bottle_0': 'false', 'has_bottle_1': 'false', 'has_bottle_2': 'false'})
 fill(2, 1, 8, 5, 1, 9, 'quartz_slab', {'type': 'bottom', 'waterlogged': 'false'})
 put(3, 2, 9, 'red_carpet')
+# Exposed service wiring powers a local indicator. A survivor can strip the run
+# for crafting dust, and the dark lamp shows the circuit has been disconnected.
+fill(2, 1, 6, 5, 1, 6, 'polished_andesite')
+put(1, 2, 6, 'redstone_block')
+for x in range(2, 5):
+    put(x, 2, 6, 'redstone_wire', {'north': 'none', 'south': 'none', 'east': 'side', 'west': 'side', 'power': str(17-x)})
+put(5, 2, 6, 'redstone_lamp', {'lit': 'true'})
 fill(16, 1, 8, 21, 4, 8, 'iron_bars')
 fill(18, 1, 8, 19, 2, 8, 'air')  # breached quarantine gate
 fill(16, 1, 3, 20, 1, 3, 'packed_ice')

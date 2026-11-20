@@ -32,8 +32,11 @@ public final class BossSiteBlock extends HorizontalDirectionalBlock implements E
     }
     @Override public <T extends net.minecraft.world.level.block.entity.BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
             Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
-        if (!(level instanceof ServerLevel server) || !state.getValue(MOTHER) || type!=com.codex.blacklight.registry.ModBlockEntities.PUMP.get()) return null;
-        return (ignored,pos,current,pump) -> ((PumpStation)pump).watch(server,pos,current);
+        if (!(level instanceof ServerLevel server) || type!=com.codex.blacklight.registry.ModBlockEntities.PUMP.get()) return null;
+        return (ignored,pos,current,pump) -> {
+            if(current.getValue(MOTHER)) ((PumpStation)pump).watch(server,pos,current);
+            else ((PumpStation)pump).openGate(server,pos,current);
+        };
     }
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, MOTHER);
@@ -65,6 +68,7 @@ public final class BossSiteBlock extends HorizontalDirectionalBlock implements E
         var facing = state.getValue(FACING);
         var pad = console.relative(facing.getOpposite(), 12);
         if (kind==EncounterKind.ELIZABETH_GREENE && !hasPumpKey(operator)) return "pump_key_needed";
+        if (kind==EncounterKind.GOLIATH && !operator.isHolding(com.codex.blacklight.registry.ModItems.CONTAINMENT_DECODER.get())) return "decoder_needed";
         if (!clearPad(level,pad,kind,null)) return "obstructed";
         if (kind==EncounterKind.ELIZABETH_GREENE) return GreeneHost.pressurize(level,console,pad,facing,operator);
         var boss = EncounterEntities.CREATURES.get(kind).get().create(level);
@@ -77,12 +81,14 @@ public final class BossSiteBlock extends HorizontalDirectionalBlock implements E
         } finally {
             if (level.getEntity(boss.getUUID()) != boss || boss.isRemoved()) record.release(boss);
         }
+        ConvoyRail.reset(level,console,facing);
+        if(level.getBlockEntity(console) instanceof PumpStation station) station.releaseGate(level,boss,operator);
         if (!operator.isCreative()) boss.setTarget(operator);
         level.playSound(null, console, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 2F, .6F);
         return "convoy_started";
     }
     public static boolean hasPumpKey(Player player) {
-        var key=com.codex.blacklight.registry.ModItems.BLOODTOX_COMMAND_KEY.get();
+        var key=com.codex.blacklight.registry.ModItems.BLOODTOX_STARTER.get();
         return player.getMainHandItem().is(key) || player.getOffhandItem().is(key);
     }
 

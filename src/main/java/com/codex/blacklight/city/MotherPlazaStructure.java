@@ -26,9 +26,34 @@ public final class MotherPlazaStructure extends Structure {
             new BlockPos(288,63,672), new BlockPos(864,63,272), new BlockPos(784,63,64), new BlockPos(560,63,64),
             new BlockPos(192,63,80), new BlockPos(352,63,496), new BlockPos(496,63,368), new BlockPos(1216,63,1168)
     };
-    public static BlockPos origin(long worldSeed){
-        return LOTS[Math.floorMod(CityLayout.hash(worldSeed,378551,37),LOTS.length)];
+    // Keep the original structure-start chunks so an existing world's recorded start stays authoritative.
+    // The offsets fit the complete 33 x 77 delivery street on dry ground, below an open skyline.
+    private static final int[][] STREET_OFFSETS = {
+            {28,-116}, {0,-44}, {0,-8}, {0,0}, {0,0},
+            {0,-40}, {-44,0}, {-72,-112}, {-84,20}, {16,-12},
+            {0,-24}, {20,-16}, {0,0}, {-12,-40}, {8,-40},
+            {-4,-16}, {88,-36}, {-24,-4}, {0,-40}, {36,-24}
+    };
+    private static int index(long seed){return Math.floorMod(CityLayout.hash(seed,378551,37),LOTS.length);}
+    private static BlockPos anchor(long seed){return LOTS[index(seed)];}
+    public static BlockPos origin(long seed){
+        int i=index(seed);
+        return LOTS[i].offset(STREET_OFFSETS[i][0],0,STREET_OFFSETS[i][1]);
     }
+    public static boolean matchesLot(long seed, BlockPos pos){
+        return origin(seed).equals(pos) || anchor(seed).equals(pos);
+    }
+    private static boolean hasPump(ServerLevel level, BlockPos at){
+        var state=level.getBlockState(at);
+        return state.getBlock() instanceof BossSiteBlock && state.getValue(BossSiteBlock.MOTHER)
+                && level.getBlockEntity(at) instanceof com.codex.blacklight.world.PumpStation;
+    }
+    private static BlockPos installedOrigin(ServerLevel level){
+        var legacy=anchor(level.getSeed());
+        var surveyed=origin(level.getSeed());
+        return !legacy.equals(surveyed) && hasPump(level,legacy.offset(16,1,28)) ? legacy : surveyed;
+    }
+    public static BlockPos console(ServerLevel level){return installedOrigin(level).offset(16,1,28);}
     public static BlockPos console(long worldSeed){return origin(worldSeed).offset(16,1,28);}
     private static final ResourceLocation ID=new ResourceLocation("blacklight","mother_plaza");
 
@@ -36,12 +61,12 @@ public final class MotherPlazaStructure extends Structure {
     public static final class Placement extends RandomSpreadStructurePlacement {
         public static final Codec<Placement> CODEC=Codec.unit(Placement::new);
         private Placement(){ super(1,0,RandomSpreadType.LINEAR,378551); }
-        @Override public ChunkPos getPotentialStructureChunk(long seed,int x,int z){return new ChunkPos(origin(seed));}
+        @Override public ChunkPos getPotentialStructureChunk(long seed,int x,int z){return new ChunkPos(anchor(seed));}
         @Override public StructurePlacementType<?> type(){return ModWorldgen.PLAZA_LOCATION.get();}
     }
     @Override public Optional<GenerationStub> findGenerationPoint(GenerationContext context){
         var origin=origin(context.seed());
-        if(!(context.chunkGenerator() instanceof BlacklightWorldGenerator) || !new ChunkPos(origin).equals(context.chunkPos()))
+        if(!(context.chunkGenerator() instanceof BlacklightWorldGenerator) || !new ChunkPos(anchor(context.seed())).equals(context.chunkPos()))
             return Optional.empty();
         var element=StructurePoolElement.single("blacklight:mother_plaza").apply(StructureTemplatePool.Projection.RIGID);
         var manager=context.structureTemplateManager();
@@ -52,31 +77,32 @@ public final class MotherPlazaStructure extends Structure {
 
     /** Existing saves can have fully explored this fixed city block before the encounter was added. */
     public static boolean chart(ServerLevel level){
-        var origin=origin(level.getSeed());
-        var console=console(level.getSeed());
-        var startChunk=new ChunkPos(origin);
+        var origin=installedOrigin(level);
+        var console=origin.offset(16,1,28);
+        var startChunk=new ChunkPos(anchor(level.getSeed()));
         if(!level.dimension().equals(CityTravel.WORLD) || !level.getServer().getWorldData().worldGenOptions().generateStructures()
                 || !(level.getChunkSource().getGenerator() instanceof BlacklightWorldGenerator generator)
-                || !level.getWorldBorder().isWithinBounds(origin) || !level.getWorldBorder().isWithinBounds(origin.offset(32,0,32))) return false;
+                || !level.getWorldBorder().isWithinBounds(origin) || !level.getWorldBorder().isWithinBounds(origin.offset(32,0,76))) return false;
         var structure=level.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ID);
         var start=level.getChunk(startChunk.x,startChunk.z).getStartForStructure(structure);
-        var state=level.getBlockState(console);
-        if(state.getBlock() instanceof BossSiteBlock && state.getValue(BossSiteBlock.MOTHER)
-                && level.getBlockEntity(console) instanceof com.codex.blacklight.world.PumpStation) return true;
-        if(start!=null && start.isValid()) return false;
+        boolean existing=hasPump(level,console);
+        if(existing && level.getBlockState(origin.offset(8,1,68)).is(com.codex.blacklight.registry.ModBlocks.FIELD_POST.get())) return true;
+        if(!existing && start!=null && start.isValid()) return false;
         var template=level.getStructureManager().get(ID).orElse(null);
         if(template==null) return false;
         var size=template.getSize();
         // Only retrofit intact atlas terrain; comparison includes air, pavement and block entities.
         var cursor=new BlockPos.MutableBlockPos();
-        for(int x=0;x<size.getX();x++) for(int z=0;z<size.getZ();z++){
+        for(int x=0;x<size.getX();x++) for(int z=existing?33:0;z<size.getZ();z++){
             int wx=origin.getX()+x, wz=origin.getZ()+z;
             var column=generator.getBaseColumn(wx,wz,level,level.getChunkSource().randomState());
             for(int y=origin.getY();y<origin.getY()+size.getY();y++){
                 cursor.set(wx,y,wz);
-                if(level.getBlockEntity(cursor)!=null || level.getBlockState(cursor)!=column.getBlock(y)) return false;
+                if(level.getBlockEntity(cursor)!=null || level.getBlockState(cursor)!=column.getBlock(y)) return existing;
             }
         }
-        return template.placeInWorld(level,origin,origin,new StructurePlaceSettings().setIgnoreEntities(true),level.random,2);
+        var settings=new StructurePlaceSettings().setIgnoreEntities(true);
+        if(existing) settings.setBoundingBox(BoundingBox.fromCorners(origin.offset(0,0,33),origin.offset(size.getX()-1,size.getY()-1,size.getZ()-1)));
+        return template.placeInWorld(level,origin,origin,settings,level.random,2);
     }
 }

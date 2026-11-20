@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:plaza_cleared",
+  "display": {
+    "icon": {
+      "item": "blacklight:mother_core"
+    },
+    "title": {
+      "translate": "item.blacklight.mother_core"
+    },
+    "description": {
+      "translate": "survival.blacklight.journal.mother_core"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:mother_core"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
