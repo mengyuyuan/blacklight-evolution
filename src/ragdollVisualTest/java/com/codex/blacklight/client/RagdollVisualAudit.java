@@ -342,12 +342,20 @@ public final class RagdollVisualAudit {
                 boolean localLoss=rows.asList().stream().map(e->e.getAsJsonObject()).anyMatch(e->e.has("rupturedRegion")&&e.get("rupturedRegion").getAsInt()>0);
                 boolean mist=rows.asList().stream().anyMatch(e->e.getAsJsonObject().has("ruptureMist"));
                 int region=0;
-                for(var el:rows){var r=el.getAsJsonObject();if(r.has("rupturedRegion"))region|=r.get("rupturedRegion").getAsInt();}
+                var fatalBodies=new HashSet<Long>();
+                for(var el:rows){
+                    var sample=el.getAsJsonObject();
+                    if(sample.has("rupturedRegion"))region|=sample.get("rupturedRegion").getAsInt();
+                    // A surviving target can fall, recover and be struck a second time.
+                    if(sample.get("health").getAsFloat()<=0 && sample.has("bodyStarted"))
+                        fatalBodies.add(sample.get("bodyStarted").getAsLong());
+                }
+                result.addProperty("fatalBodyInstances",fatalBodies.size());
                 if(c.name().contains("_arm_"))passed&=(region&6)!=0;
                 if(c.name().contains("_leg_"))passed&=(region&24)!=0;
                 result.addProperty("lostRegion",region);
                 result.addProperty("localTissueLoss",localLoss);result.addProperty("ruptureMist",mist);
-                passed&=localLoss&&mist&&cuts==1&&components==1&&bodies.size()==1;
+                passed&=localLoss&&mist&&cuts==1&&components==1&&fatalBodies.size()==1;
             }else passed&=deformation>.001&&bodies.size()==1&&(expected==FatalWeaponImpact.HAMMER_BREAK?cuts>0&&components>=2:cuts==0&&components==1);
         }
         if(c.name().contains("_zombie_")){
