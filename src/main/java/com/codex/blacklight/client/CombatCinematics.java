@@ -38,6 +38,10 @@ public final class CombatCinematics {
         if(!PassiveHudConfig.CINEMATIC_COMBAT.get())return;
         double base=switch(payload.effect()){
             case CLAW_HIT -> .34;
+            case BOSS_ARMOR -> .16;
+            case BOSS_HIT -> .40;
+            case BOSS_WEAK, BOSS_STRIKE -> .72;
+            case BOSS_BREAK -> 1;
             case BLADE_CUT,BLADE_RETURN -> .40;
             case HEAVY_LANDING -> .28;
             case SPRINT_COLLISION -> .66;

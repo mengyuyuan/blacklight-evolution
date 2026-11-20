@@ -6,6 +6,7 @@ allprojects {
     layout.buildDirectory.set(project.file('build/goliath-integration-check'))
     afterEvaluate {
     def selected = [
+        'src/encounterTest/java/com/codex/blacklight/gametest/GoliathOrganGameTest.java',
         'src/greeneTest/java/com/codex/blacklight/gametest/ThrownBossContactGameTest.java',
         'src/encounterTest/java/com/codex/blacklight/gametest/GoliathObstructionGameTest.java',
         'src/encounterTest/java/com/codex/blacklight/gametest/GoliathSlamMotionGameTest.java',

@@ -77,6 +77,12 @@ public final class ClientCarryPlacement {
         float motion=visual.motionProgress(victim.level().getGameTime(),partial);
         if(visual.stage()==ConsumeVisual.CONSUME)
             goal=ConsumePlacementTrack.pairedGoal(goal,owner.getPosition(partial),ConsumePlacementTrack.actorAnchor(visual.origin(),visual.facing(),form,motion,false,visual.variant()));
+        int gate=com.codex.blacklight.combat.ConsumeVisual.groundGate(visual.form(),visual.variant());
+        if(visual.stage()==ConsumeVisual.CONSUME && gate>=0 && visual.elapsed(victim.level().getGameTime(),partial)>=gate){
+            var surface=ConsumePlacementTrack.landingSurface(victim,goal,visual.facing(),visual.variant(),motion,owner.getY());
+            if(surface.isPresent())goal=new Vec3(goal.x,surface.getAsDouble(),goal.z);
+            if(visual.landingDelay()<0)goal=new Vec3(goal.x,current.y,goal.z);
+        }
         // A consume scene's goal is the server's own scripted track; fast whip lifts outrun the
         // receiver's 3-tick interpolation by up to ~4 blocks, so the teleport guard stays wider there.
         Vec3 delta=goal.subtract(current);double limit=visual.stage()==ConsumeVisual.CONSUME?Math.max(10,correctionLimit(owner)):correctionLimit(owner);

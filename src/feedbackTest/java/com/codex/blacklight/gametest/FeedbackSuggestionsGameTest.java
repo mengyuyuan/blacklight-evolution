@@ -2,6 +2,7 @@ package com.codex.blacklight.gametest;
 import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.GrowthProgress;
+import com.codex.blacklight.state.EvolutionMilestones;
 import com.codex.blacklight.combat.*;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.entity.EntityType;
@@ -10,18 +11,23 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class FeedbackSuggestionsGameTest {
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_threshold")
-    public static void upgradedThresholdIsSharedByHumanAndLiquidForms(GameTestHelper h){
+    public static void humanAndLiquidFormsUseTheirOwnUpgrades(GameTestHelper h){
         var p=FeedbackLifecycleGameTest.player(h);var target=EntityType.ZOMBIE.create(h.getLevel());
         try{
             target.setPos(p.position());target.setNoAi(true);target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100);
             h.getLevel().addFreshEntity(target);target.setHealth(19);
-            h.assertTrue(!ConsumeSystem.healthReady(p,target)&&!BiomassSystem.edible(p,target),"baseline requires 15 percent");
+            h.assertTrue(!ConsumeSystem.healthReady(p,target)&&BiomassSystem.edible(p,target),"19 of 100 exceeds the human 15 percent threshold but fits the liquid 20 health limit");
             p.setData(ModAttachments.GROWTH,GrowthProgress.EMPTY.buy(GrowthUpgrade.ASSIMILATION));
-            h.assertTrue(ConsumeSystem.healthReady(p,target)&&BiomassSystem.edible(p,target),"first upgrade permits 20 percent in both forms");
+            h.assertTrue(ConsumeSystem.healthReady(p,target)&&BiomassSystem.edible(p,target),"human assimilation permits 19 percent and the target remains under the liquid cap");
             target.setHealth(24);
             h.assertTrue(!ConsumeSystem.healthReady(p,target),"first tier cannot consume 24 percent");
             p.setData(ModAttachments.GROWTH,p.getData(ModAttachments.GROWTH).buy(GrowthUpgrade.ASSIMILATION_II));
-            h.assertTrue(ConsumeSystem.healthReady(p,target)&&BiomassSystem.edible(p,target),"second upgrade permits 25 percent");
+            h.assertTrue(ConsumeSystem.healthReady(p,target)&&!BiomassSystem.edible(p,target),"24 of 100 fits the second human upgrade but exceeds the base liquid cap");
+            p.setData(ModAttachments.EVOLUTION_MILESTONES,p.getData(ModAttachments.EVOLUTION_MILESTONES).grant(EvolutionMilestones.INFINITE));
+            p.setData(ModAttachments.INFINITE_EVOLUTION,p.getData(ModAttachments.INFINITE_EVOLUTION).buy(EvolutionAttribute.BIOMASS_CONSUMPTION,2));
+            h.assertTrue(BiomassSystem.edible(p,target),"two biomass ranks accept exactly 24 remaining health");
+            target.setHealth(25);
+            h.assertTrue(ConsumeSystem.healthReady(p,target)&&!BiomassSystem.edible(p,target),"25 percent still fits only the human upgrade");
             target.setHealth(26);h.assertTrue(!ConsumeSystem.healthReady(p,target),"upgrade still enforces weakening");
         }finally{target.discard();FeedbackLifecycleGameTest.cleanup(p);}h.succeed();
     }

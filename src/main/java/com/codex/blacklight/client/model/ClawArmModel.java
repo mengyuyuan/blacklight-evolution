@@ -34,6 +34,7 @@ public final class ClawArmModel extends Model {
     private ResourceLocation texture = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/claw_white.png");
     private ResourceLocation emissiveTexture = texture;
     private boolean textured;
+    private final java.util.BitSet strikingPlate = new java.util.BitSet();
 
     public ResourceLocation texture() { return texture; }
     public ResourceLocation emissiveTexture() { return emissiveTexture; }
@@ -56,6 +57,17 @@ public final class ClawArmModel extends Model {
             if (root.has("anchors")) for (var entry : root.getAsJsonObject("anchors").entrySet()) {
                 var p = entry.getValue().getAsJsonArray();
                 anchors.put(entry.getKey(), new org.joml.Vector3f(p.get(0).getAsFloat(), p.get(1).getAsFloat(), p.get(2).getAsFloat()));
+            }
+            if (asset.equals("form_hammerfists")) {
+                for (var entry : root.getAsJsonObject("parts").entrySet()) {
+                    var part = entry.getValue().getAsJsonObject();
+                    if (!part.get("joint").getAsString().equals("Hand_R")) continue;
+                    String name = entry.getKey();
+                    if (name.startsWith("Heavy fist mass") || name.startsWith("Broad outer knuckle plate") || name.startsWith("Knuckle bone tip")) {
+                        int first = part.get("start").getAsInt();
+                        strikingPlate.set(first, first + part.get("count").getAsInt());
+                    }
+                }
             }
             for (var entry : root.getAsJsonObject("joints").entrySet()) {
                 var source = entry.getValue().getAsJsonArray();
@@ -245,7 +257,7 @@ public final class ClawArmModel extends Model {
                 boolean useAtlas = textured && (emissivePass || !liquid.liquid());
                 if (useAtlas) color = 0xFFFFFFFF;
                 color=(Math.round(surface.opacity[index]*255)<<24)|(color&0xFFFFFF);
-                if(!emissivePass&&v<3&&face.color==0xff9ca69d&&surface.opacity[index]>.95F
+                if(!emissivePass&&v<3&&(strikingPlate.isEmpty()?face.color==0xff9ca69d:strikingPlate.get(faceIndex))&&surface.opacity[index]>.95F
                         &&com.codex.blacklight.client.renderer.ConsumeBladeContact.accepts(faceIndex))
                     com.codex.blacklight.client.renderer.ConsumeBladeContact.vertex(faceIndex,v,
                             new net.minecraft.world.phys.Vec3(p[0],p[1],p[2]),new net.minecraft.world.phys.Vec3(x,y,z));

@@ -81,15 +81,26 @@ public final class GoliathMotion {
         }
         return compensate(rise);
     }
-    private static float[][] blendPose(float[][] from,float[][] to,float progress){
+    static float[][] blendPose(float[][] from,float[][] to,float progress){
         float t=Math.max(0,Math.min(1,progress));
         float weight=t*t*(3-2*t);
         for(int i=0;i<to.length;i++)to[i]=SourceBossMotion.blend(from[i],to[i],weight);
         return compensate(to);
     }
     public static float[][] pose(EncounterMob mob,float partial){
-        if(!mob.isAlive())return sample("death",mob.deathTime+partial,false);
-        if(mob.exposed())return recovery(mob.exposedAge(partial),mob.exposedDuration(),mob.goliathCrashSample(),mob.tickCount+partial);
+        var window = mob.goliathWindow();
+        float idleAge = mob.tickCount + partial;
+        if (!mob.isAlive()) return sample(mob.broken(0) ? "crawl_death" : "death", mob.deathTime + partial, false);
+        if (mob.exposed() && (mob.goliathCrashSample() != 0 || window == GoliathWindow.NONE))
+            return recovery(mob.exposedAge(partial), mob.exposedDuration(), mob.goliathCrashSample(), idleAge);
+        if (window != GoliathWindow.NONE)
+            return GoliathInjuryPose.window(window, mob.exposedAge(partial), mob.exposedDuration(), idleAge);
+        if (mob.broken(0)) {
+            boolean armMissing = mob.broken(1);
+            if (mob.move() == (armMissing ? EncounterMove.SLAM : EncounterMove.ERUPTION))
+                return GoliathInjuryPose.attack(armMissing, mob.moveAge(partial), idleAge);
+            return GoliathInjuryPose.crawl(armMissing, mob.goliathGait(), mob.level().isClientSide ? partial : 1, idleAge);
+        }
         if(GoliathCharge.uses(mob.kind(),mob.move()))return GoliathCharge.pose(mob.goliathChargeSnapshot(),mob.moveAge(partial));
         if(mob.move()!=EncounterMove.NONE)return attack(mob.move(),mob.moveAge(partial));
         var gait=mob.goliathGait();

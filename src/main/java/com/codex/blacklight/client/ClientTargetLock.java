@@ -107,8 +107,8 @@ public final class ClientTargetLock {
         var mc=Minecraft.getInstance();var player=mc.player;
         if(player==null||mc.level==null||!active())return;
         if(REQUEST.desiredId()>=0){
-            // Repeated lock presses cycle visible boss subtargets. Sneak+lock releases.
-            if(lockedTarget!=null&&selection(lockedTarget).regional()&&!player.isShiftKeyDown()){
+            // A plain press always releases, including while the acquisition packet is in flight.
+            if(lockedTarget!=null&&selection(lockedTarget).regional() && SkillBindings.down(mc.options.keySprint) && !SkillBindings.down(mc.options.keyShift)){
                 var next=selection(lockedTarget).nextVisible(player,range());
                 if(next!=null){select(next);return;}
             }

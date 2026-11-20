@@ -11,5 +11,11 @@ public final class ConsumeProgression {
     public static GrowthProgress progress(Player p){return p.getData(ModAttachments.GROWTH);}
     public static int absorbTicks(Player p){return absorbTicks(progress(p));}
     public static float crawlSpeed(Player p){return crawlSpeed(progress(p));}
+    static boolean withinBiomassLimit(float remaining, float maximum, long rank, boolean boss, float bossFraction) {
+        if(!Float.isFinite(remaining) || !Float.isFinite(maximum) || remaining<=0 || maximum<=0)return false;
+        double threshold=20D+EvolutionAttribute.BIOMASS_CONSUMPTION.effect(rank);
+        if(boss)threshold=Math.min(threshold,maximum*(double)bossFraction);
+        return remaining<=threshold;
+    }
     private ConsumeProgression(){}
 }

@@ -13,11 +13,20 @@ spec=importlib.util.spec_from_file_location('source_motion',ROOT/'tools/export_e
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 import goliath_source_pose as source_pose
 from goliath_neck_geometry import add_neck
+from goliath_foot_geometry import add_feet
 np=m.np
 path,rig_name,reference_name,clips=m.PROFILES['goliath']
 clips=dict(clips,CHARGE_RETURN='behemoth_bullrush_to_aggro',
     TAUNT_TELL='behemoth_biped_to_aggro_head_tell',TAUNT='behemoth_com_biped_aggro_to_biped',
-    TAUNT_HOWL='behemoth_com_biped_howl')
+    TAUNT_HOWL='behemoth_com_biped_howl',
+    arm_fall='behemoth_com_claw_stun_flail',
+    back_slam='behemoth_aggro_crawl_bigair_attack',
+    face_stun='behemoth_com_crawl_stuned_head',
+    finish_idle='behemoth_com_crawl_stuned_idle',
+    crippled_walk='behemoth_crawl_dismembered',
+    spike_windup='behemoth_com_crawl_front_spike_all',
+    back_recover='behemoth_com_prone_stuned_recover',
+    crawl_death='behemoth_com_crawl_death')
 nodes=m.nodes(path);rig=m.skeleton(nodes,rig_name)
 anims={m.decoder.text8(n['payload'],4)[0]:n for n in nodes if n['type']==0x121000}
 decoded={name:m.decoder.decode(anims[name]) for name in set(clips.values())|{reference_name}}
@@ -322,6 +331,7 @@ for key,name in clips.items():
     table['clips'][key]={'source':name,'fps':clip['fps'],'frames':frames,'seconds':(clip['frames']-1)/clip['fps']}
     errors.append(dict(clip=key,frames=len(frames),maxJointErrorBlocks=max_error,maxAffineElementErrorPixels=max_affine_error))
 add_neck(result,table)
+add_feet(result,table,m,rig,decoded,nodes)
 geo_path.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
 (ROOT/'src/main/resources/assets/blacklight/models/encounter_goliath_source.json').write_text(json.dumps(table,separators=(',',':')),encoding='utf-8')
 report={'schema':1,'status':'source_bind_and_pose_corrected_not_native_validated',

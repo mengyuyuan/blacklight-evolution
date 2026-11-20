@@ -9,10 +9,10 @@ public final class ConsumeVariant {
     public static final int HEAD_STOMP=2, BEATDOWN=3, KNEE_HEAD=4;
     public static final int STEALTH_NECK=5,STEALTH_BEARHUG=6,STEALTH_NELSON=7,STEALTH_GUILLOTINE=8,STEALTH_JUGULAR=9;
     private ConsumeVariant() {}
-    public static boolean alternatives(PowerForm form){return form==PowerForm.NONE||form==PowerForm.CLAWS||form==PowerForm.WHIPFIST;}
+    public static boolean alternatives(PowerForm form){return form==PowerForm.NONE||form==PowerForm.CLAWS||form==PowerForm.WHIPFIST||form==PowerForm.HAMMERFISTS||form==PowerForm.MUSCLE_MASS;}
     public static int normalize(PowerForm form,int variant){
         if(form==PowerForm.NONE&&variant>=HEAD_STOMP&&variant<=STEALTH_JUGULAR)return variant;
-        return (form==PowerForm.CLAWS||form==PowerForm.WHIPFIST)&&variant==CLASSIC?CLASSIC:DEFAULT;
+        return form!=PowerForm.NONE&&alternatives(form)&&variant==CLASSIC?CLASSIC:DEFAULT;
     }
     public static int[] variants(PowerForm form){return form==PowerForm.NONE?new int[]{DEFAULT,HEAD_STOMP,BEATDOWN,KNEE_HEAD,STEALTH_NECK,STEALTH_BEARHUG,STEALTH_NELSON,STEALTH_GUILLOTINE,STEALTH_JUGULAR}:alternatives(form)?new int[]{DEFAULT,CLASSIC}:new int[]{DEFAULT};}
     public static boolean stealth(PowerForm form,int variant){return form==PowerForm.NONE&&variant>=STEALTH_NECK&&variant<=STEALTH_JUGULAR;}

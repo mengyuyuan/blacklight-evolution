@@ -347,20 +347,20 @@ public final class BlacklightSupremeHunter extends Monster {
     // ---- damage and reactions ----
     @Override public boolean hurt(DamageSource source,float amount){
         if(level().isClientSide||isBeingConsumed())return false;
-        if(amount>0&&source.getEntity() instanceof Player player&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)){
-            // Original immunity to airborne swats: only Bulletdive / devastators land cleanly.
-            boolean air=!consumed&&airborne(player)&&source.getDirectEntity()==player&&!player.isPassenger()
-                    &&!DevastatorDamage.isTrueDamage(source);
-            if(air){
-                amount*=SupremeHunterBalance.AIR_DEFLECT_FACTOR;
-                Vec3 d=player.position().subtract(position()).multiply(1,0,1).normalize();
-                player.setDeltaMovement(d.x*1.1,.45,d.z*1.1);player.hurtMarked=true;
-                playSound(SoundEvents.SHIELD_BLOCK,1.5F,.6F);
-            }
+        if(amount>0&&source.getEntity() instanceof Player player&&deflects(source)){
+            amount*=SupremeHunterBalance.AIR_DEFLECT_FACTOR;
+            Vec3 d=player.position().subtract(position()).multiply(1,0,1).normalize();
+            player.setDeltaMovement(d.x*1.1,.45,d.z*1.1);player.hurtMarked=true;
+            playSound(SoundEvents.SHIELD_BLOCK,1.5F,.6F);
         }
         boolean accepted=super.hurt(source,amount);
         if(accepted&&isAlive())react(source,amount);
         return accepted;
+    }
+    public boolean deflects(DamageSource source){
+        return !consumed && source.getEntity() instanceof Player player && source.getDirectEntity()==player
+                && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !DevastatorDamage.isTrueDamage(source)
+                && !player.isPassenger() && airborne(player);
     }
     /** Jumping swats and attacks from on top of the boss. onGround alone lags a tick behind teleports and knockback. */
     private boolean airborne(Player player){

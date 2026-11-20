@@ -47,7 +47,8 @@ public record PhysicalFeedbackPayload(Effect effect, float intensity) implements
         WALL_MANTLE,
         BLADE_CUT,
         BLADE_RETURN,
-        BLADE_HEAVY;
+        BLADE_HEAVY,
+        BOSS_ARMOR, BOSS_HIT, BOSS_WEAK, BOSS_BREAK, BOSS_STRIKE;
 
         private static Effect byId(int id) {
             Effect[] values = values();

@@ -56,7 +56,9 @@ public final class PumpTruckRenderer implements BlockEntityRenderer<PumpStation>
             double hit=pump.dent()==0?0:Math.max(0,clock-pump.impactAt()+partial);
             double dent=pump.dent()==2?Math.min(1,hit/4):0;
             double shock=pump.dent()==0?0:Math.sin(hit*.67)*Math.exp(-hit*.16);
-            int rigLight=lightAt(pump,facing,-2.5,1.55,-1.5);
+            // Both probes sit above the collision blocks hidden inside the cab and tank.
+            int rigLight=VehicleExteriorLight.combine(lightAt(pump,facing,-4.5,3.25,-1.5),
+                    lightAt(pump,facing,-1.5,3.25,-1.5));
             draw(PumpTruckModel.WHEELS,pose,out,rigLight,overlay);
             pose.pushPose();
             pose.translate(0,-.11*dent+.065*shock,0);
@@ -83,7 +85,7 @@ public final class PumpTruckRenderer implements BlockEntityRenderer<PumpStation>
                 pose.pushPose();
                 pose.translate(-pressure*t*(1-t)*.49+lash*.55,pulse*.19+Math.abs(lash)*.44,0);
                 var point=PumpTruckModel.linePoint((i+.5)/PumpTruckModel.LINE.length);
-                int hoseLight=lightAt(pump,facing,point.x,point.y+.15,point.z);
+                int hoseLight=lightAt(pump,facing,point.x,point.y+.55,point.z);
                 draw(PumpTruckModel.LINE[i],pose,out,hoseLight,overlay);
                 pose.popPose();
             }
