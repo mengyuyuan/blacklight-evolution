@@ -7,11 +7,14 @@ import java.util.HashMap;
 /** Receiver effects have their own event clock; an actor clip ending does not finish absorption. */
 public final class ConsumeReceiverScene {
     public record Profile(String style, float deformSeconds, java.util.List<Float> hitSeconds,
-                          float effectSeconds, float finishSeconds, float settleSeconds) {
+                          float effectSeconds, float finishSeconds, float settleSeconds, float absorbSeconds) {
         public boolean impactAt(int tick) { return hitSeconds.stream().anyMatch(t -> Math.round(t*20)==tick); }
     }
     private static Map<String, Profile> profiles;
     private ConsumeReceiverScene() {}
+
+    /** The recovered beatdown ends in two successive right-hand blows. */
+    public static boolean beatdownRightHand(int hit) { return hit==1 || hit==3 || hit==4; }
 
     public static Profile profile(PowerForm form,boolean large){return profile(form,large,ConsumeVariant.DEFAULT);}
     public static synchronized Profile profile(PowerForm form, boolean large,int variant) {
@@ -23,6 +26,7 @@ public final class ConsumeReceiverScene {
                 for (var entry : root.getAsJsonObject("profiles").entrySet()) {
                     var row=entry.getValue().getAsJsonObject();
                     String style=row.get("style").getAsString();
+                    float absorb=row.has("absorbSeconds")?row.get("absorbSeconds").getAsFloat():Float.NaN;
                     float effect=row.get("effectSeconds").getAsFloat(),finish=row.get("finishSeconds").getAsFloat(),settle=row.get("settleSeconds").getAsFloat();
                     float deform=row.get("deformSeconds").getAsFloat();
                     var hits=new java.util.ArrayList<Float>();
@@ -36,7 +40,7 @@ public final class ConsumeReceiverScene {
                             || !Float.isFinite(deform)||deform<0||deform>=finish
                             || effect<0||finish<=effect||finish>20||settle<=0||settle>=finish-Math.max(effect,deform))
                         throw new IllegalArgumentException("Invalid receiver events: "+entry.getKey());
-                    loaded.put(entry.getKey(), new Profile(style,deform,java.util.List.copyOf(hits),effect,finish,settle));
+                    loaded.put(entry.getKey(), new Profile(style,deform,java.util.List.copyOf(hits),effect,finish,settle,absorb));
                 }
             });
             profiles=Map.copyOf(loaded);
@@ -49,6 +53,8 @@ public final class ConsumeReceiverScene {
      * receiver's clock. Split variants start their gib's own consume track at spawn.
      * These event times are source observations; MC finish times and solver gains are adaptations. */
     public static float absorptionSeconds(PowerForm form,int variant) {
+        var nativeScene=profile(form,false,variant);
+        if(nativeScene!=null && Float.isFinite(nativeScene.absorbSeconds()))return nativeScene.absorbSeconds();
         return switch(ConsumeSequence.key(form,variant)) {
             case "normal" -> 1.833333F; // chest punch, FIG 96484
             case "claws_head" -> 2.5F; // head crush, FIG 7224

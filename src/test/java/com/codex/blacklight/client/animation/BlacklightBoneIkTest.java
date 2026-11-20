@@ -49,4 +49,16 @@ class BlacklightBoneIkTest {
         var fitted=rig.getBoundTransformFor(pose,rig.searchJointByName("Tool_R")).transformPosition(new Vector3f(endpoint));
         assertTrue(fitted.isFinite());assertEquals(reach,shoulder.distance(fitted),2e-4);
     }
+    @Test void raisedStompingSoleMeetsTargetWithoutMovingTheSupportLeg(){
+        var rig=BlacklightSkeleton.get();
+        var pose=new BlacklightPose();
+        var sole=rig.getBoundTransformFor(pose,rig.legL).invert()
+                .transformPosition(new Vector3f(-.119F,.001F,0));
+        var planted=rig.getBoundTransformFor(pose,rig.legR);
+        var target=new Vector3f(-.18F,.43F,-.24F);
+        BlacklightBoneIk.reachLimb(rig,pose,rig.thighL,rig.legL,rig.legL,target,sole);
+        var contact=rig.getBoundTransformFor(pose,rig.legL).transformPosition(new Vector3f(sole));
+        assertEquals(0,contact.distance(target),1e-4);
+        assertEquals(planted,rig.getBoundTransformFor(pose,rig.legR));
+    }
 }

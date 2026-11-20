@@ -33,11 +33,11 @@ public final class GoliathFrontSlamGameTest {
         h.runAfterDelay(110,()->{h.assertTrue(pig.getHealth()==after[0],"recovery and overlapping spheres cannot duplicate the hit");h.assertTrue(mob.move()==EncounterMove.NONE,"source recovery ends");mob.discard();pig.discard();h.succeed();});
     }
     @GameTest(template="blackwatch_arena",batch="goliath_front_slam_cancel",timeoutTicks=110)
-    public static void breakingLegDefensesCancelsTheSourceImpact(GameTestHelper h){
+    public static void staggerInterruptsFrontSlamBeforeContact(GameTestHelper h){
         var mob=actor(h);var pig=target(h);
         h.runAfterDelay(25,()->h.assertTrue(mob.begin(EncounterMove.HAMMER,pig),"source front slam begins"));
-        h.runAfterDelay(35,()->h.assertTrue(mob.hurtPart(0,h.getLevel().damageSources().generic(),100),"first leg plate breaks"));
-        h.runAfterDelay(50,()->{h.assertTrue(mob.hurtPart(1,h.getLevel().damageSources().generic(),100),"second leg plate breaks");h.assertTrue(mob.exposed()&&mob.move()==EncounterMove.NONE,"exposure cancels source action");});
+        h.runAfterDelay(35,()->h.assertTrue(mob.hurtPart(0,h.getLevel().damageSources().generic(),100),"first armored hit builds poise"));
+        h.runAfterDelay(50,()->{h.assertTrue(mob.hurtPart(1,h.getLevel().damageSources().generic(),100),"second armored hit staggers");h.assertTrue(!mob.broken(0)&&mob.goliathWindow()==GoliathWindow.HEAD&&mob.move()==EncounterMove.NONE,"exposure cancels source action");});
         h.runAfterDelay(100,()->{h.assertTrue(pig.getHealth()==100,"cancelled source impact cannot fire late");mob.discard();pig.discard();h.succeed();});
     }
     @GameTest(template="blackwatch_arena",batch="goliath_incoming_arrow",timeoutTicks=30)
@@ -59,7 +59,10 @@ public final class GoliathFrontSlamGameTest {
     public static void reboundProxiesKeepTwoWeakRegionsAndOneSavedOwner(GameTestHelper h){
         var mob=actor(h);EncounterMob copy=null;
         try{
-            h.assertTrue(mob.hurtPart(0,h.getLevel().damageSources().generic(),100),"left defense breaks");
+            var state=new net.minecraft.nbt.CompoundTag();mob.saveWithoutId(state);
+            state.putInt("GoliathWindow",GoliathWindow.KNEE.ordinal());state.putLong("EncounterExposedStart",h.getLevel().getGameTime());
+            state.putLong("EncounterExposed",h.getLevel().getGameTime()+60);mob.load(state);mob.updateParts();
+            h.assertTrue(mob.hurtPart(0,h.getLevel().damageSources().generic(),100),"vulnerable right knee breaks");
             var saved=new CompoundTag();mob.saveWithoutId(saved);copy=EncounterEntities.CREATURES.get(EncounterKind.GOLIATH).get().create(h.getLevel());copy.load(saved);copy.updateParts();
             h.assertTrue(copy.getParts().length==GoliathContact.regionBones().size(),"reload recreates deterministic skin regions");
             for(int i=0;i<copy.getParts().length;i++){
@@ -67,8 +70,11 @@ public final class GoliathFrontSlamGameTest {
                 h.assertTrue(part.getId()==copy.getId()+i+1&&!part.shouldBeSaved(),"spawn IDs are contiguous and proxies do not persist separately");
             }
             h.assertTrue(!copy.getParts()[0].isPickable()&&copy.getParts()[1].isPickable(),"broken weak plate remains absent after load");
-            h.assertTrue(copy.hurtRegions(0).get(0).boxes().isEmpty()&&copy.hurtRegions(0).stream().skip(2).allMatch(r->!r.boxes().isEmpty()),"breaking a plate does not erase body regions");
-            for(int i=2;i<copy.getParts().length;i++)h.assertTrue(copy.getParts()[i].isPickable(),"all body proxies remain pickable after two weak slots");
+            var regions=copy.hurtRegions(0);
+            for(int i=0;i<regions.size();i++){
+                boolean present=!GoliathLockPart.severed(regions.get(i).bone(),1);
+                h.assertTrue(copy.getParts()[i].isPickable()==present && regions.get(i).boxes().isEmpty()!=present,"detached mesh and all native proxies agree for "+regions.get(i).bone());
+            }
             copy.discard();for(var part:copy.getParts())h.assertTrue(!part.isPickable(),"removed owner disables every proxy");h.succeed();
         }finally{if(copy!=null)copy.discard();mob.discard();}
     }

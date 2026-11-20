@@ -319,13 +319,35 @@ public final class SurvivalEncounterGameTest {
             h.assertTrue(saved.getLong("blacklight_lost_convoy")==console.asLong(),"remember the street after respawn");
             h.assertTrue(BossSiteBlock.activate(level,console,returned).equals("active"),"return to the same fight without a second key");
             h.assertTrue(level.getEntitiesOfClass(EncounterMob.class,new AABB(pad).inflate(6)).size()==1,"one boss remains");
-            boss.hurt(returned.damageSources().playerAttack(returned),1000000);
+            finishConvoyFight(h,boss,returned);
             h.assertTrue(done(returned,"convoy_cleared"),"returning participant receives clearance");
         } finally {
             players.remove(returned);
             boss.discard();
         }
         h.succeed();
+    }
+
+    // These fixtures exercise convoy ownership, credit and the physical drop. The
+    // live GoliathOrganGameTest drives each opening from an intact boss to this saved pose.
+    static void finishConvoyFight(GameTestHelper h,EncounterMob boss,net.minecraft.server.level.ServerPlayer player){
+        var source=player.damageSources().playerAttack(player);
+        boss.hurt(source,1000000);
+        h.assertTrue(boss.isAlive(),"normal damage cannot bypass the convoy's organ fight");
+        var state=new net.minecraft.nbt.CompoundTag();boss.saveWithoutId(state);
+        long now=boss.level().getGameTime();
+        state.putInt("EncounterBroken",3);
+        state.putInt("GoliathWindow",com.codex.blacklight.combat.GoliathWindow.FACE.ordinal());
+        state.putLong("EncounterExposedStart",Math.max(0,now-30));
+        state.putLong("EncounterExposed",now+35);
+        boss.load(state);
+        var face=boss.hurtRegions(0).stream().filter(r->r.bone().equals("jaw")).findFirst().orElseThrow();
+        boss.invulnerableTime=0;
+        boss.hurtAt(source,100,new com.codex.blacklight.combat.HydraHurtContact.Contact("jaw",face.boxes().get(0).center,
+            new net.minecraft.world.phys.Vec3(0,1,0),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));
+        h.assertTrue(boss.goliathFinisherReady(),"the fallen face unlocks a kill or consumption");
+        boss.invulnerableTime=0;boss.hurt(source,100);
+        h.assertTrue(!boss.isAlive(),"the operator completes the ordinary final blow");
     }
 
     private static void fight(GameTestHelper h) {
@@ -347,8 +369,7 @@ public final class SurvivalEncounterGameTest {
             var bosses = level.getEntitiesOfClass(EncounterMob.class, new AABB(pad).inflate(5));
             h.assertTrue(bosses.size() == 1 && bosses.get(0).isPersistenceRequired(), "one persistent boss on the rotated pad");
             var boss = bosses.get(0);
-            boss.hurt(ally.damageSources().playerAttack(ally), 1000000);
-            if (boss.isAlive()) boss.hurt(level.damageSources().genericKill(), Float.MAX_VALUE);
+            finishConvoyFight(h,boss,ally);
             String victory = "convoy_cleared";
             h.assertTrue(done(operator, victory), "operator earns encounter credit");
             h.assertTrue(done(ally, victory), "attacker earns credit too");

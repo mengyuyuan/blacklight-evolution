@@ -42,6 +42,30 @@ public final class ContactEffects {
         var flash=new CombatImpactPayload(tissue.x(),tissue.y(),tissue.z(),tissue.size()*.85F,false);
         send(actor,new ContactEffectsPayload(actor.level().getGameTime(),++serial,crush?ContactEffectsPayload.CRUSH:ContactEffectsPayload.TISSUE,flash,tissue,false,List.of(),cue==null?List.of():List.of(sound(cue))));
     }
+    public static void boss(Entity actor, Vec3 at, BossImpactFeedback.Contact kind, float force) {
+        int material = switch (kind) {
+            case ARMOR -> ContactEffectsPayload.BOSS_ARMOR;
+            case FLESH -> ContactEffectsPayload.BOSS_FLESH;
+            case WEAK -> ContactEffectsPayload.BOSS_WEAK;
+            case BREAK -> ContactEffectsPayload.BOSS_BREAK;
+        };
+        var sound = switch (kind) {
+            case ARMOR -> SoundEvents.DEEPSLATE_HIT;
+            case FLESH -> SoundEvents.MUD_HIT;
+            case WEAK -> SoundEvents.ROOTED_DIRT_BREAK;
+            case BREAK -> SoundEvents.BONE_BLOCK_BREAK;
+        };
+        var sounds = new ArrayList<ContactEffectsPayload.Sound>();
+        if (!actor.isSilent()) {
+            sounds.add(new ContactEffectsPayload.Sound(BuiltInRegistries.SOUND_EVENT.getKey(sound), .85F * force, kind == BossImpactFeedback.Contact.ARMOR ? 1.1F : .72F));
+            if (kind == BossImpactFeedback.Contact.BREAK)
+                sounds.add(new ContactEffectsPayload.Sound(BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.RAVAGER_HURT), 1.1F, .75F));
+        }
+        send(actor, new ContactEffectsPayload(actor.level().getGameTime(), ++serial, material,
+                new CombatImpactPayload(at.x, at.y, at.z, force, false), null,
+                kind == BossImpactFeedback.Contact.BREAK, List.of(), sounds));
+    }
+
     public static void guard(Entity actor,Vec3 at){
         var sounds=actor.isSilent()?List.<ContactEffectsPayload.Sound>of():List.of(new ContactEffectsPayload.Sound(BuiltInRegistries.SOUND_EVENT.getKey(SoundEvents.SHIELD_BLOCK),.9F,.7F));
         send(actor,new ContactEffectsPayload(actor.level().getGameTime(),++serial,ContactEffectsPayload.GUARD,new CombatImpactPayload(at.x,at.y,at.z,.48F,false),null,false,List.of(),sounds));

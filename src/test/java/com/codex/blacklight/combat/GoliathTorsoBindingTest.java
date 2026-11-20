@@ -61,9 +61,24 @@ class GoliathTorsoBindingTest {
                     "nineteen authored cubes with one middle cube split at its centre; no added cover volume");
         }
         var pose=GoliathMotion.sample("idle",0,false);
-        var broken=GoliathContact.regions(pose,Vec3.ZERO,0,3);
-        assertTrue(broken.stream().filter(r->r.bone().startsWith("weak_")).allMatch(r->r.boxes().isEmpty()));
-        assertEquals(4,broken.stream().filter(r->r.bone().startsWith("torso")&&!r.boxes().isEmpty()).count(),
-                "breaking leg armor must not hide the repaired body connection");
+        var intact = new HashMap<String,Integer>();
+        for (var region : GoliathContact.regions(pose, Vec3.ZERO, 0, 0)) {
+            intact.put(region.bone(), region.boxes().size());
+        }
+        // weak_0 is on the severed right leg. weak_1 belongs to the surviving
+        // left support leg; the second organ break removes the slender R arm.
+        var leg = Set.of("right_leg", "right_shin", "right_calf", "right_foot", "right_toes", "weak_0");
+        var arm = Set.of("left_arm", "left_forearm", "left_hand",
+                "left_finger_0", "left_finger_1", "left_finger_2", "left_finger_3");
+        assertEquals(3, intact.get("weak_1"));
+        assertTrue(intact.keySet().containsAll(leg) && intact.keySet().containsAll(arm));
+        for (int mask : new int[]{1, 3}) {
+            for (var region : GoliathContact.regions(pose, Vec3.ZERO, 0, mask)) {
+                var bone = region.bone();
+                boolean missing = leg.contains(bone) || (mask == 3 && arm.contains(bone));
+                assertEquals(missing ? 0 : intact.get(bone), region.boxes().size(),
+                        "wrong receiving surface for mask " + mask + ", bone " + bone);
+            }
+        }
     }
 }

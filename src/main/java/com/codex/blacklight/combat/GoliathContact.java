@@ -101,9 +101,19 @@ public final class GoliathContact {
                 .transformPosition(new Vector3f(pivot[0], pivot[1], pivot[2]).div(16));
         var boxes = new ArrayList<HydraContact.Box>();
         for (var cube : CUBES)
-            if (GoliathLockPart.forSkin(cube.bone) == part && !(cube.bone.equals("weak_0") && mob.broken(0)))
+            if (part.available(mob) && GoliathLockPart.forSkin(cube.bone) == part)
                 boxes.add(worldBox(cube, transforms, base, origin));
         return new LockSurface(origin.add(at.x, at.y + .01, at.z), List.copyOf(boxes));
+    }
+
+    /** Only the striking hand and claws are needed while sweeping the planted-arm attack. */
+    public static List<HydraContact.Box> spike(EncounterMob mob,float partial){
+        var transforms=GoliathMotion.table().transforms(GoliathMotion.pose(mob,partial));
+        var base=new Matrix4f().scale(GoliathPresentation.SCALE).rotateY((float)Math.toRadians(180-mob.skinYaw(partial)));
+        var origin=mob.skinOrigin(partial);var boxes=new ArrayList<HydraContact.Box>();
+        for(var cube:CUBES)if(cube.bone.equals("left_hand")||cube.bone.startsWith("left_finger_"))
+            boxes.add(worldBox(cube,transforms,base,origin));
+        return boxes;
     }
 
     /** Stable order is shared by both loaders and both sides of the spawn packet. */
@@ -117,7 +127,7 @@ public final class GoliathContact {
         var transforms=GoliathMotion.table().transforms(pose);var base=new Matrix4f().scale(scale).rotateY((float)Math.toRadians(180-yaw));
         var byBone=new LinkedHashMap<String,List<HydraContact.Box>>();for(String bone:regionBones())byBone.put(bone,new ArrayList<>());
         for(var cube:CUBES){
-            if(cube.bone.startsWith("weak_")&&(broken&(1<<Integer.parseInt(cube.bone.substring(5))))!=0)continue;
+            if(GoliathLockPart.severed(cube.bone,broken))continue;
             byBone.get(cube.bone).add(worldBox(cube, transforms, base, origin));
         }
         var result=new ArrayList<HydraContact.Region>();

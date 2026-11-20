@@ -1,6 +1,8 @@
 package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.combat.HydraContact;
+import com.codex.blacklight.combat.GoliathLockPart;
+import com.codex.blacklight.combat.GoliathWindow;
 import com.codex.blacklight.entity.EncounterKind;
 import com.codex.blacklight.entity.EncounterMob;
 import com.codex.blacklight.entity.ThrownBlock;
@@ -114,7 +116,16 @@ public final class ThrownBossContactGameTest {
     private static void weak(GameTestHelper h,EncounterKind kind,int slot){
         var boss=boss(h,kind);
         h.runAfterDelay(5,()->{
-            var shot=shot(h,boss,bone->bone.equals("weak_"+slot));
+            Predicate<String> organ=bone->bone.equals("weak_"+slot);
+            if(kind==EncounterKind.GOLIATH){
+                var state=save(boss);var window=slot==0?GoliathWindow.KNEE:GoliathWindow.ARM;
+                state.putInt("GoliathWindow",window.ordinal());state.putInt("EncounterBroken",slot==0?0:1);
+                state.putLong("EncounterExposedStart",h.getLevel().getGameTime()-24);
+                state.putLong("EncounterExposed",h.getLevel().getGameTime()+32);
+                boss.load(state);boss.updateParts();
+                organ=bone->GoliathLockPart.forSkin(bone)==window.part;
+            }
+            var shot=shot(h,boss,organ);
             var before=save(boss);float health=boss.getHealth();
             float expected=DAMAGE*(kind==EncounterKind.ELIZABETH_GREENE?CombatScale.units(boss):1);
             h.assertTrue(armor(before,slot)>expected,"one test block does not break the selected limb");
