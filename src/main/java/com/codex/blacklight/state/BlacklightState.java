@@ -21,7 +21,8 @@ public final class BlacklightState {
             Codec.INT.optionalFieldOf("claw_upgrades", 0).forGetter(BlacklightState::getClawUpgradeMask),
             Codec.INT.optionalFieldOf("movement_upgrades", 0).forGetter(BlacklightState::getMovementUpgradeMask),
             Codec.BOOL.optionalFieldOf("prototype_mode", false).forGetter(BlacklightState::isPrototypeMode),
-            Codec.INT.optionalFieldOf("combat_skill_mask", 0).forGetter(BlacklightState::getCombatSkillMask)
+            Codec.INT.optionalFieldOf("combat_skill_mask", 0).forGetter(BlacklightState::getCombatSkillMask),
+            Codec.STRING.optionalFieldOf("stowed_weapon", "claws").forGetter(state -> state.stowedWeapon.id())
     ).apply(instance, BlacklightState::new));
 
     private boolean infected;
@@ -29,6 +30,7 @@ public final class BlacklightState {
     private int evolutionPoints;
     private int unlockedMask;
     private PowerForm activePower;
+    private PowerForm stowedWeapon = PowerForm.CLAWS;
     private String disguiseIdentity;
     private boolean disguised;
     private int alert;
@@ -51,6 +53,15 @@ public final class BlacklightState {
     BlacklightState(boolean infected, int biomass, int evolutionPoints, int unlockedMask,
                     String activePower, String disguiseIdentity, boolean disguised, int alert,
                     int clawUpgradeMask, int movementUpgradeMask, boolean prototypeMode, int combatSkillMask) {
+        this(infected, biomass, evolutionPoints, unlockedMask, activePower, disguiseIdentity, disguised, alert,
+                clawUpgradeMask, movementUpgradeMask, prototypeMode, combatSkillMask, "claws");
+    }
+
+    private BlacklightState(boolean infected, int biomass, int evolutionPoints, int unlockedMask,
+                    String activePower, String disguiseIdentity, boolean disguised, int alert,
+                    int clawUpgradeMask, int movementUpgradeMask, boolean prototypeMode, int combatSkillMask, String stowed) {
+        PowerForm saved = PowerForm.byId(stowed);
+        stowedWeapon = saved == PowerForm.NONE && !"none".equals(stowed) ? PowerForm.CLAWS : saved;
         this.infected = infected;
         this.biomass = clamp(biomass, 0, MAX_BIOMASS);
         this.evolutionPoints = Math.max(0, evolutionPoints);
@@ -71,6 +82,7 @@ public final class BlacklightState {
         unlock(PowerForm.CLAWS);
         prototypeMode = false;
         activePower = PowerForm.NONE;
+        stowedWeapon = PowerForm.CLAWS;
         disguised = false;
     }
 
@@ -80,6 +92,7 @@ public final class BlacklightState {
         evolutionPoints = 0;
         unlockedMask = 0;
         activePower = PowerForm.NONE;
+        stowedWeapon = PowerForm.CLAWS;
         disguiseIdentity = "";
         disguised = false;
         alert = 0;
@@ -108,7 +121,7 @@ public final class BlacklightState {
     }
 
     public boolean spendBiomass(int amount) {
-        // Death conversion reserve only. Upgrades spend EP; learned actions do not spend biomass.
+        // The same reserve funds death conversion and player-fired scapular quills.
         if (amount < 0 || biomass < amount) return false;
         biomass -= amount;
         return true;
@@ -188,8 +201,14 @@ public final class BlacklightState {
 
     public boolean setPrototypeMode(boolean enabled) {
         if (enabled && !infected) return false;
+        if (prototypeMode == enabled) return true;
+        if (!enabled) stowedWeapon = activePower;
         prototypeMode = enabled;
-        activePower = enabled && hasUnlocked(PowerForm.CLAWS) ? PowerForm.CLAWS : PowerForm.NONE;
+        activePower = PowerForm.NONE;
+        if (enabled && stowedWeapon != PowerForm.NONE) {
+            if (hasUnlocked(stowedWeapon)) activePower = stowedWeapon;
+            else if (hasUnlocked(PowerForm.CLAWS)) activePower = PowerForm.CLAWS;
+        }
         if (!enabled) disguised = false;
         return true;
     }

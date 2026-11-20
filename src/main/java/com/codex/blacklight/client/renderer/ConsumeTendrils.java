@@ -64,7 +64,7 @@ public final class ConsumeTendrils {
     private static double smooth(double t){t=net.minecraft.util.Mth.clamp(t,0,1);return t*t*(3-2*t);}
     /** Transport one frame along the curve: adjacent rings share vertices and never
      * leave the gaps produced by independently oriented constant-width cylinders. */
-    private static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3[] points,double[] widths,Vec3 initial){
+    static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3[] points,double[] widths,Vec3 initial){
         int sides=10;Vec3[][] rings=new Vec3[points.length][sides],normals=new Vec3[points.length][sides];Vec3 u=initial;
         for(int j=0;j<points.length;j++){
             Vec3 tangent=points[Math.min(j+1,points.length-1)].subtract(points[Math.max(0,j-1)]).normalize();

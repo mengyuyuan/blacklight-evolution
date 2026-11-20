@@ -101,7 +101,11 @@ public final class DevastatorSystem {
         WeaponMove move=null;WeaponMove.Input input=keys.intent();
         if(special&&!attack&&!action&&!p.onGround()&&glide&&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP)){
             move=WeaponMove.BULLETDIVE_DROP;input=WeaponMove.Input.SPECIAL;
-        }else if(input!=null&&input.chord()&&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p))move=move(input,!p.onGround());
+        }else if(input!=null&&input.chord()&&(action||state.getActivePower()!=PowerForm.BACKSPINES)
+                &&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p)){
+            // With quills equipped, attack + use belongs to the shoulder combo.
+            move=move(input,!p.onGround());
+        }
         if(move==null||LocalWeaponMotion.find(move.id).isEmpty()||LocalWeaponMotion.find(move.id).orElseThrow().charge().isEmpty())return false;
         if(move==WeaponMove.BULLETDIVE_DROP&&wings)com.codex.blacklight.movement.WingFlightSystem.stop(p);
         WeaponCombatSystem.cancel(p);

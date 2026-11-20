@@ -114,6 +114,8 @@ public final class ConsumeVictimPose {
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
         try {
+        var parasite=com.codex.blacklight.entity.QuillOrgan.extracting(entity);
+        if(parasite!=null){quillStruggle(model,entity,parasite,partial);return;}
         if (!com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL).active()) { hit(model,entity,partial); return; }
         var p=reaction(entity,partial);
         var saved=new IdentityHashMap<ModelPart,PartPose>();SAVED.put(model,saved);
@@ -152,6 +154,36 @@ public final class ConsumeVictimPose {
         } finally {
             var physical=SAVED.computeIfAbsent(model,ignored->new IdentityHashMap<>());
             ImpactRagdoll.pose(model,entity,partial,physical);
+        }
+    }
+    private static void quillStruggle(EntityModel<?> model,LivingEntity host,com.codex.blacklight.entity.QuillOrgan organ,float partial){
+        float t=organ.age()+partial;
+        var local=organ.getPosition(partial).subtract(host.getPosition(partial)).yRot((float)Math.toRadians(host.yBodyRot));
+        float side=local.x<0?1:-1;
+        float impact=com.codex.blacklight.entity.QuillOrgan.PIERCE_TICK;
+        float hit=(float)Math.exp(-Math.pow((t-impact-.2)/1.0,2));
+        float clasp=net.minecraft.util.Mth.clamp((t-impact+.35F)/2.5F,0,1);
+        float sag=net.minecraft.util.Mth.clamp((t-impact-1)/5F,0,1);
+        float spasm=(float)Math.exp(-Math.pow((t-com.codex.blacklight.entity.QuillOrgan.SECOND_DRAW_TICK)/1.15,2));
+        var saved=new IdentityHashMap<ModelPart,PartPose>();SAVED.put(model,saved);
+        if(model instanceof HumanoidModel<?> h){
+            for(var part:new ModelPart[]{h.head,h.hat})rotate(saved,part,-.48F*hit+.36F*sag,side*(.24F*hit-.51F*clasp),side*.16F*spasm);
+            rotate(saved,h.body,-.17F*hit+.29F*sag,side*(.26F*hit-.22F*sag),side*.16F*clasp);
+            var near=side>0?h.rightArm:h.leftArm;
+            var far=side>0?h.leftArm:h.rightArm;
+            rotate(saved,near,-.52F*clasp,side*.58F*clasp,-side*.68F*clasp);
+            rotate(saved,far,-.28F*clasp-.24F*spasm,-side*.40F*clasp,side*(.67F*hit-.88F*sag));
+            rotate(saved,h.rightLeg,side*(.44F*hit+.65F*sag),0,.22F*clasp);
+            rotate(saved,h.leftLeg,-side*(.33F*hit+.83F*sag),0,-.17F*clasp);
+            followClothing(h,saved);
+        }else if(model instanceof AgeableModelAccessor a){
+            for(var head:a.blacklight$heads())rotate(saved,head,-.42F*hit+.34F*sag,side*.45F*clasp,0);
+            int index=0;
+            for(var part:a.blacklight$body()){
+                if(index==0)rotate(saved,part,.20F*sag,side*.22F*clasp,side*.13F*hit);
+                else rotate(saved,part,(index<3?-1:1)*(.57F*clasp+.29F*spasm),0,(index%2==0?1:-1)*.24F*hit);
+                index++;
+            }
         }
     }
     private static boolean applyNative(EntityModel<?> model,Map<ModelPart,PartPose> saved,LivingEntity entity,float partial) {

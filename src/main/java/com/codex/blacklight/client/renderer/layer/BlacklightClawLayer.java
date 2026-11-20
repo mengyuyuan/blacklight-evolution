@@ -114,8 +114,6 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                              org.joml.Matrix4f[] poses,float partial,int side,boolean thirdPerson) {
         var morph=WeaponMorphTracker.sample(player,partial);
         var parts=morph.parts();
-        if(ClawTransformSettings.preview()&&(morph.target()==PowerForm.NONE||morph.target()==PowerForm.CLAWS))
-            parts=java.util.List.of(new WeaponMorphTracker.Part(PowerForm.CLAWS,BiomassSurface.Frame.stable(1)));
         var hammer=com.codex.blacklight.client.renderer.WeaponScaleRenderer.sample(player,partial);
         // All wave frequencies repeat after 50,000 ticks. Reduce before casting
         // to float so old worlds retain sub-tick liquid motion.

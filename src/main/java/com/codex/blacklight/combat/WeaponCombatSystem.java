@@ -31,6 +31,7 @@ public final class WeaponCombatSystem {
     private static long nextCutStroke;
     private record PendingCut(LivingEntity victim,boolean lethal,Vec3 previousPosition,int expires,Set<String> edges,Map<String,WeaponCutContact.Contact> blades){}
     private static final class Session {
+        final UUID attackId=UUID.randomUUID();
         long cutStroke=++nextCutStroke;
         int cutWindow=-1;
         final WeaponMove move;int started;final int created;float yaw,previousYaw;Vec3 direction;float clipOffset;double pursuitTravel;
@@ -54,6 +55,10 @@ public final class WeaponCombatSystem {
     public static boolean groundSpikeGrace(ServerPlayer p){
         var s=ACTIVE.get(p);if(s==null||!s.move.groundSpike()||s.charging||s.traveling)return false;
         int age=p.tickCount-s.started;return age>=0&&age<s.move.start&&p.tickCount-s.created<=s.move.start+2;
+    }
+    static UUID currentAttackId(ServerPlayer player) {
+        var session=ACTIVE.get(player);
+        return session!=null ? session.attackId : ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).attackId();
     }
     public static boolean busy(ServerPlayer p){return ACTIVE.containsKey(p)||DevastatorSystem.busy(p)||BackspineCombat.busy(p);}
     public static boolean active(ServerPlayer p){return ACTIVE.containsKey(p);}
@@ -119,8 +124,8 @@ public final class WeaponCombatSystem {
     }
     public static void acceptInput(ServerPlayer p,boolean attack,boolean special,boolean action,boolean jump){
         if(com.codex.blacklight.power.BiomassSystem.active(p)||com.codex.blacklight.city.HydraTransport.active(p))return;
-        if(!action&&!DevastatorSystem.busy(p)&&BackspineCombat.input(p,attack,special))return;
         if(DevastatorSystem.acceptInput(p,attack,special,action,jump))return;
+        if(!action&&BackspineCombat.input(p,attack,special))return;
         var empty=new WeaponButtons(false,false,false,false);
         var old=BUTTONS.getOrDefault(p,new Buttons(empty,p.tickCount));
         var keys=new WeaponButtons(attack,special,action,jump);

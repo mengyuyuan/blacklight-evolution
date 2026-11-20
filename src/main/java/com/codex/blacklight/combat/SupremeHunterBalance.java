@@ -1,5 +1,10 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.entity.ThrownBlock;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.Mob;
+
 /** Fixed boss encounter values in pre-CombatScale units. */
 public final class SupremeHunterBalance {
     public static final double HEALTH=20000,DAMAGE=16,ARMOR=10,TOUGHNESS=4,SPEED=.34,FOLLOW=64,HUNT_FOLLOW=512;
@@ -14,6 +19,10 @@ public final class SupremeHunterBalance {
     private static final ThreadLocal<SupremeHunterMove> CURRENT=new ThreadLocal<>();
     private static final ThreadLocal<Float> BUDGET=new ThreadLocal<>();
     private SupremeHunterBalance(){}
+    public static boolean heavyThrow(DamageSource source){
+        return source.is(DamageTypes.THROWN)
+                && (source.getDirectEntity() instanceof ThrownBlock || source.getDirectEntity() instanceof Mob);
+    }
     public static float rawMultiplier(SupremeHunterMove move){
         return switch(move){case CLAW_SLASH->.7F;case BACKHAND->1F;case OVERHAND->1.3F;case STOMP->.9F;case GROUNDSPIKE->1.4F;
             case DEVASTATOR->1F;case PICKUP_THROW->.9F;case SHOULDER_CHARGE->1.1F;case LEAP->1.2F;case GRAB_THROW->.8F;default->.5F;};

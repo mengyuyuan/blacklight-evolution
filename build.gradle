@@ -372,7 +372,6 @@ minecraft {
                 if (project.hasProperty('standaloneMorphCases')) property 'blacklight.test.standaloneMorph.cases', project.property('standaloneMorphCases').toString()
                 args '--width', '960', '--height', '640'
             }
-            if (project.hasProperty('openAnimationTuner')) property 'blacklight.test.openAnimationTuner', 'true'
             if (project.hasProperty('standaloneSync')) {
                 if (!project.hasProperty('clientRunDirectory')) throw new GradleException('Synchronization QA requires a disposable clientRunDirectory')
                 property 'blacklight.test.qaDirectory', file(project.property('clientRunDirectory')).absolutePath

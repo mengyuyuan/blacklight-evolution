@@ -7,6 +7,36 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RooftopRigTest {
+    @Test void shoulderDeploymentAndRecoilAreTimedToTheRelease(){
+        assertEquals(0F,RooftopRig.deployFill(4.9F,0));
+        assertTrue(RooftopRig.deployFill(7.5F,0)>RooftopRig.deployFill(7.5F,1));
+        assertTrue(RooftopRig.deployFill(7.5F,1)>RooftopRig.deployFill(7.5F,4));
+        for(int i=0;i<6;i++)assertEquals(1F,RooftopRig.deployFill(15,i));
+        var rig=BlacklightSkeleton.get();
+        var rest=rig.getPoseMatrices(MotionLibrary.pose("basic_run",.19F,true));
+        var left=rest.clone();var right=rest.clone();
+        RooftopRig.recoil(left,"spines_light_sweep",6);
+        RooftopRig.recoil(right,"spines_light_r_sweep",6);
+        assertFalse(left[rig.chest.getId()].equals(right[rig.chest.getId()],.01F));
+        for(var joint:new BlacklightSkeleton.Bone[]{rig.thighL,rig.thighR,rig.legL,rig.legR}){
+            assertSame(rest[joint.getId()],left[joint.getId()]);
+            assertSame(rest[joint.getId()],right[joint.getId()]);
+        }
+    }
+    @Test void lookingOverTheShoulderCarriesTheChestAndKeepsBothFeetOnTheirStride(){
+        var rig=BlacklightSkeleton.get();
+        var bones=rig.getPoseMatrices(MotionLibrary.pose("basic_run",.19F,true));
+        var original=bones.clone();
+        float turn=RooftopRig.shoulderTurn(new net.minecraft.world.phys.Vec3(0,1,-10),0,true);
+        assertTrue(turn>50 && turn<90);
+        assertEquals(0F,RooftopRig.shoulderTurn(new net.minecraft.world.phys.Vec3(0,0,10),0,true),.001F);
+        RooftopRig.aimUpperBody(bones,turn,8);
+        for(String name:new String[]{"Thigh_R","Thigh_L","Leg_R","Leg_L"}){
+            var joint=rig.searchJointByName(name);
+            assertSame(original[joint.getId()],bones[joint.getId()]);
+        }
+        assertFalse(original[rig.chest.getId()].equals(bones[rig.chest.getId()],.01F));
+    }
     @Test void spentSocketOpensItsOwnValvesAndFeedsAlongTheLaunchAxis() {
         var rig = RooftopRig.INSTANCE;
         int slot = 3;
@@ -24,6 +54,32 @@ class RooftopRigTest {
         var ready = rig.refillFrame(new org.joml.Matrix4f(), rig.quill[slot], 1, 8, false);
         assertTrue(ready.equals(new org.joml.Matrix4f().translate(0, .057F, 0), .00001F));
     }
+    @Test void walkingVolleyKeepsTheWaistOnTheStrideAndTheArmsOnTheChest() {
+        var rig = RooftopRig.INSTANCE;
+        var sk = BlacklightSkeleton.get();
+        for (boolean mirror : new boolean[]{false, true}) for (int frame = 0; frame < 24; frame++) {
+            var gait = sk.getPoseMatrices(MotionLibrary.pose("basic_walk", frame / 24F, true));
+            var shot = sk.getPoseMatrices(new BlacklightPose());
+            rig.projectPlayer(rig.sample(1 + frame / 30F), mirror, shot);
+            RooftopRig.plantGroundShot(shot);
+            var relativeHand = new org.joml.Matrix4f(shot[sk.torso.getId()]).invert().mul(shot[sk.handR.getId()]);
+            for (float weight : new float[]{0, .35F, .75F, 1}) {
+                var body = shot.clone();
+                RooftopRig.groundStride(body, gait, weight, false);
+                var hand = new org.joml.Matrix4f(body[sk.torso.getId()]).invert().mul(body[sk.handR.getId()]);
+                assertTrue(relativeHand.equals(hand, .0001F), "shoulder recoil should stay attached to the chest");
+                if (weight == 1) {
+                    for (var joint : new String[]{"Root","Thigh_R","Thigh_L","Leg_R","Leg_L","Knee_R","Knee_L"}) {
+                        int id = sk.searchJointByName(joint).getId();
+                        assertTrue(gait[id].equals(body[id], .0001F), joint);
+                    }
+                    assertEquals(0, body[sk.torso.getId()].getTranslation(new Vector3f())
+                            .distance(gait[sk.torso.getId()].getTranslation(new Vector3f())), .0001);
+                }
+            }
+        }
+    }
+
     @Test void groundVolleyKeepsBothSolesPlantedAsTheKneesCarryRecoil() {
         var rig=BlacklightSkeleton.get();
         var rest=rig.getPoseMatrices(new BlacklightPose());

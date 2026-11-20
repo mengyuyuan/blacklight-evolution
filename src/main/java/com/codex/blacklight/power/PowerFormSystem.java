@@ -45,14 +45,18 @@ public final class PowerFormSystem {
         if(visible)com.codex.blacklight.disguise.DisguiseSystem.visiblePower(player);
         if(UtilityPowerSystem.supported(form))UtilityPowerSystem.toggle(player,form);
         else if (!state.activate(form)) return false;
-        if(form==PowerForm.BACKSPINES)com.codex.blacklight.animation.PlayerActions.get().playVisual(player,"spines_scapula_deploy",0);
         combat.markTransformToggled(player.tickCount);
-        if(weapon)com.codex.blacklight.registry.ModWeaponSounds.play(player,form,"morph",player.position(),.7F,1F);
+        if(weapon)playWeaponMorph(player,form,true);
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state); com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);
         String message = UtilityPowerSystem.supported(form) && !UtilityPowerSystem.active(player, form)
                 ? "message.blacklight.form_disabled" : "message.blacklight.form_selected";
         player.displayClientMessage(Component.translatable(message, Component.translatable("power.blacklight." + form.id())), true);
         return true;
+    }
+    public static void playWeaponMorph(ServerPlayer player, PowerForm form, boolean deploying) {
+        if(deploying && form==PowerForm.BACKSPINES)
+            com.codex.blacklight.animation.PlayerActions.get().playVisual(player,"spines_scapula_deploy",0);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,form,"morph",player.position(),.7F,1F);
     }
     public static void cycle(ServerPlayer player) {
         var state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE); int index = 0;

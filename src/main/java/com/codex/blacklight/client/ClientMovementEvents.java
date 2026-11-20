@@ -1,7 +1,6 @@
 package com.codex.blacklight.client;
 
 import com.codex.blacklight.BlacklightNeoMod;
-import com.codex.blacklight.client.screen.MovementTunerScreen;
 import com.codex.blacklight.animation.PlayerAction;
 import com.codex.blacklight.animation.PlayerMotionController;
 import com.codex.blacklight.movement.JumpInputState;
@@ -21,7 +20,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import com.codex.blacklight.forge.PacketDistributor;
 import net.minecraft.world.phys.Vec3;
@@ -30,8 +28,6 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = BlacklightNeoMod.MOD_ID, value = Dist.CLIENT)
 public final class ClientMovementEvents {
     private static final String CATEGORY = "key.categories.blacklight";
-    private static final KeyMapping ENGINE_TUNER = new KeyMapping(
-            "key.blacklight.engine_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F8, CATEGORY);
     private static final KeyMapping DODGE = new KeyMapping(
             "key.blacklight.dodge", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, CATEGORY);
     private static boolean lastJumpHeld;
@@ -64,8 +60,7 @@ public final class ClientMovementEvents {
         @SubscribeEvent
         public static void registerMovementKeys(RegisterKeyMappingsEvent event) {
             event.register(DODGE);
-            if (DeveloperTools.enabled()) event.register(ENGINE_TUNER);
-        }
+            }
     }
 
     @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
@@ -191,23 +186,6 @@ public final class ClientMovementEvents {
             // knockback and airborne actions keep their own deliberate velocity.
             player.setDeltaMovement(0,player.getDeltaMovement().y,0);
             player.xxa=0;player.zza=0;
-        }
-    }
-
-    @SubscribeEvent
-    public static void onKey(InputEvent.Key event) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (event.getAction() != GLFW.GLFW_PRESS || minecraft.player == null) return;
-        if (DeveloperTools.enabled() && ENGINE_TUNER.matches(event.getKey(), event.getScanCode())) {
-            if (!isPrototype(minecraft)) return;
-            if (minecraft.screen == null && canTuneMovement(minecraft)) {
-                minecraft.setScreen(new MovementTunerScreen());
-            } else if (minecraft.screen == null) {
-                minecraft.player.displayClientMessage(
-                        net.minecraft.network.chat.Component.translatable(
-                                "message.blacklight.tuner_singleplayer_only"), true);
-            }
-            return;
         }
     }
 
@@ -569,11 +547,6 @@ public final class ClientMovementEvents {
         return (lastMovingHeld && lastSprinting)
                 || minecraft.player.getDeltaMovement().horizontalDistance()
                 >= PrototypeLocomotion.RUN_ANIMATION_SPEED;
-    }
-
-    private static boolean canTuneMovement(Minecraft minecraft) {
-        return minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer() != null
-                && !minecraft.getSingleplayerServer().isPublished();
     }
 
     private static boolean physicalSprint(Minecraft minecraft) {

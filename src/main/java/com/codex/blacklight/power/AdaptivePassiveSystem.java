@@ -60,16 +60,16 @@ public final class AdaptivePassiveSystem {
     private static void refreshEffects(ServerPlayer p) {
         if (active(p, AdaptivePassiveState.ADAPTATION)) {
             int tier=percentBased(p)?1:0;var effect=p.getEffect(ModEffects.ADAPTATION.get());
-            if (effect==null||effect.getAmplifier()!=tier) {
+            if (effect==null||effect.getAmplifier()!=tier||effect.showIcon()) {
                 p.removeEffect(ModEffects.ADAPTATION.get());
-                p.addEffect(new MobEffectInstance(ModEffects.ADAPTATION.get(), -1, tier, false, false, true));
+                p.addEffect(new MobEffectInstance(ModEffects.ADAPTATION.get(), -1, tier, false, false, false));
             }
         } else p.removeEffect(ModEffects.ADAPTATION.get());
         if (active(p, AdaptivePassiveState.REGENERATION)) {
             int tier=percentRegeneration(p)?1:0;var effect=p.getEffect(ModEffects.TISSUE_REGENERATION.get());
-            if (effect==null||effect.getAmplifier()!=tier) {
+            if (effect==null||effect.getAmplifier()!=tier||effect.showIcon()) {
                 p.removeEffect(ModEffects.TISSUE_REGENERATION.get());
-                p.addEffect(new MobEffectInstance(ModEffects.TISSUE_REGENERATION.get(), -1, tier, false, false, true));
+                p.addEffect(new MobEffectInstance(ModEffects.TISSUE_REGENERATION.get(), -1, tier, false, false, false));
             }
         } else p.removeEffect(ModEffects.TISSUE_REGENERATION.get());
     }

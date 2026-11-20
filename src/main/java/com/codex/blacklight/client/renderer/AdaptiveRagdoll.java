@@ -2,6 +2,7 @@ package com.codex.blacklight.client.renderer;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 
 import com.codex.blacklight.client.animation.RagdollDrive;
+import com.codex.blacklight.entity.QuillOrgan;
 import com.codex.blacklight.client.animation.RagdollFatalHandoff;
 import com.codex.blacklight.combat.RagdollImpact;
 import com.codex.blacklight.mixin.client.ModelPartChildrenAccessor;
@@ -70,7 +71,7 @@ public final class AdaptiveRagdoll {
 
     public static boolean replacesDeathPoof(LivingEntity victim){
         var body=BODIES.get(victim);
-        return body!=null && (body.pressed || body.rupturedRegion!=0);
+        return QuillOrgan.consumedRemains(victim) || body!=null && (body.quill!=null || body.pressed || body.rupturedRegion!=0);
     }
     public static boolean supports(LivingEntity e){
         var owner=renderOwner(e);if(owner!=e)return supports(owner);
@@ -84,7 +85,39 @@ public final class AdaptiveRagdoll {
         if(com.codex.blacklight.combat.NativeBossBodyControl.ownsPose(e)||com.codex.blacklight.combat.FlyerPhysics.ownsLive(e))return false;
         if(RagdollDrive.captured(e)&&!com.codex.blacklight.registry.ModAttachments.getData(e, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).consuming())return false;
         return supports(e)&&!e.isInvisible()&&!COOLDOWN.containsKey(e)
-                &&(BODIES.containsKey(e)||PENDING.containsKey(e)||RagdollDrive.captured(e));
+                &&(BODIES.containsKey(e)||PENDING.containsKey(e)||RagdollDrive.captured(e)||penetrating(e)!=null);
+    }
+    private static QuillOrgan penetrating(LivingEntity host) {
+        var q=QuillOrgan.extracting(host);
+        return q!=null && q.age()>=QuillOrgan.FIRST_DRAW_TICK ? q : null;
+    }
+
+    public static Vec3 quillAnchor(LivingEntity host, QuillOrgan organ, float partial) {
+        var body=BODIES.get(host);
+        if(body==null)return organ.getPosition(partial);
+        return body.quill==organ ? body.quillSink(partial) : body.physicalWound(organ.getPosition(partial),partial);
+    }
+
+    public static boolean drawingQuillBody(LivingEntity host) {
+        var body=BODIES.get(host);
+        return body!=null && body.quill!=null && body.quill==QuillOrgan.extracting(host);
+    }
+
+    public static void drawQuillTethers(LivingEntity host, PoseStack stack, MultiBufferSource buffers, int light, float partial) {
+        var body=BODIES.get(host);
+        if(body==null || body.quill==null || body.quill!=QuillOrgan.extracting(host))return;
+        var origin=host.getPosition(partial);
+        var roots=new ArrayList<ConsumeTendrils.Attachment>();
+        for(var p:body.quillParts){
+            if(p.renderedAt!=scene.getGameTime() || p.renderedPosition==null || p.flow>.98F)continue;
+            roots.add(new ConsumeTendrils.Attachment(p.renderedPosition.subtract(origin),p.half.length()*.44*p.scale));
+        }
+        var organ=body.quill;
+        float progress=net.minecraft.util.Mth.clamp((organ.age()+partial-QuillOrgan.PIERCE_TICK)/(QuillOrgan.RELEASE_TICK-QuillOrgan.PIERCE_TICK),0,1);
+        var phase=new ConsumeFracture.Phase(com.codex.blacklight.power.PowerForm.BACKSPINES,progress,1,
+                (float)QuillTendrils.ease((progress-.40)/.60),0,ConsumeFracture.Style.RIP,true);
+        ConsumeAbsorptionFx.drawPosed(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE)),
+                light,roots,body.quillSink(partial).subtract(origin),phase,host.getId());
     }
     public static Vec3 contact(LivingEntity e,int region,float partial){
         var body=BODIES.get(e);if(body==null||!active(e))return null;
@@ -171,6 +204,8 @@ public final class AdaptiveRagdoll {
             if(!(frame.entity instanceof com.codex.blacklight.entity.BlacklightInfectedHost host)||host.appearance()!=e)return;
             frame.appearance=e;
         }
+        if(model instanceof HumanoidModel<?> humanoid && QuillOrgan.extracting(e)!=null)
+            frame.rigidOwners.put(humanoid.hat,humanoid.head);
         ConsumeAnatomy.model(model).forEach((part,id)->frame.regions.put(part,region(id)));
         if(model instanceof com.codex.blacklight.client.model.BlackwatchModel military)
             frame.rigidOwners.putAll(military.ragdollOwners());
@@ -287,6 +322,7 @@ public final class AdaptiveRagdoll {
             var rotation=local.getUnnormalizedRotation(new Quaternionf()).normalize();
             if(!Double.isFinite(pivot.lengthSqr())||!rotation.isFinite()){current=null;return;}
             nodes.put(key,new Node(key,parent,pivot,rotation,region));current=key;
+            if(key instanceof ModelPart part)QuillSkinContact.part(entity,part,local,origin,partial);
         }
         public MultiBufferSource buffers(){return capturing?this:output;}
         @Override public VertexConsumer getBuffer(RenderType type){
@@ -314,6 +350,7 @@ public final class AdaptiveRagdoll {
                     vertices.add(v.world(rigidOwners.getOrDefault(v.key,v.key),p,n));
                 }
                 if(!overflow&&!vertices.isEmpty()){
+                    QuillTendrils.fit(QuillOrgan.extracting(entity),entity,origin,vertices,partial);
                     for(var v:untouched)v.emit(output.getBuffer(v.type),v.p,v.n,v.color,v.overlay,v.light);
                     var body=BODIES.get(entity);
                     if(body==null&&QuillWounds.has(entity)){
@@ -340,7 +377,12 @@ public final class AdaptiveRagdoll {
                     body.releaseQuillChip();
                     body.attachmentVertices=attachmentVertices;body.unboundAttachmentVertices=unboundAttachmentVertices;
                     body.nativeSkin=vertices;
-                    body.target(nodes,origin,partial);body.render(entry,output,origin,partial);
+                    if(body.quill==null){
+                        body.target(nodes,origin,partial);
+                        var organ=penetrating(entity);
+                        if(organ!=null)body.burst(organ);
+                    }
+                    body.render(entry,output,origin,partial);
                 }else {
                     com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Generic ragdoll fallback id={} reason={} vertices={}",entity.getId(),overflow?"invalid-coordinates":"no-compatible-vertices",vertices.size());
                     for(var c:collectors.values())c.replay();BODIES.remove(entity);PENDING.remove(entity);COOLDOWN.put(entity,scene.getGameTime()+120);
@@ -1656,7 +1698,95 @@ public final class AdaptiveRagdoll {
                 }
             }
         }
+        QuillOrgan quill;
+        long quillAge=QuillOrgan.FIRST_DRAW_TICK;
+        Vec3 quillStart;
+        List<Part> quillParts=List.of();
+
+        Vec3 quillSink(float partial) { return quillSink(quill.age(),partial); }
+
+        Vec3 quillSink(long age,float partial) {
+            double follow=QuillTendrils.ease((age+partial-QuillOrgan.FIRST_DRAW_TICK)/6);
+            return quillStart.lerp(quill.getPosition(partial),follow);
+        }
+
+        Vec3 physicalWound(Vec3 wound,float partial) {
+            var anchor=parts.stream().min(Comparator.comparingDouble(p->p.target.distanceToSqr(wound))).orElse(root);
+            var local=rotate(wound.subtract(anchor.target),new Quaternionf(anchor.targetRotation).conjugate());
+            var position=anchor.old.lerp(anchor.pos,partial);
+            var turn=new Quaternionf(anchor.oldRotation).slerp(anchor.rotation,partial);
+            return position.add(rotate(local,turn));
+        }
+
+        void burst(QuillOrgan organ) {
+            quill=organ;
+            var posed=connectedPose(1);
+            for(int i=0;i<parts.size();i++)parts.get(i).pos=posed.positions()[i];
+            quillStart=physicalWound(organ.position(),1);
+            var inside=root.pos.lerp(quillStart,.32);
+            double kick=net.minecraft.util.Mth.clamp(Math.sqrt(entity.getBbWidth()*entity.getBbHeight())*.50,.22,.88);
+            // Break major anatomical joints only. Armour, small bones and decorations stay on their parent.
+            for(var joint:joints){
+                if(joint.parent.bind.region!=joint.child.bind.region || joint.parent==root && joint.child.volume()>=root.volume()*.06)
+                    joint.severed=true;
+            }
+            var islands=connectedPose(1).components();
+            var anchors=new LinkedHashMap<Integer,Part>();
+            for(int i=0;i<parts.size();i++){
+                var part=parts.get(i);
+                anchors.merge(islands[i],part,(a,b)->a.volume()>=b.volume()?a:b);
+                var radial=part.pos.subtract(inside);
+                var push=radial.multiply(1.3,.48,1.3).normalize().scale(part==root?kick*.28:kick);
+                push=push.add(0,kick*.48,0);
+                part.velocity=part.velocity.scale(.48).add(push);
+                Vec3 lever=rotate(part.center.subtract(part.bind.pivot),part.rotation);
+                var twist=lever.cross(push).scale(2.8/Math.max(.15,lever.length()));
+                part.spin.add(localAngularImpulse(RagdollDrive.limit(twist,.84),part.rotation).toVector3f());
+                part.still=0;
+            }
+            if(organ.age()<=QuillOrgan.FIRST_DRAW_TICK+1)
+                WoundBlood.quillBurst(entity,quillStart,inside,kick);
+            quillParts=anchors.values().stream().sorted(Comparator.comparingDouble(Part::volume).reversed()).limit(8).toList();
+            // Joining visibility mid-extraction starts at the synchronized age.
+            advanceQuill();
+        }
+
+        void advanceQuill(){
+            long age=Math.min(QuillOrgan.RELEASE_TICK,quill.age());
+            while(quillAge<age){
+                quillAge++;
+                quillStep(scene.getGameTime()-(age-quillAge),quillAge);
+            }
+        }
+
+        void quillStep(long now,long elapsed) {
+            for(var p:parts){p.old=p.pos;p.oldRotation.set(p.rotation);}
+            for(int sub=0;sub<2;sub++){
+                float fraction=(sub+1)*.5F;
+                var sink=quillSink(elapsed-1,fraction);
+                for(var p:parts){
+                    // Proximal tissue draws in first. Give the detached limbs two free physics ticks of travel.
+                    double distance=Math.min(1,p.center.distanceTo(root.center)/Math.max(.15,entity.getBbHeight()));
+                    double age=elapsed-1+fraction;
+                    p.flow=(float)QuillTendrils.ease((age-QuillOrgan.FIRST_DRAW_TICK-distance)/(QuillOrgan.RELEASE_TICK-QuillOrgan.FIRST_DRAW_TICK-1.4-distance));
+                    p.scale=Math.max(.012F,1-.988F*p.flow);
+                    if(p.flow>0){
+                        var delta=sink.subtract(p.pos);
+                        var desired=RagdollDrive.limit(delta.scale(.50+1.30*p.flow),1.65);
+                        p.velocity=p.velocity.lerp(desired,.15+.80*p.flow);
+                        p.spin.mul(1-.30F*p.flow);
+                    }
+                    p.step();
+                }
+                for(int i=0;i<4;i++)for(var joint:joints){joint.solve();joint.constrainHinge();}
+                for(var p:parts)p.floorContact();
+                var fit=connectedPose(1,true);
+                for(int i=0;i<parts.size();i++)parts.get(i).pos=fit.positions()[i];
+            }
+            recordPoses(now);
+        }
         void tick(){
+            if(quill!=null){advanceQuill();return;}
             drainConsumeCuts();
             recoveryClock();
             long now=scene.getGameTime();boolean captured=RagdollDrive.captured(entity),dead=deadAt>=0||entity.isDeadOrDying();
@@ -1851,6 +1981,10 @@ public final class AdaptiveRagdoll {
         var iterator=BODIES.values().iterator();
         while(iterator.hasNext()){
             var b=iterator.next();boolean captured=RagdollDrive.captured(b.entity);
+            if(b.quill!=null && (b.quill.isRemoved() || b.quill.phase()!=QuillOrgan.EXTRACT)){
+                iterator.remove();
+                continue;
+            }
             if(b.entity.isAlive()&&!b.entity.isRemoved()&&b.deadAt<0&&!captured&&now>b.expires+2&&now-b.targetAge<3){
                 var at=b.root.renderedPosition;
                 if(at!=null){var offset=at.subtract(b.root.target);if(offset.lengthSqr()>1e-8&&offset.lengthSqr()<=.25*.25)RELEASES.put(b.entity,new Release(offset,now));}
@@ -1866,7 +2000,7 @@ public final class AdaptiveRagdoll {
     @SubscribeEvent public static void corpses(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
         var mc=Minecraft.getInstance();if(mc.level==null)return;
-        for(var b:BODIES.values())if(b.entity.isRemoved()&&b.deadAt>=0&&b.entity.level()==mc.level)
+        for(var b:BODIES.values())if(b.quill==null&&b.entity.isRemoved()&&b.deadAt>=0&&b.entity.level()==mc.level)
             b.render(event.getPoseStack().last().pose(),mc.renderBuffers().bufferSource(),event.getCamera().getPosition(),event.getPartialTick());
     }
     @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT,bus=EventBusSubscriber.Bus.MOD)

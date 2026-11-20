@@ -4,6 +4,9 @@ import com.codex.blacklight.combat.ClawCombatSystem;
 import com.codex.blacklight.animation.PlayerActions;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.BlacklightState;
+import com.codex.blacklight.power.PowerForm;
+import com.codex.blacklight.power.PowerFormSystem;
+import com.codex.blacklight.power.ParasiteSystem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,7 +28,9 @@ public final class PrototypeModeSystem {
         if (state.isPrototypeMode() == enabled) return;
 
         com.codex.blacklight.combat.WeaponCombatSystem.cancel(player);
+        PowerForm previous=state.getActivePower();
         state.setPrototypeMode(enabled);
+        if(enabled && !ParasiteSystem.allows(player,state.getActivePower()))state.activate(PowerForm.CLAWS);
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state);
         com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);
         com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).reset();
@@ -40,7 +45,12 @@ public final class PrototypeModeSystem {
             player.hurtMarked = true;
         }
         synchronizePresentationMode(player, enabled);
-        ClawCombatSystem.playPrototypeTransition(player, enabled);
+        PowerForm weapon=enabled ? state.getActivePower() : previous;
+        if(weapon==PowerForm.CLAWS)ClawCombatSystem.playPrototypeTransition(player, enabled);
+        else {
+            ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).reset();
+            if(weapon!=PowerForm.NONE)PowerFormSystem.playWeaponMorph(player,weapon,enabled);
+        }
         player.displayClientMessage(Component.translatable(enabled
                 ? "message.blacklight.prototype_mode_enabled"
                 : "message.blacklight.prototype_mode_disabled"), true);

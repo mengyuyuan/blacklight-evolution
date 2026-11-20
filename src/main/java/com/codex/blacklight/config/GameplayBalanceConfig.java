@@ -25,11 +25,30 @@ public final class GameplayBalanceConfig {
     public static final ForgeConfigSpec.BooleanValue INFECTION_STATS,INFECTION_NATIVE_UNITS,INFECTION_NATIVE_THREAT;
     public static final ForgeConfigSpec.DoubleValue INFECTION_HEALTH_THRESHOLD,INFECTION_HEALTH_BONUS,INFECTION_HEALTH_EXCESS,INFECTION_ATTACK_THRESHOLD,INFECTION_ATTACK_BONUS,INFECTION_ATTACK_EXCESS;
     public static final ForgeConfigSpec.BooleanValue CONSUME_LAST_CHANCE;
-    public static final ForgeConfigSpec.DoubleValue CONSUME_LAST_CHANCE_THRESHOLD;
     public static final ForgeConfigSpec.BooleanValue CONVERSION_ENABLED;
     public static final ForgeConfigSpec.IntValue CONVERSION_PER_TICK,CONVERSION_RETRY_TICKS;
     public static final ForgeConfigSpec.IntValue GREENE_EXPOSED_TICKS;
     public static final ForgeConfigSpec.BooleanValue GREENE_SOURCE_TIMER;
+    public static final ForgeConfigSpec.IntValue QUILL_LIGHT;
+    public static final ForgeConfigSpec.IntValue QUILL_QUICK;
+    public static final ForgeConfigSpec.IntValue QUILL_COMBO;
+    public static final ForgeConfigSpec.IntValue QUILL_CHARGED;
+    public static final ForgeConfigSpec.IntValue QUILL_LAYERS;
+    public static final ForgeConfigSpec.DoubleValue QUILL_DRAIN;
+    public static final ForgeConfigSpec.DoubleValue QUILL_GROWTH;
+    private static final ForgeConfigSpec.BooleanValue QUILL_GROWTH_UPDATED;
+    public static final ForgeConfigSpec.IntValue QUILL_RANGE;
+    private static final ForgeConfigSpec.BooleanValue QUILL_RANGE_DEFAULTS_UPDATED;
+    public static final ForgeConfigSpec.IntValue QUILL_RANGE_UP;
+    public static final ForgeConfigSpec.IntValue QUILL_LIFE;
+    public static final ForgeConfigSpec.IntValue QUILL_LIFE_UP;
+    public static final ForgeConfigSpec.DoubleValue QUILL_SPLIT;
+    public static final ForgeConfigSpec.DoubleValue QUILL_HEAL;
+    public static final ForgeConfigSpec.IntValue QUILL_AUTO_COST;
+    public static final ForgeConfigSpec.DoubleValue QUILL_ORBIT_RADIUS;
+    public static final ForgeConfigSpec.IntValue QUILL_AUTO_RANGE;
+    public static final ForgeConfigSpec.IntValue QUILL_AUTO_INTERVAL;
+    public static final ForgeConfigSpec.DoubleValue QUILL_AUTO_DAMAGE;
     static {
         var b=new ForgeConfigSpec.Builder();
         b.comment("感染传播。概率使用0～1；20 tick约1秒。仅服务端决定结果；不修改强制感染指令。").push("infection");
@@ -110,8 +129,8 @@ public final class GameplayBalanceConfig {
         INFECTION_ATTACK_EXCESS=b.defineInRange("excessAttackBonus",.1,0,100);
         INFECTION_NATIVE_THREAT=b.comment("高血/高攻击感染体使用现有精英接触伤害预算，不再被当作普通10HP小怪；不强行补高低伤害，不影响玩家攻击。").define("recognizeNativeCombatStrength",true);b.pop();
         b.comment("可吸收生物的单次残血保命；只处理已感染玩家造成的伤害，次数保存且感染转换不刷新。满血秒杀和吞噬处决不受影响。").push("consumeLastChance");
-        CONSUME_LAST_CHANCE=b.comment("已进入残血线的可吸收生物遭遇致命攻击时留1HP一次；继续攻击仍会死亡。").define("enabled",true);
-        CONSUME_LAST_CHANCE_THRESHOLD=b.comment("受击前的剩余生命比例；0.15=15%。不是每次受击重新获得机会。").defineInRange("healthFraction",.15,0,1);b.pop();
+        CONSUME_LAST_CHANCE=b.comment("可吸收生物最大生命达到50时，首次致命攻击会留下1点生命。").define("enabled",true);
+        b.pop();
         b.comment("现有生物自动转换的服务端保护，与新怪物刷怪预算独立；所有维度共享单 tick 额度，不限制后续无限进化。").push("infectionConversion");
         CONVERSION_ENABLED=b.comment("暂停／恢复原生生物到黑光宿主的自动替换；关闭时保留原生生物、感染和装备。").define("enabled",true);
         CONVERSION_PER_TICK=b.comment("整个服务器每 tick 最多尝试的自动转换数量，包括失败尝试。剩余生物留在原处，下个 tick 继续；不批量清怪。").defineInRange("maxAttemptsPerServerTick",4,1,64);
@@ -119,7 +138,45 @@ public final class GameplayBalanceConfig {
         b.comment("格林倒下与虚弱计时。任务中的失血、下潜和波次条件仍在独立还原。").push("greene");
         GREENE_SOURCE_TIMER=b.comment("使用原版计时：从倒下开始计26.6667秒，带正负1秒随机量；每轮只取样一次，存档保留余时。").define("useSourceExposureTimer",true);
         GREENE_EXPOSED_TICKS=b.comment("仅关闭useSourceExposureTimer时使用：倒地后停留刻数，不含倒下与起身；受击不重置。").defineInRange("exposedHoldTicks",400,75,2400);b.pop();
+        b.comment("Scapular quills. Percent per layer is in percent units; ranges in blocks, time in ticks.").push("quillHarvest");
+        QUILL_LIGHT = b.defineInRange("lightShotCost", 1, 0, 1000);
+        QUILL_QUICK = b.defineInRange("quickHeavyCost", 2, 0, 1000);
+        QUILL_COMBO = b.defineInRange("comboHeavyCost", 3, 0, 1000);
+        QUILL_CHARGED = b.defineInRange("chargedHeavyCost", 4, 0, 1000);
+        QUILL_LAYERS = b.defineInRange("markLayers", 10, 1, 1000);
+        QUILL_DRAIN = b.defineInRange("drainPercentPerLayer", 0.01, 0, 100);
+        QUILL_GROWTH = b.comment("寄生汲取采用的无限进化攻击加成比例。1.0=全额加成，汲取随攻击成长，无总上限。").defineInRange("attackGrowthFactor", 1.0, 0, 10000);
+        QUILL_GROWTH_UPDATED = b.comment("Set true to keep the former 0.25 growth preset.").define("growthDefaultsUpdated",false);
+        QUILL_RANGE = b.defineInRange("harvestRadius", 64, 1, 128);
+        QUILL_RANGE_DEFAULTS_UPDATED = b.comment("One-time migration of the original 12/16/8 range preset.").define("rangeDefaultsUpdated",false);
+        QUILL_RANGE_UP = b.defineInRange("upgradedHarvestRadius", 96, 1, 128);
+        QUILL_LIFE = b.defineInRange("orbitTicks", 240, 1, 72000);
+        QUILL_LIFE_UP = b.defineInRange("upgradedOrbitTicks", 360, 1, 72000);
+        QUILL_SPLIT = b.defineInRange("carriedBiomassFraction", 0.25, 0, 1);
+        QUILL_HEAL = b.defineInRange("healMultiplier", 1.0, 0, 1000);
+        QUILL_AUTO_COST = b.defineInRange("sortieCost", 2, 0, 1000);
+        QUILL_ORBIT_RADIUS = b.comment("Horizontal orbit radius around the player in blocks.").defineInRange("orbitRadius", 2.3, 0.65, 8.0);
+        QUILL_AUTO_RANGE = b.defineInRange("enemyRadius", 64, 1, 128);
+        QUILL_AUTO_INTERVAL = b.defineInRange("sortieIntervalTicks", 16, 1, 1200);
+        QUILL_AUTO_DAMAGE = b.defineInRange("sortieDamage", 3.0, 0, 1000);
+        b.pop();
         SPEC=b.build();
+    }
+    public static void updateQuillDefaults() {
+        if (QUILL_GROWTH_UPDATED.get() && QUILL_RANGE_DEFAULTS_UPDATED.get()) return;
+        if (!QUILL_GROWTH_UPDATED.get()) {
+            if (QUILL_GROWTH.get()==0.25) QUILL_GROWTH.set(1.0);
+            QUILL_GROWTH_UPDATED.set(true);
+        }
+        if (!QUILL_RANGE_DEFAULTS_UPDATED.get()) {
+            if (QUILL_RANGE.get()==12 && QUILL_RANGE_UP.get()==16 && QUILL_AUTO_RANGE.get()==8) {
+                QUILL_RANGE.set(64);
+                QUILL_RANGE_UP.set(96);
+                QUILL_AUTO_RANGE.set(64);
+            }
+            QUILL_RANGE_DEFAULTS_UPDATED.set(true);
+        }
+        SPEC.save();
     }
     private GameplayBalanceConfig(){}
     public static <T> T value(ForgeConfigSpec.ConfigValue<T> setting){return SPEC.isLoaded()?setting.get():setting.getDefault();}

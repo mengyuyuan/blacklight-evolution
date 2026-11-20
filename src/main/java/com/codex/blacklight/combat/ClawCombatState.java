@@ -15,6 +15,8 @@ public final class ClawCombatState {
     }
 
     private Action action = Action.IDLE;
+    private java.util.UUID attackId;
+    java.util.UUID attackId(){return action==Action.IDLE?null:attackId;}
     private int elapsedTicks;
     private int comboIndex = -1;
     private int comboGraceTicks;
@@ -36,6 +38,7 @@ public final class ClawCombatState {
     }
 
     public Action beginNextAttack() {
+        attackId=java.util.UUID.randomUUID();
         comboIndex = (comboIndex + 1) % 3;
         action = switch (comboIndex) {
             case 0 -> Action.AUTO_1;
@@ -51,6 +54,7 @@ public final class ClawCombatState {
 
     public void begin(Action next) {
         action = next;
+        attackId=java.util.UUID.randomUUID();
         elapsedTicks = 0;
         queuedAttack = false;
         impactTriggered = false;

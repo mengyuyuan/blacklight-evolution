@@ -20,6 +20,7 @@ public final class ConsumeOpportunity {
                 ||!(event.getSource().getEntity() instanceof ServerPlayer player))return;
         var state=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         if(!state.isInfected()||!state.isPrototypeMode()||!ConsumeSystem.eligible(mob)||!ConsumeSystem.healthReady(player,mob))return;
+        if(mob.getMaxHealth()<ConsumeSystem.DIRECT_GRAB_MAX_HEALTH)return;
         double threshold=mob.getMaxHealth()*ConsumeProgression.healthLimit(ConsumeProgression.progress(player));
         if(mob.getHealth()>threshold)return;
         long now=mob.level().getGameTime();if(now<RETRY.getOrDefault(mob,Long.MIN_VALUE))return;

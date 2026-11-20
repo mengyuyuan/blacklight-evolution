@@ -24,7 +24,7 @@ public final class DistrictZoneHud {
         var label=Component.translatable("zone.blacklight."+(state.zone()==2?"red":state.zone()==1?"yellow":"green"));
         int color=state.zone()==2?0xFFF16A65:state.zone()==1?0xFFF0C76B:0xFF81CE9A;
         int w=mc.font.width(label),x=mc.getWindow().getGuiScaledWidth()-w-14,y=mc.getWindow().getGuiScaledHeight()-52;
-        var g=event.getGuiGraphics();g.fill(x-10,y-4,x+w+6,y+12,0xA0101114);g.fill(x-5,y+1,x-2,y+7,color);
+        var g=event.getGuiGraphics();BlacklightUi.hud(g,x-9,y-4,x+w+6,y+12,color);
         g.drawString(mc.font,label,x,y,color,false);
     }
 }

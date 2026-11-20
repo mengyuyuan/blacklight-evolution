@@ -55,7 +55,7 @@ public final class PrototypeHealthHud {
     @SubscribeEvent public static void render(RenderGuiEvent.Post event){
         var mc=Minecraft.getInstance();
         if(!active()||mc.level==null){owner=null;lastTime=-1;return;}
-        if(mc.options.hideGui)return;
+        if(mc.options.hideGui || mc.screen instanceof com.codex.blacklight.client.screen.PresentationSettingsScreen settings && settings.previewsHealth())return;
         var p=mc.player;var g=event.getGuiGraphics();
         float maximum=Math.max(1,p.getMaxHealth()),health=Mth.clamp(p.getHealth(),0,maximum);
         double now=(mc.level.getGameTime()+mc.getFrameTime())/20D;

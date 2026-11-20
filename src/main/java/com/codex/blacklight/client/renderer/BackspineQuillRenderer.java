@@ -38,15 +38,7 @@ public final class BackspineQuillRenderer extends EntityRenderer<BackspineQuill>
         var cruising=new Quaternionf().rotationTo(new org.joml.Vector3f(0,1,-.20F).normalize(),heading);
         var orientation=quill.releaseOrientation().slerp(cruising,turn);
         stack.mulPose(new Quaternionf().rotationAxis((right?-1:1)*age*.14F,heading).mul(orientation));
-        stack.scale(.9375F,.9375F,.9375F);
-        int index=quill.roofIndex();
-        var center=RooftopRig.center(index);
-        stack.translate(-center.x,-center.y,-center.z);
-        var rig=RooftopRig.INSTANCE;
-        for(int pass=0;pass<2;pass++){
-            boolean veins=pass==1;
-            RoofPerformance.part(rig.mesh[rig.quill[index]],stack,buffers.getBuffer(RoofPerformance.material(veins)),light,veins,0);
-        }
+        RoofPerformance.detachedQuill(quill.roofIndex(),stack,buffers,light);
         stack.popPose();
         super.render(quill,yaw,partial,stack,buffers,light);
     }

@@ -20,7 +20,7 @@ public final class BackspineCombat {
             new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.09F,.018F,.024F),.48F);
     private enum Phase { READY, LIGHT, DRAW, THROW, LAND }
     private enum Light {
-        SWEEP("sweep",5,9,14,4), LIFT("lift",4,8,13,5), DRIVE("drive",5,14,14,6), BURST("burst",4,18,18,3);
+        SWEEP("sweep",5,9,14,ScapulaVolley.OPENING_SHOT_DAMAGE), LIFT("lift",4,8,13,5), DRIVE("drive",5,14,14,6), BURST("burst",4,18,18,3);
         final String key;
         final int shot, link, end, damage;
         Light(String key,int shot,int link,int end,int damage) {
@@ -46,12 +46,15 @@ public final class BackspineCombat {
         Light light=Light.SWEEP;
         Heavy heavy=Heavy.CRUSH;
         int started, inputAt;
+        java.util.UUID volleyId;
         boolean attack, special, pendingLight, air, charged, awaitingLanding;
         // A double shot may still be finishing when two distinct taps arrive.
         final ArrayDeque<Press> queuedHeavy = new ArrayDeque<>(2);
         Press buttonDown, drawing;
-        boolean nextRight=true,leadRight;
-        boolean extraLight, releaseReady;
+        boolean nextRight=true,leadRight,receiveRight,comboHeavy;
+        float previousAimTurn;
+        int receiveUntil=-1;
+        boolean extraLight, releaseReady, heavyPaid;
         int chamberUntil = -1;
         String clip="";
     }
@@ -69,6 +72,7 @@ public final class BackspineCombat {
     }
     public static void cancel(ServerPlayer p){
         STATES.remove(p);
+        syncAim(p,null);
         if(ModAttachments.getData(p,ModAttachments.PLAYER_ACTION).clipId().startsWith("spines_"))NativePlayerActionBackend.clear(p);
     }
     public static boolean input(ServerPlayer p,boolean attack,boolean special) {
@@ -107,19 +111,38 @@ public final class BackspineCombat {
     private static void play(ServerPlayer p,State s,Phase phase,String key) {
         s.phase=phase;
         s.started=p.tickCount;
+        s.volleyId=java.util.UUID.randomUUID();
         s.clip=ScapulaCycle.actionKey("spines_"+key,s.leadRight);
+        if(phase!=Phase.LAND)syncAim(p,QuillHarvest.attackTarget(p,64,false));
         int offset = phase == Phase.LIGHT ? (s.releaseReady ? s.light.shot - 1 : s.clip.contains("_flight_") ? 2 : 0) : 0;
         if (offset > 0) {
             s.started -= offset;
             NativePlayerActionBackend.playVisualFromTick(p, s.clip, offset);
         }else PlayerActions.get().playVisual(p,s.clip,0);
     }
+    public static void prepareReception(ServerPlayer p,boolean right){
+        State s=STATES.computeIfAbsent(p,ignored->new State());
+        s.receiveRight=right;
+        s.receiveUntil=p.tickCount+24;
+    }
+    private static void syncAim(ServerPlayer p,TargetSelection selection){
+        int id=selection==null?-1:selection.target().getId();
+        if(ModAttachments.getData(p,ModAttachments.QUILL_AIM_TARGET)!=id){
+            ModAttachments.setData(p,ModAttachments.QUILL_AIM_TARGET,id);
+            ModAttachments.syncData(p,ModAttachments.QUILL_AIM_TARGET);
+        }
+    }
+    private static boolean leadShoulder(ServerPlayer p,State s){
+        if(p.tickCount>s.receiveUntil)return s.nextRight;
+        s.receiveUntil=-1;
+        return !s.receiveRight;
+    }
     private static void light(ServerPlayer p,State s,Light move) {
         s.pendingLight = s.extraLight;
         s.extraLight = false;
         s.awaitingLanding=false;
         s.light=move;
-        s.leadRight=s.nextRight;
+        s.leadRight=leadShoulder(p,s);
         play(p,s,Phase.LIGHT,(p.onGround()?"light_":"light_flight_")+move.key);
         s.releaseReady = false;
     }
@@ -127,6 +150,7 @@ public final class BackspineCombat {
         return (s.air?"air_":"ground_")+s.heavy.name().toLowerCase(java.util.Locale.ROOT);
     }
     private static void draw(ServerPlayer p,State s,Heavy move) {
+        s.comboHeavy = s.phase==Phase.LIGHT;
         s.drawing = s.queuedHeavy.removeFirst();
         s.extraLight = false;
         s.releaseReady = false;
@@ -134,7 +158,7 @@ public final class BackspineCombat {
         s.pendingLight=false;
         s.awaitingLanding=false;
         s.heavy=move;
-        s.leadRight=s.nextRight;
+        s.leadRight=leadShoulder(p,s);
         s.air=!p.onGround();
         if(s.drawing.released>=0){
             releaseHeavy(p,s);
@@ -144,6 +168,7 @@ public final class BackspineCombat {
         ModWeaponSounds.play(p,PowerForm.BACKSPINES,"draw",p.getEyePosition(),.33F,1F);
     }
     private static void releaseHeavy(ServerPlayer p,State s){
+        s.heavyPaid = false;
         int heldTicks = s.drawing.released - s.drawing.started;
         s.drawing = null;
         s.charged=heldTicks>=(s.air?6:10);
@@ -262,11 +287,34 @@ public final class BackspineCombat {
         }
     }
     private static void fire(ServerPlayer p,State s,float damage){
+        boolean heavyShot = s.phase == Phase.THROW;
+        if (!heavyShot || !s.heavyPaid) {
+            if (!QuillHarvest.payShot(p, heavyShot, s.charged, s.comboHeavy)) {
+                s.phase = Phase.READY;
+                s.pendingLight = s.attack = s.extraLight = false;
+                s.queuedHeavy.clear();
+                s.buttonDown = null;
+                NativePlayerActionBackend.clear(p);
+                return;
+            }
+            if (heavyShot) s.heavyPaid = true;
+        }
         float time=(p.tickCount-s.started)/20F;
         var sk=BlacklightSkeleton.get();
         float yaw=p.getYRot();
-        var lock=CombatTargeting.lockedEntity(p);
-        var aim=lock!=null&&ExplicitTarget.visibleWithinRange(p,lock,64)?ExplicitTarget.point(p,lock):p.pick(64,1,false).getLocation();
+        var selection=QuillHarvest.attackTarget(p,64,false,ModAttachments.getData(p,ModAttachments.QUILL_AIM_TARGET));
+        syncAim(p,selection);
+        var lock=selection==null?null:selection.target();
+        Vec3 aim;
+        if(selection!=null){
+            aim=selection.point(p);
+        }else{
+            Vec3 eye=p.getEyePosition(),wall=p.pick(64,1,false).getLocation();
+            var sight=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p.level(),p,eye,wall,
+                    new net.minecraft.world.phys.AABB(eye,wall).inflate(1),candidate->candidate!=p
+                    && candidate.isPickable() && !candidate.isSpectator() && !p.isAlliedTo(candidate) && !QuillHarvest.protectedPet(candidate));
+            aim=sight==null?wall:sight.getLocation();
+        }
         // A quadruped's box midpoint can lie between its legs. When the lock supplies
         // that generic midpoint, raise the quill toward the body. Keep explicit part locks exact.
         if(lock instanceof net.minecraft.world.entity.animal.Animal animal
@@ -275,6 +323,13 @@ public final class BackspineCombat {
         var body=sk.getPoseMatrices(MotionLibrary.pose(s.clip,time,false));
         if(RooftopRig.fullBody(s.clip)){var rig=RooftopRig.INSTANCE;rig.projectPlayer(rig.sample(RooftopRig.time(s.clip,time*20)),RooftopRig.reflect(s.clip),body); }
         if(RooftopRig.groundShot(s.clip)&&p.onGround()&&!p.isCrouching()&&!p.isInWaterOrBubble())RooftopRig.plantGroundShot(body);
+        if(selection!=null && RooftopRig.groundShot(s.clip) && p.onGround()){
+            var offset=aim.subtract(p.getEyePosition());
+            boolean rearRight=Math.abs(s.previousAimTurn)>8 ? s.previousAimTurn>0 : s.leadRight;
+            s.previousAimTurn=RooftopRig.shoulderTurn(offset,yaw,rearRight);
+            RooftopRig.aimUpperBody(body,s.previousAimTurn,RooftopRig.shoulderPitch(offset));
+        }
+        RooftopRig.recoil(body,s.clip,p.tickCount-s.started);
         var chest=ScapulaMount.chest(body);
         float worldAngle=(float)Math.toRadians(180-yaw);
         var bodyTurn=new org.joml.Quaternionf().rotationY(worldAngle);
@@ -315,7 +370,9 @@ public final class BackspineCombat {
             }
             float share=roofFour?.25F:groundHeavy?(paired?.5F:counter?.60F:.40F):1;
             var shot=new BackspineQuill(p.serverLevel(),p,ScapulaVolley.damage(damage*share,slot,pairs),rightShoulder?0:1);
+            shot.setVolleyId(s.volleyId);
             shot.setPos(start.x,start.y,start.z);
+            if (slot==0 && selection!=null) shot.setAimTarget(selection.target().getUUID());
             var skills = ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
             shot.setWedgeSkills(skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_1),
                     heavy && slot == 0 && s.charged && skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_2));
