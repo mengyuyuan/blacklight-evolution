@@ -12,6 +12,34 @@ from pathlib import Path
 from motion_provenance import motion_notice, motion_provenance
 
 
+def fit_heavy_fist_growth(clips, moves, axes):
+    """Retarget the striking hand's volume after sampling and charge/release blending."""
+    for name, move in moves.items():
+        fit = move.get('heavyStrikeGrowth')
+        if not fit:
+            continue
+        for suffix in ('', '_charge', '_charged'):
+            clip = clips.get(name + suffix)
+            if clip is None:
+                continue
+            end = clip['times'][-1]
+            for time, row in zip(clip['times'], clip['frames']):
+                held = 1 if suffix == '_charged' else 0
+                if suffix == '_charge':
+                    progress = max(0, min(1, (time - move['release']) / (end - move['release'])))
+                    held = progress * progress * (3 - 2 * progress)
+                recovery = 1
+                if suffix != '_charge' and 'retractFrom' in fit and time > fit['retractFrom']:
+                    progress = (time - fit['retractFrom']) / (end - fit['retractFrom'])
+                    recovery = 1 - progress * progress * (3 - 2 * progress)
+                # Local Y is length along the arm. The palm is naturally deeper on Z.
+                for offset, segment, tap, charged in zip((0, 3), ('forearm', 'fist'), fit['tap'], fit['charged']):
+                    strength = tap + (charged - tap) * held
+                    for axis, weight in enumerate(axes[segment], offset):
+                        growth = max(0, row[axis] - 1)
+                        row[axis] += growth * (strength * weight - 1) * recovery
+
+
 def export(decoded, contract, motions):
     config = json.loads(contract.read_text(encoding='utf-8'))
     sources, cache, clips = {}, {}, {}
@@ -125,6 +153,7 @@ def export(decoded, contract, motions):
                     # Preserve any reference contraction and the resting size.
                     frames[i] = [1+(v-1)*weight if v > 1 else v for v in frames[i]]
             clips[name+suffix] = dict(times=times, frames=frames)
+    fit_heavy_fist_growth(clips, config['moves'], config['heavyHammerGrowthAxes'])
     result = dict(schema=1, bones=list(bones), axisMapping=config['axisMapping'], clips=clips,
                   inheritedForearmLength=[name for name,cfg in config['moves'].items()
                                            if cfg.get('inheritForearmLength')],

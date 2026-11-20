@@ -270,6 +270,46 @@ public final class RooftopRig {
         var delta=new Quaternionf().rotationTo(from.normalize(),to.normalize());
         bone.setTranslation(0,0,0).rotateLocal(delta).setTranslation(pivot);
     }
+    /** The hips follow the step. Attach the firing torso at the gait's waist,
+     * then carry its shoulders and arms together so the recoil stays articulated. */
+    public static void groundStride(Matrix4f[] shot, Matrix4f[] gait, float weight, boolean standby) {
+        if (weight <= 0) return;
+        var skeleton = NativeBind.skeleton;
+        int root = skeleton.rootJoint.getId(), torso = skeleton.torso.getId();
+        var original = shot.clone();
+        var shotWaist = new Matrix4f(original[root]).invert().mul(original[torso]);
+        var gaitWaist = new Matrix4f(gait[root]).invert().mul(gait[torso]);
+        var stepWaist = BoneTransform.fromMatrix(gaitWaist);
+        var fireWaist = BoneTransform.fromMatrix(shotWaist);
+        if (!standby) stepWaist.rotation().slerp(fireWaist.rotation(), .70F);
+
+        shot[root] = weight >= 1 ? gait[root] : BoneTransform.blend(BoneTransform.fromMatrix(original[root]),
+                BoneTransform.fromMatrix(gait[root]), weight).toMatrix();
+        shot[torso] = new Matrix4f(shot[root]).mul(BoneTransform.blend(fireWaist, stepWaist, weight).toMatrix());
+        var upperShift = new Matrix4f(shot[torso]).mul(new Matrix4f(original[torso]).invert());
+        for (var bone : skeleton.bones()) {
+            int id = bone.getId();
+            if (id == root || id == torso) continue;
+            int parentId = bone.parent().getId();
+            if (!standby && isUpperBody(bone, skeleton.torso)) {
+                shot[id] = new Matrix4f(upperShift).mul(original[id]);
+            } else if (weight >= 1) {
+                shot[id] = gait[id];
+            } else {
+                var from = new Matrix4f(original[parentId]).invert().mul(original[id]);
+                var to = new Matrix4f(gait[parentId]).invert().mul(gait[id]);
+                var local = BoneTransform.blend(BoneTransform.fromMatrix(from), BoneTransform.fromMatrix(to), weight);
+                shot[id] = new Matrix4f(shot[parentId]).mul(local.toMatrix());
+            }
+        }
+    }
+
+    private static boolean isUpperBody(BlacklightSkeleton.Bone bone, BlacklightSkeleton.Bone torso) {
+        for (var ancestor = bone.parent(); ancestor != null; ancestor = ancestor.parent())
+            if (ancestor == torso) return true;
+        return false;
+    }
+
     /** Keep the soles on their marks while the animated pelvis shifts weight into each knee. */
     public static void plantGroundShot(Matrix4f[] bones) {
         var skeleton = NativeBind.skeleton;

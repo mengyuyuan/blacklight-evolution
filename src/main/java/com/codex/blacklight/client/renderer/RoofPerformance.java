@@ -105,14 +105,7 @@ public final class RoofPerformance {
         if(gait>0){
             var sk=BlacklightSkeleton.get();
             var stride=sk.getPoseMatrices(PlayerMotionController.locomotionPose(p,partial));
-            for(var bone:sk.bones()){
-                String name=bone.getName();
-                if(standby||name.equals("Root")||name.startsWith("Thigh_")||name.startsWith("Leg_")||name.startsWith("Knee_")){
-                    int id=bone.getId();
-                    if(gait>=.999F)playerBones[id]=stride[id];
-                    else blendRigid(playerBones[id],stride[id],gait);
-                }
-            }
+            RooftopRig.groundStride(playerBones,stride,gait,standby);
         }
         return (1-gait)*(plant?1:clock.bodyWeight);
     }
