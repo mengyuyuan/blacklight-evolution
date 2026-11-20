@@ -72,9 +72,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::validCombatTarget));
         targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, MilitarySoldier.class, 10, true, false, this::validCombatTarget));
-        targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 20, true, false,
-                e -> (e instanceof net.minecraft.world.entity.animal.Animal || e instanceof net.minecraft.world.entity.npc.AbstractVillager)
-                        && validCombatTarget(e)));
+        targetSelector.addGoal(4, new HuntPreyGoal());
     }
     @Override public void tick() {
         super.tick();
@@ -378,6 +376,25 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         }));
     }
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
+    private final class HuntPreyGoal extends NearestAttackableTargetGoal<LivingEntity> {
+        private long nextSearchTick;
+
+        HuntPreyGoal() {
+            super(BlacklightHunter.this, LivingEntity.class, 0, true, false,
+                    candidate -> (candidate instanceof net.minecraft.world.entity.animal.Animal
+                            || candidate instanceof net.minecraft.world.entity.npc.AbstractVillager)
+                            && BlacklightHunter.this.validCombatTarget(candidate));
+        }
+
+        @Override public boolean canUse() {
+            long now = level().getGameTime();
+            if (now < nextSearchTick) return false;
+            // Recheck exposed prey, including passengers who have reboarded, once per second.
+            nextSearchTick = now + 20;
+            return super.canUse();
+        }
+    }
+
     private final class SwipeGoal extends Goal {
         private LivingEntity quarry;
         private Vec3 lastSeen;
