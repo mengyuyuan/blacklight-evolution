@@ -7,6 +7,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WhipCurveTest {
+    @Test void ordinaryCableAndReturningHookHaveDistinctFatalContacts(){
+        assertEquals(WeaponCutContact.Kind.BLUNT,WeaponCutContact.contactKind(WeaponMove.WHIP_LASH));
+        assertEquals(WeaponCutContact.Kind.SLICE,WeaponCutContact.contactKind(WeaponMove.WHIP_RETURN));
+        assertEquals(WeaponCutContact.Kind.SLICE,WeaponCutContact.contactKind(WeaponMove.WHIP_SWEEP_CHARGED));
+        assertEquals(WeaponCutContact.Kind.PUNCTURE,WeaponCutContact.contactKind(WeaponMove.WHIP_LONGSHOT));
+    }
     private JsonObject curve() {
         return JsonParser.parseString("""
                 {"space":"actor-feet","radius":0.045,"collisionRadius":0.436066,

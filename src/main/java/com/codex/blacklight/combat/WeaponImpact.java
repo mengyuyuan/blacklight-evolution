@@ -91,6 +91,8 @@ public final class WeaponImpact {
             if(v.isAlive())HitStop.victim(v,tier.hitstop);
         }
         HeavyBlow.apply(p,v,move,tier,charge,direction,controlled);
+        boolean waist=WeaponCutContact.waistFinisher(move,v) && !impact.contacts().isEmpty();
+        if(waist)cut=WeaponCutContact.waistSection(v,impact,direction);
         WeaponDismemberment.weapon(v,cut);
         boolean sharp=move.form==PowerForm.BLADE||move.form==PowerForm.CLAWS
                 ||move.form==PowerForm.WHIPFIST&&WeaponCutContact.contactKind(move)!=WeaponCutContact.Kind.BLUNT;
@@ -118,7 +120,7 @@ public final class WeaponImpact {
             int motion=style==null?profile.motion():style.motion;
             if(v.isAlive() && controlled && canFall && move.form==PowerForm.HAMMERFISTS && !move.quake())
                 motion=ImpactProfile.HAMMER_BUCKLE;
-            RagdollImpact.send(v,motion,physicalTicks,sharp,launch,impact,tier.hitstop);
+            RagdollImpact.send(v,motion,physicalTicks,sharp,waist?launch.scale(.48):launch,waist?cut:impact,tier.hitstop);
         }
         boolean blade=move.form==PowerForm.BLADE;
         if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact,fullyCharged);
@@ -126,7 +128,7 @@ public final class WeaponImpact {
         if (v instanceof AnimatedHurtBody animated && animated.animatedHurtBody()) soundPoint = animated.incomingPoint();
         var form = com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
         boolean chargedCrush = fullyCharged && (form == PowerForm.MUSCLE_MASS || form == PowerForm.HAMMERFISTS);
-        boolean solidHit = tier.atLeast(ImpactTier.HEAVY) || heavy || slam || chargedCrush;
+        boolean solidHit = !move.lightLash() && (tier.atLeast(ImpactTier.HEAVY) || heavy || slam || chargedCrush);
         float pitch = switch (tier) { case LIGHT -> 1.1F; case MEDIUM -> 1F; case HEAVY -> .88F; case FINISHER -> .78F; };
         if (chargedCrush) pitch = Math.min(pitch, .78F);
         if (first) com.codex.blacklight.registry.ModWeaponSounds.play(p, form, solidHit ? "heavy" : "hit",

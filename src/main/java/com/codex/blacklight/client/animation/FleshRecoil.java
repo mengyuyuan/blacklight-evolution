@@ -9,7 +9,7 @@ import java.util.WeakHashMap;
 
 /** Reaction to a confirmed strike, evaluated in victim space on the render clock. */
 public final class FleshRecoil {
-    private record Contact(FleshStrike strike, double start, float side, float facing, float strength, int region) {}
+    private record Contact(FleshStrike strike, double start, float side, float facing, float strength, int region, float pull) {}
     public record Pose(float pitch, float twist, float roll, float head, float brace, float dip, float leg, float arm) {
         Pose(float pitch,float twist,float roll,float head,float brace,float dip){this(pitch,twist,roll,head,brace,dip,0,0);}
     }
@@ -36,7 +36,8 @@ public final class FleshRecoil {
         int region=receipt.region();
         if(region==2 || region==8)side=-1;
         if(region==4 || region==16)side=1;
-        contacts.put(victim,new Contact(strike,start,side,facing,strength,region));
+        contacts.put(victim,new Contact(strike,start,side,facing,strength,region,
+                (float)(Math.abs(normal.dot(right))>.12?Math.signum(normal.dot(right)):side)));
     }
 
     public static Pose sample(LivingEntity victim, float partial) {
@@ -62,6 +63,11 @@ public final class FleshRecoil {
         float rebound = pulse(Math.max(0, age - duration * .43F), 1.6F, duration * .55F);
         float turn = contact.side * (snap - .24F * rebound);
         float pitch = contact.facing * (snap - .22F * rebound);
+        if(contact.strike==FleshStrike.LASH && contact.region!=0){
+            float shoulder=pulse(age,.65F,5.4F)*contact.strength*contact.side;
+            float follow=pulse(Math.max(0,age-.6F),1.55F,8)*contact.strength*contact.pull;
+            return new Pose(.12F*pitch,.72F*follow,.28F*follow,.14F*pitch,.32F*weight,.52F*weight,0,.80F*shoulder);
+        }
         return switch (contact.strike) {
             case CLAW -> new Pose(-.14F*pitch, .51F*turn, .19F*turn, -.24F*pitch, .33F*weight, .68F*weight);
             case EDGE -> new Pose(-.21F*pitch, .70F*turn, .24F*turn, -.27F*pitch, .46F*weight, 1.12F*weight);
