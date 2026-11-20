@@ -37,4 +37,13 @@ class BiomassStateTest {
    assertTrue(fatal.reform(20).afterRespawn(30).consumed());
    assertEquals(BiomassState.EMPTY,BiomassState.EMPTY.afterRespawn(30));
  }
+    @org.junit.jupiter.api.Test void liquidExecutionRechecksRemainingHealthAndBossWindow() {
+        org.junit.jupiter.api.Assertions.assertTrue(ConsumeProgression.withinBiomassLimit(20,20,0,false,.15F));
+        org.junit.jupiter.api.Assertions.assertFalse(ConsumeProgression.withinBiomassLimit(21,80,0,false,.15F));
+        org.junit.jupiter.api.Assertions.assertTrue(ConsumeProgression.withinBiomassLimit(22,80,1,false,.15F));
+        org.junit.jupiter.api.Assertions.assertFalse(ConsumeProgression.withinBiomassLimit(80,80,Long.MAX_VALUE,true,.25F));
+        org.junit.jupiter.api.Assertions.assertTrue(ConsumeProgression.withinBiomassLimit(20,80,42,true,.25F));
+        org.junit.jupiter.api.Assertions.assertFalse(ConsumeProgression.withinBiomassLimit(21,80,42,true,.25F));
+        org.junit.jupiter.api.Assertions.assertFalse(ConsumeProgression.withinBiomassLimit(Float.NaN,80,42,true,.25F));
+    }
 }

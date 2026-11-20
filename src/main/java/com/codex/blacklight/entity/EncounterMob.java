@@ -119,6 +119,19 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     private static final EntityDataAccessor<Integer> CHARGE_PHASE=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> CHARGE_PHASE_START=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Long> GOLIATH_CRASH_SAMPLE=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Integer> GOLIATH_WINDOW=SynchedEntityData.defineId(EncounterMob.class,EntityDataSerializers.INT);
+    private boolean goliathHealthGuard;
+    private double leapSpeed;
+    private boolean leapDescending;
+
+    public GoliathWindow goliathWindow(){return GoliathWindow.byId(entityData.get(GOLIATH_WINDOW));}
+    public int goliathBrokenMask(){return entityData.get(BROKEN);}
+    public boolean goliathFinisherReady(){return isAlive() && goliathWindow()==GoliathWindow.FINISH;}
+    public boolean goliathHealthGuard(){return goliathHealthGuard;}
+    public float goliathHealthFloor(){
+        float ratio=broken(1)?.01F:broken(0)?.31F:.64F;
+        return Math.min(getHealth(),Math.max(1,getMaxHealth()*ratio));
+    }
     private final GoliathCharge.State goliathCharge=new GoliathCharge.State();
     private final GoliathSlamMotion.State goliathSlamMotion=new GoliathSlamMotion.State();
     private final GoliathGait goliathGait=new GoliathGait();
@@ -216,18 +229,25 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public boolean hurtAt(DamageSource source,float amount,HydraHurtContact.Contact contact){
         if(level().isClientSide||contact==null||!Float.isFinite(amount)||amount<=0)return false;
         var prior=incomingContact;incomingContact=contact;try{
-            if((kind==EncounterKind.ELIZABETH_GREENE||kind==EncounterKind.GOLIATH)&&contact.bone().startsWith("weak_"))return hurtPart(Integer.parseInt(contact.bone().substring(5)),source,amount);
+            if(kind==EncounterKind.GOLIATH)return !GoliathLockPart.severed(contact.bone(),goliathBrokenMask())&&hurt(source,amount);
+            if(kind==EncounterKind.ELIZABETH_GREENE&&contact.bone().startsWith("weak_"))return hurtPart(Integer.parseInt(contact.bone().substring(5)),source,amount);
             return hurt(source,amount);
         }finally{incomingContact=prior;}
     }
     public void confirmedIncoming(DamageSource source,float amount){
-        if(incomingContact==null||amount<=0)return;
+        if(amount<=0)return;
+        if(incomingContact==null){
+            if(kind==EncounterKind.ELIZABETH_GREENE)BossImpactFeedback.accepted(this,source,amount);
+            return;
+        }
         var c=incomingContact;lastIncomingPoint=c.point();lastIncomingTick=level().getGameTime();incomingEffects++;
         var n=c.normal();var attacker=source.getEntity();
         var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
         if(kind==EncounterKind.ELIZABETH_GREENE){
             int slot=c.bone()!=null&&c.bone().startsWith("weak_")?Integer.parseInt(c.bone().substring(5,6)):3;
+            if (slot == 3 || armor[slot] > 0)
+                BossImpactFeedback.contact(this, source, c.point(), slot < 3 || exposed() ? BossImpactFeedback.Contact.WEAK : BossImpactFeedback.Contact.ARMOR, amount);
             level().broadcastEntityEvent(this,(byte)(70+slot));
             if(sound!=null)sound=new ModInfectedSounds.Prepared(sound.event(),sound.volume()*1.55F,sound.pitch()*.8F);
         }
@@ -268,6 +288,9 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public boolean inActionRange(EncounterMove action,LivingEntity target){
         if(kind==EncounterKind.ELIZABETH_GREENE&&action==EncounterMove.HOWL)
             return greeneTargetDistance(target)<GreeneRoarTiming.TRIGGER_DISTANCE;
+        if(kind==EncounterKind.GOLIATH&&broken(0)){
+            return distanceTo(target)<(broken(1)?17:18.5) && Math.abs(target.getY()-getY())<12;
+        }
         if(GoliathSlam.uses(kind,action)){
             Vec3 d=target.position().subtract(position());float facing=(float)Math.toDegrees(Math.atan2(-d.x,d.z));
             var body=AnimatedHurtBody.of(target);
@@ -290,7 +313,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public int phase(){return entityData.get(PHASE);}
     public boolean exposed(){
         if(kind==EncounterKind.ELIZABETH_GREENE)return greeneBattle.exposed();
-        return (kind!=EncounterKind.GOLIATH||isAlive())&&entityData.get(EXPOSED)>level().getGameTime();
+        return kind==EncounterKind.GOLIATH ? isAlive()&&(goliathFinisherReady()||entityData.get(EXPOSED)>level().getGameTime()) : entityData.get(EXPOSED)>level().getGameTime();
     }
     public float exposedAge(float partial){
         return kind==EncounterKind.ELIZABETH_GREENE?greeneBattle.exposureAge(partial)
@@ -317,14 +340,23 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.ERUPT);
             return;
         }
-        else if(state!=null)ticks=state.duration();
+        else if(state!=null&&kind!=EncounterKind.GOLIATH)ticks=state.duration();
         if(kind==EncounterKind.GOLIATH){
             // A second armor break during an active recovery must not restart its pose.
-            if(!isAlive()||exposed())return;
-            yaw=getYRot();
-            entityData.set(GOLIATH_CRASH_SAMPLE,impactSample);
-            setDeltaMovement(getDeltaMovement().multiply(0,1,0));
+            if(!isAlive()||exposed()||broken(0))return;
+            startGoliathWindow(armor[2]>0?GoliathWindow.HEAD:GoliathWindow.KNEE,ticks,impactSample);
+            return;
         }
+        long now=level().getGameTime();
+        entityData.set(EXPOSED_START,now);entityData.set(EXPOSED,now+ticks);cancelAttack();
+    }
+
+    private void startGoliathWindow(GoliathWindow state,int ticks,long impactSample){
+        if(!isAlive()||level().isClientSide)return;
+        yaw=getYRot();
+        entityData.set(GOLIATH_WINDOW,state.ordinal());
+        entityData.set(GOLIATH_CRASH_SAMPLE,impactSample);
+        setDeltaMovement(getDeltaMovement().multiply(0,1,0));
         long now=level().getGameTime();
         entityData.set(EXPOSED_START,now);entityData.set(EXPOSED,now+ticks);cancelAttack();
         if(kind==EncounterKind.GOLIATH)updateParts();
@@ -339,15 +371,12 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         entityData.set(EXPOSED,0L);
         entityData.set(EXPOSED_START,0L);
         entityData.set(GOLIATH_CRASH_SAMPLE,0L);
-        if(isAlive()){
-            entityData.set(BROKEN,0);
-            Arrays.fill(armor,90);
-            poise=0;
-        }
+        entityData.set(GOLIATH_WINDOW,GoliathWindow.NONE.ordinal());
+        poise=0;
     }
     public boolean broken(int slot){return (entityData.get(BROKEN)&(1<<slot))!=0;}
     public static AttributeSupplier.Builder attributes(EncounterKind kind){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,kind.health).add(Attributes.ATTACK_DAMAGE,kind.damage).add(Attributes.MOVEMENT_SPEED,kind.speed).add(Attributes.FOLLOW_RANGE,kind==EncounterKind.ELIZABETH_GREENE?GreeneMissileFlight.RANGE:32).add(Attributes.KNOCKBACK_RESISTANCE,kind.boss?.85:.4);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(PLAZA_TARGET,java.util.Optional.empty());b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(PLAZA_TARGET,java.util.Optional.empty());b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);b.define(GOLIATH_WINDOW,0);}
     @Override protected void registerGoals(){goalSelector.addGoal(0,new FloatGoal(this));goalSelector.addGoal(2,new FightGoal());goalSelector.addGoal(7,new WaterAvoidingRandomStrollGoal(this,.65));targetSelector.addGoal(1,new HurtByTargetGoal(this));targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,15,true,false,this::enemy));}
     public boolean enemy(LivingEntity target){
         if(target instanceof com.codex.blacklight.world.GreeneHost||target==null||target==this||!target.isAlive()||target.isRemoved()||target.level()!=level()||isAlliedTo(target))return false;
@@ -390,8 +419,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             if(move==EncounterMove.ORBS&&mechanical==null)return false;
             return beginGreene(mechanical!=null?mechanical:body==null?null:GreeneWeaponProgram.onFoot(greeneTargetDistance(body)),body);
         }
+        if(kind==EncounterKind.GOLIATH && (phase()==0 && move==EncounterMove.ERUPTION || phase()==1 && move!=EncounterMove.ERUPTION || phase()==2 && move!=EncounterMove.SLAM))return false;
         if(kind==EncounterKind.FLYER&&flyerStage()!=FlyerMotion.IDLE)return false;
         if(level().isClientSide||disabled()||waitingForConvoyGate()||move==null||move==EncounterMove.NONE||this.move()!=EncounterMove.NONE||cooldown>0||exposed()||!moveReady(move)||!kind.permits(move)||!enemy(target)||!hasLineOfSight(target)||!isWithinRestriction(target.blockPosition())||!inActionRange(move,target))return false;
+        leapDescending=false;leapSpeed=0;
         aim=target.getBoundingBox().getCenter();direction=aim.subtract(position()).multiply(1,0,1).normalize();if(direction.lengthSqr()<.01)direction=new Vec3(0,0,1);
         yaw=(float)Math.toDegrees(Math.atan2(-direction.x,direction.z));committed=target.getUUID();entityData.set(MOVE,move.ordinal());entityData.set(START,level().getGameTime());lastAge=-1;blocked=false;struck.clear();getNavigation().stop();
         fistHits.clear();fistGround=false;entityData.set(GUARD_HIT,-100000L);
@@ -402,7 +433,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(kind==EncounterKind.ELIZABETH_GREENE&&move==EncounterMove.HOWL)greeneRoar.started();
         else readyAt.put(move,level().getGameTime()+actionDuration(move)+EncounterTactics.recharge(move));
         contactSweep=getBoundingBox();
-        var source=SourceBossAction.get(kind,move);if(source!=null&&source.turning.length>0)yaw=getYRot();
+        var source=SourceBossAction.get(kind,move);if(source!=null&&source.turning.length>0&&!(kind==EncounterKind.GOLIATH&&broken(0)))yaw=getYRot();
         if(kind==EncounterKind.FLYER){flight.begin(target);ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.TENSION);}
         else if(kind==EncounterKind.JUGGERNAUT)ModInfectedSounds.play(this,com.codex.blacklight.infection.InfectedSoundCue.TENSION);
         else playSound(kind.military?SoundEvents.IRON_GOLEM_ATTACK:SoundEvents.RAVAGER_ROAR,.7F,kind.height>4?.55F:1.05F);return true;
@@ -471,9 +502,18 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         float height=super.maxUpStep();
         return kind==EncounterKind.GOLIATH?Math.max(height,GoliathPresentation.STEP_HEIGHT):height;
     }
+    @Override public boolean causeFallDamage(float distance,float multiplier,DamageSource source){
+        // The authored back slam is a controlled landing, including slopes and roofs.
+        if(kind==EncounterKind.GOLIATH && broken(1) && move()==EncounterMove.SLAM)return false;
+        return super.causeFallDamage(distance,multiplier,source);
+    }
     @Override public void travel(Vec3 input){
         if(kind==EncounterKind.ELIZABETH_GREENE&&greeneBattle.controlsRoot()){setDeltaMovement(Vec3.ZERO);fallDistance=0;return;}
         if(kind==EncounterKind.FLYER&&isAlive()&&FlyerPhysics.hasPose(this)){setDeltaMovement(Vec3.ZERO);return;}
+        if(kind==EncounterKind.GOLIATH&&broken(1)&&move()==EncounterMove.SLAM){
+            setDeltaMovement(Vec3.ZERO);
+            return;
+        }
         if(kind==EncounterKind.GOLIATH&&exposed()){
             // Keep gravity and block support while preventing residual charge or pathing motion.
             setDeltaMovement(getDeltaMovement().multiply(0,1,0));
@@ -525,8 +565,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(cooldown>0)cooldown--;
         if(kind==EncounterKind.FLYER){flight.tick();updateParts();return;}
         int next=getHealth()<getMaxHealth()*.30?2:getHealth()<getMaxHealth()*.65?1:0;
-        if(kind.boss&&kind!=EncounterKind.ELIZABETH_GREENE&&(kind!=EncounterKind.GOLIATH||!exposed())&&next>phase()){entityData.set(PHASE,next);cancelAttack();cooldown=40;playSound(SoundEvents.RAVAGER_ROAR,1,.6F);}
-        if(entityData.get(EXPOSED)>0&&!exposed()){entityData.set(EXPOSED,0L);entityData.set(BROKEN,0);Arrays.fill(armor,90);poise=0;}
+        if(kind.boss&&kind!=EncounterKind.ELIZABETH_GREENE&&kind!=EncounterKind.GOLIATH&&next>phase()){entityData.set(PHASE,next);cancelAttack();cooldown=40;playSound(SoundEvents.RAVAGER_ROAR,1,.6F);}
+        if(kind!=EncounterKind.GOLIATH&&entityData.get(EXPOSED)>0&&!exposed()){entityData.set(EXPOSED,0L);entityData.set(BROKEN,0);Arrays.fill(armor,90);poise=0;}
         if(kind==EncounterKind.ELIZABETH_GREENE){
             if(!greeneBattle.canAttack()){greeneWeapons.tick(null,null,0);return;}
             long closeEpoch=chargeEpoch,closeState=greeneStateEpoch;
@@ -541,15 +581,19 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         int age=(int)moveAge(0);LivingEntity target=entity instanceof LivingEntity living?living:null;
         // Once the front slam has landed, finish its ground pulses even if that
         // blow killed the committed target. Death/exposure/stun still cancel above.
-        boolean landedSlam=GoliathSlam.uses(kind,action)&&age>=actionContact(action);
+        boolean landedSlam=GoliathSlam.uses(kind,action)&&age>=actionContact(action) || kind==EncounterKind.GOLIATH&&broken(1)&&action==EncounterMove.SLAM&&age>=15;
         boolean returningCharge=GoliathCharge.uses(kind,action)&&!GoliathCharge.requiresTarget(goliathChargeSnapshot());
         if((!enemy(target)||!isWithinRestriction(target.blockPosition()))&&!landedSlam&&!returningCharge){cancelAttack();return;}
         getNavigation().stop();
+        if(kind==EncounterKind.GOLIATH&&broken(0)){
+            tickWoundedGoliath(action,age);
+            return;
+        }
         if(GoliathCharge.uses(kind,action)){tickGoliathCharge(enemy(target)&&isWithinRestriction(target.blockPosition())?target:null,age);return;}
         var source=SourceBossAction.get(kind,action);
         if(source!=null&&target!=null){float step=source.turnStep(age,distanceTo(target));if(step>0){Vec3 d=target.position().subtract(position());float wanted=(float)Math.toDegrees(Math.atan2(-d.x,d.z));yaw=net.minecraft.util.Mth.approachDegrees(yaw,wanted,step);}}
         setYRot(yaw);yBodyRot=yaw;yHeadRot=yaw;
-        if(age>=actionDuration(action)){if(GoliathSlam.uses(kind,action))goliathSlamMotion.cancel();entityData.set(MOVE,0);committed=null;struck.clear();cooldown=Math.max(12,action.recovery-phase()*3);return;}
+        if(age>=actionDuration(action)){if(GoliathSlam.uses(kind,action))goliathSlamMotion.cancel();entityData.set(MOVE,0);committed=null;struck.clear();cooldown=Math.max(12,action.recovery-phase()*3);if(kind==EncounterKind.GOLIATH)expose(60);return;}
         if(age==lastAge)return;lastAge=age;
         AABB beforeMove=getBoundingBox();
         if(GoliathSlam.uses(kind,action)&&!moveGoliathSlam(age))return;
@@ -658,6 +702,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             // number of source cycles, not the obsolete fixed96tick estimate.
             readyAt.put(EncounterMove.CHARGE,level().getGameTime()+EncounterTactics.recharge(EncounterMove.CHARGE));
             cooldown=Math.max(12,EncounterMove.CHARGE.recovery-phase()*3);
+            expose(60);
         }
         updateParts();
     }
@@ -854,6 +899,24 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         bar.setColor(exposed()?BossEvent.BossBarColor.PURPLE:BossEvent.BossBarColor.RED);
         bar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.phase",getDisplayName(),phase()+1));
         defenseBar.setVisible(kind.boss&&isAlive()&&(parts.length>0||exposed()));
+        if(kind==EncounterKind.GOLIATH){
+            var window=goliathWindow();
+            int slot=broken(1)||!broken(0)&&armor[2]>0?2:broken(0)?1:0;
+            var part=slot==2?GoliathLockPart.HEAD:slot==1?GoliathLockPart.RIGHT_ARM:GoliathLockPart.RIGHT_LEG;
+            boolean down=window==GoliathWindow.LEG_FALL||window==GoliathWindow.ARM_FALL;
+            String cue=switch(window){
+                case NONE -> !broken(0)?"stagger":broken(1)?"evade_slam":"evade_spike";
+                case LEG_FALL, ARM_FALL -> "down";
+                case FINISH -> "finish";
+                default -> "open";
+            };
+            defenseBar.setColor(window==GoliathWindow.NONE?BossEvent.BossBarColor.PURPLE:BossEvent.BossBarColor.YELLOW);
+            defenseBar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.goliath."+cue,
+                    net.minecraft.network.chat.Component.translatable(part.labelKey)));
+            float progress=down?1-exposedAge(0)/exposedDuration():window==GoliathWindow.FINISH?0:armor[slot]/90;
+            defenseBar.setProgress(Math.max(0,Math.min(1,progress)));
+            return;
+        }
         if(exposed()){
             defenseBar.setColor(BossEvent.BossBarColor.YELLOW);
             defenseBar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.exposed"));
@@ -982,6 +1045,13 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         }
     }
     public boolean hurtPart(int slot,DamageSource source,float amount){
+        if(kind==EncounterKind.GOLIATH){
+            if(slot<0||slot>1)return false;
+            // Legacy weak_1 is a visual on the healthy leg, not the native wrist.
+            var region=hurtRegions(0).get(slot);
+            if(region.boxes().isEmpty())return false;
+            return hurtAt(source,amount,new HydraHurtContact.Contact(region.bone(),region.bounds().getCenter(),new Vec3(0,1,0),com.codex.blacklight.infection.InfectedAttackStyle.TEAR));
+        }
         return hurtPart(slot,source,amount,true);
     }
     private boolean hurtPart(int slot,DamageSource source,float amount,boolean physicalContact){
@@ -1012,7 +1082,11 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             // enter collapse. Commit BROKEN before the spawn callback, so a
             // reentrant save cannot spawn this corpse twice from the same hit.
             GreeneSegmentCorpse corpse=kind==EncounterKind.ELIZABETH_GREENE?new GreeneSegmentCorpse(this,slot):null;
-            if(corpse!=null)GreeneFeedback.broken(this,physicalContact&&incomingContact!=null?incomingContact.point():hurtRegions(0).get(slot).bounds().getCenter());
+            if(corpse!=null) {
+                var point=physicalContact&&incomingContact!=null?incomingContact.point():hurtRegions(0).get(slot).bounds().getCenter();
+                GreeneFeedback.broken(this,point);
+                BossImpactFeedback.contact(this,source,point,BossImpactFeedback.Contact.BREAK,amount);
+            }
             entityData.set(BROKEN,entityData.get(BROKEN)|(1<<slot));
             if(corpse!=null){
                 level().addFreshEntity(corpse);
@@ -1023,7 +1097,21 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     }
     /** Prototype weapon sessions pass their already-authorized swept contact volume. */
     public boolean hurtWeapon(DamageSource source,float amount,WeaponCutContact.Report report,java.util.function.Predicate<AABB> bluntContact){
-        if(kind==EncounterKind.ELIZABETH_GREENE||kind==EncounterKind.GOLIATH)for(var region:hurtRegions(0))if(region.bone().startsWith("weak_"))for(var box:region.boxes()){
+        if(kind==EncounterKind.GOLIATH){
+            var skin=hurtRegions(0);
+            if(!report.contacts().isEmpty()){
+                var contact=HydraHurtContact.reportedContact(skin,report);
+                return contact!=null&&hurtAt(source,amount,contact);
+            }
+            var active=goliathWindow().part;
+            var regions=active==null?skin:skin.stream().sorted(Comparator.comparing(r->GoliathLockPart.forSkin(r.bone())!=active)).toList();
+            for(var region:regions)for(var box:region.boxes())if(bluntContact.test(box.bounds)){
+                var from=source.getSourcePosition();
+                return hurtAt(source,amount,new HydraHurtContact.Contact(region.bone(),from==null?box.center:box.nearest(from),new Vec3(0,1,0),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));
+            }
+            return false;
+        }
+        if(kind==EncounterKind.ELIZABETH_GREENE)for(var region:hurtRegions(0))if(region.bone().startsWith("weak_"))for(var box:region.boxes()){
             for(var contact:report.contacts())if(box.nearest(contact.point()).distanceToSqr(contact.point())<.08*.08)return hurtAt(source,amount,new HydraHurtContact.Contact(region.bone(),contact.point(),contact.travel().normalize().scale(-1),com.codex.blacklight.infection.InfectedAttackStyle.TEAR));
             if(bluntContact.test(box.bounds))return hurtAt(source,amount,new HydraHurtContact.Contact(region.bone(),box.center,new Vec3(0,1,0),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));
         }
@@ -1042,6 +1130,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             int prior=greeneOwnDamageDepth;greeneOwnDamageDepth=0;
             try{return super.hurt(source,amount);}finally{greeneOwnDamageDepth=prior;}
         }
+        if(kind==EncounterKind.GOLIATH)return hurtGoliath(source,amount);
         float scale=1,poiseDamage=0;boolean guardContact=false;
         if(kind!=null&&!exposed()&&amount<getMaxHealth()*5){
             if(kind.armored()||move()==EncounterMove.GUARD){
@@ -1066,6 +1155,61 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(accepted&&!level().isClientSide){if(source.getEntity() instanceof LivingEntity attacker&&enemy(attacker))lastThreatAt=level().getGameTime();poise+=poiseDamage;if(poise>=70){expose(70);poise=0;}}
         return accepted;
     }
+    private boolean hurtGoliath(DamageSource source,float amount){
+        boolean bypass=source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
+        var window=goliathWindow();
+        var contact=incomingContact;
+        if(level().isClientSide||!isAlive()||!bypass&&(ConsumeControl.protectedEntity(this)||source.getEntity() instanceof LivingEntity attacker&&isAlliedTo(attacker)))return false;
+        boolean weak=exposed() && window.part!=null && contact!=null && GoliathLockPart.forSkin(contact.bone())==window.part;
+        boolean down=window==GoliathWindow.LEG_FALL||window==GoliathWindow.ARM_FALL;
+        boolean finish=goliathFinisherReady();
+        boolean before=goliathHealthGuard;
+        boolean accepted;
+        goliathHealthGuard=!bypass&&!finish;
+        try{accepted=super.hurt(source,bypass||finish?amount:amount*(weak?.7F:down?.4F:.035F));}
+        finally{goliathHealthGuard=before;}
+        if(!accepted||bypass)return accepted;
+        BossSiteData.participant(this,source.getEntity());
+        var response=weak||down||finish?BossImpactFeedback.Contact.WEAK:BossImpactFeedback.Contact.ARMOR;
+        int slot=window==GoliathWindow.ARM?1:window==GoliathWindow.KNEE?0:2;
+        if(weak && !finish && armor[slot]<=amount)response=BossImpactFeedback.Contact.BREAK;
+        if(contact!=null)BossImpactFeedback.contact(this,source,contact.point(),response,amount);
+        else if(source.getSourcePosition()!=null){
+            var from=source.getSourcePosition();
+            var point=hurtRegions(0).stream().flatMap(r->r.boxes().stream()).map(b->b.nearest(from)).min(Comparator.comparingDouble(from::distanceToSqr));
+            if(point.isPresent())BossImpactFeedback.contact(this,source,point.get(),response,amount);
+        }
+        if(!isAlive()||isRemoved()||finish||goliathWindow()!=window)return true;
+        if(source.getEntity() instanceof LivingEntity attacker&&enemy(attacker))lastThreatAt=level().getGameTime();
+        if(weak){
+            armor[slot]=Math.max(0,armor[slot]-amount);
+            if(armor[slot]<=0){
+                switch(window){
+                    case HEAD -> startGoliathWindow(GoliathWindow.KNEE,GoliathWindow.KNEE.ticks,0);
+                    case KNEE,ARM -> {
+                        boolean arm=window==GoliathWindow.ARM;
+                        entityData.set(BROKEN,arm?3:1);
+                        entityData.set(PHASE,arm?2:1);
+                        setHealth(Math.min(getHealth(),getMaxHealth()*(arm?.31F:.64F)));
+                        if(arm)armor[2]=90;
+                        playSound(SoundEvents.RAVAGER_HURT,1.35F,.55F);
+                        var fall=arm?GoliathWindow.ARM_FALL:GoliathWindow.LEG_FALL;
+                        startGoliathWindow(fall,fall.ticks,0);
+                    }
+                    case FACE -> {
+                        setHealth(Math.min(getHealth(),1));
+                        startGoliathWindow(GoliathWindow.FINISH,1,0);
+                    }
+                    default -> {}
+                }
+            }
+        }else if(!broken(0)&&!exposed()){
+            poise+=Math.min(amount,50);
+            if(poise>=70){poise=0;expose(60);}
+        }
+        return true;
+    }
+
     /** MotherHealth redirects before the core's own immunity check. Child
      * rejection never changes this event's divisor or reallocates its share. */
     private boolean hurtGreeneCore(DamageSource source,float amount){
@@ -1112,6 +1256,89 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(kind==EncounterKind.ELIZABETH_GREENE&&greeneBattle!=null&&reason.shouldDestroy())greeneBattle.dispose();
         super.remove(reason);
     }
+    private boolean strikeWoundedContact(LivingEntity victim,HydraContact.Box volume,float damage,com.codex.blacklight.infection.InfectedAttackStyle style){
+        var body=AnimatedHurtBody.of(victim);
+        var source=damageSources().mobAttack(this);
+        if(body==null){
+            var point=HunterContactPose.nearest(victim.getBoundingBox(),volume.center);
+            return HydraHurtContact.clear(this,volume.center,point) && victim.hurt(source,damage);
+        }
+        var touch=HydraHurtContact.volume(body.hurtRegions(0),volume,volume.center,style);
+        return touch!=null&&HydraHurtContact.clear(this,volume.center,touch.point())&&body.hurtAt(source,damage,touch);
+    }
+
+    private boolean sweepGoliathSpike(){
+        // Four intermediate source poses resolve the fast rotation during the final frame.
+        var previous=GoliathContact.spike(this,-1);
+        for(int sample=1;sample<=4;sample++){
+            var next=GoliathContact.spike(this,sample/4F-1);
+            BlockHitResult ground=null;
+            for(int i=0;i<next.size();i++){
+                var box=next.get(i);var old=previous.get(i);
+                var v=box.center.subtract(old.center);
+                for(var victim:level().getEntitiesOfClass(LivingEntity.class,box.bounds.minmax(old.bounds),this::enemy)){
+                    if(struck.contains(victim.getUUID()))continue;
+                    var bounds=victim.getBoundingBox();var center=bounds.getCenter();
+                    var touched=box.sweepBox(center.add(v),center,new Vec3(bounds.getXsize(),bounds.getYsize(),bounds.getZsize()).scale(.5));
+                    if(touched==null||!HydraHurtContact.clear(this,old.center,touched.point()))continue;
+                    boolean accepted=AnimatedHurtBody.of(victim)==null?victim.hurt(damageSources().mobAttack(this),(float)kind.damage):
+                            strikeWoundedContact(victim,box,(float)kind.damage,com.codex.blacklight.infection.InfectedAttackStyle.PIERCE);
+                    if(accepted)struck.add(victim.getUUID());
+                }
+                if(ground==null && v.y<0){
+                    int tip=0;
+                    for(int j=1;j<box.points.size();j++)if(box.points.get(j).y<box.points.get(tip).y)tip=j;
+                    var hit=level().clip(new ClipContext(old.points.get(tip),box.points.get(tip),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
+                    if(hit.getType()==HitResult.Type.BLOCK && hit.getDirection()==net.minecraft.core.Direction.UP)ground=hit;
+                }
+            }
+            if(ground!=null){
+                TerrainImpactEffects.emit(this,ground,3.2F,true);
+                return true;
+            }
+            previous=next;
+        }
+        return false;
+    }
+
+    private void tickWoundedGoliath(EncounterMove action,int age){
+        if(age==lastAge)return;
+        lastAge=age;
+        setYRot(yaw);yBodyRot=yaw;yHeadRot=yaw;
+        if(action==EncounterMove.ERUPTION){
+            // Original F88..90 drives the wrist roughly 22 blocks downward in four ticks.
+            // Test the moving claw against real victims and solid ground between server ticks.
+            if(age>=35 && age<=39 && sweepGoliathSpike()){
+                if(!isAlive()||move()!=action)return;
+                startGoliathWindow(GoliathWindow.ARM,GoliathWindow.ARM.ticks,0);
+            }else if(age>=39){
+                cancelAttack();
+            }
+            return;
+        }
+        // Remove vanilla gravity while driving the committed arc. Each displacement
+        // is resolved by Minecraft collision, including a low roof or a lower street.
+        if(age<15)return;
+        if(age==15)leapSpeed=Math.min(.34,Math.max(0,aim.subtract(position()).dot(direction)/49));
+        double velocity=leapDescending?-.8:(39.5-age)*.035;
+        move(MoverType.SELF,direction.scale(leapSpeed).add(0,velocity,0));
+        if(velocity>0&&verticalCollision)leapDescending=true;
+        if(velocity<0&&onGround()){
+            updateParts();
+            var floor=new AABB(getX()-6,getY()-.65,getZ()-6,getX()+6,getY()+2.1,getZ()+6);
+            var volume=HydraContact.oriented(floor.getCenter(),new Vec3(6,floor.getYsize()*.5,6),new Vec3(1,0,0),new Vec3(0,1,0),new Vec3(0,0,1));
+            for(var victim:level().getEntitiesOfClass(LivingEntity.class,floor,this::enemy)){
+                if(victim.position().subtract(position()).horizontalDistanceSqr()>36)continue;
+                strikeWoundedContact(victim,volume,(float)kind.damage*1.5F,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH);
+                if(!isAlive()||move()!=action)return;
+            }
+            var support=level().clip(new ClipContext(position().add(0,.15,0),position().add(0,-.4,0),
+                    ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
+            TerrainImpactEffects.emit(this,support,6F,true);
+            startGoliathWindow(GoliathWindow.FACE,GoliathWindow.FACE.ticks,0);
+        }else if(age>=145){cancelAttack();}
+    }
+
     public float legAngle(boolean right,float partial){float angle;if(move()==EncounterMove.POUNCE||move()==EncounterMove.CHARGE||move()==EncounterMove.DIVE)angle=(float)Math.cos(moveAge(partial))*.5F;else angle=getDeltaMovement().horizontalDistanceSqr()>.0002?(float)Math.cos((tickCount+partial)*.65F)*.5F:0;return right?angle:-angle;}
     public void updateParts(){if(parts==null)return;
         if(greeneParts!=null&&greeneParts.length>0){
@@ -1148,7 +1375,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     @Override public void startSeenByPlayer(ServerPlayer p){super.startSeenByPlayer(p);if(kind.boss){bar.addPlayer(p);if(kind!=EncounterKind.ALEX_MERCER)defenseBar.addPlayer(p);}}
     @Override public void stopSeenByPlayer(ServerPlayer p){super.stopSeenByPlayer(p);bar.removePlayer(p);defenseBar.removePlayer(p);}
     @Override public void addAdditionalSaveData(CompoundTag tag){if(kind==EncounterKind.ELIZABETH_GREENE)greeneBattle.refreshHealthScale();super.addAdditionalSaveData(tag);tag.putInt("EncounterPhase",phase());tag.putInt("EncounterSequence",sequence);tag.putInt("EncounterBroken",entityData.get(BROKEN));tag.putLong("EncounterExposed",entityData.get(EXPOSED));tag.putLong("EncounterExposedStart",entityData.get(EXPOSED_START));for(int i=0;i<3;i++)tag.putFloat("EncounterArmor"+i,armor[i]);
-        if(kind==EncounterKind.GOLIATH&&exposed())tag.putLong("GoliathCrashSample",goliathCrashSample());
+        if(kind==EncounterKind.GOLIATH){
+            tag.putInt("GoliathWindow",goliathWindow().ordinal());
+            if(exposed())tag.putLong("GoliathCrashSample",goliathCrashSample());
+        }
         if(kind==EncounterKind.ELIZABETH_GREENE){tag.put("GreeneClose",greeneClose.save());tag.put("GreeneRoar",saveGreeneRoar());tag.put("GreeneWeaponCooldowns",greeneWeapons.save());tag.putInt("GreeneHoldTicks",greeneHoldTicks());tag.put("GreeneBattle",greeneBattle.save());tag.putBoolean("GreeneCycleActive",greeneBattle.exposed());tag.putInt("GreeneCycleAge",Math.max(0,Math.min(exposedDuration()-1,(int)exposedAge(0))));for(int i=0;i<3;i++)tag.putInt("GreenePartCooldown"+i,(int)Math.max(0,Math.min(10,10-(level().getGameTime()-armorHit[i]))));}
         var recharge=new CompoundTag();readyAt.forEach((move,at)->recharge.putInt(move.name(),(int)Math.max(0,Math.min(400,at-level().getGameTime()))));tag.put("EncounterRecharge",recharge);tag.putInt("EncounterPrevious",previous.ordinal());
         var ids=new net.minecraft.nbt.ListTag();for(UUID id:brood)ids.add(net.minecraft.nbt.StringTag.valueOf(id.toString()));tag.put("EncounterBrood",ids);
@@ -1194,7 +1424,17 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             long start=tag.contains("EncounterExposedStart")?tag.getLong("EncounterExposedStart"):now;
             for(int i=0;i<3;i++)if(tag.contains("EncounterArmor"+i))armor[i]=Math.max(0,Math.min(90,tag.getFloat("EncounterArmor"+i)));
             if(kind==EncounterKind.GOLIATH){
-                long restored=isAlive()?GoliathRecovery.restoredEnd(now,start,end):0;
+                // The old second plate was on the healthy leg. It never means a severed wrist.
+                boolean modern=tag.contains("GoliathWindow");
+                int mask=entityData.get(BROKEN)&(modern?3:1);
+                if(mask==2)mask=0;
+                entityData.set(BROKEN,mask);entityData.set(PHASE,Integer.bitCount(mask));
+                for(int slot=0;slot<3;slot++)if(!Float.isFinite(armor[slot]))armor[slot]=90;
+                if(!modern){armor[1]=90;armor[2]=90;}
+                var state=modern?GoliathWindow.byId(tag.getInt("GoliathWindow")):mask==0&&end>now?GoliathWindow.HEAD:GoliathWindow.NONE;
+                if(!state.matchesMask(mask)||!isAlive())state=GoliathWindow.NONE;
+                long restored=state==GoliathWindow.FINISH?now+1:state==GoliathWindow.NONE?0:GoliathRecovery.restoredEnd(now,start,end);
+                entityData.set(GOLIATH_WINDOW,restored>0?state.ordinal():0);
                 entityData.set(EXPOSED,restored);
                 entityData.set(EXPOSED_START,restored>0?start:0L);
                 entityData.set(GOLIATH_CRASH_SAMPLE,restored>0?GoliathRecovery.sanitizeImpactSample(tag.getLong("GoliathCrashSample")):0L);
@@ -1236,7 +1476,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             if(next!=EncounterMove.NONE)preferred=Math.min(preferred,actionRange(next)+kind.width*.5+target.getBbWidth()*.5-.6);
             if(kind.flying){flight.circle(target);}
             else if(kind.speed>0){
-                if(!hasLineOfSight(target)||distance>preferred+.35)getNavigation().moveTo(target,1);
+                if(!hasLineOfSight(target)||distance>preferred+.35)getNavigation().moveTo(target,kind==EncounterKind.GOLIATH&&broken(0)?.72:1);
                 else if(preferred>=4&&distance<preferred-1){var away=position().subtract(target.position()).multiply(1,0,1).normalize().scale(3);getNavigation().moveTo(getX()+away.x,getY(),getZ()+away.z,1);}
                 else getNavigation().stop();
             }

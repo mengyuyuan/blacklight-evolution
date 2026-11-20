@@ -23,10 +23,14 @@ public final class ConsumeAbsorptionFx {
     public static Vec3 destination(LivingEntity victim,float partial,Vec3 placement) {
         var data=victim.getData(ModAttachments.CONSUME_VISUAL);
         var owner=victim.level().getEntity(data.consumerId());if(owner==null)return Vec3.ZERO;
+        if(owner instanceof LivingEntity actor && ConsumeVisual.groundGate(data.form(),data.variant())>=0){
+            Vec3 fitted=ConsumeTrauma.chest(actor,partial);
+            if(fitted!=null)return fitted.subtract(victim.getPosition(partial).add(placement));
+        }
         Vec3 chest=new Vec3(0,owner.getBbHeight()*.63,0);
-        if(owner instanceof LivingEntity&&!ConsumeSequence.mountedStage(data.stage())){
+        if(owner instanceof LivingEntity&&data.stage()!=ConsumeVisual.HUNTER_CONSUME){
             var form=PowerForm.values()[Math.clamp(data.form(),0,PowerForm.values().length-1)];
-            var row=ConsumePlacementTrack.contactFrame(ConsumeSequence.key(form,data.variant()),data.motionProgress(victim.level().getGameTime(),partial)).orElse(null);
+            var row=ConsumePlacementTrack.contactFrame(ConsumeSequence.clipKey(form,ConsumeSequence.mountedStage(data.stage()),data.variant()),data.motionProgress(victim.level().getGameTime(),partial)).orElse(null);
             if(row!=null){Vec3 f=Vec3.directionFromRotation(0,data.facing()),r=new Vec3(-f.z,0,f.x);chest=r.scale(row[7]*.9375).add(f.scale(row[9]*.9375)).add(0,row[8]*.9375,0);}
         }
         return owner.getPosition(partial).add(chest).subtract(victim.getPosition(partial).add(placement));
@@ -57,8 +61,11 @@ public final class ConsumeAbsorptionFx {
     /** All inputs share the SAME render frame as the fractured skin, including its
      * skeleton, body projection, network interpolation and final fragment motion. */
     public static void drawPosed(PoseStack stack,VertexConsumer out,int light,java.util.List<ConsumeTendrils.Attachment> roots,Vec3 to,ConsumeFracture.Phase phase,int seed){
+        drawPosed(stack,out,light,roots,to,phase,seed,false);
+    }
+    public static void drawPosed(PoseStack stack,VertexConsumer out,int light,java.util.List<ConsumeTendrils.Attachment> roots,Vec3 to,ConsumeFracture.Phase phase,int seed,boolean grounded){
         if(roots.isEmpty())return;
-        ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed);
+        ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
         // Brief moving flecks at the actual wound. They cannot remain in a frozen
         // radial halo for the rest of the consume animation.
         float age=(phase.progress()-phase.contact())/.14F;

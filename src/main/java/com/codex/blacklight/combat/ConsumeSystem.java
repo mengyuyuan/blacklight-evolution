@@ -61,7 +61,7 @@ public final class ConsumeSystem {
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
         /** Held-throw charge, server game time; repeat START packets renew the lease like block throws. */
-        long chargeStart=-1,chargeInput=-1;int throwCharge;
+        long chargeStart=-1,chargeInput=-1;int throwCharge; int landingDelay;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=ConsumeSequence.bruteMount(v)?v.yBodyRot:p.getYRot();
             reward=com.codex.blacklight.power.AssimilationSystem.quote(p,v);
@@ -100,7 +100,7 @@ public final class ConsumeSystem {
         s.stage=stage;s.started=p.tickCount-offset;s.start=p.position();
         if(ConsumeSequence.bruteMount(s.victim)&&ConsumeSequence.mountedStage(stage))ConsumeSequence.mountFacing(s.victim,s.facing);
         int duration=stage==ConsumeVisual.MOUNT?40:stage==ConsumeVisual.WHIP_PULL?100:stage==ConsumeVisual.CAPTURE?ConsumeVisual.captureDuration(s.form):stage==ConsumeVisual.THROW?14:s.duration();
-        s.victim.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start,s.variant));
+        s.victim.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(p.getId(),p.level().getGameTime()-offset,duration,s.animationForm().ordinal(),stage,s.facing,s.start,s.variant,s.landingDelay));
         s.victim.syncData(ModAttachments.CONSUME_VISUAL);
         p.setData(ModAttachments.GRAB_STAGE,stage);p.syncData(ModAttachments.GRAB_STAGE);
         ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
@@ -125,6 +125,8 @@ public final class ConsumeSystem {
         s.variant=variant;
         if(s.form==PowerForm.NONE&&(!ConsumeSequence.humanoid(s.victim)||s.victim.isBaby())
                 ||!ConsumeSequence.paired(s.form,s.large,s.variant))s.variant=ConsumeVariant.DEFAULT;
+        int gate=ConsumeVisual.groundGate(s.form.ordinal(),s.variant);
+        s.landingDelay=!s.large && gate>=0?-1:0;
         clearThrowCharge(player,s);
         phase(player,s,s.victim instanceof BlacklightHunter?ConsumeVisual.HUNTER_CONSUME:s.large?ConsumeVisual.MOUNT_CONSUME:ConsumeVisual.CONSUME);
         if(!s.large&&ConsumeVariant.alternatives(s.form))
@@ -239,6 +241,7 @@ public final class ConsumeSystem {
         // The claimant keeps the window it opened; claim() itself marks the boss as being consumed.
         if(target instanceof BlacklightHunter infected&&infected.parasite())return infected.parasiteLocked()||consumer!=null&&infected.isAlive()&&infected.consumerId()==consumer.getId();
         if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)return supreme.consumable()||consumer!=null&&supreme.isAlive()&&supreme.consumerId()==consumer.getId();
+        if(target instanceof com.codex.blacklight.entity.EncounterMob boss&&boss.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return boss.goliathFinisherReady();
         float maximum=target.getMaxHealth();
         boolean human=target instanceof com.codex.blacklight.entity.MilitarySoldier
                 && !com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target);
@@ -485,6 +488,27 @@ public final class ConsumeSystem {
         if(target instanceof BlacklightHunter hunter)hunter.setConsumeTicks(elapsed);
         if(ConsumeSequence.paired(session.form,false,session.variant)) {
             player.setYRot(session.facing);player.setYHeadRot(session.facing);player.yBodyRot=session.facing;
+            if(session.landingDelay<0){
+                int gate=ConsumeVisual.groundGate(session.form.ordinal(),session.variant);
+                if(elapsed>=gate){
+                    pairedPlacement(player,session,gate);
+                    float t=ConsumeSequence.motionProgress(session.form,gate/(float)session.duration(),session.duration(),false,session.variant);
+                    var floor=ConsumePlacementTrack.landingSurface(target,target.position(),session.facing,session.variant,t,player.getY());
+                    if(floor.isPresent()){
+                        double delta=floor.getAsDouble()-target.getY();
+                        target.move(MoverType.SELF,new Vec3(0,Math.max(-.32,Math.min(.32,delta)),0));
+                    }
+                    if(floor.isEmpty() || Math.abs(target.getY()-floor.getAsDouble())>.055){
+                        if(elapsed-gate>=10)cancel(player);
+                        return;
+                    }
+                    session.landingDelay=elapsed-gate;
+                    var landed=ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).landed(session.landingDelay);
+                    target.setData(ModAttachments.CONSUME_VISUAL,landed);target.syncData(ModAttachments.CONSUME_VISUAL);
+                    return;
+                }
+            }
+            elapsed-=Math.max(0,session.landingDelay);
             pairedPlacement(player,session,elapsed);
             consumeEffects(player,session,elapsed);
             if(elapsed>=session.completionTick())finish(player,session);
@@ -592,6 +616,11 @@ public final class ConsumeSystem {
         if(before.distanceToSqr(player.position())>.000001)player.connection.teleport(player.getX(),player.getY(),player.getZ(),session.facing,player.getXRot());
         Vec3 goal=ConsumePlacementTrack.anchor(session.start,session.facing,target,session.form,t,session.variant).orElse(session.consumeTargetStart==null?target.position():session.consumeTargetStart);
         goal=ConsumePlacementTrack.pairedGoal(goal,player.position(),actorGoal);
+        int gate=ConsumeVisual.groundGate(session.form.ordinal(),session.variant);
+        if(gate>=0 && elapsed>=gate){
+            var surface=ConsumePlacementTrack.landingSurface(target,goal,session.facing,session.variant,t,player.getY());
+            if(surface.isPresent())goal=new Vec3(goal.x,surface.getAsDouble(),goal.z);
+        }
         Vec3 delta=goal.subtract(target.position());
         target.move(MoverType.SELF,delta.length()>1.25?delta.normalize().scale(1.25):delta);
         target.setDeltaMovement(Vec3.ZERO);target.fallDistance=0;

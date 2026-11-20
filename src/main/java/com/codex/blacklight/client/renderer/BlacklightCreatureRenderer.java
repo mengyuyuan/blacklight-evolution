@@ -34,6 +34,9 @@ public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity
     }
     public BlacklightCreatureRenderer(EntityRendererProvider.Context context,Function<T,String> asset){super(context,new BlacklightCreatureModel<>(asset));shadowRadius=.65F;}
     @Override public void renderCubesOfBone(PoseStack stack,software.bernie.geckolib.cache.object.GeoBone bone,com.mojang.blaze3d.vertex.VertexConsumer out,int light,int overlay,int color){
+        if (getAnimatable() instanceof com.codex.blacklight.entity.EncounterMob mob
+                && mob.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH
+                && GoliathLockPart.severed(bone.getName(), (mob.broken(0)?1:0) | (mob.broken(1)?2:0))) return;
         if(highlightedPart!=null && GoliathLockPart.forSkin(bone.getName())==highlightedPart){
             light=LightTexture.FULL_BRIGHT;
             overlay=net.minecraft.client.renderer.texture.OverlayTexture.pack(0,net.minecraft.client.renderer.texture.OverlayTexture.v(true));

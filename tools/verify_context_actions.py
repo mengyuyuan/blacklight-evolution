@@ -38,10 +38,36 @@ for key in PAIRS:
     a=np.array(placement['projections'][key])[:,3:].reshape(-1,4)
     assert np.max(abs(np.linalg.norm(a,axis=1)-1))<1e-6
     if key in events:
+        assert victim['source']['speed']==actor['source']['speed']==1, key
+        assert victim['source']['skeleton']=='ped_m_sold_aa_master_skeleton_skeleton', key
         scene=events[key];end=actor['animation'][0]['time'][-1]
+        if key in placement['contactCues']:
+            cues=np.array(placement['contactCues'][key])
+            assert np.allclose(cues[:,0]*end,scene['hitSeconds'],atol=1e-6), key
+            assert np.all(cues[:,1:3]>0) and np.all(np.diff(cues[:,0])>0), key
         assert 0<=scene['deformSeconds']<scene['finishSeconds']<end
         assert scene['effectSeconds']+scene['settleSeconds']<scene['finishSeconds']
         assert all(0<=t<scene['finishSeconds'] for t in scene['hitSeconds'])
+# Per-frame grapple socket, rigid basis and posed mesh support must share the
+# exact authored clock for every ordinary swallow, including both whip clips.
+villager_keys = {"normal", "hammer", "hammer_smush", "muscle_heart", "claws", "claws_head", "muscle", "blade", "whip", "whip_lash",
+                 "normal_head_stomp", "normal_knee_head", "normal_beatdown", "stealth_neck",
+                 "stealth_bearhug", "stealth_nelson", "stealth_guillotine", "stealth_jugular"}
+assert set(placement["villagerPairs"]) == villager_keys
+for key in villager_keys:
+    rows = np.array(placement["villagerPairs"][key])
+    assert rows.shape == (len(placement["actorMotion"][key]), 9), key
+    assert np.isfinite(rows).all() and np.max(abs(np.linalg.norm(rows[:, 3:7], axis=1)-1)) < 1e-6, key
+    assert np.min(rows[:, 8]) >= 0, key
+    assert np.min(rows[:, 7]) > 0 and np.max(rows[:, 7]) < 3, key
+
+# Sample the receiver's forward distance relative to the moving actor and its
+# source sole height at the throw apex. A per-frame reparent flattens both.
+for key, seconds, forward, airborne in [("claws", .93, 1.3, .9), ("whip", .8, 2.3, 2.8), ("blade", .6, 1.5, 1.1)]:
+    times = json.loads((PROFILE / f"consume_{key}_actor.json").read_bytes())["animation"][0]["time"]
+    pose = placement["villagerPairs"][key][int(np.argmin(np.abs(np.asarray(times)-seconds)))]
+    assert -pose[2] > forward and pose[8] > airborne, (key, "receiver throw path", pose)
+
 print('PASS: hashes, pair clocks, placement rows, unit quaternions and scene event bounds')
 
 # Plot data, not a gameplay screenshot. This exposes mirrored limbs/contact drift.

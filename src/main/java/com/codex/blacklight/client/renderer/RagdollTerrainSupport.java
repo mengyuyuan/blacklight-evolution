@@ -120,6 +120,20 @@ final class RagdollTerrainSupport {
         }
         return Double.isFinite(lift)?lift:0;
     }
+    /** Signed displacement to the first top surface touched by the projected skin. */
+    static double rest(List<Vec3> skin,List<AABB> terrain,double bottom){
+        double best=Double.NEGATIVE_INFINITY;
+        for(var box:mergeTiles(terrain)){
+            if(box.maxY>bottom+1.02 || box.maxY<bottom-3)continue;
+            for(int i=0;i+3<skin.size();i+=4){
+                List<Vec3> face=skin.subList(i,i+4);
+                face=clip(face,0,box.minX+.00001,true);face=clip(face,0,box.maxX-.00001,false);
+                face=clip(face,2,box.minZ+.00001,true);face=clip(face,2,box.maxZ-.00001,false);
+                for(var point:face)best=Math.max(best,box.maxY-point.y);
+            }
+        }
+        return Double.isFinite(best)?best:0;
+    }
     private static List<Vec3> clip(List<Vec3> face,int axis,double plane,boolean lower){
         if(face.isEmpty())return face;
         var result=new ArrayList<Vec3>();Vec3 a=face.get(face.size()-1);double da=coordinate(a,axis)-plane;boolean inA=lower?da>=0:da<=0;

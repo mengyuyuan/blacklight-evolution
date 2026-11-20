@@ -48,10 +48,20 @@ public final class ContactEffectsPresentation {
         if(p.kind()==ContactEffectsPayload.GROUND||p.kind()==ContactEffectsPayload.GUARD)CombatImpactRenderer.acceptAt(p.flash(),time);
         if(p.tissue()!=null){
             InfectedImpactVisuals.acceptAt(p.tissue(),time);
-            if(level.getEntity(p.tissue().victim()) instanceof com.codex.blacklight.entity.EncounterMob mob&&mob.kind()==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE){
-                if(mc.player!=null&&mc.player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL).spec()==null&&p.tissue().attacker()==mc.player.getId()&&mc.player.position().distanceToSqr(p.flash().x(),p.flash().y(),p.flash().z())<64)
-                    com.codex.blacklight.client.ClientPhysicalFeedback.accept(new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HIT,.25F));
-            }
+
+        }
+        if (p.kind() >= ContactEffectsPayload.BOSS_ARMOR && p.kind() <= ContactEffectsPayload.BOSS_BREAK) {
+            boolean armor = p.kind() == ContactEffectsPayload.BOSS_ARMOR;
+            boolean broken = p.kind() == ContactEffectsPayload.BOSS_BREAK;
+            var state = armor ? net.minecraft.world.level.block.Blocks.DEEPSLATE.defaultBlockState()
+                    : net.minecraft.world.level.block.Blocks.NETHER_WART_BLOCK.defaultBlockState();
+            int pieces = broken ? 22 : p.kind() == ContactEffectsPayload.BOSS_WEAK ? 10 : 3;
+            double speed = broken ? .42 : armor ? .14 : .22;
+            var hit = p.flash();
+            for (int i = 0; i < pieces; i++)
+                level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, state), hit.x(), hit.y(), hit.z(),
+                        (level.random.nextDouble()-.5)*speed, .035+level.random.nextDouble()*speed, (level.random.nextDouble()-.5)*speed);
+            if (armor) level.addParticle(ParticleTypes.CRIT, hit.x(), hit.y(), hit.z(), 0, .08, 0);
         }
         if(p.kind()==ContactEffectsPayload.GROUND)for(var s:p.terrain()){
             var state=Block.stateById(s.state());var at=new Vec3(s.x(),s.y(),s.z());

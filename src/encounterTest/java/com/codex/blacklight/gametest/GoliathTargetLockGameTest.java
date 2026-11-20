@@ -118,6 +118,9 @@ public final class GoliathTargetLockGameTest {
                 }
                 h.assertTrue(acquired,"real distant crosshair picks "+selected.goliathPart());
             }
+            var state=new net.minecraft.nbt.CompoundTag();mob.saveWithoutId(state);
+            state.putInt("GoliathWindow",GoliathWindow.KNEE.ordinal());state.putLong("EncounterExposedStart",h.getLevel().getGameTime());
+            state.putLong("EncounterExposed",h.getLevel().getGameTime()+60);mob.load(state);mob.updateParts();
             var leg=new TargetSelection(mob,GoliathLockPart.RIGHT_LEG.ordinal());
             CombatTargeting.requestLock(player,mob.getId(),leg.region());
             h.assertTrue(leg.equals(CombatTargeting.lockedSelection(player)),"leg lock before plate break");

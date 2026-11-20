@@ -32,6 +32,17 @@ public final class NativeConsumePose {
         float time=visual.stage()==ConsumeVisual.HUNTER_CONSUME
                 ?Math.min(HunterConsume.seconds(visual,entity.level().getGameTime(),partial),Math.max(0,clip.duration()-.001F))
                 :(role.equals("victim")?GrappleMotion.receiverProgress(entity,visual,partial):GrappleMotion.sceneProgress(entity,visual,partial))*Math.max(0,clip.duration()-.001F);
+        if(visual.consuming() && role.equals("actor") && form==PowerForm.NONE && visual.variant()==ConsumeVariant.BEATDOWN){
+            var scene=ConsumeReceiverScene.profile(form,false,visual.variant());
+            float follow=scene.hitSeconds().get(scene.hitSeconds().size()-1)+.12F;
+            float consumed=ConsumeReceiverScene.absorptionSeconds(form,visual.variant());
+            // Hold the follow-through while the tendrils are carrying the body.
+            // Rejoin the original recovery smoothly as the material disappears.
+            if(time>follow && time<scene.finishSeconds()){
+                float release=RagdollDrive.smooth((time-consumed)/(scene.finishSeconds()-consumed));
+                time=follow+(time-follow)*release;
+            }
+        }
         BlacklightPose copy=new BlacklightPose();MotionLibrary.pose(key,time,false).getJointTransformData().forEach((name,transform)->copy.getJointTransformData().put(name,transform.copy()));
         if(mounted&&role.equals("victim")){
             // A giant reacts at the contact site; a small receiver's whole-body toss must not tow it.

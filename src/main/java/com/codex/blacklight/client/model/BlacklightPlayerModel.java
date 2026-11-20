@@ -162,6 +162,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         stack.pushPose();BlacklightBoneRendering.skeletonFrame(stack);
         try {
             if(renderedPlayer!=null)com.codex.blacklight.client.renderer.QuillReception.captureBack(renderedPlayer,stack,matrices());
+            com.codex.blacklight.client.renderer.ConsumeTrauma.sampleActor(renderedPlayer,stack,matrices(),skinMatrices,renderPartial);
             if(renderedPlayer!=null&&renderedPlayer.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0)
                 com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices());
             if(mercerFrame!=null) {

@@ -29,6 +29,8 @@ public final class SourceBossPose {
             var p=pose[i];bone.updateRotation(p[0],p[1],p[2]);bone.setPosX(-p[3]);bone.setPosY(p[4]);bone.setPosZ(p[5]);
             bone.setScaleX(p.length>=9?p[6]:1);bone.setScaleY(p.length>=9?p[7]:1);bone.setScaleZ(p.length>=9?p[8]:1);
         }
+        // Goliath skin sections use the same per-cuboid severing policy as their hit volumes.
+        if (mob.kind() == EncounterKind.GOLIATH) return true;
         for(int i=0;i<mob.kind().weakParts();i++){
             String group="weak_"+i;
             for(String name:table.bones)if(name.equals(group)||name.startsWith(group+"_")){

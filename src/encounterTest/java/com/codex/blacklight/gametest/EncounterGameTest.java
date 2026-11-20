@@ -155,7 +155,7 @@ public final class EncounterGameTest {
         h.runAfterDelay(25+m.actionDuration(action)+10,()->{h.assertTrue(v.getHealth()<2000,"accepted hit "+action+" health="+v.getHealth());done(h,m,v);});
     }
     @GameTest(template="blackwatch_arena",batch="e_jugger",timeoutTicks=110)public static void juggernautHammer(GameTestHelper h){attack(h,EncounterKind.JUGGERNAUT,EncounterMove.HAMMER,3);}
-    @GameTest(template="blackwatch_arena",batch="e_goliath",timeoutTicks=120)public static void goliathWave(GameTestHelper h){attack(h,EncounterKind.GOLIATH,EncounterMove.ERUPTION,5);}
+    @GameTest(template="blackwatch_arena",batch="e_goliath",timeoutTicks=120)public static void goliathStandingImpact(GameTestHelper h){attack(h,EncounterKind.GOLIATH,EncounterMove.HAMMER,5);}
     @GameTest(template="blackwatch_arena",batch="e_greene_shot",timeoutTicks=130)public static void greeneRifleOnFoot(GameTestHelper h){
         arena(h);var m=actor(h,EncounterKind.ELIZABETH_GREENE);var v=target(h,9);m.goalSelector.removeAllGoals(g->true);m.targetSelector.removeAllGoals(g->true);
         h.runAfterDelay(25,()->{h.assertTrue(!m.begin(EncounterMove.ORBS,v),"anti-vehicle program rejects an on-foot pig");h.assertTrue(m.beginGreene(GreeneWeaponProgram.RIFLE,v),"native rifle starts against a walking target");});

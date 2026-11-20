@@ -184,7 +184,7 @@ public final class SurvivalCampaignGameTest {
             String outcome = BossSiteBlock.activate(home,latch,player);
             h.assertTrue(outcome.equals("convoy_started"),"earned decoder opens convoy: "+outcome+" at "+latch);
             var boss = home.getEntitiesOfClass(EncounterMob.class,new AABB(convoyPad).inflate(5)).get(0);
-            boss.hurt(player.damageSources().playerAttack(player),1000000);
+            SurvivalEncounterGameTest.finishConvoyFight(h,boss,player);
             player.getInventory().add(drop(home,boss.position(),ModItems.HEAVY_ARMOR_CORE.get()));
             h.assertTrue(SurvivalEncounterGameTest.done(player,"convoy_cleared") && player.getMainHandItem().is(ModItems.CONTAINMENT_DECODER.get()),"credit and reusable decoder");
             standAt(floor.above().east(2));
