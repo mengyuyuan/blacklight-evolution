@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.RenderShape;
@@ -19,6 +20,27 @@ import java.util.List;
 public final class TerrainImpactEffects {
     public record Surface(BlockHitResult hit,double angle,int ring,int index) {}
     private TerrainImpactEffects() {}
+
+    static void surfaceSound(Entity actor, BlockHitResult contact, float volume, float pitch) {
+        if (contact.getType() != HitResult.Type.BLOCK) return;
+        var level = actor.level();
+        var pos = contact.getBlockPos();
+        var material = level.getBlockState(pos).getSoundType(level, pos, actor);
+        var at = contact.getLocation();
+        level.playSound(null, at.x, at.y, at.z, material.getHitSound(), net.minecraft.sounds.SoundSource.PLAYERS,
+                volume * material.getVolume(), pitch * material.getPitch());
+    }
+
+    static void heldBodyFloor(LivingEntity body, int chips) {
+        if (!(body.level() instanceof ServerLevel level)) return;
+        var foot = body.position();
+        var hit = ray(body, foot.add(0, .16, 0), foot.add(0, -.24, 0));
+        if (hit.getType() != HitResult.Type.BLOCK || hit.getDirection() != Direction.UP) return;
+        var at = hit.getLocation();
+        surfaceSound(body, hit, .88F, .76F);
+        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, level.getBlockState(hit.getBlockPos())),
+                at.x, at.y + .04, at.z, chips, .32, .055, .32, .095);
+    }
 
     public static boolean emit(Entity actor,BlockHitResult contact,float radius,boolean heavy) {
         if(!(actor.level() instanceof ServerLevel level)||!Float.isFinite(radius)||radius<=0

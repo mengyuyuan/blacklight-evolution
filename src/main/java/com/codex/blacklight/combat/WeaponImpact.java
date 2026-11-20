@@ -20,21 +20,24 @@ public final class WeaponImpact {
      * devastators, groundspikes and thrown bodies. Call after the knockback is set so the hold
      * keeps the launch. Feedback goes to the attacker once per action ({@code first}). */
     public static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect){
-        if(!v.level().isClientSide&&tier.atLeast(ImpactTier.HEAVY)){
+        if (v.level().isClientSide) return;
+        var report = p == null ? WeaponCutContact.Report.NONE : WeaponCutContact.impact(p, v, HitStop.launchVelocity(v));
+        if(tier.atLeast(ImpactTier.HEAVY)){
             var state=v.getData(ModAttachments.HIT_REACTION);
             if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
                 RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
-                        p==null?WeaponCutContact.Report.NONE:WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
+                        report);
         }
-        if(v.level().isClientSide)return;
         if(v.isAlive())HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
-        if(p!=null)com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),tier.atLeast(ImpactTier.HEAVY)?"heavy":"hit",v.position(),.8F+.15F*tier.ordinal(),pitch);
-        if(tier.atLeast(ImpactTier.HEAVY))v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
-        if(tier==ImpactTier.FINISHER)v.level().playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
+        var at = report.contacts().isEmpty() ? v.getBoundingBox().getCenter() : report.contacts().get(0).point();
+        if (p != null && first) com.codex.blacklight.registry.ModWeaponSounds.play(p,
+                com.codex.blacklight.registry.ModWeaponSounds.equipped(p), tier.atLeast(ImpactTier.HEAVY) ? "heavy" : "hit", at, .84F, pitch);
+        if (PlayerHitEffects.metalAt(v, at))
+            v.level().playSound(null, at.x, at.y, at.z, SoundEvents.ANVIL_HIT, SoundSource.PLAYERS, first ? .56F : .24F, pitch);
         if(p!=null&&AnimatedHurtBody.of(v)==null)PlayerHitEffects.emit(p,v,
                 tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
-                .5F*tier.effectScale,WeaponCutContact.impact(p,v,HitStop.launchVelocity(v)));
+                .5F*tier.effectScale,report);
         if(first&&p!=null&&effect!=null)PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(effect,tier.feedback));
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first){apply(p,v,move,direction,first,0F);}
@@ -98,19 +101,21 @@ public final class WeaponImpact {
         }
         boolean blade=move.form==PowerForm.BLADE;
         if(AnimatedHurtBody.of(v)==null)CombatImpactEffects.target(p,v,move,impact,fullyCharged);
-        var soundPoint=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()?hydra.incomingPoint():v.position();
-        if(first){
-            float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
-            var form=com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
-            boolean chargedCrush=fullyCharged && (form==PowerForm.MUSCLE_MASS || form==PowerForm.HAMMERFISTS);
-            if(chargedCrush)pitch=Math.min(pitch,.78F);
-            com.codex.blacklight.registry.ModWeaponSounds.play(p,form,tier.atLeast(ImpactTier.HEAVY)||heavy||slam||chargedCrush?"heavy":"hit",soundPoint,chargedCrush?1.15F:.8F+.15F*tier.ordinal(),pitch);
-            // Layered body: heavier tiers add a low thump, finishers a crushing tail.
-            if(tier.atLeast(ImpactTier.HEAVY))p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.62F);
-            if(tier==ImpactTier.FINISHER){
-                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.PLAYER_ATTACK_CRIT,SoundSource.PLAYERS,1F,.7F);
-                p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,SoundEvents.WARDEN_ATTACK_IMPACT,SoundSource.PLAYERS,.55F,.85F);
-            }
+        var soundPoint = impact.contacts().isEmpty() ? v.getBoundingBox().getCenter() : impact.contacts().get(0).point();
+        if (v instanceof AnimatedHurtBody animated && animated.animatedHurtBody()) soundPoint = animated.incomingPoint();
+        var form = com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
+        boolean chargedCrush = fullyCharged && (form == PowerForm.MUSCLE_MASS || form == PowerForm.HAMMERFISTS);
+        boolean solidHit = tier.atLeast(ImpactTier.HEAVY) || heavy || slam || chargedCrush;
+        float pitch = switch (tier) { case LIGHT -> 1.1F; case MEDIUM -> 1F; case HEAVY -> .88F; case FINISHER -> .78F; };
+        if (chargedCrush) pitch = Math.min(pitch, .78F);
+        if (first) com.codex.blacklight.registry.ModWeaponSounds.play(p, form, solidHit ? "heavy" : "hit",
+                soundPoint, solidHit ? .88F : .74F, pitch);
+        if (PlayerHitEffects.metalAt(v, soundPoint)) {
+            p.level().playSound(null, soundPoint.x, soundPoint.y, soundPoint.z, SoundEvents.ANVIL_HIT,
+                    SoundSource.PLAYERS, first ? .56F : .25F, solidHit ? .76F : 1.22F);
+        } else if (first && tier.atLeast(ImpactTier.HEAVY)) {
+            p.level().playSound(null, soundPoint.x, soundPoint.y, soundPoint.z, SoundEvents.PLAYER_ATTACK_KNOCKBACK,
+                    SoundSource.PLAYERS, .62F, .72F);
         }
         if(first&&blade){
             var effect=BladeEffects.heavy(move)?PhysicalFeedbackPayload.Effect.BLADE_HEAVY

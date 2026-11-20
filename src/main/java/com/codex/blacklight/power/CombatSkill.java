@@ -20,7 +20,11 @@ public enum CombatSkill {
     ADAPTATION("adaptation", 1 << 15, 350, null),
     TISSUE_REGENERATION("tissue_regeneration", 1 << 16, 350, null),
     ADAPTATION_PERCENT("adaptation_percent", 1 << 17, 500, ADAPTATION),
-    TISSUE_REGENERATION_PERCENT("tissue_regeneration_percent", 1 << 18, 500, TISSUE_REGENERATION);
+    TISSUE_REGENERATION_PERCENT("tissue_regeneration_percent", 1 << 18, 500, TISSUE_REGENERATION),
+    QUILL_RELAY_1("quill_relay_1", 1 << 19, 200, null),
+    QUILL_RELAY_2("quill_relay_2", 1 << 20, 350, QUILL_RELAY_1),
+    QUILL_WEDGE_1("quill_wedge_1", 1 << 21, 300, null),
+    QUILL_WEDGE_2("quill_wedge_2", 1 << 22, 500, QUILL_WEDGE_1);
 
     private final String id;
     private final int bit, epCost;
@@ -37,7 +41,10 @@ public enum CombatSkill {
     public boolean advancedPassive() { return this==ADAPTATION_PERCENT||this==TISSUE_REGENERATION_PERCENT; }
     public boolean shieldBorer() { return this==SHIELD_BORER||this==SHIELD_BORER_BOOST_1||this==SHIELD_BORER_BOOST_2; }
     public boolean blockThrow() { return this==BLOCK_THROW_1||this==BLOCK_THROW_2||this==BLOCK_THROW_3; }
-    public PowerForm powerRequires() { return shieldBorer() ? PowerForm.SHIELD : blockThrow() ? PowerForm.MUSCLE_MASS : null; }
+    public PowerForm powerRequires() {
+        if (this == QUILL_RELAY_1 || this == QUILL_RELAY_2 || this == QUILL_WEDGE_1 || this == QUILL_WEDGE_2)
+            return PowerForm.BACKSPINES;
+        return shieldBorer() ? PowerForm.SHIELD : blockThrow() ? PowerForm.MUSCLE_MASS : null; }
     public MovementUpgrade movementRequires() { return this == BULLETDIVE_DROP ? MovementUpgrade.GLIDE_1 : null; }
     /** Each verified +400 source-health boost adds one base Devastator cost of storage. */
     public static int criticalMassCapacity(int mask) {

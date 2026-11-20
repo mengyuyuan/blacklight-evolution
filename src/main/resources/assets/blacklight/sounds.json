@@ -1739,19 +1739,25 @@
   "weapon.backspines.draw": {
     "subtitle": "subtitle.blacklight.weapon.backspines.draw",
     "sounds": [
-      "blacklight:weapon/backspines/draw"
+      "blacklight:weapon/backspines/draw",
+      "blacklight:weapon/backspines/draw_2",
+      "blacklight:weapon/backspines/draw_3"
     ]
   },
   "weapon.backspines.swing": {
     "subtitle": "subtitle.blacklight.weapon.backspines.swing",
     "sounds": [
-      "blacklight:weapon/backspines/swing"
+      "blacklight:weapon/backspines/swing",
+      "blacklight:weapon/backspines/swing_2",
+      "blacklight:weapon/backspines/swing_3"
     ]
   },
   "weapon.backspines.heavy": {
     "subtitle": "subtitle.blacklight.weapon.backspines.heavy",
     "sounds": [
-      "blacklight:weapon/backspines/heavy"
+      "blacklight:weapon/backspines/heavy",
+      "blacklight:weapon/backspines/heavy_2",
+      "blacklight:weapon/backspines/heavy_3"
     ]
   }
 }

@@ -70,9 +70,7 @@ public final class RagdollImpact {
     private static void send(LivingEntity victim,int motion,int ticks,boolean sharp,Vec3 velocity,WeaponCutContact.Report cut,boolean refinement,WeaponCutContact.Report woundContacts){
         send(victim,motion,ticks,sharp,velocity,cut,refinement,woundContacts,0);
     }
-    static int freezeTicks(boolean refinement,boolean dead,int remaining,int corpseFreeze){
-        return refinement?0:Math.clamp(dead?corpseFreeze:remaining,0,8);
-    }
+
     private static void send(LivingEntity victim,int motion,int ticks,boolean sharp,Vec3 velocity,WeaponCutContact.Report cut,boolean refinement,WeaponCutContact.Report woundContacts,int corpseFreeze){
         if(victim.level().isClientSide || victim.isRemoved() || !supportedBody(victim) || victim instanceof Player
                 || victim.isInvisible())return;
@@ -86,7 +84,7 @@ public final class RagdollImpact {
             var flyer=(com.codex.blacklight.entity.EncounterMob)victim;
             if(ticks>=12||flyer.flyerPhysics().active())flyer.flyerPhysics().impact(velocity,
                     cut.contacts().isEmpty()?flyer.incomingPoint():cut.contacts().get(0).point(),ticks,
-                    freezeTicks(false,false,HitStop.remainingTicks(victim),0));
+                    HitStop.ragdollFreezeTicks(false,false,HitStop.remainingTicks(victim),0));
         }
         var impulses=new java.util.ArrayList<RagdollImpactPayload.CutImpulse>();
         int mask=nativePose?0:(victim.getData(ModAttachments.DISMEMBER)&WeaponDismemberment.ALL);
@@ -130,6 +128,6 @@ public final class RagdollImpact {
             if(wounds.size()==RagdollImpactPayload.MAX_CUT_PLANES)break;
         }
         PacketDistributor.sendToPlayersTrackingEntity(victim,new RagdollImpactPayload(victim.getId(),motion,
-                Math.clamp(ticks,4,80),freezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime(),victim.isDeadOrDying()));
+                Math.clamp(ticks,4,80),HitStop.ragdollFreezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime(),victim.isDeadOrDying()));
     }
 }

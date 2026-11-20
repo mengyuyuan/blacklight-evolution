@@ -19,6 +19,7 @@
     "OptionalTwilightHydraMixin",
     "OptionalTwilightLichMixin",
     "CrossModLivingDamageMixin",
+    "QuillArmorMixin",
     "CrossModItemDamageMixin",
     "TheTitansNeoDiveMixin",
     "TheTitansNeoTagsMixin",
