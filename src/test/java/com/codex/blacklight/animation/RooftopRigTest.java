@@ -24,6 +24,32 @@ class RooftopRigTest {
         var ready = rig.refillFrame(new org.joml.Matrix4f(), rig.quill[slot], 1, 8, false);
         assertTrue(ready.equals(new org.joml.Matrix4f().translate(0, .057F, 0), .00001F));
     }
+    @Test void walkingVolleyKeepsTheWaistOnTheStrideAndTheArmsOnTheChest() {
+        var rig = RooftopRig.INSTANCE;
+        var sk = BlacklightSkeleton.get();
+        for (boolean mirror : new boolean[]{false, true}) for (int frame = 0; frame < 24; frame++) {
+            var gait = sk.getPoseMatrices(MotionLibrary.pose("basic_walk", frame / 24F, true));
+            var shot = sk.getPoseMatrices(new BlacklightPose());
+            rig.projectPlayer(rig.sample(1 + frame / 30F), mirror, shot);
+            RooftopRig.plantGroundShot(shot);
+            var relativeHand = new org.joml.Matrix4f(shot[sk.torso.getId()]).invert().mul(shot[sk.handR.getId()]);
+            for (float weight : new float[]{0, .35F, .75F, 1}) {
+                var body = shot.clone();
+                RooftopRig.groundStride(body, gait, weight, false);
+                var hand = new org.joml.Matrix4f(body[sk.torso.getId()]).invert().mul(body[sk.handR.getId()]);
+                assertTrue(relativeHand.equals(hand, .0001F), "shoulder recoil should stay attached to the chest");
+                if (weight == 1) {
+                    for (var joint : new String[]{"Root","Thigh_R","Thigh_L","Leg_R","Leg_L","Knee_R","Knee_L"}) {
+                        int id = sk.searchJointByName(joint).getId();
+                        assertTrue(gait[id].equals(body[id], .0001F), joint);
+                    }
+                    assertEquals(0, body[sk.torso.getId()].getTranslation(new Vector3f())
+                            .distance(gait[sk.torso.getId()].getTranslation(new Vector3f())), .0001);
+                }
+            }
+        }
+    }
+
     @Test void groundVolleyKeepsBothSolesPlantedAsTheKneesCarryRecoil() {
         var rig=BlacklightSkeleton.get();
         var rest=rig.getPoseMatrices(new BlacklightPose());
