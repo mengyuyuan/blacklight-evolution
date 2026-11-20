@@ -15,7 +15,8 @@ public final class ConsumeGripPose {
         if(com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
         var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(5),v->{
             var scene=com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.CONSUME_VISUAL);
-            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME&&(scene.form()==PowerForm.CLAWS.ordinal()||scene.form()==PowerForm.BLADE.ordinal());
+            return scene.consumerId()==actor.getId()&&scene.stage()==ConsumeVisual.CONSUME&&(scene.form()==PowerForm.CLAWS.ordinal()||scene.form()==PowerForm.BLADE.ordinal()
+                    ||fittedStrike(scene));
         });
         if(victims.isEmpty())return;
         var victim=victims.get(0);var visual=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
@@ -25,6 +26,12 @@ public final class ConsumeGripPose {
                               BlacklightPose pose,ConsumeVisual visual,float partial) {
         // A detached preview has no physical receiver to fit. Keep its authored pose.
         if(actor==null||victim==null)return;
+        if(fittedStrike(visual)){
+            if(visual.form()==PowerForm.NONE.ordinal() && visual.variant()==ConsumeVariant.BEATDOWN)
+                BeatdownMountPose.apply(actor,victim,visual,armature,pose,partial);
+            fitStrike(actor,victim,armature,pose,visual,partial);
+            return;
+        }
         if(visual.form()==PowerForm.BLADE.ordinal()){
             BladeConsumePose.apply(actor,victim,armature,pose,visual,partial);return;
         }
@@ -54,11 +61,91 @@ public final class ConsumeGripPose {
         var blended=BlacklightPose.interpolatePose(original,pose,weight);
         pose.getJointTransformData().putAll(blended.getJointTransformData());
     }
+    private static boolean fittedStrike(ConsumeVisual scene){
+        return scene.form()==PowerForm.MUSCLE_MASS.ordinal() || scene.form()==PowerForm.NONE.ordinal() && switch(scene.variant()){
+            case ConsumeVariant.DEFAULT,ConsumeVariant.HEAD_STOMP,ConsumeVariant.KNEE_HEAD,ConsumeVariant.BEATDOWN -> true;
+            default -> false;
+        };
+    }
+    /** Fit the striking limb to the posed anatomy of this receiver. Outside each impact window the
+     * wind-up and recoil come entirely from the original paired clip. */
+    private static void fitStrike(LivingEntity actor,LivingEntity victim,
+                                        com.codex.blacklight.animation.BlacklightSkeleton rig,
+                                        BlacklightPose pose,ConsumeVisual visual,float partial){
+        boolean muscle=visual.form()==PowerForm.MUSCLE_MASS.ordinal();
+        boolean rip=muscle && visual.variant()==ConsumeVariant.DEFAULT;
+        boolean heart=muscle && visual.variant()==ConsumeVariant.CLASSIC;
+        var scene=ConsumeReceiverScene.profile(muscle?PowerForm.MUSCLE_MASS:PowerForm.NONE,false,visual.variant());
+        if(scene==null)return;
+        float seconds=visual.elapsed(actor.level().getGameTime(),partial)/20F;
+        if(rip){
+            float split=scene.deformSeconds();
+            float hold=RagdollDrive.smooth((seconds-(split-.48F))/.22F)
+                    *(1-RagdollDrive.smooth((seconds-split)/.08F));
+            if(hold>0){
+                for(String side:new String[]{"R","L"}){
+                    float lateral=side.equals("R")?.22F:-.22F;
+                    Vec3 receiver=com.codex.blacklight.client.renderer.AdaptiveRagdoll.villagerGrip(victim,lateral,partial);
+                    if(receiver==null)receiver=RagdollDrive.contact(victim,side.equals("R")?4:2,partial);
+                    fitPalm(actor,rig,pose,visual,partial,side,receiver,hold);
+                }
+            }
+            return;
+        }
+        for(int i=0;i<scene.hitSeconds().size();i++){
+            float delta=seconds-scene.hitSeconds().get(i);
+            float weight=RagdollDrive.smooth(1-Math.abs(delta)/(delta<0?.29F:.23F));
+            if(heart && i==1 && delta>=0)weight=1-RagdollDrive.smooth((seconds-1F)/.24F);
+            if(!muscle && visual.variant()==ConsumeVariant.DEFAULT)
+                weight=Math.max(weight,RagdollDrive.smooth(1-Math.abs(seconds-46F/30F)/.19F));
+            if(weight<=0)continue;
+            boolean stomp=visual.variant()==ConsumeVariant.HEAD_STOMP;
+            int region=heart?(i==0?32:1):rip?2:visual.variant()==ConsumeVariant.DEFAULT?32:1;
+            Vec3 contact=RagdollDrive.contact(victim,region,partial);
+            if(region==32){
+                Vec3 chest=com.codex.blacklight.client.renderer.AdaptiveRagdoll.villagerGrip(victim,0,partial);
+                if(chest!=null)contact=chest;
+            }
+            if(heart){fitPalm(actor,rig,pose,visual,partial,"L",contact,weight);return;}
+            if(stomp)contact=contact.add(0,Math.min(.24,victim.getBbWidth()*.34),0);
+            Vec3 relative=contact.subtract(actor.getPosition(partial));
+            if(!Double.isFinite(relative.lengthSqr())||relative.lengthSqr()>16)return;
+            Vec3 forward=Vec3.directionFromRotation(0,visual.facing()),left=new Vec3(forward.z,0,-forward.x);
+            float scale=.9375F;
+            var goal=new org.joml.Vector3f((float)(-relative.dot(left)/scale),(float)(relative.y/scale),(float)(-relative.dot(forward)/scale));
+            var fitted=pose.copy();
+            if(stomp){
+                var sole=rig.getBoundTransformFor(new BlacklightPose(),rig.legL).invert()
+                        .transformPosition(new org.joml.Vector3f(-.119F,.001F,0));
+                BlacklightBoneIk.reachLimb(rig,fitted,rig.thighL,rig.legL,rig.legL,goal,sole);
+            }else if(visual.variant()==ConsumeVariant.KNEE_HEAD){
+                BlacklightBoneIk.aimJoint(rig,fitted,rig.thighR,rig.legR,goal);
+            }else{
+                boolean right=visual.variant()==ConsumeVariant.BEATDOWN?ConsumeReceiverScene.beatdownRightHand(i):(i&1)==1;
+                String side=rip||!heart&&right?"R":"L";
+                BlacklightBoneIk.reachTwoBone(rig,fitted,side,goal,new org.joml.Vector3f());
+            }
+            pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,fitted,weight).getJointTransformData());
+            return;
+        }
+    }
+    private static void fitPalm(LivingEntity actor,com.codex.blacklight.animation.BlacklightSkeleton rig,
+                                BlacklightPose pose,ConsumeVisual visual,float partial,String side,Vec3 point,float weight){
+        Vec3 relative=point.subtract(actor.getPosition(partial));
+        if(!Double.isFinite(relative.lengthSqr())||relative.lengthSqr()>16)return;
+        Vec3 forward=Vec3.directionFromRotation(0,visual.facing()),left=new Vec3(forward.z,0,-forward.x);
+        float scale=.9375F*actor.getScale();
+        var goal=new org.joml.Vector3f((float)(-relative.dot(left)/scale),(float)(relative.y/scale),(float)(-relative.dot(forward)/scale));
+        var fitted=pose.copy();var arm=rig.searchJointByName("Arm_"+side);var hand=rig.searchJointByName("Hand_"+side);
+        var palm=WeaponModelAnchors.get(PowerForm.MUSCLE_MASS,"palm_"+side,new org.joml.Vector3f(0,.66F,0));
+        BlacklightBoneIk.reachLimb(rig,fitted,arm,hand,hand,goal,palm);
+        pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,fitted,weight).getJointTransformData());
+    }
     private static void sweep(LivingEntity actor,LivingEntity victim,com.codex.blacklight.animation.BlacklightSkeleton rig,
                               BlacklightPose pose,ConsumeVisual visual,float partial){
         var scene=ConsumeReceiverScene.profile(PowerForm.CLAWS,false,visual.variant());
         if(scene==null||!scene.style().equals("SEVER"))return;
-        float seconds=(actor.level().getGameTime()-visual.started()+partial)/20F;
+        float seconds=visual.elapsed(actor.level().getGameTime(),partial)/20F;
         // The right palm holds the receiver only at entry. By 0.4 s the authored
         // wrist has left the grip and is sweeping; never pin it to the head then.
         float hold=1-RagdollDrive.smooth((seconds-.20F)/.18F);

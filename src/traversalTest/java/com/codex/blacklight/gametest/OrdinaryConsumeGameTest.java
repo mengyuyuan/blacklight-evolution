@@ -68,7 +68,7 @@ public final class OrdinaryConsumeGameTest {
         double heldHeight=pig.getY();
         h.assertTrue(heldHeight>p.getY()+.3,"small target must visibly hang in the restraint");
         ConsumeSystem.consume(p);var origin=p.position();
-        int complete=ConsumeSequence.completionTick(PowerForm.HAMMERFISTS,false);
+        int complete=ConsumeSequence.completionTick(PowerForm.HAMMERFISTS,false,ModAttachments.getData(pig,ModAttachments.CONSUME_VISUAL).variant());
         for(int i=1;i<complete;i++) {
             tick(p);
             h.assertTrue(pig.isAlive()&&p.getHealth()==10,"paired hammer receiver must survive until the completion cue");

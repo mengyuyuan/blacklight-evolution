@@ -189,7 +189,8 @@ public final class WoundBlood {
         var e=emitter.entity;
         if(emitter.sectionKey!=null)return AdaptiveRagdoll.sectionAnchors(e,emitter.region,emitter.sectionKey,emitter.sectionSide);
         if(emitter.consumeStarted!=Long.MIN_VALUE){
-            Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,emitter.region,1);
+            Vec3 point=emitter.fromMesh?AdaptiveRagdoll.consumeWound(e,1):null;
+            if(point==null)point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,emitter.region,1);
             return List.of(new Anchor(point,emitter.direction,e.getDeltaMovement()));
         }
         var adaptive=AdaptiveRagdoll.woundAnchors(e,emitter.point,emitter.direction);if(!adaptive.isEmpty())return adaptive;
@@ -203,6 +204,7 @@ public final class WoundBlood {
     }
     private static final class Emitter {
         final LivingEntity entity;final int region,lifetime;final Vec3 point,direction;final float strength;final boolean stump;final long started;
+        boolean fromMesh;
         boolean emitted;long consumeStarted=Long.MIN_VALUE;String sectionKey;int sectionSide;
         Emitter(LivingEntity entity,int region,Vec3 point,Vec3 direction,float strength,int lifetime,boolean stump,long started){
             this.entity=entity;this.region=region;this.point=point;this.direction=direction;this.strength=strength;this.lifetime=lifetime;this.stump=stump;this.started=started;
@@ -232,6 +234,36 @@ public final class WoundBlood {
         }
     }
     /** The synchronized receiver phase authorizes the effect; the rendered body owns its position. */
+    static void blunt(LivingEntity e,Vec3 impact,Vec3 outward){
+        reset();
+        if(scene==null||e.level()!=scene||e.isInvisible())return;
+        for(int i=0;i<7;i++){
+            var random=scene.random;
+            Vec3 velocity=outward.add(random.nextGaussian()*.25,random.nextDouble()*.25,random.nextGaussian()*.25)
+                    .normalize().scale(.10+random.nextDouble()*.15);
+            if(DROPS.size()>=MAX_DROPS)DROPS.remove(0);
+            DROPS.add(new Drop(impact,velocity,.018F,125+random.nextInt(50)));
+        }
+    }
+    static void rupture(LivingEntity e,int region,Vec3 impact,Vec3 direction,boolean crush){
+        reset();if(scene==null || e.level()!=scene || e.isInvisible())return;
+        var visual=ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
+        int count=crush?5:2;
+        for(int i=0;i<count;i++){
+            double angle=i*2.39996+e.getId();
+            Vec3 jet=crush?new Vec3(Math.cos(angle),.25+i*.10,Math.sin(angle)).normalize():i==0?direction:direction.scale(-1);
+            if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.remove(0);
+            var emitter=new Emitter(e,region,Vec3.ZERO,jet,crush?1.25F:1.65F,crush?6:15,true,scene.getGameTime());
+            emitter.consumeStarted=visual.started();emitter.fromMesh=true;EMITTERS.add(emitter);
+        }
+        var dust=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.43F,.025F,.054F),.85F);
+        for(int i=0;i<(crush?18:9);i++){
+            var random=scene.random;Vec3 spray=new Vec3(random.nextGaussian(),.22+random.nextDouble()*.6,random.nextGaussian()).normalize();
+            if(!crush)spray=spray.scale(.45).add(direction).normalize();
+            Vec3 pos=impact.add(spray.scale(random.nextDouble()*.22));
+            scene.addParticle(dust,pos.x,pos.y,pos.z,spray.x*.09,spray.y*.10,spray.z*.09);
+        }
+    }
     private static void consumeHits(){
         var active=Collections.newSetFromMap(new IdentityHashMap<LivingEntity,Boolean>());
         var player=Minecraft.getInstance().player;if(player==null)return;
@@ -245,13 +277,13 @@ public final class WoundBlood {
             var phase=ConsumeFracture.phase(e,1);
             // Sharp absorption emits from confirmed mesh caps. An event alone
             // must not create an unrelated body-center spray when the blade misses.
-            if(phase.style()==ConsumeFracture.Style.SEVER&&AdaptiveRagdoll.active(e))continue;
+            if(AdaptiveRagdoll.active(e) && (phase.style()==ConsumeFracture.Style.SEVER || ConsumeTrauma.applies(phase.form(),visual.variant())))continue;
             var profile=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
             int fallback=Math.round(visual.duration()*com.codex.blacklight.combat.ConsumeSequence.contact(phase.form(),false))-1;
             boolean impact=false;
             for(int t=Math.max(previous+1,elapsed-4);t<=elapsed;t++)if(profile!=null?profile.impactAt(t):t==fallback){impact=true;break;}
             if(!impact)continue;
-            int region=switch(phase.style()){case HEAD_CRUSH,HEAD_IMPACT->1;case ARM_RIP,RIP->2;default->32;};
+            int region=switch(phase.style()){case HEAD_CRUSH,HEAD_IMPACT->1;case RIP->2;default->32;};
             Vec3 point=com.codex.blacklight.client.animation.RagdollDrive.contact(e,region,1);
             var owner=scene.getEntity(visual.consumerId());
             Vec3 direction=owner==null?new Vec3(0,1,0):point.subtract(owner.position().add(0,owner.getBbHeight()*.6,0)).add(0,.2,0).normalize();

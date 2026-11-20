@@ -96,7 +96,7 @@ public final class TargetLockHud {
             panel(g,growthCost,g.guiWidth()/2,g.guiHeight()-96,0xFFB9B0A3);
         }
     }
-    private static boolean ready(Minecraft mc,net.minecraft.world.entity.Mob mob){return mob.isAlive()&&!mob.isRemoved()&&com.codex.blacklight.combat.ConsumeSystem.eligible(mob)&&com.codex.blacklight.combat.ConsumeSystem.healthReady(mc.player,mob);}
+    private static boolean ready(Minecraft mc,net.minecraft.world.entity.Mob mob){return mob.isAlive()&&!mob.isRemoved()&&com.codex.blacklight.combat.ConsumeSystem.eligible(mob)&&(com.codex.blacklight.power.BiomassSystem.active(mc.player)?com.codex.blacklight.power.BiomassSystem.healthReady(mc.player,mob):com.codex.blacklight.combat.ConsumeSystem.healthReady(mc.player,mob));}
     private static void consumeMarkers(GuiGraphics g,Minecraft mc){
         var state=com.codex.blacklight.registry.ModAttachments.getData(mc.player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);var captured=world;
         if(!state.isInfected()||!state.isPrototypeMode()||captured==null||captured.level!=mc.level||captured.frame!=frame)return;

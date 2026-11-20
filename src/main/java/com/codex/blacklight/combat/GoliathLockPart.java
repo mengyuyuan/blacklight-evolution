@@ -30,14 +30,23 @@ public enum GoliathLockPart {
         // The authored left_* arm is the slender P2 R arm. The plated arm is L.
         return switch (bone) {
             case "head", "jaw" -> HEAD;
-            case "weak_0", "right_leg", "right_shin" -> RIGHT_LEG;
+            case "weak_0", "right_leg", "right_shin", "right_calf", "right_foot", "right_toes" -> RIGHT_LEG;
             case "left_arm", "left_forearm", "left_hand",
                     "left_finger_0", "left_finger_1", "left_finger_2", "left_finger_3" -> RIGHT_ARM;
             default -> null;
         };
     }
 
+    public static boolean severed(String bone, int broken) {
+        var part=forSkin(bone);
+        return part==RIGHT_LEG && (broken & 1)!=0 || part==RIGHT_ARM && (broken & 2)!=0;
+    }
+
     public boolean available(EncounterMob mob) {
-        return this != RIGHT_LEG || !mob.broken(0);
+        return switch (this) {
+            case RIGHT_LEG -> !mob.broken(0);
+            case RIGHT_ARM -> !mob.broken(1);
+            case HEAD -> true;
+        };
     }
 }

@@ -32,6 +32,10 @@ public final class MilitaryVehicleRenderer extends EntityRenderer<MilitaryVehicl
             if(delta<2)distance+=delta;
         }
         distance%=Math.PI*100;movement.put(entity,new Travel(at,distance));
+        if("truck".equals(entity.chassisId())){
+            var roof=net.minecraft.core.BlockPos.containing(at.x,at.y+entity.getBbHeight(),at.z);
+            light=VehicleExteriorLight.combine(light,net.minecraft.client.renderer.LevelRenderer.getLightColor(entity.level(),roof));
+        }
         model.pose(entity.turretYaw(),entity.gunPitch(),distance);
         model.feedback(entity.feedback(partial));
         model.deformation(entity.dents());

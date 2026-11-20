@@ -44,6 +44,10 @@ public final class ClientPhysicalFeedback {
             case JUMP_LAUNCH, CLAW_HIT -> 0.38F;
             case AIR_DASH, HEAVY_LANDING -> 0.72F;
             case CLAW_HEAVY -> 0.88F;
+            case BOSS_ARMOR -> .26F;
+            case BOSS_HIT -> .48F;
+            case BOSS_WEAK -> .8F;
+            case BOSS_BREAK, BOSS_STRIKE -> 1F;
             case DEVASTATING_LANDING, GROUND_SPIKE -> 1.0F;
             case SPRINT_COLLISION -> 0.82F;
             case SPRINT_START -> 0.55F;
@@ -85,7 +89,9 @@ public final class ClientPhysicalFeedback {
             case WALL_RUN_START -> 8;
             case WALL_MANTLE -> 7;
             case BLADE_CUT,BLADE_RETURN -> 3;
-            case BLADE_HEAVY -> 5;
+            case BLADE_HEAVY, BOSS_WEAK, BOSS_STRIKE -> 5;
+            case BOSS_ARMOR, BOSS_HIT -> 3;
+            case BOSS_BREAK -> 8;
             default -> 7;
         };
         ticksRemaining = Math.max(ticksRemaining, duration);

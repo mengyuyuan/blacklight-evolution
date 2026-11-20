@@ -154,7 +154,11 @@ public final class FeedbackLifecycleGameTest {
             h.assertTrue(!p.hurt(p.damageSources().onFire(),10000)&&p.getHealth()==health,"fire cannot end the recovery chance");
             com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).crawl(h.getLevel().getGameTime()-20));p.refreshDimensions();
             tick(p);
-            h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.ABSORBING&&BiomassSystem.state(p).victim()==prey.getId(),"touching healthy prey starts absorption without E or prior damage");
+            h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.CRAWLING,"fatal recovery cannot bypass the biomass health cap on a 200-health target");
+            prey.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(20);
+            prey.setHealth(prey.getMaxHealth());
+            tick(p);
+            h.assertTrue(BiomassSystem.state(p).phase()==BiomassState.ABSORBING&&BiomassSystem.state(p).victim()==prey.getId(),"touching ordinary full-health prey starts absorption without E or prior damage");
             com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.BIOMASS_FORM,BiomassSystem.state(p).absorb(prey.getId(),h.getLevel().getGameTime()-BiomassState.ABSORB_TICKS));
             tick(p);
             h.assertTrue(!prey.isAlive()&&BiomassSystem.state(p).consumed()&&p.getHealth()==p.getMaxHealth(),"one confirmed kill restores health and commits reformation");

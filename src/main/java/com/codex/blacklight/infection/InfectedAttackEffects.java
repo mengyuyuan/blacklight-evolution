@@ -20,6 +20,7 @@ public final class InfectedAttackEffects {
     private static final class Budget {long tick;int count;}
     private InfectedAttackEffects(){}
     @SubscribeEvent public static void accepted(com.codex.blacklight.combat.ForgeDamageEvent.Post event){
+        com.codex.blacklight.combat.BossImpactFeedback.accepted(event.getEntity(),event.getSource(),event.getNewDamage());
         if(!event.getEntity().level().isClientSide&&event.getNewDamage()>0&&com.codex.blacklight.combat.AnimatedHurtBody.of(event.getEntity())!=null&&com.codex.blacklight.combat.AnimatedHurtBody.of(event.getEntity()).incomingContact()!=null){com.codex.blacklight.combat.AnimatedHurtBody.of(event.getEntity()).confirmedIncoming(event.getSource(),event.getNewDamage());return;}
         if(!(event.getEntity().level() instanceof ServerLevel level)||event.getNewDamage()<=0
                 ||!(event.getSource().getEntity() instanceof Mob attacker)||!BlacklightInfectionSystem.isInfected(attacker))return;

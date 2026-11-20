@@ -34,12 +34,25 @@ public final class ConsumeSequence {
         if(scene!=null)return scene.finishSeconds()*20/duration(form,large,variant);
         return Math.max(.88F,contact(form,large)+.12F);
     }
+    /** Finish the visible return on the server settlement clock. The actor's
+     * motion clock has a transition and can still trail it on the removal tick. */
+    public static float mountedReturn(float elapsedTicks,int duration,int completionTick){
+        float end=completionTick-2F;
+        float window=Math.max(3F,duration*.125F);
+        float t=net.minecraft.util.Mth.clamp((elapsedTicks-end+window)/window,0,1);
+        return t*t*(3-2*t);
+    }
     public static int completionTick(PowerForm form,boolean large) {
         return completionTick(form,large,ConsumeVariant.DEFAULT);
     }
     public static int completionTick(PowerForm form,boolean large,int variant) {
         var scene=ConsumeReceiverScene.profile(form,large,variant);
-        if(scene!=null)return Math.min(duration(form,large,variant)-1,(int)Math.ceil(scene.finishSeconds()*20-.0001F));
+        if(scene!=null){
+            // The client interpolates the preceding server tick. Retain a human
+            // receiver for the tick in which its last return pose is rendered.
+            int finish=(int)Math.ceil(scene.finishSeconds()*20-.0001F);
+            return Math.min(duration(form,large,variant)-1,large?finish:finish+1);
+        }
         return Math.min(duration(form,large,variant)-1,(int)Math.ceil(duration(form,large,variant)*completion(form,large,variant)));
     }
     public static boolean paired(PowerForm form,boolean large) {
@@ -67,7 +80,13 @@ public final class ConsumeSequence {
             default -> "normal";
         };
         if(ConsumeVariant.normalize(form,variant)==ConsumeVariant.CLASSIC)
-            return form==PowerForm.CLAWS?"claws_head":"whip_lash";
+            return switch(form){
+                case CLAWS -> "claws_head";
+                case WHIPFIST -> "whip_lash";
+                case HAMMERFISTS -> "hammer_smush";
+                case MUSCLE_MASS -> "muscle_heart";
+                default -> key(form);
+            };
         return key(form);
     }
     public static String clipKey(PowerForm form,boolean large,int variant){return large?clipKey(form,true):key(form,variant);}

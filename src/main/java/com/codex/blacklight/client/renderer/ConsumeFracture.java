@@ -58,7 +58,9 @@ public final class ConsumeFracture implements MultiBufferSource {
         var v=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
         var form=PowerForm.values()[net.minecraft.util.Mth.clamp(v.form(),0,PowerForm.values().length-1)];
         boolean large=ConsumeSequence.mountedStage(v.stage());
-        Style style=switch(form){case CLAWS->Style.HEAD_CRUSH;case MUSCLE_MASS->Style.RIP;case BLADE->Style.SEVER;case HAMMERFISTS->Style.CRUSH;case WHIPFIST->Style.COIL;default->large?Style.RIP:Style.HEAD_CRUSH;};
+        // A mounted blade scene has no human receiver split event. Keep its
+        // posed skin connected as the tissue returns to the rider.
+        Style style=switch(form){case CLAWS->Style.HEAD_CRUSH;case MUSCLE_MASS->Style.RIP;case BLADE->large?Style.CHEST_ABSORB:Style.SEVER;case HAMMERFISTS->Style.CRUSH;case WHIPFIST->Style.COIL;default->large?Style.RIP:Style.HEAD_CRUSH;};
         if(!v.consuming())return new Phase(form,0,0,0,1,style);
         if(v.stage()==ConsumeVisual.HUNTER_CONSUME) {
             float seconds=HunterConsume.seconds(v,mob.level().getGameTime(),partial);
@@ -69,21 +71,31 @@ public final class ConsumeFracture implements MultiBufferSource {
         }
         var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(form,large,v.variant());
         if(scene!=null){
-            float seconds=(mob.level().getGameTime()-v.started()+partial)/20F;
+            float seconds=v.elapsed(mob.level().getGameTime(),partial)/20F;
             // Some source branches begin the consume shader before spawnGib.
             // Never pull the complete body away before its actual separation.
             float sourceAbsorb=com.codex.blacklight.combat.ConsumeReceiverScene.absorptionSeconds(form,v.variant());
             float flowStart=net.minecraft.util.Mth.clamp(sourceAbsorb,scene.deformSeconds(),scene.finishSeconds()-.05F);
+            float flowEnd=scene.finishSeconds();
+            if(v.variant()==com.codex.blacklight.combat.ConsumeVariant.BEATDOWN && form==PowerForm.NONE){
+                // The FIG starts tendrils at frame 88 and consumes its receiver
+                // at 115. Keep frame 99's impact in place before the body returns.
+                flowStart=scene.hitSeconds().get(scene.hitSeconds().size()-1)+.06F;
+                flowEnd=sourceAbsorb;
+            }
             return new Phase(form,net.minecraft.util.Mth.clamp(seconds/scene.finishSeconds(),0,1),
                     smooth((seconds-scene.deformSeconds())/scene.settleSeconds()),
-                    smooth((seconds-flowStart)/(scene.finishSeconds()-flowStart)),
+                    smooth((seconds-flowStart)/(flowEnd-flowStart)),
                     (scene.style().equals("SEVER")?scene.deformSeconds():scene.effectSeconds())/scene.finishSeconds(),Style.valueOf(scene.style()),true);
         }
         float t=v.motionProgress(mob.level().getGameTime(),partial),hit=ConsumeSequence.contact(form,large);
         // prototype_consume / blades / receiver: two spawnGib records and
         // visibility switch at 0.833333s. Geometry/trajectory below adapt this to MC.
         if(form==PowerForm.BLADE&&!large)hit=.833333F/Math.max(.05F,(v.duration()-1)/20F);
-        return new Phase(form,t,smooth((t-hit)/.08F),smooth((t-(ConsumeSequence.completion(form,large)-.125F))/.125F),hit,style);
+        float flow=large?ConsumeSequence.mountedReturn((mob.level().getGameTime()-v.started())+partial,
+                v.duration(),ConsumeSequence.completionTick(form,true,v.variant()))
+                :smooth((t-(ConsumeSequence.completion(form,false)-.125F))/.125F);
+        return new Phase(form,t,smooth((t-hit)/.08F),flow,hit,style);
     }
     private static float smooth(float t){t=net.minecraft.util.Mth.clamp(t,0,1);return t*t*(3-2*t);}
     public static float cutHeight(PowerForm form){return form==PowerForm.NONE?.8F:.6F;}
@@ -95,7 +107,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         // for a missing visible blade sweep.
         if(p.style()==Style.SEVER)return false;
         var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(p.form(),ConsumeSequence.mountedStage(v.stage()),v.variant());
-        return scene!=null?(mob.level().getGameTime()-v.started()+partial)/20F>=Math.min(scene.deformSeconds(),scene.effectSeconds()):p.progress()>=Math.max(0,p.contact()-.08F);
+        return scene!=null?v.elapsed(mob.level().getGameTime(),partial)/20F>=Math.min(scene.deformSeconds(),scene.effectSeconds()):p.progress()>=Math.max(0,p.contact()-.08F);
     }
     public void bindModel(EntityModel<?> model){modelParts.putAll(ConsumeAnatomy.model(model));}
     public ConsumeFracture(LivingEntity mob,float partial,PoseStack stack,MultiBufferSource target,Vec3 destination) {
@@ -106,8 +118,9 @@ public final class ConsumeFracture implements MultiBufferSource {
         var materialScene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),ConsumeSequence.mountedStage(com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).stage()),com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).variant());
         float seconds=(mob.level().getGameTime()-com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).started()+partial)/20F;
         materialFront=materialScene==null?phase.opening():net.minecraft.util.Mth.clamp((seconds-materialScene.effectSeconds())*1.4F,0,1);
-        bisect=phase.style()==Style.SEVER&&!ConsumeSequence.mountedStage(com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).stage());
-        cutNormal=ConsumeSequence.quadruped(mob)?new Vector3f(0,0,1):new Vector3f(0,1,0);
+        boolean vertical=phase.style()==Style.ARM_RIP;
+        bisect=(vertical||phase.style()==Style.SEVER)&&!ConsumeSequence.mountedStage(com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL).stage());
+        cutNormal=vertical?new Vector3f(1,0,0):ConsumeSequence.quadruped(mob)?new Vector3f(0,0,1):new Vector3f(0,1,0);
         light=net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getPackedLightCoords(mob,partial);
         frame=new Matrix4f(stack.last().pose()).mul(ConsumeVictimPose.effectTransform(mob,partial));
         inverse=new Matrix4f(frame).invert();
@@ -118,13 +131,14 @@ public final class ConsumeFracture implements MultiBufferSource {
                     com.codex.blacklight.combat.GrappleMotion.receiverProgress(mob,visual,partial)).orElse(null);
             if(projected!=null){
                 var chest=com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(projected,11);
-                cutNormal.set(com.codex.blacklight.combat.CorpseFragmentMotion.torsoNormal(chest));
+                if(vertical)new org.joml.Quaternionf(-chest.x,-chest.y,chest.z,chest.w).transform(cutNormal);
+                else cutNormal.set(com.codex.blacklight.combat.CorpseFragmentMotion.torsoNormal(chest));
             }
         }
         float split=ConsumeSequence.splitSeconds(phase.form(),ConsumeSequence.mountedStage(visual.stage()),visual.variant());
-        fragmentAge=Float.isFinite(split)?Math.max(0,(mob.level().getGameTime()-visual.started()+partial)/20F-split):0;
+        fragmentAge=Float.isFinite(split)?Math.max(0,visual.elapsed(mob.level().getGameTime(),partial)/20F-split):0;
         up=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(0,1,0))).normalize();
-        side=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(1,0,0))).normalize();
+        side=vertical?new Vector3f(cutNormal):inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(1,0,0))).normalize();
         spinAxis=inverse.transformDirection(stack.last().pose().transformDirection(new Vector3f(0,0,1))).normalize();
         float floor=(float)(visual.origin().y-mob.getPosition(partial).y-com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(mob,partial).y);
         ground=inverse.transformPosition(stack.last().pose().transformPosition(new Vector3f(0,floor,0)));
@@ -250,20 +264,7 @@ public final class ConsumeFracture implements MultiBufferSource {
             return frame.transformPosition(local.mul(1-shrink*.997F)
                     .add(anchor).add(new Vector3f(sink).sub(anchor).mul(travel)));
         }
-        if(phase.style()==Style.ARM_RIP){
-            // Source creates a right-arm gib and a remainder gib. The other arm,
-            // legs and head stay attached to that remainder instead of exploding.
-            boolean arm=part==ConsumeAnatomy.RIGHT_ARM;
-            Vector3f anchor=arm?centers[ConsumeAnatomy.RIGHT_ARM]:centers[ConsumeAnatomy.BODY];
-            Vector3f local=new Vector3f(p).sub(anchor),offset=new Vector3f();
-            if(arm){
-                offset.set(centers[ConsumeAnatomy.RIGHT_ARM]).sub(centers[ConsumeAnatomy.BODY]);
-                if(offset.lengthSquared()<.001F)offset.set(-1,0,0);else offset.normalize();
-                offset.mul(spread*1.8F*open);local.rotateZ(open*.45F);
-            }
-            return frame.transformPosition(local.mul(1-shrink*.997F).add(anchor).fma(1-travel,offset)
-                    .add(new Vector3f(sink).sub(anchor).mul(travel)));
-        }
+
         Vector3f radial=new Vector3f(pivot).sub(centers[0]);
         if(radial.lengthSquared()<.001F)radial.set(0,1,0);else radial.normalize();
         Vector3f offset=new Vector3f(),local=new Vector3f(p).sub(pivot);
@@ -289,10 +290,9 @@ public final class ConsumeFracture implements MultiBufferSource {
     }
     private void tissueBridges(){
         if(headOnly||bisect)return;
-        if(phase.style()!=Style.RIP&&phase.style()!=Style.SEVER&&phase.style()!=Style.ARM_RIP)return;
+        if(phase.style()!=Style.RIP&&phase.style()!=Style.SEVER)return;
         var out=target.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));var stack=new PoseStack();
         for(int a=1;a<centers.length;a++){
-            if(phase.style()==Style.ARM_RIP&&a!=ConsumeAnatomy.RIGHT_ARM)continue;
             if(!present[a])continue;float open=sourcedReceiver?phase.opening():opening(a),fade=1-smooth((phase.progress()-start(a)-.13F)/.12F);
             if(open<=0||fade<=0)continue;
             Vector3f base=displaced(new Vector3f(centers[0]).lerp(centers[a],.6F),0),end=displaced(new Vector3f(centers[a]),a*divisions);
@@ -311,7 +311,6 @@ public final class ConsumeFracture implements MultiBufferSource {
             roots.add(new ConsumeTendrils.Attachment(new Vec3(p.x,p.y,p.z),Math.max(.1F,radii[0])*(1-phase.returnFlow())));
         }
         else for(int a=0;a<centers.length;a++)if(present[a]&&(!headOnly||a==ConsumeAnatomy.HEAD)){
-            if(phase.style()==Style.ARM_RIP&&a!=ConsumeAnatomy.RIGHT_ARM&&a!=ConsumeAnatomy.BODY)continue;
             if(phase.style()==Style.CHEST_ABSORB&&a!=ConsumeAnatomy.BODY)continue;
             var p=displaced(new Vector3f(centers[a]),a*divisions);roots.add(new ConsumeTendrils.Attachment(new Vec3(p.x,p.y,p.z),radii[a]*(1-smooth(phase.returnFlow()/.6F)*.997F)));
         }
