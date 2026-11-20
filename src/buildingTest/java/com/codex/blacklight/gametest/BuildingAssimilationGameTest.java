@@ -57,7 +57,21 @@ public final class BuildingAssimilationGameTest {
         void block(BlockPos pos,BlockState state){terrain.putIfAbsent(pos.immutable(),level.getBlockState(pos));level.setBlock(pos,state,3);}
         BlockPos contact(int x,BlockState original){var pos=origin.offset(x,3,1);block(pos,original);var patch=pos.north();block(patch,ModBlocks.TISSUE_ATTACHMENT.get().defaultBlockState().setValue(TissueAttachmentBlock.FACING,Direction.SOUTH).setValue(TissueAttachmentBlock.AGE,1));colony.surfaces.add(patch.asLong());return pos;}
         void run(Runnable check){h.startSequence().thenWaitUntil(()->h.assertTrue(occupied(origin,origin.north(2)),"waiting for actual dimension/root/outlet activation; dimension="+level.dimension().location()+" root="+level.isPositionEntityTicking(origin)+" outlet="+level.isPositionEntityTicking(origin.north(2))+" forcedRoot="+level.getForcedChunks().contains(new ChunkPos(origin).toLong())+" forcedOutlet="+level.getForcedChunks().contains(new ChunkPos(origin.north(2)).toLong())+" loaded="+level.getChunkSource().getLoadedChunksCount())).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
-        void after(int ticks,Runnable setup,Runnable check){h.startSequence().thenWaitUntil(()->h.assertTrue(occupied(origin,origin.north(2)),"waiting for occupied structure simulation")).thenIdle(1).thenExecute(setup).thenIdle(ticks).thenExecute(()->{try{check.run();}finally{close();}h.succeed();});}
+        void after(int ticks, Runnable setup, Runnable check) {
+            // Moving actors can cross a chunk boundary during the observation window.
+            var arena = ChunkPos.rangeClosed(new ChunkPos(origin), 1)
+                    .map(chunk -> chunk.getMiddleBlockPosition(origin.getY())).toArray(BlockPos[]::new);
+            h.startSequence()
+                    .thenWaitUntil(() -> h.assertTrue(occupied(arena), "waiting for the simulation arena to tick"))
+                    .thenIdle(1).thenExecute(setup).thenIdle(ticks).thenExecute(() -> {
+                        try {
+                            check.run();
+                        } finally {
+                            close();
+                        }
+                        h.succeed();
+                    });
+        }
         public void close(){if(closed)return;closed=true;if(observer!=null)level.removePlayerImmediately(observer,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);born.forEach(net.minecraft.world.entity.Entity::discard);colony.dead=true;for(var e:terrain.entrySet())level.setBlock(e.getKey(),e.getValue(),3);for(var cp:forced)level.setChunkForced(cp.x,cp.z,false);level.getDataStorage().set("blacklight_building_infection",old);if(city!=null)level.getDataStorage().set("blacklight_city",city);level.getDataStorage().set("blacklight_city_ecology",ecology);level.getServer().overworld().getDataStorage().set("blacklight_outbreak",outbreak);level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING).set(grief,level.getServer());level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawns,level.getServer());BuildingInfectionConfig.ASSIMILATE.set(enabled);BuildingInfectionConfig.WORK.set(work);}
     }
     private static void dimension(GameTestHelper h,ServerLevel level){var f=new Fixture(h,level);var material=level.dimension().equals(Level.END)?Blocks.END_STONE.defaultBlockState():level.dimension().equals(Level.NETHER)?Blocks.NETHER_BRICKS.defaultBlockState():Blocks.QUARTZ_PILLAR.defaultBlockState().setValue(RotatedPillarBlock.AXIS,Direction.Axis.Z);var wall=f.contact(2,material);f.run(()->{
