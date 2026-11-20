@@ -27,6 +27,22 @@ public final class InfectedImpactVisuals {
     public static void accept(InfectedImpactPayload data){
         var level=Minecraft.getInstance().level;if(level!=null)acceptAt(data,level.getGameTime());
     }
+    /** The captured mesh has actually lost tissue. Its spray starts at a fixed world contact. */
+    static void rupture(net.minecraft.world.entity.LivingEntity victim,Vec3 point,Vec3 travel,double radius){
+        Vec3 axis=travel.normalize();
+        var receipt=new InfectedImpactPayload(0,-1,InfectedImpactPayload.appearance(InfectedAttackStyle.BURST,
+                com.codex.blacklight.combat.FleshStrike.MUSCLE,true),point.x,point.y,point.z,
+                (float)axis.x,(float)axis.y,(float)axis.z,(float)Math.min(1.45,.72+radius),victim.getId()*73L+victim.level().getGameTime());
+        accept(receipt);
+        WoundBlood.contact(receipt,point,axis,victim);
+        var chips=new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,
+                net.minecraft.world.level.block.Blocks.NETHER_WART_BLOCK.defaultBlockState());
+        var rng=victim.getRandom();
+        for(int i=0;i<5;i++){
+            Vec3 v=axis.scale(.11+.18*rng.nextDouble()).add((rng.nextDouble()-.5)*.19,.06+rng.nextDouble()*.14,(rng.nextDouble()-.5)*.19);
+            victim.level().addParticle(chips,point.x,point.y,point.z,v.x,v.y,v.z);
+        }
+    }
     public static void acceptAt(InfectedImpactPayload data,double started){
         var mc=Minecraft.getInstance();if(mc.level==null||mc.player==null||!Double.isFinite(started)||!Double.isFinite(data.x())||!Double.isFinite(data.y())||!Double.isFinite(data.z()))return;
         var point=new Vec3(data.x(),data.y(),data.z());if(mc.player.position().distanceToSqr(point)>96*96)return;

@@ -66,6 +66,10 @@ public final class AdaptiveRagdoll {
         return release.offset.scale(RagdollRecovery.releaseWeight(entity.level().getGameTime()+partial-release.at));
     }
 
+    public static boolean replacesDeathPoof(LivingEntity victim){
+        var body=BODIES.get(victim);
+        return body!=null && (body.pressed || body.rupturedRegion!=0);
+    }
     public static boolean supports(LivingEntity e){
         var owner=renderOwner(e);if(owner!=e)return supports(owner);
         // Blunt knockdowns, sharp hits and paired absorption must retain the same
@@ -403,7 +407,7 @@ public final class AdaptiveRagdoll {
             String material = switch(style) {
                 case FIST -> "bruise";
                 case WHIP -> "welt";
-                case HAMMER, HAMMER_BREAK -> "crush";
+                case HAMMER, HAMMER_BREAK, HAMMER_PRESS -> "crush";
                 default -> "rupture";
             };
             double extent = radius*switch(style) { case FIST -> .8; case WHIP -> 1.36; default -> 1.18; };
@@ -449,7 +453,7 @@ public final class AdaptiveRagdoll {
         final Map<String,ContactSection.Plane> sectionContacts=new HashMap<>();
         final Map<String,Long> consumeCutTicks=new HashMap<>();
         final Map<String,Double> kerfTimes=new HashMap<>();int meshRevision;
-        final Object key;final List<Vertex> mesh=new ArrayList<>();final Node bind;final Vec3 center,half;final double invMass;
+        final Object key;final List<Vertex> mesh=new ArrayList<>();final Node bind;final Vec3 center;Vec3 half;final double invMass;
         final List<Boundary> boundaries=new ArrayList<>();
         Vec3 pos,old,velocity=Vec3.ZERO,target;Quaternionf rotation=new Quaternionf(),oldRotation=new Quaternionf(),targetRotation=new Quaternionf();
         Vec3 stepOrigin,predictedPosition;final Quaternionf stepRotation=new Quaternionf(),predictedRotation=new Quaternionf();
@@ -460,6 +464,27 @@ public final class AdaptiveRagdoll {
             half=new Vec3(Math.max(.02,bounds.getXsize()*.5),Math.max(.02,bounds.getYsize()*.5),Math.max(.02,bounds.getZsize()*.5));
             bind=node==null?new Node(key,null,center,new Quaternionf(),32):node;
             invMass=1/Math.max(.015,half.x*half.y*half.z*8);pos=old=target=center;
+        }
+        Vec3 pressAxis;
+        double thickness=1;
+        Vec3 pressedOffset(Vec3 offset){
+            return pressAxis==null?offset:offset.add(pressAxis.scale(offset.dot(pressAxis)*(thickness-1)));
+        }
+        void press(double depth){
+            pressAxis=rotate(new Vec3(0,1,0),new Quaternionf(rotation).conjugate()).normalize();
+            thickness=depth;
+            mesh.replaceAll(v->v.world(v.key,center.add(pressedOffset(skinPoint(v).subtract(center))),
+                    v.n.add(pressAxis.scale(v.n.dot(pressAxis)*(1/depth-1))).normalize()));
+            imprint=null; // The contact dent is now part of the compressed mesh.
+            refit();
+            still=0;
+        }
+        void refit(){
+            var box=bounds(mesh);
+            half=new Vec3(Math.max(.015,Math.max(box.maxX-center.x,center.x-box.minX)),
+                    Math.max(.015,Math.max(box.maxY-center.y,center.y-box.minY)),
+                    Math.max(.015,Math.max(box.maxZ-center.z,center.z-box.minZ)));
+            meshRevision++;
         }
         double volume(){return half.x*half.y*half.z;}
         void wound(String key,List<Vertex> skin){
@@ -746,7 +771,7 @@ public final class AdaptiveRagdoll {
     }
     private static final class Joint {
         final Part parent,child;final Vec3 bindA,bindB;final RagdollHinge hinge;Vec3 a,b;boolean severed;
-        Joint(Part parent,Part child,RagdollHinge hinge){this.parent=parent;this.child=child;this.hinge=hinge;Vec3 pivot=child.attachment();a=bindA=pivot.subtract(parent.center);b=bindB=pivot.subtract(child.center);}
+        Joint(Part parent,Part child,RagdollHinge hinge){this.parent=parent;this.child=child;this.hinge=hinge;Vec3 pivot=child.attachment();a=bindA=parent.pressedOffset(pivot.subtract(parent.center));b=bindB=child.pressedOffset(pivot.subtract(child.center));}
         void solve(){
             if(severed)return;
             Vec3 ra=rotate(a.scale(parent.scale),parent.rotation),rb=rotate(b.scale(child.scale),child.rotation);
@@ -1281,6 +1306,78 @@ public final class AdaptiveRagdoll {
                         speed*Math.cos(angle),.05+.12*force,speed*Math.sin(angle));
             }
         }
+        Part pendingPress;
+        int rupturedRegion;
+        boolean pressed;
+
+        /** The root and its joints survive a torso hit. A limb retains a short, capped stump. */
+        boolean rupture(Part struck,Vec3 at,Vec3 travel){
+            int region=struck.bind.region;
+            boolean limb=region!=32 && struck!=root;
+            Vec3 axis=limb?struck.center.subtract(struck.bind.pivot).normalize():at.subtract(struck.center).normalize();
+            if(axis.lengthSqr()<.5)axis=travel.scale(-1);
+            double low=Double.POSITIVE_INFINITY,high=-low;
+            for(var v:struck.mesh){
+                double projection=v.p.subtract(struck.center).dot(axis);
+                low=Math.min(low,projection);high=Math.max(high,projection);
+            }
+            if(high-low<.04)return false;
+            var cut=new Boundary(struck.center.add(axis.scale(low+(high-low)*(limb?.22:.63))),axis,1,null,"rupture");
+            var keep=clip(struck,struck.mesh,cut,-1);
+            if(keep.size()<12)return false;
+            struck.mesh.clear();struck.mesh.addAll(keep);struck.refit();
+            // Clothes or outer skin on the same limb must expose the same stump.
+            // Keep independent organs of an unlabelled rig, which share the torso id.
+            if(limb){
+                for(var layer:List.copyOf(parts)){
+                    if(layer==struck || layer==root || layer.bind.region!=region)continue;
+                    var remnant=clip(layer,layer.mesh,cut,-1);
+                    if(remnant.size()<12)parts.remove(layer);
+                    else{layer.mesh.clear();layer.mesh.addAll(remnant);layer.refit();}
+                }
+            }
+            struck.mark=StrikeMark.attach(struck,cut.point,axis.scale(-1),FatalWeaponImpact.MUSCLE_BURST,.30);
+            rupturedRegion=region;
+            appliedCuts++;
+            rebuildJoints();separateCuts();
+            return true;
+        }
+
+        void pressOnSupport(){
+            if(pendingPress==null || pressed)return;
+            double floorY=Double.NEGATIVE_INFINITY;
+            for(var p:parts){
+                if(!p.supported())continue;
+                var floor=p.floorBelow(p.pos,p.extent());
+                if(floor.getType()==HitResult.Type.BLOCK && floor.getDirection()==net.minecraft.core.Direction.UP)
+                    floorY=Math.max(floorY,floor.getLocation().y);
+            }
+            if(!Double.isFinite(floorY))return;
+            boolean small=entity.getBbHeight()<=1 && entity.getBbWidth()<=1;
+            for(var p:parts){
+                if(small){
+                    // Compress the entire small rig about its real support, including the
+                    // interpolated pose shown during hitstop. Its feet stay on the block.
+                    p.press(.23);
+                    p.pos=new Vec3(p.pos.x,floorY+(p.pos.y-floorY)*p.thickness,p.pos.z);
+                    p.old=new Vec3(p.old.x,floorY+(p.old.y-floorY)*p.thickness,p.old.z);
+                }else if(p==pendingPress || pendingPress.bind.region!=32 && p.bind.region==pendingPress.bind.region){
+                    p.press(.34);
+                }
+            }
+            if(small){
+                // Seat the deformed skin, including the struck part's dent, as one body.
+                double lowest=Double.POSITIVE_INFINITY;
+                for(var p:parts)for(var v:p.mesh)
+                    lowest=Math.min(lowest,p.pos.y+rotate(v.p.subtract(p.center).scale(p.scale),p.rotation).y);
+                double lift=floorY+.001-lowest;
+                for(var p:parts){p.pos=p.pos.add(0,lift,0);p.old=p.old.add(0,lift,0);}
+            }
+            rebuildJoints();
+            pressed=true;
+            pendingPress=null;
+        }
+
         void fatalContact(FatalWeaponImpact style,Part struck,Vec3 contact,Vec3 direction){
             fatalImpact=style;
             var inverse=new Quaternionf(struck.rotation).conjugate();
@@ -1293,8 +1390,14 @@ public final class AdaptiveRagdoll {
             // Keep the original cutting mesh for any subsequent swept lash samples.
             // All fragments inherit the same local imprint when a real edge crosses it.
             struck.imprint=new Imprint(style,at,axis,radius);
-            struck.mark=StrikeMark.attach(struck,at,axis,style,radius);
-            if(style==FatalWeaponImpact.HAMMER_BREAK||style==FatalWeaponImpact.MUSCLE_BURST){
+            if(com.codex.blacklight.combat.PlayerHitEffects.fleshBody(entity) && !com.codex.blacklight.combat.PlayerHitEffects.metalAt(entity,contact))
+                struck.mark=StrikeMark.attach(struck,at,axis,style,radius);
+            if(style==FatalWeaponImpact.MUSCLE_BURST && rupture(struck,at,axis)){
+                InfectedImpactVisuals.rupture(entity,contact,direction,radius);
+            }else if(style==FatalWeaponImpact.HAMMER_PRESS){
+                pendingPress=struck;
+                pressOnSupport();
+            }else if(style==FatalWeaponImpact.HAMMER_BREAK){
                 // Break off the impacted section of this part only. The existing clipper
                 // closes the exposed surfaces and hands both fragments to terrain physics.
                 var plane=new Boundary(at.lerp(struck.center,.49),axis,1,null,"fatal-impact");
@@ -1326,7 +1429,7 @@ public final class AdaptiveRagdoll {
                     }
                     if (Math.abs(side)<.015) side=(entity.getId()%2==0?1:-1);
                     hinge=hinge.scale(.34).add(0,Math.copySign(.94,side),0);
-                } else if (style==FatalWeaponImpact.HAMMER || style==FatalWeaponImpact.HAMMER_BREAK) {
+                } else if (style==FatalWeaponImpact.HAMMER || style==FatalWeaponImpact.HAMMER_BREAK || style==FatalWeaponImpact.HAMMER_PRESS) {
                     hinge=hinge.scale(-1);
                 }
                 roll=hinge.scale(style.turn*Math.min(1,velocity.length()));
@@ -1350,6 +1453,8 @@ public final class AdaptiveRagdoll {
                 for(var p:parts){
                     Vec3 local=rotate(at.subtract(p.pos),new Quaternionf(p.rotation).conjugate());
                     double d=local.distanceToSqr(closest(local,new AABB(p.half.scale(-1),p.half)));
+                    // Anatomical skin beats a nearby oversized decorative layer.
+                    if(wound.region()!=32 && p.bind.region!=wound.region())d+=.09;
                     if(d<distance){distance=d;struck=p;}
                 }
                 if(struck==null)continue;
@@ -1358,6 +1463,13 @@ public final class AdaptiveRagdoll {
                 kick=RagdollDrive.limit(kick.scale(soft?.3:.65),.9);struck.velocity=struck.velocity.add(kick);
                 Vec3 angular=at.subtract(struck.pos).cross(kick).scale(.7/Math.max(.04,struck.half.lengthSqr()));
                 struck.spin.add(localAngularImpulse(RagdollDrive.limit(angular,.45),struck.rotation).toVector3f());
+                if(hit.motion()==com.codex.blacklight.combat.ImpactProfile.HAMMER_BUCKLE && !hit.fatal()){
+                    // Push the struck limb around its attached joint before the ordinary recovery.
+                    Vec3 lever=struck.pos.subtract(at);
+                    Vec3 bend=lever.cross(kick).add(kick.z*.12,0,-kick.x*.12);
+                    struck.spin.add(localAngularImpulse(RagdollDrive.limit(bend.scale(2.2),.65),struck.rotation).toVector3f());
+                    struck.velocity=struck.velocity.add(0,-.23,0);
+                }
                 if(style!=null&&fatalImpact==null){
                     // Cuts carry part of the world-space launch. Recover the original
                     // contact travel independently of the launch of the complete body.
@@ -1382,7 +1494,10 @@ public final class AdaptiveRagdoll {
             // A hit captured after this tick first simulates at now + 1. Include
             // the deadline so a one-tick hitstop actually holds one physics step.
             if(now<=freezeUntil){for(var p:parts)p.floorContact();recordPoses(now);return;}
-            if(dead&&!captured)rollAfterQuill(now);
+            if(dead&&!captured){
+                pressOnSupport();
+                rollAfterQuill(now);
+            }
             if(dead&&!captured&&parts.stream().allMatch(p->p.still>=RagdollConstraintMotion.SLEEP_STEPS)){
                 var supported=supportedParts();boolean asleep=true;
                 for(int i=0;i<parts.size();i++)if(!supported[i]){parts.get(i).still=0;asleep=false;}

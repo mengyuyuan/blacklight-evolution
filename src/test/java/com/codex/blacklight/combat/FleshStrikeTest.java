@@ -16,6 +16,15 @@ class FleshStrikeTest {
         assertEquals(FleshStrike.GENERIC,FleshStrike.of(PowerForm.MUSCLE_MASS,WeaponMove.DEV_TENDRIL));
     }
 
+    @Test void bareHandSprayFollowsTheHandAndTheVerticalStroke(){
+        var outward=new Vec3(0,0,1);
+        var jab=FleshStrike.fistSpray(WeaponMove.MUSCLE_JAB,outward);
+        var cross=FleshStrike.fistSpray(WeaponMove.MUSCLE_CROSS,outward);
+        assertTrue(jab.x*cross.x<0 && jab.z>.6 && cross.z>.6);
+        assertTrue(FleshStrike.fistSpray(WeaponMove.MUSCLE_UPPERCUT,outward).y>.7);
+        assertTrue(FleshStrike.fistSpray(WeaponMove.COMBO_AXE,outward).y<-.7);
+    }
+
     @Test void chargedStrikeOnAnimatedBodyRetainsSkinPointReceiverAndContactType(){
         var at=new Vec3(8,70,4);
         var contact=new HydraHurtContact.Contact("weak_2",at,new Vec3(-1,0,0),InfectedAttackStyle.PIERCE);

@@ -83,6 +83,7 @@
     "client.LivingConsumePoseMixin",
     "client.ConsumeModelPartMixin",
     "client.GeoRagdollMixin",
+    "client.CrushDeathParticlesMixin",
     "client.ConsumeLayerPoseMixin",
     "client.InfectedSlimeCoatMixin",
     "client.BiomassEntityRenderMixin",
