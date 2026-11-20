@@ -64,6 +64,15 @@ class RagdollTerrainSupportTest {
         assertEquals(.021,shift.y,1e-8);assertEquals(-.078,shift.z,1e-8);
         assertEquals(Vec3.ZERO,RagdollTerrainSupport.correction(skin.stream().map(p->p.add(shift)).toList(),terrain));
     }
+    @Test void proneSkinSettlesDownOntoTheSlabUnderItsEdge(){
+        var skin=box(new Vec3(-.4,.88,-.4),new Vec3(.4,1.4,.4));
+        var terrain=List.of(new AABB(.18,0,-1,1,.5,1),new AABB(-.7,2,-.7,.7,2.5,.7));
+        assertEquals(-.38,RagdollTerrainSupport.rest(skin,terrain,.88),1e-8);
+    }
+    @Test void missingFloorDoesNotPullTheSceneIntoTheVoid(){
+        var skin=box(new Vec3(-.2,1,-.2),new Vec3(.2,1.45,.2));
+        assertEquals(0,RagdollTerrainSupport.rest(skin,List.of(new AABB(.5,0,.5,1,1,1)),1));
+    }
     private static List<Vec3> box(Vec3 min,Vec3 max){return FiniteMeshCutTest.box(min,max,1).stream().flatMap(List::stream).toList();}
     @Test void slabUnderTheEdgeSupportsSkinWhoseCenterIsOverAir(){
         var skin=box(new Vec3(-.4,.3,-.4),new Vec3(.4,.7,.4));

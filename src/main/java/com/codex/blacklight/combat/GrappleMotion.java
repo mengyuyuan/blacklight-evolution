@@ -41,7 +41,10 @@ public final class GrappleMotion {
         float progress=sceneProgress(entity,visual,partial);
         if(!visual.consuming())return progress;
         var forms=com.codex.blacklight.power.PowerForm.values();
-        return ConsumeSequence.receiverProgress(forms[Math.clamp(visual.form(),0,forms.length-1)],progress,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
+        var form=forms[Math.clamp(visual.form(),0,forms.length-1)];
+        if(ConsumePlacementTrack.villagerReceiver(entity))
+            progress=ConsumePlacementTrack.villagerProgress(ConsumeSequence.key(form,visual.variant()),progress);
+        return ConsumeSequence.receiverProgress(form,progress,ConsumeSequence.mountedStage(visual.stage()),visual.variant());
     }
     /** The same body-relative grip is used by authority and receiver interpolation. */
     public static java.util.Optional<net.minecraft.world.phys.Vec3> carryAnchor(LivingEntity owner,LivingEntity victim,

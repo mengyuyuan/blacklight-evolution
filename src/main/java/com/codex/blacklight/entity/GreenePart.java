@@ -20,7 +20,13 @@ public final class GreenePart extends PartEntity<EncounterMob> {
     @Override protected void defineSynchedData(SynchedEntityData.Builder b){}
     @Override protected void readAdditionalSaveData(CompoundTag tag){}
     @Override protected void addAdditionalSaveData(CompoundTag tag){}
-    public boolean hasSurface(){return getParent().isAlive()&&!getParent().isRemoved()&&(getParent().kind()!=EncounterKind.ELIZABETH_GREENE||getParent().greeneBattle().targetable())&&(slot>=getParent().kind().weakParts()||!getParent().broken(slot));}
+    public boolean hasSurface(){
+        var owner=getParent();
+        if(!owner.isAlive() || owner.isRemoved())return false;
+        if(owner.kind()==EncounterKind.GOLIATH)
+            return !GoliathLockPart.severed(GoliathContact.regionBones().get(slot),owner.goliathBrokenMask());
+        return owner.greeneBattle().targetable() && (slot>=owner.kind().weakParts() || !owner.broken(slot));
+    }
     @Override public boolean isPickable(){return hasSurface()&&!ConsumeControl.protectedEntity(getParent());}
     @Override public boolean isPushable(){return false;}
     @Override public Entity getRootVehicle(){return getParent()==null?this:getParent().getRootVehicle();}

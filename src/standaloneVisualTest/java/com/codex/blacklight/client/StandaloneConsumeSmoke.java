@@ -52,7 +52,17 @@ public final class StandaloneConsumeSmoke {
             // CLASSIC is the head-crush scene (DEFAULT is the sweep with the camera punch-in).
             new Case("claws_head_villager_pressure",PowerForm.CLAWS,"villager",true,com.codex.blacklight.combat.ConsumeVariant.CLASSIC),
             new Case("whip_classic_villager_pressure",PowerForm.WHIPFIST,"villager",true,com.codex.blacklight.combat.ConsumeVariant.CLASSIC),
+            new Case("bare_blackwatch_soldier",PowerForm.NONE,"soldier",false),
             new Case("bare_villager_pressure",PowerForm.NONE,"villager",true),
+            new Case("head_stomp",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.HEAD_STOMP),
+            new Case("beatdown",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.BEATDOWN),
+            new Case("knee_head",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.KNEE_HEAD),
+            new Case("stealth_neck",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.STEALTH_NECK),
+            new Case("stealth_bearhug",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.STEALTH_BEARHUG),
+            new Case("stealth_nelson",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.STEALTH_NELSON),
+            new Case("stealth_guillotine",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.STEALTH_GUILLOTINE),
+            new Case("stealth_jugular",PowerForm.NONE,"villager",false,com.codex.blacklight.combat.ConsumeVariant.STEALTH_JUGULAR),
+            new Case("muscle_villager",PowerForm.MUSCLE_MASS,"villager",false),
             new Case("hammer_zombie_pressure",PowerForm.HAMMERFISTS,"zombie",true),
             new Case("blade_villager_pressure",PowerForm.BLADE,"villager",true),
             new Case("whip_villager_pressure",PowerForm.WHIPFIST,"villager",true),
@@ -118,7 +128,14 @@ public final class StandaloneConsumeSmoke {
             switch(stage){
                 // Right after world load the first frames run at 8-15 fps (chunk meshing, shader warmup), which
                 // turns authored camera punch-ins into apparent snaps. Start once frame pacing has settled.
-                case SETUP->{if(stageTicks>=12&&(warmFrames()||stageTicks>=200))advance(Stage.GRAB);}
+                case SETUP->{
+                    if(mc.level.getEntity(victimId) instanceof LivingEntity visible && visible.isAlive()
+                            &&stageTicks>=12&&(warmFrames()||stageTicks>=200)) advance(Stage.GRAB);
+                    else if(stageTicks>=320){
+                        violation("client never tracked the test victim before grab");
+                        endCase(mc,server);
+                    }
+                }
                 case GRAB->{
                     // Victims flee from the pressure zombies and the first case starts right after login,
                     // so put this case's victim back in front of the actor before every grab request.
@@ -191,7 +208,7 @@ public final class StandaloneConsumeSmoke {
                 var p=server.getPlayerList().getPlayer(uuid);if(p==null)throw new IllegalStateException("QA actor missing");
                 ConsumeSystem.cancel(p);
                 var state=new BlacklightState();state.infect();state.setPrototypeMode(true);
-                for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST})state.unlock(form);
+                for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS})state.unlock(form);
                 state.activate(c.form());state.addBiomass(1000);
                 com.codex.blacklight.combat.ConsumeVariant.qaForced=c.variant();
                 p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
@@ -203,6 +220,7 @@ public final class StandaloneConsumeSmoke {
                 p.connection.teleport(40.5,251,36.5,0,0);p.setDeltaMovement(Vec3.ZERO);p.setSprinting(false);
                 boolean whip=c.form()==PowerForm.WHIPFIST;
                 Mob victim=switch(c.victim()){
+                    case "soldier"->com.codex.blacklight.registry.ModEntities.BLACKWATCH_SOLDIER.get().create(level);
                     case "zombie"->EntityType.ZOMBIE.create(level);
                     case "ravager"->EntityType.RAVAGER.create(level);
                     default->EntityType.VILLAGER.create(level);
@@ -291,6 +309,14 @@ public final class StandaloneConsumeSmoke {
             var offset=ClientCarryPlacement.consumeOffset(living,partial);
             row.add("victim",vec(living.getPosition(partial).add(offset)));row.add("victimRaw",vec(living.getPosition(partial)));row.add("victimOffset",vec(offset));
             var scene=living.getData(ModAttachments.CONSUME_VISUAL);
+            if(scene.consuming()&&com.codex.blacklight.client.animation.RagdollDrive.captured(living)){
+                var torso=com.codex.blacklight.client.renderer.AdaptiveRagdoll.contact(living,32,partial);
+                if(torso!=null){
+                    var sink=com.codex.blacklight.client.animation.RagdollDrive.sink(living,partial);
+                    row.addProperty("returnFlow",com.codex.blacklight.client.animation.RagdollDrive.flow(living,partial));
+                    row.addProperty("torsoDistanceToChest",torso.distanceTo(sink));
+                }
+            }
             // A cleared scene reads as progress 0; that is the hand-off to recovery, not a rewind.
             if(scene.active())row.addProperty("sceneProgress",scene.motionProgress(mc.level.getGameTime(),partial));
         }
@@ -341,6 +367,12 @@ public final class StandaloneConsumeSmoke {
         double maxDt=committed.stream().mapToDouble(r->r.get("dtMs").getAsDouble()).max().orElse(0);
         long hitches=committed.stream().filter(r->r.get("dtMs").getAsDouble()>100).count();
         result.addProperty("maxFrameMs",maxDt);result.addProperty("hitchFrames",hitches);
+        var returned=committed.stream().filter(r->r.has("returnFlow")&&r.get("returnFlow").getAsDouble()>=.90).toList();
+        double lastGap=returned.stream().mapToDouble(r->r.get("torsoDistanceToChest").getAsDouble()).max().orElse(0);
+        result.addProperty("lateReturnFrames",returned.size());
+        result.addProperty("maxLateTorsoDistance",lastGap);
+        if(committedSeen&&!c.victim().equals("ravager")&&returned.isEmpty())violation("no rendered torso observed during final return");
+        if(lastGap>1.0)violation("visible torso finished outside the consumer: "+lastGap+" blocks");
         int distinctTicks=(int)committed.stream().mapToInt(r->r.get("tick").getAsInt()).distinct().count();
         double framesPerTick=distinctTicks==0?0:committed.size()/(double)distinctTicks;result.addProperty("framesPerTick",framesPerTick);
         for(String key:new String[]{"actor","victim","camera"}){

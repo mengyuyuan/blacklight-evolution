@@ -6,7 +6,22 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 /** Transient phase snapshot; capture/holding never advance the dissolve clock. */
-public record ConsumeVisual(int consumerId, long started, int duration, int form, int stage,float facing,net.minecraft.world.phys.Vec3 origin,int variant) {
+public record ConsumeVisual(int consumerId, long started, int duration, int form, int stage,float facing,net.minecraft.world.phys.Vec3 origin,int variant,int landingDelay) {
+    public ConsumeVisual(int consumerId,long started,int duration,int form,int stage,float facing,net.minecraft.world.phys.Vec3 origin,int variant){
+        this(consumerId,started,duration,form,stage,facing,origin,variant,0);
+    }
+    public float elapsed(long now,float partial){
+        float age=now-started+partial;
+        return landingDelay<0?Math.min(age,groundGate(form,variant)):age-landingDelay;
+    }
+    public static int groundGate(int form,int variant){
+        if(form!=PowerForm.NONE.ordinal())return -1;
+        // Last frame before the first ground strike. Stay here until support is confirmed.
+        return switch(variant){case ConsumeVariant.BEATDOWN -> 20; case ConsumeVariant.HEAD_STOMP -> 17; default -> -1;};
+    }
+    public ConsumeVisual landed(int delay){
+        return new ConsumeVisual(consumerId,started,duration,form,stage,facing,origin,variant,delay);
+    }
     public ConsumeVisual {
         variant=ConsumeVariant.normalize(PowerForm.values()[Math.clamp(form,0,PowerForm.values().length-1)],variant);
     }
@@ -23,13 +38,13 @@ public record ConsumeVisual(int consumerId, long started, int duration, int form
     public static final ConsumeVisual EMPTY = new ConsumeVisual(-1,0,46,0,NONE);
     public ConsumeVisual(int owner,long start,int duration,int form) { this(owner,start,duration,form,CONSUME); }
     public static final StreamCodec<RegistryFriendlyByteBuf, ConsumeVisual> CODEC = new StreamCodec<>() {
-        public ConsumeVisual decode(RegistryFriendlyByteBuf b){return new ConsumeVisual(b.readVarInt(),b.readVarLong(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readFloat(),new net.minecraft.world.phys.Vec3(b.readDouble(),b.readDouble(),b.readDouble()),b.readVarInt());}
-        public void encode(RegistryFriendlyByteBuf b,ConsumeVisual v){b.writeVarInt(v.consumerId);b.writeVarLong(v.started);b.writeVarInt(v.duration);b.writeVarInt(v.form);b.writeVarInt(v.stage);b.writeFloat(v.facing);b.writeDouble(v.origin.x);b.writeDouble(v.origin.y);b.writeDouble(v.origin.z);b.writeVarInt(v.variant);}
+        public ConsumeVisual decode(RegistryFriendlyByteBuf b){return new ConsumeVisual(b.readVarInt(),b.readVarLong(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readFloat(),new net.minecraft.world.phys.Vec3(b.readDouble(),b.readDouble(),b.readDouble()),b.readVarInt(),b.readVarInt());}
+        public void encode(RegistryFriendlyByteBuf b,ConsumeVisual v){b.writeVarInt(v.consumerId);b.writeVarLong(v.started);b.writeVarInt(v.duration);b.writeVarInt(v.form);b.writeVarInt(v.stage);b.writeFloat(v.facing);b.writeDouble(v.origin.x);b.writeDouble(v.origin.y);b.writeDouble(v.origin.z);b.writeVarInt(v.variant);b.writeVarInt(v.landingDelay);}
     };
     public boolean active() { return consumerId >= 0; }
     public static boolean consumeStage(int stage){return stage==CONSUME||stage==MOUNT_CONSUME||stage==HUNTER_CONSUME;}
     public boolean consuming() { return active() && consumeStage(stage); }
-    public float phaseProgress(long now,float partial) { return Math.clamp((now-started+partial)/Math.max(1,duration),0,1); }
+    public float phaseProgress(long now,float partial) { return Math.clamp(elapsed(now,partial)/Math.max(1,duration),0,1); }
     public float progress(long now,float partial) { return consuming()?phaseProgress(now,partial):0; }
     public float motionProgress(long now,float partial) {
         if(stage==HUNTER_CONSUME)return HunterConsume.actorProgress(HunterConsume.seconds(this,now,partial));

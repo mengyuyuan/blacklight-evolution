@@ -18,7 +18,7 @@ public final class EncounterTactics {
             case LEADER_HUNTER->s.brood<2&&d>3&&ready.test(HOWL)?HOWL:d>4?first(ready,POUNCE):first(ready,s.previous==DOUBLE?CLAW:DOUBLE,CLAW,DOUBLE);
             case BRAWLER->d>4?first(ready,POUNCE):crowd?first(ready,SLAM,DOUBLE):first(ready,DOUBLE,SLAM);
             case JUGGERNAUT->s.threatened&&ready.test(GUARD)?GUARD:d>5?first(ready,CHARGE):crowd?first(ready,SLAM,HAMMER):first(ready,HAMMER,SLAM);
-            case GOLIATH->d>8?first(ready,CHARGE):crowd||s.phase>0&&d>4?first(ready,ERUPTION,SLAM,HAMMER):d>4?first(ready,SLAM,CHARGE):first(ready,HAMMER,SLAM);
+            case GOLIATH->s.phase==2?first(ready,SLAM):s.phase==1?first(ready,ERUPTION):d>8?first(ready,CHARGE):d>4||crowd?first(ready,SLAM,HAMMER):first(ready,HAMMER,SLAM);
             case FLYER->d<=16?first(ready,DIVE):NONE;
             // Caller supplies the concurrent source distance/timer gates and
             // suppresses HOWL for the higher-priority mechanical-target branch.

@@ -97,7 +97,7 @@ public final class HydraHurtContact {
     /** The swept sample already resolved which moving skin was touched. Only
      * confirm that this logical receiver still exists; using today's nearest
      * bone would redirect yesterday's contact into another Slug or the core. */
-    static Contact reportedContact(List<HydraContact.Region> regions,WeaponCutContact.Report report){
+    public static Contact reportedContact(List<HydraContact.Region> regions,WeaponCutContact.Report report){
         for(var c:report.contacts()){
             String bone=c.receivingBone();
             if(bone!=null){

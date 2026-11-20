@@ -86,9 +86,10 @@ final class SourceActionCamera {
         // Minecraft contact/landing events bridge to source common/light/medium/heavy presets.
         // Traversal starts have no matching source shake event, so they do not invent a pulse.
         int size=switch(payload.effect()) {
-            case LIGHT_LANDING,CLAW_HIT,BLADE_CUT,BLADE_RETURN -> 0;
+            case LIGHT_LANDING,CLAW_HIT,BLADE_CUT,BLADE_RETURN,BOSS_ARMOR,BOSS_HIT -> 0;
             case HEAVY_LANDING,CLAW_HEAVY,BLADE_HEAVY,GROUND_SPIKE,SPRINT_COLLISION -> 1;
-            case DEVASTATING_LANDING -> 2;
+            case BOSS_WEAK,BOSS_STRIKE -> 1;
+            case DEVASTATING_LANDING,BOSS_BREAK -> 2;
             default -> -1;
         };
         if(size>=0&&payload.intensity()>0)shake.request(size,size,player.position(),camera);

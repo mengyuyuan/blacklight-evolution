@@ -14,6 +14,8 @@ public abstract class GreeneHealthFloorMixin {
     private float blacklight$greeneHealthFloor(float nextHealth){
         if((Object)this instanceof EncounterMob owner&&owner.greeneOwnDamageActive()&&owner.isAlive()&&Float.isFinite(nextHealth))
             return Math.max(nextHealth,owner.greeneMinimumHealth());
+        if((Object)this instanceof EncounterMob boss&&boss.goliathHealthGuard()&&boss.isAlive()&&Float.isFinite(nextHealth))
+            return Math.max(nextHealth,boss.goliathHealthFloor());
         return nextHealth;
     }
 }
