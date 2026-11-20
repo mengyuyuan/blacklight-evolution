@@ -102,6 +102,18 @@ public final class WoundBlood {
             if((newSevers&32)!=0)for(var plane:hit.planes())add(entity,32,plane.point(),plane.normal(),.8F,22,true);
         }
     }
+    static void hookTear(LivingEntity entity,Vec3 point,Vec3 tangent){
+        reset();
+        if(scene==null || !available(entity) || com.codex.blacklight.combat.PlayerHitEffects.metalAt(entity,point))return;
+        var sound=com.codex.blacklight.registry.ModInfectedSounds.event(com.codex.blacklight.infection.InfectedSoundCue.TEAR);
+        scene.playLocalSound(point.x,point.y,point.z,sound,net.minecraft.sounds.SoundSource.NEUTRAL,.68F,1.15F,false);
+        var mist=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.43F,.015F,.028F),.57F);
+        for(int i=0;i<6;i++){
+            var v=tangent.scale(.04+i*.012).add((scene.random.nextDouble()-.5)*.07,
+                    (scene.random.nextDouble()-.5)*.07,(scene.random.nextDouble()-.5)*.07);
+            scene.addParticle(mist,point.x+v.x,point.y+v.y,point.z+v.z,v.x,v.y,v.z);
+        }
+    }
     static void meshCut(LivingEntity entity,int region,Vec3 point,Vec3 normal){
         reset();if(scene==null||!available(entity))return;
         add(entity,region,point.add(normal.scale(.015)),normal,.8F,22,true);

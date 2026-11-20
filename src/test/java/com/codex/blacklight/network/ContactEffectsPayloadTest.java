@@ -36,6 +36,21 @@ class ContactEffectsPayloadTest {
             assertEquals(region,packet.region());assertTrue(packet.charged());assertEquals(com.codex.blacklight.combat.FleshStrike.HAMMER,packet.strike());
         }
     }
+    @Test void lashCarriesItsContactSideAcrossTheWire(){
+        var strike=com.codex.blacklight.combat.FleshStrike.LASH;
+        int appearance=InfectedImpactPayload.appearance(com.codex.blacklight.infection.InfectedAttackStyle.TEAR,strike,false);
+        for(int side:new int[]{2,4}){
+            var hit=new InfectedImpactPayload(1,2,InfectedImpactPayload.contactRegion(appearance,side),1,2,3,1,0,0,1,9);
+            var b=buffer();try{
+                InfectedImpactPayload.STREAM_CODEC.encode(b,hit);
+                var received=InfectedImpactPayload.STREAM_CODEC.decode(b);
+                assertEquals(side,received.region());assertEquals(strike,received.strike());assertFalse(received.charged());
+                assertFalse(b.isReadable());
+            }finally{b.release();}
+        }
+        assertEquals(appearance,InfectedImpactPayload.hammerRegion(appearance,2));
+        assertEquals(appearance,InfectedImpactPayload.contactRegion(appearance,6));
+    }
     @Test void allContactKindsRoundTripTogetherWithTimeMaterialsAndSound(){
         var tissue=new InfectedImpactPayload(12,13,0,1,81,2,0,1,0,.6F,72);
         for(int kind=0;kind<=ContactEffectsPayload.SOUND;kind++){

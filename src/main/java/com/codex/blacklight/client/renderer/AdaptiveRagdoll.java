@@ -335,6 +335,7 @@ public final class AdaptiveRagdoll {
                         BODIES.put(entity,body);
                         com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Generic ragdoll built victim={} id={} parts={} joints={} vertices={} meshCuts={} components={}",entity.getType().getDescriptionId(),entity.getId(),body.parts.size(),body.joints.size(),vertices.size(),body.appliedCuts,body.components);
                     }
+                    body.releaseQuillChip();
                     body.attachmentVertices=attachmentVertices;body.unboundAttachmentVertices=unboundAttachmentVertices;
                     body.nativeSkin=vertices;
                     body.target(nodes,origin,partial);body.render(entry,output,origin,partial);
@@ -444,6 +445,7 @@ public final class AdaptiveRagdoll {
             }
             return markedSkin;
         }
+        boolean detachedTissue;
         double landingSpeed;
         Vec3 skinPoint(Vertex vertex){return imprint==null?vertex.p:imprint.apply(vertex.p);}
         final RagdollPoseHistory poses=new RagdollPoseHistory();
@@ -804,6 +806,7 @@ public final class AdaptiveRagdoll {
         final LivingEntity entity;final List<Part> parts=new ArrayList<>();final List<Joint> joints=new ArrayList<>();
         final Vec3 origin;final Matrix4f woundFrame;final long started;long expires,deadAt=-1,freezeUntil;boolean light;double targetAge;Part root;int appliedCuts,components,materialIncisions;
         final List<Boundary> cutSurfaces=new ArrayList<>();
+        final Map<String,Vec3> cutMomentum=new HashMap<>();
         final Set<String> sectionEvents=new HashSet<>();
         final List<RagdollImpactPayload> waitingCuts=new ArrayList<>();double poseTime;
         final Map<Object,Node> bindNodes;final Map<Object,Object> bindParents;
@@ -876,6 +879,12 @@ public final class AdaptiveRagdoll {
             for(var plane:hit.planes()){
                 if(parts.size()>=MAX_PARTS)break;
                 String key="strike:"+plane.stroke()+":"+plane.edge();
+                boolean hook=plane.edge().startsWith(com.codex.blacklight.combat.WeaponCutContact.WHIP_HOOK+"/");
+                boolean claw=plane.edge().contains("long blade /") || plane.edge().startsWith("Thumb short blade /");
+                if(hook || claw){
+                    cutRake(plane,key,frame,rotation,hook,hit.fatal());
+                    continue;
+                }
                 if(sectionEvents.contains(key))continue;
                 Vec3 point=RagdollDrive.transform(frame,plane.point()),normal=rotate(plane.normal(),rotation).normalize();
                 Part struck=null;double best=Double.POSITIVE_INFINITY;
@@ -886,10 +895,69 @@ public final class AdaptiveRagdoll {
                     double score=gap+.0001/Math.max(.001,p.volume());
                     if(score<best){best=score;struck=p;}
                 }
-                if(struck!=null)completeSection(point,normal,key,struck,Map.of());
+                if(struck==null || !completeSection(point,normal,key,struck,Map.of()))continue;
+                if(com.codex.blacklight.combat.WeaponCutContact.WHIP_WAIST.equals(plane.edge())){
+                    Vec3 travel=hit.cuts().stream().filter(c->c.region()==32)
+                            .map(c->new Vec3(c.x(),c.y(),c.z())).findFirst().orElse(Vec3.ZERO).multiply(1,0,1);
+                    cutMomentum.put(key,RagdollDrive.limit(travel,.48));
+                    WoundBlood.hookTear(entity,point,travel.normalize());
+                }else if(plane.edge().startsWith("Continuous sculpted blade /") && plane.path().size()>1){
+                    Vec3 edge=edgeVelocity(plane.path(),point);
+                    Vec3 across=edge.subtract(normal.scale(edge.dot(normal)));
+                    cutMomentum.put(key,RagdollDrive.limit(across.scale(.40),.52));
+                    InfectedImpactVisuals.sharpSever(entity,point,across,com.codex.blacklight.combat.FleshStrike.EDGE);
+                }
             }
         }
 
+        void cutRake(RagdollImpactPayload.CutPlane plane,String key,Matrix4f frame,Quaternionf rotation,boolean hook,boolean fatal){
+            String tear=(hook?"hook-tear:":"claw-tear:")+plane.stroke();
+            var path=plane.path();
+            if(sectionEvents.contains(tear) || path.size()<2)return;
+            Vec3 point=RagdollDrive.transform(frame,plane.point());
+            Vec3 normal=rotate(plane.normal(),rotation).normalize();
+            if(!cutAt(new Boundary(point,normal,1,null,key),plane.region(),0,path)
+                    && (hook || !fatal || !finishClawIncision(key,point,normal)))return;
+
+            // Carry only a newly detached component with the hook at its point of contact.
+            Vec3 tangent=edgeVelocity(path,point);
+            cutMomentum.put(key,RagdollDrive.limit(tangent.scale(hook?.36:.40),.52));
+            sectionEvents.add(tear);
+            WoundBlood.hookTear(entity,point,tangent.normalize());
+            if(!hook)InfectedImpactVisuals.sharpSever(entity,point,tangent,com.codex.blacklight.combat.FleshStrike.CLAW);
+        }
+
+        /** Finish a lethal rake through the one piece of skin that actually carries the claw mark. */
+        boolean finishClawIncision(String key,Vec3 contact,Vec3 normal){
+            Part struck=null;Vec3 wound=null;double nearest=Double.POSITIVE_INFINITY;
+            for(var part:parts){
+                var incision=part.incisions.get(key);
+                if(incision==null || part.detachedTissue)continue;
+                for(var vertex:incision){
+                    double distance=vertex.p.distanceToSqr(contact);
+                    if(distance<nearest){nearest=distance;struck=part;wound=vertex.p;}
+                }
+            }
+            if(struck==null)return false;
+            var plane=ContactSection.fit(wound,normal,struck.mesh.stream().map(v->v.p).toList());
+            if(plane==null)return false;
+            var cut=new Boundary(plane.point(),plane.normal(),1,null,key);
+            return cutAt(cut,struck.bind.region,struck.half.length(),List.of(),struck);
+        }
+
+        private static Vec3 edgeVelocity(List<RagdollImpactPayload.BladeSpan> path,Vec3 point){
+            double nearest=Double.POSITIVE_INFINITY;
+            Vec3 tangent=Vec3.ZERO;
+            for(int i=1;i<path.size();i++){
+                var a=path.get(i-1);var b=path.get(i);
+                Vec3 start=a.worldPoint(a.tip()),end=b.worldPoint(b.tip());
+                double gap=point.distanceToSqr(end);
+                if(gap<nearest && end.distanceToSqr(start)>1e-8){
+                    nearest=gap;tangent=end.subtract(start).scale(1/Math.max(.01,b.time()-a.time()));
+                }
+            }
+            return tangent;
+        }
         /** Prepare both sides of every intersected bone/layer before changing
          * any live part. Budget rejection leaves the entire old body untouched. */
         boolean completeSection(Vec3 point,Vec3 normal,String key,Part struck,Map<Part,RagdollPoseHistory.Pose> poses){
@@ -931,6 +999,20 @@ public final class AdaptiveRagdoll {
         Vec3 sectionPosition(Part part,Vec3 point,Map<Part,RagdollPoseHistory.Pose> poses){
             var pose=poses.get(part);return pose==null?point:pose.position().add(rotate(point.subtract(part.center).scale(pose.scale()),pose.rotation()));
         }
+        void releaseQuillChip(){
+            var exit=QuillWounds.takeChip(entity);
+            if(exit==null || parts.size()>=MAX_PARTS)return;
+            int vertices=parts.stream().mapToInt(p->p.mesh.size()).sum();
+            if(vertices+exit.skin().size()>MAX_VERTICES)return;
+            var piece=new Part(new Object(),exit.skin(),null);
+            piece.detachedTissue=true;
+            piece.velocity=exit.direction().scale(.47).add(0,.08,0);
+            Vec3 turn=exit.direction().cross(new Vec3(0,1,0));
+            if(turn.lengthSqr()<.01)turn=exit.direction().cross(new Vec3(1,0,0));
+            piece.spin.set(turn.normalize().scale(.43).toVector3f());
+            parts.add(piece);
+            components++;
+        }
         void strikeQuill(QuillWounds.Mark mark){
             var connected=connectedPose(1).positions();
             var pose=new IdentityHashMap<Object,Node>();var skin=new ArrayList<Vertex>();
@@ -952,8 +1034,10 @@ public final class AdaptiveRagdoll {
         void receive(RagdollImpactPayload hit){
             int before=appliedCuts;
             if(hit.sharp()&&hit.severMask()!=0)cut(hit);
-            if(appliedCuts!=before){rebuildJoints();separateCuts();}
+            boolean carried=appliedCuts!=before && !cutMomentum.isEmpty();
+            if(appliedCuts!=before){rebuildJoints();if(!carried)separateCuts();}
             if(!hit.refinement())impulse(hit);
+            if(carried)separateCuts();
         }
         boolean cutAt(Vec3 point,Vec3 normal,int region,double radius){
             return cutAt(new Boundary(point,normal,1),region,radius);
@@ -1076,7 +1160,7 @@ public final class AdaptiveRagdoll {
         }
         void rebuildJoints(){
             joints.clear();
-            for(var part:parts)if(part.key!=root.key){
+            for(var part:parts)if(part.key!=root.key && !part.detachedTissue){
                 var parent=ancestor(part,parts,bindNodes,bindParents);
                 if(parent!=null)joints.add(new Joint(parent,part,kneeHinge(parent,part)));
             }
@@ -1211,18 +1295,25 @@ public final class AdaptiveRagdoll {
                     var p=queue.removeFirst();if(!remaining.remove(p))continue;component.add(p);
                     for(var joint:joints){if(joint.parent==p)queue.add(joint.child);else if(joint.child==p)queue.add(joint.parent);}
                 }
-                components++;Vec3 separation=Vec3.ZERO;
+                components++;Vec3 separation=Vec3.ZERO,pull=Vec3.ZERO;
                 for(var surface:cutSurfaces){
                     int signs=0;Vec3 normal=surface.normal;
                     for(var p:component)for(var boundary:p.boundaries)
                         if(surface.same(boundary)){signs|=boundary.sign>0?1:2;normal=rotate(boundary.surface==null?boundary.normal:boundary.surface.normal(p.center),p.rotation);}
                     // Shared momentum for an entire connected fragment; intact limbs stay attached.
-                    if(signs==1||signs==2)separation=separation.add(normal.scale(signs==1?.075:-.075));
+                    if(signs==1||signs==2){
+                        separation=separation.add(normal.scale(signs==1?.075:-.075));
+                        boolean waist=surface.key.endsWith(":"+com.codex.blacklight.combat.WeaponCutContact.WHIP_WAIST);
+                        if(waist?signs==1:!component.contains(root))pull=pull.add(cutMomentum.getOrDefault(surface.key,Vec3.ZERO));
+                    }
                 }
-                separation=RagdollDrive.limit(separation,.14);
-                for(var p:component)p.velocity=p.velocity.add(separation);
+                separation=RagdollDrive.limit(separation,.14).add(RagdollDrive.limit(pull,.52));
+                for(var p:component){
+                    p.velocity=p.velocity.add(separation);
+                    if(pull.lengthSqr()>0)p.velocity=RagdollDrive.limit(p.velocity,.74);
+                }
             }
-            cutSurfaces.clear();
+            cutSurfaces.clear();cutMomentum.clear();
         }
         void target(Map<Object,Node> nodes,Vec3 now,float partial){
             recoveryClock();
@@ -1287,14 +1378,22 @@ public final class AdaptiveRagdoll {
                 }
             }
         }
-        boolean landingPlayed;
+        boolean landingPlayed,fragmentLanded;
         void landing(Part part) {
-            if (landingPlayed || fatalImpact==null || part.landingSpeed<.32 || part.half.length()<.14) return;
+            boolean fragment=part==ruptureFragment;
+            if ((fragment?fragmentLanded:landingPlayed) || fatalImpact==null || part.landingSpeed<(fragment?.13:.32)
+                    || !fragment && part.half.length()<.14) return;
             var floor = part.floorBelow(part.pos,part.extent());
             if (floor.getType()!=HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP) return;
             var point = floor.getLocation();
             var block = scene.getBlockState(floor.getBlockPos());
             if (block.isAir() || !scene.getFluidState(floor.getBlockPos().above()).isEmpty()) return;
+            if(fragment){
+                fragmentLanded=true;
+                scene.playLocalSound(point.x,point.y,point.z,block.getSoundType().getHitSound(),
+                        net.minecraft.sounds.SoundSource.NEUTRAL,.18F+.22F*(float)Math.min(1,part.landingSpeed),.91F,false);
+                return;
+            }
             landingPlayed=true;
             float force=(float)Math.min(1,part.landingSpeed);
             scene.playLocalSound(point.x,point.y,point.z,block.getSoundType().getFallSound(),
@@ -1306,8 +1405,10 @@ public final class AdaptiveRagdoll {
                         speed*Math.cos(angle),.05+.12*force,speed*Math.sin(angle));
             }
         }
-        Part pendingPress;
+        Part pendingPress,crushedTissue;
+        Vec3 pressAcross=Vec3.ZERO;
         int rupturedRegion;
+        Part ruptureFragment;
         boolean pressed;
 
         /** The root and its joints survive a torso hit. A limb retains a short, capped stump. */
@@ -1323,23 +1424,53 @@ public final class AdaptiveRagdoll {
             }
             if(high-low<.04)return false;
             var cut=new Boundary(struck.center.add(axis.scale(low+(high-low)*(limb?.22:.63))),axis,1,null,"rupture");
+            if(parts.size()>=MAX_PARTS)return false;
             var keep=clip(struck,struck.mesh,cut,-1);
-            if(keep.size()<12)return false;
-            struck.mesh.clear();struck.mesh.addAll(keep);struck.refit();
-            // Clothes or outer skin on the same limb must expose the same stump.
-            // Keep independent organs of an unlabelled rig, which share the torso id.
-            if(limb){
-                for(var layer:List.copyOf(parts)){
-                    if(layer==struck || layer==root || layer.bind.region!=region)continue;
-                    var remnant=clip(layer,layer.mesh,cut,-1);
-                    if(remnant.size()<12)parts.remove(layer);
-                    else{layer.mesh.clear();layer.mesh.addAll(remnant);layer.refit();}
-                }
+            var detached=clip(struck,struck.mesh,cut,1);
+            if(keep.size()<12 || detached.size()<12)return false;
+
+            // Stage both sides before mutating the rig. A sleeve and its underlying
+            // arm leave together as a single rigid piece with their original UVs.
+            var remnants=new LinkedHashMap<Part,List<Vertex>>();
+            remnants.put(struck,keep);
+            int total=parts.stream().mapToInt(p->p.mesh.size()).sum()-struck.mesh.size()+keep.size()+detached.size();
+            for(var layer:parts){
+                if(!limb || layer==struck || layer==root || layer.bind.region!=region)continue;
+                var remnant=clip(layer,layer.mesh,cut,-1);
+                var outer=clip(layer,layer.mesh,cut,1);
+                total+=remnant.size()+outer.size()-layer.mesh.size();
+                detached.addAll(outer);
+                remnants.put(layer,remnant);
             }
+            if(total>MAX_VERTICES)return false;
+            var fragment=new Part(new Object(),detached,struck.bind);
+            fragment.inherit(struck);
+            Vec3 away=rotate(axis,struck.rotation);
+            Vec3 travelWorld=rotate(travel,struck.rotation);
+            Vec3 carry=travelWorld.scale(.33).add(away.scale(.22)).add(0,.11,0);
+            fragment.velocity=RagdollDrive.limit(fragment.velocity.scale(.33).add(carry),.82);
+            Vec3 tumble=fragment.pos.subtract(struck.pos).cross(carry);
+            fragment.spin.add(localAngularImpulse(RagdollDrive.limit(tumble.scale(2.4),.48),fragment.rotation).toVector3f());
+            for(var entry:remnants.entrySet()){
+                var layer=entry.getKey();
+                if(layer!=struck && entry.getValue().size()<12)parts.remove(layer);
+                else {layer.mesh.clear();layer.mesh.addAll(entry.getValue());layer.refit();layer.floorContact();}
+            }
+            fragment.detachedTissue=true;
+            fragment.floorContact();
+            fragment.old=fragment.pos;
+            ruptureFragment=fragment;
+            parts.add(fragment);
             struck.mark=StrikeMark.attach(struck,cut.point,axis.scale(-1),FatalWeaponImpact.MUSCLE_BURST,.30);
             rupturedRegion=region;
             appliedCuts++;
             rebuildJoints();separateCuts();
+            // A contact dent can already cross the floor before the first physics step.
+            var fit=connectedPose(1,true);
+            for(int i=0;i<parts.size();i++){
+                var part=parts.get(i);Vec3 settled=fit.positions()[i];
+                part.old=part.old.add(settled.subtract(part.pos));part.pos=settled;
+            }
             return true;
         }
 
@@ -1373,9 +1504,47 @@ public final class AdaptiveRagdoll {
                 double lift=floorY+.001-lowest;
                 for(var p:parts){p.pos=p.pos.add(0,lift,0);p.old=p.old.add(0,lift,0);}
             }
+            if(!small && pendingPress.mark!=null)crushedTissue=pendingPress;
             rebuildJoints();
             pressed=true;
             pendingPress=null;
+        }
+
+        void shedCrushedEdges(){
+            var tissue=crushedTissue;
+            if(tissue==null)return;
+            int index=parts.indexOf(tissue);
+            if(index<0){crushedTissue=null;return;}
+            // The skeleton can transmit the floor load through a neighbouring limb.
+            if(!supportedParts()[index])return;
+            crushedTissue=null;
+            if(parts.size()+2>MAX_PARTS)return;
+            var across=rotate(pressAcross,new Quaternionf(tissue.rotation).conjugate());
+            double low=Double.POSITIVE_INFINITY,high=Double.NEGATIVE_INFINITY;
+            for(var v:tissue.mesh){
+                double d=v.p.subtract(tissue.center).dot(across);
+                low=Math.min(low,d);high=Math.max(high,d);
+            }
+            if(high-low<.12)return;
+            var core=tissue.mesh;
+            var chips=new ArrayList<Part>();
+            int otherVertices=parts.stream().mapToInt(p->p.mesh.size()).sum()-core.size(),chipVertices=0;
+            for(int sign:new int[]{-1,1}){
+                double edge=sign<0?low+(high-low)*.19:high-(high-low)*.15;
+                var plane=new Boundary(tissue.center.add(across.scale(edge)),across.scale(sign),1,null,"compressed-rim");
+                var rim=clip(tissue,core,plane,1);var next=clip(tissue,core,plane,-1);
+                if(rim.size()<12 || next.size()<12)return;
+                chipVertices+=rim.size();
+                if(otherVertices+next.size()+chipVertices>MAX_VERTICES)return;
+                var chip=new Part(new Object(),rim,tissue.bind);
+                chip.inherit(tissue);chip.detachedTissue=true;
+                chip.velocity=pressAcross.scale(sign*(sign<0?.33:.25)).add(0,.07,0);
+                chip.spin.set(localAngularImpulse(pressAcross.cross(new Vec3(0,1,0)).scale(sign*.22),chip.rotation).toVector3f());
+                chip.floorContact();chip.old=chip.pos;chips.add(chip);
+                core=next;
+            }
+            tissue.mesh.clear();tissue.mesh.addAll(core);tissue.refit();parts.addAll(chips);
+            separateCuts();
         }
 
         void fatalContact(FatalWeaponImpact style,Part struck,Vec3 contact,Vec3 direction){
@@ -1392,9 +1561,11 @@ public final class AdaptiveRagdoll {
             struck.imprint=new Imprint(style,at,axis,radius);
             if(com.codex.blacklight.combat.PlayerHitEffects.fleshBody(entity) && !com.codex.blacklight.combat.PlayerHitEffects.metalAt(entity,contact))
                 struck.mark=StrikeMark.attach(struck,at,axis,style,radius);
-            if(style==FatalWeaponImpact.MUSCLE_BURST && rupture(struck,at,axis)){
+            if(style==FatalWeaponImpact.MUSCLE_BURST && struck.mark!=null && rupture(struck,at,axis)){
                 InfectedImpactVisuals.rupture(entity,contact,direction,radius);
             }else if(style==FatalWeaponImpact.HAMMER_PRESS){
+                pressAcross=direction.cross(new Vec3(0,1,0)).normalize();
+                if(pressAcross.lengthSqr()<.5)pressAcross=new Vec3(1,0,0).yRot((float)Math.toRadians(-entity.yBodyRot));
                 pendingPress=struck;
                 pressOnSupport();
             }else if(style==FatalWeaponImpact.HAMMER_BREAK){
@@ -1549,6 +1720,7 @@ public final class AdaptiveRagdoll {
                     for(int i=0;i<parts.size();i++)parts.get(i).finishConstraints(supported[i]);
                 }
             }
+            if(dead && !captured)shedCrushedEdges();
             recordPoses(now);
         }
         boolean[] supportedParts(){

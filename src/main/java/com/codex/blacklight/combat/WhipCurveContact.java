@@ -33,8 +33,33 @@ public final class WhipCurveContact {
         return worldPoints(curve,time,feet,yaw,actor,aimPitch(actor));
     }
     static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor,float pitch){
-        return pitched(worldPoints(curve,time,feet,yaw,AttackReach.scale(actor)),feet,yaw,pitch,shoulder(actor));
+        var points=worldPoints(curve,time,feet,yaw,AttackReach.scale(actor));
+        if(actor instanceof net.minecraft.world.entity.player.Player player && time>.28 && time<.71){
+            var visual=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
+            if(visual.spec()==WeaponMove.WHIP_RETURN && !visual.charging() && visual.targetId()>=0){
+                var target=player.level().getEntity(visual.targetId());
+                if(target!=null){
+                    var forward=Vec3.directionFromRotation(0,yaw);
+                    double depth=target.getBoundingBox().getCenter().subtract(feet).dot(forward);
+                    double window=smooth((time-.28)/.12)*smooth((.71-time)/.13)*smooth((depth-2.7)/1.1);
+                    if(window>0){
+                        // Seat the real terminal on the surface at full extension. The visible wrist,
+                        // the sideways sweep and point-blank cable strikes retain their authored paths.
+                        var extension=curve.sample(.46);
+                        double peak=extension.get(extension.size()-1).forward();
+                        double hand=points.get(0).subtract(feet).dot(forward);
+                        double extent=(peak-hand)*AttackReach.scale(actor);
+                        double ratio=Math.max(.34,Math.min(1,(depth-hand-.22)/Math.max(.1,extent)));
+                        double shorten=(1-ratio)*window;
+                        Vec3 wrist=points.get(0);
+                        if(shorten>0)points=points.stream().map(v->v.subtract(forward.scale(v.subtract(wrist).dot(forward)*shorten))).toList();
+                    }
+                }
+            }
+        }
+        return pitched(points,feet,yaw,pitch,shoulder(actor));
     }
+    private static double smooth(double value){double x=Math.max(0,Math.min(1,value));return x*x*(3-2*x);}
     /** Lash elevation; within the dead zone the authored ground-level strike is kept exactly. */
     public static final float PITCH_DEAD_ZONE=12F,PITCH_LIMIT=80F;
     public static double shoulder(Entity actor){return actor.getBbHeight()*.78;}
