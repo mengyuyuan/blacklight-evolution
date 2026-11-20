@@ -23,6 +23,8 @@ public final class RooftopRig {
     private final JsonObject json;private final ByteBuffer bin;
     private final Map<Integer,float[]> cache=new HashMap<>();
     public final int[] quill=new int[6],rib=new int[6];
+    private final int[] socketSlot;
+    private final int[] valveSide;
     public final int chest;
     private final Matrix4f[] inverseBind;
     private final Vector3f[] restPosition;
@@ -65,6 +67,18 @@ public final class RooftopRig {
             if(!"LINEAR".equals(sm.get("interpolation").getAsString()))throw new IOException("interpolation");
             channels.add(new Channel(i(target,"node"),target.get("path").getAsString(),read(i(sm,"input")),read(i(sm,"output"))));}
         for(int k=0;k<6;k++){rib[k]=id("Rib."+k);quill[k]=id("Quill."+k);}chest=id("UpBody");
+        socketSlot = new int[n];
+        valveSide = new int[n];
+        Arrays.fill(socketSlot, -1);
+        for (int slot = 0; slot < quill.length; slot++) {
+            socketSlot[quill[slot]] = slot;
+            socketSlot[id("Sheath." + slot)] = slot;
+            for (int sign : new int[]{-1, 1}) {
+                int valve = id("Valve." + slot + "." + sign);
+                socketSlot[valve] = slot;
+                valveSide[valve] = sign;
+            }
+        }
         inverseBind=new Matrix4f[n];restPosition=new Vector3f[n];
         var bindWorld=new Matrix4f[n];
         for(int k=0;k<n;k++){
@@ -157,6 +171,24 @@ public final class RooftopRig {
         if(since<0)return 1;
         float t=(float)((since-1.05-.35*(slot/2))/5.3);
         return ScapulaVolley.ease(t);
+    }
+    public int socketSlot(int node) { return socketSlot[node]; }
+
+    /** The valve pivots around its hinge; the projectile socket itself stays on the authored track. */
+    public Matrix4f refillFrame(Matrix4f frame, int node, float fill, double sinceShot, boolean mirrored) {
+        int slot = socketSlot[node];
+        if (slot < 0) return frame;
+        if (node == quill[slot]) {
+            float width = .36F + .64F * (float)Math.sqrt(fill);
+            return frame.translate(0, .057F - .084F * (1 - fill), 0).scale(width, fill, width);
+        }
+        if (fill >= 1 || sinceShot < 0) return frame;
+        float open = ScapulaVolley.ease((float)sinceShot / .85F) * (1 - ScapulaVolley.ease((fill - .48F) / .52F));
+        int sign = valveSide[node] * (mirrored ? -1 : 1);
+        if (sign != 0) return frame.rotateZ(-sign * .31F * open);
+        // The back of the sheath stays attached while the advancing quill distends its mouth.
+        float swell = 4 * fill * (1 - fill);
+        return frame.scale(1 + .17F * swell, 1 - .08F * swell, 1 + .11F * swell);
     }
     public static Matrix4f mirror(Matrix4f x){return new Matrix4f().scale(-1,1,1).mul(x).scale(-1,1,1);}
     /** Ignore the source's disappearance scale on the handoff tick; its launch socket still has full orientation. */

@@ -23,10 +23,20 @@ public record InfectedImpactPayload(int attacker,int victim,int appearance,doubl
     public static int appearance(InfectedAttackStyle style, FleshStrike strike, boolean charged) {
         return style.ordinal() | (strike.id << 3) | (charged ? 64 : 0);
     }
+    public static int hammerRegion(int appearance,int region){
+        if(((appearance>>3)&7)!=FleshStrike.HAMMER.id || region<=0 || region>32 || Integer.bitCount(region)!=1)return appearance;
+        return appearance|((Integer.numberOfTrailingZeros(region)+1)<<7);
+    }
+    public int region(){
+        int code=appearance>>7;
+        return code==0?0:1<<(code-1);
+    }
     private static int normalizeAppearance(int value) {
         if (value < 0) return 0;
         int style = Math.min(value & 7, 5);
-        if ((value & ~127) != 0 || FleshStrike.byId((value >> 3) & 7) == FleshStrike.GENERIC) return style;
+        var strike=FleshStrike.byId((value>>3)&7);
+        int region=value>>7;
+        if(strike==FleshStrike.GENERIC || region>6 || region!=0 && strike!=FleshStrike.HAMMER)return style;
         return (value & ~7) | style;
     }
     public int style() { return appearance & 7; }

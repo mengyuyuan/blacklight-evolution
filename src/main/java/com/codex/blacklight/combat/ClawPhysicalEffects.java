@@ -2,16 +2,12 @@ package com.codex.blacklight.combat;
 
 import com.codex.blacklight.network.PhysicalFeedbackPayload;
 import com.codex.blacklight.registry.ModParticles;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
@@ -41,7 +37,7 @@ public final class ClawPhysicalEffects {
 
     public static void onComboTargetHit(ServerPlayer player, LivingEntity target, boolean heavy) {
         PlayerHitEffects.emit(player,target,heavy?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
-                heavy?.8F:.5F,WeaponCutContact.Report.NONE);
+                heavy?.8F:.5F,WeaponCutContact.Report.NONE,FleshStrike.CLAW,false);
     }
 
     public static void onComboImpact(ServerPlayer player, ClawCombatState.Action action,
@@ -55,7 +51,7 @@ public final class ClawPhysicalEffects {
             double normalized = i / (double)(arcPoints - 1) - 0.5D;
             Vec3 point = center.add(right.scale(normalized * (heavy ? 2.5D : 1.7D)))
                     .add(0.0D, (0.5D - Math.abs(normalized)) * 0.75D, 0.0D);
-            level.sendParticles((i & 1) == 0 ? BLOOD_RED : BIOMASS_DARK,
+            level.sendParticles(BIOMASS_DARK,
                     point.x, point.y, point.z, heavy ? 2 : 1,
                     0.06D, 0.08D, 0.06D, 0.025D);
         }
@@ -73,8 +69,6 @@ public final class ClawPhysicalEffects {
     public static void onDashingSliceImpact(ServerPlayer player, Vec3 forward, int hitCount) {
         ServerLevel level = player.serverLevel();
         Vec3 center = player.position().add(forward.scale(0.85D)).add(0.0D, 1.0D, 0.0D);
-        level.sendParticles(BLOOD_RED, center.x, center.y, center.z,
-                24, 1.05D, 0.72D, 1.05D, 0.10D);
         level.sendParticles(BIOMASS_DARK, center.x, center.y, center.z,
                 16, 0.92D, 0.62D, 0.92D, 0.065D);
         level.sendParticles(ModParticles.BIOMASS_SLASH.get(), center.x, center.y, center.z,
@@ -87,31 +81,16 @@ public final class ClawPhysicalEffects {
     }
 
     public static void onGroundSpikeImpact(ServerPlayer player, Vec3 center,
-                                           double radius, BlockPos surface) {
+                                           double radius) {
         ServerLevel level = player.serverLevel();
-        BlockState terrain = level.getBlockState(surface.below());
-        BlockParticleOption terrainParticle = new BlockParticleOption(ParticleTypes.BLOCK, terrain);
-        int[] ringPoints = {12, 18, 24};
-        double[] ringScale = {0.28D, 0.58D, 0.92D};
-        double phase = Math.toRadians(player.getYRot());
-        for (int ring = 0; ring < ringPoints.length; ring++) {
-            int points = ringPoints[ring];
-            double ringRadius = radius * ringScale[ring];
-            for (int point = 0; point < points; point++) {
-                double angle = phase + Math.PI * 2.0D * point / points
-                        + (ring & 1) * Math.PI / points;
-                double x = center.x + Math.cos(angle) * ringRadius;
-                double z = center.z + Math.sin(angle) * ringRadius;
-                // count=0 gives fragments an explicit outward/upward velocity.
-                level.sendParticles(terrainParticle, x, center.y + 0.08D, z,
-                        0, Math.cos(angle) * 0.18D, 0.22D + ring * 0.045D,
-                        Math.sin(angle) * 0.18D, 1.0D);
-                if (point % 6 == 0) {
-                    level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),
-                            x, center.y + 0.09D, z, 1,
-                            0.07D, 0.035D, 0.07D, 0.025D);
-                }
-            }
+        for (var sample : TerrainImpactEffects.surfaces(player, center, (float)radius * 1.2F)) {
+            var contact = sample.hit();
+            var at = contact.getLocation();
+            var terrain = level.getBlockState(contact.getBlockPos());
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, terrain), at.x, at.y + .035, at.z,
+                    0, Math.cos(sample.angle()) * .18, .22 + sample.ring() * .045, Math.sin(sample.angle()) * .18, 1);
+            if (sample.index() % 6 == 0) level.sendParticles(ModParticles.CONTACT_DUST.get(),
+                    at.x, at.y + .06, at.z, 1, .07, .035, .07, .025);
         }
         level.sendParticles(BLOOD_RED, center.x, center.y + 0.35D, center.z,
                 10, radius * 0.38D, 0.24D, radius * 0.38D, 0.06D);
@@ -123,12 +102,11 @@ public final class ClawPhysicalEffects {
         level.sendParticles(ModParticles.IMPACT_SMOKE.get(),
                 center.x, center.y + 0.3D, center.z, 3,
                 radius * 0.18D, 0.12D, radius * 0.18D, 0.025D);
-        level.playSound(null, surface, SoundEvents.SCULK_CATALYST_BLOOM,
-                SoundSource.PLAYERS, 1.0F, 0.46F);
-        level.playSound(null, surface, SoundEvents.MACE_SMASH_GROUND_HEAVY,
-                SoundSource.PLAYERS, 1.25F, 0.62F);
-        level.playSound(null, surface, SoundEvents.WARDEN_SONIC_BOOM,
-                SoundSource.PLAYERS, 0.24F, 0.72F);
+        var contact = level.clip(new net.minecraft.world.level.ClipContext(center.add(0, .1, 0), center.add(0, -1.1, 0),
+                net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, player));
+        TerrainImpactEffects.surfaceSound(player, contact, .95F, .72F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player, com.codex.blacklight.power.PowerForm.CLAWS,
+                "ground", center, .84F, .84F);
         feedback(player, PhysicalFeedbackPayload.Effect.GROUND_SPIKE, 1.4F);
     }
 

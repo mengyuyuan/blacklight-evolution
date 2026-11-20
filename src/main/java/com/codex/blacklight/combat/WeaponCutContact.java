@@ -292,6 +292,49 @@ public final class WeaponCutContact {
         for(var zone:zones(victim))if(zone.box().inflate(.06).contains(p))return new Report(Kind.SLICE,List.of(new Contact(zone.bit(),"item-edge",hit,player.getLookAngle().scale(.25),new Vec3(0,1,0))));
         return Report.NONE;
     }
+    /** Only a body over the fist's confirmed floor contact can be pinned by a ground slam. */
+    static Report hammerPress(LivingEntity victim,Vec3 floor,double scale){
+        var body=victim.getBoundingBox();
+        var point=closest(floor,body);
+        double radius=.52*scale;
+        if(point.subtract(floor).horizontalDistanceSqr()>radius*radius
+                ||body.minY-floor.y>.24*scale || floor.y-body.minY>.30*scale)return Report.NONE;
+        Vec3 top=new Vec3(point.x,body.maxY,point.z);
+        double modelScale=bodyScale(victim);
+        Vec3 localTop=local(top,victim.position(),victim.yBodyRot,modelScale);
+        Zone best=null;
+        double nearest=Double.POSITIVE_INFINITY;
+        for(var zone:zones(victim)){
+            Vec3 surface=closest(localTop,zone.box());
+            double distance=surface.distanceToSqr(localTop);
+            if(distance<nearest){nearest=distance;best=zone;}
+        }
+        if(best==null)return Report.NONE;
+        Vec3 skin=closest(localTop,best.box()).scale(modelScale)
+                .yRot((float)Math.toRadians(180-victim.yBodyRot)).add(victim.position());
+        return new Report(Kind.BLUNT,List.of(new Contact(best.bit(),"hammer-floor-press",skin,new Vec3(0,-.55,0),new Vec3(0,1,0))));
+    }
+
+    /** A visible arm can lie outside the standing entity box. Trace the actual anatomical
+     * boxes first, then fall back to the general accepted-impact contact on a miss. */
+    static Report aimedBlunt(ServerPlayer player,LivingEntity victim,Vec3 direction){
+        if(!RagdollImpact.legacyBody(victim))return impact(player,victim,direction);
+        double scale=bodyScale(victim);
+        Vec3 eye=player.getEyePosition(),look=player.getLookAngle();
+        Vec3 from=local(eye,victim.position(),victim.yBodyRot,scale);
+        Vec3 to=local(eye.add(look.scale(4*AttackReach.scale(player))),victim.position(),victim.yBodyRot,scale);
+        Zone nearest=null;Vec3 surface=null;double distance=Double.POSITIVE_INFINITY;
+        for(var zone:zones(victim)){
+            Vec3 point=zone.box().clip(from,to).orElse(null);
+            if(point==null)continue;
+            double d=from.distanceToSqr(point);
+            if(d<distance){nearest=zone;surface=point;distance=d;}
+        }
+        if(nearest==null)return impact(player,victim,direction);
+        Vec3 at=surface.scale(scale).yRot((float)Math.toRadians(180-victim.yBodyRot)).add(victim.position());
+        Vec3 travel=(direction.lengthSqr()>.001?direction:look).normalize().scale(.25);
+        return new Report(Kind.BLUNT,List.of(new Contact(nearest.bit(),"body-strike",at,travel,Vec3.ZERO)));
+    }
     /** Accepted blunt contact gets a local wound, but can never authorize a slice. */
     public static Report impact(ServerPlayer player,LivingEntity victim,Vec3 direction){
         if(!RagdollImpact.supportedBody(victim))return Report.NONE;

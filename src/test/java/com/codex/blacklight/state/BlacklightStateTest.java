@@ -10,6 +10,38 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BlacklightStateTest {
+    @Test void oldFreeShoulderUnlockKeepsItsBitAndDoesNotChargeAgain() {
+        var old = JsonParser.parseString("""
+                {"infected":true,"unlocked":2049,"active_power":"backspines","prototype_mode":true,"evolution_points":200}
+                """);
+        var loaded = BlacklightState.CODEC.parse(JsonOps.INSTANCE, old).result().orElseThrow();
+        assertEquals(PowerForm.BACKSPINES, loaded.getActivePower());
+        assertTrue(loaded.hasUnlocked(PowerForm.BACKSPINES));
+        assertFalse(loaded.buy(PowerForm.BACKSPINES));
+        assertEquals(200, loaded.getEvolutionPoints());
+        assertTrue(loaded.buyCombatSkill(com.codex.blacklight.power.CombatSkill.QUILL_RELAY_1));
+        assertEquals(0, loaded.getEvolutionPoints());
+    }
+
+    @Test void shoulderSpecializationsRequireTheirFormAndSurviveSaving() {
+        var state = new BlacklightState();
+        state.infect();
+        state.addEvolutionPoints(1750);
+        var relay = com.codex.blacklight.power.CombatSkill.QUILL_RELAY_1;
+        var retain = com.codex.blacklight.power.CombatSkill.QUILL_RELAY_2;
+        var wedge = com.codex.blacklight.power.CombatSkill.QUILL_WEDGE_1;
+        var pierce = com.codex.blacklight.power.CombatSkill.QUILL_WEDGE_2;
+        assertFalse(state.buyCombatSkill(wedge));
+        assertTrue(state.buy(PowerForm.BACKSPINES));
+        assertFalse(state.buyCombatSkill(pierce));
+        for (var skill : java.util.List.of(relay, retain, wedge, pierce)) assertTrue(state.buyCombatSkill(skill));
+        assertEquals(0, state.getEvolutionPoints());
+        var json = BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE, state).result().orElseThrow();
+        var loaded = BlacklightState.CODEC.parse(JsonOps.INSTANCE, json).result().orElseThrow();
+        assertTrue(loaded.hasUnlocked(PowerForm.BACKSPINES));
+        assertTrue(loaded.hasCombatSkill(retain) && loaded.hasCombatSkill(pierce));
+    }
+
     @Test
     void infectionUnlocksClawsButKeepsVanillaModeByDefault() {
         BlacklightState state = new BlacklightState();

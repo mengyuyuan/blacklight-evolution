@@ -110,17 +110,22 @@ public final class ProjectileDefenseSystem {
         return true;
     }
     private static void feedback(ServerPlayer p,Vec3 point,Vec3 incoming,Vec3 outgoing,double power,double capacity,double speed,boolean shield,boolean reflected){
-        float strength=RicochetRules.strength(power,capacity);long now=p.level().getGameTime();
-        var previous=p.getData(ModAttachments.DEFENSE_IMPACT);
-        long age=now-previous.at();boolean fresh=age<0||age>=3;
-        boolean braced=!reflected;
-        // A harmless follow-up must not interrupt the loaded guard's return stroke.
-        if(previous.braced()&&!braced&&age>=0&&age<18)return;
-        // Batch a short volley into its strongest contact. Reflection and damage still run for every projectile.
-        if(!fresh&&previous.braced()==braced&&strength<=previous.strength()*1.4F)return;
-        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ()),braced));
+        float strength=RicochetRules.strength(power,capacity);
+        boolean fresh=recordContact(p,point,incoming,strength,shield,!reflected);
         // Successful deflections stand firm. Overloads use the existing reduced-damage knockback only.
         if(fresh)com.codex.blacklight.registry.ModWeaponSounds.defense(p,shield?PowerForm.SHIELD:PowerForm.ARMOR,
                 reflected?"deflect":"heavy",point,strength);
     }
+    static boolean recordContact(ServerPlayer p,Vec3 point,Vec3 incoming,float strength,boolean shield,boolean braced) {
+        long now=p.level().getGameTime();
+        var previous=p.getData(ModAttachments.DEFENSE_IMPACT);
+        long age=now-previous.at();boolean fresh=age<0||age>=3;
+        // A harmless follow-up must not interrupt the loaded guard's return stroke.
+        if(previous.braced()&&!braced&&age>=0&&age<18)return false;
+        // Batch a short volley into its strongest contact. Reflection and damage still run for every projectile.
+        if(!fresh&&previous.braced()==braced&&strength<=previous.strength()*1.4F)return false;
+        p.setData(ModAttachments.DEFENSE_IMPACT,new DefenseImpact(now,strength,(float)incoming.x,(float)incoming.y,(float)incoming.z,shield,(float)(point.x-p.getX()),(float)(point.y-p.getY()),(float)(point.z-p.getZ()),braced));
+        return fresh;
+    }
+
 }

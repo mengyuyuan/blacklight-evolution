@@ -337,7 +337,9 @@ public final class ConsumeSystem {
         }
         if(!session.large){target.setYRot(player.getYRot()+180); target.setYHeadRot(target.getYRot()); target.yBodyRot=target.getYRot();}
         play(player,form==PowerForm.BLADE?PlayerAction.GRAB_BLADE:form==PowerForm.WHIPFIST?PlayerAction.GRAB_WHIP:PlayerAction.GRAB_REACH);
-        player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
+        if (form == PowerForm.WHIPFIST)
+            com.codex.blacklight.registry.ModWeaponSounds.play(player, form, "swing", player.getEyePosition(), .52F, 1.16F);
+        else player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
     }
 
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
@@ -379,6 +381,10 @@ public final class ConsumeSystem {
             if(!mountTick(player,session,elapsed))return;
             finish(player,session);return;
         }
+        if (session.form == PowerForm.WHIPFIST && elapsed == 14
+                && (session.stage == ConsumeVisual.WHIP_PULL || session.stage == ConsumeVisual.CAPTURE)
+                && player.hasLineOfSight(target))
+            com.codex.blacklight.registry.ModWeaponSounds.play(player, session.form, "hit", target.getBoundingBox().getCenter(), .64F, .82F);
         if(session.stage==ConsumeVisual.WHIP_PULL){
             String branch=target instanceof BlacklightHunter?"hunter":"heavy";
             int limit=(int)Math.ceil(CombatMotion.whip(branch,"TimeEnd",5)*20)+14;
@@ -466,7 +472,9 @@ public final class ConsumeSystem {
                 target.setData(ModAttachments.CONSUME_VISUAL,new ConsumeVisual(player.getId(),player.level().getGameTime(),40,session.form.ordinal(),ConsumeVisual.FLIGHT));
                 target.syncData(ModAttachments.CONSUME_VISUAL);
                 RagdollImpact.send(target,ImpactProfile.FALL,55,false,target.getDeltaMovement());
-                player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,.8F,.7F);
+                if (session.form == PowerForm.WHIPFIST)
+                    com.codex.blacklight.registry.ModWeaponSounds.play(player, session.form, "swing", target.getBoundingBox().getCenter(), .58F, 1.28F);
+                else player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_SWEEP,SoundSource.PLAYERS,.8F,.7F);
             }
             return;
         }
@@ -493,11 +501,7 @@ public final class ConsumeSystem {
                     session.form==PowerForm.HAMMERFISTS?.95F:.7F,session.form==PowerForm.HAMMERFISTS?.55F:.8F);
         }
         if (session.form() == PowerForm.HAMMERFISTS && elapsed == impact) {
-            var floor=target.blockPosition().below();
-            player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(
-                    net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),
-                    target.getX(),target.getY()+.08,target.getZ(),26,.45,.08,.45,.12);
-            player.level().playSound(null,target.blockPosition(),SoundEvents.GENERIC_BIG_FALL,SoundSource.PLAYERS,1.15F,.6F);
+            TerrainImpactEffects.heldBodyFloor(target, 26);
         }
         // Range and sight were checked when committing; scene motion cannot cancel absorption.
         if (elapsed < session.completionTick()) return;
@@ -538,8 +542,7 @@ public final class ConsumeSystem {
             if(other.hurt(other.damageSources().playerAttack(player),damage*.35F))
                 WeaponImpact.contact(player,other,ImpactTier.HEAVY,false,com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
         }
-        player.level().playSound(null,target.blockPosition(),SoundEvents.GENERIC_BIG_FALL,SoundSource.PLAYERS,1F,.65F);
-        player.serverLevel().sendParticles(net.minecraft.core.particles.ParticleTypes.POOF,center.x,center.y+.1,center.z,18,.5,.12,.5,.05);
+        TerrainImpactEffects.heldBodyFloor(target, 18);
         net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,.7F));
     }
     private static boolean mountTick(ServerPlayer player,Session session,int elapsed) {

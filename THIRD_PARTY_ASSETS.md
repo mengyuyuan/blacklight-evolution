@@ -280,3 +280,5 @@ Current production data, original editable sources and file hashes are indexed i
 Goliath and Elizabeth Greene use the authored bind geometry in `art/encounters` and the joint samples in `assets/blacklight/models/encounter_*_source.json`. Client rendering, server contact and target selection sample the same rig. The original P2 behemoth subtarget records identify Head, Knee_R and Elbow_R. The bind data and source references are available in [the encounter art directory](art/encounters).
 
 Greene's projectile loops and the Hydra death sounds use project-authored or adapted Foley. The JAR includes their notices in `META-INF/licenses/blacklight-audio`. See [Greene projectile credits](art/encounters/greene-projectile-loop-audio-LICENSE.md) and [Hydra audio credits](art/creature-audio/hydra-death-LICENSE.md).
+
+The draw, swing and heavy variations ending in _2 and _3 under sounds/weapon/backspines use the credited Socapex combat recordings and artisticdude swishes, trimmed, pitched and layered for the shoulder organ. These six mixes are licensed under CC BY-SA 3.0.

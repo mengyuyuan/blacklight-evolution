@@ -7,6 +7,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RooftopRigTest {
+    @Test void spentSocketOpensItsOwnValvesAndFeedsAlongTheLaunchAxis() {
+        var rig = RooftopRig.INSTANCE;
+        int slot = 3;
+        int valve = rig.id("Valve.3.1"), sheath = rig.id("Sheath.3");
+        assertEquals(slot, rig.socketSlot(valve));
+        assertEquals(slot, rig.socketSlot(sheath));
+        assertEquals(-1, rig.socketSlot(rig.rib[slot]));
+        var identity = new org.joml.Matrix4f();
+        assertTrue(rig.refillFrame(new org.joml.Matrix4f(), valve, 1, 9, false).equals(identity, .00001F));
+        var open = rig.refillFrame(new org.joml.Matrix4f(), valve, .3F, 3, false);
+        var reflected = rig.refillFrame(new org.joml.Matrix4f(), valve, .3F, 3, true);
+        assertTrue(open.transformDirection(new Vector3f(0, 1, 0)).x > .2F);
+        assertTrue(reflected.transformDirection(new Vector3f(0, 1, 0)).x < -.2F);
+        assertTrue(rig.refillFrame(new org.joml.Matrix4f(), sheath, .5F, 4, false).m00() > 1.1F);
+        var ready = rig.refillFrame(new org.joml.Matrix4f(), rig.quill[slot], 1, 8, false);
+        assertTrue(ready.equals(new org.joml.Matrix4f().translate(0, .057F, 0), .00001F));
+    }
     @Test void groundVolleyKeepsBothSolesPlantedAsTheKneesCarryRecoil() {
         var rig=BlacklightSkeleton.get();
         var rest=rig.getPoseMatrices(new BlacklightPose());
