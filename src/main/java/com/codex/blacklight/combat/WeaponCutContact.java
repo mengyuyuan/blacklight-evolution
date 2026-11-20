@@ -75,9 +75,25 @@ public final class WeaponCutContact {
     }
     private static double bodyScale(LivingEntity v){return !RagdollImpact.legacyBody(v)||v instanceof net.minecraft.world.entity.animal.Pig?1:v.getBbHeight()/1.95;}
 
+    public static final String WHIP_HOOK="whip-hook-rake";
+    public static final String WHIP_WAIST="whip-sweep-waist";
+    static boolean waistFinisher(WeaponMove move,LivingEntity victim){
+        if(move.uncharged()!=WeaponMove.WHIP_SWEEP || !victim.isDeadOrDying() ||
+                victim.isBaby() || !RagdollImpact.supportedBody(victim) || CombatTargeting.anchoredBody(victim))return false;
+        return RagdollImpact.legacyBody(victim) && !(victim instanceof net.minecraft.world.entity.animal.Pig)
+                || victim instanceof net.minecraft.world.entity.npc.AbstractVillager
+                || victim instanceof net.minecraft.world.entity.monster.AbstractIllager;
+    }
+    /** P1 hitreaction's horiz_01 preset. Damage has already been accepted for this receiver. */
+    static Report waistSection(LivingEntity victim,Report impact,Vec3 direction){
+        var hit=impact.contacts().get(0);
+        Vec3 point=victim.position().add(0,victim.getBbHeight()*.46,0);
+        var travel=hit.travel().lengthSqr()>.0009?hit.travel():direction;
+        return new Report(Kind.SLICE,List.of(new Contact(32,WHIP_WAIST,point,travel,new Vec3(0,1,0),hit.stroke(),List.of())));
+    }
     static Kind contactKind(WeaponMove move){
         return switch(move.uncharged()){
-            case WHIP_LASH, WHIP_RETURN, WHIP_COMBO_C -> Kind.BLUNT;
+            case WHIP_LASH, WHIP_COMBO_C -> Kind.BLUNT;
             case WHIP_LONGSHOT, WHIP_LUNGE -> Kind.PUNCTURE;
             default -> Kind.SLICE;
         };
@@ -87,6 +103,8 @@ public final class WeaponCutContact {
     public static Sweep sweep(ServerPlayer player,WeaponMove move,double from,double to,Vec3 oldFeet,float oldYaw,float yaw,WhipCurve whip){
         if(move.quake()||move.groundSpike()||!(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE||move.form==PowerForm.WHIPFIST))return Sweep.EMPTY;
         var geometry=new ArrayList<>(geometry(move.form));
+        boolean hook=move.uncharged()==WeaponMove.WHIP_RETURN || move.uncharged()==WeaponMove.WHIP_SWEEP;
+        if(hook)geometry.replaceAll(f->new Face(WHIP_HOOK+"/"+f.edge,f.bone,f.a,f.b,f.c,f.root,f.tip,f.profile,f.sharp));
         if(whip==null && (geometry.isEmpty() || MotionLibrary.find(move.id).isEmpty()))return Sweep.EMPTY;
         if(move.form==PowerForm.CLAWS||move.form==PowerForm.BLADE)geometry.addAll(bluntGeometry(move.form));
         Kind kind=contactKind(move);
@@ -207,6 +225,40 @@ public final class WeaponCutContact {
                 }
             }
             return null;
+        }
+        /** The cable can brush a shoulder well before its terminal passes that depth.
+         * Sample the contacted material point on consecutive world-space curves. */
+        Report lashStroke(ServerPlayer actor,LivingEntity victim,Vec3 previousPosition,double radius){
+            double scale=bodyScale(victim);
+            var surfaces=zones(victim);
+            boolean bodyLocal=RagdollImpact.legacyBody(victim);
+            for(int f=1;f<frames.size();f++){
+                var before=frames.get(f-1);var now=frames.get(f);
+                Vec3 origin=previousPosition.lerp(victim.position(),now.alpha());
+                float yaw=bodyLocal?net.minecraft.util.Mth.rotLerp((float)now.alpha(),victim.yBodyRotO,victim.yBodyRot):180F;
+                int count=Math.min(before.lash.size(),now.lash.size());
+                for(int i=count-1;i>0;i--){
+                    Vec3 a=now.lash.get(i-1),b=now.lash.get(i);
+                    Vec3 start=local(a,origin,yaw,scale),end=local(b,origin,yaw,scale);
+                    var segment=end.subtract(start);
+                    if(segment.lengthSqr()<1e-8)continue;
+                    Contact first=null;double nearest=Double.POSITIVE_INFINITY;
+                    for(var zone:surfaces){
+                        var cover=zone.box().inflate(radius/scale);
+                        Vec3 entry=cover.contains(start)?start:cover.clip(start,end).orElse(null);
+                        if(entry==null)continue;
+                        double u=entry.subtract(start).dot(segment)/segment.lengthSqr();
+                        if(u>=nearest)continue;
+                        Vec3 point=closest(entry,zone.box()).scale(scale).yRot((float)Math.toRadians(180-yaw)).add(origin);
+                        Vec3 old=before.lash.get(i-1).lerp(before.lash.get(i),u);
+                        Vec3 travel=a.lerp(b,u).subtract(old).scale(1/Math.max(.001,now.alpha()-before.alpha()));
+                        if(travel.lengthSqr()<.0009 || !CombatTargeting.clearRay(actor,actor.getEyePosition(),point))continue;
+                        nearest=u;first=new Contact(zone.bit(),"whip-cable",point,travel,Vec3.ZERO);
+                    }
+                    if(first!=null)return new Report(Kind.BLUNT,List.of(first));
+                }
+            }
+            return Report.NONE;
         }
         public Kind kind(){return kind;}
         /** Receiver-local ribbon samples, including the exit after the last triangle contact. */

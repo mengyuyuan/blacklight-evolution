@@ -24,7 +24,11 @@ public record InfectedImpactPayload(int attacker,int victim,int appearance,doubl
         return style.ordinal() | (strike.id << 3) | (charged ? 64 : 0);
     }
     public static int hammerRegion(int appearance,int region){
-        if(((appearance>>3)&7)!=FleshStrike.HAMMER.id || region<=0 || region>32 || Integer.bitCount(region)!=1)return appearance;
+        return ((appearance>>3)&7)==FleshStrike.HAMMER.id ? contactRegion(appearance,region) : appearance;
+    }
+    public static int contactRegion(int appearance,int region){
+        int strike=(appearance>>3)&7;
+        if((strike!=FleshStrike.HAMMER.id && strike!=FleshStrike.LASH.id) || region<=0 || region>32 || Integer.bitCount(region)!=1)return appearance;
         return appearance|((Integer.numberOfTrailingZeros(region)+1)<<7);
     }
     public int region(){
@@ -36,7 +40,7 @@ public record InfectedImpactPayload(int attacker,int victim,int appearance,doubl
         int style = Math.min(value & 7, 5);
         var strike=FleshStrike.byId((value>>3)&7);
         int region=value>>7;
-        if(strike==FleshStrike.GENERIC || region>6 || region!=0 && strike!=FleshStrike.HAMMER)return style;
+        if(strike==FleshStrike.GENERIC || region>6 || region!=0 && strike!=FleshStrike.HAMMER && strike!=FleshStrike.LASH)return style;
         return (value & ~7) | style;
     }
     public int style() { return appearance & 7; }

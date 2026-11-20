@@ -70,6 +70,10 @@ public final class RagdollVisualAudit {
             new Case("blade_pig_offset",PowerForm.BLADE,"minecraft:pig",false,true),
             new Case("blade_skeleton",PowerForm.BLADE,"minecraft:skeleton",false,true),
             new Case("blade_skeleton_close",PowerForm.BLADE,"minecraft:skeleton",false,true),
+            new Case("blade_tap_close",PowerForm.BLADE,"minecraft:zombie",false,false),
+            new Case("blade_tap_miss",PowerForm.BLADE,"minecraft:zombie",false,false),
+            new Case("claws_zombie_rake",PowerForm.CLAWS,"minecraft:zombie",false,false),
+            new Case("claws_zombie_reach",PowerForm.CLAWS,"minecraft:zombie",false,false),
             new Case("claws_cow",PowerForm.CLAWS,"minecraft:cow",false,false),
             new Case("claws_cow_side",PowerForm.CLAWS,"minecraft:cow",false,false),
             new Case("claws_cow_close",PowerForm.CLAWS,"minecraft:cow",false,false),
@@ -78,10 +82,18 @@ public final class RagdollVisualAudit {
             new Case("claws_cow_miss",PowerForm.CLAWS,"minecraft:cow",false,false),
             new Case("fist_zombie_survive",PowerForm.NONE,"minecraft:zombie",false,false),
             new Case("whip_zombie_survive",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("whip_pair_close_zombie_survive",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("whip_pair_tip_zombie_survive",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("whip_pair_close_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("whip_pair_tip_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
+            new Case("whip_sweeper_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
             new Case("fist_zombie_lethal",PowerForm.NONE,"minecraft:zombie",false,false),
             new Case("whip_zombie_lethal",PowerForm.WHIPFIST,"minecraft:zombie",false,false),
             new Case("hammer_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
             new Case("hammer_charged_zombie_lethal",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
+            new Case("muscle_iron_charge",PowerForm.MUSCLE_MASS,"minecraft:iron_golem",false,false),
+            new Case("muscle_chest_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
+            new Case("quill_cow_exit",PowerForm.BACKSPINES,"minecraft:cow",false,false),
             new Case("muscle_arm_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("muscle_leg_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("muscle_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
@@ -113,6 +125,7 @@ public final class RagdollVisualAudit {
     static int index,tick,frame;static volatile int victimId=-1;static volatile float health;static volatile boolean lastChance;
     static long previousFrameNanos;
     static boolean terrainProbe(){return TERRAIN||current().name().startsWith("thrown_")&&current().name().contains("_step_");}
+    private static volatile boolean serverFullCharge;
     static final boolean CLOSEUP="closeup".equals(System.getenv("BLACKLIGHT_QA_RAGDOLL_CAMERA"));
     static final boolean TERRAIN="steps".equals(System.getenv("BLACKLIGHT_QA_RAGDOLL_TERRAIN"));
     static final Map<BlockPos,List<AABB>> terrainShapes=new HashMap<>();
@@ -205,18 +218,34 @@ public final class RagdollVisualAudit {
             var c=current();
             // Initial aim belongs to this fixture; mounted heading belongs to the production scene.
             if(!ConsumeSequence.mountedStage(ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE))){
-            mc.player.setYRot(0);mc.player.yRotO=0;float pitch=c.name().startsWith("hammer_leg_")?52:c.name().contains("_leg_")?39:c.name().contains("_arm_")?20:0;
+            mc.player.setYRot(0);mc.player.yRotO=0;float pitch=c.name().startsWith("hammer_leg_")?52:c.name().contains("_chest_")?16:c.name().contains("_leg_")?39:c.name().contains("_arm_")?20:0;
             mc.player.setXRot(pitch);mc.player.xRotO=pitch;
             com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.MOVEMENT_STATE).setCameraYaw(0);
             }
             if(tick==40){
-                if(!c.consume()&&c.form()==PowerForm.BLADE)ClientWeaponCombat.prepareSpecialMovement();
+                if(!c.consume()&&c.form()==PowerForm.BLADE&&!c.name().startsWith("blade_tap_"))ClientWeaponCombat.prepareSpecialMovement();
                 if(c.consume()||c.name().startsWith("thrown_"))PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB));
                 else PacketDistributor.sendToServer(new WeaponInputPayload(!c.heavy(),c.heavy()));
             }
             // Explicit physical-button packets are the same production route used by normal controls.
             if(!c.consume()&&tick>40&&tick<70&&c.heavy()&&!c.name().contains("_plain_")&&tick%5==0)PacketDistributor.sendToServer(new WeaponInputPayload(false,true));
-            if(!c.consume()&&!c.name().startsWith("thrown_")&&tick==(c.heavy()&&!c.name().contains("_plain_")?70:42))PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            if(!c.consume()&&!c.name().equals("muscle_iron_charge")&&!c.name().startsWith("thrown_")&&tick==(c.heavy()&&!c.name().contains("_plain_")?70:42))PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            if(c.name().equals("muscle_iron_charge")){
+                if(tick>40&&tick<80&&tick%5==0)PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
+                if(tick==80)PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            }
+            if(c.name().equals("quill_cow_exit")){
+                if(tick>=77 && tick<=92 && (tick-77)%5==0)PacketDistributor.sendToServer(new WeaponInputPayload(false,true));
+                if(tick==94)PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            }
+            if(c.name().equals("whip_sweeper_zombie_lethal")){
+                if(tick==52)PacketDistributor.sendToServer(new WeaponInputPayload(false,true));
+                if(tick==54)PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            }
+            if(c.name().startsWith("whip_pair_")){
+                if(tick==52)PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
+                if(tick==54)PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
+            }
             if(c.name().equals("blade_pig_combo")||c.name().equals("claws_hunter_connected_survive")){
                 if(tick==60||tick==80||tick==100)PacketDistributor.sendToServer(new WeaponInputPayload(true,false));
                 if(tick==62||tick==82||tick==102)PacketDistributor.sendToServer(new WeaponInputPayload(false,false));
@@ -262,7 +291,9 @@ public final class RagdollVisualAudit {
         }
         boolean strikeSplit=!c.consume()&&(c.form()==PowerForm.BLADE||c.form()==PowerForm.CLAWS)&&!c.name().endsWith("_miss")&&!c.name().endsWith("_survive")&&!(saved&&minimum>0);
         boolean mounted=rows.asList().stream().anyMatch(r->ConsumeSequence.mountedStage(r.getAsJsonObject().get("grab").getAsInt()));
-        boolean expectsSplit=strikeSplit||c.consume()&&Float.isFinite(ConsumeSequence.splitSeconds(c.form(),mounted,c.variant()));
+        boolean whipSplit=c.name().equals("whip_pair_tip_zombie_lethal") || c.name().equals("whip_sweeper_zombie_lethal");
+        boolean localSplit=c.name().contains("_charged_zombie_lethal") || c.name().equals("hammer_press_zombie") || c.name().equals("quill_cow_exit");
+        boolean expectsSplit=localSplit||whipSplit||strikeSplit||c.consume()&&Float.isFinite(ConsumeSequence.splitSeconds(c.form(),mounted,c.variant()));
         result.addProperty("mounted",mounted);
         result.addProperty("consumeCommitted",committed);result.addProperty("minHealth",minimum);result.addProperty("maxCuts",cuts);result.addProperty("maxComponents",components);
         result.addProperty("lastChanceUsed",saved);result.addProperty("expectedSplit",expectsSplit);
@@ -276,6 +307,16 @@ public final class RagdollVisualAudit {
         if(c.name().endsWith("_miss"))damagePassed=minimum==maximum&&edgeCount==0&&components==0;
         if(c.name().endsWith("_survive"))damagePassed=minimum>0&&minimum<maximum&&cuts==0;
         boolean passed=damagePassed&&(!expectsSplit||components>=2);
+        if(c.form()==PowerForm.BACKSPINES){
+            boolean liveFirst=false,exit=false;
+            for(var el:rows){
+                var r=el.getAsJsonObject();int t=r.get("tick").getAsInt();
+                if(t>40 && t<77 && r.get("health").getAsFloat()>0 && r.get("health").getAsFloat()<10)liveFirst=true;
+                if(r.has("exitForward") && r.get("exitForward").getAsDouble()>.18 && r.get("exitSkin").getAsBoolean())exit=true;
+            }
+            result.addProperty("lightHitAlive",liveFirst);result.addProperty("physicalExitChip",exit);
+            passed&=minimum==0&&liveFirst&&exit;
+        }
         double maxJointGap=0;int jointSamples=0;
         for(var e:rows){var r=e.getAsJsonObject();if(r.has("renderJointGap")){maxJointGap=Math.max(maxJointGap,r.get("renderJointGap").getAsDouble());jointSamples++;}}
         result.addProperty("maxRenderJointGap",maxJointGap);result.addProperty("jointSamples",jointSamples);
@@ -299,9 +340,24 @@ public final class RagdollVisualAudit {
             if(lastBody!=null){result.addProperty("handoffPositionError",handoffError);result.addProperty("rawHandoffPositionError",lastBody.get("renderTargetGap").getAsDouble());result.addProperty("handoffAngleError",lastBody.get("renderTargetAngle").getAsDouble());}
             passed&=recovered;
         }
-        // Four contacting claws do not imply four fully detached chunks: a
-        // partial cut can retain a bridge, and two blades can meet the same cut.
-        if(c.name().equals("claws_cow"))passed&=edgeCount==4&&cuts>0&&components>=2&&bodies.size()==1&&monotonic;
+        if(c.name().startsWith("blade_tap_")||c.name().startsWith("claws_zombie_")||c.name().equals("claws_cow")){
+            String expected=c.form()==PowerForm.BLADE?"blade_cut":"claw_auto1";
+            boolean firstMove;
+            synchronized(contactTrace){
+                firstMove=contactTrace.asList().stream().map(e->e.getAsJsonObject())
+                        .anyMatch(r->expected.equals(r.get("move").getAsString()));
+            }
+            result.addProperty("firstLightAttack",firstMove);
+            passed&=firstMove;
+            if(!c.name().endsWith("_miss")){
+                boolean capped=rows.asList().stream().map(e->e.getAsJsonObject()).filter(r->r.has("pieces"))
+                        .flatMap(r->r.getAsJsonArray("pieces").asList().stream()).map(e->e.getAsJsonObject())
+                        .anyMatch(p->p.get("capVertices").getAsInt()>0);
+                result.addProperty("lightKillHasCap",capped);
+                passed&=minimum==0&&edgeCount>0&&cuts>0&&components>=2&&capped&&bodies.size()==1&&monotonic;
+                if(c.name().equals("claws_cow"))passed&=edgeCount==4;
+            }
+        }
         if(c.name().equals("claws_skeleton"))passed&=minimum==0&&components>=2&&bodies.size()==1&&monotonic;
         if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts==0&&components==1&&bodies.size()==1&&monotonic;
         if(c.name().startsWith("hammer_press_")){
@@ -319,7 +375,10 @@ public final class RagdollVisualAudit {
                 if(Double.isFinite(gap))result.addProperty("firstPressedFloorGap",gap);
                 passed&=gap>=-.02&&gap<.035;
             }
-            passed&=minimum==0&&components==1&&compressed>0&&(c.type().equals("minecraft:chicken")?compressed==parts:compressed<parts);
+            boolean splitRim=c.name().equals("hammer_press_zombie");
+            boolean opposed=rows.asList().stream().map(e->e.getAsJsonObject()).anyMatch(r->r.has("rimsThrownApart")&&r.get("rimsThrownApart").getAsBoolean());
+            result.addProperty("opposedRimChips",opposed);if(splitRim)passed&=opposed;
+            passed&=minimum==0&&components==(splitRim?3:1)&&compressed>0&&(c.type().equals("minecraft:chicken")?compressed==parts:compressed<parts);
         }
         if(c.name().startsWith("hammer_arm_")||c.name().startsWith("hammer_leg_")){
             String limb=c.name().startsWith("hammer_arm_")?"arm":"leg";
@@ -353,13 +412,25 @@ public final class RagdollVisualAudit {
                 result.addProperty("fatalBodyInstances",fatalBodies.size());
                 if(c.name().contains("_arm_"))passed&=(region&6)!=0;
                 if(c.name().contains("_leg_"))passed&=(region&24)!=0;
+                if(c.name().contains("_chest_"))passed&=region==32;
                 result.addProperty("lostRegion",region);
                 result.addProperty("localTissueLoss",localLoss);result.addProperty("ruptureMist",mist);
-                passed&=localLoss&&mist&&cuts==1&&components==1&&fatalBodies.size()==1;
-            }else passed&=deformation>.001&&bodies.size()==1&&(expected==FatalWeaponImpact.HAMMER_BREAK?cuts>0&&components>=2:cuts==0&&components==1);
+                boolean skinned=false,landed=false;double travel=0;
+                for(var el:rows){
+                    var sample=el.getAsJsonObject();
+                    if(!sample.has("fragmentTravel"))continue;
+                    skinned|=sample.get("fragmentOriginalSkin").getAsBoolean();
+                    landed|=sample.get("fragmentLanded").getAsBoolean();
+                    travel=Math.max(travel,sample.get("fragmentTravel").getAsDouble());
+                }
+                result.addProperty("fragmentOriginalSkin",skinned);result.addProperty("fragmentTravel",travel);
+                result.addProperty("fragmentLanded",landed);
+                passed&=localLoss&&mist&&cuts==1&&components==2&&fatalBodies.size()==1&&skinned&&travel>.25&&landed;
+            }else passed&=deformation>.001&&bodies.size()==1&&((expected==FatalWeaponImpact.HAMMER_BREAK||whipSplit)?cuts>0&&components>=2:cuts==0&&components==1);
         }
         if(c.name().contains("_zombie_")){
             String effect=switch(c.form()){
+                case CLAWS -> "CLAW";
                 case WHIPFIST -> "LASH";
                 case HAMMERFISTS -> "HAMMER";
                 case MUSCLE_MASS -> "MUSCLE";
@@ -384,6 +455,48 @@ public final class RagdollVisualAudit {
             if(c.name().endsWith("_lethal")) {result.addProperty("renderedContactMark",marked);passed&=marked;}
             result.addProperty("confirmedContactSpray",sawSpray);
             passed&=sawSpray;
+        }
+        if(c.name().equals("muscle_iron_charge")){
+            boolean charged=rows.asList().stream().map(e->e.getAsJsonObject()).anyMatch(r->r.has("serverFullCharge")&&r.get("serverFullCharge").getAsBoolean());
+            boolean metal=rows.asList().stream().map(e->e.getAsJsonObject()).anyMatch(r->r.has("fatalStyle")&&r.get("fatalStyle").getAsString().equals("MUSCLE"));
+            boolean intact=minimum==0 && charged && metal && cuts==0 && components==1;
+            result.addProperty("chargedMetalIntact",intact);passed&=intact;
+        }
+        if(c.name().equals("whip_sweeper_zombie_lethal")){
+            boolean waist=false;
+            for(var el:rows){
+                var row=el.getAsJsonObject();if(!row.has("pieces")||row.get("tick").getAsInt()>99)continue;
+                int halves=0;
+                for(var item:row.getAsJsonArray("pieces")){var piece=item.getAsJsonObject();
+                    if(piece.get("region").getAsInt()==32 && piece.get("capVertices").getAsInt()>0)halves++;
+                }
+                waist|=halves==2;
+            }
+            result.addProperty("waistHalves",waist);passed&=waist;
+        }
+        if(c.name().startsWith("whip_pair_")){
+            var contacts=new LinkedHashMap<Long,Double>();
+            for(var el:rows){
+                var sample=el.getAsJsonObject();
+                if(sample.has("contactSeed") && sample.get("contactRegion").getAsInt()>0)
+                    contacts.putIfAbsent(sample.get("contactSeed").getAsLong(),sample.getAsJsonArray("sprayDirection").get(0).getAsDouble());
+            }
+            if(c.name().endsWith("_lethal")){
+                boolean tip=c.name().contains("_tip_");boolean armCap=false;
+                for(var el:rows){
+                    var sample=el.getAsJsonObject();
+                    if(!sample.has("pieces")||sample.get("tick").getAsInt()>95)continue;
+                    for(var item:sample.getAsJsonArray("pieces")){
+                        var piece=item.getAsJsonObject();
+                        armCap|=(piece.get("region").getAsInt()&6)!=0 && piece.get("capVertices").getAsInt()>0;
+                    }
+                }
+                result.addProperty("returnArmCut",armCap);
+                passed&=tip?armCap&&components>1:!armCap&&cuts==0&&components==1;
+            }
+            var sides=new ArrayList<>(contacts.values());
+            result.add("lashDirections",new Gson().toJsonTree(sides));
+            passed&=sides.size()==2 && sides.get(0)*sides.get(1)<-.04;
         }
         double floorClearance=Double.POSITIVE_INFINITY;int penetrations=0;
         for(var e:rows){var r=e.getAsJsonObject();if(r.has("floorClearance")){double clearance=r.get("floorClearance").getAsDouble();floorClearance=Math.min(floorClearance,clearance);if(clearance<-.02)penetrations++;}}
@@ -554,7 +667,7 @@ public final class RagdollVisualAudit {
         checks.add(result);
     }
     static void setup()throws ReflectiveOperationException{
-        ready=false;trackedTorso=null;weaponAudio.clear();tick=frame=0;previousFrameNanos=0;var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();var c=current();var uuid=mc.player.getUUID();
+        ready=false;serverFullCharge=false;trackedTorso=null;weaponAudio.clear();tick=frame=0;previousFrameNanos=0;var mc=Minecraft.getInstance();var server=mc.getSingleplayerServer();var c=current();var uuid=mc.player.getUUID();
         partIds.clear();
         drawnBlades.clear();
         // Each isolated fixture starts with clean blood, so old splats cannot be
@@ -621,13 +734,24 @@ public final class RagdollVisualAudit {
                     projectile.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).setBaseValue(0);
                     level.addFreshEntity(projectile);
                 }
+                if(c.name().startsWith("whip_pair_")||c.name().equals("whip_sweeper_zombie_lethal"))
+                    v.moveTo(.5,251,c.name().contains("_tip_")?7.65:2.15,facing,0);
                 if(c.name().startsWith("hammer_arm_"))v.moveTo(.11,251,2.2,facing,0);
                 if(c.name().startsWith("hammer_press_")){
                     v.moveTo(.54,251,1.52,facing,0);
                     v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(6);
                 }
                 if(c.name().contains("_connected_"))v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(10000);
-                level.addFreshEntity(v);v.setHealth(c.name().endsWith("_survive")?v.getMaxHealth():c.consume()||c.name().endsWith("_lethal")?1:Math.min(v.getMaxHealth(),8));victimId=v.getId();health=v.getHealth();
+                if(c.name().startsWith("claws_zombie_")||c.name().equals("blade_tap_close"))v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(7);
+                if(c.name().equals("muscle_iron_charge")){
+                    v.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(6);
+                    v.moveTo(.5,251,2.2,180,0);
+                }
+                if(c.name().equals("claws_zombie_rake")){v.moveTo(.18,251,3,-90,0);v.setYHeadRot(-90);v.yBodyRot=-90;}
+                if(c.name().equals("claws_zombie_reach")){v.moveTo(.2,251,2.65,90,0);v.setYHeadRot(90);v.yBodyRot=90;}
+                if(c.form()==PowerForm.BACKSPINES)v.moveTo(.5,251,5.5,180,0);
+                level.addFreshEntity(v);v.setHealth(c.form()==PowerForm.BACKSPINES?10:(c.name().startsWith("whip_pair_")||c.name().equals("whip_sweeper_zombie_lethal"))&&c.name().endsWith("_lethal")?15:c.name().endsWith("_survive")?v.getMaxHealth():c.consume()||c.name().endsWith("_lethal")?1:Math.min(v.getMaxHealth(),8));victimId=v.getId();health=v.getHealth();
+                if(c.form()==PowerForm.BACKSPINES)CombatTargeting.requestLock(p,v.getId());
                 standingProbe=(Mob)type.create(level);standingProbe.moveTo(v.getX(),v.getY(),v.getZ(),facing,0);standingProbe.yBodyRot=standingProbe.yBodyRotO=facing;
                 oldActor=p.position();oldVictim=v.position();
                 ConsumeVariant.qaForced=c.variant();
@@ -651,7 +775,8 @@ public final class RagdollVisualAudit {
                 double from=Math.max(offset,(elapsed-1)/20.0-transition+correction),to=Math.max(offset,elapsed/20.0-transition+correction);
                 var sweep=WeaponCutContact.sweep(p,move,from,to,oldActor,yaw,yaw,local.flatMap(LocalWeaponMotion.Definition::whipCurve).orElse(null));
                 var actual=sweep.trace(p,victim,oldVictim);var blunt=sweep.bluntContact(p,victim,oldVictim);var standing=sweep.trace(p,standingProbe,standingProbe.position());
-                var row=new JsonObject();row.addProperty("tick",tick);row.addProperty("elapsed",elapsed);row.addProperty("active",move.contactIndex(elapsed)>=0);row.addProperty("from",from);row.addProperty("to",to);row.addProperty("health",victim.getHealth());
+                var row=new JsonObject();row.addProperty("move",move.id);row.addProperty("tick",tick);row.addProperty("elapsed",elapsed);row.addProperty("active",move.contactIndex(elapsed)>=0);row.addProperty("from",from);row.addProperty("to",to);row.addProperty("health",victim.getHealth());
+                if(current().name().equals("muscle_iron_charge") && (Boolean)field(session,"fullyCharged"))serverFullCharge=true;
                 row.addProperty("cutWindow",(Integer)field(session,"cutWindow"));row.addProperty("cutStroke",(Long)field(session,"cutStroke"));
                 var pending=((Map<?,?>)field(session,"pendingCuts")).get(victim.getUUID());row.addProperty("acceptedEdges",pending==null?0:((Set<?>)field(pending,"edges")).size());
                 if(pending!=null){var paths=new JsonObject();var sampleFrames=new JsonObject();for(var entry:((Map<?,?>)field(pending,"blades")).entrySet()){
@@ -662,7 +787,7 @@ public final class RagdollVisualAudit {
                 }row.add("bladePaths",paths);row.add("bladeFrames",sampleFrames);}
                 row.add("actor",vector(p.position()));row.add("victim",vector(victim.position()));row.addProperty("actualCuts",actual.contacts().size());row.addProperty("bluntContacts",blunt.contacts().size());row.addProperty("standingCuts",standing.contacts().size());
                 var nativeBlades=new JsonObject();var names=new LinkedHashSet<String>();for(String hand:List.of("Hand_R","Hand_L"))names.addAll(WeaponCutContact.sharpProfiles(move.form,hand).keySet());
-                for(var name:names){var samples=new JsonArray();for(var span:sweep.path(name,victim,oldVictim)){var sample=new JsonObject();sample.addProperty("time",span.time());var points=new JsonArray();for(var point:span.points())points.add(vector(span.worldPoint(point)));sample.add("points",points);samples.add(sample);}nativeBlades.add(name,samples);}row.add("nativeBlades",nativeBlades);
+                for(var name:names){var samples=new JsonArray();for(var span:sweep.path(move.uncharged()==WeaponMove.WHIP_RETURN || move.uncharged()==WeaponMove.WHIP_SWEEP?WeaponCutContact.WHIP_HOOK+"/"+name:name,victim,oldVictim)){var sample=new JsonObject();sample.addProperty("time",span.time());var points=new JsonArray();for(var point:span.points())points.add(vector(span.worldPoint(point)));sample.add("points",points);samples.add(sample);}nativeBlades.add(name,samples);}row.add("nativeBlades",nativeBlades);
                 var edges=new JsonArray();for(var c:standing.contacts()){var q=new JsonObject();q.addProperty("edge",c.edge());q.add("point",vector(c.point()));q.add("normal",vector(c.normal()));edges.add(q);}row.add("standingEdges",edges);
                 synchronized(contactTrace){contactTrace.add(row);}
             }
@@ -674,7 +799,11 @@ public final class RagdollVisualAudit {
         int side=Integer.getInteger("blacklight.test.ragdollCameraSide",1)<0?-1:1;
         String view=System.getenv().getOrDefault("BLACKLIGHT_QA_RAGDOLL_CAMERA","front");
         Vec3 at=new Vec3(.5,251.8,current().name().startsWith("thrown_")?6:3),eye=at.add(view.equals("side")?6*side:4*side,2.4,view.equals("rear")?4.4:view.equals("side")?0:-4.4),look=at.subtract(eye);
-        if(CLOSEUP){
+        if(current().name().startsWith("whip_pair_")||current().name().startsWith("whip_sweeper_")){
+            boolean far=current().name().contains("_tip_");
+            at=new Vec3(.5,252.05,far?4.4:1.72);
+            eye=at.add(far?8.1:4.4,far?2.2:1.35,far?-3.2:-2.5);look=at.subtract(eye);
+        }else if(CLOSEUP || current().name().contains("_charged_zombie_lethal")){
             at=new Vec3(.5,current().name().contains("_charged_")?252.48:252.10,1.65);
             if(trackedTorso!=null) {
                 // Keep the departing body and its eventual landing in the shot.
@@ -688,6 +817,28 @@ public final class RagdollVisualAudit {
         var a=(com.codex.blacklight.mixin.client.PrototypeCameraAccess)e.getCamera();a.blacklight$setPosition(eye);
         e.setYaw((float)Math.toDegrees(Math.atan2(-look.x,look.z)));
         e.setPitch((float)-Math.toDegrees(Math.atan2(look.y,look.horizontalDistance())));e.setRoll(0);
+    }
+    private static final boolean HIDE_MIST="1".equals(System.getenv("BLACKLIGHT_QA_HIDE_MIST"));
+    private static final ArrayList<Object> hiddenImpacts=new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    private static Deque<Object> impacts()throws ReflectiveOperationException{
+        var f=com.codex.blacklight.client.renderer.InfectedImpactVisuals.class.getDeclaredField("ACTIVE");
+        f.setAccessible(true);return (Deque<Object>)f.get(null);
+    }
+    @SubscribeEvent(priority=EventPriority.HIGHEST) public static void hideMist(RenderLevelStageEvent event)throws ReflectiveOperationException{
+        if(!HIDE_MIST||!active()||event.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES)return;
+        var active=impacts();hiddenImpacts.clear();hiddenImpacts.addAll(active);active.clear();
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST) public static void restoreMist(RenderLevelStageEvent event)throws ReflectiveOperationException{
+        if(!HIDE_MIST||!active()||event.getStage()!=RenderLevelStageEvent.Stage.AFTER_ENTITIES||hiddenImpacts.isEmpty())return;
+        var active=impacts();
+        long now=Minecraft.getInstance().level.getGameTime();
+        for(var impact:hiddenImpacts){
+            var hit=(com.codex.blacklight.network.InfectedImpactPayload)field(impact,"data");
+            if(now-((Number)field(impact,"at")).doubleValue()<=com.codex.blacklight.infection.InfectedAttackStyle.resolve(hit.style()).lifetime)
+                active.addLast(impact);
+        }
+        hiddenImpacts.clear();
     }
     static Object field(Object o,String name)throws ReflectiveOperationException{var f=o.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(o);}
     static JsonArray vector(Vec3 v){var a=new JsonArray();a.add(v.x);a.add(v.y);a.add(v.z);return a;}
@@ -714,12 +865,19 @@ public final class RagdollVisualAudit {
                         row.addProperty("contactSpray",packet.strike().name());
                         row.addProperty("contactRegion",packet.region());
                         row.add("contactPoint",vector(new Vec3(packet.x(),packet.y(),packet.z())));
+                        if(current().name().startsWith("whip_pair_")){
+                            row.addProperty("contactSeed",packet.seed());
+                            row.add("sprayDirection",vector(new Vec3(packet.dx(),packet.dy(),packet.dz())));
+                        }
                         row.addProperty("contactCharged",packet.charged());
                     }
                 }
             }
             long nowNanos=System.nanoTime();if(previousFrameNanos!=0)row.addProperty("frameMillis",(nowNanos-previousFrameNanos)/1e6);previousFrameNanos=nowNanos;
             row.addProperty("partial",mc.getFrameTime());
+            if(current().name().equals("muscle_iron_charge"))row.addProperty("serverFullCharge",serverFullCharge);
+            Path wave=output.resolve("game.wav");
+            if(Files.isRegularFile(wave))row.addProperty("audioBytes",Files.size(wave));
             var blades=new JsonObject();for(var entry:drawnBlades.entrySet()){var sample=entry.getValue();var value=new JsonObject();value.addProperty("time",sample.time());var points=new JsonArray();sample.points().forEach(p->points.add(vector(p)));value.add("points",points);blades.add(entry.getKey(),value);}row.add("drawnBlades",blades);
             row.addProperty("move",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.WEAPON_VISUAL).toString());row.addProperty("grab",com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE));row.addProperty("lastChance",lastChance);
             var recoveryVictim=mc.level.getEntity(victimId);
@@ -749,16 +907,53 @@ public final class RagdollVisualAudit {
             var bodies=(Map<?,?>)f.get(null);
             for(var entry:bodies.entrySet())if(entry.getKey() instanceof LivingEntity l&&l.getId()==victimId){
                 var body=entry.getValue();row.addProperty("bodyStarted",(Long)field(body,"started"));row.addProperty("cuts",(Integer)field(body,"appliedCuts"));row.addProperty("components",(Integer)field(body,"components"));
+                if(current().form()==PowerForm.BACKSPINES){
+                    for(var part:(List<?>)field(body,"parts")){
+                        if(!(Boolean)field(part,"detachedTissue"))continue;
+                        Vec3 pos=(Vec3)field(part,"renderedPosition");if(pos==null)continue;
+                        Vec3 start=(Vec3)field(part,"center");
+                        row.addProperty("exitDistance",pos.distanceTo(start));
+                        row.addProperty("exitForward",pos.z-start.z);
+                        row.addProperty("exitSkin",((List<?>)field(part,"mesh")).stream().anyMatch(v->{
+                            try{return field(v,"type").toString().contains("cow.png");}catch(ReflectiveOperationException ex){throw new IllegalStateException(ex);}
+                        }));
+                    }
+                }
                 if(current().name().startsWith("hammer_press_")){
                     int pressed=0;
                     for(var part:(List<?>)field(body,"parts"))if((Double)field(part,"thickness")<.5)pressed++;
+                    if(current().name().equals("hammer_press_zombie")){
+                        double lo=0,hi=0;int rimCount=0;
+                        for(var part:(List<?>)field(body,"parts")){
+                            if(!(Boolean)field(part,"detachedTissue"))continue;
+                            boolean skin=false;for(var vertex:(List<?>)field(part,"mesh"))if(field(vertex,"type").toString().contains("zombie.png")){skin=true;break;}
+                            if(!skin)continue;
+                            double along=((Vec3)field(part,"velocity")).dot((Vec3)field(body,"pressAcross"));
+                            lo=Math.min(lo,along);hi=Math.max(hi,along);rimCount++;
+                        }
+                        row.addProperty("rimsThrownApart",rimCount==2&&lo<-.15&&hi>.15);
+                    }
                     row.addProperty("pressedParts",pressed);
                 }
-                if(current().name().endsWith("_zombie_lethal")&&field(body,"fatalImpact") instanceof FatalWeaponImpact style){
+                if((current().name().endsWith("_zombie_lethal")||current().name().equals("muscle_iron_charge"))&&field(body,"fatalImpact") instanceof FatalWeaponImpact style){
                     row.addProperty("rupturedRegion",(Integer)field(body,"rupturedRegion"));
+                    var fragment=field(body,"ruptureFragment");
+                    if(fragment!=null){
+                        var vertices=(List<?>)field(fragment,"mesh");boolean original=false;
+                        for(var vertex:vertices){
+                            if(field(vertex,"type").toString().contains("zombie.png")){original=true;break;}
+                        }
+                        var drawn=(Vec3)field(fragment,"renderedPosition");
+                        if(drawn!=null){
+                            row.addProperty("fragmentOriginalSkin",original);
+                            row.addProperty("fragmentTravel",drawn.distanceTo((Vec3)field(fragment,"center")));
+                            row.addProperty("fragmentLanded",(Boolean)field(body,"fragmentLanded"));
+                        }
+                    }
                     var torso=field(body,"root");
                     var rendered=(Vec3)field(torso,"renderedPosition");
                     trackedTorso=rendered!=null?rendered:(Vec3)field(torso,"pos");
+                    if(HIDE_MIST && fragment!=null && field(fragment,"renderedPosition") instanceof Vec3 loose)trackedTorso=loose;
                     row.addProperty("fatalStyle",style.name());
                     int stampVertices=0;
                     for(var part:(List<?>)field(body,"parts"))

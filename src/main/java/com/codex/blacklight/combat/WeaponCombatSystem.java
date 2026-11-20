@@ -738,10 +738,17 @@ public final class WeaponCombatSystem {
             var body=AnimatedHurtBody.of(v);
             boolean meshStrike=cutting.sharp() && !bodyFlight && (body!=null || RagdollImpact.supportedBody(v)&&!CombatTargeting.multipart(v)
                     &&(s.move.form==PowerForm.CLAWS || s.move.form==PowerForm.BLADE));
-            if(body==null&&!meshStrike&&!preciseOnly&&!close&&!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
+            boolean lightLash=whip!=null && s.move.lightLash() && body==null && !CombatTargeting.multipart(v);
+            if(body==null&&!lightLash&&!meshStrike&&!preciseOnly&&!close&&!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
             var boxes=CombatTargeting.hitboxes(v);
             Vec3 oldVictim=v.position().add(previousBox(s,v,boxes,0).getCenter().subtract(boxes.get(0).getCenter()));
-            var cut=cutting.trace(p,v,oldVictim).stroke(s.cutStroke);
+            var cut=cutting.trace(p,v,oldVictim);
+            if(lightLash && (cut.contacts().isEmpty() || s.move==WeaponMove.WHIP_LASH)){
+                var cable=cutting.lashStroke(p,v,oldVictim,whip.collisionRadius());
+                if(!cable.contacts().isEmpty())cut=cable;
+            }
+            if(lightLash&&cut.contacts().isEmpty())continue;
+            cut=cut.stroke(s.cutStroke);
             if(preciseOnly&&cut.contacts().isEmpty())continue;
             var impact=cut;
             if(!bodyFlight&&cutting.sharp()&&(s.move.form==PowerForm.CLAWS||s.move.form==PowerForm.BLADE)
@@ -778,9 +785,10 @@ public final class WeaponCombatSystem {
             if(accepted){
                 LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));
                 s.hit.add(v.getUUID());if(close)s.closeSweepHits.put(v.getUUID(),pulse);
-                if(cutting.sharp()&&cutting.kind()!=WeaponCutContact.Kind.BLUNT){
+                if(cutting.sharp()&&cutting.kind()!=WeaponCutContact.Kind.BLUNT && !WeaponCutContact.waistFinisher(s.move,v)){
                     var edges=new HashSet<String>();for(var c:cut.contacts())edges.add(c.region()+":"+c.edge());
-                    var blades=new LinkedHashMap<String,WeaponCutContact.Contact>();for(var c:cut.contacts())blades.putIfAbsent(c.edge(),c);
+                    var blades=new LinkedHashMap<String,WeaponCutContact.Contact>();
+                    for(var c:cut.contacts())if(!c.path().isEmpty())blades.putIfAbsent(c.edge(),c);
                     s.pendingCuts.put(v.getUUID(),new PendingCut(v,v.isDeadOrDying(),v.position(),Math.min(s.move.duration,s.move.end+3),edges,blades));
                 }else s.pendingCuts.remove(v.getUUID());
                 boolean resistsControl=v instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.evolvedControlProtected();

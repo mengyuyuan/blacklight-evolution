@@ -65,8 +65,16 @@ public final class PlayerHitEffects {
             if ((metalAt(target,hit.point()) || normal.lengthSqr() < 1e-8) && hit.normal().lengthSqr() > 1e-8) normal = hit.normal();
             if(strike==FleshStrike.FIST && move!=null && !metalAt(target,hit.point()))normal=FleshStrike.fistSpray(move,normal);
             if(strike==FleshStrike.HAMMER && hit.edge().equals("hammer-floor-press"))style=InfectedAttackStyle.BURST;
+            boolean lightLash=move!=null && move.lightLash();
+            if(lightLash && !metalAt(target,hit.point())){
+                var forward=hit.point().subtract(player.position()).multiply(1,0,1).normalize();
+                var travel=hit.travel();
+                // Blood follows the departing length of cable; retain a little forward carry.
+                var across=travel.subtract(forward.scale(travel.dot(forward)*.78));
+                if(across.lengthSqr()>1e-8)normal=across.normalize();
+            }
             int index = emitted.size();
-            surface(player, target, style, index == 0 ? size : size * .56F, strike, charged && index == 0, hit.point(), normal, index, hit.region());
+            surface(player, target, style, index == 0 ? size : size * .56F, strike, charged && index == 0, hit.point(), normal, index, strike==FleshStrike.LASH && !lightLash?0:hit.region());
             emitted.add(hit);
             if (emitted.size() == limit) break;
         }
@@ -85,7 +93,7 @@ public final class PlayerHitEffects {
                     new CombatImpactPayload(point.x,point.y,point.z,size,false,false,(float)normal.x,(float)normal.y,(float)normal.z));
         }else{
             PacketDistributor.sendToPlayersNear(player.serverLevel(),null,point.x,point.y,point.z,80,
-                    new InfectedImpactPayload(player.getId(),target.getId(),InfectedImpactPayload.hammerRegion(InfectedImpactPayload.appearance(style,strike,charged),region),point.x,point.y,point.z,
+                    new InfectedImpactPayload(player.getId(),target.getId(),InfectedImpactPayload.contactRegion(InfectedImpactPayload.appearance(style,strike,charged),region),point.x,point.y,point.z,
                             (float)normal.x,(float)normal.y,(float)normal.z,size,player.level().getGameTime()*31+target.getId()*73L+player.getId()+index*101L));
         }
     }

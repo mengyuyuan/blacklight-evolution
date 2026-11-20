@@ -21,7 +21,7 @@ public final class ImpactSpray {
                              Vec3 camera, InfectedAttackStyle style, double ageTicks,
                              float size, long seed, boolean hunter, int light) {
         flesh(pose,out,new SprayEmitterPath(origin,normal,false),camera,style,FleshStrike.GENERIC,
-                false,ageTicks,size,seed,hunter,light);
+                false,false,ageTicks,size,seed,hunter,light);
     }
 
     // Dimensions are tuned in blocks. The lash is a narrow streak along its sweep,
@@ -30,6 +30,7 @@ public final class ImpactSpray {
     private static final Shape FIST=new Shape(10,2,.88,1.12,1.22,1.12,.36);
     private static final Shape FIST_FINISH=new Shape(14,3,1.25,1.43,1.38,1.50,.52);
     private static final Shape RUPTURE=new Shape(19,4,1.45,1.55,1.48,1.20,.63);
+    private static final Shape LIGHT_LASH=new Shape(7,1,.21,1.38,.61,2.4,.62);
     private static final Shape LASH=new Shape(15,3,.26,1.45,.86,2.05,.72);
     private static final Shape HAMMER=new Shape(20,4,2.65,.90,1.58,.94,.75);
     private static final Shape MUSCLE=new Shape(16,3,.72,1.68,1.28,1.36,.85);
@@ -52,12 +53,12 @@ public final class ImpactSpray {
     }
 
     static void flesh(PoseStack pose,VertexConsumer out,SprayEmitterPath path,Vec3 camera,
-                      InfectedAttackStyle style,FleshStrike strike,boolean charged,double ageTicks,
+                      InfectedAttackStyle style,FleshStrike strike,boolean charged,boolean lightLash,double ageTicks,
                       float size,long seed,boolean hunter,int light){
         if (!Double.isFinite(ageTicks) || ageTicks < 0 || ageTicks > 14) return;
         double age = ageTicks / 20, scale = scale(size)*(charged?1.16:1);
         boolean rupture=strike==FleshStrike.MUSCLE && style==InfectedAttackStyle.BURST;
-        var shape=rupture ? RUPTURE : strike==FleshStrike.FIST && (size>=.78F || charged) ? FIST_FINISH : shape(strike,style);
+        var shape=lightLash ? LIGHT_LASH : rupture ? RUPTURE : strike==FleshStrike.FIST && (size>=.78F || charged) ? FIST_FINISH : shape(strike,style);
         int drops=strike==FleshStrike.QUILL && size<.4F ? 4 : shape.drops+(charged?4:0);
         for (int i = 0; i < drops; i++) {
             long s = seed + i * 53L;
@@ -120,11 +121,11 @@ public final class ImpactSpray {
         }
         // Full-charge slashes against a Hunter add the longer fan to the player's hit.
         boolean fan=hunterCut&&charged || strike==FleshStrike.GENERIC&&(style==InfectedAttackStyle.CRUSH||style==InfectedAttackStyle.BURST);
-        int clouds = rupture ? 5 : fan ? 4 : 1;
+        int clouds = rupture ? 3 : fan ? 4 : 1;
         for (int i = 0; i < clouds; i++) {
             long s = seed + 1301 + i * 61L;
             double delay = rupture ? i*.012 : fan ? unit(s) * FAN_EMISSION : .025;
-            double t = age - delay, life = rupture ? .29 : fan ? .25 : .19;
+            double t = age - delay, life = rupture ? .19 : fan ? .25 : .19;
             if (t < 0 || t >= life) continue;
             var frame=path.at(delay);
             var axis=frame.axis();var u=frame.tangent();var v=frame.bitangent();
@@ -133,7 +134,7 @@ public final class ImpactSpray {
                     .add(v.scale(Math.sin(a) * .28 * scale));
             if(rupture)drift=axis.scale(.9+i*.37).add(u.scale(Math.cos(a)*.65)).add(v.scale(Math.sin(a)*.65));
             var point = frame.point().add(drift.scale(t)).add(0, -.8 * t * t, 0);
-            double radius = (.09 + t * .70) * scale * (rupture ? 1.75 : fan ? 1.5 : 1);
+            double radius = (.09 + t * .70) * scale * (rupture ? 1.35 : fan ? 1.5 : 1);
             double envelope = Math.sin(Math.PI * t / life);
             soft(pose, out, camera, point, u, radius * 1.4, radius,
                     0x76141d, (rupture ? 110 : fan ? 45 : 30) * envelope, light, s, true);
