@@ -7,6 +7,18 @@ public final class EvolvedSamplePreset {
     private static final double PRIMARY=600,FILLER=150;
     private static final TissueCore[] LEGACY={TissueCore.MUSCLE,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.BLADE,TissueCore.HYDROSTAT};
     private static final TissueCore[] FILLERS={TissueCore.HEART,TissueCore.CARAPACE,TissueCore.JAW,TissueCore.GRASP,TissueCore.CREST,TissueCore.TENDON};
+    public static com.codex.blacklight.entity.BlacklightInfectedHost matureHost(net.minecraft.server.level.ServerLevel level,
+            EvolvedArchetype archetype) {
+        var host=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);if(host==null)return null;
+        host.inherit(net.minecraft.world.entity.EntityType.ZOMBIE.create(level));
+        var genes=com.codex.blacklight.infection.EvolvedSamplePreset.organs(archetype);
+        long seed=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
+        var inventory=new com.codex.blacklight.infection.TissueInheritance(genes,6,2100,false,null,1,6).digest(1,true,seed,504000,com.codex.blacklight.infection.TissueInheritance.Rules.DEFAULT,com.codex.blacklight.infection.TissueCore.MUSCLE);
+        var tag=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",com.codex.blacklight.infection.TissueCore.MUSCLE.key());
+        tag.putLong("BlacklightTissueAge",504000);tag.put("BlacklightTissueInheritance",com.codex.blacklight.infection.TissueInheritanceCodec.write(inventory));tag.putInt("BlacklightTissueNutrition",100);host.load(tag);host.advanceTissue(0);
+        return host;
+    }
+
     private EvolvedSamplePreset(){}
     public static TissueCore primary(EvolvedArchetype type){
         return switch(type){

@@ -6,6 +6,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -14,6 +15,7 @@ import net.minecraft.core.HolderLookup;
 
 public final class PumpStation extends BlockEntity {
     public PumpStation(BlockPos pos,BlockState state) { super(ModBlockEntities.PUMP.get(),pos,state); }
+    CompoundTag shift = new CompoundTag();
     private boolean hasRig;
     private boolean running;
     private long startedAt;
@@ -68,6 +70,7 @@ public final class PumpStation extends BlockEntity {
 
     @Override protected void saveAdditional(CompoundTag tag,HolderLookup.Provider registries) {
         super.saveAdditional(tag,registries);
+        tag.put("Dispatch",shift.copy());
         tag.putLong("NextPreview",nextPreview);
         writeRig(tag);
     }
@@ -86,6 +89,7 @@ public final class PumpStation extends BlockEntity {
 
     @Override protected void loadAdditional(CompoundTag tag,HolderLookup.Provider registries) {
         super.loadAdditional(tag,registries);
+        shift=tag.getCompound("Dispatch").copy();
         nextPreview=tag.getLong("NextPreview");
         hasRig=tag.getBoolean("FieldRig");
         running=tag.getBoolean("Running");
@@ -94,7 +98,34 @@ public final class PumpStation extends BlockEntity {
         dent=tag.getInt("Dent");
     }
 
+    void releaseGate(ServerLevel level, com.codex.blacklight.entity.EncounterMob boss, ServerPlayer operator) {
+        boss.holdAtConvoyGate();
+        shift.putLong("LatchAt",level.getGameTime());
+        shift.putUUID("ConvoyBoss",boss.getUUID());
+        shift.putUUID("ConvoyOperator",operator.getUUID());
+        setChanged();
+    }
+    void openGate(ServerLevel level, BlockPos console, BlockState state) {
+        if(!shift.hasUUID("ConvoyBoss")) return;
+        long elapsed=level.getGameTime()-shift.getLong("LatchAt");
+        var facing=state.getValue(BossSiteBlock.FACING);
+        int open=(int)Math.min(4,Math.max(0,elapsed)/4);
+        if(elapsed%4==0 || elapsed>=16) {
+            for(int dx=-open;dx<=open;dx++) for(int y=1;y<=4;y++)
+                ConvoyRail.bend(level,ConvoyRail.relative(console,facing,16+dx,y,21));
+            if(elapsed<=16) level.playSound(null,console.relative(facing.getOpposite(),7),SoundEvents.PISTON_EXTEND,SoundSource.BLOCKS,1.6F,.55F+open*.08F);
+        }
+        if (elapsed>=16) {
+            var boss=level.getEntity(shift.getUUID("ConvoyBoss"));
+            var player=level.getPlayerByUUID(shift.getUUID("ConvoyOperator"));
+            if (boss instanceof com.codex.blacklight.entity.EncounterMob mob)
+                mob.leaveConvoyGate(player);
+            shift.remove("ConvoyBoss");shift.remove("ConvoyOperator");setChanged();
+        }
+    }
+
     void watch(ServerLevel level, BlockPos pos, BlockState state) {
+        FutianDispatch.tick(level,this);
         long tick=level.getGameTime();
         if (running && hasRig) {
             long age=tick-startedAt;

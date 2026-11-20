@@ -35,9 +35,12 @@ public final class PrototypeSurvivalLock {
     public static boolean canOperateConsole(Player player, BlockPos pos) {
         if(player==null || player.isSpectator() || player.isPassenger()) return false;
         var state=player.level().getBlockState(pos);
+        if (state.is(com.codex.blacklight.registry.ModBlocks.FIELD_POST.get())) return !player.getData(ModAttachments.CONSUMING);
         if(!(state.getBlock() instanceof BossSiteBlock) || player.getData(ModAttachments.CONSUMING)) return false;
         return (player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty())
-                || state.getValue(BossSiteBlock.MOTHER) && BossSiteBlock.hasPumpKey(player);
+                || player.isHolding(com.codex.blacklight.registry.ModItems.CONTAINMENT_DECODER.get())
+                || player.isHolding(com.codex.blacklight.registry.ModItems.BLOODTOX_COMMAND_KEY.get())
+                || BossSiteBlock.hasPumpKey(player);
     }
 
     /** Disabling pickup leaves the dropped item intact; enabling it keeps vanilla ownership/delay rules. */

@@ -84,6 +84,8 @@ public final class AssimilationSystem {
         p.syncData(ModAttachments.PLAYER_STATE);GrowthSystem.consumed(p,target);
         if(heal)CriticalMassSystem.healFromConsume(p,reward.healing());
         PrototypeMetabolism.feed(p,target);
+        if (target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host && host.claimGanglion())
+            p.drop(new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.EVOLVED_GANGLION.get()), false);
         if(target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
                 && soldier.commandRole()==com.codex.blacklight.military.MilitaryRole.COMMANDER
                 && target.getRandom().nextInt(3)==0){

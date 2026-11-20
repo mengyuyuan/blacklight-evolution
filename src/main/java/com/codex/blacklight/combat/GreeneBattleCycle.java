@@ -229,7 +229,22 @@ public final class GreeneBattleCycle {
                 if(age>=SUBMERGE_CLIP_TICKS&&owner.getY()-goalY<SOURCE_TOLERANCE*scale())enter(UNDERGROUND);
                 if(undergroundRemaining==0)beginEmerge();
             }
-            case UNDERGROUND -> {if(--undergroundRemaining<=0)beginEmerge();}
+            case UNDERGROUND -> {
+                if (undergroundRemaining<=48 && undergroundRemaining%6==0 && owner.level() instanceof ServerLevel level) {
+                    var direction=Vec3.directionFromRotation(0,owner.yBodyRot);
+                    var point=owner.position().add(direction.scale(undergroundRemaining*.24));
+                    var ground=net.minecraft.core.BlockPos.containing(point.x,surfaceY-.05,point.z);
+                    if (level.hasChunkAt(ground)) {
+                        var state=level.getBlockState(ground);
+                        if (!state.isAir()) {
+                            level.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,state),
+                                    point.x,surfaceY+.12,point.z,15,.55,.12,.55,.12);
+                            level.playSound(null,ground,net.minecraft.sounds.SoundEvents.STONE_BREAK,net.minecraft.sounds.SoundSource.HOSTILE,1.7F,.55F);
+                        }
+                    }
+                }
+                if(--undergroundRemaining<=0)beginEmerge();
+            }
             case EMERGE_WAIT -> {if(player==null)choosePlayer();if(age>=EMERGE_GATE_TICKS&&!playerBusy())enter(EMERGING);}
             case EMERGING -> {
                 if(age<=EMERGE_TARGET_TICKS)vertical(SOURCE_DEPTH*scale()/1.3333300352096558/20);
