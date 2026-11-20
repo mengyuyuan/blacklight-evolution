@@ -1,21 +1,36 @@
 package com.codex.blacklight.mixin.client;
 
+import com.codex.blacklight.client.ClientCarryPlacement;
+import com.codex.blacklight.combat.ConsumeVisual;
 import com.codex.blacklight.combat.DevastatorSystem;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Vanilla tests the current tick's box against an interpolated camera. Fast
- * dives and powered wing flight can cull a perfectly nearby interpolated pose.
- * Scope the exemption to the local third-person actor and a bounded distance. */
+/** Account for interpolated flight and consume poses outside the network culling box. */
 @Mixin(EntityRenderer.class)
 public abstract class BulletFlightCullingMixin {
+    // A thrown receiver can be several blocks ahead of the network box that vanilla tested.
+    @Inject(method="shouldRender",at=@At("RETURN"),cancellable=true)
+    private void blacklight$visibleConsume(Entity entity,Frustum frustum,double x,double y,double z,CallbackInfoReturnable<Boolean> result){
+        if(result.getReturnValueZ() || !(entity instanceof LivingEntity victim)
+                || !entity.shouldRender(x,y,z))return;
+        var scene=ModAttachments.peekData(victim,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
+        if(scene.stage()!=ConsumeVisual.CONSUME)return;
+        var mc=Minecraft.getInstance();
+        float partial=mc.getFrameTime();
+        var drawn=victim.getPosition(partial).add(ClientCarryPlacement.consumeOffset(victim,partial));
+        var bounds=victim.getBoundingBox().move(drawn.subtract(victim.position())).inflate(victim.getBbHeight()*.5);
+        if(frustum.isVisible(bounds))result.setReturnValue(true);
+    }
+
     @Inject(method="shouldRender",at=@At("HEAD"),cancellable=true)
     private void blacklight$keepLocalDive(Entity entity,Frustum frustum,double x,double y,double z,CallbackInfoReturnable<Boolean> result){
         var mc=Minecraft.getInstance();

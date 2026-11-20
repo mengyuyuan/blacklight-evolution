@@ -51,7 +51,8 @@ public final class RagdollDrive {
         var style=ConsumeFracture.phase(e,partial).style();
         float delay=switch(style) {
             case HEAD_CRUSH,HEAD_IMPACT -> region==1?0:region==32?.10F:.20F;
-            case ARM_RIP,RIP -> region==2?0:region==32?.10F:.18F;
+            case ARM_RIP -> 0;
+            case RIP -> region==2?0:region==32?.10F:.18F;
             default -> region==32?0:region==1?.08F:.16F;
         };
         return smooth((f-delay)/(1-delay));
@@ -62,7 +63,7 @@ public final class RagdollDrive {
         if(!v.consuming())return .36F;
         var form=PowerForm.values()[v.form()];
         var scene=ConsumeReceiverScene.profile(form,false,v.variant());
-        float seconds=(e.level().getGameTime()-v.started())/20F;
+        float seconds=v.elapsed(e.level().getGameTime(),0)/20F;
         float release=ConsumeReceiverScene.absorptionSeconds(form,v.variant());
         if(!Float.isFinite(release))release=scene==null?v.duration()/20F*.65F:scene.deformSeconds();
         return .72F*(1-smooth((seconds-release)/.18F));
@@ -85,6 +86,11 @@ public final class RagdollDrive {
         if(point!=null)return point;
         var v=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
         String key=GrappleMotion.sceneKey(e,v);float time=GrappleMotion.receiverProgress(e,v,partial);
+        if(ConsumePlacementTrack.villagerReceiver(e) && v.consuming()){
+            double y=region==1?.86:region==2?.66:.5;
+            double x=region==2?e.getBbWidth()*.18:0;
+            return transform(frame(e,partial),new Vec3(x,e.getBbHeight()*y,0));
+        }
         var row=ConsumePlacementTrack.contactFrame(key,time).orElse(null);
         if(row!=null&&ConsumeSequence.humanoid(e)){
             int index=region==1?3:10;double scale=ConsumeSequence.receiverScale(e);

@@ -40,7 +40,8 @@ public final class ConsumeBladeContact implements AutoCloseable {
     public static ConsumeBladeContact begin(AbstractClientPlayer actor,PowerForm form,Object model,String joint,PoseStack stack,float partial){
         if(com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&observer==null||StandalonePlayerRendering.nativeHandPass()
                 ||VisionPowerRenderer.drawingSilhouettes()||com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.PLAYER_STATE).getActivePower()!=form
-                ||form!=PowerForm.CLAWS&&form!=PowerForm.BLADE&&form!=PowerForm.WHIPFIST)return null;
+                ||form!=PowerForm.CLAWS&&form!=PowerForm.BLADE&&form!=PowerForm.WHIPFIST
+                &&!(form==PowerForm.HAMMERFISTS&&joint.equals("Hand_R")))return null;
         return new ConsumeBladeContact(actor,form,model,joint,stack,partial);
     }
     public static void vertex(int face,int corner,Vec3 source,Vec3 drawn){
@@ -75,6 +76,14 @@ public final class ConsumeBladeContact implements AutoCloseable {
     @Override public void close(){
         try{
             if(triangles.isEmpty())return;
+            if(form==PowerForm.HAMMERFISTS){
+                var plate=new LinkedHashSet<Vec3>();
+                for(var triangle:triangles.values()){
+                    for(int i=0;i<3;i++)if(triangle.world[i]!=null && triangle.source[i].y>.39)plate.add(triangle.world[i]);
+                }
+                ConsumeTrauma.sampleHammer(actor,partial,plate.toArray(Vec3[]::new));
+                return;
+            }
             var cache=MAPPINGS.computeIfAbsent(model,k->new HashMap<>());String key=form+":"+joint;
             var mapped=cache.get(key);if(mapped==null){
                 mapped=new Binding(mapping());

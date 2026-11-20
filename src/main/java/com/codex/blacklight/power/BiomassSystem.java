@@ -22,6 +22,9 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 /** Same player and inventory throughout. Only the server may claim/kill a victim or restore a body. */
 public final class BiomassSystem {
     private BiomassSystem(){}
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> BOSSES=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE,new net.minecraft.resources.ResourceLocation("c","bosses"));
+    private static final net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> FORGE_BOSSES=net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE,new net.minecraft.resources.ResourceLocation("forge","bosses"));
+
     private record RejectedPrey(java.util.UUID target,long until){}
     private static final java.util.Map<ServerPlayer,RejectedPrey> REJECTED=new java.util.WeakHashMap<>();
     private static final java.util.Set<ServerPlayer> STARTING=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
@@ -126,13 +129,23 @@ public final class BiomassSystem {
         }
         return !(victim instanceof BiomassHusk) && (!(victim instanceof GreeneHost host) || host.stage()==GreeneHost.SPENT)
                 && ConsumeSystem.eligibleBiomass(victim)
-                // Death recovery must be possible without first fighting in a helpless form.
-                // Mature organs and protected bosses still retain their physical assimilation gate.
-                &&(state(p).active()&&state(p).fatal()?AssimilationSystem.ready(victim):ConsumeSystem.healthReady(p,victim))
+                && healthReady(p,victim)
                 &&(claimant(victim)==null||claimant(victim)==p)&&CombatTargeting.damageable(p,victim)
                 &&inContact(p,victim)
                 &&(CombatTargeting.multipart(victim)?CombatTargeting.visibleContact(p,victim,p.getBoundingBox().inflate(1.15,.65,1.15))
                     :CombatTargeting.visible(p,p.getEyePosition(),victim.getBoundingBox()));
+    }
+    public static boolean healthReady(Player player, Mob victim) {
+        if(victim instanceof GreeneHost host && host.stage()!=GreeneHost.SPENT)return false;
+        if(!AssimilationSystem.ready(victim))return false;
+        if(victim instanceof com.codex.blacklight.entity.EncounterMob boss&&boss.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return boss.goliathFinisherReady();
+        if(victim instanceof com.codex.blacklight.entity.BlacklightHunter hunter && hunter.parasite() && !hunter.parasiteLocked())return false;
+        if(victim instanceof com.codex.blacklight.entity.BlacklightSupremeHunter hunter && !hunter.consumable())return false;
+        float units=CombatScale.units(victim);
+        long rank=InfiniteEvolutionSystem.effectiveRank(player,EvolutionAttribute.BIOMASS_CONSUMPTION);
+        return ConsumeProgression.withinBiomassLimit(victim.getHealth()/units, victim.getMaxHealth()/units, rank,
+                ConsumeSequence.boss(victim) || victim.getType().is(BOSSES) || victim.getType().is(FORGE_BOSSES),
+                ConsumeProgression.healthLimit(ConsumeProgression.progress(player)));
     }
     private static boolean inContact(Player player,LivingEntity victim){
         var contact=player.getBoundingBox().inflate(1.15,.65,1.15);

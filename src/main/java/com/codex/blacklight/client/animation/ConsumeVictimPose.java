@@ -1,6 +1,10 @@
 package com.codex.blacklight.client.animation;
 
 import com.codex.blacklight.combat.ConsumeReaction;
+import com.codex.blacklight.combat.ConsumePlacementTrack;
+import com.codex.blacklight.combat.ConsumeSequence;
+import com.codex.blacklight.combat.ConsumeVariant;
+import com.codex.blacklight.combat.ConsumeVisual;
 import com.codex.blacklight.combat.GrappleMotion;
 import com.codex.blacklight.mixin.client.AgeableModelAccessor;
 import com.codex.blacklight.power.PowerForm;
@@ -58,8 +62,18 @@ public final class ConsumeVictimPose {
                 float yaw=(float)Math.toRadians(180-GrappleMotion.facing(entity,visual,partial));
                 if(com.codex.blacklight.combat.ConsumePlacementTrack.rigidReceiver(entity))return matrix.rotateY(yaw)
                         .mul(com.codex.blacklight.combat.ConsumePlacementTrack.rigidBody(entity,GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial))).rotateY(-yaw);
-                return matrix.rotateY(yaw).translate((float)frame[0]*scale,(float)frame[1]*scale,(float)frame[2]*scale)
+                matrix.rotateY(yaw).translate((float)frame[0]*scale,(float)frame[1]*scale,(float)frame[2]*scale)
                         .translate(0,.9F*scale,0).rotate(com.codex.blacklight.combat.ConsumePlacementTrack.quaternion(frame,3)).translate(0,-.9F*scale,0).rotateY(-yaw);
+                float ground=beatdownRest(entity,visual,partial);
+                if(ground>0){
+                    var prone=new org.joml.Matrix4f().rotateY(yaw)
+                            .mul(ConsumePlacementTrack.rigidBody(entity,"normal_beatdown",GrappleMotion.receiverProgress(entity,visual,partial))).rotateY(-yaw);
+                    if(ground>=1)return prone;
+                    var at=matrix.getTranslation(new org.joml.Vector3f()).lerp(prone.getTranslation(new org.joml.Vector3f()),ground);
+                    var turn=matrix.getNormalizedRotation(new org.joml.Quaternionf()).slerp(prone.getNormalizedRotation(new org.joml.Quaternionf()),ground);
+                    return matrix.translationRotate(at.x,at.y,at.z,turn);
+                }
+                return matrix;
             }
         }
         if(visual.stage()==com.codex.blacklight.combat.ConsumeVisual.FLIGHT) {
@@ -164,6 +178,7 @@ public final class ConsumeVictimPose {
         var contact=large?null:com.codex.blacklight.combat.ConsumePlacementTrack.contactFrame(GrappleMotion.sceneKey(entity,visual),GrappleMotion.receiverProgress(entity,visual,partial)).orElse(null);
         if(model instanceof HumanoidModel<?> h) {
             projectHumanoid(h,saved,frame,contact,large);
+            relaxOnBack(model,saved,beatdownRest(entity,visual,partial));
             if(!large&&visual.form()==PowerForm.WHIPFIST.ordinal()
                     &&visual.variant()==com.codex.blacklight.combat.ConsumeVariant.CLASSIC) {
                 var scene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(PowerForm.WHIPFIST,false,visual.variant());
@@ -176,8 +191,65 @@ public final class ConsumeVictimPose {
         }
         int bound=ReceiverModelPose.apply(model,saved,frame,
                 com.codex.blacklight.combat.ConsumePlacementTrack.rigidReceiver(entity),large);
+        relaxOnBack(model,saved,beatdownRest(entity,visual,partial));
+        if(visual.consuming() && com.codex.blacklight.combat.ConsumePlacementTrack.villagerReceiver(entity)){
+            var root=ReceiverModelPose.root(model);
+            float t=visual.motionProgress(entity.level().getGameTime(),partial);
+            float weight=(float)com.codex.blacklight.combat.ConsumePlacementTrack.groundWeight(
+                    PowerForm.values()[visual.form()],visual.variant(),t);
+            if(root!=null && root.hasChild("arms") &&
+                    (visual.form()==PowerForm.NONE.ordinal() && visual.variant()==com.codex.blacklight.combat.ConsumeVariant.DEFAULT ||
+                    visual.form()==PowerForm.MUSCLE_MASS.ordinal() && visual.variant()==com.codex.blacklight.combat.ConsumeVariant.CLASSIC)){
+                // Vanilla's two folded sleeves are one bone crossing the chest.
+                // Let the captive's arms drop away from the entry wound.
+                var folded=root.getChild("arms");var rest=folded.getInitialPose();
+                float seconds=visual.elapsed(entity.level().getGameTime(),partial)/20F;
+                float lower=RagdollDrive.smooth((seconds-.46F)/.24F);
+                saved.putIfAbsent(folded,folded.storePose());
+                folded.y=rest.y+lower*3.8F;
+                folded.xRot+=(.36F-folded.xRot)*lower;
+            }
+            if(root!=null && weight>0){
+                // The folded arms and hat move with their sockets. Relax head and legs
+                // toward their bind orientation as the coat takes the body's weight.
+                for(String name:new String[]{"head","arms","left_leg","right_leg"})if(root.hasChild(name)){
+                    var part=root.getChild(name);var rest=part.getInitialPose();
+                    saved.putIfAbsent(part,part.storePose());
+                    var rotation=new org.joml.Quaternionf().rotationZYX(part.zRot,part.yRot,part.xRot)
+                            .slerp(new org.joml.Quaternionf().rotationZYX(rest.zRot,rest.yRot,rest.xRot+(name.endsWith("leg")?.14F:name.equals("head")?.12F:0)),weight*.96F);
+                    var angle=rotation.getEulerAnglesZYX(new org.joml.Vector3f());
+                    part.xRot=angle.x;part.yRot=angle.y;part.zRot=angle.z;
+                }
+            }
+        }
         ReceiverPoseDiagnostics.record(entity, model, GrappleMotion.sceneKey(entity,visual), bound);
         return bound>0;
+    }
+    private static float beatdownRest(LivingEntity entity,ConsumeVisual visual,float partial){
+        if(visual.stage()!=ConsumeVisual.CONSUME || visual.form()!=PowerForm.NONE.ordinal()
+                || visual.variant()!=ConsumeVariant.BEATDOWN || !ConsumeSequence.humanoid(entity)
+                || ConsumePlacementTrack.villagerReceiver(entity))return 0;
+        return (float)ConsumePlacementTrack.groundWeight(PowerForm.NONE,ConsumeVariant.BEATDOWN,
+                visual.motionProgress(entity.level().getGameTime(),partial));
+    }
+    private static void relaxOnBack(EntityModel<?> model,Map<ModelPart,PartPose> saved,float weight){
+        if(weight<=0)return;
+        // The full-body turn now owns the fall. Relax the receiver's local joints
+        // onto the floor, retaining a little neck recoil and space between limbs.
+        for(var part:saved.keySet()){
+            var bind=part.getInitialPose();
+            float bend=0,spread=0,blend=weight;
+            if(model instanceof HumanoidModel<?> h){
+                if(part==h.head || part==h.hat){bend=.08F;blend*=.9F;}
+                if(part==h.leftArm)spread=-.32F;
+                if(part==h.rightArm)spread=.32F;
+                if(part==h.leftLeg || part==h.rightLeg){bend=.07F;spread=part==h.leftLeg?-.10F:.10F;}
+            }
+            var turn=rotation(part).slerp(new org.joml.Quaternionf().rotationZYX(bind.zRot+spread,bind.yRot,bind.xRot+bend),blend);
+            var angle=turn.getEulerAnglesZYX(new org.joml.Vector3f());
+            part.setRotation(angle.x,angle.y,angle.z);
+            part.x+=(bind.x-part.x)*weight;part.y+=(bind.y-part.y)*weight;part.z+=(bind.z-part.z)*weight;
+        }
     }
     static void projectHumanoid(HumanoidModel<?> h,Map<ModelPart,PartPose> saved,double[] frame,double[] contact,boolean large) {
         var body=renderPosition(h.body,h.young,false);var head=renderPosition(h.head,h.young,true);

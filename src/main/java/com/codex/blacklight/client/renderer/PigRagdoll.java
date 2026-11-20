@@ -297,24 +297,20 @@ public final class PigRagdoll {
             }
         }
         void splitForConsume(ConsumeFracture.Phase phase){
-            if(phase.style()==ConsumeFracture.Style.ARM_RIP){
-                joints.removeIf(j->j.limb.region==2);
-                for(var p:pieces)if(p.region==2)p.velocity=p.velocity.add(rotate(new Vec3(-.12,.06,0),p.rotation));
-                return;
-            }
-            if(phase.style()!=ConsumeFracture.Style.SEVER||pieces.stream().filter(p->p.region==32).count()!=1)return;
-            var torso=pieces.get(0);var plane=new RagdollImpactPayload.CutPlane(torso.center,new Vec3(0,0,1));
+            boolean vertical=phase.style()==ConsumeFracture.Style.ARM_RIP;
+            if(!vertical&&phase.style()!=ConsumeFracture.Style.SEVER||pieces.stream().filter(p->p.region==32).count()!=1)return;
+            var torso=pieces.get(0);var plane=new RagdollImpactPayload.CutPlane(torso.center,vertical?new Vec3(1,0,0):new Vec3(0,0,1));
             var halves=new ArrayList<Piece>();
             for(int sign:new int[]{-1,1}){
                 var mesh=clip(torso.mesh,plane,sign);if(mesh.isEmpty())return;
                 Vec3 origin=torso.pos.subtract(rotate(torso.center,torso.rotation));
                 var half=new Piece(mesh,32,origin,torso.rotation);
-                half.velocity=torso.velocity.add(rotate(new Vec3(0,.025,sign*.045),torso.rotation));half.spin.set(torso.spin);
+                half.velocity=torso.velocity.add(rotate(plane.normal().scale(sign*.065).add(0,.025,0),torso.rotation));half.spin.set(torso.spin);
                 half.boundaries=List.of(new Halfspace(plane,sign));halves.add(half);
             }
             pieces.remove(0);pieces.addAll(0,halves);joints.clear();
             for(var limb:pieces)if(limb.region!=32&&(mask&limb.region)==0){
-                Vec3 anchor=bindPivots.get(limb.region);Piece owner=halves.get(anchor.z<torso.center.z?0:1);
+                Vec3 anchor=bindPivots.get(limb.region);Piece owner=halves.get(anchor.subtract(torso.center).dot(plane.normal())<0?0:1);
                 joints.add(new Joint(owner,limb,anchor));
             }
         }

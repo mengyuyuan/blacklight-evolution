@@ -4,6 +4,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RagdollImpactTimingTest {
+    @org.junit.jupiter.api.BeforeAll
+    static void bootstrapMinecraft(){
+        net.minecraft.SharedConstants.tryDetectVersion();
+        net.minecraft.server.Bootstrap.bootStrap();
+    }
+
     @Test void lethalContactsKeepTheWeaponPauseWhenTheLivingHoldHasAlreadyEnded(){
         assertEquals(1,HitStop.ragdollFreezeTicks(false,true,0,ImpactTier.LIGHT.hitstop));
         assertEquals(4,HitStop.ragdollFreezeTicks(false,true,0,ImpactTier.HEAVY.hitstop));

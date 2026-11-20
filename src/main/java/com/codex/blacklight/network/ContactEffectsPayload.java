@@ -9,7 +9,7 @@ import java.util.*;
 /** One confirmed contact and its cosmetic layers share the server's animation time. */
 public record ContactEffectsPayload(long tick,long serial,int kind,CombatImpactPayload flash,
         InfectedImpactPayload tissue,boolean heavy,List<Surface> terrain,List<Sound> sounds) implements CustomPacketPayload {
-    public static final int GROUND=0,CRUSH=1,TISSUE=2,GUARD=3,SOUND=4,OBSTACLE=5;
+    public static final int GROUND=0,CRUSH=1,TISSUE=2,GUARD=3,SOUND=4,OBSTACLE=5,BOSS_ARMOR=6,BOSS_FLESH=7,BOSS_WEAK=8,BOSS_BREAK=9;
     public record Surface(double x,double y,double z,int state,int ring,int index,double angle) {}
     public record Sound(ResourceLocation id,float volume,float pitch) {}
     public static final Type<ContactEffectsPayload> TYPE=new Type<>(new ResourceLocation("blacklight","contact_effects"));
@@ -29,7 +29,7 @@ public record ContactEffectsPayload(long tick,long serial,int kind,CombatImpactP
             return new ContactEffectsPayload(tick,serial,kind,flash,tissue,heavy,terrain,sounds);
         });
     public ContactEffectsPayload {
-        if(tick<0||kind<0||kind>OBSTACLE||flash==null||terrain.size()>48||sounds.size()>3)throw new IllegalArgumentException("Invalid contact receipt");
+        if(tick<0||kind<0||kind>BOSS_BREAK||flash==null||terrain.size()>48||sounds.size()>3)throw new IllegalArgumentException("Invalid contact receipt");
         if(!Double.isFinite(flash.x()+flash.y()+flash.z()))throw new IllegalArgumentException("Nonfinite contact");
         for(var s:terrain)if(!Double.isFinite(s.x+s.y+s.z+s.angle)||s.ring<0||s.ring>2||s.index<0||s.index>15||s.state<0
                 ||Math.abs(s.x-flash.x())>13||Math.abs(s.z-flash.z())>13||Math.abs(s.y-flash.y())>2)throw new IllegalArgumentException("Invalid terrain sample");
