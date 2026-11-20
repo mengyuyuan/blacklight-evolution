@@ -186,6 +186,14 @@ public final class DisguiseSystem {
         if(player.isCreative()||player.isSpectator()||!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(player))return;
         DisguiseAwareness.expose(player,active(player));syncAlert(player);
     }
+    public static boolean exposedIdentity(Player player) {
+        return active(player) && DisguiseAwareness.exposure(player,true)>0;
+    }
+    public static boolean militaryClearance(Player p) {
+        if (!active(p) || DisguiseAwareness.exposure(p,true)>0) return false;
+        String family=p.getData(ModAttachments.DISGUISE_IDENTITY).family();
+        return family.equals("blackwatch") || family.equals("military");
+    }
     public static boolean fooled(Mob mob,Player p){
         return active(p)&&DisguiseAwareness.exposure(p,true)==0&&factionMatches(mob,p);
     }

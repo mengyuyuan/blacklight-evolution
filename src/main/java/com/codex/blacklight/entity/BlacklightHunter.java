@@ -69,10 +69,11 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, .7));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 10));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 20, true, false,
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::validCombatTarget));
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, MilitarySoldier.class, 10, true, false, this::validCombatTarget));
+        targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 20, true, false,
                 e -> (e instanceof net.minecraft.world.entity.animal.Animal || e instanceof net.minecraft.world.entity.npc.AbstractVillager)
-                        && !BlacklightInfectionSystem.isInfected(e)));
+                        && validCombatTarget(e)));
     }
     @Override public void tick() {
         super.tick();
@@ -377,16 +378,38 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     }
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
     private final class SwipeGoal extends Goal {
+        private LivingEntity quarry;
+        private Vec3 lastSeen;
+        private long seenAt, nextPath;
+
         SwipeGoal() { setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK)); }
-        @Override public boolean canUse() { return !isBeingConsumed() && getTarget() != null && getTarget().isAlive(); }
+        @Override public boolean canUse() { return !isBeingConsumed() && validCombatTarget(getTarget()); }
         @Override public boolean requiresUpdateEveryTick() { return true; }
         @Override public void tick() {
             LivingEntity target = getTarget(); if (target == null) return;
-            getLookControl().setLookAt(target, 30, 30);
             if (entityData.get(ATTACK) > 0) return;
-            getNavigation().moveTo(target, 1.15);
+            if (target != quarry) {
+                quarry = target;
+                lastSeen = null;
+                nextPath = 0;
+            }
+            long now = level().getGameTime();
+            boolean visible = getSensing().hasLineOfSight(target);
+            if (visible) {
+                lastSeen = target.position();
+                seenAt = now;
+                getLookControl().setLookAt(target, 30, 30);
+            } else if (lastSeen == null || now - seenAt >= 60 || position().distanceToSqr(lastSeen) < 1) {
+                setTarget(null);
+                getNavigation().stop();
+                return;
+            }
+            if (now >= nextPath) {
+                getNavigation().moveTo(lastSeen.x, lastSeen.y, lastSeen.z, 1.15);
+                nextPath = now + 6;
+            }
             double distance=distanceTo(target);
-            if (attackCooldown == 0 && distance<10 && hasLineOfSight(target)) {
+            if (attackCooldown == 0 && distance<10 && visible) {
                 boolean evade=evadeCooldown==0&&target instanceof Player p&&p.swinging&&distance<4&&random.nextFloat()<.35F;
                 var move=evade?CreatureAttack.DODGE:CreatureAttack.choose(distance,attackSequence);
                 float facing=(float)Math.toDegrees(Math.atan2(getX()-target.getX(),target.getZ()-getZ()));
@@ -396,6 +419,10 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
                 }
             }
         }
-        @Override public void stop() { getNavigation().stop(); }
+        @Override public void stop() {
+            quarry = null;
+            lastSeen = null;
+            getNavigation().stop();
+        }
     }
 }

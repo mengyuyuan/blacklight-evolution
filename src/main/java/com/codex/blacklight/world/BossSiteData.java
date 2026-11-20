@@ -85,6 +85,8 @@ public final class BossSiteData extends SavedData {
         }
         rewards.setDirty();
         data.release(boss);
+        boss.spawnAtLocation(bit == 1 ? com.codex.blacklight.registry.ModItems.HEAVY_ARMOR_CORE.get()
+                : com.codex.blacklight.registry.ModItems.MOTHER_CORE.get());
     }
     void deliver(ServerPlayer player) {
         var bits = pending.remove(player.getUUID());

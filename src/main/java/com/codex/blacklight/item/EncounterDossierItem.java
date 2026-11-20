@@ -45,7 +45,7 @@ public final class EncounterDossierItem extends Item {
                 player.displayClientMessage(Component.translatable("survival.blacklight.city_site_unavailable"),false);
                 return InteractionResultHolder.fail(stack);
             }
-            SurvivalGuide.remember(reader,site,com.codex.blacklight.city.MotherPlazaStructure.console(server.getSeed()));
+            SurvivalGuide.remember(reader,site,com.codex.blacklight.city.MotherPlazaStructure.console(server));
             return InteractionResultHolder.success(stack);
         }
         BlockPos dest=server.findNearestMapStructure(destinations,player.blockPosition(),8,false);
