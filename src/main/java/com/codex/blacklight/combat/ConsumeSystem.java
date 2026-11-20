@@ -275,6 +275,10 @@ public final class ConsumeSystem {
         var state = player.getData(ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
                 || ACTIVE.containsKey(player) || player.isPassenger()) return;
+        if (state.getActivePower() == PowerForm.BACKSPINES) {
+            QuillHarvest.recall(player);
+            return;
+        }
         if (player.getData(ModAttachments.CLAW_COMBAT).action() != ClawCombatState.Action.IDLE
                 || WeaponCombatSystem.busy(player)
                 || player.getData(ModAttachments.MOVEMENT_STATE).chargeTicks() > 0
@@ -641,24 +645,8 @@ public final class ConsumeSystem {
         // neither and drops the actor to its idle pose for a frame.
         player.setData(ModAttachments.CONSUME_RECOVERY,recovery);player.syncData(ModAttachments.CONSUME_RECOVERY);
         release(target);unlock(player);
-        if(ConsumeSequence.boss(target)) {
-            var source=target.damageSources().playerAttack(player);
-            if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)supreme.markConsumed();
-            target.invulnerableTime=0;
-            boolean accepted=ConsumeLastChance.execute(target,()->target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon
-                    ? dragon.hurt(dragon.head,source,Math.max(1000,dragon.getMaxHealth()*20))
-                    : target.hurt(source,Math.max(1000,target.getMaxHealth()*20)));
-            // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
-            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
-                clearRecovery(player);message(player,"consume_cancelled");return;
-            }
-        } else if(target instanceof BlacklightHunter hunter){
-            if(hunter.parasite())com.codex.blacklight.power.ParasiteSystem.consumedInfectedHunter(player);
-            hunter.beginConsumeRemains();
-        }
-        else {
-            if(target instanceof com.codex.blacklight.world.GreeneHost host) host.absorbedBy(player);
-            target.discard();
+        if (!defeatForConsume(player,target)) {
+            clearRecovery(player);message(player,"consume_cancelled");return;
         }
         // Locomotion owns the base layer; the client samples the remaining source
         // pose independently, even after the receiver entity has disappeared.
@@ -669,6 +657,32 @@ public final class ConsumeSystem {
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
         player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, ConsumeVariant.stealth(session.form,session.variant)?.25F:.8F, .55F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
+    }
+    static boolean defeatForConsume(ServerPlayer player,Mob target) {
+        if(ConsumeSequence.boss(target)) {
+            var source=target.damageSources().playerAttack(player);
+            float damage=Math.max(1000,target.getMaxHealth()*20);
+            target.invulnerableTime=0;
+            boolean accepted=ConsumeLastChance.execute(target,()->{
+                if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
+                    return supreme.finishConsumption(player,source,damage);
+                if(target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
+                    return dragon.hurt(dragon.head,source,damage);
+                return target.hurt(source,damage);
+            });
+            // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
+            if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
+                return false;
+            }
+        } else if(target instanceof BlacklightHunter hunter){
+            if(hunter.parasite())com.codex.blacklight.power.ParasiteSystem.consumedInfectedHunter(player);
+            hunter.beginConsumeRemains();
+        }
+        else {
+            if(target instanceof com.codex.blacklight.world.GreeneHost host) host.absorbedBy(player);
+            target.discard();
+        }
+        return true;
     }
     private static void clearRecovery(ServerPlayer player) {
         if (player.isRemoved()) return;

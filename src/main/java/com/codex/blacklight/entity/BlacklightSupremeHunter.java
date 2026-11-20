@@ -107,7 +107,7 @@ public final class BlacklightSupremeHunter extends Monster {
         super.tick();
         if(level().isClientSide){clientEffects();return;}
         bossBar.setProgress(getHealth()/getMaxHealth());
-        if(tickCount%20==0)refreshAudience();
+        if(isAlive() && tickCount%20==0)refreshAudience();
         if(isBeingConsumed()||!isAlive()){if(heldId()>=0)releaseHeld(Vec3.ZERO,false);return;}
         trackThrown();
         // Aggro: 64 blocks to notice a target, 512 to keep hunting it.
@@ -373,10 +373,10 @@ public final class BlacklightSupremeHunter extends Monster {
         var move=move();int t=(int)(level().getGameTime()-entityData.get(STARTED));
         // The weaken line beats super armor: any accepted hit below it drops the leg.
         if(collapseDue()){if(heldId()>=0)releaseHeld(new Vec3(0,.3,0),false);if(move!=SupremeHunterMove.NONE)finish();begin(SupremeHunterMove.LEG_COLLAPSE,getTarget());poise=0;return;}
-        if(move.armored(t)||move.reaction()&&t<8)return;
+        if(source.is(com.codex.blacklight.combat.QuillHarvest.DRAIN)||move.armored(t)||move.reaction()&&t<8)return;
         if(introduced==0)return;
         boolean heavy=amount>=getMaxHealth()*.04F||DevastatorDamage.isTrueDamage(source)
-                ||source.is(net.minecraft.world.damagesource.DamageTypes.THROWN)&&amount>=getMaxHealth()*.005F;
+                ||SupremeHunterBalance.heavyThrow(source)&&amount>=getMaxHealth()*.005F;
         poise+=heavy?4:1;lastPoiseTick=tickCount;
         if(heldId()>=0&&heavy)releaseHeld(new Vec3(0,.3,0),false);
         // Below the weaken line one stagger knocks the leg out: the consume window.
@@ -403,9 +403,16 @@ public final class BlacklightSupremeHunter extends Monster {
         return getHealth()/getMaxHealth()<=SupremeHunterBalance.WEAKEN&&!weakened()&&move()!=SupremeHunterMove.LEG_COLLAPSE
                 &&level().getGameTime()>=entityData.get(WEAK_UNTIL)+SupremeHunterBalance.RECOVER_TICKS;
     }
-    public boolean consumable(){return (weakened()||move()==SupremeHunterMove.LEG_COLLAPSE)&&isAlive()&&!isBeingConsumed();}
-    /** Set by the consume transaction immediately before its execution hit. */
-    public void markConsumed(){consumed=true;}
+    public boolean consumable(){
+        return isAlive() && !isBeingConsumed() && (weakened() || move()==SupremeHunterMove.LEG_COLLAPSE
+                || com.codex.blacklight.combat.ConsumeLastChance.awaitingFinisher(this));
+    }
+    public boolean finishConsumption(ServerPlayer player,DamageSource source,float damage){
+        if(isBeingConsumed() && consumerId()!=player.getId())return false;
+        release();
+        consumed=true;
+        try{return hurt(source,damage);}finally{consumed=false;}
+    }
     public boolean claim(Player player){
         if(!consumable())return false;previousNoAi=isNoAi();setNoAi(true);getNavigation().stop();setTarget(null);finish();
         entityData.set(CONSUMER,player.getId());return true;

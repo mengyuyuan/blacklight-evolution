@@ -2,8 +2,6 @@ package com.codex.blacklight.client;
 
 import com.codex.blacklight.BlacklightNeoMod;
 import com.codex.blacklight.client.renderer.GroundSpikeRenderer;
-import com.codex.blacklight.client.screen.ClawTunerScreen;
-import com.codex.blacklight.client.screen.AnimationTunerScreen;
 import com.codex.blacklight.client.screen.UpgradeScreen;
 import com.codex.blacklight.client.model.ClawArmModel;
 import com.codex.blacklight.entity.GroundSpikeEntity;
@@ -45,10 +43,6 @@ public final class ClientClawEvents {
             "key.blacklight.toggle_claws", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, CATEGORY);
     private static final KeyMapping PROTOTYPE_MODE = new KeyMapping(
             "key.blacklight.prototype_mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, CATEGORY);
-    private static final KeyMapping CLAW_TUNER = new KeyMapping(
-            "key.blacklight.claw_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY);
-    private static final KeyMapping ANIMATION_TUNER = new KeyMapping(
-            "key.blacklight.animation_tuner", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_J, CATEGORY);
     private static final KeyMapping TARGET_LOCK = new KeyMapping(
             "key.blacklight.target_lock", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, CATEGORY);
     private static final KeyMapping TARGET_INFO = new KeyMapping(
@@ -57,7 +51,6 @@ public final class ClientClawEvents {
             "key.blacklight.upgrades", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, CATEGORY);
     /** Grounded left-clicks held this long become a dashing slice instead of a combo hit. */
     private static final int DASHING_SLICE_HOLD_TICKS = 4;
-    private static boolean automaticTunerOpened;
     private static boolean lastGrabLeft,lastGrabRight;
     private static boolean lastGrabDown;
     private static net.minecraft.client.player.LocalPlayer inputOwner;
@@ -88,8 +81,6 @@ public final class ClientClawEvents {
         event.register(CYCLE_FORM);
         event.register(TOGGLE_CLAWS);
         event.register(PROTOTYPE_MODE);
-        if (DeveloperTools.enabled()) event.register(CLAW_TUNER);
-        if (DeveloperTools.enabled()) event.register(ANIMATION_TUNER);
         event.register(TARGET_LOCK);
         event.register(TARGET_INFO);
         event.register(UPGRADE_PANEL);
@@ -133,6 +124,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.HIVE_TENDRIL.get(),com.codex.blacklight.client.renderer.HiveTendrilRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_HIVE.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightHive>(context,e->"blacklight_hive"));
         event.registerEntityRenderer(ModEntities.BACKSPINE_QUILL.get(),com.codex.blacklight.client.renderer.BackspineQuillRenderer::new);
+        event.registerEntityRenderer(ModEntities.QUILL_ORGAN.get(),com.codex.blacklight.client.renderer.QuillOrganRenderer::new);
         event.registerEntityRenderer(ModEntities.BLACKLIGHT_SPIT.get(),com.codex.blacklight.client.renderer.BlacklightSpitRenderer::new);
         event.registerEntityRenderer(ModEntities.EVOLVED_QUILL.get(),com.codex.blacklight.client.renderer.EvolvedQuillRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_TUMOR.get(),com.codex.blacklight.client.renderer.InfectedTumorRenderer::new);
@@ -201,14 +193,6 @@ public final class ClientClawEvents {
             return;
         }
 
-        if (DeveloperTools.enabled() && minecraft.screen == null && matches.test(CLAW_TUNER)) {
-            minecraft.setScreen(new ClawTunerScreen());
-            return;
-        }
-        if (DeveloperTools.enabled() && minecraft.screen == null && matches.test(ANIMATION_TUNER)) {
-            minecraft.setScreen(new AnimationTunerScreen());
-            return;
-        }
         if (minecraft.screen != null) return;
 
         if (matches.test(TARGET_LOCK)) {
@@ -221,7 +205,6 @@ public final class ClientClawEvents {
         }
     }
 
-    /** Opens the timeline once for repeatable development screenshots and nothing else. */
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         com.codex.blacklight.client.audio.GreeneProjectileAudio.tick();
@@ -239,12 +222,6 @@ public final class ClientClawEvents {
         tickDeferredGrab();
         tickPhysicalLeftAttack();
         holdGroundSpikePlantPose();
-        if (automaticTunerOpened || !Boolean.getBoolean("blacklight.test.openAnimationTuner")) return;
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || minecraft.level == null || minecraft.screen != null) return;
-        automaticTunerOpened = true;
-        BlacklightNeoMod.LOGGER.info("Opening animation timeline from development acceptance hook");
-        minecraft.setScreen(new AnimationTunerScreen());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -254,8 +231,7 @@ public final class ClientClawEvents {
         if (VehicleControls.riding() || SkillBindings.mouse(minecraft.options.keyUse,event.getButton())
                 && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         if(event.getAction()==GLFW.GLFW_PRESS){
-            boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS,CLAW_TUNER,ANIMATION_TUNER)
-                    .filter(key->DeveloperTools.enabled() || key!=CLAW_TUNER && key!=ANIMATION_TUNER)
+            boolean mapped=java.util.stream.Stream.of(PROTOTYPE_MODE,UPGRADE_PANEL,CYCLE_FORM,GRAB,TARGET_LOCK,TOGGLE_CLAWS)
                     .anyMatch(key->SkillBindings.mouse(key,event.getButton()));
             if(mapped){handleKeyPress(minecraft,key->SkillBindings.mouse(key,event.getButton()));event.setCanceled(true);return;}
         }
@@ -373,7 +349,10 @@ public final class ClientClawEvents {
         lastGrabDown=down;
         if(!pressed||mc.player==null||mc.getConnection()==null||mc.screen!=null||!mc.isWindowActive()
                 ||!mc.player.isAlive()||!com.codex.blacklight.mode.PrototypeModeSystem.isActive(mc.player))return;
-        if(ClientWeaponCombat.active())deferredGrabTick=mc.player.tickCount+2;
+        if(mc.player.getData(ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BACKSPINES){
+            deferredGrabTick=-1;
+            PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB));
+        }else if(ClientWeaponCombat.active())deferredGrabTick=mc.player.tickCount+2;
         else sendGrab(mc);
         mc.options.keyInventory.setDown(false);
         while(mc.options.keyInventory.consumeClick()){}

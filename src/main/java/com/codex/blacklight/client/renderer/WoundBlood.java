@@ -102,6 +102,25 @@ public final class WoundBlood {
             if((newSevers&32)!=0)for(var plane:hit.planes())add(entity,32,plane.point(),plane.normal(),.8F,22,true);
         }
     }
+    /** The brief outward spray shares the charge centre and momentum of the rupturing rig. */
+    static void quillBurst(LivingEntity host,Vec3 mark,Vec3 inside,double kick) {
+        reset();
+        if(scene==null || !available(host))return;
+        long tick=scene.getGameTime();
+        if(dropTick!=tick){dropTick=tick;contactDrops=0;}
+        int count=Math.min(13,48-contactDrops);
+        var random=net.minecraft.util.RandomSource.create(host.getId()*71L+tick);
+        for(int i=0;i<count;i++){
+            double y=1-2*(i+.5)/count;
+            double angle=i*2.399963+host.getId(),r=Math.sqrt(1-y*y);
+            var normal=new Vec3(Math.cos(angle)*r,y,Math.sin(angle)*r);
+            var start=inside.lerp(mark,.45).add(normal.scale(host.getBbWidth()*.22));
+            var velocity=normal.scale(kick*(.36+.40*random.nextDouble())).add(0,.10,0);
+            if(DROPS.size()>=MAX_DROPS)DROPS.remove(0);
+            DROPS.add(new Drop(start,velocity,.025F+.031F*random.nextFloat(),120+random.nextInt(66)));
+        }
+        contactDrops+=count;
+    }
     static void hookTear(LivingEntity entity,Vec3 point,Vec3 tangent){
         reset();
         if(scene==null || !available(entity) || com.codex.blacklight.combat.PlayerHitEffects.metalAt(entity,point))return;

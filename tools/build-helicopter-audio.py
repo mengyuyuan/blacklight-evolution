@@ -32,7 +32,11 @@ for name,seconds in [('rotor',4),('turbine',4),('door',1.2),('alarm',2)]:
 for root in (ROOT,Path('D:/blacklight-evolution-forge-1.20.1')):
     path=root/'src/main/resources/assets/blacklight/sounds.json';data=json.loads(path.read_text('utf8'))
     for entry in report:
-        name=entry['cue'];data['vehicle.helicopter_'+name]={'sounds':[{'name':'blacklight:vehicles/helicopter_'+name,'stream':False,'attenuation_distance':96 if name in ('rotor','turbine') else 32}]}
+        name=entry['cue']
+        # The sound manifest owns the playback mix. Rebuilding a sample keeps its gain and range.
+        sample=data.setdefault('vehicle.helicopter_'+name,{'sounds':[{}]})['sounds'][0]
+        sample.update(name='blacklight:vehicles/helicopter_'+name,stream=False)
+        sample.setdefault('attenuation_distance',96 if name in ('rotor','turbine') else 32)
     path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n','utf8')
     out=root/'art/military-vehicles/helicopter-audio.json';out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps({'origin':'Project-authored procedural synthesis; no commercial audio','cues':report},indent=2)+'\n','utf8')
 print(json.dumps(report))

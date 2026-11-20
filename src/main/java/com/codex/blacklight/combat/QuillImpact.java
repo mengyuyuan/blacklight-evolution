@@ -19,16 +19,19 @@ public final class QuillImpact {
         var contact=new WeaponCutContact.Contact(region,"quill",entry,direction,direction.scale(-1));
         var report=new WeaponCutContact.Report(WeaponCutContact.Kind.PUNCTURE,List.of(contact));
         boolean central = slot == 0;
-        float size = central ? (heavy ? 1.16F : .57F) : .32F;
+        float size = central ? (heavy ? 1.28F : .72F) : .32F;
         PlayerHitEffects.emit(player,target,InfectedAttackStyle.PIERCE,size,report,FleshStrike.QUILL,heavy && central);
         var hardSound=PlayerHitEffects.hardContactSound(target,entry);
         var cue=hardSound!=null ? hardSound : com.codex.blacklight.registry.ModInfectedSounds.event(com.codex.blacklight.infection.InfectedSoundCue.PIERCE);
         float gain = central ? (heavy ? .72F : .46F) : .14F;
         player.level().playSound(null, entry.x, entry.y, entry.z, cue, net.minecraft.sounds.SoundSource.PLAYERS,
                 gain, central && heavy ? .84F : 1.08F + .04F * Math.abs(slot));
+        if(central && heavy && hardSound==null)
+            player.level().playSound(null,entry.x,entry.y,entry.z,com.codex.blacklight.registry.ModInfectedSounds.event(
+                    com.codex.blacklight.infection.InfectedSoundCue.CRUSH),net.minecraft.sounds.SoundSource.PLAYERS,.33F,.77F);
         if (central && heavy && target.isAlive() && !CombatTargeting.anchoredBody(target))
             target.knockback(.32, -direction.x, -direction.z);
-        double force = heavy ? (central ? .96 : .29) : .27;
+        double force = heavy ? (central ? 1.11 : .29) : (central ? .39 : .22);
         Vec3 momentum = direction.scale(force).add(0, force * .13, 0);
         RagdollImpact.send(target,heavy && central?HEAVY:LIGHT,target.isDeadOrDying()?65:6,true,momentum,report);
     }

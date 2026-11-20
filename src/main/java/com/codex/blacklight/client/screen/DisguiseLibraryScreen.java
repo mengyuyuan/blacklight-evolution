@@ -1,5 +1,7 @@
 package com.codex.blacklight.client.screen;
 
+import com.codex.blacklight.client.BlacklightUi;
+
 import com.codex.blacklight.client.DisguiseControls;
 import com.codex.blacklight.disguise.*;
 import com.codex.blacklight.network.DisguiseSelectPayload;
@@ -34,16 +36,16 @@ public final class DisguiseLibraryScreen extends Screen {
         for(int i=start;i<Math.min(start+rows,library.identities().size());i++){
             final int index=i;var identity=library.identities().get(i);
             addRenderableWidget(Button.builder(name(identity),b->{selected=index;rebuild();})
-                    .bounds(left+24,38+(i-start)*26,listWidth-24,22).build());
+                    .bounds(left+24,38+(i-start)*26,listWidth-24,22).build(TutorialButton::new));
         }
-        var previous=addRenderableWidget(Button.builder(Component.literal("‹"),b->{page--;rebuild();}).bounds(left,height-54,28,20).build());
-        var next=addRenderableWidget(Button.builder(Component.literal("›"),b->{page++;rebuild();}).bounds(left+listWidth-28,height-54,28,20).build());
+        var previous=addRenderableWidget(Button.builder(Component.literal("‹"),b->{page--;rebuild();}).bounds(left,height-54,28,20).build(TutorialButton::new));
+        var next=addRenderableWidget(Button.builder(Component.literal("›"),b->{page++;rebuild();}).bounds(left+listWidth-28,height-54,28,20).build(TutorialButton::new));
         previous.active=page>0;next.active=(page+1)*rows<library.identities().size();
         var choose=addRenderableWidget(Button.builder(Component.translatable("screen.blacklight.identity_use"),b->{
             PacketDistributor.sendToServer(new DisguiseSelectPayload(library.revision(),selected));minecraft.setScreen(null);
-        }).bounds(right,height-54,detailWidth,20).build());
+        }).bounds(right,height-54,detailWidth,20).build(TutorialButton::new));
         choose.active=!library.identities().isEmpty();
-        addRenderableWidget(Button.builder(Component.translatable("gui.back"),b->onClose()).bounds(width-92,height-28,80,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("gui.back"),b->onClose()).bounds(width-92,height-28,80,20).build(TutorialButton::new));
     }
     private static Component name(DisguiseIdentity identity){return identity.valid()?identity.entityType().getDescription():Component.literal(identity.type());}
     @Override public void tick(){
@@ -54,12 +56,14 @@ public final class DisguiseLibraryScreen extends Screen {
         if(next.revision()!=library.revision()){library=next;selected=0;page=0;rebuild();}
     }
     @Override public void render(GuiGraphics g,int mx,int my,float partial){
-        g.fill(0,0,width,height,0xF0101217);
-        g.drawString(font,title,12,14,0xFFF3D9DD,false);
+        BlacklightUi.backdrop(g,width,height);
+        BlacklightUi.panel(g,left-4,36,left+listWidth+4,height-57);
+        BlacklightUi.panel(g,right-4,36,width-7,height-57);
+        BlacklightUi.title(g,font,title,12,14);
         g.drawString(font,Component.translatable("screen.blacklight.identity_count",library.identities().size(),DisguiseLibrary.LIMIT),right,14,0xFFAAA4AD,false);
         for(int i=page*rows;i<Math.min((page+1)*rows,library.identities().size());i++){
             int y=38+(i-page*rows)*26;
-            if(i==selected)g.fill(left-2,y-2,left+listWidth+2,y+24,0xFF6A2939);
+            if(i==selected)BlacklightUi.hud(g,left-2,y-1,left+listWidth+1,y+23,BlacklightUi.RED);
             var identity=library.identities().get(i);var egg=identity.valid()?SpawnEggItem.byId(identity.entityType()):null;
             g.renderItem(new ItemStack(egg==null?Items.PAPER:egg),left+3,y+3);
         }
@@ -67,7 +71,10 @@ public final class DisguiseLibraryScreen extends Screen {
         if(library.identities().isEmpty())textY=paragraph(g,Component.translatable("screen.blacklight.identity_empty"),right,textY,detailWidth,0xFFCEC4C9);
         else {
             var identity=library.identities().get(selected);var trait=SpeciesTrait.of(identity.type());
-            textY=paragraph(g,name(identity),right,textY,detailWidth,0xFFFFA2AB)+10;
+            var egg=identity.valid()?SpawnEggItem.byId(identity.entityType()):null;
+            g.renderItem(new ItemStack(egg==null?Items.PAPER:egg),right+4,textY);
+            textY=paragraph(g,name(identity),right+25,textY+4,detailWidth-25,BlacklightUi.TEXT)+10;
+            g.fill(right+3,textY-3,right+detailWidth-3,textY-2,BlacklightUi.LINE);
             textY=paragraph(g,Component.translatable("species.blacklight."+trait.id()),right,textY,detailWidth,0xFFF0E5E7)+6;
             textY=paragraph(g,Component.translatable("species.blacklight."+trait.id()+".desc"),right,textY,detailWidth,0xFFCEC4C9)+10;
             if(trait!=SpeciesTrait.NONE) {

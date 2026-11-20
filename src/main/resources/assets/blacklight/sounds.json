@@ -1395,7 +1395,8 @@
       {
         "name": "blacklight:vehicles/helicopter_rotor",
         "stream": false,
-        "attenuation_distance": 96
+        "volume": 0.32,
+        "attenuation_distance": 72
       }
     ]
   },
@@ -1404,7 +1405,8 @@
       {
         "name": "blacklight:vehicles/helicopter_turbine",
         "stream": false,
-        "attenuation_distance": 96
+        "volume": 0.27,
+        "attenuation_distance": 56
       }
     ]
   },
@@ -1413,7 +1415,8 @@
       {
         "name": "blacklight:vehicles/helicopter_door",
         "stream": false,
-        "attenuation_distance": 32
+        "volume": 0.45,
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1422,6 +1425,7 @@
       {
         "name": "blacklight:vehicles/helicopter_alarm",
         "stream": false,
+        "volume": 0.36,
         "attenuation_distance": 32
       }
     ]
@@ -1432,7 +1436,8 @@
       {
         "name": "blacklight:vehicles/uav_rotor",
         "stream": false,
-        "attenuation_distance": 40
+        "volume": 0.32,
+        "attenuation_distance": 30
       }
     ]
   },
@@ -1442,7 +1447,8 @@
       {
         "name": "blacklight:vehicles/uav_scan",
         "stream": false,
-        "attenuation_distance": 40
+        "volume": 0.4,
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1472,7 +1478,8 @@
       {
         "name": "blacklight:vehicles/uav_break",
         "stream": false,
-        "attenuation_distance": 32
+        "volume": 0.5,
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1482,7 +1489,8 @@
       {
         "name": "blacklight:vehicles/uav_seeing",
         "stream": false,
-        "attenuation_distance": 40
+        "volume": 0.32,
+        "attenuation_distance": 30
       }
     ]
   },
@@ -1492,6 +1500,7 @@
       {
         "name": "blacklight:vehicles/uav_alert",
         "stream": false,
+        "volume": 0.45,
         "attenuation_distance": 40
       }
     ]
@@ -1661,7 +1670,8 @@
       {
         "name": "blacklight:vehicles/helicopter_jet",
         "stream": false,
-        "attenuation_distance": 96
+        "volume": 0.25,
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1670,7 +1680,8 @@
       {
         "name": "blacklight:vehicles/helicopter_startup",
         "stream": false,
-        "attenuation_distance": 96
+        "volume": 0.36,
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1679,7 +1690,8 @@
       {
         "name": "blacklight:vehicles/helicopter_winddown",
         "stream": false,
-        "attenuation_distance": 96
+        "volume": 0.36,
+        "attenuation_distance": 64
       }
     ]
   },

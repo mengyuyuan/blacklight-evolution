@@ -40,6 +40,51 @@ public final class SupremeHunterBlockRig {
                 clips.put(e.getKey(),new Clip(c.get("loop").getAsBoolean(),rows));}
         }catch(Exception failure){throw new IllegalStateException("Invalid Supreme Hunter block rig",failure);}
     }
+    public record PosedBones(Quaternionf[] rotation, Vector3f[] joint) {}
+    public record SkinPoint(int bone, Vector3f offset, Vector3f normal, Quad face) {
+        public Vector3f position(PosedBones pose) {
+            return pose.rotation[bone].transform(new Vector3f(offset)).add(pose.joint[bone]);
+        }
+        public Vector3f outward(PosedBones pose) {
+            return pose.rotation[bone].transform(new Vector3f(normal)).normalize();
+        }
+    }
+
+    public PosedBones pose(float[] row) {
+        int count=names.length;
+        Quaternionf[] rotation=new Quaternionf[count];
+        Vector3f[] joint=new Vector3f[count];
+        for(int i=0;i<count;i++) {
+            int o=i*4, parent=parents[i];
+            rotation[i]=new Quaternionf(row[o],row[o+1],row[o+2],row[o+3]);
+            joint[i]=parent<0 ? new Vector3f(pivots[i]).add(row[count*4],row[count*4+1],row[count*4+2])
+                    : rotation[parent].transform(new Vector3f(pivots[i]).sub(pivots[parent])).add(joint[parent]);
+        }
+        return new PosedBones(rotation,joint);
+    }
+
+    /** Bind once against the visible triangles, then follow the same spot on the moving joint. */
+    public SkinPoint bind(PosedBones pose, Vector3f contact) {
+        float closest=Float.POSITIVE_INFINITY;
+        SkinPoint result=null;
+        Vector3f local=new Vector3f(), point=new Vector3f();
+        Vector3f[] corners={new Vector3f(),new Vector3f(),new Vector3f(),new Vector3f()};
+        for(Quad face:quads) {
+            int b=face.bone();
+            pose.rotation[b].transformInverse(local.set(contact).sub(pose.joint[b])).add(pivots[b]);
+            for(int k=0;k<4;k++)corners[k].set(face.xyz[k*3],face.xyz[k*3+1],face.xyz[k*3+2]);
+            for(int k=1;k<=2;k++) {
+                org.joml.Intersectionf.findClosestPointOnTriangle(corners[0],corners[k],corners[k+1],local,point);
+                float distance=point.distanceSquared(local);
+                if(distance<closest) {
+                    closest=distance;
+                    result=new SkinPoint(b,new Vector3f(point).sub(pivots[b]),new Vector3f(face.nx,face.ny,face.nz),face);
+                }
+            }
+        }
+        return result;
+    }
+
     public boolean has(String clip){return clips.containsKey(clip);}
     public float seconds(String clip){var c=clips.get(clip);return c==null?0:c.seconds();}
     /** Samples at server ticks (20 Hz) into 30 fps rows. */

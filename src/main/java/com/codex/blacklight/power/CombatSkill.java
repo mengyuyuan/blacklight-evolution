@@ -24,7 +24,10 @@ public enum CombatSkill {
     QUILL_RELAY_1("quill_relay_1", 1 << 19, 200, null),
     QUILL_RELAY_2("quill_relay_2", 1 << 20, 350, QUILL_RELAY_1),
     QUILL_WEDGE_1("quill_wedge_1", 1 << 21, 300, null),
-    QUILL_WEDGE_2("quill_wedge_2", 1 << 22, 500, QUILL_WEDGE_1);
+    QUILL_WEDGE_2("quill_wedge_2", 1 << 22, 500, QUILL_WEDGE_1),
+    QUILL_REACH("quill_reach", 1 << 23, 200, null),
+    QUILL_HARVEST("quill_harvest", 1 << 24, 350, null),
+    QUILL_ORBIT("quill_orbit", 1 << 25, 250, null);
 
     private final String id;
     private final int bit, epCost;
@@ -42,7 +45,8 @@ public enum CombatSkill {
     public boolean shieldBorer() { return this==SHIELD_BORER||this==SHIELD_BORER_BOOST_1||this==SHIELD_BORER_BOOST_2; }
     public boolean blockThrow() { return this==BLOCK_THROW_1||this==BLOCK_THROW_2||this==BLOCK_THROW_3; }
     public PowerForm powerRequires() {
-        if (this == QUILL_RELAY_1 || this == QUILL_RELAY_2 || this == QUILL_WEDGE_1 || this == QUILL_WEDGE_2)
+        if (this == QUILL_REACH || this == QUILL_HARVEST || this == QUILL_ORBIT
+                || this == QUILL_RELAY_1 || this == QUILL_RELAY_2 || this == QUILL_WEDGE_1 || this == QUILL_WEDGE_2)
             return PowerForm.BACKSPINES;
         return shieldBorer() ? PowerForm.SHIELD : blockThrow() ? PowerForm.MUSCLE_MASS : null; }
     public MovementUpgrade movementRequires() { return this == BULLETDIVE_DROP ? MovementUpgrade.GLIDE_1 : null; }

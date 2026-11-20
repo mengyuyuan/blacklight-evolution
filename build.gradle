@@ -462,10 +462,6 @@ neoForge {
             if (project.hasProperty('quickPlayMultiplayer')) {
                 programArguments.addAll '--quickPlayMultiplayer', project.property('quickPlayMultiplayer').toString()
             }
-            // Developer-only visual acceptance hook. Normal launches never set it.
-            if (project.hasProperty('openAnimationTuner')) {
-                systemProperty 'blacklight.test.openAnimationTuner', 'true'
-            }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }

@@ -85,6 +85,9 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<Integer>> GRAB_STAGE = ATTACHMENTS.register(
             "grab_stage", () -> AttachmentType.builder(() -> 0)
                     .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
+    public static final Supplier<AttachmentType<Integer>> QUILL_AIM_TARGET = ATTACHMENTS.register(
+            "quill_aim_target", () -> AttachmentType.builder(() -> -1)
+                    .sync(net.minecraft.network.codec.ByteBufCodecs.VAR_INT).build());
 
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.WeaponVisual>> WEAPON_VISUAL=ATTACHMENTS.register(
             "weapon_visual",()->AttachmentType.builder(()->com.codex.blacklight.combat.WeaponVisual.EMPTY).sync(com.codex.blacklight.combat.WeaponVisual.CODEC).build());

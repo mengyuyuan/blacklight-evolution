@@ -22,12 +22,26 @@ public final class RoofPerformance {
             net.minecraft.resources.ResourceLocation.tryParse("blacklight:textures/entity/weapons_mc.png"));
     private static final net.minecraft.resources.ResourceLocation VEINS=java.util.Objects.requireNonNull(
             net.minecraft.resources.ResourceLocation.tryParse("blacklight:textures/entity/weapons_mc_emissive.png"));
+    /** Draw the released blade at its attached model scale with its original shoulder socket and materials. */
+    public static void detachedQuill(int slot, PoseStack stack, MultiBufferSource buffers, int light){
+        stack.pushPose();
+        stack.scale(.9375F,.9375F,.9375F);
+        var center=RooftopRig.center(slot);
+        stack.translate(-center.x,-center.y,-center.z);
+        for(int pass=0;pass<2;pass++){
+            boolean veins=pass==1;
+            part(R.mesh[R.quill[slot]],stack,buffers.getBuffer(material(veins)),light,veins,0);
+        }
+        stack.popPose();
+    }
     public static RenderType material(boolean veins){return veins?RenderType.entityTranslucentEmissive(VEINS):RenderType.entityCutoutNoCull(ATLAS);}
     private static final Matrix4f[] READY=R.sample(1);
     private static final class Tail {
         String key="";
         float tick,lastSource,entrySource;
         double when;
+        double lastAim=Double.NaN;
+        float aimYaw,aimPitch;
         final double[] firedAt=new double[6];
         Tail(){java.util.Arrays.fill(firedAt,Double.NEGATIVE_INFINITY);}
     }
@@ -84,6 +98,11 @@ public final class RoofPerformance {
     private static Matrix4f[] pose(float at){if(at==1)return READY;var cache=CACHE.get();if(at!=cache.at){cache.at=at;cache.pose=R.sample(at);}return cache.pose;}
     public static float projectPlayer(AbstractClientPlayer p,float partial,Matrix4f[] playerBones){
         Clock clock=clock(p,partial);
+        float feet=projectBase(p,partial,playerBones,clock);
+        RooftopRig.recoil(playerBones,clock.key,clock.tick);
+        return feet;
+    }
+    private static float projectBase(AbstractClientPlayer p,float partial,Matrix4f[] playerBones,Clock clock){
         boolean standby=clock.key().startsWith("spines_rack_still");
         boolean groundShot=RooftopRig.groundShot(clock.key());
         var phase=com.codex.blacklight.client.PrototypeAnimationController.phaseFor(p);
@@ -93,8 +112,10 @@ public final class RoofPerformance {
         float gait=PlayerMotionController.spineStride(p,partial);
         boolean plant=standing&&(groundShot||standby&&gait<.999F);
         boolean project=clock.bodyWeight>0&&RooftopRig.fullBody(clock.key())&&!p.isPassenger();
-        if(!plant&&!project)return 0;
-        if(standby&&gait>=.999F)return 0;
+        if(!plant&&!project || standby&&gait>=.999F){
+            if(standing)aim(p,partial,playerBones,clock);
+            return 0;
+        }
         if(project){
             var nativePose=clock.bodyWeight<1?playerBones.clone():null;
             R.projectPlayer(pose(clock.source),RooftopRig.reflect(clock.key()),playerBones);
@@ -107,7 +128,35 @@ public final class RoofPerformance {
             var stride=sk.getPoseMatrices(PlayerMotionController.locomotionPose(p,partial));
             RooftopRig.groundStride(playerBones,stride,gait,standby);
         }
+        if(clock.key.equals("spines_scapula_deploy")){
+            float brace=ScapulaVolley.ease(clock.tick/4)*(1-ScapulaVolley.ease((clock.tick-4)/3));
+            float open=ScapulaVolley.ease((clock.tick-5)/3)*(1-ScapulaVolley.ease((clock.tick-9)/7));
+            RooftopRig.aimUpperBody(playerBones,10*brace-7*open,15*brace-8*open);
+        }
+        if(standing)aim(p,partial,playerBones,clock);
         return (1-gait)*(plant?1:clock.bodyWeight);
+    }
+    private static void aim(AbstractClientPlayer p,float partial,Matrix4f[] bones,Clock clock){
+        var tail=tails.get(p);
+        if(tail==null)return;
+        double now=p.tickCount+(double)partial;
+        float dt=(float)(Double.isFinite(tail.lastAim)?Math.max(0,Math.min(2,now-tail.lastAim)):1);
+        if(now-tail.lastAim>8){tail.aimYaw=0;tail.aimPitch=0;}
+        tail.lastAim=now;
+        float yaw=0,pitch=0;
+        if(RooftopRig.groundShot(clock.key())){
+            var target=p.level().getEntity(p.getData(ModAttachments.QUILL_AIM_TARGET));
+            if(target!=null && target.isAlive()){
+                var delta=target.getPosition(partial).add(0,target.getBbHeight()*.55,0).subtract(p.getEyePosition(partial));
+                float facing=com.codex.blacklight.client.animation.BlacklightRenderPose.facing(p,partial);
+                boolean rearRight=Math.abs(tail.aimYaw)>8 ? tail.aimYaw>0 : ScapulaCycle.rightLead(clock.key());
+                yaw=RooftopRig.shoulderTurn(delta,facing,rearRight);
+                pitch=RooftopRig.shoulderPitch(delta);
+            }
+        }
+        tail.aimYaw=net.minecraft.util.Mth.approach(tail.aimYaw,yaw,dt*24);
+        tail.aimPitch=net.minecraft.util.Mth.approach(tail.aimPitch,pitch,dt*10);
+        RooftopRig.aimUpperBody(bones,tail.aimYaw,tail.aimPitch);
     }
     private static void blendRigid(Matrix4f a,Matrix4f b,float weight){
         var position=a.getTranslation(new Vector3f()).lerp(b.getTranslation(new Vector3f()),weight);
@@ -143,6 +192,14 @@ public final class RoofPerformance {
         }
     }
     private static float[] chargeWave(Clock c){
+        if(c.key.equals("spines_scapula_deploy")){
+            var wave=new float[24];
+            for(int i=0;i<wave.length;i++){
+                float t=c.tick-3.4F-i*.29F;
+                wave[i]=ScapulaVolley.ease(t/1.2F)*(1-ScapulaVolley.ease((t-1.2F)/2.8F));
+            }
+            return wave;
+        }
         float load;
         if(c.key.endsWith("_draw"))load=ScapulaVolley.ease(c.tick/(c.key.startsWith("spines_air_")?5:9));
         else if(c.key.endsWith("_charged"))load=1-ScapulaVolley.ease((c.tick-(c.key.startsWith("spines_air_")?1:5))/3);
@@ -183,6 +240,11 @@ public final class RoofPerformance {
         if(c.key.startsWith("spines_rack_"))ready=Math.max(ready,1-c.bodyWeight);
         var m=R.frame(ready>=1?READY:source,driver,c.key,nativeChest);
         if(ready>0&&ready<1)blendRigid(m,R.frame(READY,driver,c.key,nativeChest),ready);
+        if(deploy && R.socketSlot(node)>=0){
+            int outlet=R.socketSlot(node);
+            float fill=RooftopRig.deployFill(c.tick,outlet);
+            R.refillFrame(m,node,fill,1.1,false);
+        }
         if (slot >= 0) R.refillFrame(m, node, c.fill(slot), c.sinceShot(slot), RooftopRig.reflect(c.key));
         return m;
     }

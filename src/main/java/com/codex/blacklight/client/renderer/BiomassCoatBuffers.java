@@ -19,12 +19,21 @@ public final class BiomassCoatBuffers implements MultiBufferSource {
         this.target=target;this.coverage=coverage;this.morph=morph;this.time=time;
         frame=new Matrix4f(stack.last().pose());inverse=new Matrix4f(frame).invert();
     }
+    private QuillHostAbsorption quill;
+    private LivingEntity quillHost;
+    private boolean physicalQuill;
+    public BiomassCoatBuffers(LivingEntity mob,PoseStack stack,MultiBufferSource target,com.codex.blacklight.entity.QuillOrgan organ,float partial){
+        this(mob,stack,target,0,0,organ.age()+partial);
+        quillHost=mob;
+        quill=new QuillHostAbsorption(mob,organ,partial);
+    }
     public VertexConsumer getBuffer(RenderType type){
         // Names, leash lines and debug geometry are not part of the creature's skin.
         if(type.mode()!=VertexFormat.Mode.QUADS||type.format()!=DefaultVertexFormat.NEW_ENTITY)return target.getBuffer(type);
         return streams.computeIfAbsent(type,Collector::new);
     }
     public void finish(){
+        physicalQuill=quillHost!=null && AdaptiveRagdoll.drawingQuillBody(quillHost);
         // Collect every body layer before calculating a front: a head/arm may be in a different stream.
         for(var c:streams.values()){
             c.flush();
@@ -38,7 +47,7 @@ public final class BiomassCoatBuffers implements MultiBufferSource {
             for(var c:streams.values())c.finish(false);
             for(var c:streams.values())c.finish(true);
         }
-        envelope(light);
+        if(quill==null)envelope(light);
     }
     /** Fills gaps between disconnected limbs as they fuse, so species share one closed handoff surface. */
     private void envelope(int light){
@@ -65,14 +74,16 @@ public final class BiomassCoatBuffers implements MultiBufferSource {
     private void quad(RenderType type,V a,V b,V c,V d,boolean coatedPass){
         var center=new Vector3f(a.p).add(b.p).add(c.p).add(d.p).mul(.25F);
         float noise=(float)(Math.sin(center.x*19+time*.18)*Math.sin(center.z*17+time*.13)*.09);
-        boolean coated=coverage>=.999F||coverage>0&&surface.heightFraction(center.y)+noise<coverage*1.2F-.05F;
+        boolean coated=quill!=null?quill.exposed(center):coverage>=.999F||coverage>0&&surface.heightFraction(center.y)+noise<coverage*1.2F-.05F;
         if(coated!=coatedPass)return;
         var out=target.getBuffer(coated?RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE):type);
         for(var v:new V[]{a,b,c,d}){
-            var p=new Vector3f(v.p);if(morph>0){surface.reshape(p,morph);}
+            var p=new Vector3f(v.p);if(quill!=null && !physicalQuill)quill.pull(p);else if(morph>0){surface.reshape(p,morph);}
             frame.transformPosition(p);
             int r=v.r,g=v.g,blue=v.b;
-            if(coated){boolean vein=Math.floorMod((int)Math.floor(center.x*12)+(int)Math.floor(center.y*9)+(int)Math.floor(center.z*12),13)==0;r=vein?82:24;g=vein?27:29;blue=vein?32:31;}
+            if(coated&&quill!=null){
+                int tissue=quill.color(center);r=(tissue>>16)&255;g=(tissue>>8)&255;blue=tissue&255;
+            }else if(coated){boolean vein=Math.floorMod((int)Math.floor(center.x*12)+(int)Math.floor(center.y*9)+(int)Math.floor(center.z*12),13)==0;r=vein?82:24;g=vein?27:29;blue=vein?32:31;}
             out.addVertex(p.x,p.y,p.z).setColor(r,g,blue,v.a).setUv(coated?.5F:v.u,coated?.5F:v.v).setOverlay(v.overlay).setLight(v.light).setNormal(v.nx,v.ny,v.nz);
         }
     }

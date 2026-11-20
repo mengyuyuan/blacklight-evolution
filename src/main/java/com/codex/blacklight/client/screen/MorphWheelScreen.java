@@ -1,5 +1,7 @@
 package com.codex.blacklight.client.screen;
 
+import com.codex.blacklight.client.BlacklightUi;
+
 import com.codex.blacklight.client.SkillBindings;
 import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
@@ -45,21 +47,43 @@ public final class MorphWheelScreen extends Screen {
         RenderSystem.enableBlend();RenderSystem.defaultBlendFunc();RenderSystem.disableCull();RenderSystem.setShader(GameRenderer::getPositionColorShader);
         var mesh=Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLES,DefaultVertexFormat.POSITION_COLOR);var matrix=g.pose().last().pose();
         for(int slot=0;slot<3;slot++){
-            int color=!enabled(slot)?0xc8202228:selected==slot?0xef8c2638:0xdc292e36;
+            boolean available=enabled(slot);
+            int color=slot==selected?0xEF71383D:available?0xE227282D:0xDA1D1D23;
+            int edge=slot==selected?BlacklightUi.RED:available?0xEB725357:0xCC414148;
+
             double middle=-Math.PI/2+slot*Math.PI*2/3,span=Math.PI/3-.07;
             for(int j=0;j<32;j++){
                 double a=middle-span+2*span*j/32,b=middle-span+2*span*(j+1)/32;
                 float ax=(float)Math.cos(a),ay=(float)Math.sin(a),bx=(float)Math.cos(b),by=(float)Math.sin(b);
                 vertex(mesh,matrix,cx+ax*inner,cy+ay*inner,color);vertex(mesh,matrix,cx+ax*outer,cy+ay*outer,color);vertex(mesh,matrix,cx+bx*outer,cy+by*outer,color);
                 vertex(mesh,matrix,cx+ax*inner,cy+ay*inner,color);vertex(mesh,matrix,cx+bx*outer,cy+by*outer,color);vertex(mesh,matrix,cx+bx*inner,cy+by*inner,color);
+                float rim=outer-2;
+                vertex(mesh,matrix,cx+ax*rim,cy+ay*rim,edge);vertex(mesh,matrix,cx+ax*outer,cy+ay*outer,edge);vertex(mesh,matrix,cx+bx*outer,cy+by*outer,edge);
+                vertex(mesh,matrix,cx+ax*rim,cy+ay*rim,edge);vertex(mesh,matrix,cx+bx*outer,cy+by*outer,edge);vertex(mesh,matrix,cx+bx*rim,cy+by*rim,edge);
             }
         }
+        for(int n=0;n<48;n++){
+            double a=n*Math.PI/24,b=(n+1)*Math.PI/24;
+            float radius=inner-2;
+            vertex(mesh,matrix,cx,cy,0xED19171D);
+            vertex(mesh,matrix,cx+radius*(float)Math.cos(a),cy+radius*(float)Math.sin(a),0xE9322B30);
+            vertex(mesh,matrix,cx+radius*(float)Math.cos(b),cy+radius*(float)Math.sin(b),0xE9322B30);
+        }
         BufferUploader.drawWithShader(mesh.buildOrThrow());RenderSystem.enableCull();RenderSystem.disableBlend();
-        for(int slot=0;slot<3;slot++)g.drawCenteredString(font,label(slot),cx+(int)(Math.cos(-Math.PI/2+slot*Math.PI*2/3)*outer*.72),cy+(int)(Math.sin(-Math.PI/2+slot*Math.PI*2/3)*outer*.72)-4,enabled(slot)?0xfff1e7e9:0xff88888d);
+        for(int slot=0;slot<3;slot++){
+            double angle=-Math.PI/2+slot*Math.PI*2/3;
+            int x=cx+(int)(Math.cos(angle)*outer*.72),y=cy+(int)(Math.sin(angle)*outer*.72);
+            var item=switch(slot){case 0->net.minecraft.world.item.Items.PLAYER_HEAD;case 1->net.minecraft.world.item.Items.SLIME_BALL;default->net.minecraft.world.item.Items.BOOK;};
+            g.renderItem(item.getDefaultInstance(),x-8,y-14);
+            g.drawCenteredString(font,label(slot),x,y+4,enabled(slot)?BlacklightUi.TEXT:BlacklightUi.MUTED);
+        }
         g.drawCenteredString(font,title,cx,cy-(int)outer-24,0xffff899a);
-        g.drawCenteredString(font,binding.getTranslatedKeyMessage(),cx,cy-4,0xffeee4e6);
+        var center=label(selected);
+        var lines=font.split(center,Math.max(30,(int)(inner*1.55)));
+        int centerY=cy-lines.size()*5;
+        for(var line:lines){g.drawCenteredString(font,line,cx,centerY,BlacklightUi.TEXT);centerY+=10;}
         String hint=BiomassSystem.state(minecraft.player).fatal()?"screen.blacklight.morph_fatal":!enabled(selected)?"screen.blacklight.morph_unavailable":"screen.blacklight.morph_hint";
-        int y=cy+(int)outer+14;for(var line:font.split(Component.translatable(hint,binding.getTranslatedKeyMessage()),width-30)){g.drawCenteredString(font,line,cx,y,0xffd4cbd0);y+=11;}
+        BlacklightUi.wheelHint(g,font,Component.translatable(hint,binding.getTranslatedKeyMessage()),cx,cy+(int)outer+10,Math.min(340,width-30));
         super.render(g,mx,my,partial);
     }
     private static void vertex(BufferBuilder b,org.joml.Matrix4f m,float x,float y,int color){b.addVertex(m,x,y,0).setColor(color);}
