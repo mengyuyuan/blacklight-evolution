@@ -296,6 +296,7 @@ public final class MilitaryVehicle extends Entity {
         if (hand != InteractionHand.MAIN_HAND || destroyed || player.distanceToSqr(this) > 36) return InteractionResult.PASS;
         if (player.getItemInHand(hand).getItem() instanceof com.codex.blacklight.firearms.FirearmItem) return InteractionResult.PASS;
         if (level().isClientSide) return InteractionResult.SUCCESS;
+        if (hand==InteractionHand.MAIN_HAND && player instanceof ServerPlayer operator && com.codex.blacklight.world.FutianDispatch.intercept(this,operator)) return InteractionResult.CONSUME;
         var supply=com.codex.blacklight.military.vehicle.VehicleRegistry.supply(player,this,hand);
         if(supply!=InteractionResult.PASS)return supply;
         if(player instanceof ServerPlayer server && player.isShiftKeyDown() && player.getMainHandItem().isEmpty()) return VehicleHijackSystem.request(server,this)?InteractionResult.CONSUME:InteractionResult.FAIL;
@@ -318,6 +319,7 @@ public final class MilitaryVehicle extends Entity {
         reconcileCrew();
         if(controlLocked()){setDeltaMovement(Vec3.ZERO);syncVehicleState();return;}
         Entity driver = occupant(VehicleDefinition.Job.DRIVER);
+        com.codex.blacklight.world.FutianDispatch.drive(this,driver);
         if (driver instanceof ServerPlayer player && crewOperational(player)) {
             var input = controlState(player);
             if (input.throttle() != 0 || input.steering() != 0) moveVehicle(input.throttle() * definition.maxSpeed(), (float)(input.steering() * 3));

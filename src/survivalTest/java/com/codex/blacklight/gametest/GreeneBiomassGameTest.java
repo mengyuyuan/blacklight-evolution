@@ -60,7 +60,7 @@ public final class GreeneBiomassGameTest {
             h.assertTrue(actors.size()==1,"waiting host present");
             h.assertTrue(!BiomassSystem.edible(slime,actors.get(0)),"opening human remains protected");
         }).thenExecute(()->{
-            operator.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.BLOODTOX_COMMAND_KEY.get()));
+            operator.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.BLOODTOX_STARTER.get()));
             h.assertTrue(BossSiteBlock.activate(level,station,operator).equals("plaza_started"),"operator starts the encounter");
         }).thenWaitUntil(()->{
             var bosses=level.getEntitiesOfClass(EncounterMob.class,near,e->e.greeneBattle().canAttack());
@@ -103,6 +103,9 @@ public final class GreeneBiomassGameTest {
             tick(slime);
             h.assertTrue(!host.isAlive() && BiomassSystem.state(slime).consumed(),"accepted execution reforms the consumer");
             h.assertTrue(done(slime,"plaza_cleared") && done(operator,"plaza_cleared"),"finisher and operator both receive the plaza reward");
+            var cores=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,host.getBoundingBox().inflate(6),
+                    item -> item.getItem().is(com.codex.blacklight.registry.ModItems.MOTHER_CORE.get()));
+            h.assertTrue(cores.size()==1 && cores.get(0).getItem().getCount()==1,"biomass receives a single Mother Core");
             var reformed=BiomassSystem.state(slime).reform(level.getGameTime()-BiomassState.REFORM_TICKS-1);
             slime.setData(ModAttachments.BIOMASS_FORM,reformed);
             tick(slime);

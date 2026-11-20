@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:evolved_ganglion",
+  "display": {
+    "icon": {
+      "id": "blacklight:containment_decoder"
+    },
+    "title": {
+      "translate": "item.blacklight.containment_decoder"
+    },
+    "description": {
+      "translate": "survival.blacklight.journal.containment_decoder"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:containment_decoder"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

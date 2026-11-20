@@ -208,13 +208,8 @@ public final class BlacklightCommands {
 
     private static int evolvedSample(CommandSourceStack source,com.codex.blacklight.infection.EvolvedArchetype archetype) throws com.mojang.brigadier.exceptions.CommandSyntaxException{
         var player=source.getPlayerOrException();var level=player.serverLevel();
-        var host=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);if(host==null)return 0;
-        host.inherit(net.minecraft.world.entity.EntityType.ZOMBIE.create(level));
-        var genes=com.codex.blacklight.infection.EvolvedSamplePreset.organs(archetype);
-        long seed=com.codex.blacklight.infection.TissueOrgans.seed(host.getUUID());
-        var inventory=new com.codex.blacklight.infection.TissueInheritance(genes,6,2100,false,null,1,6).digest(1,true,seed,504000,com.codex.blacklight.infection.TissueInheritance.Rules.DEFAULT,com.codex.blacklight.infection.TissueCore.MUSCLE);
-        var tag=new net.minecraft.nbt.CompoundTag();host.saveWithoutId(tag);tag.getCompound("BlacklightHost").putString("NativeCore",com.codex.blacklight.infection.TissueCore.MUSCLE.key());
-        tag.putLong("BlacklightTissueAge",504000);tag.put("BlacklightTissueInheritance",com.codex.blacklight.infection.TissueInheritanceCodec.write(inventory));tag.putInt("BlacklightTissueNutrition",100);host.load(tag);host.advanceTissue(0);
+        var host=com.codex.blacklight.infection.EvolvedSamplePreset.matureHost(level,archetype);
+        if(host==null)return 0;
         var pos=player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(8));host.moveTo(pos.x,pos.y,pos.z,player.getYRot()+180,0);
         if(!level.noCollision(host,host.getBoundingBox())||!level.addFreshEntity(host)){source.sendFailure(Component.literal("这里空间不足，进化者样本未生成。"));return 0;}
         // Metamorphosis assigns the selected archetype's real name.

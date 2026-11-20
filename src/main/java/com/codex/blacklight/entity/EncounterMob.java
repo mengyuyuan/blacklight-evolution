@@ -360,6 +360,29 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(!kind.military&&BlacklightInfectionSystem.isInfected(living))return true;
     }return super.isAlliedTo(other);}
     private boolean disabled(){return !kind.enabled()||!isAlive()||isNoAi()||isPassenger()||ImpactControl.stunned(this)||ModAttachments.peekData(this,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).active()||com.codex.blacklight.power.BiomassSystem.claimant(this)!=null||level().getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL;}
+    // The truck controls the first move only while its gate is opening. If the
+    // console is lost or unloaded, the creature returns to ordinary AI on its own.
+    private static final String CONVOY_GATE_TIMEOUT = "ConvoyGateTimeout";
+
+    public void holdAtConvoyGate() {
+        getPersistentData().putLong(CONVOY_GATE_TIMEOUT, level().getGameTime() + 40);
+        getNavigation().stop();
+    }
+
+    private boolean waitingForConvoyGate() {
+        return kind == EncounterKind.GOLIATH && getPersistentData().contains(CONVOY_GATE_TIMEOUT)
+                && level().getGameTime() < getPersistentData().getLong(CONVOY_GATE_TIMEOUT);
+    }
+
+    public void leaveConvoyGate(LivingEntity operator) {
+        boolean opening = waitingForConvoyGate();
+        getPersistentData().remove(CONVOY_GATE_TIMEOUT);
+        if (!opening || operator == null || !enemy(operator) || hurtTime > 0 || exposed()) return;
+        cooldown = 0;
+        setTarget(operator);
+        begin(EncounterMove.CHARGE, operator);
+    }
+
     public boolean begin(EncounterMove move,LivingEntity target){
         if(kind==EncounterKind.ELIZABETH_GREENE&&(!greeneBattle.canAttack()||greeneClose.opening()))return false;
         if(kind==EncounterKind.ELIZABETH_GREENE&&(move==EncounterMove.VOLLEY||move==EncounterMove.ORBS)){
@@ -368,7 +391,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             return beginGreene(mechanical!=null?mechanical:body==null?null:GreeneWeaponProgram.onFoot(greeneTargetDistance(body)),body);
         }
         if(kind==EncounterKind.FLYER&&flyerStage()!=FlyerMotion.IDLE)return false;
-        if(level().isClientSide||disabled()||move==null||move==EncounterMove.NONE||this.move()!=EncounterMove.NONE||cooldown>0||exposed()||!moveReady(move)||!kind.permits(move)||!enemy(target)||!hasLineOfSight(target)||!isWithinRestriction(target.blockPosition())||!inActionRange(move,target))return false;
+        if(level().isClientSide||disabled()||waitingForConvoyGate()||move==null||move==EncounterMove.NONE||this.move()!=EncounterMove.NONE||cooldown>0||exposed()||!moveReady(move)||!kind.permits(move)||!enemy(target)||!hasLineOfSight(target)||!isWithinRestriction(target.blockPosition())||!inActionRange(move,target))return false;
         aim=target.getBoundingBox().getCenter();direction=aim.subtract(position()).multiply(1,0,1).normalize();if(direction.lengthSqr()<.01)direction=new Vec3(0,0,1);
         yaw=(float)Math.toDegrees(Math.atan2(-direction.x,direction.z));committed=target.getUUID();entityData.set(MOVE,move.ordinal());entityData.set(START,level().getGameTime());lastAge=-1;blocked=false;struck.clear();getNavigation().stop();
         fistHits.clear();fistGround=false;entityData.set(GUARD_HIT,-100000L);
@@ -611,7 +634,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(obstruction==GoliathCharge.Obstruction.EXPOSE){
             Vec3 blockedTravel=nextPos.subtract(position());
             crashGoliathCharge(age);
+            // Sample the original contact first. Folding the barrier removes its
+            // collision and would move the debris impact up into the floor above.
             GoliathTerrainImpact.wall(this,blockedTravel);
+            com.codex.blacklight.world.ConvoyRail.crash((ServerLevel)level(),getBoundingBox().expandTowards(blockedTravel).inflate(.15,0,.15));
             return;
         }
         // A clipped windup/return consumes this tick's root request. It must not
@@ -1188,10 +1214,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     @Override public AABB getBoundingBoxForCulling(){var bounds=super.getBoundingBoxForCulling();if(kind==EncounterKind.FLYER)return bounds.inflate(3,2,3);if(greeneParts!=null)for(var part:greeneParts)if(part!=null)bounds=bounds.minmax(part.getBoundingBox());return bounds;}
     private final class FightGoal extends Goal{
         FightGoal(){setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
-        @Override public boolean canUse(){return !disabled()&&(move()!=EncounterMove.NONE||enemy(getTarget())
+        @Override public boolean canUse(){return !disabled()&&(waitingForConvoyGate()||move()!=EncounterMove.NONE||enemy(getTarget())
                 ||kind==EncounterKind.GOLIATH&&exposed()||kind==EncounterKind.FLYER&&flyerStage()!=FlyerMotion.IDLE);}
         @Override public boolean requiresUpdateEveryTick(){return true;}
-        @Override public void tick(){var target=getTarget();if(move()!=EncounterMove.NONE||!enemy(target)||exposed()||kind==EncounterKind.ELIZABETH_GREENE&&!greeneBattle.canAttack()||kind==EncounterKind.FLYER&&flyerStage()!=FlyerMotion.IDLE)return;getLookControl().setLookAt(target,30,30);
+        @Override public void tick(){var target=getTarget();if(waitingForConvoyGate()||move()!=EncounterMove.NONE||!enemy(target)||exposed()||kind==EncounterKind.ELIZABETH_GREENE&&!greeneBattle.canAttack()||kind==EncounterKind.FLYER&&flyerStage()!=FlyerMotion.IDLE)return;getLookControl().setLookAt(target,30,30);
             double distance=distanceTo(target);
             EncounterMove next=EncounterMove.NONE;
             if(cooldown==0){

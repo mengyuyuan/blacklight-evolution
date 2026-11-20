@@ -12,6 +12,11 @@ public final class ModBlocks {
     private static final DeferredRegister.Blocks BLOCKS=DeferredRegister.createBlocks("blacklight");
     public static final DeferredBlock<Block> BUILDING_BIOMASS=BLOCKS.register("building_biomass",()->new com.codex.blacklight.world.BuildingBiomassBlock(BlockBehaviour.Properties.of().strength(3F,6F).sound(SoundType.SLIME_BLOCK).noOcclusion().noLootTable()));
     public static final DeferredBlock<Block> BUILDING_CORE=BLOCKS.register("building_infection_core",()->new com.codex.blacklight.world.BuildingInfectionCoreBlock(BlockBehaviour.Properties.of().strength(5,8).sound(SoundType.SLIME_BLOCK).noOcclusion()));
+    public static final DeferredBlock<Block> CONVOY_RAIL = BLOCKS.register("convoy_rail", () ->
+            new com.codex.blacklight.world.ConvoyRail(BlockBehaviour.Properties.of().strength(-1F,3600000F)
+                    .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).noOcclusion().sound(SoundType.METAL).noLootTable()));
+    public static final DeferredBlock<Block> FIELD_POST = BLOCKS.register("field_post", () ->
+            new com.codex.blacklight.world.FieldPostBlock(BlockBehaviour.Properties.of().strength(4F, 8F).sound(SoundType.METAL)));
     public static final DeferredBlock<Block> ENCOUNTER_CONSOLE = BLOCKS.register("encounter_console", () ->
             new com.codex.blacklight.world.BossSiteBlock(BlockBehaviour.Properties.of().strength(-1F, 3600000F)
                     .pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK).sound(SoundType.METAL).noLootTable()));

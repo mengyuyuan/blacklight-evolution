@@ -22,6 +22,18 @@ public final class ModItems {
             () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "lost_convoy"));
     public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> MOTHER_INTEL = ITEMS.register("mother_intel",
             () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "mother_plaza"));
+    public static final DeferredItem<Item> EVOLVED_GANGLION = ITEMS.register("evolved_ganglion",
+            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> CONTAINMENT_DECODER = ITEMS.register("containment_decoder",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> HEAVY_ARMOR_CORE = ITEMS.register("heavy_armor_core",
+            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> BLOODTOX_STARTER = ITEMS.register("bloodtox_starter",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> MOTHER_CORE = ITEMS.register("mother_core",
+            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> STATION_RECORD = ITEMS.register("station_record",
+            () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "on_research_station_maps"));
     public static final DeferredItem<Item> BLOODTOX_COMMAND_KEY = ITEMS.register("bloodtox_command_key",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)));
 
@@ -80,6 +92,12 @@ public final class ModItems {
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(SUPREME_PARASITE_SYRINGE.get());
                         output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(LIVING_HIVE_TISSUE.get());
+                        output.accept(STATION_RECORD.get());
+                        output.accept(EVOLVED_GANGLION.get());
+                        output.accept(CONTAINMENT_DECODER.get());
+                        output.accept(HEAVY_ARMOR_CORE.get());
+                        output.accept(BLOODTOX_STARTER.get());
+                        output.accept(MOTHER_CORE.get());
                         output.accept(CONVOY_MANIFEST.get()); output.accept(MOTHER_INTEL.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

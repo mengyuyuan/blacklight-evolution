@@ -54,7 +54,7 @@ public final class GreeneCloseCombat {
         var candidate=owner.getTarget();
         if(valid(candidate)&&distance(candidate)>=GreeneCloseAttack.RESET_DISTANCE)cooldown=0;
         if(!owner.greeneBattle().canAttack()||owner.move()==EncounterMove.HOWL){cancel();return;}
-        if(opening && (owner.broken(0)||owner.broken(1))) {opening=false;cancel();}
+        if(opening && owner.broken(GreeneCloseAttack.Side.LEFT.segment())) {opening=false;cancel();}
         if(opening && owner.plazaTruck().isEmpty()) owner.trackPlazaTruck(true);
         if(opening && !clock.active()) {
             clock.begin(GreeneCloseAttack.Side.LEFT);
@@ -64,20 +64,17 @@ public final class GreeneCloseCombat {
         }
         if(!clock.active()){
             if(cooldown>0||!valid(candidate)||!GreeneWeaponTarget.visible(owner,candidate)
-                    ||!GreeneCloseAttack.aiEligible(distance(candidate),!owner.broken(0),!owner.broken(1))
-                    ||!GreeneCloseAttack.motionEligible(!owner.broken(0)))return;
-            var side=GreeneCloseAttack.choose(owner.getRandom().nextFloat());
-            // Do not produce an invisible arm strike after that arm was destroyed.
-            // Both original motion nodes still require Segment1; that gate above
-            // is not silently "corrected" to match the left/right clip names.
-            if(owner.broken(side.segment()))side=GreeneCloseAttack.Side.RIGHT;
-            if(owner.broken(side.segment()))return;
+                    ||!GreeneCloseAttack.aiEligible(distance(candidate),!owner.broken(0),!owner.broken(1))) return;
+            var offset=candidate.position().subtract(owner.position()).yRot((float)Math.toRadians(owner.yBodyRot));
+            var side=Math.abs(offset.x)<.75 ? GreeneCloseAttack.choose(owner.getRandom().nextFloat())
+                    : offset.x>0 ? GreeneCloseAttack.Side.LEFT : GreeneCloseAttack.Side.RIGHT;
+            if(owner.broken(side.segment())) return;
             clock.begin(side);target=candidate.getUUID();receipts.clear();cooldown=40;facingLatched=false;
             ModInfectedSounds.play(owner,InfectedSoundCue.TENSION);
         }
         var entity=target==null?null:level.getEntity(target);
         var victim=entity instanceof LivingEntity living?living:null;
-        if(!opening&&!valid(victim)||owner.broken(clock.side().segment())||!GreeneCloseAttack.motionEligible(!owner.broken(0))){cancel();return;}
+        if(!opening&&!valid(victim)||owner.broken(clock.side().segment())){cancel();return;}
         if(opening && clock.seconds()>=1.95F && openingHold>0) {
             openingHold--;
             owner.syncGreeneClose(clock.side(),clock.seconds()*20);
