@@ -32,7 +32,8 @@ public final class BladeEffects {
             com.codex.blacklight.movement.LandingDebrisSystem.fragment(player.serverLevel(),ground.getLocation().add(0,.19,0),state,side.add(0,.26+Math.abs(i)*.025,0),.25F,12);
         }
         CombatEnvironmentEffects.disturbLooseItems(player,at,1.6,.2);
-        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.BLADE,"ground",at,1F,1F);
+        com.codex.blacklight.registry.ModWeaponSounds.play(player,com.codex.blacklight.power.PowerForm.BLADE,"ground",at,.72F,1F);
+        TerrainImpactEffects.surfaceSound(player, surface, .66F, 1.08F);
     }
     public static void hit(ServerPlayer player,LivingEntity target,WeaponMove move){
         CombatImpactEffects.target(player,target,move);

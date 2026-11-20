@@ -9,15 +9,17 @@ import java.util.WeakHashMap;
 
 /** Reaction to a confirmed strike, evaluated in victim space on the render clock. */
 public final class FleshRecoil {
-    private record Contact(FleshStrike strike, double start, float side, float facing, float strength) {}
-    public record Pose(float pitch, float twist, float roll, float head, float brace, float dip) {}
+    private record Contact(FleshStrike strike, double start, float side, float facing, float strength, int region) {}
+    public record Pose(float pitch, float twist, float roll, float head, float brace, float dip, float leg, float arm) {
+        Pose(float pitch,float twist,float roll,float head,float brace,float dip){this(pitch,twist,roll,head,brace,dip,0,0);}
+    }
     private static final WeakHashMap<LivingEntity, Contact> contacts = new WeakHashMap<>();
 
     private FleshRecoil() {}
 
     public static void accept(LivingEntity victim, InfectedImpactPayload receipt, double start) {
         FleshStrike strike = receipt.strike();
-        if (strike == FleshStrike.GENERIC || strike == FleshStrike.EDGE || !victim.isAlive()
+        if (strike == FleshStrike.GENERIC || (strike == FleshStrike.QUILL && receipt.size() < .4F) || !victim.isAlive()
                 || CombatTargeting.anchoredBody(victim)) return;
         double yaw = Math.toRadians(victim.yBodyRot);
         Vec3 right = new Vec3(Math.cos(yaw), 0, Math.sin(yaw));
@@ -28,7 +30,13 @@ public final class FleshRecoil {
         if (Math.abs(lateral) < .12) lateral = normal.dot(right);
         float side = (float)Math.copySign(1, Math.abs(lateral) < .04 ? ((receipt.seed() & 1) == 0 ? 1 : -1) : lateral);
         float facing = normal.dot(forward) < -.18 ? -1 : 1;
-        contacts.put(victim, new Contact(strike, start, side, facing, receipt.charged() ? 1.18F : 1F));
+        float strength = Math.min(1.35F, .44F + receipt.size() * .67F + (receipt.charged() ? .10F : 0));
+        var previous = contacts.get(victim);
+        if (previous != null && previous.start == start && previous.strength >= strength) return;
+        int region=receipt.region();
+        if(region==2 || region==8)side=-1;
+        if(region==4 || region==16)side=1;
+        contacts.put(victim,new Contact(strike,start,side,facing,strength,region));
     }
 
     public static Pose sample(LivingEntity victim, float partial) {
@@ -37,7 +45,9 @@ public final class FleshRecoil {
         float age = (float)(victim.level().getGameTime() - contact.start + partial);
         if (age < 0) return null;
         float duration = switch (contact.strike) {
-            case FIST -> 7;
+            case FIST, CLAW -> 7;
+            case EDGE -> 9;
+            case QUILL -> 6;
             case LASH -> 10;
             case HAMMER -> 12;
             default -> 11;
@@ -53,9 +63,14 @@ public final class FleshRecoil {
         float turn = contact.side * (snap - .24F * rebound);
         float pitch = contact.facing * (snap - .22F * rebound);
         return switch (contact.strike) {
+            case CLAW -> new Pose(-.14F*pitch, .51F*turn, .19F*turn, -.24F*pitch, .33F*weight, .68F*weight);
+            case EDGE -> new Pose(-.21F*pitch, .70F*turn, .24F*turn, -.27F*pitch, .46F*weight, 1.12F*weight);
+            case QUILL -> new Pose(-.26F*pitch, .22F*turn, .13F*turn, -.32F*pitch, .23F*weight, .42F*weight);
             case FIST -> new Pose(-.32F*pitch, .20F*turn, .09F*turn, -.52F*pitch, .36F*weight, .8F*weight);
             case LASH -> new Pose(.18F*pitch, 1.03F*turn, .52F*turn, .30F*pitch, .94F*weight, 1.4F*weight);
-            case HAMMER -> new Pose(.96F*pitch, .17F*turn, .17F*turn, .48F*pitch, .76F*weight, 3.4F*weight);
+            case HAMMER -> new Pose(.76F*pitch, .18F*turn, .30F*turn, .42F*pitch, .62F*weight,
+                    ((contact.region&24)!=0?4.5F:2.6F)*weight,(contact.region&24)!=0?weight*contact.side:0,
+                    (contact.region&6)!=0?weight*contact.side:0);
             default -> new Pose(-.82F*pitch, .28F*turn, .24F*turn, -.43F*pitch, 1.02F*weight, -.6F*weight);
         };
     }

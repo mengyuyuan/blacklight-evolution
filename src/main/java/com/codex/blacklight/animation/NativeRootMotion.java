@@ -75,8 +75,9 @@ public final class NativeRootMotion {
         float current = weaponClock(elapsedTick, offset, definition.transitionSeconds());
         Vec3 step;
         if (com.codex.blacklight.combat.HammerQuakeContact.owns(move)) {
-            // The support foot and the pelvis were retargeted together. Move on that
-            // clip's horizontal track at the same FIG frame as the visible legs.
+            // A standalone ground strike follows the authored stride only when the player drives forward.
+            // The light-to-heavy combo owns its separate hop in hammerComboStep.
+            if (ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).wallInput().forward() <= 0) return;
             step=clipStep(MotionLibrary.clip("hammer_ground_stroke"),MotionLibrary.hammerReleaseSeconds(previous),
                     MotionLibrary.hammerReleaseSeconds(current),yaw);
             step=com.codex.blacklight.combat.HammerQuakeContact.limitWallAdvance(player,move,step,yaw);

@@ -12,10 +12,11 @@ public final class RoofPerformance {
     private static final RooftopRig R=RooftopRig.INSTANCE;
     private RoofPerformance(){}
     public record Clock(String key,float tick,float source,float bodyWeight,double now,double[] firedAt){
-        float fill(int slot){
-            int physical=slot^(RooftopRig.reflect(key)?1:0);
-            return RooftopRig.refill(now-firedAt[physical],slot);
+        double sinceShot(int slot) {
+            int physical = slot ^ (RooftopRig.reflect(key) ? 1 : 0);
+            return now - firedAt[physical];
         }
+        float fill(int slot) { return RooftopRig.refill(sinceShot(slot), slot); }
     }
     public static final net.minecraft.resources.ResourceLocation ATLAS=java.util.Objects.requireNonNull(
             net.minecraft.resources.ResourceLocation.tryParse("blacklight:textures/entity/weapons_mc.png"));
@@ -182,18 +183,14 @@ public final class RoofPerformance {
     /** Body recovery plays to completion while the equipped sockets return directly to their ready angles. */
     static Matrix4f organFrame(Clock c,Matrix4f[] source,int node,Matrix4f nativeChest){
         boolean deploy=c.key.equals("spines_scapula_deploy");
-        int slot=-1;
-        if(!deploy)for(int q=0;q<6;q++)if(node==R.quill[q]){slot=q;break;}
-        int driver=slot<0?node:R.parent[node];
+        int slot = deploy ? -1 : R.socketSlot(node);
+        boolean quill = slot >= 0 && node == R.quill[slot];
+        int driver = quill ? R.parent[node] : node;
         float ready=ScapulaVolley.ease((c.source-3.78F)/.86F);
         if(c.key.startsWith("spines_rack_"))ready=Math.max(ready,1-c.bodyWeight);
         var m=R.frame(ready>=1?READY:source,driver,c.key,nativeChest);
         if(ready>0&&ready<1)blendRigid(m,R.frame(READY,driver,c.key,nativeChest),ready);
-        if(slot>=0){
-            float length=c.fill(slot);
-            float width=.34F+.66F*length;
-            m.translate(0,.057F-.036F*(1-length),0).scale(width,length,width);
-        }
+        if (slot >= 0) R.refillFrame(m, node, c.fill(slot), c.sinceShot(slot), RooftopRig.reflect(c.key));
         return m;
     }
     public static void part(int mesh,PoseStack stack,VertexConsumer out,int light,boolean veins,float wet){

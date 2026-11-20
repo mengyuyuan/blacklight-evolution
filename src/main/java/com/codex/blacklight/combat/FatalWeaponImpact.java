@@ -10,7 +10,8 @@ public enum FatalWeaponImpact {
     HAMMER(11,.40,-.28,.58,.62),
     MUSCLE(12,1.65,.91,.94,.47),
     HAMMER_BREAK(13,.44,-.76,.80,.77),
-    MUSCLE_BURST(14,1.85,1.06,.96,.54);
+    MUSCLE_BURST(14,1.85,1.06,.96,.54),
+    HAMMER_PRESS(17,.16,-.98,.80,.23);
 
     public final int motion;
     public final double bodyTransfer, turn;
@@ -40,7 +41,7 @@ public enum FatalWeaponImpact {
         return forForm(equipped);
     }
     public static FatalWeaponImpact fromMotion(int motion){
-        return switch(motion){case 9->FIST;case 10->WHIP;case 11->HAMMER;case 12->MUSCLE;case 13->HAMMER_BREAK;case 14->MUSCLE_BURST;default->null;};
+        return switch(motion){case 9->FIST;case 10->WHIP;case 11->HAMMER;case 12->MUSCLE;case 13->HAMMER_BREAK;case 14->MUSCLE_BURST;case 17->HAMMER_PRESS;default->null;};
     }
     public Vec3 launch(Vec3 inherited,Vec3 direction,double weight,boolean rising,boolean descending){
         double vertical=descending?-Math.max(.45,Math.abs(lift)):rising?Math.max(.6,lift):lift;
@@ -55,7 +56,7 @@ public enum FatalWeaponImpact {
         return switch(this){
             case FIST -> vertex.add(axis.scale(depth*.18));
             case WHIP -> vertex.subtract(axis.scale(depth*.37));
-            case HAMMER, HAMMER_BREAK -> vertex.add(axis.scale(depth*.62)).add(offset.subtract(axis.scale(offset.dot(axis))).scale(.28*falloff));
+            case HAMMER, HAMMER_BREAK, HAMMER_PRESS -> vertex.add(axis.scale(depth*.62)).add(offset.subtract(axis.scale(offset.dot(axis))).scale(.28*falloff));
             case MUSCLE, MUSCLE_BURST -> vertex.add(axis.scale(depth*.32));
         };
     }

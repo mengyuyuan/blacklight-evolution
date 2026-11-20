@@ -103,6 +103,16 @@ public final class UtilityPowerSystem {
         }
         if (p.tickCount % 5 == 0) attributes(p);
     }
+    private static void meleeContact(ServerPlayer p,net.minecraft.world.damagesource.DamageSource source,float force,boolean shield) {
+        if (!(source.getDirectEntity() instanceof net.minecraft.world.entity.LivingEntity attacker)
+                || source.is(DamageTypeTags.IS_PROJECTILE) || attacker!=source.getEntity()) return;
+        var from=attacker.getEyePosition();
+        var center=p.getBoundingBox().getCenter();
+        var incoming=center.subtract(from).normalize();
+        if (incoming.lengthSqr()<.5) return;
+        var point=p.getBoundingBox().clip(from,center).orElse(center);
+        ProjectileDefenseSystem.recordContact(p,point,incoming,Math.min(1.25F,force),shield,force>=.65F);
+    }
     @SubscribeEvent public static void damage(LivingHurtEvent e) {
         if (!(e.getEntity() instanceof ServerPlayer p) || e.getAmount() <= 0 || e.isCanceled()) return;
         var source = e.getSource();
@@ -110,6 +120,7 @@ public final class UtilityPowerSystem {
         if (active(p, PowerForm.ARMOR)) {
             if(source.getDirectEntity()!=null){
                 float force=Math.min(1,e.getAmount()*CombatScale.units(p)/20F);
+                meleeContact(p,source,force,false);
                 ModWeaponSounds.defense(p,PowerForm.ARMOR,force>=.5F?"heavy":"hit",p.position(),force);
             }
             e.setAmount(e.getAmount() * .525F); return;
@@ -130,6 +141,7 @@ public final class UtilityPowerSystem {
         // armor pipeline's original units; CombatScale converts once after armor.
         float remaining = Math.max(0, incoming - s.shield())/units;
         if (remaining == 0) e.setCanceled(true); else e.setAmount(remaining);
+        meleeContact(p,source,incoming/20,true);
         ModWeaponSounds.defense(p,PowerForm.SHIELD,hp<=0?"break":incoming>=10?"heavy":"hit",p.position(),Math.min(1,incoming/20));
         // Surface debris is emitted once by each client from the posed shield,
         // instead of spawning unrelated critical-hit particles inside the torso.

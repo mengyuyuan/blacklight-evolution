@@ -70,9 +70,7 @@ public final class RagdollImpact {
     private static void send(LivingEntity victim,int motion,int ticks,boolean sharp,Vec3 velocity,WeaponCutContact.Report cut,boolean refinement,WeaponCutContact.Report woundContacts){
         send(victim,motion,ticks,sharp,velocity,cut,refinement,woundContacts,0);
     }
-    static int freezeTicks(boolean refinement,boolean dead,int remaining,int corpseFreeze){
-        return refinement?0:net.minecraft.util.Mth.clamp(dead?corpseFreeze:remaining,0,8);
-    }
+
     private static void send(LivingEntity victim,int motion,int ticks,boolean sharp,Vec3 velocity,WeaponCutContact.Report cut,boolean refinement,WeaponCutContact.Report woundContacts,int corpseFreeze){
         if(victim.level().isClientSide || victim.isRemoved() || !supportedBody(victim) || victim instanceof Player
                 || victim.isInvisible())return;
@@ -86,16 +84,22 @@ public final class RagdollImpact {
             var flyer=(com.codex.blacklight.entity.EncounterMob)victim;
             if(ticks>=12||flyer.flyerPhysics().active())flyer.flyerPhysics().impact(velocity,
                     cut.contacts().isEmpty()?flyer.incomingPoint():cut.contacts().get(0).point(),ticks,
-                    freezeTicks(false,false,HitStop.remainingTicks(victim),0));
+                    HitStop.ragdollFreezeTicks(false,false,HitStop.remainingTicks(victim),0));
         }
         var impulses=new java.util.ArrayList<RagdollImpactPayload.CutImpulse>();
         int mask=nativePose?0:(com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.DISMEMBER)&WeaponDismemberment.ALL);
         for(int bit=1;bit<=32;bit<<=1){
             // Every confirmed contact drives its struck joint, including non-lethal hits.
             // Separation remains governed independently by the server's dismember mask.
-            Vec3 travel=Vec3.ZERO;for(var contact:cut.contacts())if(contact.region()==bit)travel=travel.add(contact.travel());
+            Vec3 travel=Vec3.ZERO;
+            int samples=0;
+            for(var contact:cut.contacts()) if(contact.region()==bit) {
+                travel=travel.add(contact.travel());
+                samples++;
+            }
             if(travel.lengthSqr()<1e-8)continue;
-            var impulse=velocity.scale(.5).add(travel.normalize().scale(.38));
+            double volume=victim.getBbWidth()*victim.getBbWidth()*victim.getBbHeight();
+            var impulse=JointImpact.impulse(velocity,travel,samples,volume,sharp,QuillImpact.isQuill(motion));
             impulses.add(new RagdollImpactPayload.CutImpulse(bit,(float)impulse.x,(float)impulse.y,(float)impulse.z));
         }
         var planes=new java.util.ArrayList<RagdollImpactPayload.CutPlane>();
@@ -130,6 +134,6 @@ public final class RagdollImpact {
             if(wounds.size()==RagdollImpactPayload.MAX_CUT_PLANES)break;
         }
         PacketDistributor.sendToPlayersTrackingEntity(victim,new RagdollImpactPayload(victim.getId(),motion,
-                net.minecraft.util.Mth.clamp(ticks,4,80),freezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime(),victim.isDeadOrDying()));
+                net.minecraft.util.Mth.clamp(ticks,4,80),HitStop.ragdollFreezeTicks(refinement,victim.isDeadOrDying(),HitStop.remainingTicks(victim),corpseFreeze),sharp,refinement,mask,velocity.x,velocity.y,velocity.z,impulses,planes,wounds,victim.level().getGameTime(),victim.isDeadOrDying()));
     }
 }

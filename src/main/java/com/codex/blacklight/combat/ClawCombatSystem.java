@@ -420,7 +420,12 @@ public final class ClawCombatSystem {
                         action == ClawCombatState.Action.AUTO_3 ? 0.28D : 0.08D,
                         forward.z * knockback);
                 hitCount++;
-                WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
+                var move = switch (action) {
+                    case AUTO_2 -> WeaponMove.CLAW_AUTO2;
+                    case AUTO_3 -> WeaponMove.CLAW_AUTO3;
+                    default -> WeaponMove.CLAW_AUTO1;
+                };
+                WeaponImpact.contact(player,target,ImpactTier.of(move),false,null,move,player.position());
             }
         }
         hitCount+=hitHulls(player,sweep,damage,new HashSet<>(),maxTargets-targets.size());
@@ -484,11 +489,7 @@ public final class ClawCombatSystem {
             loose.push(away.x * 0.72D, 0.46D, away.z * 0.72D);
         }
 
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, level.getBlockState(surface.below())),
-                x, y + 0.18D, z, 64, radius * 0.60D, 0.40D,
-                radius * 0.60D, 0.19D);
-        level.playSound(null, surface, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2F, 0.58F);
-        ClawPhysicalEffects.onGroundSpikeImpact(player, new Vec3(x, y, z), radius, surface);
+        ClawPhysicalEffects.onGroundSpikeImpact(player, new Vec3(x, y, z), radius);
     }
 
     private static void spawnGroundSpikeField(ServerLevel level, Vec3 center,

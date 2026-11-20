@@ -10,6 +10,7 @@
     "OptionalTwilightHydraMixin",
     "OptionalTwilightLichMixin",
     "CrossModLivingDamageMixin",
+    "QuillArmorMixin",
     "CrossModItemDamageMixin",
     "PotentiaDiveMixin",
     "PotentiaDamageTagsMixin",
@@ -100,6 +101,7 @@
     "client.SeveredHeldItemMixin",
     "client.SeveredHeadLayerMixin",
     "client.GeoRagdollMixin",
+    "client.CrushDeathParticlesMixin",
     "client.OptionalTheBoysBodyRenderMixin"
   ],
   "injectors": {

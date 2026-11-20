@@ -10,6 +10,7 @@ import numpy as np
 parser = argparse.ArgumentParser()
 parser.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[1])
 parser.add_argument('--output', type=Path, default=Path('build/sample-audio'))
+parser.add_argument('--backspines-only', action='store_true', help='Build the shoulder organ variations only')
 args = parser.parse_args()
 sources = args.repo/'art/weapon-audio'
 out = args.output; out.mkdir(parents=True, exist_ok=True)
@@ -83,6 +84,37 @@ def defense(form,cue,v):
     return mix([(metal,.6,0),(wet,.65,.02),(cut,.4,.10),(metal,.3,.18)],.61,1.1)
 
 events=json.loads((assets/'sounds.json').read_text(encoding='utf8')) if (assets/'sounds.json').exists() else {}
+def build_backspines():
+    # Short, dry joints lead the swish. On a heavy launch the lower body layer arrives as the valve opens.
+    folder = assets / 'sounds/weapon/backspines'
+    folder.mkdir(parents=True, exist_ok=True)
+    for cue in ('draw', 'swing', 'heavy'):
+        names = [f'blacklight:weapon/backspines/{cue}']
+        for i in range(2):
+            rate = (.94, 1.06)[i]
+            flex = sample('body', 'slow squish', 1.6 * rate)
+            joint = sample('body', ('new_hits_3', 'new_hits_4')[i], 1.45 * rate)
+            air = sample('air', (4, 12)[i], 1.2 * rate)
+            if cue == 'draw':
+                sound = mix([(flex, .55, 0), (joint, .24, .056)], .42, .23)
+            elif cue == 'swing':
+                sound = mix([(joint, .68, 0), (air, .64, .013)], .46, .29)
+            else:
+                thump = sample('body', ('big punch', 'new_hits_6')[i], .85 * rate)
+                sound = mix([(joint, .71, 0), (thump, .68, .016), (air, .53, .026)], .59, .43)
+            name = f'{cue}_{i + 2}'
+            target = folder / (name + '.ogg')
+            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'f32le', '-ar', str(SR), '-ac', '1',
+                            '-i', 'pipe:0', '-c:a', 'libvorbis', '-q:a', '5', str(target)],
+                           input=sound.astype('<f4').tobytes(), check=True)
+            names.append(f'blacklight:weapon/backspines/{name}')
+        events[f'weapon.backspines.{cue}']['sounds'] = names
+    (assets / 'sounds.json').write_text(json.dumps(events, indent=2) + '\n', encoding='utf8')
+
+build_backspines()
+if args.backspines_only:
+    raise SystemExit(0)
+
 report=[]; previews={}
 for group,forms,cues,fn in [
     ('weapon',['none','claws','blade','hammerfists','whipfist','muscle_mass'],['swing','hit','heavy','ground','morph'],weapon),

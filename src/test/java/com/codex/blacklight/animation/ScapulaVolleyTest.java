@@ -8,6 +8,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScapulaVolleyTest {
+    @Test void overlappingAirborneQuillsShareOneStrikeBudget() {
+        for (int pairs : new int[]{1, 2}) {
+            float base = pairs == 1 ? 12 : 21;
+            float total = 0;
+            for (int slot = -pairs; slot <= pairs; slot++) total += ScapulaVolley.damage(base, slot, pairs);
+            assertEquals(base, total, .0001F);
+            assertEquals(pairs == 1 ? 8 : 11, ScapulaVolley.damage(base, 0, pairs), .0001F);
+        }
+        assertEquals(18, ScapulaVolley.damage(18, 0, 0), .0001F);
+    }
     @Test void satellitesOccupyDistinctSocketsAndLeaveWithTheCenterBlade(){
         var up=new Vec3(0,1,0);var right=new Vec3(1,0,0);
         for(boolean charged:new boolean[]{false,true}){

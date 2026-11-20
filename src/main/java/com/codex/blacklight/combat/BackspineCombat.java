@@ -3,6 +3,7 @@ package com.codex.blacklight.combat;
 import com.codex.blacklight.animation.*;
 import com.codex.blacklight.entity.BackspineQuill;
 import com.codex.blacklight.power.PowerForm;
+import com.codex.blacklight.power.CombatSkill;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModWeaponSounds;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,11 +51,17 @@ public final class BackspineCombat {
         final ArrayDeque<Press> queuedHeavy = new ArrayDeque<>(2);
         Press buttonDown, drawing;
         boolean nextRight=true,leadRight;
+        boolean extraLight, releaseReady;
+        int chamberUntil = -1;
         String clip="";
     }
     private static final Map<ServerPlayer,State> STATES=new WeakHashMap<>();
     private BackspineCombat() {}
     private static boolean equipped(ServerPlayer p){return ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BACKSPINES;}
+    private static boolean movingOnFoot(ServerPlayer p) {
+        var input = com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.MOVEMENT_STATE).wallInput();
+        return p.onGround() && !p.isPassenger() && (Math.abs(input.forward()) + Math.abs(input.sideways()) > .05);
+    }
     public static boolean busy(ServerPlayer p){var s=STATES.get(p);return s!=null&&s.phase!=Phase.READY;}
     private static boolean eligible(ServerPlayer p){
         return equipped(p)&&WeaponCombatSystem.canRequest(p,true)&&ModAttachments.getData(p,ModAttachments.GRAB_STAGE)==0
@@ -68,7 +75,16 @@ public final class BackspineCombat {
         if(!equipped(p))return false;
         if(!eligible(p)){cancel(p);return true;}
         State s=STATES.computeIfAbsent(p,ignored->new State());
-        if(attack&&!s.attack)s.pendingLight=true;
+        if (attack && !s.attack) {
+            if (s.pendingLight && s.phase == Phase.LIGHT && movingOnFoot(p) && ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.QUILL_RELAY_1))
+                s.extraLight = true;
+            s.pendingLight = true;
+            s.releaseReady = p.onGround() && s.chamberUntil >= p.tickCount;
+            s.chamberUntil = -1;
+        }
+        if (!attack && s.attack && p.onGround() && s.phase == Phase.LIGHT && !s.pendingLight
+                && p.tickCount - s.started >= s.light.shot && ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.QUILL_RELAY_2))
+            s.chamberUntil = p.tickCount + 8;
         if (special && !s.special && s.queuedHeavy.size() < 2) {
             s.buttonDown = new Press(p.tickCount);
             s.queuedHeavy.addLast(s.buttonDown);
@@ -92,23 +108,29 @@ public final class BackspineCombat {
         s.phase=phase;
         s.started=p.tickCount;
         s.clip=ScapulaCycle.actionKey("spines_"+key,s.leadRight);
-        if(phase==Phase.LIGHT&&s.clip.contains("_flight_")){
-            s.started-=2;
-            NativePlayerActionBackend.playVisualFromTick(p,s.clip,2);
+        int offset = phase == Phase.LIGHT ? (s.releaseReady ? s.light.shot - 1 : s.clip.contains("_flight_") ? 2 : 0) : 0;
+        if (offset > 0) {
+            s.started -= offset;
+            NativePlayerActionBackend.playVisualFromTick(p, s.clip, offset);
         }else PlayerActions.get().playVisual(p,s.clip,0);
     }
     private static void light(ServerPlayer p,State s,Light move) {
-        s.pendingLight=false;
+        s.pendingLight = s.extraLight;
+        s.extraLight = false;
         s.awaitingLanding=false;
         s.light=move;
         s.leadRight=s.nextRight;
         play(p,s,Phase.LIGHT,(p.onGround()?"light_":"light_flight_")+move.key);
+        s.releaseReady = false;
     }
     private static String heavyKey(State s) {
         return (s.air?"air_":"ground_")+s.heavy.name().toLowerCase(java.util.Locale.ROOT);
     }
     private static void draw(ServerPlayer p,State s,Heavy move) {
         s.drawing = s.queuedHeavy.removeFirst();
+        s.extraLight = false;
+        s.releaseReady = false;
+        s.chamberUntil = -1;
         s.pendingLight=false;
         s.awaitingLanding=false;
         s.heavy=move;
@@ -160,7 +182,10 @@ public final class BackspineCombat {
                     draw(p,s,switch(move){case SWEEP -> Heavy.RETURN; case LIFT -> Heavy.SWEEP; case DRIVE,BURST -> Heavy.CRUSH;});
                     return;
                 }
-                if(age>=move.link&&(s.attack||s.pendingLight)){light(p,s,move.next(s.attack&&!s.pendingLight));return;}
+                int link = move.link;
+                if (move != Light.BURST && movingOnFoot(p)
+                        && ModAttachments.getData(p, ModAttachments.PLAYER_STATE).hasCombatSkill(CombatSkill.QUILL_RELAY_1)) link = Math.max(move.shot + 2, link - 2);
+                if(age>=link&&(s.attack||s.pendingLight)){light(p,s,move.next(s.attack&&!s.pendingLight));return;}
                 if(age<move.end)return;
             }
             case DRAW -> {
@@ -291,6 +316,9 @@ public final class BackspineCombat {
             float share=roofFour?.25F:groundHeavy?(paired?.5F:counter?.60F:.40F):1;
             var shot=new BackspineQuill(p.serverLevel(),p,ScapulaVolley.damage(damage*share,slot,pairs),rightShoulder?0:1);
             shot.setPos(start.x,start.y,start.z);
+            var skills = ModAttachments.getData(p, ModAttachments.PLAYER_STATE);
+            shot.setWedgeSkills(skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_1),
+                    heavy && slot == 0 && s.charged && skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_2));
             shot.setRoofIndex(index);shot.setVolleySlot(slot);shot.setHeavy(heavy);
             // A quaternion carries the proper rotation. The entity's shoulder bit carries the reflection.
             var proper=socket;

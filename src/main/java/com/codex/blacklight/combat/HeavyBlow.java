@@ -1,6 +1,5 @@
 package com.codex.blacklight.combat;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +11,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import java.util.*;
@@ -26,6 +28,8 @@ public final class HeavyBlow {
     private static final class Flight {
         final UUID attacker;final Vec3 direction;final float damage;final long started;final boolean full;
         final Set<UUID> bowled=new HashSet<>();Vec3 before=Vec3.ZERO;boolean walled;
+        AABB previousBox;
+        float vitality;
         Flight(UUID attacker,Vec3 direction,float damage,long started,boolean full){this.attacker=attacker;this.direction=direction;this.damage=damage;this.started=started;this.full=full;}
     }
     private static final Map<LivingEntity,Flight> FLYING=new WeakHashMap<>();
@@ -72,7 +76,12 @@ public final class HeavyBlow {
 
     @SubscribeEvent public static void before(ForgeEntityTickEvent.Pre e){
         if(!(e.getEntity() instanceof LivingEntity v)||v.level().isClientSide)return;
-        var f=FLYING.get(v);if(f!=null&&!HitStop.held(v))f.before=v.getDeltaMovement();
+        var f = FLYING.get(v);
+        if (f != null && !HitStop.held(v)) {
+            f.before = v.getDeltaMovement();
+            f.previousBox = v.getBoundingBox();
+            f.vitality = v.getHealth() + v.getAbsorptionAmount();
+        }
     }
     @SubscribeEvent public static void after(ForgeEntityTickEvent.Post e){
         if(!(e.getEntity() instanceof LivingEntity v)||!(v.level() instanceof ServerLevel level))return;
@@ -85,49 +94,99 @@ public final class HeavyBlow {
         // Knockback motion trail.
         if(speed>.25)level.sendParticles(ParticleTypes.CLOUD,mid.x,mid.y,mid.z,1,.08,.08,.08,.005);
         var attacker=level.getServer().getPlayerList().getPlayer(f.attacker);
-        if(!f.walled&&speed>.35&&v.horizontalCollision)wall(level,v,f,attacker,speed);
+        if (!f.walled && speed > .35 && v.horizontalCollision) {
+            var surface = ThrownBodyWall.find(level, v, f.before);
+            if (surface != null) wall(level, v, f, attacker, surface);
+        }
         if(attacker!=null&&speed>.3)bowl(level,v,f,attacker,speed);
         if(age>3&&v.onGround()){
             FLYING.remove(v);LANDED.put(v,level.getGameTime());
-            level.sendParticles(ParticleTypes.POOF,v.getX(),v.getY()+.1,v.getZ(),8,v.getBbWidth()*.5,.05,v.getBbWidth()*.5,.03);
-            level.playSound(null,v.getX(),v.getY(),v.getZ(),SoundEvents.GENERIC_BIG_FALL,SoundSource.HOSTILE,.9F,.7F);
-        }
-    }
-    private static void wall(ServerLevel level,LivingEntity v,Flight f,ServerPlayer attacker,double speed){
-        f.walled=true;
-        var at=v.position().add(0,v.getBbHeight()*.5,0).add(f.direction.scale(v.getBbWidth()*.5+.3));
-        var pos=BlockPos.containing(at);var state=level.getBlockState(pos);
-        if(state.isAir()){pos=pos.below();state=level.getBlockState(pos);}
-        if(!state.isAir()){
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,state),at.x,at.y,at.z,26,.25,.35,.25,.18);
-            for(int i=0;i<4;i++){
-                var out=f.direction.scale(-.18-.06*i).add((level.random.nextDouble()-.5)*.2,.18+.06*i,(level.random.nextDouble()-.5)*.2);
-                com.codex.blacklight.movement.LandingDebrisSystem.fragment(level,at.subtract(f.direction.scale(.3)),state,out,.18F+.05F*i,14);
+            var floor = level.clip(new ClipContext(v.position().add(0, .04, 0), v.position().add(0, -.10, 0),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, v));
+            if (floor.getType() == HitResult.Type.BLOCK) {
+                var point = floor.getLocation();
+                var state = level.getBlockState(floor.getBlockPos());
+                var material = state.getSoundType(level, floor.getBlockPos(), v);
+                float speedDown = (float)Math.max(0, -f.before.y);
+                level.playSound(null, point.x, point.y, point.z, material.getFallSound(), SoundSource.HOSTILE,
+                        Math.min(.9F, .25F + speedDown * .65F) * material.getVolume(), .8F * material.getPitch());
+                if (speedDown > .55F) {
+                    level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), point.x, point.y + .03, point.z,
+                            12, v.getBbWidth() * .32, .045, v.getBbWidth() * .32, .075);
+                    // Vanilla may already have applied fall damage in the movement tick.
+                    boolean hurt = f.previousBox != null && v.getHealth()+v.getAbsorptionAmount()<f.vitality;
+                    if (f.previousBox != null && !hurt) {
+                        float landingDamage = f.damage * Math.min(.65F, (speedDown - .45F) * .55F);
+                        if (v.isAlive()) hurt=v.hurt(level.damageSources().fall(), landingDamage);
+                    }
+                    if (hurt && attacker!=null)
+                        PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                                Math.min(1.4F,speedDown),FleshStrike.HAMMER,false,point.add(0,.045,0),new Vec3(0,-1,0),0);
+                }
             }
         }
-        level.sendParticles(ParticleTypes.EXPLOSION,at.x,at.y,at.z,1,0,0,0,0);
-        level.playSound(null,at.x,at.y,at.z,SoundEvents.ZOMBIE_ATTACK_WOODEN_DOOR,SoundSource.PLAYERS,1F,.55F);
-        level.playSound(null,at.x,at.y,at.z,SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,1F,.5F);
-        float damage=(float)(f.damage*Math.min(.9,.35+.35*speed));
+    }
+    private static void wall(ServerLevel level, LivingEntity v, Flight f, ServerPlayer attacker, ThrownBodyWall surface) {
+        f.walled = true;
+        var normal = surface.normal();
+        var at = surface.point().add(normal.scale(.025));
+        var state = level.getBlockState(surface.block());
+        var material = state.getSoundType(level, surface.block(), v);
+        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), at.x, at.y, at.z,
+                18, .12, .17, .12, .1);
+        for (int i = 0; i < 4; i++) {
+            var out = normal.scale(.11 + .035 * i).add((level.random.nextDouble() - .5) * .12,
+                    .12 + .035 * i, (level.random.nextDouble() - .5) * .12);
+            com.codex.blacklight.movement.LandingDebrisSystem.fragment(level, at, state, out, .13F + .03F * i, 14);
+        }
+        level.playSound(null, at.x, at.y, at.z, material.getHitSound(), SoundSource.PLAYERS,
+                .9F * material.getVolume(), .76F * material.getPitch());
+        level.playSound(null, at.x, at.y, at.z, SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, .64F, .68F);
+        float damage = (float)(f.damage * Math.min(.9, .35 + .35 * surface.speed()));
         v.invulnerableTime=0;
-        if(attacker!=null)v.hurt(attacker.damageSources().playerAttack(attacker),damage);else v.hurt(level.damageSources().flyIntoWall(),damage);
-        // Slide down the wall, then the normal knockdown / get-up runs on landing.
-        v.setDeltaMovement(f.direction.x*-.06,-.12,f.direction.z*-.06);v.hurtMarked=true;
+        boolean hurt=v.hurt(attacker!=null?attacker.damageSources().playerAttack(attacker):level.damageSources().flyIntoWall(),damage);
+        if (hurt && attacker!=null)
+            PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                    (float)Math.min(1.55,.54+surface.speed()*.55),FleshStrike.HAMMER,false,at,normal.scale(-1),0);
+        v.setDeltaMovement(surface.rebound(f.before));
+        v.hurtMarked = true;
         HitStop.victim(v,3);
         if(attacker!=null)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(attacker,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.1F));
     }
     private static void bowl(ServerLevel level,LivingEntity v,Flight f,ServerPlayer attacker,double speed){
-        for(var other:level.getEntitiesOfClass(LivingEntity.class,v.getBoundingBox().inflate(.35),o->o!=v&&o!=attacker&&o.isAlive()&&!f.bowled.contains(o.getUUID()))){
-            if(!CombatTargeting.selectable(attacker,other)||CombatTargeting.anchoredBody(other))continue;
+        if (f.previousBox == null) return;
+        var from = f.previousBox.getCenter();
+        var current = v.getBoundingBox();
+        var to = current.getCenter();
+        var travel = to.subtract(from);
+        if (travel.horizontalDistanceSqr() < .09) return;
+        var bounds = f.previousBox.minmax(current).inflate(.001);
+        for (var other : level.getEntitiesOfClass(LivingEntity.class, bounds,
+                actor -> actor != v && actor != attacker && actor.isAlive() && !f.bowled.contains(actor.getUUID()))) {
+            if (!CombatTargeting.damageable(attacker, other) || CombatTargeting.anchoredBody(other)) continue;
+            var target = other.getBoundingBox();
+            var sweep = target.inflate(f.previousBox.getXsize() * .5, f.previousBox.getYsize() * .5, f.previousBox.getZsize() * .5);
+            if (target.getCenter().subtract(from).dot(travel) <= 0) continue;
+            var centerAtHit = sweep.contains(from) ? from : sweep.clip(from, to).orElse(null);
+            if (centerAtHit == null) continue;
+            var point = target.clip(centerAtHit, target.getCenter()).orElse(target.getCenter());
+            if (level.clip(new ClipContext(centerAtHit, point, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, v)).getType() == HitResult.Type.BLOCK) continue;
             f.bowled.add(other.getUUID());
+            int immunity = other.invulnerableTime;
             other.invulnerableTime=0;
-            other.hurt(attacker.damageSources().playerAttack(attacker),f.damage*.35F);
+            if (!other.hurt(attacker.damageSources().playerAttack(attacker), f.damage * .35F)) {
+                other.invulnerableTime = immunity;
+                continue;
+            }
             double resist=Math.max(0,1-other.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
             if(ImpactControl.begin(other,new ImpactProfile(HitReaction.HEAVY,ImpactProfile.FALL,30,.6,.3,true),attacker.getYRot())){
                 var push=f.direction.scale(speed*.7*resist);other.setDeltaMovement(push.x,.32*resist,push.z);other.setOnGround(false);other.hurtMarked=true;
                 if(other instanceof Mob mob)mob.getNavigation().stop();
             }
-            level.playSound(null,other.getX(),other.getY(),other.getZ(),SoundEvents.PLAYER_ATTACK_KNOCKBACK,SoundSource.PLAYERS,.9F,.75F);
+            PlayerHitEffects.surface(attacker,other,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                    (float)Math.min(1.2,.38+speed*.47),FleshStrike.MUSCLE,false,point,travel.normalize().scale(-1),0);
+            level.playSound(null, point.x, point.y, point.z, PlayerHitEffects.metalAt(other, point)
+                    ? SoundEvents.ANVIL_HIT : SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, .68F, .79F);
             // The thrown body loses part of its momentum to the one it hit.
             var d=v.getDeltaMovement();v.setDeltaMovement(d.x*.7,d.y,d.z*.7);v.hurtMarked=true;
         }
