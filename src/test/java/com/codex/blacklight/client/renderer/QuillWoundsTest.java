@@ -10,7 +10,7 @@ class QuillWoundsTest {
     private static List<Vertex> surface(Object owner,double z){
         var vertices=new ArrayList<Vertex>();
         for(double[] xy:new double[][]{{-1,-1},{1,-1},{1,1},{-1,1}})
-            vertices.add(new Vertex(owner,null,new Vec3(xy[0],xy[1],z),new Vec3(0,0,1),0,0,-1,0,0));
+            vertices.add(new Vertex(owner,null,new Vec3(xy[0],xy[1],z),new Vec3(0,0,1),(float)(xy[0]+1)/2,(float)(xy[1]+1)/2,-1,0,0));
         return vertices;
     }
     private static double edge(Vec3 a,Vec3 b,double x,double y){return (b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x);}
@@ -22,6 +22,22 @@ class QuillWoundsTest {
             if(Math.min(p,Math.min(q,r))>=-1e-8||Math.max(p,Math.max(q,r))<=1e-8)return true;
         }
         return false;
+    }
+    @Test void piercedExitReleasesOnlyTheSkinInsideTheFarRim(){
+        var owner=new Object();var skin=new ArrayList<Vertex>();
+        skin.addAll(surface(owner,0));skin.addAll(surface(owner,1));
+        var cut=new ArrayList<Vertex>();var chip=new ArrayList<Vertex>();
+        QuillWounds.perforate(skin,cut,owner,Vec3.ZERO,new Vec3(0,0,1),new Vec3(1,0,0),new Vec3(0,1,0),.18,false,null,chip);
+        assertTrue(chip.size()>=24);
+        assertTrue(blocked(chip,0,0,1));
+        assertFalse(blocked(cut,0,0,1));
+        assertTrue(chip.stream().allMatch(v->v.p.z>.8 && v.p.z<=1 && v.key==owner));
+        var outside=chip.stream().filter(v->v.color==-1).toList();
+        assertTrue(outside.size()>=4);
+        for(var v:outside){
+            assertEquals((v.p.x+1)/2,v.u,1.0e-5);
+            assertEquals((v.p.y+1)/2,v.v,1.0e-5);
+        }
     }
     @Test void aBoreOpensBothSkinsAndPreservesNeighbouringFacesAndBones(){
         var owner=new Object();var neighbour=new Object();var skin=new ArrayList<Vertex>();

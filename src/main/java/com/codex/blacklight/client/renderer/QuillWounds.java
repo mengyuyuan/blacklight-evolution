@@ -19,17 +19,21 @@ import java.util.*;
 /** Intersects the rendered skin, then carries the embedded quill or open bore in bone space. */
 final class QuillWounds {
     private static final Map<LivingEntity,List<Mark>> MARKS=new WeakHashMap<>();
+    record ExitChip(List<Vertex> skin,Vec3 direction){}
+    private static final Map<LivingEntity,ExitChip> EXIT_CHIPS=new WeakHashMap<>();
+    static ExitChip takeChip(LivingEntity entity){return EXIT_CHIPS.remove(entity);}
     private static final int SIDES=6;
     private static final double EPS=1e-6;
     private QuillWounds(){}
     static final class Mark {
         final Vec3 point,direction;
-        final boolean heavy;
+        final boolean heavy,fatal;
         final long expires;
         Object key;
         Vec3 localEntry,localExit,localAcross;
         boolean reported;
         Mark(RagdollImpactPayload hit){
+            fatal=hit.fatal();
             var wound=hit.wounds().get(0);
             point=wound.point();direction=wound.direction();heavy=hit.motion()==QuillImpact.HEAVY;expires=hit.at()+100;
         }
@@ -46,7 +50,7 @@ final class QuillWounds {
         if(marks.isEmpty()){MARKS.remove(e);return false;}
         return true;
     }
-    static void clear(){MARKS.clear();}
+    static void clear(){MARKS.clear();EXIT_CHIPS.clear();}
     private static Vec3 rotate(Vec3 v,Quaternionf q){return new Vec3(q.transform(v.toVector3f()));}
     private static Node node(LivingEntity e,Map<Object,Node> nodes,Object key,float partial){
         Node n=nodes.get(key);
@@ -134,7 +138,11 @@ final class QuillWounds {
             if(surface!=null)Barb.attach(out,surface,a.add(direction.scale(Math.min(.22,a.distanceTo(b)*.58))),direction);
         }else{
             Vec3 u=rotate(mark.localAcross,bone.rotation()).normalize(),v=direction.cross(u).normalize();
-            perforate(skin,out,mark.key,a,b,u,v,radius(e),metal,RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
+            boolean eject=mark.fatal && !mark.reported && !metal && com.codex.blacklight.combat.PlayerHitEffects.fleshBody(e)
+                    && !com.codex.blacklight.combat.PlayerHitEffects.metalAt(e,b);
+            List<Vertex> chip=eject?new ArrayList<>():null;
+            perforate(skin,out,mark.key,a,b,u,v,radius(e),metal,RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE),chip);
+            if(chip!=null && !chip.isEmpty())EXIT_CHIPS.put(e,new ExitChip(chip,direction));
         }
         if(!mark.reported){
             mark.reported=true;
@@ -156,6 +164,10 @@ final class QuillWounds {
     }
     /** Remove a convex prism from each struck quad. Interpolated vertices retain the original skin UVs. */
     static void perforate(List<Vertex> skin,List<Vertex> out,Object key,Vec3 a,Vec3 b,Vec3 u,Vec3 v,double radius,boolean metal,RenderType material){
+        perforate(skin,out,key,a,b,u,v,radius,metal,material,null);
+    }
+    static void perforate(List<Vertex> skin,List<Vertex> out,Object key,Vec3 a,Vec3 b,Vec3 u,Vec3 v,double radius,boolean metal,RenderType material,List<Vertex> chip){
+        Vec3 travel=b.subtract(a).normalize();
         Vec3[] radial=new Vec3[SIDES],plane=new Vec3[SIDES];double inner=radius*Math.cos(Math.PI/SIDES);
         for(int s=0;s<SIDES;s++){
             double t=2*Math.PI*s/SIDES;
@@ -182,7 +194,16 @@ final class QuillWounds {
                 }
                 triangles(scraps,kept);inside=next;
             }
-            if(inside.isEmpty())out.addAll(face);else out.addAll(scraps);
+            if(inside.isEmpty())out.addAll(face);
+            else{
+                out.addAll(scraps);
+                if(chip!=null && inside.size()>=3){
+                    Vec3 mid=Vec3.ZERO;for(var vertex:inside)mid=mid.add(vertex.p);
+                    mid=mid.scale(1.0/inside.size());
+                    if(Math.abs(mid.subtract(b).dot(travel))<Math.min(radius*.7,a.distanceTo(b)*.3))
+                        exitShell(chip,inside,travel,Math.min(radius*.65,a.distanceTo(b)*.3),material);
+                }
+            }
         }
         if(owner==null)return;
         Vec3 dir=b.subtract(a).normalize();
@@ -205,6 +226,20 @@ final class QuillWounds {
             for(Vec3 p:List.of(front[i],front[j],back[j],back[i]))
                 out.add(new Vertex(key,material,p,normal,.5F,.5F,color,owner.overlay,owner.light));
         }
+    }
+    private static void exitShell(List<Vertex> out,List<Vertex> surface,Vec3 travel,double thickness,RenderType material){
+        triangles(out,surface);
+        var back=new ArrayList<Vertex>();
+        for(var v:surface)back.add(new Vertex(v.key,material,v.p.subtract(travel.scale(thickness)),travel.scale(-1),
+                .5F,.5F,0xff70231f,v.overlay,v.light));
+        for(int i=0;i<surface.size();i++){
+            int next=(i+1)%surface.size();
+            var p=surface.get(i);var q=surface.get(next);
+            var normal=q.p.subtract(p.p).cross(travel).normalize();
+            for(Vec3 point:List.of(p.p,q.p,back.get(next).p,back.get(i).p))
+                out.add(new Vertex(p.key,material,point,normal,.5F,.5F,0xff572428,p.overlay,p.light));
+        }
+        Collections.reverse(back);triangles(out,back);
     }
     private static boolean outside(List<Vertex> face,Vec3 a,Vec3[] planes,double limit){
         for(var n:planes){

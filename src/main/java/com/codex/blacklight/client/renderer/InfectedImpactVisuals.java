@@ -43,6 +43,16 @@ public final class InfectedImpactVisuals {
             victim.level().addParticle(chips,point.x,point.y,point.z,v.x,v.y,v.z);
         }
     }
+    static void sharpSever(net.minecraft.world.entity.LivingEntity victim,Vec3 point,Vec3 travel,com.codex.blacklight.combat.FleshStrike strike){
+        if(travel.lengthSqr()<1.0e-8 || victim.isInvisible() || !com.codex.blacklight.combat.PlayerHitEffects.fleshBody(victim)
+                || com.codex.blacklight.combat.PlayerHitEffects.metalAt(victim,point))return;
+        Vec3 axis=travel.normalize();
+        var receipt=new InfectedImpactPayload(0,-1,InfectedImpactPayload.appearance(InfectedAttackStyle.TEAR,strike,false),
+                point.x,point.y,point.z,(float)axis.x,(float)axis.y,(float)axis.z,1.35F,
+                victim.getId()*127L+victim.level().getGameTime());
+        accept(receipt);
+        WoundBlood.contact(receipt,point,axis,victim);
+    }
     public static void acceptAt(InfectedImpactPayload data,double started){
         var mc=Minecraft.getInstance();if(mc.level==null||mc.player==null||!Double.isFinite(started)||!Double.isFinite(data.x())||!Double.isFinite(data.y())||!Double.isFinite(data.z()))return;
         var point=new Vec3(data.x(),data.y(),data.z());if(mc.player.position().distanceToSqr(point)>96*96)return;
@@ -100,7 +110,7 @@ public final class InfectedImpactVisuals {
             if(bounds.distanceToSqr(camera)>64*64||!event.getFrustum().isVisible(bounds))continue;
             int light=LevelRenderer.getLightColor(mc.level,net.minecraft.core.BlockPos.containing(end));
             ImpactSpray.flesh(pose,out,impact.path,camera,InfectedAttackStyle.resolve(p.style()),p.strike(),
-                    p.charged(),age,p.size(),p.seed(),impact.hunter,light);
+                    p.charged(),p.strike()==com.codex.blacklight.combat.FleshStrike.LASH && p.region()!=0,age,p.size(),p.seed(),impact.hunter,light);
         }
         pose.popPose();buffers.endBatch(type);
     }

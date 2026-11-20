@@ -864,7 +864,7 @@
       "bytes": 200236
     },
     "whip_lash.json": {
-      "bytes": 253288
+      "bytes": 253224
     },
     "whip_lash_charge.json": {
       "bytes": 146472
@@ -885,10 +885,10 @@
       "bytes": 385494
     },
     "whip_return.json": {
-      "bytes": 289802
+      "bytes": 289478
     },
     "whip_return_charge.json": {
-      "bytes": 170876
+      "bytes": 170815
     },
     "whip_return_charged.json": {
       "bytes": 289797

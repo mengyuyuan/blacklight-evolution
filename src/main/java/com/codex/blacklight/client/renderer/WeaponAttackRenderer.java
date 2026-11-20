@@ -48,8 +48,9 @@ public final class WeaponAttackRenderer {
                     var hand=WhipTetherRenderer.capturedHand(player.getId());
                     if(hand!=null)points=new java.util.ArrayList<>(WhipCurveContact.attachHand(points,hand));
                     var visible=WhipCurveContact.visiblePoints(points,mc.level,player);
-                    WhipArmSurface.render(stack,out,light,visible,Math.max(.105,sourceCurve.radius()));
-                    if(visible.size()>1)WeaponTrailRenderer.captureWorld(player,false,visible.get(visible.size()-2),visible.getLast());
+                    boolean tipVisible=visible.size()==points.size() && visible.get(visible.size()-1).distanceToSqr(points.get(points.size()-1))<1e-8;
+                    WhipArmSurface.render(stack,out,light,visible,Math.max(.105,sourceCurve.radius()),tipVisible);
+                    if(tipVisible && visible.size()>1)WeaponTrailRenderer.captureWorld(player,false,visible.get(visible.size()-2),visible.getLast());
                     stack.popPose();continue;
                 }
                 tick=attackTick;
