@@ -300,8 +300,11 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
         boolean nearby=planter!=null&&planter.level()==level&&planter.isAlive()&&distanceToSqr(planter)<24*24;
         if(!nearby){destination.release();destinationReady=false;prepareTicks=0;return;}
         if(tickCount%20==0){
-            if(feeds>0&&prepareTicks<1200){
-                destinationReady=prepareDestination(level);if(!destinationReady)prepareTicks+=20;
+            // A slow first city load can outlast the initial polling window. Keep the
+            // owner's destination ticket alive at a lower rate until the chunks can tick.
+            if(feeds>0 && (prepareTicks<1200 || tickCount%100==0)){
+                destinationReady=prepareDestination(level);
+                prepareTicks=destinationReady?0:Math.min(1200,prepareTicks+20);
             }
             if(growth()<1&&feeds<HydraGrowth.REQUIRED_FEEDS)seekFood(level,planter);
             spread(level);

@@ -34,6 +34,7 @@ public abstract class MilitarySoldier extends Monster {
     public void beginRadio(){entityData.set(RADIO_STARTED,level().getGameTime());entityData.set(PHASE,6);}
     public void cancelRadio(){entityData.set(RADIO_STARTED,-1L);}
     @Override public void setTarget(@javax.annotation.Nullable LivingEntity target) {
+        if (target instanceof net.minecraft.server.level.ServerPlayer player && !com.codex.blacklight.world.FutianDispatch.allowsTarget(this,player)) target=null;
         var previous = getTarget();
         super.setTarget(target);
         // Target-change listeners can veto or replace the requested contact.

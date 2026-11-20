@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "bent=false": {
+      "model": "blacklight:block/convoy_rail"
+    },
+    "bent=true": {
+      "model": "blacklight:block/convoy_rail_bent"
+    }
+  }
+}

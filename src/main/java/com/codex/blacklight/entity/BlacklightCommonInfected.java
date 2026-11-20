@@ -60,7 +60,16 @@ public final class BlacklightCommonInfected extends Monster {
         goalSelector.addGoal(0,new FloatGoal(this));goalSelector.addGoal(2,new CivilianAttackGoal());
         goalSelector.addGoal(6,new WaterAvoidingRandomStrollGoal(this,.70));
         goalSelector.addGoal(7,new LookAtPlayerGoal(this,Player.class,8));goalSelector.addGoal(8,new RandomLookAroundGoal(this));
-        targetSelector.addGoal(1,new HurtByTargetGoal(this));
+        targetSelector.addGoal(1,new HurtByTargetGoal(this) {
+            @Override public boolean canUse() {
+                return combatAvailable() && validTarget(getLastHurtByMob()) && super.canUse();
+            }
+            @Override protected void alertOther(Mob other, LivingEntity attacker) {
+                if (other instanceof BlacklightCommonInfected ally && ally.combatAvailable()
+                        && ally.validTarget(attacker) && distanceToSqr(ally) <= 100
+                        && ally.hasLineOfSight(attacker)) super.alertOther(ally, attacker);
+            }
+        }.setAlertOthers());
         targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,10,true,false,this::validTarget));
     }
     public boolean validTarget(LivingEntity target){
