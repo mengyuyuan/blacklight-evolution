@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "blacklight:heavy_armor_core"
+    },
+    {
+      "item": "blacklight:military_circuit"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "item": "blacklight:bloodtox_starter",
+    "count": 1
+  }
+}

@@ -54,6 +54,13 @@ public final class GoliathObstructionGameTest {
     }
     @GameTest(template="blackwatch_arena",batch="goliath_active_wall",timeoutTicks=125)
     public static void actualForwardChargeCollisionStillExposesTheBoss(GameTestHelper h){
+        forwardImpact(h,false);
+    }
+    @GameTest(template="blackwatch_arena",batch="goliath_active_rail",timeoutTicks=125)
+    public static void chargingIntoAConvoyRailOpensTheLaneAndExposesTheKnee(GameTestHelper h){
+        forwardImpact(h,true);
+    }
+    private static void forwardImpact(GameTestHelper h,boolean rail){
         var s=scene(h);boolean[] wall={false},done={false};int[] wallZ={0};
         h.runAfterDelay(25,()->h.assertTrue(s.actor.begin(EncounterMove.CHARGE,s.target),"unobstructed charge starts"));
         h.onEachTick(()->{
@@ -62,13 +69,20 @@ public final class GoliathObstructionGameTest {
                 var body=s.actor.getBoundingBox();int z=(int)Math.ceil(body.maxZ+.1);
                 for(int x=(int)Math.floor(body.minX)-2;x<=(int)Math.ceil(body.maxX)+2;x++)
                     for(int y=(int)Math.floor(body.minY);y<=(int)Math.ceil(body.maxY)+2;y++)
-                        h.getLevel().setBlockAndUpdate(new BlockPos(x,y,z),Blocks.STONE.defaultBlockState());
+                        h.getLevel().setBlockAndUpdate(new BlockPos(x,y,z),rail && y<body.minY+4
+                                ? com.codex.blacklight.registry.ModBlocks.CONVOY_RAIL.get().defaultBlockState()
+                                : Blocks.STONE.defaultBlockState());
                 wallZ[0]=z;wall[0]=true;
             }
             if(wall[0]&&s.actor.exposed()){
                 done[0]=true;h.assertTrue(s.actor.move()==EncounterMove.NONE&&s.actor.goliathChargeSnapshot().phase()==-1,"physical impact during cycle clears the committed charge");
                 var center=BlockPos.containing(s.actor.getX(),s.actor.getY()+1.6,wallZ[0]);
-                h.assertTrue(h.getLevel().getBlockState(center).isAir(),"the collision opens the middle of the stone wall");
+                var state=h.getLevel().getBlockState(center);
+                if(rail){
+                    h.assertTrue(state.is(com.codex.blacklight.registry.ModBlocks.CONVOY_RAIL.get())
+                            && state.getValue(com.codex.blacklight.world.ConvoyRail.BENT)
+                            && state.getCollisionShape(h.getLevel(),center).isEmpty(),"the struck rail stays bent and passable");
+                }else h.assertTrue(state.isAir(),"the collision opens the middle of the stone wall");
                 h.assertTrue(h.getLevel().getBlockState(center.above(5)).is(Blocks.STONE),"untouched upper storey remains");
                 finish(h,s);
             }

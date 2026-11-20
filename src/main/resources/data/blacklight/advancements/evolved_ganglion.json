@@ -1,0 +1,31 @@
+{
+  "parent": "blacklight:sealed_sample",
+  "display": {
+    "icon": {
+      "item": "blacklight:evolved_ganglion"
+    },
+    "title": {
+      "translate": "item.blacklight.evolved_ganglion"
+    },
+    "description": {
+      "translate": "survival.blacklight.journal.evolved_ganglion"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "found": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "blacklight:evolved_ganglion"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

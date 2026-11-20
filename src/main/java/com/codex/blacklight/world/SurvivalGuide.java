@@ -13,7 +13,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public final class SurvivalGuide {
     private SurvivalGuide() {}
-    private static final String[] SITES = {"lost_convoy", "mother_plaza"};
+    private static final String[] SITES = {"on_research_station_maps", "lost_convoy", "mother_plaza", "dispatch_intersection"};
 
     @SubscribeEvent public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -62,7 +62,12 @@ public final class SurvivalGuide {
             if (!com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
                 next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
                         : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-            } else if (!done(player, "first_consume")) next = consumeHint();
+            } else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
+            else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
+            else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
+            else if (done(player,"containment_decoder")) next=Component.translatable("survival.blacklight.journal.containment_decoder");
+            else if (done(player,"evolved_ganglion")) next=Component.translatable("survival.blacklight.journal.evolved_ganglion");
+            else if (!done(player, "first_consume")) next = consumeHint();
             else if (!done(player, "first_evolution")) next = Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades"));
             else next = Component.translatable("survival.blacklight.branch");
             player.displayClientMessage(next, false);

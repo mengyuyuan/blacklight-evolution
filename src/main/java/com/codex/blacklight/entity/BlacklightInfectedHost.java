@@ -1113,8 +1113,14 @@ public final class BlacklightInfectedHost extends Monster {
             }
         }
     }
+    public boolean claimGanglion() {
+        if (!isEvolved() || level().isClientSide || getPersistentData().getBoolean("BlacklightGanglionClaimed")) return false;
+        getPersistentData().putBoolean("BlacklightGanglionClaimed", true);
+        return true;
+    }
     @Override protected void dropCustomDeathLoot(DamageSource source,int looting,boolean recentlyHit) {
         super.dropCustomDeathLoot(source,looting,recentlyHit);
+        if (claimGanglion()) spawnAtLocation(com.codex.blacklight.registry.ModItems.EVOLVED_GANGLION.get());
         // This hook already observes doMobLoot, drop capture, and LivingDrops cancellation.
         if(bossProfile()==InfectedBossProfile.WITHER)spawnAtLocation(net.minecraft.world.item.Items.NETHER_STAR);
     }

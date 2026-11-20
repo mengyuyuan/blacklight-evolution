@@ -1,0 +1,7 @@
+{
+  "parent": "blacklight:item/bloodtox_command_key",
+  "textures": {
+    "stripe": "minecraft:block/red_concrete",
+    "edge": "minecraft:block/netherite_block"
+  }
+}
