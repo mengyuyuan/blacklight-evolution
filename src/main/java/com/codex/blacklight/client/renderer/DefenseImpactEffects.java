@@ -36,22 +36,26 @@ public final class DefenseImpactEffects {
             Vec3 up=side.cross(outgoing).normalize();
             Vec3 contact=player.position().add(s.hitX(),s.hitY(),s.hitZ()).add(normal.scale(s.shield()?.45:.12));
             float force=Math.min(1.5F,s.strength());
-            int count=4+(int)(force*4); // 4-10 small sparks, instead of an overlapping cloud.
+            double incidence=Math.max(0,-incoming.dot(normal));
+            Vec3 skim=incoming.subtract(normal.scale(incoming.dot(normal))).normalize();
+            int count=4+(int)(force*4)+(s.braced()?2:0);
             for(int i=0;i<count;i++){
                 var random=player.getRandom();
                 double spread=.035+.035*force;
-                Vec3 scatter=outgoing.scale(.10+.14*force+random.nextDouble()*.10)
+                Vec3 scatter=outgoing.scale(.09+.13*force+random.nextDouble()*.09)
+                    .add(skim.scale((1-incidence)*(.08+random.nextDouble()*.12)))
                     .add(side.scale((random.nextDouble()-.5)*spread*2))
                     .add(up.scale((random.nextDouble()-.5)*spread));
                 var spark=mc.particleEngine.createParticle(ParticleTypes.ELECTRIC_SPARK,contact.x,contact.y,contact.z,scatter.x,scatter.y,scatter.z);
                 if(spark!=null){
                     boolean white=i%3==0;spark.setColor(1,white?.95F:.65F,white?.82F:.12F);
-                    spark.scale(.22F+force*.14F);spark.setLifetime(3+random.nextInt(3)+(int)force);
+                    spark.scale(.19F+force*(s.shield()?.15F:.10F));
+                    spark.setLifetime(3+random.nextInt(3)+(int)(force+(1-incidence)*2));
                 }
             }
             // A tiny two-tick white contact flash makes the impact readable without hiding the plate.
             var flash=mc.particleEngine.createParticle(ParticleTypes.ELECTRIC_SPARK,contact.x,contact.y,contact.z,0,0,0);
-            if(flash!=null){flash.setColor(1,.97F,.86F);flash.scale(.35F+force*.12F);flash.setLifetime(2);}
+            if(flash!=null){flash.setColor(1,.97F,.86F);flash.scale((float)(.20+.13*force+.14*incidence+(s.braced()?.08:0)));flash.setLifetime(2);}
         }
     }
 }

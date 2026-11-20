@@ -13,8 +13,21 @@ import com.codex.blacklight.forge.PacketDistributor;
  * The original source sprites stay private; rendering uses authored equivalents. */
 public final class PlayerHitEffects {
     private PlayerHitEffects(){}
-    static boolean metalAt(LivingEntity target, Vec3 point) {
-        if (target instanceof IronGolem) return true;
+    public static boolean fleshBody(LivingEntity target) {
+        return !(target instanceof IronGolem || target instanceof com.codex.blacklight.entity.MilitaryUav
+                || target instanceof net.minecraft.world.entity.monster.AbstractSkeleton
+                || target instanceof net.minecraft.world.entity.animal.SnowGolem);
+    }
+
+    static net.minecraft.sounds.SoundEvent hardContactSound(LivingEntity target, Vec3 point) {
+        if (metalAt(target, point)) return net.minecraft.sounds.SoundEvents.ANVIL_HIT;
+        if (target instanceof net.minecraft.world.entity.monster.AbstractSkeleton) return net.minecraft.sounds.SoundEvents.BONE_BLOCK_HIT;
+        if (target instanceof net.minecraft.world.entity.animal.SnowGolem) return net.minecraft.sounds.SoundEvents.SNOW_HIT;
+        return null;
+    }
+
+    public static boolean metalAt(LivingEntity target, Vec3 point) {
+        if (target instanceof IronGolem || target instanceof com.codex.blacklight.entity.MilitaryUav) return true;
         double height = (point.y - target.getBoundingBox().minY) / Math.max(.01, target.getBbHeight());
         var slot = height >= .82 ? net.minecraft.world.entity.EquipmentSlot.HEAD
                 : height > .46 ? net.minecraft.world.entity.EquipmentSlot.CHEST
@@ -30,17 +43,31 @@ public final class PlayerHitEffects {
     }
     public static void emit(ServerPlayer player,LivingEntity target,InfectedAttackStyle style,float size,WeaponCutContact.Report report,FleshStrike strike,boolean charged){
         if(player.level().isClientSide||target.level()!=player.level())return;
-        Vec3 point,normal;
-        if(report!=null&&!report.contacts().isEmpty()){
-            var hit=report.contacts().get(0);point=hit.point();
-            // A cutting plane faces across the swing. Flesh emission uses incoming
-            // hit-volume travel; only metal sparks need the contact surface normal.
-            normal=hit.travel().scale(-1);
-            if((metalAt(target,point)||normal.lengthSqr()<1e-8)&&hit.normal().lengthSqr()>1e-8)normal=hit.normal();
-        }else{
-            var box=target.getBoundingBox();var eye=player.getEyePosition();var center=box.getCenter();
-            point=box.clip(eye,center).orElse(center);normal=eye.subtract(point);
+        if (report == null || report.contacts().isEmpty()) {
+            var box = target.getBoundingBox();
+            Vec3 eye = player.getEyePosition();
+            Vec3 point = box.clip(eye, box.getCenter()).orElse(box.getCenter());
+            surface(player, target, style, size, strike, charged, point, eye.subtract(point), 0);
+            return;
         }
+        // A claw can cross more than one patch of skin. Duplicate contacts on one edge share a spray.
+        int limit = strike == FleshStrike.CLAW && report.kind() == WeaponCutContact.Kind.SLICE ? 3 : 1;
+        var emitted = new java.util.ArrayList<WeaponCutContact.Contact>(limit);
+        for (var hit : report.contacts()) {
+            if (emitted.stream().anyMatch(old -> java.util.Objects.equals(old.edge(),hit.edge()) || old.point().distanceToSqr(hit.point()) < .0064)) continue;
+            var normal = hit.travel().scale(-1);
+            if (report.kind()==WeaponCutContact.Kind.SLICE && !metalAt(target,hit.point()))
+                normal=FleshStrike.cutSpray(hit.travel(),hit.point().subtract(target.getBoundingBox().getCenter()));
+            if ((metalAt(target,hit.point()) || normal.lengthSqr() < 1e-8) && hit.normal().lengthSqr() > 1e-8) normal = hit.normal();
+            int index = emitted.size();
+            surface(player, target, style, index == 0 ? size : size * .56F, strike, charged && index == 0, hit.point(), normal, index);
+            emitted.add(hit);
+            if (emitted.size() == limit) break;
+        }
+    }
+
+    static void surface(ServerPlayer player, LivingEntity target, InfectedAttackStyle style, float size,
+                        FleshStrike strike, boolean charged, Vec3 point, Vec3 normal, int index) {
         if(!Double.isFinite(point.x+point.y+point.z+normal.x+normal.y+normal.z))return;
         if(normal.lengthSqr()<1e-8)normal=new Vec3(0,1,0);else normal=normal.normalize();
         if(metalAt(target,point)){
@@ -49,7 +76,7 @@ public final class PlayerHitEffects {
         }else{
             PacketDistributor.sendToPlayersNear(player.serverLevel(),null,point.x,point.y,point.z,80,
                     new InfectedImpactPayload(player.getId(),target.getId(),InfectedImpactPayload.appearance(style,strike,charged),point.x,point.y,point.z,
-                            (float)normal.x,(float)normal.y,(float)normal.z,size,player.level().getGameTime()*31+target.getId()*73L+player.getId()));
+                            (float)normal.x,(float)normal.y,(float)normal.z,size,player.level().getGameTime()*31+target.getId()*73L+player.getId()+index*101L));
         }
     }
 }

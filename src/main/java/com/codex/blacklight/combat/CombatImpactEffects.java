@@ -39,6 +39,22 @@ public final class CombatImpactEffects {
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
         return true;
     }
+    public static void devastator(ServerPlayer p,LivingEntity victim,WeaponMove move,Vec3 origin) {
+        if (AnimatedHurtBody.of(victim)!=null) return;
+        var box=victim.getBoundingBox();
+        var center=box.getCenter();
+        int kind=DevastatorSystem.kind(move);
+        Vec3 from=kind==0?new Vec3(center.x,box.minY-.20,center.z):origin;
+        Vec3 axis=center.subtract(from).normalize();
+        var entry=box.clip(from,center).orElse(CombatTargeting.closestPoint(from,victim));
+        var style=switch(kind) {
+            case 0 -> com.codex.blacklight.infection.InfectedAttackStyle.PIERCE;
+            case 1 -> com.codex.blacklight.infection.InfectedAttackStyle.WHIP;
+            case 2 -> com.codex.blacklight.infection.InfectedAttackStyle.BURST;
+            default -> com.codex.blacklight.infection.InfectedAttackStyle.CRUSH;
+        };
+        PlayerHitEffects.surface(p,victim,style,1.42F,FleshStrike.GENERIC,false,entry,kind==0?axis:axis.scale(-1),0);
+    }
     public static void target(ServerPlayer p,LivingEntity v,WeaponMove move){
         target(p,v,move,WeaponCutContact.Report.NONE,false);
     }
@@ -52,11 +68,12 @@ public final class CombatImpactEffects {
             case LASH -> .6F;
             case HAMMER -> .8F;
             case MUSCLE -> .7F;
-            case EDGE -> move.form==PowerForm.BLADE?.65F:.5F;
+            case EDGE -> .76F;
+            case CLAW -> .62F;
             default -> .5F;
         };
         var kind=contact.kind();
-        if(contact.contacts().isEmpty()&&(strike==FleshStrike.EDGE||strike==FleshStrike.LASH))
+        if(contact.contacts().isEmpty()&&(strike==FleshStrike.EDGE||strike==FleshStrike.CLAW||strike==FleshStrike.LASH))
             kind=WeaponCutContact.contactKind(move);
         PlayerHitEffects.emit(p,v,strike.style(kind),size*ImpactTier.of(move).effectScale,contact,strike,fullyCharged);
     }

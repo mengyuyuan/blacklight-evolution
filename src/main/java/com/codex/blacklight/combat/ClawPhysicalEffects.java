@@ -37,7 +37,7 @@ public final class ClawPhysicalEffects {
 
     public static void onComboTargetHit(ServerPlayer player, LivingEntity target, boolean heavy) {
         PlayerHitEffects.emit(player,target,heavy?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
-                heavy?.8F:.5F,WeaponCutContact.Report.NONE);
+                heavy?.8F:.5F,WeaponCutContact.Report.NONE,FleshStrike.CLAW,false);
     }
 
     public static void onComboImpact(ServerPlayer player, ClawCombatState.Action action,
@@ -51,7 +51,7 @@ public final class ClawPhysicalEffects {
             double normalized = i / (double)(arcPoints - 1) - 0.5D;
             Vec3 point = center.add(right.scale(normalized * (heavy ? 2.5D : 1.7D)))
                     .add(0.0D, (0.5D - Math.abs(normalized)) * 0.75D, 0.0D);
-            level.sendParticles((i & 1) == 0 ? BLOOD_RED : BIOMASS_DARK,
+            level.sendParticles(BIOMASS_DARK,
                     point.x, point.y, point.z, heavy ? 2 : 1,
                     0.06D, 0.08D, 0.06D, 0.025D);
         }
@@ -69,8 +69,6 @@ public final class ClawPhysicalEffects {
     public static void onDashingSliceImpact(ServerPlayer player, Vec3 forward, int hitCount) {
         ServerLevel level = player.serverLevel();
         Vec3 center = player.position().add(forward.scale(0.85D)).add(0.0D, 1.0D, 0.0D);
-        level.sendParticles(BLOOD_RED, center.x, center.y, center.z,
-                24, 1.05D, 0.72D, 1.05D, 0.10D);
         level.sendParticles(BIOMASS_DARK, center.x, center.y, center.z,
                 16, 0.92D, 0.62D, 0.92D, 0.065D);
         level.sendParticles(ModParticles.BIOMASS_SLASH.get(), center.x, center.y, center.z,

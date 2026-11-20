@@ -27,7 +27,8 @@ public final class GoliathTargetLockGameTest {
         static Fixture open(GameTestHelper h) {
             var level = h.getLevel();
             var mob = EncounterEntities.CREATURES.get(EncounterKind.GOLIATH).get().create(level);
-            mob.setPos(h.absoluteVec(new Vec3(8, 24, 8)));
+            // Keep the twenty-block sight line above neighboring test structures.
+            mob.setPos(h.absoluteVec(new Vec3(8, 120, 8)));
             mob.setNoAi(true);
             mob.setNoGravity(true);
             level.addFreshEntity(mob);

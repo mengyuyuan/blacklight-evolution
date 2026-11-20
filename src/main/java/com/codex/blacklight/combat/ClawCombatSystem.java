@@ -420,7 +420,12 @@ public final class ClawCombatSystem {
                         action == ClawCombatState.Action.AUTO_3 ? 0.28D : 0.08D,
                         forward.z * knockback);
                 hitCount++;
-                WeaponImpact.contact(player, target, action == ClawCombatState.Action.AUTO_3 ? ImpactTier.FINISHER : ImpactTier.LIGHT, false, null);
+                var move = switch (action) {
+                    case AUTO_2 -> WeaponMove.CLAW_AUTO2;
+                    case AUTO_3 -> WeaponMove.CLAW_AUTO3;
+                    default -> WeaponMove.CLAW_AUTO1;
+                };
+                WeaponImpact.contact(player,target,ImpactTier.of(move),false,null,move,player.position());
             }
         }
         hitCount+=hitHulls(player,sweep,damage,new HashSet<>(),maxTargets-targets.size());
