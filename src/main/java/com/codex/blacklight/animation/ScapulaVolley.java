@@ -36,7 +36,9 @@ public final class ScapulaVolley {
 
     public static float damage(float base,int slot,int pairs) {
         if(pairs==0)return base;
-        return base*(slot==0?.68F:Math.abs(slot)==1?.29F:.21F);
+        if (pairs == 1) return base * (slot == 0 ? 8 : 2) / 12F;
+        int weight = slot == 0 ? 11 : Math.abs(slot) == 1 ? 3 : 2;
+        return base * weight / 21F;
     }
 
     /** Turn existing horizontal travel a little. Repeated light attacks cannot add altitude or stack dash speed. */

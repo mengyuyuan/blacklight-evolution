@@ -9,6 +9,7 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
+import com.codex.blacklight.combat.QuillWedge;
 
 /** Each detached quill travels and collides with the world independently. */
 public final class BackspineQuill extends ThrowableItemProjectile {
@@ -51,6 +52,15 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         return body==null?target.getUUID():body.getUUID();
     }
     private float damage=4;
+    private boolean canWedge, canPierceWedge, piercingWedge;
+    private LivingEntity wedgedTarget;
+    public void setWedgeSkills(boolean wedge, boolean pierce) {
+        canWedge = wedge;
+        canPierceWedge = wedge && pierce;
+    }
+    public boolean reducesArmorOf(LivingEntity victim) { return wedgedTarget == victim; }
+    private int cleaveLimit() { return piercingWedge ? 2 : CLEAVE_LIMIT; }
+
     public BackspineQuill(EntityType<? extends BackspineQuill> type,Level level){super(type,level);}
     public BackspineQuill(Level level,Player owner,float damage,int side){
         super(ModEntities.BACKSPINE_QUILL.get(),owner,level);this.damage=damage;entityData.set(SIDE,side);
@@ -72,27 +82,51 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         var previous=living==null?null:living.getLastDamageSource();
         boolean ownVolley=immunity>0&&previous!=null&&previous.getDirectEntity() instanceof BackspineQuill other
                 &&getOwner()!=null&&other.getOwner()==getOwner();
-        if(ownVolley)living.invulnerableTime=0;
-        boolean accepted=receiver.hurt(damageSources().thrown(this,getOwner()),damage);
-        if(accepted&&living!=null&&getOwner() instanceof net.minecraft.server.level.ServerPlayer player){
-            var direction=getDeltaMovement().normalize();
-            var box=receiver.getBoundingBox();
-            double span=box.getSize()*3+2;
-            Vec3 from=position().subtract(direction.scale(span)),to=position().add(direction.scale(span));
-            var entry=box.clip(from,to).orElseGet(()->{
-                var nearest=box.inflate(.3).clip(from,to).orElse(position());
-                return new Vec3(Math.max(box.minX,Math.min(box.maxX,nearest.x)),Math.max(box.minY,Math.min(box.maxY,nearest.y)),
-                        Math.max(box.minZ,Math.min(box.maxZ,nearest.z)));
-            });
-            com.codex.blacklight.combat.QuillImpact.hit(player,living,entry,direction,heavy());
+        var source = damageSources().thrown(this, getOwner());
+        var direction = getDeltaMovement().normalize();
+        var box = receiver.getBoundingBox();
+        // ProjectileUtil can report the entity origin. Preserve the actual flight line for a local wound.
+        var from = position().subtract(direction.scale(.001));
+        var end = position().add(getDeltaMovement()).add(direction.scale(.30));
+        var intersection = box.contains(from) ? java.util.Optional.of(from) : box.clip(from, end);
+        var entry = intersection.orElseGet(() -> box.clip(from, box.getCenter()).orElse(box.getCenter()));
+        var owner = getOwner();
+        long now = level().getGameTime();
+        var site = canWedge && owner != null && living != null && intersection.isPresent() && volleySlot() == 0 && !piercingWedge
+                ? QuillWedge.site(receiver, living, from, end, entry) : null;
+        boolean wedge = heavy() && site != null && QuillWedge.matches(receiver, owner.getUUID(), site, now);
+        if (ownVolley) living.invulnerableTime = 0;
+        boolean accepted = false;
+        wedgedTarget = wedge ? living : null;
+        try {
+            accepted = receiver.hurt(source, damage);
+        } finally {
+            wedgedTarget = null;
+            if (ownVolley && !accepted) living.invulnerableTime = immunity;
         }
-        if(ownVolley&&!accepted)living.invulnerableTime=immunity;
+        if (accepted && living != null && owner instanceof net.minecraft.server.level.ServerPlayer player) {
+            if (site != null && (!heavy() || wedge)) QuillWedge.accepted(receiver, owner.getUUID(), site, now, heavy());
+            com.codex.blacklight.combat.QuillImpact.hit(player, living, site == null ? entry : site.point(),
+                    direction, heavy(), volleySlot());
+            if (wedge && canPierceWedge && cutTargets == null) {
+                piercingWedge = true;
+                enableCleaving();
+                damage *= .6F;
+                // Continue along the segment which hit the wedge, including the next server tick.
+                entityData.set(TRAVEL, getDeltaMovement().toVector3f());
+                entityData.set(BOW, new org.joml.Vector3f());
+            }
+        }
     }
     @Override protected void onHitBlock(BlockHitResult hit){
         super.onHitBlock(hit);
         if(level() instanceof net.minecraft.server.level.ServerLevel server){
             var state=server.getBlockState(hit.getBlockPos());
             var point=hit.getLocation().add(Vec3.atLowerCornerOf(hit.getDirection().getNormal()).scale(.035));
+            var material = state.getSoundType(server, hit.getBlockPos(), this);
+            float gain = volleySlot() == 0 ? (heavy() ? .72F : .5F) : .14F;
+            server.playSound(null, point.x, point.y, point.z, material.getHitSound(), net.minecraft.sounds.SoundSource.PLAYERS,
+                    gain * material.getVolume(), material.getPitch() * (heavy() ? .84F : 1.16F));
             server.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,state),
                     point.x,point.y,point.z,heavy()?13:5,.065,.065,.065,heavy()?.13:.06);
         }
@@ -117,10 +151,11 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         Vec3 end=position().add(getDeltaMovement());
         var wall=level().clip(new net.minecraft.world.level.ClipContext(position(),end,
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,this));
-        Vec3 from=position();
+        var box = first.getEntity().getBoundingBox();
+        Vec3 from = box.contains(position()) ? position() : box.clip(position(), end).orElse(end);
         // Vanilla reports the nearest contact in a tick. Consume the remainder
         // of that same segment so adjacent bodies and a wall behind one agree.
-        while(cutTargets.size()<CLEAVE_LIMIT){
+        while(cutTargets.size()<cleaveLimit()){
             var next=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(level(),this,from,
                     wall.getLocation(),new AABB(from,wall.getLocation()).inflate(1),this::canHitEntity);
             if(next==null){
@@ -188,6 +223,9 @@ public final class BackspineQuill extends ThrowableItemProjectile {
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){
         super.addAdditionalSaveData(tag);tag.putFloat("QuillDamage",damage);tag.putInt("FalxSide",side());tag.putBoolean("QuillHeavy",heavy());
+        tag.putBoolean("CanWedge", canWedge);
+        tag.putBoolean("CanPierceWedge", canPierceWedge);
+        tag.putBoolean("PiercingWedge", piercingWedge);
         tag.putInt("VolleySlot",volleySlot());tag.putInt("RoofIndex",roofIndex());
         tag.putInt("FalxSpan",entityData.get(SPAN));tag.putLong("FalxStart",entityData.get(START));
         if(cutTargets!=null){
@@ -202,6 +240,8 @@ public final class BackspineQuill extends ThrowableItemProjectile {
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){
         super.readAdditionalSaveData(tag);if(tag.contains("QuillDamage"))damage=tag.getFloat("QuillDamage");
+        setWedgeSkills(tag.getBoolean("CanWedge"), tag.getBoolean("CanPierceWedge"));
+        piercingWedge = tag.getBoolean("PiercingWedge");
         setVolleySlot(tag.getInt("VolleySlot"));
         setRoofIndex(tag.contains("RoofIndex")?tag.getInt("RoofIndex"):2*Math.abs(volleySlot())+(tag.getInt("FalxSide")&1));
         setHeavy(tag.getBoolean("QuillHeavy"));

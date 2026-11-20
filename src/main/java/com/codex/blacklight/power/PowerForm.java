@@ -15,7 +15,7 @@ public enum PowerForm {
     INFECTED_VISION("infected_vision", 1 << 8, 300),
     BIOMASS("biomass",1 << 9,0),
     SOVEREIGN_WINGS("sovereign_wings",1 << 10,1500),
-    BACKSPINES("backspines",1 << 11,0);
+    BACKSPINES("backspines",1 << 11,400);
 
     private final String id;
     private final int bit;

@@ -15,6 +15,10 @@ public final class HitStop {
     private static final Map<LivingEntity, Hold> HELD = new WeakHashMap<>();
     private HitStop() { }
 
+    static int ragdollFreezeTicks(boolean refinement,boolean dead,int remaining,int corpseFreeze){
+        return refinement?0:net.minecraft.util.Mth.clamp(dead?corpseFreeze:remaining,0,8);
+    }
+
     public static void victim(LivingEntity v, int ticks) {
         if (com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled()) com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("HitStop victim {} ticks={} alive={} multipart={}", v.getType().getDescriptionId(), ticks, v.isAlive(), CombatTargeting.anchoredBody(v));
         // Player movement is client-predicted; a server freeze only rubber-bands the victim.

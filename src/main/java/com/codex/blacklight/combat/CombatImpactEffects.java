@@ -32,7 +32,10 @@ public final class CombatImpactEffects {
         if(hit.getType()!=HitResult.Type.BLOCK||hit.getDirection()!=net.minecraft.core.Direction.UP)return false;
         var level=p.serverLevel();var center=hit.getLocation();float radius=(float)(move.quake()?AttackReach.reach(p,move):(move==move.uncharged()?1.65:2.2)*AttackReach.scale(p));
         if(!TerrainImpactEffects.emit(p,hit,radius,move.quake()))return false;
-        com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"ground",center,1F,move.quake()?.9F:1F);
+        var form = com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
+        boolean hammer = form == PowerForm.HAMMERFISTS;
+        com.codex.blacklight.registry.ModWeaponSounds.play(p, form, "ground", center, hammer ? .72F : 1F, move.quake() ? .9F : 1F);
+        TerrainImpactEffects.surfaceSound(p, hit, hammer ? .88F : .62F, move.quake() ? .75F : .9F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
         return true;
     }

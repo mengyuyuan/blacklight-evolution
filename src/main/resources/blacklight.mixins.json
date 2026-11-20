@@ -10,6 +10,7 @@
     "OptionalTwilightHydraMixin",
     "OptionalTwilightLichMixin",
     "CrossModLivingDamageMixin",
+    "QuillArmorMixin",
     "CrossModItemDamageMixin",
     "PotentiaDiveMixin",
     "PotentiaDamageTagsMixin",

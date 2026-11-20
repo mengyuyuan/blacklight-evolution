@@ -11,3 +11,5 @@ Complete upstream contributors and source links for Socapex are included in Soca
 The derived audio cues under assets/blacklight/sounds/weapons and assets/blacklight/sounds/defense are provided under CC BY-SA 3.0. This audio notice does not change the license of the mod code or other assets. Source archives remain under their respective licenses above.
 
 License links: https://creativecommons.org/licenses/by-sa/3.0/ and https://creativecommons.org/publicdomain/zero/1.0/
+
+The draw, swing and heavy variations ending in _2 and _3 under sounds/weapon/backspines use the credited Socapex combat recordings and artisticdude swishes, trimmed, pitched and layered for the shoulder organ. These six mixes are licensed under CC BY-SA 3.0.
