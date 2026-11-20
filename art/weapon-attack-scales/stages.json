@@ -1,6 +1,18 @@
 {
   "schema": 1,
   "axisMapping": "source bone X -> mesh longitudinal Y; source Y -> mesh X; source Z -> mesh Z",
+  "heavyHammerGrowthAxes": {
+    "forearm": [
+      0.92,
+      0.47,
+      0.84
+    ],
+    "fist": [
+      1.0,
+      1.1,
+      0.8
+    ]
+  },
   "moves": {
     "hammer_jab": {
       "folder": "alex_hammerfist",
@@ -218,7 +230,17 @@
         }
       ],
       "chargedBlendFrames": 3,
-      "release": 0.1
+      "release": 0.1,
+      "heavyStrikeGrowth": {
+        "tap": [
+          1.4,
+          1.75
+        ],
+        "charged": [
+          1.75,
+          2.35
+        ]
+      }
     },
     "hammer_combo_special": {
       "folder": "alex_hammerfist",
@@ -445,6 +467,16 @@
               1
             ]
           }
+        ]
+      },
+      "heavyStrikeGrowth": {
+        "tap": [
+          1.4,
+          1.75
+        ],
+        "charged": [
+          1.75,
+          2.35
         ]
       }
     },
@@ -1171,6 +1203,16 @@
             ]
           }
         ]
+      },
+      "heavyStrikeGrowth": {
+        "tap": [
+          1.55,
+          1.95
+        ],
+        "charged": [
+          1.55,
+          1.95
+        ]
       }
     },
     "hammer_ram": {
@@ -1222,7 +1264,18 @@
           "blend": 0
         }
       ],
-      "release": 0.1
+      "release": 0.1,
+      "heavyStrikeGrowth": {
+        "tap": [
+          1.85,
+          3.35
+        ],
+        "charged": [
+          1.85,
+          3.35
+        ],
+        "retractFrom": 2.6333333333333333
+      }
     },
     "claw_sprint": {
       "folder": "alex_claws",

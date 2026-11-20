@@ -1,9 +1,52 @@
 package com.codex.blacklight.client.animation;
 import com.codex.blacklight.animation.*;
 import com.codex.blacklight.combat.*;
+import org.joml.Vector3f;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class HammerGroundPoseTest {
+    @Test void heavyKnucklesOutgrowTheChargedJabAtImpact() {
+        var jab = WeaponAttackScales.sample("hammer_jab_charged", .10F, false);
+        for (String name : new String[]{"hammer_quake", "hammer_combo_special"}) {
+            var motion = LocalWeaponMotion.find(name).orElseThrow();
+            float impact = motion.landing().map(LocalWeaponMotion.Landing::impactTime).orElse(1.33F);
+            var tap = WeaponAttackScales.sample(name, impact, false);
+            var charged = WeaponAttackScales.sample(name + "_charged", impact, false);
+            assertTrue(tap.px() > jab.px() * 1.30F && tap.py() > jab.py() * 1.30F && tap.pz() > jab.pz() * 1.15F, name);
+            assertTrue(charged.px() > tap.px() * 1.20F && charged.pz() > tap.pz() * 1.20F, name);
+            assertTrue(charged.py() > tap.py() * 1.20F, name);
+            var charge = motion.charge().orElseThrow();
+            assertEquals(WeaponAttackScales.sample(charge.animation(), 2F, false),
+                    WeaponAttackScales.sample(name + "_charged", charge.releaseTime(), false));
+            assertEquals(WeaponAttackScales.Shape.IDENTITY, WeaponAttackScales.sample(name, impact, true));
+        }
+    }
+
+    @Test void heavyPalmKeepsDepthAndLength() {
+        var rig = BlacklightSkeleton.get();
+        var neutral = new BlacklightPose();
+        var handLocal = rig.getBoundTransformFor(neutral, rig.handR).invert();
+        var knuckles = HammerGroundPose.fist(neutral, WeaponAttackScales.Shape.IDENTITY, false).stream()
+                .map(handLocal::transformPosition).filter(vertex -> vertex.y >= .55F).toList();
+        assertFalse(knuckles.isEmpty());
+        for (String clip : new String[]{"hammer_quake", "hammer_quake_charged", "hammer_combo_special",
+                "hammer_combo_special_charged", "hammer_drop", "hammer_ram"}) {
+            var shape = WeaponAttackScales.sample(clip, clip.equals("hammer_ram") ? .43F : 1F, false);
+            var low = new Vector3f(Float.POSITIVE_INFINITY);
+            var high = new Vector3f(Float.NEGATIVE_INFINITY);
+            for (var vertex : knuckles) {
+                var point = shape.point(new Vector3f(vertex));
+                low.min(point);
+                high.max(point);
+            }
+            var size = high.sub(low);
+            float shortest = Math.min(size.x, Math.min(size.y, size.z));
+            float longest = Math.max(size.x, Math.max(size.y, size.z));
+            assertTrue(shortest >= longest * .82F, clip + " knuckle dimensions " + size);
+            assertTrue(shape.py() > shape.fy(), clip + " wrist should taper into the fist");
+        }
+    }
+
     @Test void comboFistGrowsThroughDescentAndRetractsWithRecovery() {
         var normal=WeaponMove.HAMMER_COMBO_SPECIAL;
         for(var move:new WeaponMove[]{normal,WeaponMove.HAMMER_COMBO_SPECIAL_CHARGED}) {
