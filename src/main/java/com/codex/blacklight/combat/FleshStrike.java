@@ -5,7 +5,7 @@ import com.codex.blacklight.power.PowerForm;
 
 /** Presentation of one accepted flesh contact. IDs are stable on the cosmetic wire. */
 public enum FleshStrike {
-    GENERIC(0), FIST(1), LASH(2), HAMMER(3), MUSCLE(4), EDGE(5);
+    GENERIC(0), FIST(1), LASH(2), HAMMER(3), MUSCLE(4), EDGE(5), CLAW(6), QUILL(7);
 
     public final int id;
     FleshStrike(int id) { this.id = id; }
@@ -17,6 +17,8 @@ public enum FleshStrike {
             case 3 -> HAMMER;
             case 4 -> MUSCLE;
             case 5 -> EDGE;
+            case 6 -> CLAW;
+            case 7 -> QUILL;
             default -> GENERIC;
         };
     }
@@ -28,9 +30,17 @@ public enum FleshStrike {
             case MUSCLE_MASS -> equipped == PowerForm.MUSCLE_MASS ? MUSCLE : FIST;
             case HAMMERFISTS -> HAMMER;
             case WHIPFIST -> LASH;
-            case BLADE, CLAWS -> EDGE;
+            case BLADE -> EDGE;
+            case CLAWS -> CLAW;
             default -> GENERIC;
         };
+    }
+
+    /** A cutting edge throws the sheet along its stroke while the skin opens outwards. */
+    static net.minecraft.world.phys.Vec3 cutSpray(net.minecraft.world.phys.Vec3 travel, net.minecraft.world.phys.Vec3 outward) {
+        var face=outward.normalize();
+        var tangent=travel.subtract(face.scale(travel.dot(face))).normalize();
+        return face.scale(.40).add(tangent.scale(.90)).normalize();
     }
 
     public InfectedAttackStyle style(WeaponCutContact.Kind kind) {

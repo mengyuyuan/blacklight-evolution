@@ -31,12 +31,16 @@ public final class ImpactSpray {
     private static final Shape LASH=new Shape(15,3,.26,1.45,.86,2.05,.72);
     private static final Shape HAMMER=new Shape(20,4,2.65,.90,1.58,.94,.75);
     private static final Shape MUSCLE=new Shape(16,3,.72,1.68,1.28,1.36,.85);
-    private static final Shape CUT=new Shape(16,3,.52,1,1,1,1);
+    private static final Shape CUT=new Shape(17,3,.39,1.32,1.08,1.62,.85);
+    private static final Shape RAKE=new Shape(11,3,.35,1.13,.87,1.81,.62);
     private static final Shape PUNCTURE=new Shape(10,0,.24,1,.9,1.25,1);
     private static final Shape CRUSH=new Shape(21,5,.52,1,1,1,1);
     private static Shape shape(FleshStrike strike,InfectedAttackStyle style) {
         if(style==InfectedAttackStyle.PIERCE)return PUNCTURE;
         return switch(strike){
+            case EDGE -> CUT;
+            case CLAW -> RAKE;
+            case QUILL -> PUNCTURE;
             case FIST -> FIST;
             case LASH -> LASH;
             case HAMMER -> HAMMER;
@@ -51,7 +55,7 @@ public final class ImpactSpray {
         if (!Double.isFinite(ageTicks) || ageTicks < 0 || ageTicks > 14) return;
         double age = ageTicks / 20, scale = scale(size)*(charged?1.16:1);
         var shape=shape(strike,style);
-        int drops=shape.drops+(charged?4:0);
+        int drops=strike==FleshStrike.QUILL && size<.4F ? 4 : shape.drops+(charged?4:0);
         for (int i = 0; i < drops; i++) {
             long s = seed + i * 53L;
             double delay = i == 0 ? 0 : unit(s + 1) * BLOOD_EMISSION * shape.window;

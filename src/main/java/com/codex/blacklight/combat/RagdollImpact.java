@@ -91,9 +91,15 @@ public final class RagdollImpact {
         for(int bit=1;bit<=32;bit<<=1){
             // Every confirmed contact drives its struck joint, including non-lethal hits.
             // Separation remains governed independently by the server's dismember mask.
-            Vec3 travel=Vec3.ZERO;for(var contact:cut.contacts())if(contact.region()==bit)travel=travel.add(contact.travel());
+            Vec3 travel=Vec3.ZERO;
+            int samples=0;
+            for(var contact:cut.contacts()) if(contact.region()==bit) {
+                travel=travel.add(contact.travel());
+                samples++;
+            }
             if(travel.lengthSqr()<1e-8)continue;
-            var impulse=velocity.scale(.5).add(travel.normalize().scale(.38));
+            double volume=victim.getBbWidth()*victim.getBbWidth()*victim.getBbHeight();
+            var impulse=JointImpact.impulse(velocity,travel,samples,volume,sharp,QuillImpact.isQuill(motion));
             impulses.add(new RagdollImpactPayload.CutImpulse(bit,(float)impulse.x,(float)impulse.y,(float)impulse.z));
         }
         var planes=new java.util.ArrayList<RagdollImpactPayload.CutPlane>();

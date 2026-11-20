@@ -33,8 +33,21 @@ public final class InfectedImpactVisuals {
         if(current!=mc.level){ACTIVE.clear();current=mc.level;}
         while(ACTIVE.size()>=128)ACTIVE.removeFirst();var victim=mc.level.getEntity(data.victim());
         var anchor=victim instanceof com.codex.blacklight.combat.AnimatedHurtBody hydra&&hydra.animatedHurtBody()?HydraWoundAnchor.capture(hydra,point,new Vec3(data.dx(),data.dy(),data.dz()),(float)Math.max(0,Math.min(1,started-mc.level.getGameTime()))):null;
-        if (victim instanceof net.minecraft.world.entity.LivingEntity living)
+        if (victim instanceof net.minecraft.world.entity.LivingEntity living) {
+            if (living.isInvisible()) return;
+            if (!com.codex.blacklight.combat.PlayerHitEffects.fleshBody(living)) {
+                var item = living instanceof net.minecraft.world.entity.animal.SnowGolem ? net.minecraft.world.item.Items.SNOWBALL
+                        : living instanceof net.minecraft.world.entity.monster.AbstractSkeleton ? net.minecraft.world.item.Items.BONE : null;
+                if (item != null) {
+                    var chip = new net.minecraft.core.particles.ItemParticleOption(net.minecraft.core.particles.ParticleTypes.ITEM, new net.minecraft.world.item.ItemStack(item));
+                    for (int i=0;i<4;i++) mc.level.addParticle(chip, point.x,point.y,point.z,
+                            data.dx()*.07+(mc.level.random.nextDouble()-.5)*.12,.06+mc.level.random.nextDouble()*.08,data.dz()*.07+(mc.level.random.nextDouble()-.5)*.12);
+                }
+                return;
+            }
             com.codex.blacklight.client.animation.FleshRecoil.accept(living, data, started);
+            WoundBlood.contact(data, point, new Vec3(data.dx(),data.dy(),data.dz()), living);
+        }
         var axis=new Vec3(data.dx(),data.dy(),data.dz());
         var path=new SprayEmitterPath(anchor==null?point:anchor.point(),anchor==null?axis:anchor.normal(),victim!=null);
         ACTIVE.addLast(new Impact(data,started,victim==null?point:victim.getPosition((float)Math.clamp(started-mc.level.getGameTime(),0,1)),anchor,path,victim instanceof com.codex.blacklight.entity.BlacklightHunter));accepted++;

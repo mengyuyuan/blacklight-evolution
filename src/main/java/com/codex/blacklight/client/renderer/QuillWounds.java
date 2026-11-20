@@ -9,7 +9,6 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
@@ -103,7 +102,7 @@ final class QuillWounds {
         }
         if(hit==null||hit.first>e.getBbWidth()+e.getBbHeight()+1)return;
         var n=node(e,nodes,hit.key,partial);var inverse=new Quaternionf(n.rotation()).conjugate();
-        var entry=from.add(dir.scale(hit.first));var exit=from.add(dir.scale(Math.max(hit.first+.04,hit.last)));
+        var entry=from.add(dir.scale(hit.first));var exit=from.add(dir.scale(mark.heavy ? hit.last : Math.max(hit.first+.04,hit.last)));
         mark.key=hit.key;mark.localEntry=rotate(entry.subtract(n.pivot()),inverse);
         mark.localExit=rotate(exit.subtract(n.pivot()),inverse);mark.localAcross=rotate(right,inverse);
     }
@@ -127,7 +126,7 @@ final class QuillWounds {
     private static ArrayList<Vertex> apply(LivingEntity e,ArrayList<Vertex> skin,Map<Object,Node> nodes,float partial,Mark mark){
         var bone=node(e,nodes,mark.key,partial);
         Vec3 a=bone.pivot().add(rotate(mark.localEntry,bone.rotation())),b=bone.pivot().add(rotate(mark.localExit,bone.rotation()));
-        Vec3 direction=b.subtract(a).normalize();boolean metal=e instanceof IronGolem;
+        Vec3 direction=b.subtract(a).normalize();boolean metal=com.codex.blacklight.combat.PlayerHitEffects.metalAt(e,a);
         var out=new ArrayList<Vertex>(skin.size()+256);
         if(!mark.heavy){
             out.addAll(skin);
@@ -139,6 +138,14 @@ final class QuillWounds {
         }
         if(!mark.reported){
             mark.reported=true;
+            if(mark.heavy && !metal && com.codex.blacklight.combat.PlayerHitEffects.fleshBody(e)
+                    && !com.codex.blacklight.combat.PlayerHitEffects.metalAt(e,b)) {
+                int appearance=com.codex.blacklight.network.InfectedImpactPayload.appearance(
+                        com.codex.blacklight.infection.InfectedAttackStyle.PIERCE,com.codex.blacklight.combat.FleshStrike.QUILL,true);
+                var exit=new com.codex.blacklight.network.InfectedImpactPayload(-1,e.getId(),appearance,b.x,b.y,b.z,
+                        (float)direction.x,(float)direction.y,(float)direction.z,1.20F,mark.expires*31+e.getId());
+                WoundBlood.contact(exit,b,direction,e);
+            }
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Quill surface victim={} id={} heavy={} depth={} verticesBefore={} verticesAfter={}",e.getType().getDescriptionId(),e.getId(),mark.heavy,a.distanceTo(b),skin.size(),out.size());
         }
         return out;

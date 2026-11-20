@@ -9,6 +9,12 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 
 /** Solid face touching a thrown body's final collision box. Speed is measured into that face. */
 record ThrownBodyWall(BlockPos block, Vec3 point, Vec3 normal, double speed) {
+    Vec3 rebound(Vec3 incoming) {
+        double into = Math.max(0, -incoming.dot(normal));
+        Vec3 tangent = incoming.add(normal.scale(into));
+        return tangent.scale(.63).add(normal.scale(Math.min(.17, into * .12))).add(0,-.06,0);
+    }
+
     static ThrownBodyWall find(ServerLevel level, LivingEntity victim, Vec3 incoming) {
         AABB body = victim.getBoundingBox();
         var low = BlockPos.containing(body.minX - .01, body.minY - 1, body.minZ - .01);

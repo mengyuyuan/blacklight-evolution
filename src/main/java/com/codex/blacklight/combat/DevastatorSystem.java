@@ -325,7 +325,7 @@ public final class DevastatorSystem {
                     double resistance=target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
                     target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,(kind==0?.8:.15)*(1-resistance),0));target.hurtMarked=true;
                 }
-                WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null);
+                WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null,s.move,kind==2?p.getEyePosition():s.origin);
             }
         }
     }
@@ -409,7 +409,7 @@ public final class DevastatorSystem {
                 float damage=DevastatorDamage.secondary(track.damage());
                 if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
                         DevastatorCollision.activeStart(s.move,s.timing)+track.begin(),damage))){
-                    struck.add(target.getUUID());s.hits++;CombatImpactEffects.target(p,target,s.move);
+                    struck.add(target.getUUID());s.hits++;CombatImpactEffects.devastator(p,target,s.move,capsuleOrigin);
                 }
             }
         }

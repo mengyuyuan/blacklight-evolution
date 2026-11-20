@@ -45,16 +45,48 @@ public final class WoundBlood {
     }
     private static void reset(){
         var level=Minecraft.getInstance().level;
-        if(scene!=level){scene=level;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();CONSUME_HITS.clear();}
+        if(scene!=level){scene=level;dropTick=Long.MIN_VALUE;contactDrops=0;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();CONSUME_HITS.clear();}
     }
+    private static long dropTick = Long.MIN_VALUE;
+    private static int contactDrops;
+
+    static void contact(com.codex.blacklight.network.InfectedImpactPayload hit, Vec3 point, Vec3 direction, LivingEntity victim) {
+        reset();
+        var player = Minecraft.getInstance().player;
+        if (scene == null || player == null || victim.isInvisible() || player.position().distanceToSqr(point) > 48*48) return;
+        long tick = scene.getGameTime();
+        if (dropTick != tick) { dropTick = tick; contactDrops = 0; }
+        var flight = BloodFlight.of(hit.strike(), com.codex.blacklight.infection.InfectedAttackStyle.resolve(hit.style()));
+        int count = Math.min(48 - contactDrops, Math.max(1, Math.round(flight.drops * hit.size()) + (hit.charged() ? 2 : 0)));
+        if (count <= 0) return;
+        contactDrops += count;
+        Vec3 axis = direction.lengthSqr() > 1e-8 ? direction.normalize() : new Vec3(0,1,0);
+        Vec3 across = axis.cross(Math.abs(axis.y) < .9 ? new Vec3(0,1,0) : new Vec3(1,0,0)).normalize();
+        Vec3 up = across.cross(axis);
+        var drift = victim.getDeltaMovement();
+        Vec3 inherited = drift.lengthSqr() > 1 ? drift.normalize().scale(.18) : drift.scale(.18);
+        var random = net.minecraft.util.RandomSource.create(hit.seed());
+        double force = .73 + hit.size() * .46 + (hit.charged() ? .16 : 0);
+        for (int i=0;i<count;i++) {
+            var velocity = flight.velocity(axis,across,up,inherited,force,random);
+            float radius = (.021F + random.nextFloat() * .026F) * (.70F + .48F * hit.size());
+            if (DROPS.size() >= MAX_DROPS) DROPS.remove(0);
+            DROPS.add(new Drop(point.add(axis.scale(.012)),velocity,radius,112+random.nextInt(75)));
+        }
+    }
+
     private static boolean available(LivingEntity entity){
         var consume=entity.getData(ModAttachments.CONSUME_VISUAL);
-        return entity.level()==scene&&!entity.isInvisible()&&(!consume.active()||consume.stage()==ConsumeVisual.FLIGHT);
+        return com.codex.blacklight.combat.PlayerHitEffects.fleshBody(entity)&&entity.level()==scene&&!entity.isInvisible()&&(!consume.active()||consume.stage()==ConsumeVisual.FLIGHT);
     }
     public static void accept(LivingEntity entity,RagdollImpactPayload hit){
         reset();if(scene==null||!available(entity))return;
-        for(var wound:hit.wounds())add(entity,wound.region(),wound.point(),wound.direction(),wound.strength(),
+        for(var wound:hit.wounds()) {
+            var world=entity.position().add(wound.point().yRot((float)Math.toRadians(180-entity.yBodyRot)));
+            if(com.codex.blacklight.combat.PlayerHitEffects.metalAt(entity,world)) continue;
+            add(entity,wound.region(),wound.point(),wound.direction(),wound.strength(),
                 (hit.severMask()&wound.region())!=0?20:hit.sharp()?10:6,false);
+        }
         // Generic contact bits identify wounds, not proven amputation. The mesh solver
         // emits stump blood only after its finite cutting surface actually separates skin.
         if(AdaptiveRagdoll.supports(entity))return;
@@ -76,7 +108,7 @@ public final class WoundBlood {
         add(entity,region,point.add(normal.scale(-.015)),normal.scale(-1),.8F,22,true);
     }
     static void meshSection(LivingEntity entity,int region,String key){
-        reset();if(scene==null||entity.level()!=scene||entity.isInvisible())return;
+        reset();if(scene==null||entity.level()!=scene||entity.isInvisible()||!com.codex.blacklight.combat.PlayerHitEffects.fleshBody(entity))return;
         for(int side:new int[]{-1,1}){
             if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.remove(0);
             var emitter=new Emitter(entity,region,Vec3.ZERO,Vec3.ZERO,.8F,22,true,scene.getGameTime());
@@ -172,7 +204,7 @@ public final class WoundBlood {
         var active=Collections.newSetFromMap(new IdentityHashMap<LivingEntity,Boolean>());
         var player=Minecraft.getInstance().player;if(player==null)return;
         for(var entity:scene.entitiesForRendering()){
-            if(!(entity instanceof LivingEntity e)||e.isInvisible()||e.distanceToSqr(player)>64*64)continue;
+            if(!(entity instanceof LivingEntity e)||!com.codex.blacklight.combat.PlayerHitEffects.fleshBody(e)||e.isInvisible()||e.distanceToSqr(player)>64*64)continue;
             var visual=e.getData(ModAttachments.CONSUME_VISUAL);
             if(!visual.consuming()||com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))continue;
             active.add(e);int elapsed=(int)(scene.getGameTime()-visual.started());
@@ -193,7 +225,21 @@ public final class WoundBlood {
             Vec3 direction=owner==null?new Vec3(0,1,0):point.subtract(owner.position().add(0,owner.getBbHeight()*.6,0)).add(0,.2,0).normalize();
             if(direction.lengthSqr()<.5)direction=new Vec3(0,1,0);
             if(EMITTERS.size()>=MAX_EMITTERS)EMITTERS.removeFirst();
-            var emitter=new Emitter(e,region,Vec3.ZERO,direction,1.1F,12,true,scene.getGameTime());
+            int duration=switch(phase.style()) {
+                case ARM_RIP,RIP,SEVER -> 16;
+                case HEAD_CRUSH,CRUSH -> 10;
+                default -> 7;
+            };
+            float force=switch(phase.style()) {
+                case HEAD_CRUSH,CRUSH -> 1.38F;
+                case ARM_RIP,RIP -> 1.15F;
+                case COIL,CHEST_ABSORB -> .58F;
+                default -> .92F;
+            };
+            if (phase.style()==ConsumeFracture.Style.CHEST_ABSORB && owner!=null)
+                direction=owner.getBoundingBox().getCenter().subtract(point).normalize();
+            var emitter=new Emitter(e,region,Vec3.ZERO,direction,force,duration,
+                    phase.style()!=ConsumeFracture.Style.CHEST_ABSORB,scene.getGameTime());
             emitter.consumeStarted=visual.started();EMITTERS.add(emitter);
         }
         CONSUME_HITS.keySet().removeIf(e->!active.contains(e));
@@ -213,7 +259,7 @@ public final class WoundBlood {
             velocity=velocity.scale(water?.65:.97).add(0,water?-.004:-.033,0);
             var hit=scene.clip(new ClipContext(pos,pos.add(velocity),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,CollisionContext.empty()));
             if(hit.getType()==HitResult.Type.BLOCK){
-                if(!water&&velocity.lengthSqr()>.0003)splat(hit,radius*(2.2F+(float)Math.min(2,velocity.length()*4)),red);
+                if(!water&&velocity.lengthSqr()>.0003)splat(hit,radius*(2.8F+(float)Math.min(2,velocity.length()*5)),red,velocity);
                 return false;
             }
             pos=pos.add(velocity);return !water||age<12;
@@ -235,24 +281,26 @@ public final class WoundBlood {
             vertex(out,stack,front.add(across.scale(.42)),normal,red,alpha,light);vertex(out,stack,right,normal,red,alpha,light);
         }
     }
-    private record Splat(Vec3 center,Vec3 normal,List<Vec3> rim,BlockPos block,int red,long started) {}
-    private static void splat(BlockHitResult hit,float radius,int red){
+    private record Splat(Vec3 center,Vec3 normal,List<Vec3> rim,BlockPos block,net.minecraft.world.level.block.state.BlockState state,int red,long started) {}
+    private static void splat(BlockHitResult hit,float radius,int red,Vec3 velocity){
         Vec3 normal=Vec3.atLowerCornerOf(hit.getDirection().getNormal()),center=hit.getLocation().add(normal.scale(.0025));
         Vec3 x=normal.cross(Math.abs(normal.y)<.85?new Vec3(0,1,0):new Vec3(1,0,0)).normalize(),y=normal.cross(x);
+        Vec3 stretch=BloodFlight.surfaceStretch(velocity,normal);
         var rim=new ArrayList<Vec3>();double phase=scene.random.nextDouble()*Math.PI*2;
         for(int i=0;i<8;i++){
             double angle=phase+i*Math.PI/4,length=radius*(.55+scene.random.nextDouble()*.45);
-            Vec3 offset=x.scale(Math.cos(angle)*length).add(y.scale(Math.sin(angle)*length));
+            Vec3 radial=x.scale(Math.cos(angle)).add(y.scale(Math.sin(angle)));
+            Vec3 offset=radial.add(stretch.scale(Math.max(0,radial.dot(stretch.normalize())))).scale(length);
             // Validate each edge against this exact collision face; splashes cannot hang across a stair/ledge.
             for(int shrink=0;shrink<5;shrink++){
                 Vec3 point=center.add(offset);var support=scene.clip(new ClipContext(point.add(normal.scale(.035)),point.subtract(normal.scale(.07)),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,CollisionContext.empty()));
                 if(support.getType()==HitResult.Type.BLOCK&&support.getBlockPos().equals(hit.getBlockPos())&&support.getDirection()==hit.getDirection())break;
-                offset=offset.scale(.45);
+                offset=shrink==4?Vec3.ZERO:offset.scale(.45);
             }
             rim.add(offset);
         }
         if(SPLATS.size()>=MAX_SPLATS)SPLATS.removeFirst();
-        SPLATS.add(new Splat(center,normal,List.copyOf(rim),hit.getBlockPos(),red,scene.getGameTime()));
+        SPLATS.add(new Splat(center,normal,List.copyOf(rim),hit.getBlockPos(),scene.getBlockState(hit.getBlockPos()),red,scene.getGameTime()));
     }
     private static void vertex(VertexConsumer out,PoseStack stack,Vec3 point,Vec3 normal,int red,int alpha,int light){
         out.addVertex(stack.last(),(float)point.x,(float)point.y,(float)point.z).setColor(red,9,16,Math.clamp(alpha,0,255))
@@ -265,7 +313,7 @@ public final class WoundBlood {
         EMITTERS.removeIf(e->!available(e)||now-e.started>=e.lifetime||mc.player==null||mc.player.distanceToSqr(e.entity)>64*64);
         for(var e:EMITTERS)e.tick();
         DROPS.removeIf(d->!d.tick()||mc.player==null||mc.player.position().distanceToSqr(d.pos)>64*64);
-        SPLATS.removeIf(s->now-s.started>160||scene.getBlockState(s.block).isAir()||mc.player==null||mc.player.position().distanceToSqr(s.center)>64*64);
+        SPLATS.removeIf(s->now-s.started>160||scene.getBlockState(s.block)!=s.state||mc.player==null||mc.player.position().distanceToSqr(s.center)>64*64);
         var tracked=Collections.newSetFromMap(new IdentityHashMap<LivingEntity,Boolean>());for(var e:EMITTERS)tracked.add(e.entity);
         FRAMES.keySet().removeIf(e->!tracked.contains(e));
     }

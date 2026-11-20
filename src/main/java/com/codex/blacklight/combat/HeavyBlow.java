@@ -115,10 +115,14 @@ public final class HeavyBlow {
                     level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), point.x, point.y + .03, point.z,
                             12, v.getBbWidth() * .32, .045, v.getBbWidth() * .32, .075);
                     // Vanilla may already have applied fall damage in the movement tick.
-                    if (f.previousBox != null && v.getHealth() + v.getAbsorptionAmount() >= f.vitality) {
+                    boolean hurt = f.previousBox != null && v.getHealth()+v.getAbsorptionAmount()<f.vitality;
+                    if (f.previousBox != null && !hurt) {
                         float landingDamage = f.damage * Math.min(.65F, (speedDown - .45F) * .55F);
-                        if (v.isAlive()) v.hurt(level.damageSources().fall(), landingDamage);
+                        if (v.isAlive()) hurt=v.hurt(level.damageSources().fall(), landingDamage);
                     }
+                    if (hurt && attacker!=null)
+                        PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                                Math.min(1.4F,speedDown),FleshStrike.HAMMER,false,point.add(0,.045,0),new Vec3(0,-1,0),0);
                 }
             }
         }
@@ -141,10 +145,11 @@ public final class HeavyBlow {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, .64F, .68F);
         float damage = (float)(f.damage * Math.min(.9, .35 + .35 * surface.speed()));
         v.invulnerableTime=0;
-        if(attacker!=null)v.hurt(attacker.damageSources().playerAttack(attacker),damage);else v.hurt(level.damageSources().flyIntoWall(),damage);
-        // Slide down the wall, then the normal knockdown / get-up runs on landing.
-        var tangent = f.before.subtract(normal.scale(f.before.dot(normal))).multiply(.48, 0, .48);
-        v.setDeltaMovement(tangent.add(normal.scale(.06)).add(0, -.12, 0));
+        boolean hurt=v.hurt(attacker!=null?attacker.damageSources().playerAttack(attacker):level.damageSources().flyIntoWall(),damage);
+        if (hurt && attacker!=null)
+            PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                    (float)Math.min(1.55,.54+surface.speed()*.55),FleshStrike.HAMMER,false,at,normal.scale(-1),0);
+        v.setDeltaMovement(surface.rebound(f.before));
         v.hurtMarked = true;
         HitStop.victim(v,3);
         if(attacker!=null)net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(attacker,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.1F));
@@ -179,6 +184,8 @@ public final class HeavyBlow {
                 var push=f.direction.scale(speed*.7*resist);other.setDeltaMovement(push.x,.32*resist,push.z);other.setOnGround(false);other.hurtMarked=true;
                 if(other instanceof Mob mob)mob.getNavigation().stop();
             }
+            PlayerHitEffects.surface(attacker,other,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
+                    (float)Math.min(1.2,.38+speed*.47),FleshStrike.MUSCLE,false,point,travel.normalize().scale(-1),0);
             level.playSound(null, point.x, point.y, point.z, PlayerHitEffects.metalAt(other, point)
                     ? SoundEvents.ANVIL_HIT : SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, .68F, .79F);
             // The thrown body loses part of its momentum to the one it hit.
