@@ -120,6 +120,16 @@ public final class ConsumeSystem {
         beginConsume(player,s,ConsumeVariant.choose(s.form,s.large,player.getRandom()));
     }
     private static void beginConsume(ServerPlayer player,Session s,int variant){
+        if(s.victim instanceof com.codex.blacklight.world.GreeneHost host) {
+            if(!host.beginEscape(player)) { cancel(player); return; }
+            ACTIVE.remove(player);
+            clearThrowCharge(player,s);
+            clearRecovery(player);
+            release(host);
+            unlock(player);
+            play(player,PlayerAction.GRAB_REACH);
+            return;
+        }
         if(!ConsumeSequence.bruteMount(s.victim))s.facing=player.getYRot();
         s.consumeTargetStart=s.victim.position();
         s.variant=variant;
@@ -233,7 +243,7 @@ public final class ConsumeSystem {
         Vec3 delta=anchor(p,v).subtract(v.position());
         v.move(MoverType.SELF,delta.length()>speed?delta.normalize().scale(speed):delta);
         v.setDeltaMovement(Vec3.ZERO);v.fallDistance=0;
-        v.setYRot(p.getYRot()+(GrappleMotion.active(ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL))?0:180));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
+        v.setYRot(p.getYRot()+GrappleMotion.receiverTurn(v,ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL)));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
     }
 
     /** Ordinary human soldiers retain their grab class regardless of armour/health tuning. */
@@ -323,7 +333,7 @@ public final class ConsumeSystem {
         if (target instanceof BlacklightHunter hunter && !hunter.claim(player)) return;
         if (target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme && !supreme.claim(player)) return;
         // Check awareness before clearing the target/attack state for the claim.
-        boolean stealth=StealthConsume.canStart(player,target,form);
+        boolean stealth=!(target instanceof com.codex.blacklight.world.GreeneHost) && StealthConsume.canStart(player,target,form);
         ImpactControl.cancel(target);
         if(target instanceof com.codex.blacklight.entity.BlacklightCommonInfected civilian)civilian.cancelAttack();
         if(target instanceof com.codex.blacklight.entity.BlacklightMutant mutant)mutant.cancelAttack();
@@ -686,18 +696,22 @@ public final class ConsumeSystem {
         player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, ConsumeVariant.stealth(session.form,session.variant)?.25F:.8F, .55F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }
+    /** Run the death callback while the absorber and the type of execution are still known. */
+    public static boolean executeConsumption(ServerPlayer player, Mob target, float damage) {
+        var source = target.damageSources().playerAttack(player);
+        target.invulnerableTime = 0;
+        return ConsumeLastChance.execute(target, () -> {
+            if (target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
+                return supreme.finishConsumption(player, source, damage);
+            if (target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
+                return dragon.hurt(dragon.head, source, damage);
+            return target.hurt(source, damage);
+        });
+    }
+
     static boolean defeatForConsume(ServerPlayer player,Mob target) {
-        if(ConsumeSequence.boss(target)) {
-            var source=target.damageSources().playerAttack(player);
-            float damage=Math.max(1000,target.getMaxHealth()*20);
-            target.invulnerableTime=0;
-            boolean accepted=ConsumeLastChance.execute(target,()->{
-                if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
-                    return supreme.finishConsumption(player,source,damage);
-                if(target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
-                    return dragon.hurt(dragon.head,source,damage);
-                return target.hurt(source,damage);
-            });
+        if(ConsumeSequence.boss(target) || target instanceof com.codex.blacklight.entity.BlacklightHive) {
+            boolean accepted = executeConsumption(player, target, Math.max(1000, target.getMaxHealth()*20));
             // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
             if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
                 return false;
@@ -707,7 +721,7 @@ public final class ConsumeSystem {
             hunter.beginConsumeRemains();
         }
         else {
-            if(target instanceof com.codex.blacklight.world.GreeneHost host) host.absorbedBy(player);
+            if(target instanceof com.codex.blacklight.world.GreeneHost) return false;
             target.discard();
         }
         return true;

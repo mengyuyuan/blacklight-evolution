@@ -20,7 +20,7 @@ public final class GrabHoldPose {
         boolean blade=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).getActivePower()==PowerForm.BLADE&&(!(player instanceof net.minecraft.world.entity.player.Player p)||com.codex.blacklight.combat.BlockThrowSystem.held(p)==null);
         var held=player.level().getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(4),e->{
             var visual=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
-            return visual.consumerId()==player.getId()&&(ConsumeVisual.holding(visual.stage()) || blade &&
+            return visual.consumerId()==player.getId()&&(ConsumeVisual.holding(visual.stage()) || GrappleMotion.greeneGrip(e,visual) && visual.phaseProgress(player.level().getGameTime(),partial)>.24F || blade &&
                     (visual.stage()==ConsumeVisual.CONSUME || visual.stage()==ConsumeVisual.THROW || visual.stage()==ConsumeVisual.CAPTURE &&
                      visual.phaseProgress(player.level().getGameTime(),partial)>=.6F));
         });
@@ -39,7 +39,7 @@ public final class GrabHoldPose {
         var target=mobPos.add(0,gripHeight,0).subtract(forward.scale((mob==null?0:mob.getBbWidth()*.4))).subtract(ownerPos);
         if(carried!=null)target=GrabPlacement.palm(ownerPos,yaw,pitch).subtract(ownerPos);
         boolean paired=mob!=null&&GrappleMotion.active(com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL));
-        if(paired) {
+        if(paired && !GrappleMotion.greeneGrip(mob,ModAttachments.getData(mob,ModAttachments.CONSUME_VISUAL))) {
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);
             var point=ConsumePlacementTrack.carryContact(mob,GrappleMotion.key(player,visual),GrappleMotion.progress(player,visual,partial)).orElse(null);
             if(point!=null)target=mobPos.add(left.scale(-point.x)).add(forward.scale(point.z)).add(0,point.y,0).subtract(ownerPos);

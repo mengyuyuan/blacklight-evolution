@@ -61,7 +61,7 @@ public final class QuillHarvest {
 
     /** Capture eligibility before hurt(), while pet, grapple and boss protections can still be checked. */
     public static boolean canHarvestImpact(ServerPlayer p,LivingEntity target){
-        return target instanceof Mob mob && active(p) && CombatTargeting.damageable(p,mob) && !protectedPet(mob)
+        return target instanceof Mob mob && !(mob instanceof com.codex.blacklight.world.GreeneHost) && active(p) && CombatTargeting.damageable(p,mob) && !protectedPet(mob)
                 && ConsumeSystem.eligible(mob) && AssimilationSystem.ready(mob)
                 && (!ConsumeSequence.boss(mob) || ConsumeSystem.healthReady(p,mob));
     }
@@ -126,7 +126,7 @@ public final class QuillHarvest {
                 && eligibleHost(p,mob);
     }
     private static boolean eligibleHost(ServerPlayer p, Mob mob) {
-        return active(p) && p.level()==mob.level() && !protectedPet(mob) && ConsumeSystem.eligible(mob) && CombatTargeting.damageable(p,mob)
+        return !(mob instanceof com.codex.blacklight.world.GreeneHost) && active(p) && p.level()==mob.level() && !protectedPet(mob) && ConsumeSystem.eligible(mob) && CombatTargeting.damageable(p,mob)
                 && ConsumeSystem.healthReady(p,mob);
     }
     public static void recall(ServerPlayer p) {

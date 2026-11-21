@@ -896,7 +896,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         bar.setProgress(Math.max(0,Math.min(1,getHealth()/getMaxHealth())));bar.setVisible(kind.enabled()&&kind.boss&&isAlive());
         if(!kind.enabled()){defenseBar.setVisible(false);return;}
         bar.setOverlay(BossEvent.BossBarOverlay.NOTCHED_10);
-        bar.setColor(exposed()?BossEvent.BossBarColor.PURPLE:BossEvent.BossBarColor.RED);
+        boolean counterWindow = kind == EncounterKind.ELIZABETH_GREENE ? greeneBattle.coreDamageable() : exposed();
+        bar.setColor(counterWindow ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.RED);
         bar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.phase",getDisplayName(),phase()+1));
         defenseBar.setVisible(kind.boss&&isAlive()&&(parts.length>0||exposed()));
         if(kind==EncounterKind.GOLIATH){
@@ -919,7 +920,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         }
         if(exposed()){
             defenseBar.setColor(BossEvent.BossBarColor.YELLOW);
-            defenseBar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.exposed"));
+            defenseBar.setName(net.minecraft.network.chat.Component.translatable(counterWindow ? "boss.blacklight.exposed" : "boss.blacklight.collapsing"));
             defenseBar.setProgress(kind==EncounterKind.ELIZABETH_GREENE?Math.max(0,Math.min(1,1-exposedAge(0)/Math.max(1,exposedDuration()))):Math.max(0,Math.min(1,(entityData.get(EXPOSED)-level().getGameTime())/(float)Math.max(1,entityData.get(EXPOSED)-entityData.get(EXPOSED_START)))));
         }else{
             int remaining=parts.length-Integer.bitCount(entityData.get(BROKEN));float total=0;for(int i=0;i<parts.length;i++)total+=Math.max(0,armor[i]);
