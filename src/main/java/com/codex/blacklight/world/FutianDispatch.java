@@ -81,27 +81,35 @@ public final class FutianDispatch {
         if(level.getDifficulty()==Difficulty.PEACEFUL || player.isSpectator()) { tell(player,"peaceful"); return; }
         var data=BossSiteData.get(level);
         if(data.occupied(desk)) { tell(player,"active"); return; }
-        // The service street and its drain lie south of the truck, inside the authored dispatch block.
-        for(int z : new int[]{54,48,59,42}) {
-            var pad=origin.offset(16,1,z);
-            if(!BossSiteBlock.clearPad(level,pad,EncounterKind.ELIZABETH_GREENE,null)) continue;
-            var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(EncounterKind.ELIZABETH_GREENE).get().create(level);
-            if(boss==null) break;
-            boss.moveTo(pad.getX()+.5,pad.getY(),pad.getZ()+.5,0,0);
-            boss.yBodyRot=boss.yBodyRotO=boss.yHeadRot=0;
-            boss.setPersistenceRequired();
-            boss.startGreenePursuit();
-            data.reserve(desk,boss,player);
-            try {
-                if(!level.addFreshEntity(boss) || boss.isRemoved())break;
-            } finally {
-                if(level.getEntity(boss.getUUID())!=boss || boss.isRemoved())data.release(boss);
-            }
-            if(!player.isCreative())boss.setTarget(player);
-            tell(player,"greene_pursuit_started",pad.getX(),pad.getZ());
-            return;
+        var pad=findPursuitPad(level,origin);
+        if(pad==null) { tell(player,"greene_pursuit_blocked"); return; }
+        var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(EncounterKind.ELIZABETH_GREENE).get().create(level);
+        if(boss==null) return;
+        boss.moveTo(pad.getX()+.5,pad.getY(),pad.getZ()+.5,0,0);
+        boss.yBodyRot=boss.yBodyRotO=boss.yHeadRot=0;
+        boss.setPersistenceRequired();
+        boss.startGreenePursuit();
+        data.reserve(desk,boss,player);
+        try {
+            if(!level.addFreshEntity(boss) || boss.isRemoved())return;
+        } finally {
+            if(level.getEntity(boss.getUUID())!=boss || boss.isRemoved())data.release(boss);
         }
-        tell(player,"greene_pursuit_blocked");
+        if(!player.isCreative())boss.setTarget(player);
+        tell(player,"greene_pursuit_started",pad.getX(),pad.getZ());
+    }
+
+    private static BlockPos findPursuitPad(ServerLevel level, BlockPos origin) {
+        // The delivery street bends west halfway between the guard post and the plaza.
+        // Search the roadway and both shoulders so a truck in one lane leaves a route.
+        for(int z : new int[]{54,48,60,42,66,38,70}) {
+            int streetX = 21 - Mth.clamp(53-z,0,10);
+            for(int lateral : new int[]{0,-5,5,-8,8}) {
+                var pad=origin.offset(streetX+lateral,1,z);
+                if(BossSiteBlock.clearPad(level,pad,EncounterKind.ELIZABETH_GREENE,null))return pad;
+            }
+        }
+        return null;
     }
 
     private static void remember(ServerPlayer player, BlockPos origin, String clue) {
