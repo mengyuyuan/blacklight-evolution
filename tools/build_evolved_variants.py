@@ -4,7 +4,7 @@ No source animations or existing blade geometry are rewritten.
 from pathlib import Path
 import base64, io, json, math, uuid
 from PIL import Image,ImageDraw
-from p2_evolved_variant_surfaces import append_power
+import author_evolved_base_arms  # rebuild project-designed blade surfaces first
 
 ROOT=Path(__file__).resolve().parents[1]
 MODELS=ROOT/'src/main/resources/assets/blacklight/models'
@@ -109,60 +109,51 @@ class Model:
     def finish(self):
         used=sorted({i for f in self.faces for i in f[:4]});mapping={i:k for k,i in enumerate(used)}
         self.vertices=[self.vertices[i] for i in used];self.faces=[[*[mapping[i] for i in f[:4]],*f[4:]] for f in self.faces]
-        result={'schema':2,'vertices':self.vertices,'faces':sorted(self.faces,key=lambda f:f[5]),'body':'Standard Minecraft player with fitted cloth/vest/boots and actual locally decoded power surfaces.','variant':self.key,'sourceSurfaces':getattr(self,'lineage',[base.get('armSource',{})] if self.key=='blade' else [])}
+        result={'schema':2,'vertices':self.vertices,'faces':sorted(self.faces,key=lambda f:f[5]),'body':'Standard Minecraft player with fitted cloth/vest/boots and project-designed beveled arm and weapon parts.','variant':self.key,'authoring':'tools/build_evolved_variants.py and tools/author_evolved_base_arms.py'}
         target=MODELS/'evolved_variants';target.mkdir(exist_ok=True)
         (target/(self.key+'.json')).write_text(json.dumps(result,separators=(',',':')),'utf-8')
-        # Editable static generic mesh, grouped by the actual runtime driver.
-        elements=[];groups=[];texture=ROOT/'src/main/resources/assets/blacklight/textures/entity/evolved_variant_arms.png'
-        def visible_body(f):
-            if f[5]!=0:return False
-            if f[4] not in (2,3):return True
-            return self.key not in ('blade','skirmisher') and not (self.key=='armored' and f[4]==2) and sum(self.vertices[i][1] for i in f[:4])/4<=6.5
-        authored=[f for f in self.faces if f[5] in (4,6,8) or visible_body(f)]
-        colors=sorted({f[-1] for f in authored if f[5]==8})
-        palette=Image.new('RGBA',(16,max(1,(len(colors)+15)//16)),(255,255,255,255))
-        swatches={color:(i%16,i//16) for i,color in enumerate(colors)}
-        for color,point in swatches.items():palette.putpixel(point,((color>>16)&255,(color>>8)&255,color&255,(color>>24)&255))
-        def palette_source():
-            data=io.BytesIO();palette.save(data,format='PNG');return 'data:image/png;base64,'+base64.b64encode(data.getvalue()).decode('ascii')
-        def editable_uv(f,j):
-            if f[5]==8:
-                x,y=swatches[f[-1]];return [x+.5,y+.5]
-            width=128 if f[5]==0 else 256
-            return [f[6+j*2]*width,f[7+j*2]*width]
-        for bone_index in sorted({self.vertices[f[0]][3] for f in authored}):
-            fs=[f for f in authored if self.vertices[f[0]][3]==bone_index]
-            indices=sorted({i for f in fs for i in f[:4]});ids={v:str(i) for i,v in enumerate(indices)}
-            ident=str(uuid.uuid5(uuid.NAMESPACE_URL,self.key+str(bone_index)))
-            vertices={ids[i]:[self.vertices[i][0],24-self.vertices[i][1],self.vertices[i][2]] for i in indices}
-            def texture_index(f):return 0 if f[5]==0 else 2 if f[5]==6 else 3 if f[5]==8 else 1
-            faces={str(i):{'vertices':[ids[x] for x in reversed(f[:4])],'uv':{ids[x]:editable_uv(f,j) for j,x in enumerate(f[:4])},'texture':texture_index(f)} for i,f in enumerate(fs)}
-            elements.append({'name':bones[bone_index]['name'],'uuid':ident,'type':'mesh','origin':[0,0,0],'vertices':vertices,'faces':faces})
-            groups.append({'name':bones[bone_index]['name'],'origin':[bones[bone_index]['pivot'][0],24-bones[bone_index]['pivot'][1],bones[bone_index]['pivot'][2]],'children':[ident]})
-        if self.key in ('blade','skirmisher','armored'):texture=textures/'evolved_arms.png'
-        editable={'meta':{'format_version':'4.10','model_format':'free','box_uv':False},'name':self.key+'_evolved','resolution':{'width':256,'height':256},'elements':elements,'outliner':groups,'textures':[{'path':str(textures/'evolved_variant_body.png'),'name':'evolved_variant_body.png','id':'0','width':128,'height':128,'uv_width':128,'uv_height':128},{'path':str(texture),'name':texture.name,'id':'1','width':256,'height':256,'uv_width':256,'uv_height':256}]}
-        editable['textures'].extend([{'path':str(textures/'weapons_mc.png'),'name':'weapons_mc.png','id':'2','width':256,'height':256,'uv_width':256,'uv_height':256},{'name':self.key+'_vertex_palette.png','id':'3','width':palette.width,'height':palette.height,'uv_width':palette.width,'uv_height':palette.height,'source':palette_source()}])
-        for item in editable['textures']:
-            if 'path' in item:item['source']='data:image/png;base64,'+base64.b64encode(Path(item.pop('path')).read_bytes()).decode('ascii')
-        art=ROOT/'art/evolved-variants';art.mkdir(exist_ok=True)
-        (art/(self.key+'.bbmodel')).write_text(json.dumps(editable,separators=(',',':')),'utf-8')
-        return {'type':self.key,'vertices':len(self.vertices),'submittedQuads':len(self.faces),'weaponSurfaces':sum(f[5] in (4,6,8) for f in self.faces),'editableSurfaces':len(authored),'bytes':(target/(self.key+'.json')).stat().st_size,'sourceSurfaces':result['sourceSurfaces']}
+        return {'type':self.key,'vertices':len(self.vertices),'quads':len(self.faces),
+                'weaponSurfaces':sum(f[5]==4 for f in self.faces),'authoring':result['authoring']}
+
+def power(model, side, style):
+    """Design each forearm in Minecraft pixels around the animating elbow."""
+    sign = -1 if side == 'R' else 1
+    role = 2 if side == 'R' else 3
+    def part(joint, rings, tile):
+        start = len(model.faces)
+        model.loft(role, joint + '_' + side,
+                   [(sign*(5+x),y,z,rx,rz) for x,y,z,rx,rz in rings], tile)
+        model.faces.extend([*f[:5],5,*f[6:]] for f in model.faces[start:])
+    part('Shoulder', [(0,0,0,1.75,1.7),(.12,2,0,1.92,1.85),(0,6.6,0,1.45,1.5)],1)
+    part('Elbow', [(0,6.1,0,1.5,1.55),(.15,9,0,1.8,1.7),(0,12,0,1.45,1.45)],0)
+    if style=='strength':
+        part('Elbow',[(0,8,0,1.7,1.55),(.5,10,-.35,2.55,2.2),(.45,13.5,-.6,2.9,2.45),(.3,14.4,-.6,2.1,2)],1)
+        for x in [-1.25,0,1.25]:
+            part('Elbow',[(x,11,-2.45,.47,.45),(x,13.7,-2.75,.54,.4),(x,14.2,-2.55,.44,.28)],2)
+    elif style=='armored':
+        part('Elbow',[(.7,6.4,-1,1.35,.65),(1,8.4,-1.55,3.45,1.15),
+                      (.85,12,-1.65,3.05,1.02),(.55,16,-1.4,.45,.45)],1)
+        part('Elbow',[(1,7.9,-2.55,.26,.23),(1,11,-2.75,.42,.26),(.55,15.5,-1.9,.14,.14)],2)
+    elif style in ('predator','sensory'):
+        for i,x in enumerate([-1.25,0,1.25]):
+            reach=[4.4,5.9,4.8][i] if style=='predator' else [2.8,3.6,2.5][i]
+            part('Elbow',[(x*.7,10.4,-1,.47,.55),(x,12.2,-1.4,.51,.5),
+                          (x*1.3,12+reach*.64,-2,.36,.37),(x*1.4,12+reach,-3.05,.075,.085)],2)
+    else:
+        for i,x in enumerate([-1.15,.12,1.05]):
+            reach=[5,7.5,5.7][i] if style=='tendril' else [2.7,4.3,3.1][i]
+            turn = (i-1)*.7
+            part('Elbow',[(x*.8,10.6,i*.55-.9,.62,.63),(x,12.7,i*.62-1,.56,.52),
+                          (x+turn,12+reach*.56,i*.9-1.5,.44,.4),
+                          (x+turn*1.8,12+reach,-2.1+i*.75,.11,.12)],3 if i==1 else 0)
 
 reports=[]
 for key in ['blade','strength','armored','predator','tendril','skirmisher','sensory','regenerator']:
-    m=Model(key);lineage=[]
-    if key in ('blade','skirmisher'):
-        m.source_arm('R',1 if key=='blade' else .83);m.source_arm('L',1 if key=='blade' else .83)
-        lineage=[base.get('armSource',{})]
-    elif key=='strength':lineage.append(append_power(m,'alex_hammerfist3',bones))
-    elif key=='predator':lineage.append(append_power(m,'alex_claws3',bones))
-    elif key=='tendril':lineage.append(append_power(m,'alex_tendril3',bones))
-    elif key=='armored':
-        lineage.append(append_power(m,'alex_tendril3',bones,sides=('L',)))
-        lineage.append(append_power(m,'heller_shield_3',bones,sides=('L',),shield=True,append=True))
-        m.source_arm('R',.78)
-    elif key=='sensory':lineage.append(append_power(m,'alex_claws2',bones))
-    elif key=='regenerator':lineage.append(append_power(m,'alex_tendril2',bones))
-    m.lineage=lineage;reports.append(m.finish())
-(ROOT/'docs/design/evolved-variants-geometry.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2)+'\n','utf-8')
+    model=Model(key)
+    for side in ('R','L'):
+        if key in ('blade','skirmisher') or key=='armored' and side=='R':
+            model.source_arm(side,{'blade':1,'skirmisher':.83,'armored':.72}[key])
+        else:
+            power(model,side,key)
+    reports.append(model.finish())
 print(json.dumps(reports))

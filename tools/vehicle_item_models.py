@@ -167,8 +167,7 @@ def repair_kit():
 def _running_gear(kind, pivots, boxes):
     """Authored stepped wheels fitted inside the existing item hull/track envelope.
 
-    P1 mesh measurements establish the dual tires, wheel counts, relative
-    centers and concentric profiles. No source vertices or texture pixels ship.
+    Wheel profiles, tire thickness and hub proportions use the block chassis envelope.
     Each new box reuses a complete existing material UV island (uvSize), so its
     changed dimensions cannot read neighboring islands in the authored atlas.
     """
@@ -200,26 +199,18 @@ def _running_gear(kind, pivots, boxes):
                 name=f'{side}_wheel_{axle}';tire,lo,hi=source[name+'_tire_vertical'];metal,hlo,hhi=source[name+'_hub']
                 _,y,z=pivots[name];radius=(hi[1]-lo[1])/2
                 outward=hi[0] if sign>0 else lo[0];hub_edge=hhi[0] if sign>0 else hlo[0]
-                # wShape1/2: radius .560373, tire shoulder width .26506.
-                # wShape3..6: two such shoulders separated by .05627.
-                width=radius*.26506/.560373;gap=radius*.05627/.560373
+                width=radius*.5;gap=radius*.125
                 for tire_index in range(1 if axle==1 else 2):
                     outer=outward-sign*tire_index*(width+gap)
                     disc(name+f'_tire_{tire_index}',outer-sign*width,outer,y,z,radius,tire)
-                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.53904,.30475,.13390))
+                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.56,.34,.18))
         return result
 
-    # Bind translations in native source units; +Z is rear in the P1 packages.
-    # APC: six road wheels and two elevated end wheels per side. Tank: seven
-    # road wheels, elevated front wheel and the thirteen-tooth rear sprocket.
-    if kind=='apc':
-        native=[('front',.783477,-2.915622,.228145),
-                *[(f'road_{i+1}',.392276,z,.323889) for i,z in enumerate((-2.074277,-1.347004,-.529001,.442286,1.198450,1.925723))],
-                ('rear',.751000,2.611633,.269321)]
-    else:
-        native=[('front',.914000,-3.208000,.323889),
-                *[(f'road_{i+1}',.450479,z,.323889) for i,z in enumerate((-2.086200,-1.190000,-.472000,.266000,.988000,1.725000,2.494000))],
-                ('sprocket',.915057,3.221614,.418979)]
+    count=6 if kind=='apc' else 7
+    pitch=1.0
+    native=[('front',.78,-(count+1)*pitch/2,.38)]
+    native.extend((f'road_{i+1}',.5,(i-(count-1)/2)*pitch,.48) for i in range(count))
+    native.append(('rear' if kind=='apc' else 'sprocket',.76,(count+1)*pitch/2,.42))
     source_low=min(-z-r for _,y,z,r in native);source_high=max(-z+r for _,y,z,r in native)
     source_floor=min(y-r for _,y,z,r in native)
     for side,sign in [('left',-1),('right',1)]:
@@ -232,16 +223,14 @@ def _running_gear(kind, pivots, boxes):
         for label,ny,nz,nr in native:
             name=prefix+'_'+label;y=floor+(ny-source_floor)*scale;z=low_z+(-nz-source_low)*scale;radius=nr*scale
             if label=='sprocket':
-                # Real vertex buffer has thirteen outer teeth (~.419 radius),
-                # despite its stale 0x10003 declared box suggesting only .269.
                 disc(name+'_core',lo[0],hi[0],y,z,radius*.76,metal)
                 for i in range(13):
                     angle=math.pi/2+i*math.tau/13;cy=y+math.sin(angle)*radius*.83;cz=z+math.cos(angle)*radius*.83;half=radius*.12
                     box(name+f'_tooth_{i}',[lo[0],cy-half,cz-half],[hi[0],cy+half,cz+half],metal)
-                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.48572,.43062))
+                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.5,.37))
             else:
                 disc(name+'_tire',lo[0],hi[0],y,z,radius,tire)
-                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.78127,.75533,.237))
+                hub(name,outward,abs(hub_edge-outward),sign,y,z,radius,metal,tire,(.70,.47,.22))
     return result
 
 

@@ -17,6 +17,15 @@ final class SourceTendrilPath {
         return sample(root,tip,radius,rollDegrees,pitchDegrees,sections,Double.POSITIVE_INFINITY);
     }
 
+    /** Paired P1 poses map to Minecraft world as (x, y, -z) at zero yaw. Sample in the
+     * native handedness, including its alternate frame for nearly vertical targets. */
+    static Vec3[] sampleMinecraft(Vec3 root,Vec3 tip,double radius,double rollDegrees,double pitchDegrees,int sections,double travelled){
+        Vec3[] path=sample(reflectZ(root),reflectZ(tip),radius,rollDegrees,pitchDegrees,sections,travelled);
+        for(int i=0;i<path.length;i++)path[i]=reflectZ(path[i]);
+        return path;
+    }
+    private static Vec3 reflectZ(Vec3 p){return new Vec3(p.x,p.y,-p.z);}
+
     /** Advance the head by the given source speed times elapsed time, expressed in world units. */
     static Vec3[] sample(Vec3 root,Vec3 tip,double radius,double rollDegrees,double pitchDegrees,int sections,double travelled){
         if(sections<1)throw new IllegalArgumentException("sections must be positive");

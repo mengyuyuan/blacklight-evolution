@@ -965,4 +965,8 @@ if (['nativeFrameworkTest', 'nativeFrameworkLiveTest'].any { project.hasProperty
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
 
-apply from: 'gradle/local-p1-effects.gradle'
+// Private reference exports are never release inputs, including stale incremental output.
+tasks.withType(Jar).configureEach {
+    exclude 'assets/blacklight/textures/private_devfx/**', 'blacklight/bundled_motions/devastator-fx.data'
+    exclude 'assets/blacklight/textures/particle/hammer_*.png', 'assets/blacklight/models/devastators/p1_*.json', 'assets/blacklight/models/evolved_weapons.json'
+}

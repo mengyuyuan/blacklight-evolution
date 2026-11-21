@@ -44,9 +44,9 @@ final class ChestConsumeTendrils {
         long now=actor.level().getGameTime(),tail=actor.getData(ModAttachments.MOBILE_CONSUME_START);
         if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&(tail<0||now-tail>400))return;
         var rig=PlayerMotionController.skeleton();
-        Vec3 chest=joint(stack,bones,rig.chest.getId()),hip=joint(stack,bones,rig.thighR.getId());
-        Vec3 pelvis=hip.lerp(joint(stack,bones,rig.thighL.getId()),.5);
-        ACTORS.put(actor,new ActorPose(new WeakReference<>(actor.level()),now+partial,new Vec3[]{chest,hip,pelvis,chest.lerp(pelvis,.35)}));
+        Vec3[] sockets=ConsumeSocketFit.actor(joint(stack,bones,rig.thighR.getId()),joint(stack,bones,rig.thighL.getId()),
+                joint(stack,bones,rig.armR.getId()),joint(stack,bones,rig.armL.getId()));
+        ACTORS.put(actor,new ActorPose(new WeakReference<>(actor.level()),now+partial,sockets));
     }
     private static Vec3 joint(PoseStack stack,Matrix4f[] bones,int index){
         return BlacklightBoneRendering.worldPoint(stack,bones[index].getTranslation(new Vector3f()));
@@ -57,8 +57,9 @@ final class ChestConsumeTendrils {
         // The camera can suppress the local player model in first person.
         Vec3 feet=owner.getPosition(partial),side=left(owner.yBodyRot);
         double h=owner.getBbHeight(),w=owner.getBbWidth();
-        return new Vec3[]{feet.add(0,h*.68,0),feet.add(0,h*.48,0).subtract(side.scale(w*.24)),
-                feet.add(0,h*.48,0),feet.add(0,h*.60,0)};
+        Vec3 hip=feet.add(0,h*.48,0),shoulder=feet.add(0,h*.80,0);
+        return ConsumeSocketFit.actor(hip.subtract(side.scale(w*.20)),hip.add(side.scale(w*.20)),
+                shoulder.subtract(side.scale(w*.5)),shoulder.add(side.scale(w*.5)));
     }
     private static Vec3 left(float yaw){return Vec3.directionFromRotation(0,yaw-90);}
     static Vec3[] receiverPoints(LivingEntity mob,float partial){
@@ -66,14 +67,14 @@ final class ChestConsumeTendrils {
         if(physical!=null)return physical;
         Vec3 base=mob.getPosition(partial).add(ClientCarryPlacement.consumeOffset(mob,partial));
         double h=mob.getBbHeight(),w=mob.getBbWidth();
-        Vec3 pelvis=new Vec3(0,h*.49,0);
-        Vec3[] points={pelvis,new Vec3(0,h*.80,0),pelvis.add(left(mob.yBodyRot).scale(w*.24)),new Vec3(0,h*.64,0)};
+        Vec3 hip=new Vec3(0,h*.48,0),side=left(mob.yBodyRot).scale(w*.20);
+        Vec3[] points=ConsumeSocketFit.receiver(hip.subtract(side),hip.add(side),new Vec3(0,h*.80,0));
         for(int i=0;i<points.length;i++)points[i]=base.add(ConsumeVictimPose.effectPoint(mob,points[i],partial));
         return points;
     }
     private static Vec3[] route(Vec3 root,Vec3 tip,Vec3 normal,Track track,double elapsed){
         double scale=DevastatorEffectTimeline.WORLD_SCALE;
-        Vec3[] path=SourceTendrilPath.sample(root,tip,track.circle()*scale,track.roll(),track.pitch(),track.segments(),elapsed*track.speed()*scale);
+        Vec3[] path=SourceTendrilPath.sampleMinecraft(root,tip,track.circle()*scale,track.roll(),track.pitch(),track.segments(),elapsed*track.speed()*scale);
         if(track.target()==Target.SHOULDER_R){
             // Branch 98 alone adds a wave. No chest-punch track requests a corkscrew or wave.
             double distance=root.distanceTo(tip);
@@ -87,12 +88,11 @@ final class ChestConsumeTendrils {
         return path;
     }
     private static Vec3 sourceBone(Vec3[] actor,Source bone){
-        return bone==Source.HIP_L?actor[2].add(actor[2].subtract(actor[1])):actor[bone.ordinal()];
+        return actor[bone.ordinal()];
     }
     private static Vec3 targetBone(Vec3[] joints,Target bone,LivingEntity mob,float partial){
-        if(bone.ordinal()<4)return joints[bone.ordinal()];
-        Vec3 pelvis=joints[0],neck=joints[1],left=joints[2].subtract(pelvis),up=neck.subtract(pelvis);
-        if(bone==Target.HIP_R)return pelvis.subtract(left);
+        if(bone.ordinal()<5)return joints[bone.ordinal()];
+        Vec3 pelvis=joints[0],neck=joints[1],left=joints[2].subtract(joints[4]).scale(.5),up=neck.subtract(pelvis);
         boolean knee=bone==Target.KNEE_R,armLeft=bone==Target.SHOULDER_L;
         Vec3 estimate=knee?pelvis.subtract(up.scale(.86)).subtract(left):
                 neck.subtract(up.scale(.12)).add(left.scale(armLeft?2:-2));
@@ -106,18 +106,22 @@ final class ChestConsumeTendrils {
         if(remaining<.015)return;
         Vec3[] roots=actorPoints(owner,partial),tips=receiverPoints(mob,partial);
         if(roots[0].subtract(tips[3]).lengthSqr()>36)return;
-        Vec3 side=roots[2].subtract(roots[1]).normalize();
+        var actorSkin=ConsumeSocketFit.actorSkin(roots);
+        var receiverSkin=ConsumeSocketFit.receiverSkin(tips);
+        Vec3 side=roots[4].subtract(roots[1]).normalize();
         if(side.lengthSqr()<.1)side=left(owner.yBodyRot);
         for(Track tr:cue.tracks()){
             double elapsed=age-tr.delayFrames()/30.0;
             if(elapsed<=0)continue;
             Vec3 root=sourceBone(roots,tr.source()),tip=targetBone(tips,tr.target(),mob,partial);
             Vec3[] points=route(root,tip,side,tr,elapsed);
+            double radius=(1.5/16)*tr.scale()*remaining; // Three MC texels across before the per-track scale.
+            ConsumeSocketFit.clearSkin(points,root,tip,actorSkin,receiverSkin,radius);
             for(int j=0;j<points.length;j++)points[j]=points[j].subtract(camera);
             int segments=tr.segments();
             double[] widths=new double[points.length];
             for(int j=0;j<=segments;j++)
-                widths[j]=.107*DevastatorEffectTimeline.WORLD_SCALE*tr.scale()*remaining;
+                widths[j]=radius;
             ConsumeTendrilSegmentMesh.draw(stack,out,light,points,widths,side,0xffffffff);
         }
     }

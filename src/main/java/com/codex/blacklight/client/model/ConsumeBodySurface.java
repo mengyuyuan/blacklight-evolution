@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Skinned relief for the P1 consume material. All UVs, joint weights and ridge heights
+/** Skinned relief for the authored charcoal material. All UVs, joint weights and ridge heights
  * are in bind space, so a sleeve's weave follows the elbow when the grip opens. */
 public final class ConsumeBodySurface {
     private record Point(float x,float y,float z,float nx,float ny,float nz,int a,int b,float weight,
@@ -22,7 +22,7 @@ public final class ConsumeBodySurface {
         Panel(int region,Point[] points,int columns){this(region,points,columns,new float[points.length*7]);}
     }
     private final List<Panel> panels=new ArrayList<>();
-    private static final String MAP="/assets/blacklight/textures/entity/consume_body_weave.png";
+    private static final String MAP="/assets/blacklight/textures/entity/consume_charcoal_skin.png";
     private static final int SIZE=256;
     private static final float[] HEIGHT=heightMap();
 

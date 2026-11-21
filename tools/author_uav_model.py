@@ -1,4 +1,4 @@
-"""Authored voxel geometry/surface from measured P1 UAV references; no source mesh/texture is embedded."""
+"""Project-designed drone chassis, struts, sensor and procedural pixel atlas."""
 from pathlib import Path
 import json,math,random,hashlib
 from PIL import Image,ImageDraw
@@ -49,54 +49,26 @@ for i in range(12):
 for a in [0,math.tau/3,math.tau*2/3]:
  beam('torso',[0,7.8,0],[math.sin(a)*10.5,7.8,math.cos(a)*10.5],.65,'steel')
 box('torso',[0,8.35,0],[2.1,1.9,2.1],'dark')
-# Original uav001Blade has one joint at Y=0.5846875906 and spans X +/-0.5295076.
-rotor_y=.5846875905990601*16;bone('rotor_0','torso',(0,rotor_y,0))
-box('rotor_0',[0,rotor_y,0],[16.94424,.28653,1.5],'dark')
-for side in [-1,1]:
- box('rotor_0',[side*6.25,rotor_y,side*.5],[4.1,.30,1.9],'panel',[0,side*7,0])
-box('rotor_0',[0,rotor_y+.3,0],[1.55,.6,1.55],'steel')
-# P1 MeshShape has three disconnected six-point triangular struts. These are
-# the two endpoint-face centroids, in source units, not guessed convergence.
-struts=[([-.499000,.597924,-.362583],[-.041923,1.573165,-.033779]),
-        ([.499356,.597924,-.362583],[.042279,1.573165,-.033779]),
-        ([0,.603426,.617719],[0,1.555918,.067797])]
-def source_point(p):return [-p[0]*16,p[1]*16,p[2]*16]
-for a,b in struts:
- start,end=source_point(a),source_point(b)
- # The retained authored shroud's inner lip is lower than the source upper
- # shoulder. Extend the SAME measured strut line into that lip, so measured
- # top attachments do not leave floating feet above our existing body mesh.
- t=(8.25-start[1])/(end[1]-start[1]);start=[x+t*(y-x) for x,y in zip(start,end)]
- beam('torso',start,end,.46,'steel')
- # The sockets overlap the shroud and sensor housing along the same strut.
- for lo,hi,width in [(0,.10,.88),(.91,1,.73)]:
-  p=[x+(y-x)*lo for x,y in zip(start,end)];q=[x+(y-x)*hi for x,y in zip(start,end)]
-  beam('torso',p,q,width,'panel')
-# The 86-point connected head is a SOLID flattened oval, not a ring around a
-# rectangular housing. Fit continuous authored cuboid bands to measured bounds.
-head_bounds=[[-.3339794,1.49146235,-.20075928],[.33397949,1.72888458,-.03665394]]
-head_center=source_point([(a+b)/2 for a,b in zip(*head_bounds)])
-head_radius=[(b-a)*8 for a,b in zip(*head_bounds)]
-for iy in range(9):
- yn=-1+(iy+.5)*2/9
- for iz in range(5):
-  zn=-1+(iz+.5)*2/5;remaining=1-yn*yn-zn*zn
-  if remaining<=0:continue
-  width=2*head_radius[0]*math.sqrt(remaining)
-  box('head',[head_center[0],head_center[1]+yn*head_radius[1],head_center[2]+zn*head_radius[2]],
-      [width,2*head_radius[1]/9,2*head_radius[2]/5],'sensor')
-# Separate 33-point rear barrel: oval cross-section, long axis Z. Its measured
-# front intersects the cap; strut tips enter its underside rather than floating.
-barrel_bounds=[[-.15757427,1.54857337,-.16645387],[.15757425,1.66432357,.16645387]]
-barrel_center=source_point([(a+b)/2 for a,b in zip(*barrel_bounds)])
-barrel_radius=[(b-a)*8 for a,b in zip(*barrel_bounds)]
-for iy in range(7):
- yn=-1+(iy+.5)*2/7;width=2*barrel_radius[0]*math.sqrt(1-yn*yn)
- box('head',[barrel_center[0],barrel_center[1]+yn*barrel_radius[1],barrel_center[2]],
-     [width,2*barrel_radius[1]/7,2*barrel_radius[2]],'panel')
- # A narrow authored termination band keeps the rear cylindrical silhouette.
- box('head',[barrel_center[0],barrel_center[1]+yn*barrel_radius[1],barrel_radius[2]-.12],
-     [width,2*barrel_radius[1]/7,.24],'edge')
+# Integral motor, three spokes and a protected camera pod, all in model pixels.
+rotor_y=9.25
+bone('rotor_0','torso',(0,rotor_y,0))
+box('rotor_0',[0,rotor_y,0],[17,.5,1.8],'dark')
+for side in (-1,1):
+ box('rotor_0',[side*6.5,rotor_y,side*.45],[3.8,.45,2.1],'panel',[0,side*8,0])
+box('rotor_0',[0,rotor_y+.35,0],[1.8,.7,1.8],'steel')
+for i in range(3):
+ angle=i*math.tau/3
+ start=[math.sin(angle)*10.15,8.15,math.cos(angle)*10.15]
+ end=[math.sin(angle)*1.3,23.75,math.cos(angle)*1.3]
+ beam('torso',start,end,.65,'steel')
+ for lo,hi in [(0,.12),(.89,1)]:
+  beam('torso',[x+(y-x)*lo for x,y in zip(start,end)],[x+(y-x)*hi for x,y in zip(start,end)],.98,'panel')
+box('head',[0,24.4,-.25],[7.5,3.1,4.75],'panel')
+box('head',[0,24.4,-2.8],[6.2,2.35,1.05],'rubber')
+box('head',[0,24.5,-3.4],[4.7,1.52,.48],'sensor')
+for side in (-1,1):
+ box('head',[side*3.85,24.4,-.05],[.65,2.2,3.1],'edge')
+box('head',[0,24.6,2.25],[4.9,1.85,1.16],'grille')
 # Curved underside guard/skid frames, approximated with connected short segments.
 for a in [0,math.tau/3,2*math.tau/3]:
  for side in [-1,1]:
@@ -133,8 +105,4 @@ for b in bones:
 wreck={'bones':{'body':[0,0,0],'rotor':[0,rotor_y,0],'sensor':[0,26.1,0]},'parts':wreck_parts}
 (ASSETS/'military/recon-uav-wreck.json').write_text(json.dumps(wreck,indent=2)+'\n',encoding='utf8')
 wreck_tex.save(ASSETS/'textures/entity/recon_uav_wreck.png')
-report={'origin':'Authored voxel mesh and procedural surface measured against private P1 original UAV geometry; original assets are not embedded','sourcePackageSha256':'deb7ddceb62f5ef91c6230d02170d992c3b93af6fa837524872d04d039ee27a5','sourceMeshBounds':[[-.9459512,-.00281513,-.96015084],[.94595075,1.7288846,.94595104]],'sourceRotorJoint':[0,.5846875905990601,0],'sourceLampOffset':[-.155,.428,-.964],'bedrockLamp':lamp,'rotors':1,'cubes':sum(len(b['cubes']) for b in bones),'stateEffects':{'idle':'lightGlowGreen','seeing':'lightGlowYellow','alert':'lightGlowRed'},'limits':['Voxel surface approximates curved source geometry','Detection-duration and lease values remain Minecraft adaptations, not decoded original timing']}
-report['headCorrection']={'sourceProof':'D:/PrototypeReference/p1/private/uav/head-measurements.json','method':'1002-vertex P1 main mesh, welded triangle-connected components: solid cap86 points, rear barrel33 points, three struts6 points each. No native mesh or texture copied.','sourceCapBounds':head_bounds,'sourceBarrelBounds':barrel_bounds,'sourceStrutEndpointCentroids':struts,'mapping':'Bedrock [-X,Y,Z]*16. New solid voxel ellipse and rear elliptical cylinder replace hollow segmented trim and square backing blocks. Existing torso shell, single rotor and lamp placement remain unchanged.','adaptation':'Cap uses9x5 ellipsoid bands; barrel7 bands; strut square width.46px approximates original triangular cross-section. Strut upper endpoints and direction use measured source, while each lower end is extended along that same line to authored Y8.25 to intersect the retained inner shroud lip rather than float above it. Rear termination band and crosshatch are authored material cues. Exact native cap curvature/asymmetric barrel contour are approximations.','status':'Static source/asset generation only; no Java/client or game verification.'}
-report['runtimeRotationCorrection']={'cause':'The prior beam angles used mathematical authoring Euler directly as Gecko JSON. Mirrored vertices plus Gecko Euler(-X,-Y,+Z) reversed the horizontal lean of non-horizontal beams; the previous preview omitted that conversion and falsely showed attached struts.','encoding':'Authoring Rz(z)*Ry(y)*Rx(x) becomes JSON[-x,y,-z]; Gecko baked Euler[-JSON.x,-JSON.y,JSON.z] then correctly transforms the mirrored-X vertices.','scope':'Three upper support rods and underside skid frames. Head remains fixed, its measured bounds unchanged; shell, rotor origin, light location and textures retain their authored values. Wreck export uses baked Gecko angles so its geometry stays aligned with the live model.','evidence':'art/military2/uav-gecko-rotation-review-20261117.json','preview':'preview_uav_head.py now reconstructs the actual Gecko cube transform, shown back in authoring axes for comparison.','validation':'Static endpoints/geometry only; no game or JVM executed.'}
-report['files']={str(p.relative_to(ROOT)).replace('\\','/'):hashlib.sha256(p.read_bytes()).hexdigest() for p in [*files,ASSETS/'textures/entity/recon_uav_mc.png',ASSETS/'textures/entity/recon_uav_mc_glowmask.png',ASSETS/'military/recon-uav-wreck.json',ASSETS/'textures/entity/recon_uav_wreck.png']}
-(ROOT/'art/military2/uav-model-source.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf8');print('Authored',report['cubes'],'cubes, one rotor, source-located three-state lamp')
+print('Built live drone and wreck:',len(wreck_parts),'body pieces')

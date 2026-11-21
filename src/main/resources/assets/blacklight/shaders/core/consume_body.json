@@ -13,9 +13,6 @@
     },
     {
       "name": "Sampler3"
-    },
-    {
-      "name": "Sampler4"
     }
   ],
   "uniforms": [
@@ -130,5 +127,6 @@
       "values": [
         0
       ]
-    }]
+    }
+  ]
 }

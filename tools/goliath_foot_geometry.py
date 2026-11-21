@@ -1,4 +1,4 @@
-"""Fit existing shoe and toe cubes to the original ankle / ball skin weights."""
+"""Attach project-designed boots and toe plates to animated joints."""
 import copy
 
 import numpy as np
@@ -16,9 +16,6 @@ def add_feet(geometry, motion, reader, rig, clips, nodes):
     signs = np.diag([-1., 1., 1.])
     bind = goliath_source_pose.world(reader, rig, {'tracks': []}, 0)
     indices = {name: i for i, (name, _, _) in enumerate(rig)}
-    skin = [reader.decoder.m.streams(n)[0] for n in nodes if n['type'] == 0x10040
-            and reader.decoder.text8(n['payload'], 4)[0] in
-            ('behemoth_R_LegShape001_skin', 'behemoth_TorsoShape001_skin')]
     foot_joints = []
 
     def add_joint_layer(name, parent):
@@ -60,25 +57,14 @@ def add_feet(geometry, motion, reader, rig, clips, nodes):
                 add_joint_layer(bridge, 'source_' + rig[parent][0])
                 add_joint_layer(animated, bridge)
                 foot_joints.append((index, parent))
-            points = np.concatenate([
-                mesh['position'][np.where(mesh['indices'] == index, mesh['weights'], 0).sum(axis=1) > .7, :3]
-                for mesh in skin
-            ])
-            if joint == 'Ankle_L':
-                split = np.quantile(points[:, 2], .35)
-                points = points[points[:, 2] <= split] if len(templates) > 1 else points[points[:, 2] >= split - .12]
-            assert len(points) > 10, joint
-            # The three authored toe plates retain a small lateral seam.
-            groups = np.array_split(points[np.argsort(points[:, 0])], len(templates))
-            cubes = []
-            for template, group in zip(templates, groups):
-                low = group.min(axis=0).astype(float)
-                high = group.max(axis=0).astype(float)
-                if len(templates) > 1:
-                    inset = (high[0] - low[0]) * .035
-                    low[0] += inset
-                    high[0] -= inset
-                cubes.append(fitted_cube(template, joint, low, high))
+            # Project-designed boots and split toes. Bind positions locate the attachment;
+            # width, height and toe offsets are specified in Minecraft model pixels.
+            cubes=[]
+            for toe,template in enumerate(templates):
+                size=np.array([14.,8.,20.]) if len(templates)==1 else np.array([4.,4.5,10.])
+                offset=np.array([0.,-1.,-3.]) if len(templates)==1 else np.array([(toe-1)*4.6,-2.,-5.])
+                center=bind[joint][:3,3]+offset/pixels
+                cubes.append(fitted_cube(template,joint,center-size/(2*pixels),center+size/(2*pixels)))
             bones.append(dict(name=name, parent=animated, pivot=[0, 0, 0], cubes=cubes))
 
     for clip in motion['clips'].values():

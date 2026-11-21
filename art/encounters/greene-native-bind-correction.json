@@ -2030,7 +2030,7 @@
   "parentScaleCompensation": {
     "Body": "Body_Root"
   },
-  "bindPolicy": "Core authored cube coordinates/rotations/sizes/UVs remain byte-value identical. The legacy independent weakpoint ring is replaced by source segment region boxes with existing authored UVs. Native bind multiplied by the static inverse-bind leaf is identity.",
+  "bindPolicy": "Core authored cube coordinates/rotations/sizes/UVs remain byte-value identical. The legacy independent weakpoint ring is replaced by independently sized Minecraft cuffs and petals with existing authored UVs. Native bind multiplied by the static inverse-bind leaf is identity.",
   "classification": "Authored cube center in scaled source bind space; inverse-distance mean of eight nearest source skin vertices chooses a rigid joint. Horns explicitly retain Horn. This rigid cuboid mapping is an MC adaptation of blended native skin, not a copied mesh.",
   "checks": [
     {

@@ -1,0 +1,281 @@
+{
+  "schema": 1,
+  "state": "Source shared-pose segment binding replaces authored ring; no compilation or gameplay/visual validation performed.",
+  "source": "D:\\PrototypeReference\\p1\\private\\comparison\\mother.p3d",
+  "sourceSha256": "f67e081a7497191554de61995bdb75fad58cfca1cb53adeb9bd0b15ef8b97df6",
+  "scalePixelsPerSourceUnit": 7.167352101048183,
+  "sourceCoordinateSystem": "All three segment skin buffers are in the same bind world as mother_core; their named skeletons contain byte-identical 56 joint records. No grab-slot offset is added.",
+  "script": {
+    "figOffset": 66452,
+    "function": "P4 MotherSpawnSegments",
+    "attachInstructions": "098..104",
+    "sharePoseInstructions": "105..108",
+    "physicsEnableInstructions": "109..112",
+    "exclusionGroupInstructions": "113..116",
+    "sequence": "Spawn Mother_Segment_i at core position/orientation; attach to Segment+i with empty child joint, mode 0; go_SharePose(core, child); phys_EnablePhysics(child,true); phys_SetExclusionGroup(child,coreGroup). RestoreSegments/P5 repeats attach and SharePose."
+  },
+  "replacement": {
+    "removedLegacyRingCubes": 42,
+    "sourceBoundSegmentCubes": 30,
+    "unchangedAuthoredCoreCubes": 108
+  },
+  "geometryPolicy": "Project-designed cuff and jaw dimensions attach to the animated joints.",
+  "axes": "geometry = diag(-1,1,1) * sourceBind * existingPixelsPerSourceUnit; runtime model mirrors geometry X back. Core cuboids and all existing texture pixels remain unchanged.",
+  "segments": [
+    {
+      "segment": 0,
+      "skeleton": "mother_segment_1_skeleton",
+      "regions": [
+        {
+          "leaf": "weak_0_Slug_01_Jaw_3",
+          "sourceJoint": "Slug_01_Jaw_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Head",
+          "sourceJoint": "Slug_01_Head",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_0_Slug_01_Jaw_1",
+          "sourceJoint": "Slug_01_Jaw_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_5",
+          "sourceJoint": "Slug_01_Spine_5",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Jaw_2",
+          "sourceJoint": "Slug_01_Jaw_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_4",
+          "sourceJoint": "Slug_01_Spine_4",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_3",
+          "sourceJoint": "Slug_01_Spine_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_2",
+          "sourceJoint": "Slug_01_Spine_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_1",
+          "sourceJoint": "Slug_01_Spine_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_0_Slug_01_Spine_Base",
+          "sourceJoint": "Slug_01_Spine_Base",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        }
+      ]
+    },
+    {
+      "segment": 1,
+      "skeleton": "mother_segment_2_skeleton",
+      "regions": [
+        {
+          "leaf": "weak_1_Slug_02_Jaw_3",
+          "sourceJoint": "Slug_02_Jaw_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_1_Slug_02_Head",
+          "sourceJoint": "Slug_02_Head",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_1_Slug_02_Jaw_1",
+          "sourceJoint": "Slug_02_Jaw_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_5",
+          "sourceJoint": "Slug_02_Spine_5",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Jaw_2",
+          "sourceJoint": "Slug_02_Jaw_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_4",
+          "sourceJoint": "Slug_02_Spine_4",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_3",
+          "sourceJoint": "Slug_02_Spine_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_2",
+          "sourceJoint": "Slug_02_Spine_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_1",
+          "sourceJoint": "Slug_02_Spine_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_Base",
+          "sourceJoint": "Slug_02_Spine_Base",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        }
+      ]
+    },
+    {
+      "segment": 2,
+      "skeleton": "mother_segment_3_skeleton",
+      "regions": [
+        {
+          "leaf": "weak_2_Slug_03_Jaw_3",
+          "sourceJoint": "Slug_03_Jaw_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Head",
+          "sourceJoint": "Slug_03_Head",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_1",
+          "sourceJoint": "Slug_03_Jaw_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_5",
+          "sourceJoint": "Slug_03_Spine_5",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_2",
+          "sourceJoint": "Slug_03_Jaw_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_4",
+          "sourceJoint": "Slug_03_Spine_4",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_3",
+          "sourceJoint": "Slug_03_Spine_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_2",
+          "sourceJoint": "Slug_03_Spine_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_1",
+          "sourceJoint": "Slug_03_Spine_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_Base",
+          "sourceJoint": "Slug_03_Spine_Base",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "clip": "idle",
+      "frames": 166,
+      "maxAffineCoefficientError": 0.00014577980283281278
+    },
+    {
+      "clip": "HOWL",
+      "frames": 123,
+      "maxAffineCoefficientError": 0.00014614354632414006
+    },
+    {
+      "clip": "ORBS",
+      "frames": 185,
+      "maxAffineCoefficientError": 0.00014528285607617875
+    },
+    {
+      "clip": "VOLLEY",
+      "frames": 185,
+      "maxAffineCoefficientError": 0.00014528285607617875
+    },
+    {
+      "clip": "exposed",
+      "frames": 210,
+      "maxAffineCoefficientError": 0.000132812101433899
+    },
+    {
+      "clip": "hit",
+      "frames": 31,
+      "maxAffineCoefficientError": 0.00010774471655672357
+    },
+    {
+      "clip": "exit",
+      "frames": 45,
+      "maxAffineCoefficientError": 0.00013538672675217356
+    },
+    {
+      "clip": "enter",
+      "frames": 245,
+      "maxAffineCoefficientError": 0.00014459641850805838
+    },
+    {
+      "clip": "death",
+      "frames": 260,
+      "maxAffineCoefficientError": 0.00011985505720346623
+    },
+    {
+      "clip": "segment_death",
+      "frames": 96,
+      "maxAffineCoefficientError": 0.000145584664933196
+    }
+  ],
+  "limits": [
+    "No Java, Gradle, unit/GameTests, game/client or visual acceptance run.",
+    "Rigid bounding cuboids can overfill curved native surfaces and do not implement weighted vertex blending.",
+    "Segment detach/dead-body presentation remains separate work; this change corrects attached live segment geometry and pose."
+  ]
+}

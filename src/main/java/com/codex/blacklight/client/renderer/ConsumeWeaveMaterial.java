@@ -13,18 +13,18 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import org.slf4j.Logger;
 
-/** Normal-mapped consume tissue with the P1 cloth shader's per-pixel coverage equation. */
+/** Pixel-cut charcoal fibres drawn on the receiver and player's moving skin. */
 @EventBusSubscriber(modid = "blacklight", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ConsumeWeaveMaterial extends RenderType {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final ResourceLocation SHADER = ResourceLocation.fromNamespaceAndPath("blacklight", "consume_body");
     private static ShaderInstance shader;
     private static ResourceLocation texture(String name){
-        return ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/consume_body_"+name+".png");
+        return ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/consume_charcoal_skin"+name+".png");
     }
-    private static final ResourceLocation BAKED=texture("weave");
-    private static final RenderType MESH=material("blacklight_consume_body",texture("diffuse"),()->shader,false);
-    private static final RenderType RECEIVER=material("blacklight_consume_receiver",texture("diffuse"),()->shader,true);
+    private static final ResourceLocation BAKED=texture("");
+    private static final RenderType MESH=material("blacklight_consume_body",texture(""),()->shader,false);
+    private static final RenderType RECEIVER=material("blacklight_consume_receiver",texture(""),()->shader,true);
     private static final RenderType BAKED_RECEIVER=create("blacklight_consume_receiver_flat",DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS,1536,false,true,CompositeState.builder()
                     .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
@@ -36,9 +36,9 @@ public final class ConsumeWeaveMaterial extends RenderType {
         return create(name,DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS,65536,true,true,CompositeState.builder()
                     .setShaderState(new ShaderStateShard(source))
-                    .setTextureState(MultiTextureStateShard.builder().add(diffuse,true,false)
+                    .setTextureState(MultiTextureStateShard.builder().add(diffuse,false,false)
                             .add(BAKED,false,false).add(BAKED,false,false) // Overlay and lightmap occupy units 1 and 2.
-                            .add(texture("normal"),true,false).add(texture("reflection"),true,false).build())
+                            .add(texture("_normal"),false,false).build())
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY).setCullState(NO_CULL)
                     .setDepthTestState(decal?EQUAL_DEPTH_TEST:LEQUAL_DEPTH_TEST)
                     .setWriteMaskState(decal?COLOR_WRITE:COLOR_DEPTH_WRITE)

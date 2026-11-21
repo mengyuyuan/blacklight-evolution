@@ -48,6 +48,7 @@ public final class ConsumeTrauma {
         }
         if(!sites.isEmpty()){lashTime=time;lashSites=sites.toArray(Vec3[]::new);}
     }
+    final ConsumeImpactResponse response=new ConsumeImpactResponse();
     private int lastHit=-1;
     private int landedBlows;
     private final List<Shard> shards=new ArrayList<>();
@@ -175,6 +176,7 @@ public final class ConsumeTrauma {
         lastHit=event;
         struck=hit.part();localImpact=hit.local();lastTime=impactTime=now;crushed=head&&!blunt;
         Vec3 world=hit.world();
+        response.hit(e,owner,visual,event,world,positions[parts.indexOf(hit.part())],parts,positions,partial);
         Vec3 forward=Vec3.directionFromRotation(0,visual.facing());
         Vec3 jet=stomp?new Vec3(0,.22,0).add(forward.scale(-.32)).normalize():forward;
         if(blunt||hold||lash){
@@ -302,6 +304,7 @@ public final class ConsumeTrauma {
                     Vec3 outward=pos.subtract(positions[i]).normalize().add(pos.subtract(impact).normalize().scale(.28));
                     Vec3 radial=new Vec3(outward.x,s*.035+t*.03,outward.z).normalize();
                     Vec3 kick=radial.scale(stomp?.145:.125).add(s*.022,stomp?.055:.10,t*.025);
+                    if(!stomp&&!groundPulp)kick=kick.add(response.fragmentImpulse());
                     if(groundPulp){
                         // Compression and lateral spread happen on the impact surface.
                         // Preserve the faceted outline rather than stacking red sheets in air.
