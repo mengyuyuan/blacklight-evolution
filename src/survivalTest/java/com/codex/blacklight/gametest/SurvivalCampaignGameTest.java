@@ -106,7 +106,13 @@ public final class SurvivalCampaignGameTest {
                     .thenExecute(this::followManifest)
                     .thenWaitUntil(()->h.assertTrue(ready(home,convoyPad),"approach the loaded convoy"))
                     .thenExecute(this::recoverConvoyCore)
-                    .thenIdle(1).thenExecute(this::plantHiveLoot)
+                    .thenExecute(() -> PrototypeModeSystem.handle(player,true))
+                    .thenWaitUntil(() -> {
+                        // An embedded player sends no movement packets to advance the claw morph.
+                        com.codex.blacklight.combat.ClawCombatSystem.onPlayerTick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+                        h.assertTrue(player.getData(ModAttachments.CLAW_COMBAT).action() == com.codex.blacklight.combat.ClawCombatState.Action.IDLE,
+                                "finish transforming before attacking the hive");
+                    }).thenExecute(this::plantHiveLoot)
                     .thenWaitUntil(()->h.assertTrue(hydra.feeds()==5,"planted tissue has eaten five living animals, feeds="+hydra.feeds()))
                     .thenWaitUntil(this::takeGateway)
                     .thenExecute(()->holdChunks(player.serverLevel(),player.blockPosition()))
@@ -159,7 +165,7 @@ public final class SurvivalCampaignGameTest {
             evolved=actors.get(0);
         }
         private void followManifest() {
-            evolved.hurt(player.damageSources().playerAttack(player),1000000);
+            SurvivalEncounterGameTest.finishWithMelee(player, evolved);
             var decoder = SurvivalEncounterGameTest.craft(player,"containment_decoder",
                     drop(home,evolved.position(),ModItems.EVOLVED_GANGLION.get()),
                     take(player.getInventory(),Items.COPPER_INGOT),take(player.getInventory(),Items.REDSTONE));
@@ -193,8 +199,7 @@ public final class SurvivalCampaignGameTest {
             var hive = ModEntities.BLACKLIGHT_HIVE.get().create(home);
             hive.setPos(Vec3.atBottomCenterOf(floor.above().west(4)));
             home.addFreshEntity(hive);
-            PrototypeModeSystem.handle(player,true);
-            hive.hurt(player.damageSources().playerAttack(player),1000000);
+            SurvivalEncounterGameTest.finishWithMelee(player, hive);
             h.assertTrue(!hive.isAlive(),"awakened combat destroys the structural hive");
             PrototypeModeSystem.handle(player,false);
             var intel = drop(home,hive.position(),ModItems.MOTHER_INTEL.get());

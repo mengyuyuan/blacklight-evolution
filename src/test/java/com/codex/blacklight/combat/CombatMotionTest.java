@@ -23,6 +23,20 @@ class CombatMotionTest {
         for(var move:new WeaponMove[]{WeaponMove.AIR_KICK,WeaponMove.AIR_PAIN})
             assertTrue(CombatMotion.speed(move,1)>CombatMotion.speed(move,0));
     }
+    @Test void groundReleaseKeepsPerMoveStartDurationAndChargeRange(){
+        var jab=CombatMotion.GroundStep.forMove(WeaponMove.MUSCLE_JAB);
+        assertEquals(2F/30,jab.begin,1e-6);assertEquals(5F/30,jab.end,1e-6);
+        assertEquals(.87,jab.advance(0,jab.end-jab.begin),1e-6);
+        assertEquals(3*.87,jab.advance(1,jab.end-jab.begin),1e-6);
+        assertSame(CombatMotion.GroundStep.forMove(WeaponMove.HAMMER_HOOK),CombatMotion.GroundStep.forMove(WeaponMove.HAMMER_HOOK_CHARGED));
+        assertNull(CombatMotion.GroundStep.forMove(WeaponMove.WHIP_LONGSHOT));
+    }
+    @Test void sprintBladeBrakesAfterTheRushAndAcceptsPartialTicks(){
+        double integrated=0;for(int t=0;t<40;t++)integrated+=CombatMotion.sprintBladeStep(.5F,t*.037,(t+1)*.037);
+        assertEquals((8.5+7.5)*.87,integrated,1e-6);
+        assertEquals(0,CombatMotion.sprintBladeStep(1,-1,.15),1e-6);
+        assertEquals(0,CombatMotion.sprintBladeStep(1,2,1),1e-6);
+    }
     @Test void longApproachHasEnoughTimeWithoutChangingContactReach(){
         for(var move:WeaponMove.values()){
             double speed=CombatMotion.speed(move,0);

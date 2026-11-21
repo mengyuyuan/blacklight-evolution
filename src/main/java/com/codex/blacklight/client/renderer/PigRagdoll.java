@@ -320,11 +320,12 @@ public final class PigRagdoll {
             var profile=com.codex.blacklight.combat.ConsumeReceiverScene.profile(com.codex.blacklight.power.PowerForm.values()[visual.form()],false,visual.variant());
             float seconds=(level.getGameTime()-visual.started()+partial)/20F;
             float front=visual.consuming()&&profile!=null?Math.clamp((seconds-profile.effectSeconds())*1.4F,0,1):0;
-            for(var p:pieces){p.stain=Math.max(p.absorption,RagdollDrive.smooth((front-(p.region==32?0:p.region==1?.15F:.3F))/.65F));p.render(level,texture,stack,buffers,camera,partial,recovery,overlay);}
+            var recoil=ConsumeBodyImpact.receiver(entity,visual,partial);
+            for(var p:pieces){p.stain=Math.max(p.absorption,RagdollDrive.smooth((front-(p.region==32?0:p.region==1?.15F:.3F))/.65F));p.render(level,texture,stack,buffers,camera,partial,recovery,overlay,recoil);}
             if(RagdollDrive.captured(entity)){
                 var phase=ConsumeFracture.phase(entity,partial);if(phase.opening()<=0)return;
                 var roots=new ArrayList<ConsumeTendrils.Attachment>();
-                for(var p:pieces)roots.add(new ConsumeTendrils.Attachment(p.old.lerp(p.pos,partial),Math.max(.03,p.half.length()*.35*p.scale)));
+                for(var p:pieces)roots.add(new ConsumeTendrils.Attachment(recoil==null?p.old.lerp(p.pos,partial):recoil.point(p.old.lerp(p.pos,partial)),Math.max(.03,p.half.length()*.35*p.scale)));
                 stack.pushPose();try{stack.translate(-camera.x,-camera.y,-camera.z);
                     ConsumeAbsorptionFx.drawPosed(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE)),
                             LevelRenderer.getLightColor(level,entity.blockPosition()),roots,RagdollDrive.sink(entity,partial),phase,entity.getId());
@@ -390,9 +391,10 @@ public final class PigRagdoll {
             }
             still=y&&requested.y<0&&velocity.lengthSqr()<.002&&spin.lengthSquared()<.002?still+1:0;
         }
-        void render(ClientLevel level,ResourceLocation texture,PoseStack stack,MultiBufferSource buffers,Vec3 camera,float partial,float recovery,int overlay){
+        void render(ClientLevel level,ResourceLocation texture,PoseStack stack,MultiBufferSource buffers,Vec3 camera,float partial,float recovery,int overlay,ConsumeBodyImpact.Frame recoil){
             Vec3 at=old.lerp(pos,partial);var turn=new Quaternionf(oldRotation).slerp(rotation,partial);
             if(recovery>0&&recoveryPosition!=null){at=at.lerp(recoveryPosition,recovery);turn.slerp(recoveryRotation,recovery);}
+            if(recoil!=null){at=recoil.point(at);turn.premul(recoil.rotation);}
             at=at.subtract(camera);stack.pushPose();
             try{
                 stack.translate(at.x,at.y,at.z);stack.mulPose(turn);stack.scale(scale,scale,scale);stack.translate(-center.x,-center.y,-center.z);

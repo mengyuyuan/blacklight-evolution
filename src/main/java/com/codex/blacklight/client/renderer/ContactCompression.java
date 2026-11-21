@@ -10,6 +10,24 @@ final class ContactCompression {
     final Vec3 center, direction;
     final double radius, depth, started;
     double strength;
+    private ConsumeSurfaceResponse grip;
+    private Vec3 tangent,transverse;
+    private ContactCompression partner;
+    int actor=-1;long scene;
+    static ContactCompression grip(Vec3 center,Vec3 travel,Vec3 axis,double radius,double now,
+                                   ConsumeSurfaceResponse mode,int actor,long scene){
+        var field=new ContactCompression(center,travel,radius,now);
+        field.grip=mode;field.tangent=ConsumeSurfaceResponse.tangent(field.direction,axis);
+        field.transverse=field.direction.cross(field.tangent);field.actor=actor;field.scene=scene;
+        return field;
+    }
+    boolean sameGrip(long start,int owner,double clock){return grip!=null&&scene==start&&actor==owner&&started==clock;}
+    void addGrip(ContactCompression other){partner=other;}
+    ConsumeSurfaceResponse mode(){return grip;}
+    double weightAt(double age){return grip==null?weight(age):grip.strength(age);}
+    private Vec3 offset(Vec3 point){
+        return grip.offset(point.subtract(center),direction,tangent,transverse,radius,strength);
+    }
 
     ContactCompression(Vec3 center,Vec3 direction,double radius,double started) {
         this.center=center;
@@ -28,11 +46,28 @@ final class ContactCompression {
     }
 
     Vec3 point(Vec3 p) {
+        if(grip!=null){
+            Vec3 displacement=offset(p);
+            if(partner!=null){
+                partner.strength=strength;
+                Vec3 second=partner.offset(p);
+                // On coincident surfaces the dominant contact wins; the two arms cannot double the depth.
+                if(second.lengthSqr()>displacement.lengthSqr())displacement=second;
+            }
+            return p.add(displacement);
+        }
         double w=1-p.distanceToSqr(center)/(radius*radius);
         return w<=0?p:p.add(direction.scale(depth*strength*w*w));
     }
 
     Vec3 normal(Vec3 p,Vec3 normal) {
+        if(grip!=null){
+            Vec3 t=ConsumeSurfaceResponse.tangent(normal,tangent),b=normal.cross(t);
+            double h=radius*.014;
+            Vec3 x=point(p.add(t.scale(h))).subtract(point(p.subtract(t.scale(h))));
+            Vec3 y=point(p.add(b.scale(h))).subtract(point(p.subtract(b.scale(h))));
+            return x.scale(.5/h).cross(y.scale(.5/h)).normalize();
+        }
         Vec3 delta=p.subtract(center);
         double w=1-delta.lengthSqr()/(radius*radius);
         if(w<=0)return normal;
@@ -56,7 +91,8 @@ final class ContactCompression {
         int[] extra = new int[9];
         for (int i = 0; i < faces; i++) {
             int at = 4 * i;
-            if (AdaptiveRagdoll.bounds(source.subList(at, at + 4)).distanceToSqr(center) >= radius * radius) continue;
+            var bounds=AdaptiveRagdoll.bounds(source.subList(at,at+4));
+            if(bounds.distanceToSqr(center)>=radius*radius&&(partner==null||bounds.distanceToSqr(partner.center)>=partner.radius*partner.radius))continue;
             var a = source.get(at); var b = source.get(at + 1);
             var c = source.get(at + 2); var d = source.get(at + 3);
             columns[i] = divisions(Math.max(a.p.distanceTo(b.p), d.p.distanceTo(c.p)));

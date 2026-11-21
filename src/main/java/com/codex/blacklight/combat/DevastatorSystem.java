@@ -25,7 +25,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid="blacklight")
 public final class DevastatorSystem {
     public static final int CHARGE=0, RELEASE=1, FLIGHT=2, LAND=3, RECOVERY=4;
-    private record TargetPlan(LivingEntity target,double contact) { }
+    private record TargetPlan(LivingEntity target,double contact,Vec3 groundAnchor) { }
     private record Held(WeaponButtons buttons,int tick) { }
     private static final Map<ServerPlayer,Held> INPUT=new WeakHashMap<>();
     private static final Map<ServerPlayer,Session> ACTIVE=new WeakHashMap<>();
@@ -101,7 +101,11 @@ public final class DevastatorSystem {
         WeaponMove move=null;WeaponMove.Input input=keys.intent();
         if(special&&!attack&&!action&&!p.onGround()&&glide&&state.hasCombatSkill(CombatSkill.BULLETDIVE_DROP)){
             move=WeaponMove.BULLETDIVE_DROP;input=WeaponMove.Input.SPECIAL;
-        }else if(input!=null&&input.chord()&&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p))move=move(input,!p.onGround());
+        }else if(input!=null&&input.chord()&&(action||state.getActivePower()!=PowerForm.BACKSPINES)
+                &&state.hasCombatSkill(skill(input))&&CriticalMassSystem.ready(p)){
+            // With quills equipped, attack + use belongs to the shoulder combo.
+            move=move(input,!p.onGround());
+        }
         if(move==null||LocalWeaponMotion.find(move.id).isEmpty()||LocalWeaponMotion.find(move.id).orElseThrow().charge().isEmpty())return false;
         if(move==WeaponMove.BULLETDIVE_DROP&&wings)com.codex.blacklight.movement.WingFlightSystem.stop(p);
         WeaponCombatSystem.cancel(p);
@@ -112,6 +116,7 @@ public final class DevastatorSystem {
                 move.id,s.id,p.getGameProfile().getName(),p.getY(),p.onGround());
         movement.cancelCharge();movement.consumeDashRequest();movement.clearSprintDrive();
         p.setData(ModAttachments.GLIDE_UNTIL,-1L);p.syncData(ModAttachments.GLIDE_UNTIL);
+        com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"skill.charge",p.position(),.80F,1F);
         play(p,s,true,0,-1);publish(p,s);return true;
     }
     private static void play(ServerPlayer p,Session s,boolean charging,float offset,float heldPose){
@@ -124,7 +129,7 @@ public final class DevastatorSystem {
         p.setData(ModAttachments.DEVASTATOR_VISUAL,new DevastatorVisual(kind(s.move),s.id,s.released,s.phase,s.target==null?-1:s.target.getId(),
                 s.origin.x,s.origin.y,s.origin.z,(float)s.direction.x,(float)s.direction.y,(float)s.direction.z,s.timing.radius(),s.timing.effectStart(),s.timing.effectEnd(),
                 Math.max(0,s.highest-(s.landed?s.origin.y:p.getY())),s.peakDown,
-                s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact())).toList(),
+                s.targets.stream().map(plan->new DevastatorVisual.Contact(plan.target().getId(),(float)plan.contact(),plan.groundAnchor())).toList(),
                 s.move==WeaponMove.BULLETDIVE_DROP&&!s.landed&&s.target!=null?s.target.position():null));
         p.syncData(ModAttachments.DEVASTATOR_VISUAL);
     }
@@ -152,6 +157,10 @@ public final class DevastatorSystem {
                         s.move.id,s.id,age,s.released);
                 if(kind(s.move)==2&&s.target!=null&&s.target.isAlive()&&ExplicitTarget.visibleWithinRange(p,s.target,s.timing.radius()))
                     s.direction=ExplicitTarget.point(p,s.target).subtract(p.getEyePosition()).normalize();
+                if(s.move!=WeaponMove.BULLETDIVE_DROP && s.move!=WeaponMove.DEV_AIR_GROUNDSPIKE) {
+                    String cue=switch(kind(s.move)){case 0->"groundspike";case 1->"tendril";default->"pain";};
+                    com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"skill."+cue,s.origin,1F,1F);
+                }
                 play(p,s,false,charge.releaseTime(),-1);publish(p,s);
             }
             return;
@@ -175,6 +184,8 @@ public final class DevastatorSystem {
                 s.landed=true;s.phase=LAND;s.phaseTick=p.tickCount;s.released=p.level().getGameTime();s.origin=p.position();
                 com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator land {} session={} y={} onGround={} fallHeight={} peakDown={}",
                         s.move.id,s.id,p.getY(),p.onGround(),Math.max(0,s.highest-s.origin.y),s.peakDown);
+                com.codex.blacklight.registry.ModWeaponSounds.spatial(p,
+                        s.move==WeaponMove.BULLETDIVE_DROP?"skill.dive":"skill.groundspike",s.origin,1F,.98F);
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
                     { // Bulletdive shockwave ring: the surface buckles outward from the crater.
@@ -301,29 +312,42 @@ public final class DevastatorSystem {
             var target=plan.target();
             if(s.struck.size()>=s.timing.targets())break;
             if(s.struck.contains(target.getUUID())||!CombatTargeting.damageable(p,target)||!CombatTargeting.visibleWithinRange(p,target,radius))continue;
-            var point=kind==2?(CombatTargeting.multipart(target)?CombatTargeting.closestPoint(p.getEyePosition(),target):target.getBoundingBox().getCenter())
-                    :CombatTargeting.positionNear(s.origin,target);
+            double contact=plan.contact();
+            if(kind==0&&!GroundSpikePin.touches(target,plan.groundAnchor()))continue;
+            if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
+            var body = AnimatedHurtBody.of(target);
+            var skin = body == null ? null : targetSurface(p, s, body, kind, radius);
+            if (body != null && skin == null) continue;
+            var point = skin != null ? skin.point() : kind==2 ? (CombatTargeting.multipart(target)
+                    ? CombatTargeting.closestPoint(p.getEyePosition(),target) : target.getBoundingBox().getCenter())
+                    : CombatTargeting.positionNear(s.origin,target);
             double distance=point.distanceTo(kind==2?p.getEyePosition():s.origin);
             if(distance>radius)continue;
-            double contact=plan.contact();
             if(kind==2){var delta=point.subtract(p.getEyePosition());double along=delta.dot(s.direction);
                 if(along<0||delta.subtract(s.direction.scale(along)).length()>Math.max(1.25,target.getBbWidth()*.65))continue;
                 // Source target-control duration bounds this MC travel driver.
                 // Adapt acceleration for distant targets so the declared reach
                 // remains usable within the finite source effect lease.
             }
-            if(age<contact||age>Math.min(s.timing.damageEnd(),contact+DevastatorCollision.targetDuration(s.move)))continue;
             float damage=s.timing.damage();
             if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
-            if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("target_control",0,contact,damage))){
-                s.struck.add(target.getUUID());s.hits++;var outward=point.subtract(s.origin).multiply(1,0,1);
+            if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,skin,new HitContext("target_control",0,contact,damage))){
+                s.struck.add(target.getUUID());s.hits++;
+                if(kind==0){
+                    int ticks=(int)Math.ceil((s.timing.effectEnd()-.2-age)*20);
+                    if(!GroundSpikePin.catchMob(target,plan.groundAnchor(),ticks,s.yaw,p,s.id))
+                        ImpactControl.begin(target,new ImpactProfile(HitReaction.HEAVY,ImpactProfile.UP,12,0,0,false),s.yaw);
+                    WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null,s.move,plan.groundAnchor());
+                    continue;
+                }
+                var outward=point.subtract(s.origin).multiply(1,0,1);
                 if(outward.lengthSqr()<.0001)outward=s.direction;else outward=outward.normalize();
-                ImpactControl.begin(target,new ImpactProfile(kind==0?HitReaction.LAUNCH:HitReaction.HEAVY,kind==0?ImpactProfile.UP:ImpactProfile.FALL,40,.6,kind==0?.8:.15,true),s.yaw);
+                ImpactControl.begin(target,new ImpactProfile(HitReaction.HEAVY,ImpactProfile.FALL,40,.6,.15,true),s.yaw);
                 if(!NativeBossBodyControl.ownsPose(target)
                         &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.giantBoss())
                         &&!ConsumeSystem.grappleProtected(target)){
                     double resistance=target.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE);
-                    target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,(kind==0?.8:.15)*(1-resistance),0));target.hurtMarked=true;
+                    target.setDeltaMovement(outward.scale(.6*(1-resistance)).add(0,.15*(1-resistance),0));target.hurtMarked=true;
                 }
                 WeaponImpact.contact(p,target,ImpactTier.FINISHER,false,null,s.move,kind==2?p.getEyePosition():s.origin);
             }
@@ -337,31 +361,48 @@ public final class DevastatorSystem {
         for(var target:candidates){
             if(s.targets.size()>=s.timing.targets())break;
             if(!CombatTargeting.damageable(p,target)||!CombatTargeting.visibleWithinRange(p,target,radius))continue;
-            var point=kind==2?(CombatTargeting.multipart(target)?CombatTargeting.closestPoint(p.getEyePosition(),target):target.getBoundingBox().getCenter()):CombatTargeting.positionNear(s.origin,target);
+            var body=AnimatedHurtBody.of(target);
+            var skin=body==null ? null : targetSurface(p,s,body,kind,radius);
+            if(body!=null && skin==null)continue;
+            var point=skin!=null ? skin.point() : kind==2 ? (CombatTargeting.multipart(target)
+                    ? CombatTargeting.closestPoint(p.getEyePosition(),target) : target.getBoundingBox().getCenter())
+                    : CombatTargeting.positionNear(s.origin,target);
             double distance=point.distanceTo(kind==2?p.getEyePosition():s.origin);if(distance>radius)continue;
-            if(kind==0&&!graveContactSupported(p,point))continue;
+            Vec3 anchor=kind==0?GroundSpikePin.groundAt(p,point):null;
+            if(kind==0&&anchor==null)continue;
             double contact=kind==2?Math.max(s.timing.targetStart(),s.timing.effectStart()+
                     Math.min(distance/(30*DevastatorTiming.SOURCE_WORLD_SCALE),DevastatorCollision.targetDuration(s.move))):s.timing.contactAt(distance);
-            s.targets.add(new TargetPlan(target,contact));
+            s.targets.add(new TargetPlan(target,contact,anchor));
         }
     }
     private static boolean graveContactSupported(ServerPlayer p,Vec3 point){
-        var hit=p.level().clip(new net.minecraft.world.level.ClipContext(point.add(0,3,0),point.add(0,-8,0),
-                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
-        // Every authored variant reaches at least 1.8 blocks above support.
-        // Do not damage a high airborne actor with a groundspike that cannot
-        // physically reach it. Independent native direct volumes remain separate.
-        return hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK&&hit.getDirection()==net.minecraft.core.Direction.UP
-                &&point.y>=hit.getLocation().y-.1&&point.y-hit.getLocation().y<=1.8;
+        return GroundSpikePin.groundAt(p,point)!=null;
     }
     private static boolean hurtHull(ServerPlayer p,Session s,Entity hull,float damage,Vec3 point){
         if(hull instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)
             return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecial(p,vehicle,damage,point);
         return com.codex.blacklight.military.vehicle.VehicleDamageBridge.hurtSpecialAircraft(p,(com.codex.blacklight.entity.BlackwatchHelicopter)hull,damage,point,()->ACTIVE.get(p)==s);
     }
-    private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,boolean bulletdive,HitContext context){
+    private static HydraHurtContact.Contact targetSurface(ServerPlayer player, Session session,
+                                                          AnimatedHurtBody body, int kind, double radius) {
+        Vec3 eye = player.getEyePosition();
+        if (kind == 2) {
+            return DevastatorCollision.skinContact(body, eye, eye.add(session.direction.scale(radius)), 1.25,
+                    point -> CombatTargeting.clearRay(player, eye, point));
+        }
+        return DevastatorCollision.skinContact(body, session.origin, session.origin, radius,
+                point -> CombatTargeting.clearRay(player, eye, point) && (kind != 0 || graveContactSupported(player, point)));
+    }
+
+    private static boolean hurt(ServerPlayer p,LivingEntity target,float damage,boolean bulletdive,HydraHurtContact.Contact skin,HitContext context){
         var prior=HIT_CONTEXT.get();HIT_CONTEXT.set(context);
-        try{return bulletdive?target.hurt(BulletdiveDamage.source(p),damage):DevastatorDamage.hurt(p,target,damage);}
+        try {
+            if (bulletdive) {
+                var source = BulletdiveDamage.source(p);
+                return skin == null ? target.hurt(source, damage) : ((AnimatedHurtBody)target).hurtAt(source, damage, skin);
+            }
+            return DevastatorDamage.hurt(p, target, damage, skin);
+        }
         finally{if(prior==null)HIT_CONTEXT.remove();else HIT_CONTEXT.set(prior);}
     }
     private static void directStrike(ServerPlayer p,Session s,double age){
@@ -397,25 +438,36 @@ public final class DevastatorSystem {
             candidates.sort(CombatTargeting.contactPriority(p));
             for(var target:candidates){
                 if(struck.size()>=64)break;
-                double contactDistance=track.extendingCapsule()?CombatTargeting.hitboxes(target).stream()
-                        .mapToDouble(box->DevastatorCollision.capsuleDistanceSquared(capsuleOrigin,end,box)).min().orElse(Double.POSITIVE_INFINITY)
-                        :CombatTargeting.distanceSquared(center,target);
-                if(struck.contains(target.getUUID())||contactDistance>radius*radius
-                        ||!CombatTargeting.visibleWithinRange(p,target,radius+center.distanceTo(end)+Math.abs(track.offsetY())*scale))continue;
-                var point=CombatTargeting.closestPoint(center,target);
-                var delta=point.subtract(center).multiply(1,0,1);
-                if(track.arc()>0&&track.arc()<360&&delta.lengthSqr()>.000001
-                        &&delta.normalize().dot(forward)<Math.cos(Math.toRadians(track.arc()/2)))continue;
+                if (struck.contains(target.getUUID())
+                        || !CombatTargeting.visibleWithinRange(p,target,radius+center.distanceTo(end)+Math.abs(track.offsetY())*scale)) continue;
+                var body = AnimatedHurtBody.of(target);
+                HydraHurtContact.Contact skin = null;
+                if (body != null) {
+                    skin = DevastatorCollision.skinContact(body, center, end, radius, point ->
+                            withinArc(point, capsuleOrigin, forward, track.arc()) && CombatTargeting.clearRay(p, p.getEyePosition(), point));
+                    if (skin == null) continue;
+                } else {
+                    double contactDistance=track.extendingCapsule()?CombatTargeting.hitboxes(target).stream()
+                            .mapToDouble(box->DevastatorCollision.capsuleDistanceSquared(capsuleOrigin,end,box)).min().orElse(Double.POSITIVE_INFINITY)
+                            :CombatTargeting.distanceSquared(center,target);
+                    if (contactDistance > radius*radius || !withinArc(CombatTargeting.closestPoint(center,target),center,forward,track.arc())) continue;
+                }
                 float damage=DevastatorDamage.secondary(track.damage());
-                if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
+                if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,skin,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
                         DevastatorCollision.activeStart(s.move,s.timing)+track.begin(),damage))){
                     struck.add(target.getUUID());s.hits++;CombatImpactEffects.devastator(p,target,s.move,capsuleOrigin);
                 }
             }
         }
     }
+    private static boolean withinArc(Vec3 point, Vec3 center, Vec3 forward, double arc) {
+        var delta = point.subtract(center).multiply(1, 0, 1);
+        return arc <= 0 || arc >= 360 || delta.lengthSqr() <= .000001
+                || delta.normalize().dot(forward) >= Math.cos(Math.toRadians(arc / 2));
+    }
     public static void cancel(ServerPlayer p){
         INPUT.remove(p);var s=ACTIVE.remove(p);if(s==null)return;
+        if(kind(s.move)==0)GroundSpikePin.releaseSession(p,s.id);
         if(com.codex.blacklight.BlacklightNeoMod.LOGGER.isDebugEnabled())com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator cancel {} session={} phase={}",s.move.id,s.id,s.phase);
         p.setData(ModAttachments.DEVASTATOR_VISUAL,DevastatorVisual.EMPTY);p.syncData(ModAttachments.DEVASTATOR_VISUAL);
         if(p.getData(ModAttachments.WEAPON_VISUAL).move()==s.move.ordinal()){

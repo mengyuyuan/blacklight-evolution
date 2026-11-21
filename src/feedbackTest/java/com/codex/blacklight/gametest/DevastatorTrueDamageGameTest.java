@@ -37,7 +37,8 @@ public final class DevastatorTrueDamageGameTest {
             h.assertTrue(!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY),"true damage never grants administrative invulnerability bypass");
             h.assertTrue(DevastatorDamage.hurt(p,hunter,2000),"armored resistant hunter accepts the real hurt call");
             h.assertTrue(Math.abs(hunter.getHealth()-500)<.01,"2500 health becomes 500, without armor/resistance/25% penalty; actual="+hunter.getHealth());
-            h.assertTrue(DevastatorDamage.hurt(p,hunter,4000)&&hunter.isDeadOrDying(),"lethal hit uses ordinary death processing");
+            h.assertTrue(DevastatorDamage.hurt(p,hunter,4000)&&hunter.getHealth()==1&&ConsumeLastChance.awaitingFinisher(hunter),"the first lethal strike opens the one-time consume window");
+            h.assertTrue(DevastatorDamage.hurt(p,hunter,4000)&&hunter.isDeadOrDying(),"a separate lethal strike finishes the hunter");
             h.assertTrue(hunter.getKillCredit()==p,"kill credit belongs to the casting player");
         }finally{hunter.discard();p.discard();}h.succeed();
     }

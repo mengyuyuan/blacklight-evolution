@@ -142,13 +142,16 @@ public final class CombatTravelGameTest {
         var origin=p.position();var mob=h.spawn(EntityType.SNIFFER,3,180,13);mob.setNoAi(true);mob.setNoGravity(true);mob.setHealth(10);var targetStart=mob.position();
         CombatTargeting.requestLock(p,mob.getId());
         ConsumeSystem.request(p);
-        h.assertTrue(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT,"large sniffer selects mounted owner approach");
+        h.assertTrue(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.WHIP_PULL,"a distant heavy target starts the whip extension");
+        boolean mounted=false;
         for(int t=0;t<160&&p.getData(ModAttachments.CONSUMING)&&!ConsumeSystem.holding(p);t++){
             p.move(MoverType.SELF,p.getDeltaMovement());p.tickCount++;ConsumeSystem.tick(new PlayerTickEvent.Post(p));
-            if(p.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT)
+            int stage=p.getData(ModAttachments.GRAB_STAGE);
+            mounted |= stage==ConsumeVisual.MOUNT;
+            if(stage==ConsumeVisual.MOUNT||stage==ConsumeVisual.WHIP_PULL)
                 h.assertTrue(mob.position().distanceTo(targetStart)<.01,"heavy target stays grounded while owner approaches");
         }
-        h.assertTrue(ConsumeSystem.holding(p)&&p.position().distanceTo(origin)>7,"owner physically travels then captures heavy target: "+p.position().subtract(origin));
+        h.assertTrue(mounted&&ConsumeSystem.holding(p)&&p.position().distanceTo(origin)>7,"owner closes the gap, mounts, and holds the heavy target: "+p.position().subtract(origin));
         ConsumeSystem.cancel(p);mob.discard();h.succeed();
     }
 }

@@ -5,12 +5,11 @@ import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
-/** Runtime-editable Prototype movement constants. Dedicated servers synchronize a snapshot to clients. */
+/** Server-owned Prototype movement settings. Dedicated servers synchronize a snapshot to clients. */
 public final class MovementTuningSettings {
     private static final String FILE_NAME = "blacklight-movement-engine.properties";
     public static final MovementTuningSnapshot MVP_DEFAULTS = new MovementTuningSnapshot(
@@ -57,38 +56,6 @@ public final class MovementTuningSettings {
             setFovBoost(read(values, "fov_boost", fovBoost));
         } catch (IOException | NumberFormatException exception) {
             BlacklightNeoMod.LOGGER.warn("Unable to load movement engine tuning", exception);
-        }
-    }
-
-    public static synchronized boolean save() {
-        load();
-        Properties values = new Properties();
-        put(values, "sprint_acceleration", sprintAcceleration);
-        put(values, "sprint_max_speed", sprintMaxSpeed);
-        put(values, "jump_min_velocity", jumpMinVelocity);
-        put(values, "jump_max_velocity", jumpMaxVelocity);
-        put(values, "jump_charge_ticks", jumpChargeTicks);
-        put(values, "wall_detect_distance", wallDetectDistance);
-        put(values, "wall_climb_velocity", wallClimbVelocity);
-        put(values, "glide_fall_speed", glideFallSpeed);
-        put(values, "glide_max_speed", glideMaxSpeed);
-        put(values, "air_dash_speed", airDashSpeed);
-        put(values, "air_dash_ticks", airDashTicks);
-        put(values, "fov_boost", fovBoost);
-        try {
-            Files.createDirectories(path().getParent());
-            Path pending=Files.createTempFile(path().getParent(), "blacklight-movement-", ".tmp");
-            try {
-            try (Writer writer = Files.newBufferedWriter(pending)) {
-                values.store(writer, "Blacklight: Ascension movement engine tuner");
-            }
-            try { Files.move(pending,path(),java.nio.file.StandardCopyOption.ATOMIC_MOVE,java.nio.file.StandardCopyOption.REPLACE_EXISTING); }
-            catch(java.nio.file.AtomicMoveNotSupportedException ex){Files.move(pending,path(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);}
-            } finally { Files.deleteIfExists(pending); }
-            return true;
-        } catch (IOException exception) {
-            BlacklightNeoMod.LOGGER.error("Unable to save movement engine tuning", exception);
-            return false;
         }
     }
 

@@ -1,6 +1,7 @@
 package com.codex.blacklight.client;
 
 import com.codex.blacklight.BlacklightNeoMod;
+import com.codex.blacklight.client.particle.HammerImpactParticle;
 import com.codex.blacklight.client.particle.ExpandingImpactParticle;
 import com.codex.blacklight.client.particle.GroundShockwaveParticle;
 import com.codex.blacklight.registry.ModParticles;
@@ -17,6 +18,16 @@ public final class ClientParticleEvents {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.HAMMER_WAVE_DUST.get(), sprites -> (type,level,x,y,z,dx,dy,dz) ->
+                new HammerImpactParticle(level,x,y,z,dx,dy,dz,sprites,HammerImpactParticle.Layer.WAVE));
+        event.registerSpriteSet(ModParticles.HAMMER_FIRE.get(), sprites -> (type,level,x,y,z,dx,dy,dz) ->
+                new HammerImpactParticle(level,x,y,z,dx,dy,dz,sprites,HammerImpactParticle.Layer.FIRE));
+        event.registerSpriteSet(ModParticles.HAMMER_BURST_DUST.get(), sprites -> (type,level,x,y,z,dx,dy,dz) ->
+                new HammerImpactParticle(level,x,y,z,dx,dy,dz,sprites,HammerImpactParticle.Layer.DUST));
+        event.registerSpriteSet(ModParticles.HAMMER_DIRT.get(), sprites -> (type,level,x,y,z,dx,dy,dz) ->
+                new HammerImpactParticle(level,x,y,z,dx,dy,dz,sprites,HammerImpactParticle.Layer.DIRT));
+        event.registerSpriteSet(ModParticles.HAMMER_DEBRIS.get(), sprites -> (type,level,x,y,z,dx,dy,dz) ->
+                new HammerImpactParticle(level,x,y,z,dx,dy,dz,sprites,HammerImpactParticle.Layer.DEBRIS));
         event.registerSpriteSet(ModParticles.CONTACT_DUST.get(), com.codex.blacklight.client.particle.ContactDustParticle.Provider::new);
         event.registerSpriteSet(ModParticles.BIOMASS_SLASH.get(),
                 ExpandingImpactParticle.SlashProvider::new);

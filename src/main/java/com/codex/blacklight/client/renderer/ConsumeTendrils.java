@@ -91,7 +91,10 @@ public final class ConsumeTendrils {
     private static double smooth(double t){t=Math.clamp(t,0,1);return t*t*(3-2*t);}
     /** Transport one frame along the curve: adjacent rings share vertices and never
      * leave the gaps produced by independently oriented constant-width cylinders. */
-    private static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3[] points,double[] widths,Vec3 initial){
+    static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3[] points,double[] widths,Vec3 initial){
+        sweep(stack,out,light,points,widths,initial,false);
+    }
+    static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3[] points,double[] widths,Vec3 initial,boolean charcoal){
         int sides=points.length<=8?5:8;Vec3[][] rings=new Vec3[points.length][sides],normals=new Vec3[points.length][sides];Vec3 u=initial;
         for(int j=0;j<points.length;j++){
             Vec3 tangent=points[Math.min(j+1,points.length-1)].subtract(points[Math.max(0,j-1)]).normalize();
@@ -105,7 +108,7 @@ public final class ConsumeTendrils {
             }
         }
         for(int j=1;j<points.length;j++)for(int k=0;k<sides;k++){
-            int next=(k+1)%sides;int color=k==2?0xff692630:k==3?0xff46202a:k==6?0xff393039:0xff20171d;
+            int next=(k+1)%sides;int color=charcoal?(k==2?0xff42464a:k==3?0xff2e3135:k==6?0xff212427:0xff141517):k==2?0xff692630:k==3?0xff46202a:k==6?0xff393039:0xff20171d;
             vertex(stack,out,light,rings[j-1][k],normals[j-1][k],color);vertex(stack,out,light,rings[j][k],normals[j][k],color);
             vertex(stack,out,light,rings[j][next],normals[j][next],color);vertex(stack,out,light,rings[j-1][next],normals[j-1][next],color);
         }

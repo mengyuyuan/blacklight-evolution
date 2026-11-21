@@ -71,8 +71,10 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         float partial=renderPartial;
         pose(BlacklightRenderPose.sample(player,partial));
         footSkinWeight=0;
-        if(player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES)
+        if(player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES){
             footSkinWeight=com.codex.blacklight.client.renderer.RoofPerformance.projectPlayer(player,partial,matrices);
+            com.codex.blacklight.client.renderer.QuillReception.pose(player,partial,matrices);
+        }
         else if(player.onGround()){
             var attack=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
             if(com.codex.blacklight.combat.HammerQuakeContact.owns(attack.spec())){
@@ -102,10 +104,8 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         rightBiological=leftBiological=false;
         if(state.isPrototypeMode()) {
             var morph=com.codex.blacklight.client.renderer.WeaponMorphTracker.sample(player,partial);
-            boolean preview=com.codex.blacklight.client.tuning.ClawTransformSettings.preview()
-                    &&(form==com.codex.blacklight.power.PowerForm.NONE||form==com.codex.blacklight.power.PowerForm.CLAWS);
-            rightBiological=preview||morph.coverage(false)>=.72F;
-            leftBiological=preview||morph.coverage(true)>=.72F;
+            rightBiological=morph.coverage(false)>=.72F;
+            leftBiological=morph.coverage(true)>=.72F;
             if(rightBiological){rightArm.visible=false;rightSleeve.visible=false;}
             if(leftBiological){leftArm.visible=false;leftSleeve.visible=false;}
             if(armor.covers(player,"right_arm",partial))rightBiological=false;
@@ -161,6 +161,7 @@ public final class BlacklightPlayerModel extends PlayerModel<AbstractClientPlaye
         }
         stack.pushPose();BlacklightBoneRendering.skeletonFrame(stack);
         try {
+            if(renderedPlayer!=null)com.codex.blacklight.client.renderer.QuillReception.captureBack(renderedPlayer,stack,matrices());
             com.codex.blacklight.client.renderer.ConsumeTrauma.sampleActor(renderedPlayer,stack,matrices(),skinMatrices,renderPartial);
             if(renderedPlayer!=null&&renderedPlayer.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0)
                 com.codex.blacklight.client.renderer.DevastatorEffectRenderer.captureBody(renderedPlayer,stack,matrices());

@@ -69,6 +69,25 @@ class BlacklightStateTest {
     }
 
     @Test
+    void modeSwitchRestoresTheLastWeaponEvenAfterReload() {
+        var state=new BlacklightState();
+        state.infect();
+        for(var weapon:java.util.List.of(PowerForm.BACKSPINES,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.NONE)){
+            state.setPrototypeMode(true);
+            state.unlock(weapon);
+            assertTrue(state.activate(weapon));
+            state.setPrototypeMode(false);
+            state.setPrototypeMode(false);
+            assertEquals(PowerForm.NONE,state.getActivePower());
+            var save=BlacklightState.CODEC.encodeStart(JsonOps.INSTANCE,state).result().orElseThrow();
+            state=BlacklightState.CODEC.parse(JsonOps.INSTANCE,save).result().orElseThrow();
+            state.setPrototypeMode(true);
+            state.setPrototypeMode(true);
+            assertEquals(weapon,state.getActivePower());
+        }
+    }
+
+    @Test
     void biomassIsClampedAndCannotOverspend() {
         BlacklightState state = new BlacklightState();
         state.infect();

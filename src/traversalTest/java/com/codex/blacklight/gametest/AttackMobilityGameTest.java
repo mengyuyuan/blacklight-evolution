@@ -91,7 +91,7 @@ public final class AttackMobilityGameTest {
         h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.BLADE_RUSH,"sprint blade selects rush");
         for(int t=0;t<100&&WeaponCombatSystem.busy(p);t++)tick(p);
         double distance=p.position().subtract(origin).horizontalDistance();
-        h.assertTrue(distance>5&&distance<12,"blade callback supplies bounded displacement once: "+distance);WeaponCombatSystem.cancel(p);h.succeed();
+        h.assertTrue(Math.abs(distance-(7+7.5)*.87)<.08,"sprint blade integrates release and braking once: "+distance);WeaponCombatSystem.cancel(p);h.succeed();
     }
 
     private static final net.minecraft.server.level.TicketType<java.util.UUID> MOBILITY_TICKET=net.minecraft.server.level.TicketType.create("blacklight_mobility_qa",java.util.UUID::compareTo);

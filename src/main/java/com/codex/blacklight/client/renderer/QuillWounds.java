@@ -57,7 +57,7 @@ final class QuillWounds {
         return n!=null?n:new Node(key,null,e.getPosition(partial),new Quaternionf().rotationY((float)Math.toRadians(180-e.yBodyRot)),32);
     }
     private record Span(Object key,double first,double last){}
-    private static double ray(Vec3 start,Vec3 dir,Vec3 a,Vec3 b,Vec3 c){
+    static double ray(Vec3 start,Vec3 dir,Vec3 a,Vec3 b,Vec3 c){
         Vec3 edge=b.subtract(a),side=c.subtract(a),cross=dir.cross(side);
         double det=edge.dot(cross);if(Math.abs(det)<1e-10)return Double.POSITIVE_INFINITY;
         Vec3 rel=start.subtract(a);double u=rel.dot(cross)/det;

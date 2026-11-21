@@ -24,6 +24,7 @@ public final class InfectedCombatBalance {
     public static void incoming(LivingIncomingDamageEvent event){
         if(event.getEntity().level().isClientSide||event.isCanceled()||event.getAmount()<=0)return;
         var source=event.getSource();
+        if(source.is(com.codex.blacklight.combat.QuillHarvest.DRAIN))return;
         if(event.getEntity() instanceof BlacklightHunter && source.getEntity() instanceof Player
                 && !com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
@@ -31,7 +32,7 @@ public final class InfectedCombatBalance {
         if(event.getEntity() instanceof com.codex.blacklight.entity.BlacklightSupremeHunter && source.getEntity() instanceof Player
                 && !com.codex.blacklight.combat.DevastatorDamage.isTrueDamage(source)
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
-            event.setAmount(event.getAmount()*(source.is(net.minecraft.world.damagesource.DamageTypes.THROWN)
+            event.setAmount(event.getAmount()*(com.codex.blacklight.combat.SupremeHunterBalance.heavyThrow(source)
                     ?com.codex.blacklight.combat.SupremeHunterBalance.THROWN_BONUS:com.codex.blacklight.combat.SupremeHunterBalance.PLAYER_ATTACK_FACTOR));
         var supremeMove=source.getEntity() instanceof com.codex.blacklight.entity.BlacklightSupremeHunter?com.codex.blacklight.combat.SupremeHunterBalance.current():null;
         if(supremeMove!=null&&!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)&&event.getEntity() instanceof Player victim){

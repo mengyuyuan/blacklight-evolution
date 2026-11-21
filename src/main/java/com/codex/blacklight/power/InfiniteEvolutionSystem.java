@@ -42,7 +42,7 @@ public final class InfiniteEvolutionSystem {
     private static void updateMobility(ServerPlayer p){CombatScale.modifier(p.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,mobility(p)-1,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);}
     /** Called after the existing health-unit conversion. Never scales a hit twice. */
     public static float damage(LivingEntity victim,DamageSource source,float amount){
-        if(CrossModCombat.administrative(source))return amount;
+        if(CrossModCombat.administrative(source) || source.is(com.codex.blacklight.combat.QuillHarvest.DRAIN))return amount;
         double value=amount;
         if(source.getEntity() instanceof Player owner&&PrototypeMetabolism.active(owner)&&CrossModCombat.nativeAttack(source)){
             boolean skill=DevastatorDamage.isTrueDamage(source)||source.typeHolder().unwrapKey().map(k->k.location().getNamespace().equals("blacklight")).orElse(false);

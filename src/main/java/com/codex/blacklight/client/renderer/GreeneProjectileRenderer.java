@@ -25,8 +25,12 @@ public final class GreeneProjectileRenderer extends EntityRenderer<GreeneProject
         stack.pushPose();
         stack.mulPose(GreeneProjectileAppearance.orientation(projectile.ammo(),projectile.getUUID(),projectile.renderHeading(partial),projectile.renderFlightSeconds(partial)));
         stack.scale(profile.scale(),profile.scale(),profile.scale());
-        for(var cube:SHAPES.get(profile.shape()))box(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(cube.texture)),light,profile.sourceBounds(),cube);
+        for(var cube:SHAPES.get(profile.shape()))box(stack,buffers.getBuffer(RenderType.entityCutoutNoCull(cube.texture)),light,authoredBounds(profile.shape()),cube);
         stack.popPose();super.render(projectile,yaw,partial,stack,buffers,light);
+    }
+    private static AABB authoredBounds(String shape) {
+        return shape.equals("torso") ? new AABB(-.31,-.50,-.20,.31,.50,.20)
+                : new AABB(-.75,-.42,-.25,.75,.42,.25);
     }
     private static void box(PoseStack stack,VertexConsumer out,int light,AABB bounds,Cube cube){
         Vec3 a=point(bounds,cube.from),b=point(bounds,cube.to);

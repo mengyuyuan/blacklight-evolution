@@ -20,17 +20,28 @@ public final class TargetLockHud {
     private static WorldFrame world;
     private static Marker marker;
     private static Object candidateLevel;
+    private static int quillRadius=-1;
+    private static final java.util.Map<Integer,com.codex.blacklight.entity.QuillOrgan> rootedHosts=new java.util.HashMap<>();
     private static int candidateTick=-100,readyCount;
     private static java.util.List<net.minecraft.world.entity.Mob> candidates=java.util.List.of();
     private TargetLockHud() { }
     public static Marker lastMarker(){return marker;}
     public static int readyMarkerCount(){return readyCount;}
-    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;if(Minecraft.getInstance().level==null){world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();}}
+    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;if(Minecraft.getInstance().level==null){world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();rootedHosts.clear();quillRadius=-1;}}
     @SubscribeEvent public static void captureWorld(RenderLevelStageEvent event) {
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();
         world=new WorldFrame(mc.level,frame,new Matrix4f(event.getModelViewMatrix()),new Matrix4f(event.getProjectionMatrix()),
                 event.getCamera().getPosition(),event.getPartialTick().getGameTimeDeltaPartialTick(false));
+    }
+    /** Clip coordinates from the same world draw as this frame's first-person hand. */
+    public static org.joml.Vector4f handTarget(Vec3 at){
+        var w=world;
+        if(w==null||w.level!=Minecraft.getInstance().level||w.frame!=frame)return null;
+        var d=at.subtract(w.camera);
+        var p=new org.joml.Vector4f((float)d.x,(float)d.y,(float)d.z,1);
+        w.view.transform(p);
+        return w.projection.transform(p);
     }
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
         var mc=Minecraft.getInstance();var g=event.getGuiGraphics();
@@ -66,9 +77,9 @@ public final class TargetLockHud {
         }
         String status=name+"  "+Math.round(Math.sqrt(ClientTargetLock.selection(target).distanceSquared(mc.player)))+"m"
                 +(marker==null||!marker.onScreen()?" · 目标在视野外":"");
-        if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
+        if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob)&&(quillRadius<0||canRecall(mc,mob)))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
         var shown=mc.font.plainSubstrByWidth(status,182);int statusY=g.guiHeight()-108;
-        g.fill(4,statusY-4,12+Math.min(182,mc.font.width(shown)),statusY+12,0xA6090B10);
+        BlacklightUi.hud(g,4,statusY-4,12+Math.min(182,mc.font.width(shown)),statusY+12,BlacklightUi.RED);
         g.drawString(mc.font,shown,8,statusY,0xFFE8DDD6,false);
         if(target instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
             int w=72,x=8,y=statusY+13;
@@ -96,13 +107,21 @@ public final class TargetLockHud {
     private static void consumeMarkers(GuiGraphics g,Minecraft mc){
         var state=mc.player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);var captured=world;
         if(!state.isInfected()||!state.isPrototypeMode()||captured==null||captured.level!=mc.level||captured.frame!=frame)return;
-        if(candidateLevel!=mc.level||mc.player.tickCount-candidateTick>=10||mc.player.tickCount<candidateTick){
+        int radius=state.getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES ? com.codex.blacklight.combat.QuillHarvest.harvestRange(state) : -1;
+        if(candidateLevel!=mc.level||quillRadius!=radius||mc.player.tickCount-candidateTick>=5||mc.player.tickCount<candidateTick){
             candidateLevel=mc.level;candidateTick=mc.player.tickCount;
-            candidates=mc.level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,mc.player.getBoundingBox().inflate(16),mob->ready(mc,mob)&&mc.player.hasLineOfSight(mob)).stream()
+            quillRadius=radius;rootedHosts.clear();
+            if(radius>=0){
+                for(var root:mc.level.getEntitiesOfClass(com.codex.blacklight.entity.QuillOrgan.class,mc.player.getBoundingBox().inflate(radius+4),
+                        q->q.phase()==com.codex.blacklight.entity.QuillOrgan.ROOT && q.actor()==mc.player.getId()))
+                    rootedHosts.put(root.hostId(),root);
+                candidates=rootedHosts.keySet().stream().map(id->mc.level.getEntity(id))
+                        .filter(net.minecraft.world.entity.Mob.class::isInstance).map(net.minecraft.world.entity.Mob.class::cast).toList();
+            } else candidates=mc.level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,mc.player.getBoundingBox().inflate(16),mob->ready(mc,mob)&&mc.player.hasLineOfSight(mob)).stream()
                     .sorted(java.util.Comparator.comparingDouble(mc.player::distanceToSqr)).limit(8).toList();
         }
         for(var mob:candidates){
-            if(!ready(mc,mob)||!mc.player.hasLineOfSight(mob)||mc.player.distanceToSqr(mob)>16*16)continue;
+            if(!ready(mc,mob)||(radius>=0 ? !canRecall(mc,mob) : !mc.player.hasLineOfSight(mob)||mc.player.distanceToSqr(mob)>16*16))continue;
             var p=mob.getPosition(captured.partial).add(0,mob.getBbHeight()+.35,0);var eye=captured.camera;
             var screen=WorldHudProjection.project(captured.view,captured.projection,eye.x,eye.y,eye.z,p.x,p.y,p.z,g.guiWidth(),g.guiHeight());
             if(!screen.onScreen())continue;readyCount++;int x=Math.round(screen.x()),y=Math.round(screen.y());
@@ -115,6 +134,12 @@ public final class TargetLockHud {
                 if(i%2==0)g.fill(x-Math.abs(dx)+1,yy+1,x+Math.abs(dx)+1,yy+2,0xCCFFB0A4);
             }
         }
+    }
+    private static boolean canRecall(Minecraft mc,net.minecraft.world.entity.Mob mob){
+        var root=rootedHosts.get(mob.getId());
+        return root!=null && !root.isRemoved() && root.phase()==com.codex.blacklight.entity.QuillOrgan.ROOT
+                && !com.codex.blacklight.combat.QuillHarvest.protectedPet(mob)
+                && mc.player.distanceToSqr(mob)<=quillRadius*quillRadius && com.codex.blacklight.combat.CombatTargeting.damageable(mc.player,mob);
     }
     private static void brackets(GuiGraphics g,int x,int y,int color) {
         int r=9,l=5;

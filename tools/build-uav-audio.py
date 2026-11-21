@@ -30,7 +30,12 @@ for cue,(patch,source,seconds,loop) in roles.items():
 labels={'rotor':('UAV idles','无人机待机嗡鸣'),'seeing':('UAV scans a target','无人机正在扫描目标'),'scan':('UAV starts scanning','无人机启动扫描'),'alert':('UAV raises an alert','无人机发出警报')}
 for root in [ROOT,FORGE]:
  path=root/'src/main/resources/assets/blacklight/sounds.json';data=json.loads(path.read_text(encoding='utf8'))
- for cue in labels:data['vehicle.uav_'+cue]={'subtitle':'subtitles.blacklight.uav_'+cue,'sounds':[{'name':'blacklight:vehicles/uav_'+cue,'stream':False,'attenuation_distance':40}]}
+ for cue in labels:
+  event=data.setdefault('vehicle.uav_'+cue,{'sounds':[{}]})
+  event['subtitle']='subtitles.blacklight.uav_'+cue
+  sample=event['sounds'][0]
+  sample.update(name='blacklight:vehicles/uav_'+cue,stream=False)
+  sample.setdefault('attenuation_distance',40)
  path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
  for lang,index in [('en_us',0),('zh_cn',1)]:
   path=root/f'src/main/resources/assets/blacklight/lang/{lang}.json';data=json.loads(path.read_text(encoding='utf8'))

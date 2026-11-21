@@ -19,7 +19,7 @@ public final class PlayerHitEffects {
                 || target instanceof net.minecraft.world.entity.animal.SnowGolem);
     }
 
-    static net.minecraft.sounds.SoundEvent hardContactSound(LivingEntity target, Vec3 point) {
+    public static net.minecraft.sounds.SoundEvent hardContactSound(LivingEntity target, Vec3 point) {
         if (metalAt(target, point)) return net.minecraft.sounds.SoundEvents.ANVIL_HIT;
         if (target instanceof net.minecraft.world.entity.monster.AbstractSkeleton) return net.minecraft.sounds.SoundEvents.BONE_BLOCK_HIT;
         if (target instanceof net.minecraft.world.entity.animal.SnowGolem) return net.minecraft.sounds.SoundEvents.SNOW_HIT;

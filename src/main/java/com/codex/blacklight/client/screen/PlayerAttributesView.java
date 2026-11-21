@@ -30,8 +30,18 @@ final class PlayerAttributesView {
             add(values,"ricochet_power",Component.literal(number(RicochetRules.capacity(reflection,true))+" / "+number(RicochetRules.capacity(reflection,false))));
             add(values,"ricochet_damage",Component.literal("×"+number(RicochetRules.multiplier(reflection))));
         }
-        var move=WeaponMove.choose(form,WeaponMove.Input.ATTACK,false,false,false);
-        add(values,"damage",move==null?Component.literal("—"):Component.literal(number(move.damageFor(form)*CombatScale.UNITS)));
+        if(form==PowerForm.BACKSPINES){
+            int base=com.codex.blacklight.animation.ScapulaVolley.OPENING_SHOT_DAMAGE;
+            add(values,"damage",Component.translatable("screen.blacklight.stats.quill_damage",number(base),number(base*CombatScale.UNITS)));
+            int layers=com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.QUILL_LAYERS);
+            double one=com.codex.blacklight.combat.QuillHarvest.drainPercent(p,1);
+            double all=com.codex.blacklight.combat.QuillHarvest.drainPercent(p,layers);
+            var fmt=new java.text.DecimalFormat("0.####",java.text.DecimalFormatSymbols.getInstance(Locale.ROOT));
+            add(values,"quill_drain",Component.translatable("screen.blacklight.stats.quill_rates",fmt.format(one),layers,fmt.format(all)));
+        }else{
+            var move=WeaponMove.choose(form,WeaponMove.Input.ATTACK,false,false,false);
+            add(values,"damage",move==null?Component.literal("—"):Component.literal(number(move.damageFor(form)*CombatScale.UNITS)));
+        }
         add(values,"attack_speed",Component.translatable("screen.blacklight.stats.per_second",number(p.getAttributeValue(Attributes.ATTACK_SPEED))));
         add(values,"movement",Component.literal(number(p.getAttributeValue(Attributes.MOVEMENT_SPEED))));
         add(values,"current_speed",Component.translatable("screen.blacklight.stats.blocks_second",number(p.getDeltaMovement().horizontalDistance()*20)));

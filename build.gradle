@@ -462,10 +462,6 @@ neoForge {
             if (project.hasProperty('quickPlayMultiplayer')) {
                 programArguments.addAll '--quickPlayMultiplayer', project.property('quickPlayMultiplayer').toString()
             }
-            // Developer-only visual acceptance hook. Normal launches never set it.
-            if (project.hasProperty('openAnimationTuner')) {
-                systemProperty 'blacklight.test.openAnimationTuner', 'true'
-            }
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -967,4 +963,10 @@ if (project.hasProperty('nativeFrameworkVisualTest')) sourceSets.main.java.srcDi
 if (['nativeFrameworkTest', 'nativeFrameworkLiveTest'].any { project.hasProperty(it) }) {
     sourceSets.main.java.srcDir('src/nativeFrameworkSharedTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
+
+// Private reference exports are never release inputs, including stale incremental output.
+tasks.withType(Jar).configureEach {
+    exclude 'assets/blacklight/textures/private_devfx/**', 'blacklight/bundled_motions/devastator-fx.data'
+    exclude 'assets/blacklight/textures/particle/hammer_*.png', 'assets/blacklight/models/devastators/p1_*.json', 'assets/blacklight/models/evolved_weapons.json'
 }

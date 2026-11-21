@@ -72,10 +72,11 @@ public final class CombatScale {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void damage(LivingDamageEvent.Pre event){
-        if(!event.getEntity().level().isClientSide&&event.getNewDamage()>0)
-            event.setNewDamage(com.codex.blacklight.infection.TissueCompetition.finalDamage(event.getEntity(),event.getSource(),com.codex.blacklight.combat.CrossModCombat.defend(event.getEntity(), event.getSource(),
+        if(event.getEntity().level().isClientSide || event.getNewDamage()<=0) return;
+        float scaled = com.codex.blacklight.infection.TissueCompetition.finalDamage(event.getEntity(),event.getSource(),com.codex.blacklight.combat.CrossModCombat.defend(event.getEntity(), event.getSource(),
                     InfiniteEvolutionSystem.damage(event.getEntity(),event.getSource(),
-                            (float)Math.min(Float.MAX_VALUE,(double)com.codex.blacklight.compat.CultivationCompatibility.afterCultivationDefense(event.getEntity(),event.getSource(),event.getNewDamage())*units(event.getEntity()))))));
+                            (float)Math.min(Float.MAX_VALUE,(double)com.codex.blacklight.compat.CultivationCompatibility.afterCultivationDefense(event.getEntity(),event.getSource(),event.getNewDamage())*units(event.getEntity())))));
+        event.setNewDamage(com.codex.blacklight.combat.ConsumeContactDamage.limitDamage(event.getEntity(),event.getSource(),scaled));
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){

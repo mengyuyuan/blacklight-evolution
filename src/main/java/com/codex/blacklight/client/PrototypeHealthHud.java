@@ -21,12 +21,12 @@ public final class PrototypeHealthHud {
     private static double lastTime=-1,holdUntil;
     private record Bar(float x,float y,float width,float height) { }
     private static final class SourceBar {
-        // Use the same exported GFX placement as NativeHealthHud, including its GUI scale.
+        // Use the same project panel placement as NativeHealthHud, including its GUI scale.
         static final Bar VALUE=load();
         static Bar load(){
             try {
                 var data=com.codex.blacklight.combat.MotionResources.read("health-hud.data",1_000_000).orElse(null);
-                if(data==null||data.get("schema").getAsInt()!=1)return null;
+                if(data==null||data.get("schema").getAsInt()!=2)return null;
                 var b=data.getAsJsonArray("bar");float width=data.get("width").getAsFloat();
                 if(!(width>0)||!Float.isFinite(width)||b.size()!=4)return null;
                 var value=new Bar(b.get(0).getAsFloat()/width,b.get(1).getAsFloat()/width,
@@ -54,7 +54,7 @@ public final class PrototypeHealthHud {
     @SubscribeEvent public static void render(RenderGuiEvent.Post event){
         var mc=Minecraft.getInstance();
         if(!active()||mc.level==null){owner=null;lastTime=-1;return;}
-        if(mc.options.hideGui)return;
+        if(mc.options.hideGui || mc.screen instanceof com.codex.blacklight.client.screen.PresentationSettingsScreen settings && settings.previewsHealth())return;
         var p=mc.player;var g=event.getGuiGraphics();
         float maximum=Math.max(1,p.getMaxHealth()),health=Mth.clamp(p.getHealth(),0,maximum);
         double now=(mc.level.getGameTime()+mc.getTimer().getGameTimeDeltaPartialTick(false))/20D;

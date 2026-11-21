@@ -26,7 +26,7 @@ public final class FirearmHud {
         boolean loading=started>=0&&now<ammo.readyAt();
         int width=134,x=mc.getWindow().getGuiScaledWidth()-width-8,y=mc.getWindow().getGuiScaledHeight()-83;
         var g=e.getGuiGraphics();boolean hint=owner==mc.player&&mc.player.tickCount<missingUntil&&gun.reserveAmmo(mc.player)==0;
-        g.fill(x-4,y-4,x+width+4,y+(hint?35:22),0xB00C1116);
+        BlacklightUi.hud(g,x-5,y-4,x+width+4,y+(hint?35:22),BlacklightUi.GOLD);
         g.drawString(mc.font,Component.literal(ammo.magazine()+" / "+gun.definition().capacity()+"  ·  "+gun.reserveAmmo(mc.player)),x,y,ammo.magazine()==0?0xFFFFAA77:0xFFE8EDD9,false);
         var label=loading?Component.translatable("hud.blacklight.firearm_reloading"):Component.translatable("hud.blacklight.firearm_reload_key",FirearmControls.RELOAD.getTranslatedKeyMessage(),ClientClawEvents.targetLockKey().getTranslatedKeyMessage());
         g.drawString(mc.font,label,x,y+11,0xFFB9C7CF,false);

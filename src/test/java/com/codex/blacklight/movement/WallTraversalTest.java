@@ -78,9 +78,31 @@ class WallTraversalTest {
         var ceiling=new WallTraversal.Surface(true,true,true,0,-1,-1);
         var wall=new WallTraversal();step(wall,input(1,0,true,false));
         for(int i=0;i<50;i++)assertEquals(WallTraversal.Mode.CLING,wall.tick(input(0,0,false,false),ceiling,50,0,.36,1).mode());
-        WallTraversal.Frame frame=null;
-        for(int i=0;i<3;i++)frame=wall.tick(input(1,0,true,false),ceiling,50,0,.36,1);
+        for(int i=0;i<160;i++) {
+            assertEquals(WallTraversal.Mode.RUN,wall.tick(input(1,0,true,false),ceiling,50,0,.36,1).mode());
+        }
+        var reachable=new WallTraversal.Surface(true,true,true,0,-1,-1,false,false,51.5);
+        var frame=wall.tick(input(1,0,true,false),reachable,50,0,.36,1);
         assertEquals(WallTraversal.Mode.VAULT,frame.mode());
+    }
+    @Test void losingBothWallProbesNearAFloorIsNotARoofEdge() {
+        var wall=new WallTraversal();
+        step(wall,input(1,0,true,false));
+        var floor=new WallTraversal.Surface(false,false,false,0,0,0,false,false,49.75);
+        assertFalse(wall.tick(input(1,0,true,false),floor,50,0,.36,1).handled());
+        assertFalse(wall.attached());
+    }
+
+    @Test void feetLevelWithTheLipMoveInAndSettle() {
+        var wall=new WallTraversal();
+        step(wall,input(1,0,true,false));
+        var lip=new WallTraversal.Surface(false,true,false,0,-1,-1,false,false,50);
+        var frame=wall.tick(input(1,0,true,false),lip,50,0,.36,1);
+        assertEquals(WallTraversal.Mode.TOP,frame.mode());
+        assertTrue(frame.z()>0);
+        assertEquals(0,frame.y(),1e-8);
+        var supported=new WallTraversal.Surface(false,false,false,0,0,0,false,true,50);
+        assertTrue(wall.tick(input(1,0,true,false),supported,50,0,.36,1).y()<0);
     }
     @Test void detachIsExplicitAndCannotImmediatelyRelatch() {
         var wall=new WallTraversal();step(wall,input(1,0,true,false));

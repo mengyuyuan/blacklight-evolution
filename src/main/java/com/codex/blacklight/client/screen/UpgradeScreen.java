@@ -1,6 +1,8 @@
 package com.codex.blacklight.client.screen;
 
 import com.codex.blacklight.client.SkillBindings;
+import com.codex.blacklight.client.BlacklightUi;
+import java.util.EnumSet;
 import com.codex.blacklight.network.*;
 import com.codex.blacklight.power.*;
 import com.codex.blacklight.registry.ModAttachments;
@@ -20,9 +22,18 @@ import java.util.List;
 public final class UpgradeScreen extends Screen {
     private static final int BG=0xFF101114, PANEL=0xFF1A1C20, RED=0xFFE94B42, TEXT=0xFFE9E5DF, DIM=0xFFABA9A7;
     private static final int TOP=48,ROW=31;
-    private enum Category { BASIC, MOVEMENT, CLAW, FORMS, COMBAT, UTILITY, BIOLOGY, ORGANS, EVOLUTION, ATTRIBUTES, SETTINGS;
+    private enum Category { BASIC, MOVEMENT, FORMS, COMBAT, UTILITY, BIOLOGY, ORGANS, EVOLUTION, ATTRIBUTES, SETTINGS;
         Component label(){return Component.translatable("screen.blacklight.section."+name().toLowerCase(java.util.Locale.ROOT));}}
     private record Entry(String id,int cost,String required,boolean free) {}
+    private static final List<PowerForm> WEAPONS = List.of(PowerForm.CLAWS, PowerForm.HAMMERFISTS,
+            PowerForm.BLADE, PowerForm.WHIPFIST, PowerForm.MUSCLE_MASS, PowerForm.BACKSPINES);
+    private record Row(Entry entry, PowerForm group) {
+        boolean header() { return group != null; }
+    }
+    private final EnumSet<PowerForm> expandedWeapons = EnumSet.noneOf(PowerForm.class);
+    private final java.util.EnumMap<PowerForm,Integer> weaponCounts = new java.util.EnumMap<>(PowerForm.class);
+    private final List<Row> rows = new ArrayList<>();
+    private boolean headerSelected;
     private Category category=Category.BASIC;
     private final List<Entry> entries=new ArrayList<>();
     private final java.util.Map<String,List<String>> tiers=new java.util.HashMap<>();
@@ -50,20 +61,71 @@ public final class UpgradeScreen extends Screen {
         switch(category){
             case BASIC -> {for(String id:List.of("mode","grab","target_lock","disguise","biomass"))entries.add(new Entry(id,0,null,true));}
             case MOVEMENT -> {for(var u:MovementUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),u.prerequisiteId(),false));}
-            case CLAW -> {entries.add(new Entry("groundspike",0,null,true));for(var u:ClawUpgrade.values())entries.add(new Entry(u.id(),u.epCost(),null,false));}
-            case FORMS -> {for(var u:List.of(PowerForm.CLAWS,PowerForm.HAMMERFISTS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS,PowerForm.BACKSPINES))entries.add(new Entry(u.id(),u.epCost(),null,u==PowerForm.CLAWS));}
-            case COMBAT -> {for(var u:CombatSkill.values())if(!u.shieldBorer()&&!u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()!=null?u.requires().id():u.movementRequires()!=null?u.movementRequires().id():u.powerRequires()!=null?u.powerRequires().id():null,false));}
+            case FORMS -> {
+                for (var form : WEAPONS) {
+                    entries.add(new Entry(form.id(), form.epCost(), null, form == PowerForm.CLAWS));
+                    if (form == PowerForm.CLAWS) {
+                        entries.add(new Entry("groundspike", 0, null, true));
+                        for (var upgrade : ClawUpgrade.values())
+                            entries.add(new Entry(upgrade.id(), upgrade.epCost(), null, false));
+                    }
+                    for (var skill : CombatSkill.values())
+                        if (skill.powerRequires() == form) entries.add(combatEntry(skill));
+                }
+            }
+            case COMBAT -> {
+                for (var skill : CombatSkill.values())
+                    if (skill.powerRequires() == null && !skill.adaptivePassive()) entries.add(combatEntry(skill));
+            }
             case UTILITY -> {entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS,PowerForm.SOVEREIGN_WINGS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())if(core.legacy())entries.add(new Entry(core.id,0,null,false));}
             case EVOLUTION -> {for(var a:EvolutionAttribute.values())entries.add(new Entry(a.id,0,null,false));}
-            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","passive_stacks","infection_zones","health_hud","wing_speed","wing_appearance","cinematic_combat","cinematic_strength"))entries.add(new Entry(id,0,null,true));}
+            case SETTINGS -> {for(String id:List.of("bulletdive_blocks","shield_borer_blocks","prototype_item_pickup","infection_zones","health_hud","wing_speed","wing_appearance","cinematic_combat","cinematic_strength"))entries.add(new Entry(id,0,null,true));}
             default -> {}
         }
         tierEntries.clear();for(var e:entries)tierEntries.put(e.id,e);
         if(category!=Category.SETTINGS&&category!=Category.EVOLUTION&&category!=Category.ORGANS&&!entries.isEmpty())collapseTiers();else tiers.clear();
-        if(entries.stream().noneMatch(e->e.id.equals(selected)))select(entries.isEmpty()?"":entries.get(0).id);
+        rebuildRows();
+        if (entries.stream().noneMatch(e -> e.id.equals(selected))) {
+            headerSelected = category == Category.FORMS;
+            select(entries.isEmpty() ? "" : entries.get(0).id);
+        }
         listScroll=Math.clamp(listScroll,0,maxListScroll());purchase.visible=category!=Category.ATTRIBUTES;refreshButton();
+    }
+    private static Entry combatEntry(CombatSkill skill) {
+        String required = skill.requires() != null ? skill.requires().id()
+                : skill.movementRequires() != null ? skill.movementRequires().id()
+                : skill.powerRequires() != null ? skill.powerRequires().id() : null;
+        return new Entry(skill.id(), skill.epCost(), required, false);
+    }
+    private void rebuildRows() {
+        rows.clear();
+        weaponCounts.clear();
+        PowerForm group = null;
+        for (var entry : entries) {
+            if (category == Category.FORMS) {
+                PowerForm form = PowerForm.byId(entry.id);
+                if (WEAPONS.contains(form)) {
+                    group = form;
+                    rows.add(new Row(entry, group));
+                }
+                weaponCounts.merge(group,1,Integer::sum);
+                if (!expandedWeapons.contains(group)) continue;
+            }
+            rows.add(new Row(entry, null));
+        }
+    }
+    private void toggleWeapon(PowerForm form) {
+        if (!expandedWeapons.remove(form)) expandedWeapons.add(form);
+        headerSelected = true;
+        select(form.id());
+        rebuildRows();
+        listScroll = Math.min(listScroll, maxListScroll());
+    }
+    private void selectRow(Row row) {
+        headerSelected = row.header();
+        select(row.entry.id);
     }
     /** Tiers 1/2/3 of one ability share a row; the row always offers the next tier still to learn. */
     private void collapseTiers(){
@@ -93,11 +155,13 @@ public final class UpgradeScreen extends Screen {
     private Entry tierEntry(String id){return tierEntries.get(id);}
     /** After a purchase syncs, move the row (and the selection) on to the next tier. */
     private void advanceTiers(){
+        boolean changed = false;
         for(int i=0;i<entries.size();i++){
             var e=entries.get(i);if(!tiers.containsKey(e.id))continue;
             var next=currentTier(e);
-            if(next!=e){entries.set(i,next);if(selected.equals(e.id))selected=next.id;}
+            if(next!=e){changed=true;entries.set(i,next);if(selected.equals(e.id))selected=next.id;}
         }
+        if (changed) rebuildRows();
     }
     private Component tierLabel(Entry e){
         var ids=tiers.get(e.id);if(ids==null)return label(e.id);
@@ -129,7 +193,6 @@ public final class UpgradeScreen extends Screen {
                 PacketDistributor.sendToServer(new SkillSettingsPayload(SkillSettingsPayload.Setting.PRECISION_WINGS,!settingEnabled(e.id)));return;
             }
             if(e.id.equals("health_hud")||e.id.equals("wing_speed")){minecraft.setScreen(new PresentationSettingsScreen(this,e.id.equals("health_hud")));return;}
-            if (e.id.equals("passive_stacks")) { com.codex.blacklight.config.PassiveHudConfig.toggle(); refreshButton(); return; }
             if(e.id.equals("cinematic_combat")){var option=com.codex.blacklight.config.PassiveHudConfig.CINEMATIC_COMBAT;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
             if(e.id.equals("cinematic_strength")){com.codex.blacklight.config.PassiveHudConfig.cycleCinematicStrength();refreshButton();return;}
             if(e.id.equals("infection_zones")){var option=com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE;option.set(!option.get());com.codex.blacklight.config.PassiveHudConfig.SPEC.save();refreshButton();return;}
@@ -148,7 +211,6 @@ public final class UpgradeScreen extends Screen {
     private boolean settingEnabled(String id){
         if(id.equals("wing_appearance"))return minecraft.player!=null&&minecraft.player.getData(ModAttachments.SKILL_SETTINGS).precisionWings();
         if(id.equals("health_hud")||id.equals("wing_speed"))return true;
-        if (id.equals("passive_stacks")) return com.codex.blacklight.config.PassiveHudConfig.SHOW_STACKS.get();
         if(id.equals("infection_zones"))return com.codex.blacklight.config.PassiveHudConfig.SHOW_ZONE.get();
         if(id.equals("cinematic_combat"))return com.codex.blacklight.config.PassiveHudConfig.CINEMATIC_COMBAT.get();
         if(id.equals("cinematic_strength"))return true;
@@ -189,32 +251,49 @@ public final class UpgradeScreen extends Screen {
     }
     @Override public void renderBackground(GuiGraphics g,int x,int y,float partial){}
     @Override public void render(GuiGraphics g,int mx,int my,float partial){
-        g.fill(0,0,width,height,BG);g.fill(0,0,rail,height,0xFF0B0C0E);g.fill(0,37,width,38,0xFF74302D);
-        g.fill(10,10,13,27,RED);g.drawString(font,title,20,13,TEXT,false);
+        BlacklightUi.backdrop(g,width,height);g.fill(0,38,rail,height,0xFF151519);
+        BlacklightUi.title(g,font,title,10,14);
         var ep=Component.translatable("screen.blacklight.ep_balance",balance());
         if(width>460)g.drawString(font,ep,width-126-font.width(ep),14,0xFFE6C68A,false);
         int step=Math.max(14,Math.min(27,(height-54)/Category.values().length)),y=TOP;
         for(var c:Category.values()){
-            if(c==category){g.fill(4,y,rail-3,y+step-2,0xFF4A2020);g.fill(4,y,6,y+step-2,RED);}
+            if(c==category){g.fill(4,y,rail-3,y+step-2,0xFF50292D);g.fill(4,y,6,y+step-2,RED);}
             g.drawString(font,font.plainSubstrByWidth(c.label().getString(),rail-15),11,y+(step-10)/2,c==category?TEXT:DIM,false);y+=step;
         }
         if(category==Category.ATTRIBUTES)renderAttributes(g);
         else {
             advanceTiers();
             g.enableScissor(listX,TOP,listX+listWidth,bottom);y=TOP-listScroll;
-            for(var e:entries){
-                boolean chosen=e.id.equals(selected),hover=mx>=listX&&mx<listX+listWidth&&my>=y&&my<y+ROW-3;
-                g.fill(listX,y,listX+listWidth,y+ROW-3,chosen?0xFF682C29:hover?0xFF302627:PANEL);
-                if(chosen)g.fill(listX,y,listX+2,y+ROW-3,RED);
-                g.drawString(font,font.plainSubstrByWidth(tierLabel(e).getString(),listWidth-12),listX+7,y+5,TEXT,false);
+            for (var row : rows) {
+                var e = row.entry;
+                boolean chosen = e.id.equals(selected) && (category != Category.FORMS || row.header() == headerSelected);
+                boolean hover = mx >= listX && mx < listX+listWidth && my >= Math.max(TOP,y) && my < Math.min(bottom,y+ROW-2);
+                int left = listX + (category == Category.FORMS && !row.header() ? 8 : 0);
+                g.fillGradient(left,y,listX+listWidth,y+ROW-2,chosen?0xFF593035:hover?0xFF363037:0xFF26272E,
+                        chosen?0xFF39262B:0xFF1D1E24);
+                if (chosen) g.fill(left,y,left+2,y+ROW-2,BlacklightUi.RED);
+                if (row.header()) {
+                    BlacklightUi.emblem(g,row.group,left+3,y+2,24);
+                    g.drawString(font,BlacklightUi.fit(font,label(e.id).getString(),listWidth-44),left+30,y+5,TEXT,false);
+                    var count=Component.translatable("screen.blacklight.weapon_entries",weaponCounts.get(row.group));
+                    g.drawString(font,BlacklightUi.fit(font,count.getString(),listWidth-44),left+30,y+17,BlacklightUi.MUTED,false);
+                    int x = listX + listWidth - 12, mid = y + 14;
+                    g.fill(x-2,mid,x+5,mid+1,BlacklightUi.RED);
+                    if (!expandedWeapons.contains(row.group)) g.fill(x+1,mid-3,x+2,mid+4,BlacklightUi.RED);
+                    y += ROW;
+                    continue;
+                }
+                var name = category == Category.FORMS && WEAPONS.contains(PowerForm.byId(e.id))
+                        ? Component.translatable("screen.blacklight.weapon_ability") : tierLabel(e);
+                g.drawString(font,BlacklightUi.fit(font,name.getString(),listX+listWidth-left-12),left+7,y+5,TEXT,false);
                 var organ=com.codex.blacklight.infection.TissueCore.byId(e.id);
                 var evolution=EvolutionAttribute.byId(e.id);
                 var status=category==Category.SETTINGS&&e.id.equals("wing_appearance")?Component.translatable(settingEnabled(e.id)?"setting.blacklight.wing_appearance.row_precision":"setting.blacklight.wing_appearance.row_classic"):
                         evolution!=null?Component.translatable("screen.blacklight.infinite_rank",evolutionRank(evolution)):organ!=null?Component.translatable("screen.blacklight.organ_row",research().rank(organ),research().sample(organ)):
                         Component.translatable(category==Category.SETTINGS?(settingEnabled(e.id)?"screen.blacklight.setting_on":"screen.blacklight.setting_off"):owns(e)?"tutorial.blacklight.learned":prerequisite(e)?"tutorial.blacklight.available":"tutorial.blacklight.locked");
-                g.drawString(font,status,listX+7,y+17,owns(e)?0xFFB1BEAE:0xFFD6A089,false);y+=ROW;
+                g.drawString(font,BlacklightUi.fit(font,status.getString(),listX+listWidth-left-12),left+7,y+17,owns(e)?0xFFB1BEAE:0xFFD6A089,false);y+=ROW;
             }
-            g.disableScissor();bar(g,listX+listWidth-2,TOP,bottom,listScroll,entries.size()*ROW);
+            g.disableScissor();bar(g,listX+listWidth-2,TOP,bottom,listScroll,rows.size()*ROW);
             renderDetail(g,mx,my);refreshButton();
             if(width<=460)g.drawString(font,ep,listX,height-19,0xFFE6C68A,false);
         }
@@ -222,10 +301,10 @@ public final class UpgradeScreen extends Screen {
     }
     private void renderDetail(GuiGraphics g,int mx,int my){
         var e=entry();if(e==null)return;
-        g.fill(detailX-3,TOP-4,width-8,bottom,0xFF16181B);g.enableScissor(detailX,TOP,width-10,bottom);
+        BlacklightUi.panel(g,detailX-6,TOP-4,width-7,bottom);g.enableScissor(detailX,TOP,width-10,bottom);
         int y=paragraph(g,tierLabel(e),TOP-detailScroll,TEXT)+6;
         if(category==Category.EVOLUTION&&minecraft.player!=null){
-            if(EvolutionProgression.infiniteUnlocked(minecraft.player)){y=paragraph(g,Component.translatable("screen.blacklight.evolution_unlocked"),y,0xFFB1BEAE)+8;y=paragraph(g,Component.literal("Shift+点击：一次升 10 级；Ctrl+点击：用光 EP 升到最高（单次最多 1000 级）"),y,0xFFE6C68A)+8;}
+            if(EvolutionProgression.infiniteUnlocked(minecraft.player)){y=paragraph(g,Component.translatable("screen.blacklight.evolution_unlocked"),y,0xFFB1BEAE)+8;y=paragraph(g,Component.translatable("screen.blacklight.evolution_bulk"),y,0xFFE6C68A)+8;}
             else{
                 var missing=EvolutionProgression.missing(minecraft.player);int total=BaseEvolutionCatalog.REQUIREMENTS.size();
                 y=paragraph(g,Component.translatable("screen.blacklight.evolution_curriculum",total-missing.size(),total),y,RED)+5;
@@ -247,7 +326,7 @@ public final class UpgradeScreen extends Screen {
         }
         if(category!=Category.SETTINGS&&category!=Category.ORGANS&&category!=Category.EVOLUTION&&!e.id.equals(RicochetRules.ID)){
             var tutorial=SkillTutorial.forSkill(e.id);int previewHeight=previewHeight();
-            g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF22262B);
+            g.fill(detailX,y,detailX+detailWidth,y+previewHeight,0xFF121318);
             long elapsed=((paused?pausedAt:System.nanoTime())-selectedAt)/1_000_000;
             if(!gif.render(g,detailX+(detailWidth-previewHeight*16/9)/2,y,previewHeight*16/9,previewHeight,elapsed))
                 g.drawCenteredString(font,Component.translatable(gif.failed?"tutorial.blacklight.preview_missing":"tutorial.blacklight.loading"),detailX+detailWidth/2,y+previewHeight/2,DIM);
@@ -287,9 +366,17 @@ public final class UpgradeScreen extends Screen {
     }
     private void renderAttributes(GuiGraphics g){
         g.enableScissor(listX,TOP,width-12,bottom);int y=TOP-listScroll;
+        int w=width-listX-14, labelWidth=Math.max(66,w*42/100), index=0;
         for(var a:PlayerAttributesView.entries()){
-            g.drawString(font,a.label(),listX+5,y,DIM,false);y+=13;
-            for(var line:font.split(a.value(),width-listX-20)){g.drawString(font,line,listX+5,y,TEXT,false);y+=11;}y+=12;
+            var labels=font.split(a.label(),labelWidth-12);
+            var values=font.split(a.value(),w-labelWidth-14);
+            int rowHeight=10+11*Math.max(labels.size(),values.size());
+            g.fill(listX,y,listX+w,y+rowHeight-1,index++%2==0?0xFF292930:0xFF202127);
+            int lineY=y+5;
+            for(var line:labels){g.drawString(font,line,listX+7,lineY,DIM,false);lineY+=11;}
+            lineY=y+5;
+            for(var line:values){g.drawString(font,line,listX+labelWidth,lineY,TEXT,false);lineY+=11;}
+            y+=rowHeight;
         }
         detailHeight=y-(TOP-listScroll);g.disableScissor();bar(g,width-12,TOP,bottom,listScroll,detailHeight);
     }
@@ -297,7 +384,7 @@ public final class UpgradeScreen extends Screen {
         int view=end-top;if(total<=view)return;int size=Math.max(12,view*view/total),y=top+(view-size)*offset/Math.max(1,total-view);
         g.fill(x,top,x+2,end,0xFF303034);g.fill(x,y,x+2,y+size,RED);
     }
-    private int maxListScroll(){return Math.max(0,(category==Category.ATTRIBUTES?detailHeight:entries.size()*ROW)-(bottom-TOP));}
+    private int maxListScroll(){return Math.max(0,(category==Category.ATTRIBUTES?detailHeight:rows.size()*ROW)-(bottom-TOP));}
     private int maxDetailScroll(){return Math.max(0,detailHeight-(bottom-TOP));}
     @Override public boolean mouseClicked(double x,double y,int button){
         var binding=SkillBindings.find("key.blacklight.upgrades");
@@ -305,7 +392,7 @@ public final class UpgradeScreen extends Screen {
         if(button==0){
             int step=Math.max(14,Math.min(27,(height-54)/Category.values().length));
             if(x>=4&&x<rail&&y>=TOP&&y<TOP+step*Category.values().length){category=Category.values()[(int)(y-TOP)/step];listScroll=detailScroll=0;rebuild();return true;}
-            if(x>=listX&&x<listX+listWidth&&y>=TOP&&y<bottom){int index=((int)y-TOP+listScroll)/ROW;if(index<entries.size()){select(entries.get(index).id);return true;}}
+            if(x>=listX&&x<listX+listWidth&&y>=TOP&&y<bottom){int index=((int)y-TOP+listScroll)/ROW;if(index<rows.size()){var row=rows.get(index);if(row.header())toggleWeapon(row.group);else selectRow(row);return true;}}
             if(category!=Category.ATTRIBUTES&&category!=Category.SETTINGS&&category!=Category.ORGANS&&category!=Category.EVOLUTION&&x>=detailX&&x<detailX+detailWidth&&y>=TOP&&y<bottom){
                 int start=TOP-detailScroll+font.split(label(selected),Math.max(50,detailWidth-6)).size()*11+6;
                 if(y>=start&&y<start+previewHeight()+15){if(paused){selectedAt+=System.nanoTime()-pausedAt;paused=false;}else{pausedAt=System.nanoTime();paused=true;}return true;}
@@ -321,8 +408,25 @@ public final class UpgradeScreen extends Screen {
     @Override public boolean keyPressed(int key,int scan,int mods){
         if(SkillBindings.matches("key.blacklight.upgrades",key,scan)){onClose();return true;}
         if(key==GLFW.GLFW_KEY_PAGE_DOWN||key==GLFW.GLFW_KEY_PAGE_UP){detailScroll=Math.clamp(detailScroll+(key==GLFW.GLFW_KEY_PAGE_DOWN?1:-1)*(bottom-TOP-15),0,maxDetailScroll());return true;}
-        if((key==GLFW.GLFW_KEY_DOWN||key==GLFW.GLFW_KEY_UP)&&!entries.isEmpty()){
-            int i=entries.indexOf(entry()),next=Math.clamp(i+(key==GLFW.GLFW_KEY_DOWN?1:-1),0,entries.size()-1);select(entries.get(next).id);listScroll=Math.clamp(next*ROW-(bottom-TOP)/2,0,maxListScroll());return true;
+        int index = -1;
+        for (int i=0; i<rows.size(); i++) {
+            var row=rows.get(i);
+            if (row.entry.id.equals(selected) && (category!=Category.FORMS || row.header()==headerSelected)) { index=i; break; }
+        }
+        if (index>=0 && (key==GLFW.GLFW_KEY_DOWN || key==GLFW.GLFW_KEY_UP)) {
+            int next = Math.max(0,Math.min(rows.size()-1,index+(key==GLFW.GLFW_KEY_DOWN?1:-1)));
+            selectRow(rows.get(next));
+            listScroll = Math.max(0,Math.min(listScroll,next*ROW));
+            listScroll = Math.max(listScroll,(next+1)*ROW-(bottom-TOP));
+            return true;
+        }
+        if (index>=0 && rows.get(index).header() && (key==GLFW.GLFW_KEY_LEFT || key==GLFW.GLFW_KEY_RIGHT
+                || ((key==GLFW.GLFW_KEY_ENTER || key==GLFW.GLFW_KEY_SPACE) && getFocused()==null))) {
+            var form=rows.get(index).group;
+            if (key==GLFW.GLFW_KEY_LEFT && !expandedWeapons.contains(form)
+                    || key==GLFW.GLFW_KEY_RIGHT && expandedWeapons.contains(form)) return true;
+            toggleWeapon(form);
+            return true;
         }
         return super.keyPressed(key,scan,mods);
     }

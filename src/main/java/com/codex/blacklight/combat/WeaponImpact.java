@@ -26,20 +26,17 @@ public final class WeaponImpact {
     static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect,WeaponMove action,Vec3 origin){
         if (v.level().isClientSide) return;
         var report = p == null ? WeaponCutContact.Report.NONE : WeaponCutContact.impact(p, v, HitStop.launchVelocity(v));
-        if(tier.atLeast(ImpactTier.HEAVY)){
+        if(!GroundSpikePin.held(v)&&tier.atLeast(ImpactTier.HEAVY)){
             var state=v.getData(ModAttachments.HIT_REACTION);
             if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
                 RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
                         report);
         }
-        if(v.isAlive())HitStop.victim(v,tier.hitstop);
+        if(v.isAlive()&&!GroundSpikePin.held(v))HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
         var at = report.contacts().isEmpty() ? v.getBoundingBox().getCenter() : report.contacts().get(0).point();
-        if (p != null && first) com.codex.blacklight.registry.ModWeaponSounds.play(p,
-                com.codex.blacklight.registry.ModWeaponSounds.equipped(p), tier.atLeast(ImpactTier.HEAVY) ? "heavy" : "hit", at, .84F, pitch);
-        var surfaceSound=PlayerHitEffects.hardContactSound(v,at);
-        if (surfaceSound!=null)
-            v.level().playSound(null, at.x, at.y, at.z, surfaceSound, SoundSource.PLAYERS, first ? .56F : .24F, pitch);
+        contactSound(p,v,at,p==null?PowerForm.NONE:com.codex.blacklight.registry.ModWeaponSounds.equipped(p),
+                tier.atLeast(ImpactTier.HEAVY),first,.84F,pitch);
         if (action!=null && p!=null && AnimatedHurtBody.of(v)==null) {
             if (action.id.startsWith("dev_") || action==WeaponMove.BULLETDIVE_DROP)
                 CombatImpactEffects.devastator(p,v,action,origin);
@@ -48,6 +45,16 @@ public final class WeaponImpact {
                 tier.atLeast(ImpactTier.HEAVY)?com.codex.blacklight.infection.InfectedAttackStyle.CRUSH:com.codex.blacklight.infection.InfectedAttackStyle.TEAR,
                 .5F*tier.effectScale,report);
         if(first&&p!=null&&effect!=null)PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(effect,tier.feedback));
+    }
+    /** Select a single contact event. Other howls and hurt vocals belong to the receiver itself. */
+    private static void contactSound(ServerPlayer owner,LivingEntity victim,Vec3 at,PowerForm form,
+                                     boolean heavy,boolean first,float gain,float pitch) {
+        var material=PlayerHitEffects.hardContactSound(victim,at);
+        if(material!=null) {
+            victim.level().playSound(null,at.x,at.y,at.z,material,SoundSource.PLAYERS,first?.95F:.33F,pitch);
+        } else if(first && owner!=null) {
+            com.codex.blacklight.registry.ModWeaponSounds.play(owner,form,heavy?"heavy":"hit",at,gain,pitch);
+        }
     }
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first){apply(p,v,move,direction,first,0F);}
     public static void apply(ServerPlayer p,LivingEntity v,WeaponMove move,Vec3 direction,boolean first,float charge) {
@@ -131,20 +138,7 @@ public final class WeaponImpact {
         boolean solidHit = !move.lightLash() && (tier.atLeast(ImpactTier.HEAVY) || heavy || slam || chargedCrush);
         float pitch = switch (tier) { case LIGHT -> 1.1F; case MEDIUM -> 1F; case HEAVY -> .88F; case FINISHER -> .78F; };
         if (chargedCrush) pitch = Math.min(pitch, .78F);
-        if (first) com.codex.blacklight.registry.ModWeaponSounds.play(p, form, solidHit ? "heavy" : "hit",
-                soundPoint, solidHit ? .88F : .74F, pitch);
-        var surfaceSound=PlayerHitEffects.hardContactSound(v,soundPoint);
-        if (surfaceSound!=null) {
-            p.level().playSound(null, soundPoint.x, soundPoint.y, soundPoint.z, surfaceSound,
-                    SoundSource.PLAYERS, first ? .56F : .25F, solidHit ? .76F : 1.22F);
-        } else if (first && AnimatedHurtBody.of(v)==null && PlayerHitEffects.fleshBody(v)) {
-            var strike=FleshStrike.of(form,move);
-            var style=strike.style(impact.kind());
-            var cue=com.codex.blacklight.infection.InfectedSoundCue.contact(style);
-            float gain=solidHit?.55F:.25F;
-            p.level().playSound(null,soundPoint.x,soundPoint.y,soundPoint.z,
-                    com.codex.blacklight.registry.ModInfectedSounds.event(cue),SoundSource.PLAYERS,gain,pitch*(fullyCharged?.86F:1.04F));
-        }
+        contactSound(p,v,soundPoint,form,solidHit,first,solidHit?.88F:.74F,pitch);
         if(first&&blade){
             var effect=BladeEffects.heavy(move)?PhysicalFeedbackPayload.Effect.BLADE_HEAVY
                 :move==WeaponMove.BLADE_RETURN||move==WeaponMove.BLADE_COMBO_C2?PhysicalFeedbackPayload.Effect.BLADE_RETURN:PhysicalFeedbackPayload.Effect.BLADE_CUT;

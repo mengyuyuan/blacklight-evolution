@@ -71,7 +71,9 @@ public final class AdaptivePassiveDocumentGameTest {
         var p=player(h,false,CombatSkill.TISSUE_REGENERATION,CombatSkill.TISSUE_REGENERATION_PERCENT);
         p.setHealth(600);due(p,0,75);
         h.runAfterDelay(20,()->{pulse(p);near(h,p.getHealth(),900,"75 percent of missing 400 HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),15,"actual 300 HP costs 60 layers");
-            near(h,p.getEffect(ModEffects.TISSUE_REGENERATION).getAmplifier(),1,"second-tier marker");});
+            var marker=p.getEffect(ModEffects.TISSUE_REGENERATION);
+            near(h,marker.getAmplifier(),1,"second-tier marker");
+            h.assertTrue(!marker.showIcon(),"Blacklight regeneration leaves the buff row clear");});
         h.runAfterDelay(40,()->{try{pulse(p);near(h,p.getHealth(),915,"15 percent of missing 100 HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),12,"actual 15 HP costs three layers");}finally{p.discard();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="document_healing")

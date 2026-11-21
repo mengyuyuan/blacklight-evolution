@@ -36,7 +36,7 @@ public final class ConsumeBladeContact implements AutoCloseable {
         previous=CURRENT.get();CURRENT.set(this);
     }
     public static ConsumeBladeContact begin(AbstractClientPlayer actor,PowerForm form,Object model,String joint,PoseStack stack,float partial){
-        if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&observer==null||StandalonePlayerRendering.nativeHandPass()
+        if(!ConsumeVisual.consumeStage(actor.getData(ModAttachments.GRAB_STAGE))&&observer==null||StandalonePlayerRendering.nativeHandPass()
                 ||VisionPowerRenderer.drawingSilhouettes()||actor.getData(ModAttachments.PLAYER_STATE).getActivePower()!=form
                 ||form!=PowerForm.CLAWS&&form!=PowerForm.BLADE&&form!=PowerForm.WHIPFIST
                 &&!(form==PowerForm.HAMMERFISTS&&joint.equals("Hand_R")))return null;
@@ -99,7 +99,12 @@ public final class ConsumeBladeContact implements AutoCloseable {
                     drawnEdges.put(edge.getKey(),List.copyOf(points));
                 }
             }
-            if(actor.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.CONSUME)AdaptiveRagdoll.consumeBlades(actor,form,drawnEdges,partial);
+            int stage=actor.getData(ModAttachments.GRAB_STAGE);
+            if(ConsumeVisual.consumeStage(stage)){
+                if(stage==ConsumeVisual.MOUNT_CONSUME||stage==ConsumeVisual.HUNTER_CONSUME)
+                    ConsumeTrauma.mountEdges(actor,form,joint,drawnEdges,partial);
+                else AdaptiveRagdoll.consumeBlades(actor,form,drawnEdges,partial);
+            }
         }finally{if(previous==null)CURRENT.remove();else CURRENT.set(previous);}
     }
 }
