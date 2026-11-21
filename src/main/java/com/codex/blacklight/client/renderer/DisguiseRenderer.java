@@ -75,7 +75,7 @@ public final class DisguiseRenderer {
     public static void render(RenderPlayerEvent.Pre e){
         Player p=e.getEntity();if(RENDERING.contains(p))return;
         boolean disguised=DisguiseSystem.active(p);var morph=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.DISGUISE_MORPH);
-        boolean transition=morph.active(p.level().getGameTime());
+        boolean transition=DisguiseSystem.morphing(p);
         if(!disguised&&!transition){CACHE.remove(p);return;}
         Mob avatar=avatar(p);if(disguised&&avatar==null)return;
         e.setCanceled(true);var stack=e.getPoseStack();stack.pushPose();RENDERING.add(p);
