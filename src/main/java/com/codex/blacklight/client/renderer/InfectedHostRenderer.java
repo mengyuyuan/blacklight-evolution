@@ -138,9 +138,6 @@ public final class InfectedHostRenderer extends EntityRenderer<BlacklightInfecte
             if(consuming){
                 placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(entity,partial);
                 stack.translate(placement.x,placement.y,placement.z);
-                ConsumedMobVisuals.whip(entity,stack,buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE)),
-                        light,entity.level().getEntity(visual.consumerId()).getPosition(partial).subtract(entity.getPosition(partial).add(placement)),
-                        ConsumedMobVisuals.tetherProgress(entity,partial));
             }
             ConsumeFracture fracture=consuming&&ConsumeFracture.visible(entity,partial)
                     ?new ConsumeFracture(entity,partial,stack,buffers,ConsumeAbsorptionFx.destination(entity,partial,placement)):null;

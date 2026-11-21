@@ -36,10 +36,23 @@ public final class ConsumeSequence {
     }
     /** Finish the visible return on the server settlement clock. The actor's
      * motion clock has a transition and can still trail it on the removal tick. */
+    public static float mountedReturnStart(int duration,int completionTick){
+        return completionTick-2F-Math.max(3F,duration*.125F);
+    }
+    public static int returnSoundTick(PowerForm form,int variant,int stage,int duration,int completionTick){
+        if(stage==ConsumeVisual.HUNTER_CONSUME)return Math.round(20*HunterConsume.EFFECT_REVERSE_SECONDS);
+        if(stage==ConsumeVisual.MOUNT_CONSUME)return (int)Math.ceil(mountedReturnStart(duration,completionTick));
+        var scene=ConsumeReceiverScene.profile(form,false,variant);
+        if(scene!=null)return ConsumeGiverEffect.tick(ConsumeReceiverScene.flowStartSeconds(form,variant,scene));
+        float start=completion(form,false)-.125F;
+        for(int tick=0;tick<completionTick;tick++){
+            if(motionProgress(form,tick/(float)duration,duration,false,variant)>=start)return tick;
+        }
+        return completionTick;
+    }
     public static float mountedReturn(float elapsedTicks,int duration,int completionTick){
-        float end=completionTick-2F;
         float window=Math.max(3F,duration*.125F);
-        float t=net.minecraft.util.Mth.clamp((elapsedTicks-end+window)/window,0,1);
+        float t=net.minecraft.util.Mth.clamp((elapsedTicks-mountedReturnStart(duration,completionTick))/window,0,1);
         return t*t*(3-2*t);
     }
     public static int completionTick(PowerForm form,boolean large) {

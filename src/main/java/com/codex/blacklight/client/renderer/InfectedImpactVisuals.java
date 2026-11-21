@@ -72,6 +72,8 @@ public final class InfectedImpactVisuals {
                 return;
             }
             com.codex.blacklight.client.animation.FleshRecoil.accept(living, data, started);
+            if(mc.level.getEntity(data.attacker()) instanceof net.minecraft.world.entity.player.Player)
+                CombatSurfaceWounds.accept(living,data,started);
             WoundBlood.contact(data, point, new Vec3(data.dx(),data.dy(),data.dz()), living);
         }
         var axis=new Vec3(data.dx(),data.dy(),data.dz());

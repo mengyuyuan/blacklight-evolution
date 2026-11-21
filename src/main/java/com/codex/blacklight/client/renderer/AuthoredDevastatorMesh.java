@@ -22,7 +22,7 @@ import org.joml.Matrix4f;
 /** Editable three-dimensional models sculpted from reference, with raised tissue and veins. */
 public final class AuthoredDevastatorMesh {
     private record Mesh(float[] p,float[] n,float[] uv,int[] indices,float[] min,float[] max,
-                        float scale,ResourceLocation texture,int[] colors,float[] shaped) { }
+                        boolean textured,float scale,ResourceLocation texture,int[] colors,float[] shaped) { }
     private record RigidDraw(VertexBuffer buffer,ResourceLocation texture,Matrix4f pose,
                              Matrix3f normal,int light,int alpha,RigidBiomassMaterial.Curve curve) { }
     private static final Map<String,VertexBuffer> RIGID_BUFFERS=new HashMap<>();
@@ -32,8 +32,9 @@ public final class AuthoredDevastatorMesh {
     }
     private static Map<String,Mesh> read(){
         var result=new HashMap<String,Mesh>();
-        for(String resource:new String[]{"spikes","tendrils"}){
+        for(String resource:new String[]{"spikes","tendrils","weapon_skills"}){
             try(var stream=AuthoredDevastatorMesh.class.getResourceAsStream("/assets/blacklight/models/devastators/"+resource+".json")){
+                boolean textured=resource.equals("weapon_skills");
                 if(stream==null)throw new IllegalStateException("Missing authored model "+resource);
                 var data=com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(stream,java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
                 for(var entry:data.getAsJsonObject("meshes").entrySet()){
@@ -41,13 +42,14 @@ public final class AuthoredDevastatorMesh {
                     float[] p=array(m.getAsJsonArray("positions")),n=array(m.getAsJsonArray("normals")),uv=array(m.getAsJsonArray("uvs"));
                     int[] indices=new int[m.getAsJsonArray("indices").size()],colors=new int[p.length/3];
                     for(int i=0;i<indices.length;i++)indices[i]=m.getAsJsonArray("indices").get(i).getAsInt();
-                    for(int i=0;i<colors.length;i++)colors[i]=m.getAsJsonArray("colors").get(i).getAsInt();
+                    if(textured)java.util.Arrays.fill(colors,0xFFFFFF);
+                    else for(int i=0;i<colors.length;i++)colors[i]=m.getAsJsonArray("colors").get(i).getAsInt();
                     if(p.length%3!=0||n.length!=p.length||uv.length!=p.length/3*2||indices.length%3!=0||indices.length>60_000)
                         throw new IllegalStateException("Invalid authored effect model "+entry.getKey());
                     for(int index:indices)if(index<0||index>=p.length/3)throw new IllegalStateException("Model index outside vertices");
                     var bounds=m.getAsJsonObject("bounds");
-                    result.put(entry.getKey(),new Mesh(p,n,uv,indices,array(bounds.getAsJsonArray("min")),array(bounds.getAsJsonArray("max")),
-                            1,m.has("textureName")?new ResourceLocation(m.get("textureName").getAsString()):ConsumedMobVisuals.WHITE,colors,new float[p.length*2]));
+                    result.put(textured?"skill_"+entry.getKey():entry.getKey(),new Mesh(p,n,uv,indices,array(bounds.getAsJsonArray("min")),array(bounds.getAsJsonArray("max")),
+                            textured,1,m.has("textureName")?new ResourceLocation(m.get("textureName").getAsString()):ConsumedMobVisuals.WHITE,colors,new float[p.length*2]));
                 }
             }catch(java.io.IOException error){throw new IllegalStateException("Cannot read authored model "+resource,error);}
         }
@@ -58,8 +60,10 @@ public final class AuthoredDevastatorMesh {
     public static void finish(MultiBufferSource.BufferSource buffers){
         // Flush the dynamic tissue consumer before changing VAO/shader. The
         // caller has finished its complete effect pass; no consumer survives it.
-        for(var texture:Loaded.ALL.values().stream().map(Mesh::texture).distinct().toList())
+        for(var texture:Loaded.ALL.values().stream().map(Mesh::texture).distinct().toList()) {
             buffers.endBatch(LiquidBiomassMaterial.mesh(texture));
+            buffers.endBatch(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture));
+        }
         if(RIGID_DRAWS.isEmpty())return;
         net.minecraft.client.renderer.RenderType material=null;
         try{
@@ -81,6 +85,12 @@ public final class AuthoredDevastatorMesh {
             RIGID_DRAWS.clear();
         }
     }
+    static String skillModel(net.minecraft.world.entity.LivingEntity owner,String id) {
+        return owner instanceof net.minecraft.world.entity.player.Player && Loaded.ALL.containsKey("skill_"+id) ? "skill_"+id : id;
+    }
+    static void playerShard(PoseStack stack,MultiBufferSource buffers,int light,String id,float yaw,double growth) {
+        if (growth>0) drawSpikeFaces(stack,buffers,light,mesh(id),Vec3.ZERO,yaw,growth,1,255);
+    }
     public static boolean available(){return !Loaded.ALL.isEmpty();}
     public static int vertices(String id){return RigidBiomassMaterial.ready()?mesh(id).indices.length:mesh(id).indices.length/3*4;}
     public static int spike(PoseStack stack,MultiBufferSource buffers,int light,String id,Vec3 base,
@@ -94,6 +104,10 @@ public final class AuthoredDevastatorMesh {
                     rigidNormal(stack,yaw),light,alpha,null));
             return m.indices.length;
         }
+        return drawSpikeFaces(stack,buffers,light,m,base,yaw,growth,size,alpha);
+    }
+    private static int drawSpikeFaces(PoseStack stack,MultiBufferSource buffers,int light,Mesh m,Vec3 base,
+                                      float yaw,double growth,double size,int alpha) {
         var material=net.minecraft.client.renderer.RenderType.entityCutoutNoCull(m.texture);
         var out=buffers.getBuffer(material);double sine=Math.sin(yaw),cosine=Math.cos(yaw);
         double scale=m.scale*size;
@@ -105,13 +119,13 @@ public final class AuthoredDevastatorMesh {
             // repeated vertex: shader packs derive quad normals/tangents, which a
             // degenerate quad turns into NaN and an invisible face.
             int index=m.indices[face+(corner==3?0:corner)],p=index*3,u=index*2;
-            int far=m.indices[face+2]*3;double mix=corner==3?.5:0;
+            int last=m.indices[face+2],far=last*3;float mix=corner==3?.5F:0;
             double x=(m.p[p]+(m.p[far]-m.p[p])*mix)*scale,z=(m.p[p+2]+(m.p[far+2]-m.p[p+2])*mix)*scale;
             double y=(m.p[p+1]+(m.p[far+1]-m.p[p+1])*mix)*scale-underground;
-            double nx=m.n[p],nz=m.n[p+2],ny=m.n[p+1];
+            double nx=m.n[p]+(m.n[far]-m.n[p])*mix,ny=m.n[p+1]+(m.n[far+1]-m.n[p+1])*mix,nz=m.n[p+2]+(m.n[far+2]-m.n[p+2])*mix;
             double len=Math.sqrt(nx*nx+ny*ny+nz*nz);
             out.vertex(stack.last().pose(),(float)(base.x+x*cosine-z*sine),(float)(base.y+y),(float)(base.z+x*sine+z*cosine))
-                    .color((alpha<<24)|(m.colors[index]&0xFFFFFF)).uv(m.uv[u],m.uv[u+1]).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light)
+                    .color((alpha<<24)|(m.colors[index]&0xFFFFFF)).uv(m.uv[u]+(m.uv[last*2]-m.uv[u])*mix,m.uv[u+1]+(m.uv[last*2+1]-m.uv[u+1])*mix).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light)
                     .normal(stack.last().normal(),(float)((nx*cosine-nz*sine)/len),(float)(ny/len),(float)((nx*sine+nz*cosine)/len)).endVertex();
         }
         return m.indices.length/3*4;
@@ -165,12 +179,12 @@ public final class AuthoredDevastatorMesh {
             var buffer=RIGID_BUFFERS.computeIfAbsent(id,key->uploadRigid(m));
             // Curve coordinates stay near zero. A root translation in WorldPose
             // preserves precision even far from the world's origin.
-            var curve=RigidBiomassMaterial.Curve.of(root,control,tip,m.min[1],sourceLength,length,m.scale*width,twist);
+            var curve=RigidBiomassMaterial.Curve.of(root,control,tip,m.min[1],sourceLength,length,m.scale*width,twist,m.textured);
             var pose=new Matrix4f(stack.last().pose()).translate((float)root.x,(float)root.y,(float)root.z);
             RIGID_DRAWS.add(new RigidDraw(buffer,m.texture,pose,new Matrix3f(stack.last().normal()),light,alpha,curve));
             return m.indices.length;
         }
-        var material=LiquidBiomassMaterial.mesh(m.texture);var out=buffers.getBuffer(material);
+        var material=m.textured?net.minecraft.client.renderer.RenderType.entityCutoutNoCull(m.texture):LiquidBiomassMaterial.mesh(m.texture);var out=buffers.getBuffer(material);
         // Deform each authored vertex once, then reuse it through the model index buffer.
         // No per-triangle Vec3 allocation or procedural replacement topology.
         double ax=root.x,ay=root.y,az=root.z,bx=control.x,by=control.y,bz=control.z,cx=tip.x,cy=tip.y,cz=tip.z;
@@ -186,7 +200,7 @@ public final class AuthoredDevastatorMesh {
             double rx=refX-projection*tx,ry=-projection*ty,rz=refZ-projection*tz;
             double rm=Math.max(.00001,Math.sqrt(rx*rx+ry*ry+rz*rz));rx/=rm;ry/=rm;rz/=rm;
             double ux=ry*tz-rz*ty,uy=rz*tx-rx*tz,uz=rx*ty-ry*tx;
-            double taper=Math.max(.08,1-t*.86),cross=m.scale*width*taper;
+            double taper=m.textured?1:Math.max(.08,1-t*.86),cross=m.scale*width*taper;
             double x=(m.p[p]*c-m.p[p+2]*s)*cross,z=(m.p[p]*s+m.p[p+2]*c)*cross;
             m.shaped[q]=(float)(ax*one*one+2*bx*one*t+cx*t*t+rx*x+ux*z);
             m.shaped[q+1]=(float)(ay*one*one+2*by*one*t+cy*t*t+ry*x+uy*z);
@@ -202,7 +216,8 @@ public final class AuthoredDevastatorMesh {
             float mix=corner==3?.5F:0;
             out.vertex(stack.last().pose(),m.shaped[q]+(m.shaped[far]-m.shaped[q])*mix,
                     m.shaped[q+1]+(m.shaped[far+1]-m.shaped[q+1])*mix,m.shaped[q+2]+(m.shaped[far+2]-m.shaped[q+2])*mix).color((alpha<<24)|(m.colors[index]&0xFFFFFF))
-                    .uv(.8F,.5F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light)
+                    .uv(m.textured ? m.uv[u]+(m.uv[m.indices[face+2]*2]-m.uv[u])*mix : .8F,
+                        m.textured ? m.uv[u+1]+(m.uv[m.indices[face+2]*2+1]-m.uv[u+1])*mix : .5F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light)
                     .normal(stack.last().normal(),m.shaped[q+3],m.shaped[q+4],m.shaped[q+5]).endVertex();
         }
         return m.indices.length/3*4;

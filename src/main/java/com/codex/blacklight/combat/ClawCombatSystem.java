@@ -59,7 +59,7 @@ public final class ClawCombatSystem {
             if(request==ClawActionPayload.Action.BLOCK_THROW_START)heldBlock.startCharge(player);
             else if(request==ClawActionPayload.Action.BLOCK_THROW_RELEASE)heldBlock.releaseCharge(player);
             else if(request==ClawActionPayload.Action.BLOCK_THROW_CANCEL)heldBlock.cancelInput(player);
-            else if(request==ClawActionPayload.Action.GRAB||request==ClawActionPayload.Action.THROW||request==ClawActionPayload.Action.ATTACK)heldBlock.throwFrom(player);
+            else if(request==ClawActionPayload.Action.THROW||request==ClawActionPayload.Action.ATTACK)heldBlock.throwFrom(player);
             else if(request==ClawActionPayload.Action.CONSUME)heldBlock.drop();
             return;
         }
@@ -312,7 +312,7 @@ public final class ClawCombatSystem {
                 if (target.hurt(player.damageSources().playerAttack(player),
                         clawDamage(state, 16.0F))) {
                     if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
-                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
+                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, true, null);
                 }
             }
             hitHulls(player,sweep,clawDamage(state,16F),alreadyHit,Integer.MAX_VALUE);
@@ -350,6 +350,8 @@ public final class ClawCombatSystem {
                             clawDamage(state, 9.0F))) {
                         if(!CombatTargeting.anchoredBody(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
                         hitCount++;
+                        if(hitCount==1)com.codex.blacklight.registry.ModWeaponSounds.play(player,
+                                com.codex.blacklight.power.PowerForm.CLAWS,"hit",target.getBoundingBox().getCenter(),.88F,1.04F);
                         ClawPhysicalEffects.onComboTargetHit(player, target, false);
                     }
                 }
@@ -425,7 +427,7 @@ public final class ClawCombatSystem {
                     case AUTO_3 -> WeaponMove.CLAW_AUTO3;
                     default -> WeaponMove.CLAW_AUTO1;
                 };
-                WeaponImpact.contact(player,target,ImpactTier.of(move),false,null,move,player.position());
+                WeaponImpact.contact(player,target,ImpactTier.of(move),hitCount==1,null,move,player.position());
             }
         }
         hitCount+=hitHulls(player,sweep,damage,new HashSet<>(),maxTargets-targets.size());
@@ -446,23 +448,33 @@ public final class ClawCombatSystem {
         if(lockedTarget!=null&&!ExplicitTarget.visibleWithinRange(player,lockedTarget,GroundSpikeRules.MAX_LOCKED_TARGET_DISTANCE*AttackReach.scale(player)))return;
         Vec3 requested=lockedTarget instanceof LivingEntity living?CombatTargeting.aimPoint(player,player.position(),living):
                 lockedTarget!=null?ExplicitTarget.point(player,lockedTarget):player.position().add(forward.scale(GroundSpikeRules.BASE_CAST_DISTANCE*rangeMultiplier));
-        BlockPos surface = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                BlockPos.containing(requested));
-        double x = surface.getX() + 0.5D;
-        double y = surface.getY();
-        double z = surface.getZ() + 0.5D;
-
-        double visualRadius = GroundSpikeRules.BASE_VISUAL_RADIUS * rangeMultiplier;
-        spawnGroundSpikeField(level, new Vec3(x, y, z), player.getYRot(), visualRadius);
+        var floor = ClawSpikeField.floor(player,requested);
+        if (!ClawSpikeField.supported(floor)) return;
+        Vec3 center=floor.getLocation();
+        double x=center.x, y=center.y, z=center.z;
+        BlockPos surface=floor.getBlockPos().above();
+        int tier=AttackReach.tier(player)+(state.hasClawUpgrade(ClawUpgrade.RANGE)?1:0);
+        var master=tier>=2 ? ClawSpikeField.Master.LARGE :
+                tier==1 ? ClawSpikeField.Master.MEDIUM : ClawSpikeField.Master.SMALL;
 
         double radius = GroundSpikeRules.BASE_DAMAGE_RADIUS * rangeMultiplier;
         AABB hitBox = new AABB(x - radius, y - 0.5D, z - radius,
                 x + radius, y + 6.5D, z + radius);
+        var targets=CombatTargeting.candidates(player,hitBox,target->CombatTargeting.damageable(player,target));
+        targets.sort(CombatTargeting.contactPriority(player));
+        var anchors=ClawSpikeField.spawn(player,center,master,targets);
         boolean firstSpike = true;
-        for (LivingEntity target : CombatTargeting.candidates(player, hitBox,
-                target -> CombatTargeting.damageable(player,target))) {
+        for (LivingEntity target : targets) {
+            var anchor=anchors.stream().filter(root->GroundSpikePin.touches(target,root))
+                    .min(java.util.Comparator.comparingDouble(root->root.distanceToSqr(target.position()))).orElse(null);
+            if(anchor==null)continue;
             if (target.hurt(player.damageSources().playerAttack(player),
                     clawDamage(state, 14.0F))) {
+                if(GroundSpikePin.catchMob(target,anchor,GroundSpikeEntity.ERUPTION_DURATION_TICKS-4,player.getYRot())){
+                    WeaponImpact.contact(player,target,ImpactTier.of(WeaponMove.CLAW_GROUNDSPIKE),firstSpike,null,WeaponMove.CLAW_GROUNDSPIKE,anchor);
+                    firstSpike=false;
+                    continue;
+                }
                 Vec3 away = target.position().subtract(x, y, z);
                 if (away.lengthSqr() < 1.0E-5D) {
                     // A target standing exactly on the spike center gets a benign
@@ -490,39 +502,6 @@ public final class ClawCombatSystem {
         }
 
         ClawPhysicalEffects.onGroundSpikeImpact(player, new Vec3(x, y, z), radius);
-    }
-
-    private static void spawnGroundSpikeField(ServerLevel level, Vec3 center,
-                                               float baseYaw, double fieldRadius) {
-        spawnGroundSpikeVisual(level, center.x, center.z, baseYaw);
-        int[] ringCounts = {6};
-        double[] ringScales = {1.0D};
-        double yawOffset = Math.toRadians(baseYaw);
-        for (int ring = 0; ring < ringCounts.length; ring++) {
-            int count = ringCounts[ring];
-            double ringRadius = fieldRadius * ringScales[ring];
-            // A single broad ring leaves deliberate gaps between the oversized
-            // clusters instead of turning the attack into a dense spike carpet.
-            double stagger = Math.PI / count;
-            for (int index = 0; index < count; index++) {
-                double angle = yawOffset + stagger + Math.PI * 2.0D * index / count;
-                double x = center.x + Math.cos(angle) * ringRadius;
-                double z = center.z + Math.sin(angle) * ringRadius;
-                spawnGroundSpikeVisual(level, x, z,
-                        (float)Math.toDegrees(angle) + 90.0F);
-            }
-        }
-    }
-
-    private static void spawnGroundSpikeVisual(ServerLevel level, double x, double z,
-                                               float yaw) {
-        BlockPos surface = level.getHeightmapPos(
-                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                BlockPos.containing(x, level.getMinBuildHeight(), z));
-        GroundSpikeEntity visual = new GroundSpikeEntity(ModEntities.GROUND_SPIKE.get(), level);
-        visual.moveTo(surface.getX() + 0.5D, surface.getY(), surface.getZ() + 0.5D,
-                yaw, 0.0F);
-        level.addFreshEntity(visual);
     }
 
     /** Epic Fight already synchronizes its lock-on target to the server player patch. */

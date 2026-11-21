@@ -82,6 +82,13 @@ public final class PrototypeMovementSystem {
     /** Handles edge-triggered inputs immediately instead of waiting for a later player tick. */
     public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
                                    int forward, int sideways, boolean sprinting, boolean detach) {
+        acceptInput(player,jumpHeld,dashPressed,forward,sideways,sprinting,detach,false);
+    }
+
+    public static void acceptInput(ServerPlayer player, boolean jumpHeld, boolean dashPressed,
+                                   int forward, int sideways, boolean sprinting, boolean detach, boolean airEvade) {
+        if (airEvade && player.onGround()) dashPressed=false;
+        com.codex.blacklight.combat.ConsumeSystem.travelIntent(player,forward!=0||sideways!=0);
         if(detach&&com.codex.blacklight.combat.ConsumeSystem.releaseUncommitted(player,false))return;
         if (com.codex.blacklight.disguise.DisguiseSystem.active(player)||com.codex.blacklight.city.HydraTransport.active(player)||com.codex.blacklight.power.BiomassSystem.active(player) || !PrototypeModeSystem.isActive(player) || !player.isAlive()
                 || player.isSpectator() || player.isDeadOrDying()
@@ -102,8 +109,12 @@ public final class PrototypeMovementSystem {
             return;
         }
         movement.acceptInput(jumpHeld, dashPressed, forward, sideways, sprinting, detach);
+        if (airEvade && dashPressed) {
+            float yaw=com.codex.blacklight.combat.CombatPursuit.inputYaw(movement.cameraYaw(player.getYRot()),forward,sideways);
+            movement.requestEvade(yaw);
+        }
         movement.jumpInput().acceptInput(jumpHeld, player, movement.wallTraversal().attached());
-        if (dashPressed && player.onGround() && movement.canHop() && WeaponCombatSystem.cancelableRecovery(player)) {
+        if (dashPressed && (player.onGround() ? movement.canHop() : airEvade && movement.canAirDash()) && WeaponCombatSystem.cancelableRecovery(player)) {
             // Recovery frames yield to an explicit dodge: the move's contacts are spent.
             WeaponCombatSystem.cancel(player);
         }
@@ -269,16 +280,20 @@ public final class PrototypeMovementSystem {
         var spikeAction = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).action();
         if (spikeAction == ClawCombatState.Action.GROUND_SPIKE_CHARGING
                 || spikeAction == ClawCombatState.Action.GROUND_SPIKE) {
+            movement.consumeDashRequest();
             movement.wallTraversal().reset();
             syncWallMotion(player, movement.wallTraversal());
             movement.finishInputTick();
             return;
         }
-        if (movement.consumeDashRequest() && !player.onGround() && movement.canAirDash()) {
+        if (!player.onGround() && movement.takeAirDashRequest()) {
             // An airborne pounce homes on the Epic Fight lock-on target when one is
             // held, exactly like Prototype's air pounce; otherwise it follows the
             // player's view direction.
-            Vec3 dashDirection = lockedDashDirection(player, forward);
+            Vec3 dashDirection = movement.evading()
+                    ? Vec3.directionFromRotation(0,movement.evadeYaw())
+                    : lockedDashDirection(player, forward);
+            AIR_POUNCE_HITS.remove(player);
             movement.beginDash(dashDirection.x, dashDirection.z);
             player.setDeltaMovement(dashDirection.x * MovementTuningSettings.airDashSpeed(),
                     Math.max(0.04D, player.getDeltaMovement().y),
@@ -293,7 +308,7 @@ public final class PrototypeMovementSystem {
             syncWallMotion(player, movement.wallTraversal());
             Vec3 velocity = player.getDeltaMovement();
             double speed = MovementTuningSettings.airDashSpeed();
-            LivingEntity lockedTarget = getLockedTarget(player);
+            LivingEntity lockedTarget = movement.evading() ? null : getLockedTarget(player);
             if (lockedTarget != null) {
                 // Ballistic pounce: steer at the prey but clamp every tick's step to
                 // the remaining distance, so the pounce can never cross the target
@@ -334,7 +349,7 @@ public final class PrototypeMovementSystem {
                     movement.dashDirectionZ());
             player.setDeltaMovement(dashDirection.x * speed,
                     Math.max(-0.02D, velocity.y), dashDirection.z * speed);
-            sweepAirPounceHits(player);
+            if (!movement.evading()) sweepAirPounceHits(player);
             movement.tickDash();
             if(movement.dashTicks()==0)finishDashPose(player);
             player.resetFallDistance();
@@ -483,6 +498,7 @@ public final class PrototypeMovementSystem {
         WallTraversal.Frame frame = wall.tick(movement.wallInput(), WallContacts.sample(player, wall),
                 player.getY(), player.getDeltaMovement().horizontalDistance(),
                 MovementTuningSettings.wallClimbVelocity(), MovementUpgrade.wallMultiplier(upgradeMask));
+        movement.observeWallRun(previous,frame,player.position());
         if (frame.handled()) {
             if (movement.jumpHeld()) movement.jumpInput().claimCharge();
             if (movement.chargeTicks() > 0) {

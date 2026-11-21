@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-50-consume-landing";
+    private static final String PROTOCOL = "forge-1.20.1-54-consume-contact";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -123,7 +123,7 @@ public final class ModNetwork {
                             if (!PrototypeModeSystem.isActive(player)) return;
                             com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.MOVEMENT_STATE).setCameraYaw(payload.cameraYaw());
                             PrototypeMovementSystem.acceptInput(player, payload.jumpHeld(),
-                                    payload.dashPressed(), payload.forward(), payload.sideways(), payload.sprinting(), payload.detach());
+                                    payload.dashPressed(), payload.forward(), payload.sideways(), payload.sprinting(), payload.detach(),payload.airEvade());
                         });
                     }
                 })
@@ -139,6 +139,9 @@ public final class ModNetwork {
                 })
                 .playToClient(MovementTuningPayload.class, MovementTuningPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> com.codex.blacklight.client.ClientMovementTuning.receive(payload.snapshot()));
+                })
+                .playToClient(ConsumeContactSoundPayload.class, ConsumeContactSoundPayload.STREAM_CODEC, (payload, context) -> {
+                    context.enqueueWork(() -> com.codex.blacklight.client.renderer.ConsumeContactAudio.receive(payload));
                 })
                 .playToClient(PhysicalFeedbackPayload.class, PhysicalFeedbackPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> ClientPhysicalFeedback.accept(payload));

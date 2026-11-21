@@ -3,19 +3,14 @@ package com.codex.blacklight.client;
 import com.codex.blacklight.BlacklightNeoMod;
 import com.codex.blacklight.combat.MotionResources;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import java.io.ByteArrayInputStream;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Local-only source textures and source GFX layout, scaled together in GUI space. */
+/** Project health meter with resource-pack compatible pixel artwork. */
 final class NativeHealthHud {
     private static JsonObject profile;
     private static boolean loaded;
@@ -27,15 +22,14 @@ final class NativeHealthHud {
         try {
             var data=MotionResources.read("health-hud.data",1_000_000).orElse(null);
             if(data==null)return false;
-            if(data.get("schema").getAsInt()!=1)throw new IllegalArgumentException("HUD schema");
-            for(var entry:data.getAsJsonObject("textures").entrySet()){
-                var image=NativeImage.read(new ByteArrayInputStream(Base64.getDecoder().decode(entry.getValue().getAsJsonObject().get("png").getAsString())));
-                TEXTURES.put(entry.getKey(),Minecraft.getInstance().getTextureManager().register("blacklight_hud_"+entry.getKey(),new DynamicTexture(image)));
+            if(data.get("schema").getAsInt()!=2)throw new IllegalArgumentException("HUD schema");
+            for (String key : java.util.List.of("heart", "junction", "underline")) {
+                TEXTURES.put(key, new ResourceLocation("blacklight", "textures/gui/health/" + key + ".png"));
             }
             profile=data;
         } catch(Exception error){
-            TEXTURES.values().forEach(Minecraft.getInstance().getTextureManager()::release);TEXTURES.clear();
-            BlacklightNeoMod.LOGGER.error("Cannot load locally installed Prototype health HUD",error);
+            TEXTURES.clear();
+            BlacklightNeoMod.LOGGER.error("Cannot load the Blacklight health meter",error);
         }
         return profile!=null;
     }
@@ -45,7 +39,6 @@ final class NativeHealthHud {
         g.pose().pushPose();g.pose().translate(x,y,0);g.pose().scale(scale,scale,1);
         RenderSystem.enableBlend();RenderSystem.defaultBlendFunc();
         try {
-            // These fills are the original GFX rectangular shapes and color transforms.
             var bar=profile.getAsJsonArray("bar");int bx=bar.get(0).getAsInt(),by=bar.get(1).getAsInt(),bw=bar.get(2).getAsInt(),bh=bar.get(3).getAsInt();
             g.fill(bx,by,bx+bw,by+bh,0x2DFFEACF);
             texture(g,"underline","underline",.8984375F);
@@ -68,11 +61,8 @@ final class NativeHealthHud {
         int w=data.get("width").getAsInt(),h=data.get("height").getAsInt();
         g.flush();g.pose().pushPose();g.pose().translate(rect.get(0).getAsFloat(),rect.get(1).getAsFloat(),0);
         g.pose().scale(rect.get(2).getAsFloat()/w,rect.get(3).getAsFloat()/h,1);
-        // The source portrait needs its own vertical UV orientation; the bar
-        // and junction already have the correct direction in GUI coordinates.
         RenderSystem.setShaderColor(1,1,1,alpha);
-        boolean flip=key.equals("heart");
-        g.blit(TEXTURES.get(key),0,0,w,h,0F,flip?h:0F,w,flip?-h:h,w,h);
+        g.blit(TEXTURES.get(key),0,0,w,h,0F,0F,w,h,w,h);
         g.flush();RenderSystem.setShaderColor(1,1,1,1);g.pose().popPose();
     }
 }

@@ -97,7 +97,10 @@ public final class ConsumeVictimPose {
                 .rotateZ(p.twist()*.18F).translate(0,-half,0).rotateY((float)Math.toRadians(entity.yBodyRot));
         return matrix;
     }
-    public static void body(LivingEntity entity,PoseStack stack,float partial) { com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,bodyTransform(entity,partial)); }
+    public static void body(LivingEntity entity,PoseStack stack,float partial) {
+        com.codex.blacklight.client.renderer.ConsumeBodyImpact.fallback(entity,ModAttachments.getData(entity,ModAttachments.CONSUME_VISUAL),stack,partial);
+        com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,bodyTransform(entity,partial));
+    }
     /** Effects follow the posed torso even when Blacklight already applies the pose to its mesh. */
     public static org.joml.Matrix4f effectTransform(LivingEntity entity,float partial) {
         var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, ModAttachments.CONSUME_VISUAL);

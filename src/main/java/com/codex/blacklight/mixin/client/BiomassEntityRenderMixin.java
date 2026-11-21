@@ -43,13 +43,24 @@ public abstract class BiomassEntityRenderMixin {
                 AdaptiveRagdoll.drawQuillTethers(mob,stack,source,light,partial);
                 return;
             }
+            if(owner==null && entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon mob
+                    && com.codex.blacklight.registry.ModAttachments.getData(mob,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).stage()==com.codex.blacklight.combat.ConsumeVisual.MOUNT_CONSUME){
+                var skin=new com.codex.blacklight.client.renderer.ConsumeFracture(mob,partial,stack,source,net.minecraft.world.phys.Vec3.ZERO);
+                original.call(renderer,entity,yaw,partial,stack,skin,light);
+                if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush(mob,skin);
+                skin.finishMountedSurface();
+                return;
+            }
             if(owner==null){
-                try(var physics=com.codex.blacklight.client.renderer.AdaptiveRagdoll.begin(entity,stack,source,partial)){
-                    var output=physics==null?source:physics.buffers();
+                var receiver=com.codex.blacklight.client.renderer.ChestConsumeReceiver.begin(entity,stack,source,partial);
+                var skin=receiver==null?source:receiver;
+                try(var physics=com.codex.blacklight.client.renderer.AdaptiveRagdoll.begin(entity,stack,skin,partial)){
+                    var output=physics==null?skin:physics.buffers();
                     original.call(renderer,entity,yaw,partial,stack,output,light);
                     if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush((LivingEntity)entity,output);
                     if(physics!=null)physics.finish();
                 }
+                if(receiver!=null)receiver.finish();
                 return;
             }
                 float progress=BiomassSystem.state(owner).progress(entity.level().getGameTime()+partial,com.codex.blacklight.power.ConsumeProgression.absorbTicks(owner));

@@ -94,7 +94,7 @@ public final class ConsumeLastChance {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void finish(net.minecraftforge.event.entity.living.LivingDamageEvent event) {
-        if (awaitingFinisher(event.getEntity()) && event.getSource().getEntity()!=null && event.getAmount()>0
+        if (!ConsumeContactDamage.owns(event.getEntity(),event.getSource()) && awaitingFinisher(event.getEntity()) && event.getSource().getEntity()!=null && event.getAmount()>0
                 && event.getAmount()<1) event.setAmount(1);
     }
     @SubscribeEvent public static void stopped(ServerStoppedEvent event){HITS.keySet().removeIf(m->m.getServer()==event.getServer());}

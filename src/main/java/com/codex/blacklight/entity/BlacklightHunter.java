@@ -140,7 +140,8 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     }
     @Override public boolean hurt(DamageSource source,float amount){
         // A locked Infected Hunter only leaves through consumption (or /kill).
-        if(parasiteLocked()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY))return false;
+        if(parasiteLocked()&&!source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)
+                && !com.codex.blacklight.combat.ConsumeContactDamage.owns(this,source))return false;
         return super.hurt(source,amount);
     }
     @Override public void setHealth(float health){

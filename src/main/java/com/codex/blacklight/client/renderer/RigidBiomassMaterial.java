@@ -32,12 +32,15 @@ public final class RigidBiomassMaterial extends RenderType {
     private static Uniform worldPose,worldNormal,instanceLight,instanceAlpha;
     private static Uniform curveMode,curveB,curveC,curveReference,curveMetrics,curveTwist;
     record Curve(float bx,float by,float bz,float cx,float cy,float cz,float referenceX,float referenceZ,
-                 float minY,float sourceLength,float length,float width,float cosine,float sine){
+                 float minY,float sourceLength,float length,float width,float cosine,float sine,boolean authoredWidth){
         static Curve of(Vec3 root,Vec3 control,Vec3 tip,float minY,double sourceLength,double length,double width,double twist){
+            return of(root,control,tip,minY,sourceLength,length,width,twist,false);
+        }
+        static Curve of(Vec3 root,Vec3 control,Vec3 tip,float minY,double sourceLength,double length,double width,double twist,boolean authoredWidth){
             double hx=tip.x-root.x,hz=tip.z-root.z,hl=Math.sqrt(hx*hx+hz*hz);
             return new Curve((float)(control.x-root.x),(float)(control.y-root.y),(float)(control.z-root.z),
                     (float)hx,(float)(tip.y-root.y),(float)hz,hl<.00001?1:(float)(-hz/hl),hl<.00001?0:(float)(hx/hl),
-                    minY,(float)sourceLength,(float)length,(float)width,(float)Math.cos(twist),(float)Math.sin(twist));
+                    minY,(float)sourceLength,(float)length,(float)width,(float)Math.cos(twist),(float)Math.sin(twist),authoredWidth);
         }
     }
     private static final Function<ResourceLocation,RenderType> MESH=Util.memoize(texture->create(
@@ -83,7 +86,7 @@ public final class RigidBiomassMaterial extends RenderType {
         worldPose.set(pose);worldNormal.set(normal);
         instanceLight.set((float)(light&65535),(float)(light>>>16&65535));
         instanceAlpha.set(com.codex.blacklight.util.MathCompat.clamp(alpha,0,255)/255F);
-        curveMode.set(curve==null?0F:1F);
+        curveMode.set(curve==null?0F:curve.authoredWidth?2F:1F);
         if(curve!=null){
             curveB.set(curve.bx,curve.by,curve.bz);curveC.set(curve.cx,curve.cy,curve.cz);
             curveReference.set(curve.referenceX,0,curve.referenceZ);

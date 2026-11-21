@@ -68,7 +68,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             wings.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
         } finally { stack.popPose(); }
     }
-    public void renderPoweredArm(AbstractClientPlayer player,PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light,float partial,boolean left) {
+    public void renderPoweredArm(AbstractClientPlayer player,PoseStack stack,net.minecraft.client.renderer.MultiBufferSource buffers,int light,float partial,boolean left,FirstPersonConsumeTendrils.Scene weave,boolean probeOnly) {
         // A plain vanilla model is isolated from the third-person animated skin.
         handModel.attackTime=0;handModel.crouching=false;handModel.swimAmount=0;
         handModel.setupAnim(player,0,0,0,0,0);
@@ -104,6 +104,40 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
                     com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix(),frame,form==PowerForm.HAMMERFISTS?hammer.maximumScale():1F,left,
                     morph.parts().stream().map(WeaponMorphTracker.Part::form).toList(),.045F*morph.flow());
             VIEWS.put(player,new RenderedView(view,player.level().getGameTime()+partial));
+            if(weave!=null){
+                boolean useMesh=plated||morph.visible(left);
+                String suffix=left?"_L":"_R";
+                var rig=com.codex.blacklight.animation.PlayerMotionController.skeleton();
+                var forearmPose=view.matrices()[rig.searchJointByName("Arm"+suffix).getId()];
+                var handPose=view.matrices()[rig.searchJointByName("Hand"+suffix).getId()];
+                // Plain arms keep Minecraft's static cuboid. Transformed hands use the same matrices as their visible mesh.
+                var wrist=useMesh?new net.minecraft.world.phys.Vec3(handPose.getTranslation(new org.joml.Vector3f())):new net.minecraft.world.phys.Vec3(0,.65,-.08);
+                var forearm=useMesh?new net.minecraft.world.phys.Vec3(forearmPose.getTranslation(new org.joml.Vector3f())).lerp(wrist,.60):new net.minecraft.world.phys.Vec3(0,.34,-.07);
+                var settleWrist=wrist;var settleForearm=forearm;
+                if(useMesh&&weave.residue()>.004F){
+                    var endpoints=com.codex.blacklight.client.animation.FirstPersonPose.consumeSurface(form,plated,left,view.matrices(),frame,
+                            com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix(),
+                            (float)com.codex.blacklight.client.tuning.ClawTransformSettings.limbWidth(side),
+                            (float)com.codex.blacklight.client.tuning.ClawTransformSettings.talonLength(side),hammer.maximumScale());
+                    if(endpoints!=null){
+                        settleWrist=new net.minecraft.world.phys.Vec3(endpoints[0]);settleForearm=new net.minecraft.world.phys.Vec3(endpoints[1]);
+                    }
+                    // During the residue tail lift the actual arm and all its layers together if only a sliver remains on screen.
+                    var projection=com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix();
+                    var eye=frame.transformPosition(settleWrist.lerp(settleForearm,.4).toVector3f());
+                    if(eye.z<-.10F){
+                        var ndc=projection.transformProject(eye,new org.joml.Vector3f());
+                        float weight=Math.min(1,weave.residue()*3);
+                        float dy=Math.max(0,Math.min(.83F,-.77F-ndc.y));
+                        float dx=-Math.copySign(Math.max(0,Math.min(.38F,Math.abs(ndc.x)-.85F)),ndc.x);
+                        var shift=new org.joml.Vector3f(dx*(-eye.z)/projection.m00(),dy*(-eye.z)/projection.m11(),0).mul(weight);
+                        new org.joml.Matrix4f(frame).invert().transformDirection(shift);
+                        stack.translate(shift.x,shift.y,shift.z);
+                    }
+                }
+                FirstPersonConsumeTendrils.draw(player,stack,buffers,light,partial,left,wrist,forearm,settleWrist,settleForearm,weave);
+            }
+            if(probeOnly)return;
             biological.renderFirstPerson(player,stack,buffers,light,view.matrices(),partial,left?1:0);
             utility.renderFirstPerson(player,stack,buffers,light,view.matrices(),partial,left?1:0);
         }finally{stack.popPose();}

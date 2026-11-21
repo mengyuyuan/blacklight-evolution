@@ -98,6 +98,10 @@ public final class HydraHurtContact {
      * confirm that this logical receiver still exists; using today's nearest
      * bone would redirect yesterday's contact into another Slug or the core. */
     public static Contact reportedContact(List<HydraContact.Region> regions,WeaponCutContact.Report report){
+        return reportedContact(regions,report,null);
+    }
+    public static Contact reportedContact(List<HydraContact.Region> regions,WeaponCutContact.Report report,GoliathLockPart open){
+        Contact first=null;
         for(var c:report.contacts()){
             String bone=c.receivingBone();
             if(bone!=null){
@@ -108,34 +112,53 @@ public final class HydraHurtContact {
                         .mapToDouble(b->b.nearest(c.point()).distanceToSqr(c.point())).min().orElse(Double.MAX_VALUE)));
                 if(nearest.isEmpty())continue;bone=nearest.orElseThrow().bone();
             }
-            return new Contact(bone,c.point(),c.travel().normalize().scale(-1),FleshStrike.EDGE.style(report.kind()));
-        }return null;
+            var hit=new Contact(bone,c.point(),c.travel().normalize().scale(-1),FleshStrike.EDGE.style(report.kind()));
+            if(open==null || open.acceptsDamage(bone))return hit;
+            if(first==null)first=hit;
+        }return first;
     }
     /** Shared weapon-session receiver. Sharp weapons require their actual moving triangles. */
     public static Contact weapon(AnimatedHurtBody body,net.minecraft.server.level.ServerPlayer p,WeaponCutContact.Report report,boolean sharp,
             LocalWeaponMotion.ContactBounds bounds,Vec3 previousFeet,float oldYaw,float yaw,boolean flight,double reach,Vec3 direction,double arc){
         var h=(LivingEntity)body;
+        var open=GoliathLockPart.openOn(body);
         if(!report.contacts().isEmpty()){
-            var contact=reportedContact(body.hurtRegions(0),report);
+            var contact=reportedContact(body.hurtRegions(0),report,open);
             return contact!=null&&clear(h,p.getEyePosition(),contact.point())?contact:null;
         }
         if(sharp&&!flight)return null;
+        Contact fallback=null;
         if(bounds==null&&!flight){
             var from=p.position().add(0,p.getBbHeight()*.5,0);
             for(var r:body.hurtRegions(0))for(var b:r.boxes()){
                 var point=b.nearest(from);var d=point.subtract(from);double horizontal=d.horizontalDistance();
-                if(horizontal<=reach&&Math.abs(d.y)<=2&&(arc>=360||horizontal<.05||direction.dot(d.multiply(1,0,1).scale(1/horizontal))>=Math.cos(Math.toRadians(arc*.5)))&&clear(h,p.getEyePosition(),point))
-                    return new Contact(r.bone(),point,from.subtract(point).normalize(),InfectedAttackStyle.CRUSH);
-            }return null;
+                if(horizontal<=reach&&Math.abs(d.y)<=2&&(arc>=360||horizontal<.05||direction.dot(d.multiply(1,0,1).scale(1/horizontal))>=Math.cos(Math.toRadians(arc*.5)))&&clear(h,p.getEyePosition(),point)){
+                    var hit=new Contact(r.bone(),point,from.subtract(point).normalize(),InfectedAttackStyle.CRUSH);
+                    if(open==null || open.acceptsDamage(r.bone()))return hit;
+                    if(fallback==null)fallback=hit;
+                }
+            }return fallback;
         }
         for(int i=0;i<=16;i++){
             float alpha=i/16F;var feet=previousFeet.lerp(p.position(),alpha);float facing=net.minecraft.util.Mth.rotLerp(alpha,oldYaw,yaw);
             var forward=Vec3.directionFromRotation(0,facing);var right=new Vec3(-forward.z,0,forward.x);var up=new Vec3(0,1,0);
             var center=flight?feet.add(0,.9,0):feet.add(right.scale((bounds.minRight()+bounds.maxRight())*.5)).add(up.scale((bounds.minUp()+bounds.maxUp())*.5)).add(forward.scale((bounds.minForward()+bounds.maxForward())*.5));
             var half=flight?new Vec3(p.getBbWidth()*.5,p.getBbHeight()*.5,p.getBbWidth()*.5):new Vec3((bounds.maxRight()-bounds.minRight())*.5,(bounds.maxUp()-bounds.minUp())*.5,(bounds.maxForward()-bounds.minForward())*.5);
-            var hit=volume(body.hurtRegions(alpha-1),HydraContact.oriented(center,half,right,up,forward),p.getEyePosition(),InfectedAttackStyle.CRUSH);
-            if(hit!=null&&clear(h,p.getEyePosition(),hit.point()))return hit;
-        }return null;
+            var skin=body.hurtRegions(alpha-1);
+            var sweep=HydraContact.oriented(center,half,right,up,forward);
+            if(open!=null){
+                var weak=skin.stream().filter(r->open.acceptsDamage(r.bone())).toList();
+                var hit=volume(weak,sweep,p.getEyePosition(),InfectedAttackStyle.CRUSH);
+                if(hit!=null&&clear(h,p.getEyePosition(),hit.point()))return hit;
+            }
+            if(fallback==null){
+                var hit=volume(skin,sweep,p.getEyePosition(),InfectedAttackStyle.CRUSH);
+                if(hit!=null&&clear(h,p.getEyePosition(),hit.point())){
+                    if(open==null)return hit;
+                    fallback=hit;
+                }
+            }
+        }return fallback;
     }
     private HydraHurtContact(){}
 }

@@ -69,6 +69,24 @@ class FirstPersonPoseTest {
             projectGeometry(form,view,frame,left,geometry(form),true);
         }
     }
+    @Test void consumeAnchorsAreAnatomicallyOrderedVerticesOfTheVisibleWeapon(){
+        var rig=BlacklightSkeleton.get();
+        var source=rig.getPoseMatrices(new com.codex.blacklight.animation.BlacklightPose());
+        for(var form:FORMS)for(boolean left:new boolean[]{false,true})if(poweredSide(form,left)){
+            var frame=nativeFrame(left,0,0,false);
+            var view=convert(form,source,frame,left,1);
+            var anchors=FirstPersonPose.consumeSurface(form.form,form.armor,left,view.matrices(),frame,PROJECTION,1,1,1);
+            assertNotNull(anchors,"missing surface pair on "+form+" left="+left);
+            var axis=view.matrices()[rig.searchJointByName(left?"Hand_L":"Hand_R").getId()].getTranslation(new Vector3f())
+                    .sub(view.matrices()[rig.searchJointByName(left?"Arm_L":"Arm_R").getId()].getTranslation(new Vector3f())).normalize();
+            assertTrue(anchors[0].dot(axis)-anchors[1].dot(axis)>=.0349,form+" hand -> elbow orientation");
+            for(var anchor:anchors){
+                assertTrue(geometry(form).stream().filter(v->v.bone.endsWith(left?"_L":"_R"))
+                        .anyMatch(v->view.matrices()[rig.searchJointByName(v.bone).getId()]
+                                .transformPosition(new Vector3f(v.point)).distanceSquared(anchor)<1e-9),form+" anchor must be on the posed mesh");
+            }
+        }
+    }
     @Test void bodyWorldPositionAndLookRotationCannotMoveNativeHands() {
         var rig=BlacklightSkeleton.get();
         for(var form:FORMS)for(boolean left:new boolean[]{false,true})if(poweredSide(form,left)) {

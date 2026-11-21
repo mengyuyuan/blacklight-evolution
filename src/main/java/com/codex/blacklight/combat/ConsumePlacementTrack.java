@@ -226,12 +226,17 @@ public final class ConsumePlacementTrack {
      * entity box and the player's feet do not describe a body lying on stairs. */
     public static java.util.OptionalDouble landingSurface(LivingEntity victim,Vec3 base,float yaw,
                                                            int variant,float t,double nearbyY){
+        var hit=landingContact(victim,base,yaw,variant,t,nearbyY);
+        return hit.isPresent()?java.util.OptionalDouble.of(hit.get().y):java.util.OptionalDouble.empty();
+    }
+    static java.util.Optional<Vec3> landingContact(LivingEntity victim,Vec3 base,float yaw,
+                                                    int variant,float t,double nearbyY) {
         var forward=Vec3.directionFromRotation(0,yaw);
         var right=new Vec3(-forward.z,0,forward.x);
-        double top=Double.NEGATIVE_INFINITY;
+        Vec3 top=null;
         var rotation=rigidBody(victim,ConsumeSequence.key(PowerForm.NONE,variant),t);
         for(float height:new float[]{.44F,.69F}){
-            double site=Double.NEGATIVE_INFINITY;
+            Vec3 site=null;
             for(int side=-1;side<=1;side++){
                 var local=rotation.transformPosition(new org.joml.Vector3f(side*victim.getBbWidth()*.28F,
                         height*victim.getBbHeight(),0));
@@ -240,13 +245,13 @@ public final class ConsumePlacementTrack {
                 var hit=victim.level().clip(new net.minecraft.world.level.ClipContext(from,
                         from.add(0,-2.55,0),net.minecraft.world.level.ClipContext.Block.COLLIDER,
                         net.minecraft.world.level.ClipContext.Fluid.NONE,victim));
-                if(hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK)
-                    site=Math.max(site,hit.getLocation().y);
+                if(hit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK && hit.getDirection()==net.minecraft.core.Direction.UP
+                        && (site==null || hit.getLocation().y>site.y)) site=hit.getLocation();
             }
-            if(!Double.isFinite(site))return java.util.OptionalDouble.empty();
-            top=Math.max(top,site);
+            if(site==null)return java.util.Optional.empty();
+            if(top==null || site.y>top.y)top=site;
         }
-        return java.util.OptionalDouble.of(top);
+        return java.util.Optional.of(top);
     }
     public static double groundWeight(PowerForm form,int variant,float progress){
         int gate=ConsumeVisual.groundGate(form.ordinal(),variant);
