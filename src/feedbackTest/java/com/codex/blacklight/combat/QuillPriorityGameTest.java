@@ -441,11 +441,15 @@ public final class QuillPriorityGameTest {
         return p;
     }
 
-    @GameTest(template="wall_test", timeoutTicks=80)
+    @GameTest(template="wall_test", timeoutTicks=240)
     public static void runningFireSpreadsParasitesAndRecallsAtRange(GameTestHelper h) {
         // A full terrain chunk can still be waiting for its entity section to start ticking.
         var start=h.absolutePos(new BlockPos(5,180,5));
         var level=h.getLevel();
+        var p=join(h,"QuillSpread");
+        var middle=start.offset(48,0,0).getCenter();
+        p.connection.teleport(middle.x,middle.y,middle.z,0,0);
+        p.setNoGravity(true);
         var chunks=new ArrayList<net.minecraft.world.level.ChunkPos>();
         var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
         for(int x=start.getX()>>4;x<=(start.getX()+97)>>4;x++){
@@ -453,20 +457,23 @@ public final class QuillPriorityGameTest {
                 var chunk=new net.minecraft.world.level.ChunkPos(x,z);
                 chunks.add(chunk);
                 if(level.setChunkForced(x,z,true))forced.add(chunk);
+                level.getChunk(x,z);
             }
         }
         h.startSequence().thenWaitUntil(()->{
             for(var chunk:chunks)
                 h.assertTrue(level.isPositionEntityTicking(chunk.getBlockAt(0,start.getY(),0)),"waiting for distant quill hosts to tick");
         }).thenExecute(()->{
-            try{checkRunningFire(h,start);}
-            finally{for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);}
+            try{checkRunningFire(h,start,p);}
+            finally{
+                for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);
+                level.getServer().getPlayerList().remove(p);
+            }
         }).thenSucceed();
     }
 
-    private static void checkRunningFire(GameTestHelper h,BlockPos start) {
+    private static void checkRunningFire(GameTestHelper h,BlockPos start,ServerPlayer p) {
         var level=h.getLevel();
-        var p=join(h,"QuillSpread");
         p.setPos(start.getCenter());
         var mobs=new ArrayList<Mob>();
         var shard=new QuillOrgan(com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get(),level);
@@ -523,7 +530,6 @@ public final class QuillPriorityGameTest {
                 if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
                 mob.discard();
             }
-            level.getServer().getPlayerList().remove(p);
         }
     }
 
