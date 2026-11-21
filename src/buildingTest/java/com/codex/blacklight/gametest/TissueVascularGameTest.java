@@ -76,7 +76,13 @@ public final class TissueVascularGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="vascular_wall")
     public static void aNewSolidWallCancelsTheConnectionBeforeAnyMaterialCrossesIt(GameTestHelper h){
-        var f=new Fixture(h);var host=f.host(5,2,false);f.start(host);h.runAfterDelay(6,()->{for(int x=3;x<=7;x++)for(int y=2;y<=5;y++)h.setBlock(new BlockPos(x,y,4),Blocks.GLASS);});
+        var f=new Fixture(h);f.supportNavigation();var host=f.host(5,2,false);f.start(host);
+        h.runAfterDelay(6,()->{
+            h.assertTrue(host.vascular().active(),"the visible duct stays attached before the barrier is introduced");
+            var mouth=TissueVascular.mouth(f.level,f.origin);
+            var middle=BlockPos.containing(TissueVascular.root(host,1).lerp(mouth,.5));
+            for(int x=-2;x<=2;x++)for(int y=-1;y<=3;y++)f.level.setBlock(middle.offset(x,y,0),Blocks.GLASS.defaultBlockState(),3);
+        });
         h.runAfterDelay(10,()->h.assertTrue(!host.vascular().active()&&host.vascularVisual().contains("CancelledAt")&&host.vascularVisual().getFloat("CancelFrom")>0,"cancellation releases gameplay control but synchronizes a short closing motion from the actual reached length"));
         h.runAfterDelay(18,()->{try{h.assertTrue(!host.vascular().active()&&host.vascularVisual().isEmpty()&&f.colony.supply.reserve()==0&&host.tissueNutrition()==398,"a solid path obstruction interrupts the real paid duct without a remote gift");}finally{f.close();}h.succeed();});
     }
