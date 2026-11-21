@@ -26,7 +26,14 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         try(var stream=new GZIPInputStream(open(name))){return ByteBuffer.wrap(stream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);}
     }
     private static void beginLoad(){
-        if(loading==null)loading=java.util.concurrent.CompletableFuture.supplyAsync(()->{
+        if(loading!=null)return;
+        var textureManager=Minecraft.getInstance().getTextureManager();
+        var executor=net.minecraft.Util.backgroundExecutor();
+        textureManager.preload(id("textures/entity/greene_goddess_tissue.png"),executor);
+        textureManager.preload(ConsumeTendrilSegmentMesh.TEXTURE,executor);
+        textureManager.preload(id("textures/entity/consume_charcoal_skin.png"),executor);
+        for(int i=0;i<4;i++)textureManager.preload(CommonInfectedRenderer.skin(i),executor);
+        loading=java.util.concurrent.CompletableFuture.supplyAsync(()->{
             try{return new SceneData(inflate("scene.bin.gz"),inflate("clamber.bin.gz"));}
             catch(IOException ex){throw new java.io.UncheckedIOException(ex);}
         },net.minecraft.Util.backgroundExecutor());
