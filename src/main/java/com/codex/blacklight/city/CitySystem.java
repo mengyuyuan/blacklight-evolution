@@ -149,6 +149,7 @@ public final class CitySystem {
         if(!CityHiveSupply.ready(data,hive)||level.getDifficulty()==net.minecraft.world.Difficulty.PEACEFUL||!com.codex.blacklight.infection.WorldOutbreakSystem.active(level))return;
         if(level.random.nextDouble()>=com.codex.blacklight.config.GameplayBalanceConfig.BROOD_CHANCE.get()){data.hiveBroodTicks[hive]=0;data.setDirty();return;}
         int start=level.random.nextInt(PORTS.length);
+        int flyerRoll=level.random.nextInt(100);
         for(int j=0;j<PORTS.length;j++){
             int i=(start+j)%PORTS.length;BlockPos port=port(level,hive,i);
             if((data.brokenPorts[hive]&(1<<i))!=0||!loaded(level,port)||!level.getBlockState(port).is(CityBlocks.HATCH.get()))continue;
@@ -166,7 +167,12 @@ public final class CitySystem {
             var tier=com.codex.blacklight.infection.OutbreakRules.populationTier(stage,common,developed,mature,ancient,com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get(),com.codex.blacklight.infection.OutbreakConfig.LOCAL_CAP.get(),level.random.nextDouble());
             if(com.codex.blacklight.config.GameplayBalanceConfig.LINEAGE_GUARANTEES.get()&&stage>=2&&!hasHunter&&common>=com.codex.blacklight.infection.OutbreakConfig.COMMON_RESERVE.get())tier=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER;
             boolean hydra=stage>=3&&hasHunter&&tier==com.codex.blacklight.infection.OutbreakRules.Tier.ANCIENT&&level.random.nextDouble()<CityConfig.HYDRA_CHANCE.get()&&level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightHydra.class,new AABB(port).inflate(64)).isEmpty();
-            if((hydra?CityHiveSupply.hatchHydra(level,data,hive,port):CityHiveSupply.hatch(level,data,hive,port,tier))!=null){
+            Mob child;
+            if(hydra)child=CityHiveSupply.hatchHydra(level,data,hive,port);
+            else if(tier!=com.codex.blacklight.infection.OutbreakRules.Tier.HUNTER && com.codex.blacklight.infection.AirPopulation.wantsFlyer(stage,flyerRoll))
+                child=CityHiveSupply.hatchFlyer(level,data,hive,port);
+            else child=CityHiveSupply.hatch(level,data,hive,port,tier);
+            if(child!=null){
                 level.setBlock(port,level.getBlockState(port).setValue(CityHatchBlock.OPEN,true),3);
                 level.sendParticles(ParticleTypes.CRIMSON_SPORE,outside.getX()+.5,65,outside.getZ()+.5,16,.7,.6,.7,.02);
                 level.playSound(null,port,SoundEvents.SLIME_SQUISH,SoundSource.HOSTILE,1,.6f);

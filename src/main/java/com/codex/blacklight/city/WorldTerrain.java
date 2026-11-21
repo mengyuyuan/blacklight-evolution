@@ -45,14 +45,21 @@ final class WorldTerrain {
                 result[z*16+x]=c;continue;
             }
             if(FutianMap.inside(wx,wz)){c.core=FutianLayout.column(key.seed,wx,wz);c.top=c.core.top;result[z*16+x]=c;continue;}
-            // OSM land-use polygons often stop before the road reservation. Reclaim the
-            // at-grade road verge before applying explicit water, not after it.
+            boolean inland=tile.inlandBasin(wx,wz);
+            if(inland)c.water=0;
+            // Use the surveyed street grade across the carriageway and taper the cut into the verge.
+            double influence=0;
             for(var f:features){
-                if(f.kind==6&&f.layer==0&&f.intersects(wx,wz,1)
-                        &&f.lineDistance(wx+.5,wz+.5)<=f.width/2+24){
-                    c.urban=true;c.ground=Math.max(SEA+1,c.ground);c.water=0;
-                }
+                if((f.kind!=6&&f.kind!=7)||!f.intersects(wx,wz,1))continue;
+                double verge=Math.max(0,f.lineDistance(wx+.5,wz+.5)-f.width/2);
+                double shoulder=f.kind==7?4:24;
+                influence=Math.max(influence,Math.max(0,1-verge/shoulder));
+                if(f.kind==6&&f.layer==0&&verge<=24)c.urban=true;
             }
+            c.ground=Math.max(2,c.ground-(int)Math.round(influence*tile.streetCut(wx,wz)));
+            int grade=Math.max(SEA+1,c.ground);
+            if(c.urban){c.ground=grade;c.water=0;}
+            boolean lake=false;
             for(var f:features){
                 if(!f.intersects(wx,wz,1))continue;
                 double distance=f.lines.length>0?f.lineDistance(wx+.5,wz+.5):Double.POSITIVE_INFINITY;
@@ -72,18 +79,30 @@ final class WorldTerrain {
                     case 1,2->{c.cover=f.kind;c.ground=Math.max(SEA+1,c.ground);c.water=0;}
                     case 3->{c.cover=3;c.ground=Math.max(SEA+1,c.ground);c.water=0;}
                     case 4,5->{
-                        int water=f.kind==4?f.base:Math.max(SEA,c.ground);
+                        if(lake&&f.kind==5)break;
+                        lake=f.kind==4;
+                        int water=lake?f.waterLevel:Math.max(inland?4:SEA,c.ground-1);
                         c.ground=Math.min(c.ground,water-3);c.water=water;c.cover=0;
                     }
                     case 6,7->{
-                        if(f.layer>0){c.bridge=Math.max(c.bridge,f.base+f.layer*5);}
-                        else {c.ground=Math.max(c.ground,SEA+1);c.water=0;c.cover=3;c.sidewalk=false;c.lamp=false;}
-                        c.road=f.kind;c.line=distance<.65&&Math.floorMod(wx+wz,10)<6;
+                        boolean stripe=distance<.65&&Math.floorMod(wx+wz,10)<6;
+                        if(f.layer>0){
+                            int deck=f.deck(grade,wx+.5,wz+.5);
+                            c.addDeck(deck,f.kind,stripe);
+                            if(c.road==0)c.road=f.kind;
+                        }else{
+                            c.atGrade=true;c.ground=grade;c.water=0;c.cover=3;c.sidewalk=false;c.lamp=false;
+                            c.road=f.kind;c.line=stripe;
+                        }
                     }
                     case 8->{
                         var part=new Part(f,f.edgeDistance(wx+.5,wz+.5),wx,wz);
                         c.parts.add(part);if(f.landmark!=0)c.landmark=part;c.lamp=false;
-                        if(f.min==0){c.ground=f.base;c.water=0;}
+                        if(f.min==0){
+                            // Cut into the uphill side; carry a downhill floor on structural footings.
+                            if(!c.atGrade)c.ground=Math.min(c.ground,f.base);
+                            c.water=0;
+                        }
                     }
                     default->{}
                 }
@@ -116,15 +135,27 @@ final class WorldTerrain {
             return b(dy%5==0?Blocks.SMOOTH_STONE:Blocks.AIR);
         }
     }
+    private record Deck(int y,int kind,boolean stripe){
+        BlockState pavement(){return b(kind==7?Blocks.IRON_BLOCK:stripe?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE);}
+    }
     static final class Column {
         final long seed;final int x,z;int ground,water,cover,road,bridge,top,treeBase,treeDistance,treeHeight;
-        boolean line,urban,sidewalk,lamp,scenery;FullLosAngelesMap.Column arnis;FutianLayout.Column core;Part landmark;final List<Part> parts=new ArrayList<>();
+        private List<Deck> decks;
+        boolean line,atGrade,urban,sidewalk,lamp,scenery;FullLosAngelesMap.Column arnis;FutianLayout.Column core;Part landmark;final List<Part> parts=new ArrayList<>();
         Column(long seed,int x,int z,int ground){
             this.seed=seed;this.x=x;this.z=z;
             // The legacy core is at sea-level numerically, but its border is dry ground.
             int distance=Math.max(Math.max(-x,x-FutianMap.WIDTH),Math.max(-z,z-FutianMap.DEPTH));
             if(distance>=0&&distance<32)ground=Math.max(SEA+1,ground);
             this.ground=Math.max(2,ground);water=ground<=SEA?SEA:0;
+        }
+        void addDeck(int y,int kind,boolean stripe){
+            if(decks==null)decks=new ArrayList<>(2);
+            // Where two survey layers cross, keep each traversable deck at its own height.
+            for(int i=0;i<decks.size();i++)if(decks.get(i).y==y){
+                decks.set(i,new Deck(y,kind,stripe||decks.get(i).stripe));return;
+            }
+            decks.add(new Deck(y,kind,stripe));bridge=Math.max(bridge,y);
         }
         void finish(){
             top=Math.max(ground,Math.max(water,bridge));
@@ -149,13 +180,21 @@ final class WorldTerrain {
             if(y==0)return b(Blocks.BEDROCK);
             if(y<ground-3)return b(Blocks.STONE);
             if(y<ground)return b(water>0?Blocks.SAND:Blocks.DIRT);
+            boolean passage=atGrade&&y>ground&&y<=ground+3;
+            if(decks!=null)for(var deck:decks){
+                if(y==deck.y)return deck.pavement();
+                if(y>deck.y&&y<=deck.y+3)passage=true;
+            }
             if(y==ground)return b(water>0?Blocks.SAND:sidewalk?Blocks.SMOOTH_STONE:cover==3?(road==7?Blocks.IRON_BLOCK:line?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE):Blocks.GRASS_BLOCK);
+            if(passage)return b(Blocks.AIR);
             // Named massing replaces its overlapping OSM structural parts, which otherwise
             // re-extrude the old cylinder over the tapered crown (notably the bamboo tower).
             if(landmark!=null&&y>=landmark.feature.base&&y<=landmark.feature.base+landmark.feature.height)
                 return landmark.landmark(y);
             for(int i=parts.size()-1;i>=0;i--){
                 var part=parts.get(i);var f=part.feature;
+                if(f.min==0&&y<f.base&&(y==f.base-1||
+                        Math.floorMod(x,6)==0&&Math.floorMod(z,6)==0))return b(Blocks.STONE_BRICKS);
                 if(y<f.base+f.min||y>f.base+f.height)continue;
                 if(f.landmark!=0)return part.landmark(y);
                 int dy=y-f.base-f.min;
@@ -169,12 +208,11 @@ final class WorldTerrain {
                 }
                 return b(Blocks.AIR);
             }
-            if(y==bridge)return b(road==7?Blocks.IRON_BLOCK:line?Blocks.WHITE_CONCRETE:Blocks.GRAY_CONCRETE);
             if(bridge>0&&y<bridge&&Math.floorMod(x,16)==0&&Math.floorMod(z,8)<2)return b(Blocks.STONE_BRICKS);
             if(y<=water)return b(Blocks.WATER);
             if(lamp&&y>ground&&y<=ground+6)return b(y==ground+6?Blocks.SEA_LANTERN:Blocks.DEEPSLATE_TILE_WALL);
             if(treeBase>0){
-                if(treeDistance==0&&y>treeBase&&y<=treeBase+treeHeight)return b(Blocks.OAK_LOG);
+                if(treeDistance==0&&y>ground&&y<=treeBase+treeHeight)return b(Blocks.OAK_LOG);
                 if(y>=treeBase+treeHeight-2&&y<=treeBase+treeHeight+1)
                     return Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT,true);
             }
