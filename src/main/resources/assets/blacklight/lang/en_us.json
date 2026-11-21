@@ -1104,6 +1104,7 @@
   "item.blacklight.blacklight_brute_spawn_egg": "Blacklight Brute Spawn Egg",
   "item.blacklight.blacklight_hive_spawn_egg": "Blacklight Hive Spawn Egg",
   "boss.blacklight.phase": "%s · Phase %s",
+  "boss.blacklight.collapsing": "Guard broken · Core opening",
   "boss.blacklight.exposed": "Exposed · Punish window",
   "boss.blacklight.weakpoints": "Defenses %s / %s",
   "entity.blacklight.blackwatch_helicopter": "Blackwatch Transport Helicopter",

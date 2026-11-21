@@ -55,7 +55,7 @@ public final class BlacklightInfectionSystem {
     }
 
     public static boolean infectionImmune(LivingEntity target){
-        return target instanceof com.codex.blacklight.entity.MilitaryUav || target instanceof com.codex.blacklight.entity.EncounterMob encounter && encounter.kind().military || com.codex.blacklight.config.InfectionEcologyConfig.immune(target) || target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
+        return target instanceof com.codex.blacklight.world.GreeneHost || target instanceof com.codex.blacklight.entity.MilitaryUav || target instanceof com.codex.blacklight.entity.EncounterMob encounter && encounter.kind().military || com.codex.blacklight.config.InfectionEcologyConfig.immune(target) || target instanceof com.codex.blacklight.entity.MilitarySoldier soldier
                 &&soldier.faction()==com.codex.blacklight.military.MilitaryFaction.BLACKWATCH;
     }
     /** Migrate still-native saved soldiers before any infection conversion/AI tick. */

@@ -686,18 +686,22 @@ public final class ConsumeSystem {
         player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, ConsumeVariant.stealth(session.form,session.variant)?.25F:.8F, .55F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }
+    /** Run the death callback while the absorber and the type of execution are still known. */
+    public static boolean executeConsumption(ServerPlayer player, Mob target, float damage) {
+        var source = target.damageSources().playerAttack(player);
+        target.invulnerableTime = 0;
+        return ConsumeLastChance.execute(target, () -> {
+            if (target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
+                return supreme.finishConsumption(player, source, damage);
+            if (target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
+                return dragon.hurt(dragon.head, source, damage);
+            return target.hurt(source, damage);
+        });
+    }
+
     static boolean defeatForConsume(ServerPlayer player,Mob target) {
-        if(ConsumeSequence.boss(target)) {
-            var source=target.damageSources().playerAttack(player);
-            float damage=Math.max(1000,target.getMaxHealth()*20);
-            target.invulnerableTime=0;
-            boolean accepted=ConsumeLastChance.execute(target,()->{
-                if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
-                    return supreme.finishConsumption(player,source,damage);
-                if(target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
-                    return dragon.hurt(dragon.head,source,damage);
-                return target.hurt(source,damage);
-            });
+        if(ConsumeSequence.boss(target) || target instanceof com.codex.blacklight.entity.BlacklightHive) {
+            boolean accepted = executeConsumption(player, target, Math.max(1000, target.getMaxHealth()*20));
             // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
             if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
                 return false;
