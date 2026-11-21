@@ -71,6 +71,7 @@ public final class ConsumeTrauma {
         return grip==null || owner.tickCount-grip.tick>1?Vec3.ZERO:grip.velocity[side];
     }
     public static void sampleActor(LivingEntity actor,PoseStack stack,Matrix4f[] bones,Matrix4f[] skin,float partial){
+        ChestConsumeTendrils.captureActor(actor,stack,bones,partial);
         if(actor==null || ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
         var skeleton=PlayerMotionController.skeleton();
         var palms=new Vec3[2];var fists=new Vec3[2];var forearms=new Vec3[10];

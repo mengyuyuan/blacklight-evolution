@@ -166,6 +166,11 @@ public final class ModAttachments {
             "consume_recovery", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
                     .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
 
+    /** Independent shader clock on the giver, including the mobile and post-settlement tail. */
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_BODY_VISUAL = ATTACHMENTS.register(
+            "consume_body_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
+                    .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
+
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_VISUAL = ATTACHMENTS.register(
             "consume_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
                     .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());

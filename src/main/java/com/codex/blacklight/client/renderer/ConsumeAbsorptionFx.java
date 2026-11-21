@@ -47,6 +47,14 @@ public final class ConsumeAbsorptionFx {
         var camera=event.getCamera().getPosition();var stack=event.getPoseStack();var buffers=mc.renderBuffers().bufferSource();
         var type=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
         for(var entity:mc.level.entitiesForRendering()){
+            if(entity instanceof LivingEntity small&&!small.isRemoved()&&small.distanceToSqr(camera)<=96*96){
+                var v=ModAttachments.getData(small,ModAttachments.CONSUME_VISUAL);
+                if(ChestConsumeTendrils.matches(v)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity owner){
+                    ChestConsumeTendrils.draw(stack,buffers.getBuffer(type),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
+                            camera,small,owner,v,partial);
+                    continue;
+                }
+            }
             if(!(entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon mob)||mob.distanceToSqr(camera)>96*96)continue;
             var visual=com.codex.blacklight.registry.ModAttachments.getData(mob, ModAttachments.CONSUME_VISUAL);if(!visual.consuming()||mc.level.getEntity(visual.consumerId())==null)continue;
             var phase=ConsumeFracture.phase(mob,partial);if(phase.opening()<=0)continue;
@@ -70,7 +78,10 @@ public final class ConsumeAbsorptionFx {
     }
     public static void drawPosed(PoseStack stack,VertexConsumer out,int light,java.util.List<ConsumeTendrils.Attachment> roots,Vec3 to,ConsumeFracture.Phase phase,int seed,boolean grounded){
         if(roots.isEmpty())return;
-        ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
+        var level=Minecraft.getInstance().level;
+        boolean chest=phase.form()==PowerForm.NONE&&level!=null&&level.getEntity(seed) instanceof LivingEntity small
+                &&ChestConsumeTendrils.matches(ModAttachments.getData(small,ModAttachments.CONSUME_VISUAL));
+        if(!chest)ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
         // Brief moving flecks at the actual wound. They cannot remain in a frozen
         // radial halo for the rest of the consume animation.
         float age=(phase.progress()-phase.contact())/.14F;

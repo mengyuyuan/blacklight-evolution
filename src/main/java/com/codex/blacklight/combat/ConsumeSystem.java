@@ -63,7 +63,7 @@ public final class ConsumeSystem {
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
         /** Held-throw charge, server game time; repeat START packets renew the lease like block throws. */
-        boolean travelRequested, grabQueued;
+        boolean travelRequested, grabQueued, bodyWeaveStarted;
         long chargeStart=-1,chargeInput=-1;int throwCharge; int landingDelay;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=ConsumeSequence.bruteMount(v)?v.yBodyRot:p.getYRot();
@@ -122,6 +122,9 @@ public final class ConsumeSystem {
         }
     }
     private static void cancelTails(ServerPlayer p){
+        if(!p.isRemoved() && ModAttachments.getData(p,ModAttachments.CONSUME_BODY_VISUAL).active()){
+            ModAttachments.setData(p,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(p,ModAttachments.CONSUME_BODY_VISUAL);
+        }
         for(var tail:List.copyOf(ABSORBING.values()))if(tail.owner()==p){
             ABSORBING.remove(tail.scene().victim);release(tail.scene().victim);
         }
@@ -425,6 +428,11 @@ public final class ConsumeSystem {
         try(var motion=ConsumeControl.motion(player,claimed==null?null:claimed.victim)) {tickPlayer(player);}
     }
     private static void tickPlayer(ServerPlayer player) {
+        var body=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        if(body.active() && (!player.isAlive() || !ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isPrototypeMode()
+                ||body.elapsed(player.level().getGameTime(),0)>body.duration()+18)){
+            ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        }
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1
                 ||!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isPrototypeMode()
@@ -584,12 +592,14 @@ public final class ConsumeSystem {
                 }
             }
             elapsed-=Math.max(0,session.landingDelay);
+            triggerBodyWeave(player,session,elapsed);
             pairedPlacement(player,session,elapsed);
             consumeEffects(player,session,elapsed);
             if(elapsed>=session.completionTick())finish(player,session);
             else if((session.travelRequested||session.grabQueued)&&elapsed>=mobileAt(session))startTail(player,session);
             return;
         }
+        triggerBodyWeave(player,session,elapsed);
         // The body follows the strike, instead of sinking before the wind-up has finished.
         int impact=ConsumeVisual.impactTick(session.form);
         int settleStart=impact-(session.form==PowerForm.HAMMERFISTS?3:1);
@@ -610,6 +620,14 @@ public final class ConsumeSystem {
         // Range and sight were checked when committing; scene motion cannot cancel absorption.
         if(elapsed>=session.completionTick())finish(player,session);
         else if((session.travelRequested||session.grabQueued)&&elapsed>=mobileAt(session))startTail(player,session);
+    }
+    private static void triggerBodyWeave(ServerPlayer player,Session session,int elapsed){
+        if(session.stage!=ConsumeVisual.CONSUME || session.large || session.bodyWeaveStarted)return;
+        float cue=ConsumeReceiverScene.absorptionSeconds(session.form,session.variant);
+        if(elapsed<(int)Math.ceil(cue*20-.0001F))return;
+        session.bodyWeaveStarted=true;
+        var scene=ModAttachments.getData(session.victim,ModAttachments.CONSUME_VISUAL);
+        ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,scene);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
     }
     private static void tickHeldAttack(ServerPlayer player,Session session,int elapsed){
         var target=session.victim;
@@ -816,6 +834,9 @@ public final class ConsumeSystem {
         clearRecovery(player);
         Session session = ACTIVE.remove(player);
         if (session == null) return;
+        if(session.bodyWeaveStarted){
+            ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        }
         clearThrowCharge(player,session);
         release(session.victim());
         unlock(player);
