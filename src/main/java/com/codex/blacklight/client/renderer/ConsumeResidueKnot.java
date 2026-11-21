@@ -8,95 +8,82 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import static com.codex.blacklight.client.renderer.ConsumeExteriorShape.*;
 
-/** Raised, open folds drawn on the posed body. Each cross-section follows the local skin's
- * propagation value, so clearing the sleeve does not shrink a fully covered chest. */
+/** Open, tapered tendrils on the chest, back and posed arms after a victim is absorbed. */
 final class ConsumeResidueKnot {
-    // Azimuth from the sternum, relative height between hips and collar, stand-off in blocks.
-    private record Pin(double angle, double height, double lift) {}
-    private record Fold(double radius, Pin[] pins) {}
-    private static Pin p(double a, double y, double lift) { return new Pin(a, y, lift); }
-    private static Fold fold(double radius, Pin... pins) { return new Fold(radius, pins); }
+    // Unwrapped azimuth in degrees from sternum, and height from waist (-1) to collar (+1).
+    private record Pin(double angle, double height) {}
+    private record Tendril(double radius, double arch, double delay, Pin[] pins) {}
+    private static Pin p(double angle, double height) { return new Pin(angle, height); }
+    private static Tendril strand(double radius, double arch, double delay, Pin... pins) {
+        return new Tendril(radius, arch, delay, pins);
+    }
 
-    // Skewed open paths go round the ribs. Overlapping high and low points give both sides
-    // of the torso a mixture of exposed clothing, narrow seams and thicker bundles.
-    private static final Fold[] TRUNK = {
-        fold(.083, p(169,-.54,-.035), p(128,-.20,.046), p(102,.43,.088), p(77,.84,.092),
-                p(45,.78,.060), p(21,.47,.084), p(4,.04,.107), p(-16,-.47,.082),
-                p(-30,-.71,.049), p(-47,-.65,-.026)),
-        fold(.075, p(-153,-.38,-.03), p(-125,.03,.077), p(-96,.58,.069), p(-67,.81,.079),
-                p(-43,.68,.062), p(-22,.32,.066), p(-2,-.02,.040), p(23,-.57,.057),
-                p(43,-.75,.034), p(58,-.52,-.025)),
-        fold(.087, p(43,-.72,-.03), p(70,-.64,.043), p(88,-.35,.070), p(114,-.61,.066),
-                p(143,-.58,.10), p(166,-.18,.094), p(187,.30,.076), p(208,.78,.096),
-                p(230,.71,.060), p(258,.31,-.026)),
-        fold(.068, p(-58,.39,-.027), p(-81,.14,.051), p(-114,.60,.063), p(-138,.79,.085),
-                p(-162,.49,.075), p(-183,.04,.104), p(-196,-.44,.083), p(-219,-.66,.057),
-                p(-239,-.59,-.024)),
-        fold(.054, p(113,.65,-.024), p(92,.59,.046), p(69,.21,.072), p(56,-.16,.062),
-                p(34,-.31,.035), p(18,-.07,.039), p(22,.15,-.032)),
-        fold(.050, p(-214,-.15,-.022), p(-188,-.42,.052), p(-168,-.43,.073), p(-153,-.15,.080),
-                p(-147,.30,.061), p(-132,.44,.043), p(-111,.34,-.025)),
-        fold(.044, p(-109,-.42,-.019), p(-82,-.52,.040), p(-60,-.32,.067), p(-48,.06,.069),
-                p(-27,.19,.044), p(-17,.05,-.022))
+    // Start each curve inside a different rib attachment. Make room between neighbouring
+    // sweeps for the jacket to show, and cross at different heights on the two faces.
+    private static final Tendril[] TRUNK = {
+        strand(.020,.039,.04, p(-118,-.40),p(-86,-.53),p(-48,-.32),p(-24,.10),p(7,.29),p(38,.23),p(72,.51),p(99,.72)),
+        strand(.017,.028,.13, p(21,-.50),p(46,-.66),p(82,-.48),p(117,-.13),p(150,-.09),p(181,.20),p(206,.55)),
+        strand(.016,.042,.00, p(134,.42),p(161,.52),p(189,.38),p(219,.08),p(246,.13),p(273,.49),p(288,.47)),
+        strand(.014,.033,.17, p(-37,.68),p(-63,.70),p(-91,.45),p(-111,.19),p(-132,.23),p(-153,.12),p(-175,-.24)),
+        strand(.015,.034,.07, p(103,.41),p(76,.25),p(54,-.10),p(28,-.28),p(2,-.27),p(-20,-.44),p(-32,-.70)),
+        strand(.012,.028,.01, p(-159,-.71),p(-134,-.58),p(-111,-.28),p(-85,-.13),p(-68,.06),p(-60,.32)),
+        strand(.012,.035,.12, p(34,.56),p(12,.64),p(-9,.54),p(-29,.33),p(-46,.32),p(-64,.48)),
+        strand(.010,.021,.20, p(93,-.68),p(122,-.48),p(146,-.44),p(160,-.53),p(185,-.53),p(204,-.34),p(215,-.04)),
+        strand(.011,.029,.03, p(-4,-.67),p(-29,-.58),p(-50,-.33),p(-71,-.28),p(-93,-.39)),
+        strand(.009,.024,.09, p(-175,.72),p(-151,.59),p(-131,.56),p(-110,.71),p(-93,.67)),
+        strand(.010,.027,.16, p(55,.72),p(72,.62),p(95,.63),p(122,.78),p(145,.67),p(162,.49)),
+        strand(.009,.022,.06, p(221,-.69),p(200,-.58),p(185,-.27),p(171,-.17),p(158,-.20))
     };
-    // Each open fibre dives back into one of several rib attachments. Coarser fibres
-    // and their finer offshoots do not share a moving tip.
-    private static final double[] ROOT_ALONG = {.69,.57,.62,.46,.68,.55,.49};
 
     static Strip[] folds(Surface torso, Surface upperRight, Surface upperLeft, Surface foreRight, Surface foreLeft,
                          Vec3 facing, float envelope, float cycleAge, double time, Vec3 movement) {
         if (!(envelope > .012F) || !(cycleAge >= 0)) return new Strip[0];
         var weights = ConsumeSkinPath.giverWeights(cycleAge);
-        // The settled mass is gathered from the prey. On the return the bone field owns its volume.
         double gather = cycleAge < ConsumeGiverEffect.REVERSE_SECONDS ? envelope : 1;
         double scale = Mth.clamp(torso.width() / .235, .45, 1.65);
         Vec3 front = torso.front().dot(facing) < 0 ? torso.front().scale(-1) : torso.front();
-        List<Strip> strips = new ArrayList<>(TRUNK.length * 2 + 4);
-        for (int index = 0; index < TRUNK.length * 2; index++) {
-            Fold fold = TRUNK[index / 2];
-            boolean fine = (index & 1) != 0;
-            int spans = fold.pins.length - 1;
-            double retreat = Mth.clamp((cycleAge - ConsumeGiverEffect.REVERSE_SECONDS) / ConsumeGiverEffect.REVERSE_SECONDS,0,1);
-            double retract = Mth.clamp((retreat - .035 * (index % 4)) * (fine ? 1.15 : 1.02),0,1);
-            double root = ROOT_ALONG[index / 2] + (fine ? .045 : 0);
-            double from = Mth.lerp(retract, fine ? .07 : 0, root);
-            double to = Mth.lerp(retract, fine ? .89 : 1, root);
-            if (to - from < .012) continue;
-            Vec3[] points = new Vec3[spans * 4 + 1];
-            double[] widths = new double[points.length];
-            for (int n = 0; n < points.length; n++) {
-                double length = n / (double)(points.length - 1);
-                // Smaller fibres branch away, arc over the main fibre, then dive back into the weave.
-                double along = Mth.lerp(length, from, to);
-                int s = Math.min((int)(along * spans), spans - 1);
-                double u = along * spans - s;
-                Pin a = fold.pins[s], b = fold.pins[s + 1];
-                double beat = time * 4.0 - along * 8.4 + index * 1.6;
-                double angle = Math.toRadians(Mth.lerp(u, a.angle, b.angle) + 2.4 * Math.sin(beat));
-                double h = Mth.lerp(u, a.height, b.height);
-                double crossing = Math.sin(along * 7.5 + index * .67);
-                if (fine) {
-                    h += .115 + .23 * crossing;
-                    angle += .14 * Math.cos(along * 8 + index);
-                }
-                h = Mth.clamp(h, -.89, .88);
+        double reverse = Mth.clamp((cycleAge - ConsumeGiverEffect.REVERSE_SECONDS) / ConsumeGiverEffect.REVERSE_SECONDS, 0, 1);
+        List<Strip> strips = new ArrayList<>(TRUNK.length + 4);
+        for (int i = 0; i < TRUNK.length; i++) {
+            Tendril strand = TRUNK[i];
+            double retreat = Mth.clamp((reverse - strand.delay) / (1 - strand.delay), 0, 1);
+            double reach = 1 - retreat;
+            if (reach < .025) continue;
+            // Keep the shaft's width and UV sampling independent of how short the returning tip is.
+            int last = Math.max(3, (int) Math.ceil((strand.pins.length - 1) * 5 * reach));
+            Vec3[] points = new Vec3[last + 1];
+            double[] widths = new double[last + 1];
+            for (int n = 0; n <= last; n++) {
+                double along = reach * n / last;
+                double sample = along * (strand.pins.length - 1);
+                int segment = Math.min((int) sample, strand.pins.length - 2);
+                double u = sample - segment;
+                Pin a = strand.pins[Math.max(0, segment - 1)], b = strand.pins[segment];
+                Pin c = strand.pins[segment + 1], d = strand.pins[Math.min(segment + 2, strand.pins.length - 1)];
+                double phase = along * 10 - time * 5 + i * 2.39;
+                double flex = Math.sin(Math.PI * along);
+                double angle = Math.toRadians(curve(a.angle,b.angle,c.angle,d.angle,u) + 2.4 * flex * Math.sin(phase));
+                double h = curve(a.height,b.height,c.height,d.height,u) + .042 * flex * Math.cos(phase);
                 double coverage = ConsumeSkinPath.torsoCoverage(weights, (h + 1) * .5) * gather;
-                // Slide each local ridge a short distance over the skin as it sinks.
-                // Circumferential coordinates stay on their original face during the retreat.
-                double taper = Math.min(1, Math.min(.08 + length * 6, .065 + (1 - length) * 3.8));
-                double wave = Math.sin(time * 4.5 - 6.5 * along + index * 1.87);
-                double lift = (Mth.lerp(u, a.lift, b.lift) + .009 * wave
-                        + (fine ? .028 * Math.cos(along * 7.5 + index * .67) : 0)) * scale;
-                points[n] = torso.point(front, angle, Mth.lerp(coverage, .12 + .78 * h, h),
-                        Mth.lerp(coverage, -.055 * scale, lift))
-                        .subtract(movement.scale(.068 * coverage * taper));
-                widths[n] = fold.radius * (fine ? .24 : .49) * scale * coverage * taper * (.97 + .085 * wave);
+                // Merge the root into the jacket. The remaining tip travels all the way back to it.
+                double anchored = Mth.clamp(along / .19, 0, 1);
+                double lift = Mth.lerp(anchored, -.060, .002 + strand.arch * (.5 + .5 * Math.sin(phase * .7)));
+                double clearance = scale * Mth.lerp(coverage, -.085, lift);
+                points[n] = torso.point(front, angle, h, clearance)
+                        .subtract(movement.scale(.035 * along * coverage));
+                double tip = Math.min(1, (reach - along) / .19);
+                double taper = (.64 + .36 * Math.sin(Math.PI * along)) * (.025 + .975 * tip);
+                widths[n] = strand.radius * scale * coverage * taper * (.95 + .10 * Math.sin(phase));
             }
             addVisible(strips, points, widths);
         }
         sleeve(strips, torso, upperRight, foreRight, front, false, weights, gather, scale, time);
         sleeve(strips, torso, upperLeft, foreLeft, front, true, weights, gather, scale, time);
         return strips.toArray(new Strip[0]);
+    }
+
+    private static double curve(double a, double b, double c, double d, double t) {
+        return .5 * (2*b + (c-a)*t + (2*a-5*b+4*c-d)*t*t + (3*b-3*c+d-a)*t*t*t);
     }
 
     private static void sleeve(List<Strip> strips, Surface torso, Surface arm, Surface forearm, Vec3 front,
@@ -121,12 +108,12 @@ final class ConsumeResidueKnot {
                 double local = ConsumeSkinPath.armCoverage(weights, left, along) * gather;
                 double angle = sign * (ridge == 0 ? 42 + 194 * along : 145 - 243 * along);
                 double h = pastElbow ? -.9 + 1.18*t : -.91 + (ridge == 0 ? 1.84 : 1.41)*t;
-                double shell = .031 + .010 * Math.sin(time * 4 - along * 8 + ridge * 1.9);
+                double shell = .014 + .007 * Math.sin(time * 4 - along * 8 + ridge * 1.9);
                 Surface segment = pastElbow ? forearm : arm;
                 points[i] = segment.point(front, Math.toRadians(angle), h,
                         scale * Mth.lerp(local, -.047, shell));
                 double taper = Math.min(1, .14 + (last - i) * .35);
-                widths[i] = (ridge == 0 ? .061 : .043) * scale * local * taper;
+                widths[i] = (ridge == 0 ? .025 : .015) * scale * local * taper;
             }
             points[0] = base;
             points[1] = base.lerp(points[2], .52).add(torso.up().scale(.024 * scale));
