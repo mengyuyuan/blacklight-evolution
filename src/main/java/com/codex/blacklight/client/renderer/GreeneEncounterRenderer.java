@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.cache.object.GeoBone;
 
-/** Draw the authored shell on the fighting entity, retaining its three independently hittable organs. */
+/** Draw the authored shell on the fighting entity, revealing its striking limb during the matching contact animation. */
 public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<EncounterMob> {
     private final GreeneSpiderRenderer spider;
     private final GreeneGoddessRenderer goddess;
@@ -18,9 +18,13 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         goddess=new GreeneGoddessRenderer(context);
     }
     @Override public void renderCubesOfBone(PoseStack stack,GeoBone bone,VertexConsumer out,int light,int overlay,float red,float green,float blue,float alpha) {
-        if(bone.getName().startsWith("weak_")) super.renderCubesOfBone(stack,bone,out,light,overlay,red,green,blue,alpha);
+        if(!getAnimatable().greenePursuit() || bone.getName().startsWith("weak_") && bone.getName().charAt(5)-'0'==getAnimatable().greeneStrikingSlot()) super.renderCubesOfBone(stack,bone,out,light,overlay,red,green,blue,alpha);
     }
     @Override public void render(EncounterMob boss,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light) {
+        if(!boss.greenePursuit()) {
+            super.render(boss,yaw,partial,stack,buffers,light);
+            return;
+        }
         var form=GreeneForm.of(boss);
         var transform=form.transform(GreeneMotion.table().transforms(GreeneMotion.pose(boss,partial)),boss.skinYaw(partial));
         stack.pushPose();

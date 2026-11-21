@@ -1,5 +1,6 @@
 {
-  "survival.blacklight.journal.mother_core": "Greene escaped beneath the street. Keep the living Mother Core she left behind.",
+  "survival.blacklight.journal.greene_defeated": "The service street is quiet. The recovered Mother Core is yours.",
+  "survival.blacklight.journal.mother_core": "Greene escaped beneath the street. Bring the living Mother Core to the dispatch desk at the south end of the Futian plaza.",
   "survival.blacklight.journal.bloodtox_starter": "Read the dispatch in the Blacklight dimension. Infiltrate the office, tail a truck or breach the checkpoint, then use the starter at the pump.",
   "survival.blacklight.after_convoy": "Fight a giant hive in Prototype mode to recover living tissue and an operations report. Plant the tissue in the open, feed the Hydra five living creatures, then approach its roots when mature to travel to Futian.",
   "survival.blacklight.journal.containment_decoder": "Follow the cold-storage manifest to the wreck. Bait a charge into a barricade, sidestep and strike the right knee.",
@@ -1344,5 +1345,10 @@
   "subtitle.blacklight.consume.body_land_wood": "Body lands on timber",
   "subtitle.blacklight.consume.body_land_soil": "Body lands on earth",
   "subtitle.blacklight.consume.body_land_metal": "Body lands on metal",
-  "subtitle.blacklight.consume.body_land": "Body hits the ground"
+  "subtitle.blacklight.consume.body_land": "Body hits the ground",
+  "survival.blacklight.greene_pursuit_clue": "The knocking is moving south. Take the Mother Core to the dispatch desk at %s, %s and use it to trace Greene.",
+  "survival.blacklight.greene_pursuit_started": "Dispatch confirms a second ground rupture on the service street at %s, %s.",
+  "survival.blacklight.greene_pursuit_blocked": "The service street is obstructed. Clear the junction and check dispatch again.",
+  "survival.blacklight.greene_pursuit": "Echo beneath the street",
+  "survival.blacklight.greene_pursuit.desc": "Track Greene to the service street and defeat her spider and goddess forms."
 }

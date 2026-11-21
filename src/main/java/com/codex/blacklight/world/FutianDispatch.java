@@ -56,6 +56,10 @@ public final class FutianDispatch {
     public static void read(ServerLevel level, BlockPos desk, ServerPlayer player) {
         BlockPos origin=desk.offset(-8,-1,-68);
         if (!MotherPlazaStructure.matchesLot(level.getSeed(),origin)) return;
+        if(player.isHolding(ModItems.MOTHER_CORE.get())) {
+            startPursuit(level,desk,origin,player);
+            return;
+        }
         if (!DisguiseSystem.militaryClearance(player) || wanted(player)) {
             tell(player,"dispatch_denied");
             if (guards(level,origin).stream().anyMatch(g -> g.distanceToSqr(player)<24*24 && g.hasLineOfSight(player))) alarm(player);
@@ -71,6 +75,33 @@ public final class FutianDispatch {
                 station.setChanged();
             }
         }
+    }
+
+    private static void startPursuit(ServerLevel level,BlockPos desk,BlockPos origin,ServerPlayer player) {
+        if(level.getDifficulty()==Difficulty.PEACEFUL || player.isSpectator()) { tell(player,"peaceful"); return; }
+        var data=BossSiteData.get(level);
+        if(data.occupied(desk)) { tell(player,"active"); return; }
+        // The service street and its drain lie south of the truck, inside the authored dispatch block.
+        for(int z : new int[]{54,48,59,42}) {
+            var pad=origin.offset(16,1,z);
+            if(!BossSiteBlock.clearPad(level,pad,EncounterKind.ELIZABETH_GREENE,null)) continue;
+            var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(EncounterKind.ELIZABETH_GREENE).get().create(level);
+            if(boss==null) break;
+            boss.moveTo(pad.getX()+.5,pad.getY(),pad.getZ()+.5,0,0);
+            boss.yBodyRot=boss.yBodyRotO=boss.yHeadRot=0;
+            boss.setPersistenceRequired();
+            boss.startGreenePursuit();
+            data.reserve(desk,boss,player);
+            try {
+                if(!level.addFreshEntity(boss) || boss.isRemoved())break;
+            } finally {
+                if(level.getEntity(boss.getUUID())!=boss || boss.isRemoved())data.release(boss);
+            }
+            if(!player.isCreative())boss.setTarget(player);
+            tell(player,"greene_pursuit_started",pad.getX(),pad.getZ());
+            return;
+        }
+        tell(player,"greene_pursuit_blocked");
     }
 
     private static void remember(ServerPlayer player, BlockPos origin, String clue) {

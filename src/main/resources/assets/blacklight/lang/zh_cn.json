@@ -1,5 +1,6 @@
 {
-  "survival.blacklight.journal.mother_core": "格林逃进了街道下方。收好从她身上扯下的母体核心，它还活着。",
+  "survival.blacklight.journal.greene_defeated": "南段路口恢复了平静。格林留下的母体核心已归你所有。",
+  "survival.blacklight.journal.mother_core": "格林逃进了街道下方。带上母体核心，到福田母巢广场南端的调度岗查阅记录。",
   "survival.blacklight.journal.bloodtox_starter": "在黑光维度阅读行动情报；潜入调度室，尾随卡车，或驾车突破封锁。抵达泵车后手持启动器操作。",
   "survival.blacklight.after_convoy": "用原型形态攻破巨型母巢，取得活性组织和行动情报。把组织种在空地，喂九头蛇五只活物。它成熟后靠近根部，便能前往福田。",
   "survival.blacklight.journal.containment_decoder": "跟随冷库运输单前往事故区。在路障前引诱冲锋，侧闪后攻击歌利亚的右膝。",
@@ -1344,5 +1345,10 @@
   "subtitle.blacklight.consume.body_land_wood": "身体撞上木板",
   "subtitle.blacklight.consume.body_land_soil": "身体撞上松软地面",
   "subtitle.blacklight.consume.body_land_metal": "身体撞上金属表面",
-  "subtitle.blacklight.consume.body_land": "身体撞地"
+  "subtitle.blacklight.consume.body_land": "身体撞地",
+  "survival.blacklight.greene_pursuit_clue": "井盖下的响声正往南移。带母体核心去南端调度岗（%s，%s），对调度台使用核心追踪她。",
+  "survival.blacklight.greene_pursuit_started": "调度记录确认，南段路口（%s，%s）出现第二处地面隆起。",
+  "survival.blacklight.greene_pursuit_blocked": "南段路口被堵住了。清开街面后，再查调度记录。",
+  "survival.blacklight.greene_pursuit": "井下回声",
+  "survival.blacklight.greene_pursuit.desc": "追踪格林到南段路口，击败蜘蛛与女神形态。"
 }
