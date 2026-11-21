@@ -107,7 +107,10 @@ public final class MilitaryCampaignSystem {
         FieldReinforcementSystem.retire(level,observers);
         if(WorldOutbreakSystem.active(level)&&level.getDifficulty()!=Difficulty.PEACEFUL
                 &&level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)
-                &&level.getGameTime()%MilitaryCampaignConfig.reinforcementInterval()==0)FieldReinforcementSystem.reinforce(level,observers);
+                &&level.getGameTime()%MilitaryCampaignConfig.reinforcementInterval()==0){
+            FieldReinforcementSystem.reinforce(level,observers);
+            com.codex.blacklight.infection.AirPopulation.patrol(level,observers);
+        }
         if(level.getGameTime()%MilitaryCampaignConfig.interval()!=0||!WorldOutbreakSystem.active(level)
                 ||level.getDifficulty()==Difficulty.PEACEFUL||!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))return;
         if(d.operations.size()>=MilitaryCampaignConfig.ACTIVE.get())return;
