@@ -65,6 +65,7 @@ public final class NativeConsumePose {
         // The victim scene may clear one packet before CONSUMING/GRAB_STAGE; keep sampling the recovery copy.
         if(victims.isEmpty())return recovery(entity,pose,partial,true);
         var visual=com.codex.blacklight.registry.ModAttachments.getData(victims.get(0), ModAttachments.CONSUME_VISUAL);
+        if(GrappleMotion.greeneGrip(victims.get(0),visual))return false;
         if(stage==ConsumeVisual.MOUNT||stage==ConsumeVisual.MOUNT_HOLD) {
             float age=entity.level().getGameTime()-visual.started()+partial;
             float stroke=stage==ConsumeVisual.MOUNT?(float)Math.sin(age*.55F)*.32F:0;
