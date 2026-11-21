@@ -45,7 +45,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         }catch(IOException ex){throw new IllegalStateException("Cannot prepare Greene molt",ex);}
     }
     private static final String DIR="greene/molt/";
-    private static final int JOINTS=5363, BONES=JOINTS*16, SAMPLE_RATE=10;
+    private static final int JOINTS=791, BONES=JOINTS*16, SAMPLE_RATE=10;
     private static final String[] ATTR={"pos","normal","ink","uv","joint"};
     private final List<Integer> textures=new ArrayList<>(),vaos=new ArrayList<>(),buffers=new ArrayList<>(),programs=new ArrayList<>();
     private final Map<Integer,Map<String,Integer>> uniforms=new HashMap<>();

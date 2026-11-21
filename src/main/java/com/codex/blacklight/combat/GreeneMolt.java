@@ -24,6 +24,7 @@ public final class GreeneMolt {
     private static final int SLOTS=16;
     private static final int[] CUES={0,48,102,177,266,333};
     private final UUID[] captives=new UUID[SLOTS];
+    private final GreeneMoltShockwave shockwave = new GreeneMoltShockwave();
     private int spawned,absent;
     public int absent(){return absent;}
 
@@ -50,6 +51,8 @@ public final class GreeneMolt {
     }
     public boolean tick(EncounterMob boss, int age){
         if(!(boss.level() instanceof ServerLevel level))return false;
+        if (age == 0) shockwave.begin(boss, level);
+        shockwave.tick(boss, level, age);
         int prior=absent;
         for(int i=0;i<SLOTS;i++){
             if(age<Source.TABLE.spawn[i] || (absent&(1<<i))!=0)continue;
@@ -101,9 +104,11 @@ public final class GreeneMolt {
     public CompoundTag save(){
         var t=new CompoundTag();t.putInt("Spawned",spawned);t.putInt("Absent",absent);
         for(int i=0;i<SLOTS;i++)if(captives[i]!=null)t.putUUID("Actor"+i,captives[i]);
+        shockwave.save(t);
         return t;
     }
     public void load(CompoundTag t){
+        shockwave.load(t);
         spawned=t.getInt("Spawned");absent=t.getInt("Absent");
         for(int i=0;i<SLOTS;i++)captives[i]=t.hasUUID("Actor"+i)?t.getUUID("Actor"+i):null;
     }
