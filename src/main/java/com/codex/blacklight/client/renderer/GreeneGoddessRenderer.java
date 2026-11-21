@@ -18,9 +18,14 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     private static final ResourceLocation MESH = ResourceLocation.fromNamespaceAndPath("blacklight","models/greene_fullbody.mesh.gz");
     private static final ResourceLocation COLONY = ResourceLocation.fromNamespaceAndPath("blacklight","models/greene_outbreak_fullbody.mesh.gz");
     private final ResourceLocation mesh;
+    private final ResourceLocation bodySkin;
+    private static final ResourceLocation OUTBREAK_SKIN = ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/greene_goddess_tissue.png");
     private static final ResourceLocation SKIN = ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/greene_goddess.png");
     private record Group(float[] transforms, float[] vertices, int[] colors, int skin) {}
     private volatile Group[] groups;
+    private Group[] jointOrder;
+    private final Quaternionf from=new Quaternionf(), to=new Quaternionf();
+    private final org.joml.Matrix4f transform=new org.joml.Matrix4f();
     private java.util.concurrent.CompletableFuture<Void> loading;
     void warm(){
         if(groups==null && loading==null)loading=java.util.concurrent.CompletableFuture.runAsync(this::load,net.minecraft.Util.backgroundExecutor());
@@ -29,7 +34,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
 
     public GreeneGoddessRenderer(EntityRendererProvider.Context context) { this(context,false); }
     GreeneGoddessRenderer(EntityRendererProvider.Context context,boolean outbreak) {
-        super(context);mesh=outbreak?COLONY:MESH;
+        super(context);mesh=outbreak?COLONY:MESH;bodySkin=outbreak?OUTBREAK_SKIN:SKIN;
     }
     @Override public ResourceLocation getTextureLocation(GreeneGoddess entity) { return SKIN; }
     @Override public void render(GreeneGoddess entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light) {
@@ -57,18 +62,31 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
                     colors[i]=in.readInt();
                 }
                 int skinIndex=-1;
-                if(vertices.length>0 && vertices[4]<.8f){
+                if(p>=35 && vertices.length>0){
                     float u=0,vv=0;for(int i=0;i<count;i++){u+=vertices[i*8+3];vv+=vertices[i*8+4];}
                     int col=(int)(2*u/count),row=(int)(4*vv/count);skinIndex=col+2*row;
                     for(int i=0;i<count;i++){vertices[i*8+3]=vertices[i*8+3]*2-col;vertices[i*8+4]=vertices[i*8+4]*4-row;}
                 }
                 parts[p]=new Group(transforms,vertices,colors,skinIndex);
             }
-            java.util.Arrays.sort(parts,java.util.Comparator.comparingInt(Group::skin));groups=parts;
+            jointOrder=parts.clone();java.util.Arrays.sort(parts,java.util.Comparator.comparingInt(Group::skin));groups=parts;
         } catch(IOException e) { throw new IllegalStateException("Cannot load the Greene full-body mesh",e); }
+    }
+    void writeJointMatrices(float ticks,float[] matrices) {
+        float sample=ticks*fps/20F%frames;
+        int frame=(int)sample, a=7*frame, b=7*((frame+1)%frames);
+        float mix=sample-frame;
+        for(int i=0;i<jointOrder.length;i++) {
+            float[] t=jointOrder[i].transforms();
+            from.set(t[a+3],t[a+4],t[a+5],t[a+6]);to.set(t[b+3],t[b+4],t[b+5],t[b+6]);
+            transform.translationRotate(t[a]+mix*(t[b]-t[a]),t[a+1]+mix*(t[b+1]-t[a+1]),
+                    t[a+2]+mix*(t[b+2]-t[a+2]),from.slerp(to,mix)).get(matrices,16*i);
+        }
     }
     void draw(float ticks,PoseStack stack,MultiBufferSource buffers,int light,int overlay) {
         if(groups==null){warm();loading.join();}
+        if(mesh.equals(COLONY) && !com.codex.blacklight.client.ShaderPackCompat.active()
+                && GreeneMoltRenderer.drawColony(this,ticks,stack,light,overlay))return;
         float sample=(ticks*fps/20F)%frames;
         int frame=(int)sample, a=frame*7, b=((frame+1)%frames)*7;
         float mix=sample-frame;
@@ -76,7 +94,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
         var q=new Quaternionf(); var next=new Quaternionf();
         for(var group:groups) {
             if(skinIndex!=group.skin()){
-                skinIndex=group.skin();out=buffers.getBuffer(RenderType.entityCutoutNoCull(skinIndex<0?SKIN:CommonInfectedRenderer.skin(skinIndex)));
+                skinIndex=group.skin();out=buffers.getBuffer(RenderType.entityCutoutNoCull(skinIndex<0?bodySkin:CommonInfectedRenderer.skin(skinIndex)));
             }
             var t=group.transforms();
             stack.pushPose();

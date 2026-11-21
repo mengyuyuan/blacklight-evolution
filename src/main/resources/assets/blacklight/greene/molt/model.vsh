@@ -34,6 +34,7 @@ void main(){
  digested=0.;
  int j=int(joint+.1);vec3 p=pos, n=normal;rgb=ink;texuv=uv;surface=kind;
  if(kind==0 || kind==1){
+   if(kind==0)surface=8;else if(j<35)surface=7;
    mat4 bone=mat4(texelFetch(bones,ivec2((j%4)*4+0,j/4),0),texelFetch(bones,ivec2((j%4)*4+1,j/4),0),texelFetch(bones,ivec2((j%4)*4+2,j/4),0),texelFetch(bones,ivec2((j%4)*4+3,j/4),0));
    p=(root*bone*vec4(p,1)).xyz;if(kind==0)p*=.9912102;n=mat3(root)*mat3(bone)*n;
  }else if(kind==2){
