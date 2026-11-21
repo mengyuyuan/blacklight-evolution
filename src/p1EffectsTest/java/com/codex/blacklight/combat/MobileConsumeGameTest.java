@@ -97,7 +97,12 @@ public final class MobileConsumeGameTest {
                 if(frame<=release)com.codex.blacklight.movement.PrototypeMovementSystem.acceptInput(p,false,false,1,0,false,false);
                 if(frame==release-1)h.assertTrue(ConsumeSystem.committed(p)&&ConsumeControl.ownsMotion(p),"strike was cut before its consume marker");
                 tick(p);
-                if(frame==release-1)h.assertTrue(!p.getData(ModAttachments.CONSUME_BODY_VISUAL).active(),"giver shader started before its own cue");
+                if(frame==release-1){
+                    h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(old)&&ConsumeGiverEffect.exterior(old,frame/20F)>0,
+                            "exterior missing while the receiver was still paired");
+                    h.assertTrue(ConsumeGiverEffect.reach(frame/20F-ConsumeGiverEffect.cue(old))==0,
+                            "native giver shader started before its own cue");
+                }
                 if(frame==release){
                     h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(old),"walking restarted or lost the giver shader clock");
                     var current=first.getData(ModAttachments.CONSUME_VISUAL);
@@ -120,6 +125,9 @@ public final class MobileConsumeGameTest {
                             &&first.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.MOBILE_CONSUME,"new grab waits for previous receiver removal");
                 }
                 if(frame==finish){
+                    var consumed = p.getData(ModAttachments.CONSUME_RESIDUE_VISUAL);
+                    h.assertTrue(consumed.active() && consumed.started()==old.started() && ConsumeGiverEffect.residue(consumed,frame/20F)>.85F,
+                            "second grab lost the settled first receiver's shoulder mass");
                     h.assertTrue(first.isRemoved()&&p.getHealth()==12,"first return did not settle exactly once");
                     h.assertTrue(next[0].getData(ModAttachments.CONSUME_VISUAL).active()&&ConsumeSystem.active(p),"first completion unlocked the second scene");
                 }
@@ -233,7 +241,11 @@ public final class MobileConsumeGameTest {
             h.runAfterDelay(frame,()->{
                 tick(p);
                 var body=p.getData(ModAttachments.CONSUME_BODY_VISUAL);
-                if(frame<cue)h.assertTrue(!body.active(),"coat started early at "+frame);
+                int wrap=ConsumeGiverEffect.tick(ConsumeGiverEffect.exteriorStart(scene));
+                if(frame<wrap)h.assertTrue(!body.active(),"exterior started before contact");
+                if(frame>wrap && frame<finish)h.assertTrue(body.active() && ConsumeGiverEffect.exterior(body,frame/20F)>0 && mob.isAlive(),
+                        "claw victim vanished before a visible wrap");
+                if(frame<cue)h.assertTrue(ConsumeGiverEffect.reach(frame/20F-ConsumeGiverEffect.cue(scene))==0,"native surface started early");
                 if(frame==finish)h.assertTrue(mob.isRemoved(),"receiver waited for the giver event");
                 if(frame==cue){
                     h.assertTrue(body.active()&&body.started()==scene.started()&&body.variant()==scene.variant(),

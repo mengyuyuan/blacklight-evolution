@@ -66,6 +66,33 @@ public final class FirstPersonPose {
         for(int i=0;i<vertices.size();i++){var p=vertices.get(i);p.z-=shift;near=Math.min(near,-p.z);if(distal.get(i)){maxX=Math.max(maxX,Math.abs(p.x*projection.m00()/-p.z));maxY=Math.max(maxY,Math.abs(p.y*projection.m11()/-p.z));}}
         return new Result(result,near,maxX,maxY);
     }
+    /** Two camera-facing points on the transformed hand's own mesh. The limb skeleton can be below the screen
+     * while its gauntlet or organic forearm is still visible. Select those surfaces for the settled tissue. */
+    public static Vector3f[] consumeSurface(PowerForm form,boolean plated,boolean left,Matrix4f[] poses,Matrix4f camera,Matrix4f projection,
+                                            float width,float talons,float hammer){
+        var surfaces=WeaponMorphTiming.arm(form,left)?biological(form):plated?armor():List.<Surface>of();
+        String suffix=left?"_L":"_R";
+        var rig=BlacklightSkeleton.get();
+        Vector3f[] best=new Vector3f[2];
+        double[] scores={Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
+        for(var surface:surfaces){
+            if(!surface.bone.endsWith(suffix))continue;
+            var local=new Vector3f(surface.point);
+            if(form==PowerForm.CLAWS){local.x*=width;local.z*=width;if(surface.bone.startsWith("Hand_")&&local.y>.30F)local.y=.30F+(local.y-.30F)*talons;}
+            if(form==PowerForm.HAMMERFISTS&&surface.bone.startsWith("Hand_"))local.mul(hammer);
+            poses[rig.searchJointByName(surface.bone).getId()].transformPosition(local);
+            var eye=camera.transformPosition(local,new Vector3f());
+            if(eye.z>-.10F)continue;
+            var screen=projection.transformProject(eye,new Vector3f());
+            if(!Float.isFinite(screen.x+screen.y)||Math.abs(screen.x)>1.12||screen.y< -1.17||screen.y>.28)continue;
+            for(int j=0;j<2;j++){
+                double dx=screen.x*(left?-1:1)-(j==0?.62:.75),dy=screen.y-(j==0?-.61:-.85);
+                double score=dx*dx+dy*dy+.095*(-eye.z)+(surface.distal?.09:0);
+                if(score<scores[j]){scores[j]=score;best[j]=new Vector3f(local);}
+            }
+        }
+        return best[0]==null?null:best;
+    }
     private static JsonObject read(String name) {
         try(var in=FirstPersonPose.class.getResourceAsStream("/assets/blacklight/models/"+name+".json")) {
             if(in==null)throw new IllegalStateException("Missing viewmodel geometry: "+name);

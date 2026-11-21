@@ -137,6 +137,21 @@ public final class AdaptiveRagdoll {
         return ConsumeSocketFit.receiver(hipR,hipL,neck);
     }
 
+    /** Bounds of the largest visible torso fragment in the exact transform used by render().
+     * A prey split into pieces must not leave an envelope around its former entity box. */
+    static ConsumeExteriorShape.Surface exteriorTorso(LivingEntity entity,float partial){
+        var body=BODIES.get(entity);
+        if(body==null||scene!=entity.level()||!active(entity))return null;
+        Part torso=null;
+        for(var part:body.parts)if(part.bind.region==32&&submittedSocketPart(body,part,partial)
+                &&(torso==null||part.volume()*part.scale*part.scale*part.scale>torso.volume()*torso.scale*torso.scale*torso.scale))torso=part;
+        if(torso==null)return null;
+        var rot=torso.renderedRotation;double scale=torso.scale;
+        return new ConsumeExteriorShape.Surface(torso.renderedPosition,rotate(new Vec3(0,1,0),rot),
+                rotate(new Vec3(1,0,0),rot),rotate(new Vec3(0,0,1),rot),
+                Math.max(.015,torso.half.x*scale),Math.max(.012,torso.half.z*scale),Math.max(.02,torso.half.y*scale));
+    }
+
     private static boolean submittedSocketPart(Body body,Part part,float partial){
         return part.renderedAt==scene.getGameTime()&&Math.abs(part.renderedPartial-partial)<.021F
                 &&part.renderedPosition!=null&&part.flow<.985F&&!body.trauma.hides(part);

@@ -24,6 +24,7 @@ public final class MobileConsumeWrap {
     }
     public static void render(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffers,int light,
                               Matrix4f[] poses,float partial,MercerRig.Frame frame){
+        ConsumeExteriorWrap.capture(player,stack,poses,partial);
         draw(player,stack,buffers,light,poses,partial,frame,-2);
     }
     public static void renderArm(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffers,int light,
