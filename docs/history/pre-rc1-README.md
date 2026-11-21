@@ -4,9 +4,9 @@ Blacklight Evolution 是一个面向 Minecraft 1.21.1 / NeoForge 的原创同人
 
 ## 参与开发
 
-欢迎参与代码、模型、动画、特效和测试，见 [贡献指南](CONTRIBUTING.md)。公开协作仓库：[mengyuyuan/blacklight-evolution](https://github.com/mengyuyuan/blacklight-evolution)。项目原创内容采用 [GPL-3.0-only](LICENSE)。
+欢迎参与代码、模型、动画、特效和测试，见 [贡献指南](../../CONTRIBUTING.md)。公开协作仓库：[mengyuyuan/blacklight-evolution](https://github.com/mengyuyuan/blacklight-evolution)。项目原创内容采用 [GPL-3.0-only](../../LICENSE)。
 
-R9 将感染后的僵尸转化为独立黑光猎杀者，并加入近身吸收；保留 R8 分阶段感染与玩家利爪展开/收回动画。可选接入 Epic ParCool 墙跑下肢动作，长爪上半身单独适配。试玩、依赖版本和制作工具见 [感染体试作说明](docs/INFECTED_PROTOTYPE.md)。
+R9 将感染后的僵尸转化为独立黑光猎杀者，并加入近身吸收；保留 R8 分阶段感染与玩家利爪展开/收回动画。可选接入 Epic ParCool 墙跑下肢动作，长爪上半身单独适配。试玩、依赖版本和制作工具见 [感染体试作说明](../INFECTED_PROTOTYPE.md)。
 
 最近的 R7 改动将墙跑、慢速攀爬、静止抓墙和沿墙跳跃分开，并修正攀爬利爪靠近头部的问题。松开移动留在墙上，W/S 上下、A/D 横移，加速恢复墙跑，空格沿墙向上跳，Shift 离墙。动画表现和真实操作手感仍在迭代。
 
@@ -66,7 +66,7 @@ R9 将感染后的僵尸转化为独立黑光猎杀者，并加入近身吸收�
 
 ## 独立感染生物与吸收（R9）
 
-僵尸感染异化结束后转化为独立的黑光猎杀者，使用自己的全身模型与近战 AI。原型模式下，近距离面对生命不足 30% 的猎杀者按 **E** 抓住后右键吸收，完成抓取吸收后回复生命、生物质和进化点。`/blacklight infected_sample` 生成试作生物。模型和动作仍是 Minecraft 风格的首版适配，具体功能、参考与验证见 [感染体与吸收说明](docs/INFECTED_PROTOTYPE.md)。
+僵尸感染异化结束后转化为独立的黑光猎杀者，使用自己的全身模型与近战 AI。原型模式下，近距离面对生命不足 30% 的猎杀者按 **E** 抓住后右键吸收，完成抓取吸收后回复生命、生物质和进化点。`/blacklight infected_sample` 生成试作生物。模型和动作仍是 Minecraft 风格的首版适配，具体功能、参考与验证见 [感染体与吸收说明](../INFECTED_PROTOTYPE.md)。
 
 ## 构建
 
@@ -78,21 +78,21 @@ R9 将感染后的僵尸转化为独立黑光猎杀者，并加入近身吸收�
 
 ## 验收与边界
 
-- [MVP 验收清单](docs/MVP_ACCEPTANCE_ZH.md)
-- [项目规范](docs/PROJECT_SPEC_ZH.md)
-- [项目规划](docs/ROADMAP_ZH.md)
-- [已知坑位与扩展槽位](docs/KNOWN_ISSUES_AND_SLOTS_ZH.md)
-- [动画架构](docs/ANIMATION_ARCHITECTURE.md)
+- [MVP 验收清单](../MVP_ACCEPTANCE_ZH.md)
+- [项目规范](../PROJECT_SPEC_ZH.md)
+- [项目规划](../ROADMAP_ZH.md)
+- [已知坑位与扩展槽位](../KNOWN_ISSUES_AND_SLOTS_ZH.md)
+- [动画架构](../ANIMATION_ARCHITECTURE.md)
 
-当前仍属于视觉粗模阶段。详细的已知坑位、编辑器限制、未开发功能和代码扩展入口，以 [已知坑位与扩展槽位](docs/KNOWN_ISSUES_AND_SLOTS_ZH.md) 为准。
+当前仍属于视觉粗模阶段。详细的已知坑位、编辑器限制、未开发功能和代码扩展入口，以 [已知坑位与扩展槽位](../KNOWN_ISSUES_AND_SLOTS_ZH.md) 为准。
 
 
-R10 新增普通生物吸收、徒手/锤拳/刀刃/鞭拳专属吸收与受害目标关节反应。U 菜单解锁武器形态，Z 切换，E 抓取、右键吸收、左键/再次 E 投掷；具体规则与本轮范围见 [R10 吸收说明](docs/CONSUMPTION_R10.md)。
+R10 新增普通生物吸收、徒手/锤拳/刀刃/鞭拳专属吸收与受害目标关节反应。U 菜单解锁武器形态，Z 切换，E 抓取、右键吸收、左键/再次 E 投掷；具体规则与本轮范围见 [R10 吸收说明](../CONSUMPTION_R10.md)。
 
-R11 将抓取与吸收拆成独立阶段，支持持有等待、步行携带与投掷，见 [抓取操作与验证](docs/GRAB_R11.md)。
+R11 将抓取与吸收拆成独立阶段，支持持有等待、步行携带与投掷，见 [抓取操作与验证](../GRAB_R11.md)。
 
-R15 依据原作概念图重新制作利爪、锤拳、双端刀臂和鞭拳；刀臂保留前后两端长刃，并调整待机与吸收姿态。鞭拳 E 抓取可达 12 格，拉近后右键吸收。见 [R15 武器与建模说明](docs/WEAPONS_R15.md)。
+R15 依据原作概念图重新制作利爪、锤拳、双端刀臂和鞭拳；刀臂保留前后两端长刃，并调整待机与吸收姿态。鞭拳 E 抓取可达 12 格，拉近后右键吸收。见 [R15 武器与建模说明](../WEAPONS_R15.md)。
 
-R16 修正被否定的刀臂造型，收掉大空圈、收紧刀根并重画长刃，移除强制平举待机。见 [R16 刀臂说明](docs/BLADE_R16.md)。
+R16 修正被否定的刀臂造型，收掉大空圈、收紧刀根并重画长刃，移除强制平举待机。见 [R16 刀臂说明](../BLADE_R16.md)。
 
-R17 依据用户明确认可的生成参考图重建刀臂；上挑刃与宽下刃连成连续实体刀身，保留两处镂空和黑红组织。见 [R17 刀臂说明](docs/BLADE_R17.md)。
+R17 依据用户明确认可的生成参考图重建刀臂；上挑刃与宽下刃连成连续实体刀身，保留两处镂空和黑红组织。见 [R17 刀臂说明](../BLADE_R17.md)。
