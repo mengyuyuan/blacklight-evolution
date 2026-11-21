@@ -25,7 +25,7 @@ import static com.codex.blacklight.client.renderer.ConsumeExteriorShape.*;
 /** A single world-space draw after both third-person bodies have submitted their posed surfaces. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class ConsumeExteriorWrap {
-    private record Actor(Surface body,Surface right,Surface left,Vec3 forward){}
+    private record Actor(Surface body,Surface right,Surface left,Surface upperRight,Surface upperLeft,Vec3 forward){}
     private record Pulse(float weight,double age){}
     public record Draw(int owner,int victim,boolean paired,int ribbons,int points,double thickness,float weight){}
     public static java.util.function.Consumer<Draw> observer;
@@ -53,7 +53,8 @@ public final class ConsumeExteriorWrap {
         Vec3 rightElbow=joint(stack,bones,rig.handR.getId()),leftElbow=joint(stack,bones,rig.handL.getId());
         var right=Surface.arm(rightElbow,joint(stack,bones,rig.searchJointByName("Tool_R").getId()),skin.side());
         var left=Surface.arm(leftElbow,joint(stack,bones,rig.searchJointByName("Tool_L").getId()),skin.side());
-        ACTORS.put(actor,new Actor(Surface.torso(skin,skin.width()+.034,skin.depth()+.034),right,left,facing));
+        ACTORS.put(actor,new Actor(Surface.torso(skin,skin.width()+.034,skin.depth()+.034),right,left,
+                Surface.arm(shoulderR,rightElbow,skin.side()), Surface.arm(shoulderL,leftElbow,skin.side()),facing));
     }
     private static Vec3 joint(PoseStack stack,Matrix4f[] bones,int id){
         return BlacklightBoneRendering.worldPoint(stack,bones[id].getTranslation(new Vector3f()));
@@ -72,7 +73,7 @@ public final class ConsumeExteriorWrap {
         Vec3 wing=BlacklightBoneRendering.worldPoint(stack,left.scale(w*.48).toVector3f()).subtract(feet);
         Vec3 front=BlacklightBoneRendering.worldPoint(stack,forward.scale(w*(tall?.35:.59)).toVector3f()).subtract(feet);
         var body=new Surface(center,top.subtract(feet).normalize(),wing.normalize(),front.normalize(),wing.length(),front.length(),h*(tall?.21:.33));
-        ACTORS.put(owner,new Actor(body,null,null,front.normalize()));
+        ACTORS.put(owner,new Actor(body,null,null,null,null,front.normalize()));
     }
     private static Pulse pulse(ConsumeVisual scene,long now,float partial){
         float time=scene.elapsed(now,partial)/20F;
@@ -144,18 +145,16 @@ public final class ConsumeExteriorWrap {
             float settledWeight=residue(owner,settled,now,partial),activeWeight=residue(owner,active,now,partial);
             float strength=Math.max(settledWeight,activeWeight);if(!(strength>.012F))continue;
             var scene=settledWeight>=activeWeight?settled:active;var actor=entry.getValue();
-            // The same flank bears the load during consecutive claims, even when their pulses cross.
-            // The blade is fitted to Tool_R. Keep the left scapula free to silhouette the absorbed mass.
-            boolean blade=scene.form()==com.codex.blacklight.power.PowerForm.BLADE.ordinal()
-                    ||ModAttachments.getData(owner, ModAttachments.PLAYER_STATE).getActivePower()==com.codex.blacklight.power.PowerForm.BLADE;
-            boolean flip=!blade&&(owner.getUUID().getLeastSignificantBits()&1L)!=0;
-            var strips=ConsumeResidueKnot.folds(actor.body,actor.forward,flip,strength,scene.elapsed(now,partial)/20F,drag(owner));
+            float seconds = scene.elapsed(now,partial)/20F;
+            var strips = ConsumeResidueKnot.folds(actor.body,actor.upperRight,actor.upperLeft,actor.right,actor.left,
+                    actor.forward,strength,ConsumeGiverEffect.residueAge(scene,seconds),seconds,drag(owner));
+            if (strips.length == 0) continue;
             var out=buffers.getBuffer(type);int light=mc.getEntityRenderDispatcher().getPackedLightCoords(owner,partial);
             int points=0;double radius=0;
             for(var strip:strips){
                 var path=strip.points();
                 for(int j=0;j<path.length;j++){path[j]=path[j].subtract(camera);radius=Math.max(radius,strip.widths()[j]);}
-                ConsumeTendrilSegmentMesh.draw(stack,out,light,path,strip.widths(),actor.body.side(),0xffffffff);
+                ConsumeTendrilSegmentMesh.draw(stack,out,light,path,strip.widths(),actor.body.side(),0xffffffff,false);
                 points+=path.length;
             }
             if(observer!=null)observer.accept(new Draw(owner.getId(),-2,false,strips.length,points,radius,strength));

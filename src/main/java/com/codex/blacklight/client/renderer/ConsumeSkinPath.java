@@ -12,7 +12,7 @@ import java.util.Map;
 import net.minecraft.world.phys.Vec3;
 
 /** Map rigid and split MC skin onto an authored 32-pixel-high material rig. */
-final class ConsumeSkinPath {
+public final class ConsumeSkinPath {
     private record Joint(String name, int parent, double[] position) {}
     private static final Joint[] JOINTS = readJoints();
     private static final Map<String,Integer> IDS = new HashMap<>();
@@ -53,6 +53,26 @@ final class ConsumeSkinPath {
             case ANKLE_L -> "leftBoot"; case SPINE_2 -> "ribs";
         };
         return SKELETON.playback(cue,IDS.get(joint));
+    }
+
+    private static final class GiverCycle {
+        static final ConsumeSkinGrowth.Weights[] FRAMES = SKELETON.forwardBackward(IDS.get("ribs"), .35F, .5F,
+                com.codex.blacklight.combat.ConsumeGiverEffect.REVERSE_SECONDS,
+                com.codex.blacklight.combat.ConsumeGiverEffect.END_SECONDS);
+    }
+
+    public static ConsumeSkinGrowth.Weights giverWeights(float age) {
+        var frames = GiverCycle.FRAMES;
+        if (!(age >= 0)) return frames[frames.length - 1];
+        return frames[Math.min(frames.length - 1, Math.round(age * 60))];
+    }
+
+    public static float armCoverage(ConsumeSkinGrowth.Weights weights, boolean left, double shoulderToFingers) {
+        return (left ? ARM_L : ARM_R).coverage(weights, shoulderToFingers);
+    }
+
+    public static float torsoCoverage(ConsumeSkinGrowth.Weights weights, double hipsToCollar) {
+        return TORSO.coverage(weights, hipsToCollar);
     }
 
     // Retain coordinates from the uncompressed MC skin when a piece separates.

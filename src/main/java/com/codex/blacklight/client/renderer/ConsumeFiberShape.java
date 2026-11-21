@@ -11,6 +11,10 @@ final class ConsumeFiberShape {
     private ConsumeFiberShape() {}
 
     static void draw(Vec3[] path,double[] widths,Vec3 initialSide,Faces faces){
+        draw(path,widths,initialSide,true,faces);
+    }
+
+    static void draw(Vec3[] path,double[] widths,Vec3 initialSide,boolean jointed,Faces faces){
         if(path.length<2||widths.length!=path.length)return;
         int first=0;
         while(first+1<path.length&&path[first].distanceToSqr(path[first+1])<EPS)first++;
@@ -32,14 +36,19 @@ final class ConsumeFiberShape {
             Vec3 middle=start.lerp(end,.5).add(forward.subtract(endForward).scale(delta.length()*.09));
             Vec3 midSide=perpendicular(side,spanForward);
             Vec3 endSide=perpendicular(midSide,endForward);
-            double collarWidth=(w0+w1)*.57;
-            Vec3[] collar=ring(middle,midSide,spanForward,collarWidth);
             Vec3[] next=ring(end,endSide,endForward,w1);
             if(w0+w1>1e-6){
-                sleeve(faces,i,false,previous,collar,0,.5F);
-                sleeve(faces,i,false,collar,next,.5F,1);
-                // Isolated alternating side buds leave a clear unbroken main fibre.
-                if(i%7==1||i%7==4)fork(faces,i,middle,midSide,spanForward,collarWidth,delta.length());
+                if (jointed) {
+                    double collarWidth=(w0+w1)*.57;
+                    Vec3[] collar=ring(middle,midSide,spanForward,collarWidth);
+                    sleeve(faces,i,false,previous,collar,0,.5F);
+                    sleeve(faces,i,false,collar,next,.5F,1);
+                    if(i%7==1||i%7==4)fork(faces,i,middle,midSide,spanForward,collarWidth,delta.length());
+                } else {
+                    // A continuous fibre carries the longitudinal grain through several spans.
+                    int row=i%8;
+                    sleeve(faces,i,false,previous,next,row/8F,(row+1)/8F);
+                }
             }
             previous=next;forward=endForward;side=endSide;
         }

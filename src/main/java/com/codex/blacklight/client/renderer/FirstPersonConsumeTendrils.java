@@ -1,6 +1,7 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.combat.ConsumeGiverEffect;
+import com.codex.blacklight.combat.ConsumeSkinGrowth;
 import com.codex.blacklight.combat.ConsumeVisual;
 import com.codex.blacklight.registry.ModAttachments;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,7 +20,7 @@ import org.joml.Vector4f;
 
 /** The short hand-side fibres use the actual vanilla hand pass. Target positions use the world camera's projection. */
 public final class FirstPersonConsumeTendrils {
-    record Scene(ConsumeVisual visual,ConsumeVisual residueSource,float envelope,float residue,double age) {}
+    record Scene(ConsumeVisual visual,ConsumeVisual residueSource,float envelope,float residue,double age,float residueAge) {}
     private FirstPersonConsumeTendrils(){}
     static Scene active(AbstractClientPlayer actor,float partial){
         var mc=Minecraft.getInstance();
@@ -28,16 +29,23 @@ public final class FirstPersonConsumeTendrils {
         var v=ModAttachments.getData(actor,ModAttachments.CONSUME_BODY_VISUAL);
         var retained=ModAttachments.getData(actor,ModAttachments.CONSUME_RESIDUE_VISUAL);
         long now=actor.level().getGameTime();
-        boolean active=v.consuming()&&v.consumerId()==actor.getId();
-        boolean settled=retained.consuming()&&retained.consumerId()==actor.getId();
+        return scene(actor.getId(),v,retained,now,partial);
+    }
+    static Scene scene(int owner,ConsumeVisual v,ConsumeVisual retained,long now,float partial){
+        boolean active=v.consuming()&&v.consumerId()==owner;
+        boolean settled=retained.consuming()&&retained.consumerId()==owner;
         if(!active&&!settled)return null;
         float age=active?v.elapsed(now,partial)/20F:0F;
+        float retainedAge=settled?retained.elapsed(now,partial)/20F:0F;
         float envelope=active?ConsumeGiverEffect.exterior(v,age):0F;
         float mass=active?ConsumeGiverEffect.residue(v,age):0F;
-        float retainedMass=settled?ConsumeGiverEffect.residue(retained,retained.elapsed(now,partial)/20F):0F;
-        var residueSource=retainedMass>mass?retained:v;
+        float retainedMass=settled?ConsumeGiverEffect.residue(retained,retainedAge):0F;
+        boolean useRetained=retainedMass>mass;
+        var residueSource=useRetained?retained:v;
         float residue=Math.max(mass,retainedMass);
-        return Math.max(envelope,residue)>.004F?new Scene(v,residueSource,envelope,residue,active?age-ConsumeGiverEffect.exteriorStart(v):0):null;
+        if(Math.max(envelope,residue)<=.004F)return null;
+        float residueAge=ConsumeGiverEffect.residueAge(residueSource,useRetained?retainedAge:age);
+        return new Scene(v,residueSource,envelope,residue,active?age-ConsumeGiverEffect.exteriorStart(v):0,residueAge);
     }
     private record Target(Vec3 eye,Vec3 tip,int victim){}
     private static Target target(AbstractClientPlayer owner,Scene scene,boolean left,float partial,Matrix4f inverse){
@@ -147,31 +155,50 @@ public final class FirstPersonConsumeTendrils {
             normal=normal.subtract(axis.scale(normal.dot(axis))).normalize();
             if(normal.lengthSqr()<.5)normal=new Vec3(0,1,0).subtract(axis.scale(axis.y)).normalize();
             var across=axis.cross(normal).normalize();
-            centre=centre.add(normal.scale(.035*scene.residue));
+            var growth=armGrowth(left,scene.residueAge);
             for(int strand=0;strand<3;strand++){
-                var points=residue(centre,axis,normal,across,forearm.distanceTo(wrist),scene.residue,strand);
-                var radii=new double[points.length];
-                for(int i=0;i<radii.length;i++){
-                    double t=i/(double)(radii.length-1);
-                    radii[i]=Math.min(.048,forearm.distanceTo(wrist)*.23)*(.36+.64*Math.sin(t*Math.PI))*scene.residue;
-                }
-                emit(owner,scene,pose,out,light,projection,points,radii,null,false,left,scene.residue,"knot");
+                var fold=residue(forearm,wrist,normal,across,scene.residue,growth,strand);
+                emit(owner,scene,pose,out,light,projection,fold.points(),fold.radii(),null,false,left,scene.residue,"knot");
             }
         }
     }
-    // Broad interlocked folds lie against the limb. As they lose volume their highest ridge sinks into the skin.
-    static Vec3[] residue(Vec3 centre,Vec3 axis,Vec3 outward,Vec3 across,double length,double mass,int strand){
-        double span=Math.max(.10,Math.min(.30,length));
+    record ArmGrowth(boolean left,ConsumeSkinGrowth.Weights weights,double pull) {}
+    record Fold(Vec3[] points,double[] radii) {}
+    static ArmGrowth armGrowth(boolean left,float age){
+        var weights=ConsumeSkinPath.giverWeights(age);
+        double pull=0;
+        if(age>ConsumeGiverEffect.REVERSE_SECONDS){
+            // As the giver coverage leaves the back of the hand, draw the fold up the posed forearm.
+            var peak=ConsumeSkinPath.giverWeights(ConsumeGiverEffect.REVERSE_SECONDS);
+            double atPeak=ConsumeSkinPath.armCoverage(peak,left,.84);
+            if(atPeak>0){
+                double loss=1-Math.min(1,ConsumeSkinPath.armCoverage(weights,left,.84)/atPeak);
+                pull=loss*loss*(3-2*loss);
+            }
+        }
+        return new ArmGrowth(left,weights,pull);
+    }
+    static Fold residue(Vec3 forearm,Vec3 wrist,Vec3 outward,Vec3 across,double mass,ArmGrowth growth,int strand){
+        double length=forearm.distanceTo(wrist);
+        double span=Math.min(.30,length);
         Vec3[] points=new Vec3[9];
+        double[] radii=new double[points.length];
         for(int i=0;i<points.length;i++){
             double t=i/(double)(points.length-1),arch=Math.sin(Math.PI*t);
             double u=(t-.5)*(.94-.12*strand)+(strand-1)*.10;
-            double v=(.21*Math.sin(t*Math.PI*(1.5+strand*.33)+strand*2)+(strand-1)*.12)*mass;
-            double sink=Math.max(0,1-mass/.15);
-            double height=mass*(-.05+arch*(.30+.045*strand))-.125*sink*sink;
-            points[i]=centre.add(axis.scale(span*u)).add(across.scale(span*v)).add(outward.scale(span*height));
+            double along=Math.min(1,Math.max(0,.47+u*span/Math.max(.00001,length)));
+            // Cuff-to-hand mesh samples span the elbow side of the forearm through the knuckles.
+            double shoulderToFingers=.44+.48*along;
+            double localMass=mass*ConsumeSkinPath.armCoverage(growth.weights(),growth.left(),shoulderToFingers);
+            double width=(.21*Math.sin(t*Math.PI*(1.5+strand*.33)+strand*2)+(strand-1)*.12)*localMass;
+            double sink=Math.max(0,1-localMass/.15);
+            double height=.035*localMass+span*(localMass*(-.05+arch*(.30+.045*strand))-.125*sink*sink);
+            // Keep the moving base on the segment between the two actual posed surface anchors.
+            var base=forearm.lerp(wrist,along*(1-.67*growth.pull()));
+            points[i]=base.add(across.scale(span*width)).add(outward.scale(height));
+            radii[i]=Math.min(.048,length*.23)*(.36+.64*arch)*localMass;
         }
-        return points;
+        return new Fold(points,radii);
     }
     private static void emit(AbstractClientPlayer owner,Scene scene,PoseStack pose,com.mojang.blaze3d.vertex.VertexConsumer out,int light,
                              Matrix4f projection,Vec3[] points,double[] radii,Target target,boolean linked,boolean left,
@@ -181,8 +208,8 @@ public final class FirstPersonConsumeTendrils {
         double minGap=Double.POSITIVE_INFINITY;
         for(int j=1;j<=points.length;j++){
             double clearance=j==points.length?0:gap(ndc(projection,points[j-1]),ndc(projection,points[j]));
-            double padding=j==points.length?0:radii[j]/-points[j-1].z*Math.max(projection.m00()/.105,projection.m11()/.155);
-            if(j<points.length&&points[j-1].z<-.07&&points[j].z<-.07&&clearance>1+padding){minGap=Math.min(minGap,clearance);continue;}
+            double padding=j==points.length?0:Math.max(radii[j-1],radii[j])/Math.max(.001,-Math.max(points[j-1].z,points[j].z))*Math.max(projection.m00()/.105,projection.m11()/.155);
+            if(j<points.length&&radii[j-1]+radii[j]>1e-6&&points[j-1].z<-.07&&points[j].z<-.07&&clearance>1+padding){minGap=Math.min(minGap,clearance);continue;}
             if(j-begin>=2){
                 var span=java.util.Arrays.copyOfRange(points,begin,j);
                 ConsumeTendrilSegmentMesh.draw(pose,out,light,span,java.util.Arrays.copyOfRange(radii,begin,j),new Vec3(0,1,0),0xffffffff);

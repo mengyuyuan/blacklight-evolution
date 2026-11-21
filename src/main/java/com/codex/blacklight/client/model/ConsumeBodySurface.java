@@ -2,6 +2,8 @@ package com.codex.blacklight.client.model;
 
 import com.codex.blacklight.animation.PlayerMotionController;
 import com.codex.blacklight.client.renderer.ConsumeAnatomy;
+import com.codex.blacklight.client.renderer.ConsumeSkinPath;
+import com.codex.blacklight.combat.ConsumeSkinGrowth;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -17,7 +19,7 @@ import java.util.List;
  * are in bind space, so a sleeve's weave follows the elbow when the grip opens. */
 public final class ConsumeBodySurface {
     private record Point(float x,float y,float z,float nx,float ny,float nz,int a,int b,float weight,
-                         float u,float v,float distance) {}
+                         float u,float v,float along) {}
     private record Panel(int region,Point[] points,int columns,float[] posed) {
         Panel(int region,Point[] points,int columns){this(region,points,columns,new float[points.length*7]);}
     }
@@ -44,12 +46,8 @@ public final class ConsumeBodySurface {
         return HEIGHT[y*SIZE+x];
     }
     private static Point point(int region,Vector3f p,Vector3f n,int a,int b,float weight,float u,float v){
-        // Approximate skin distance from Spine_2 on each retargeted mesh. The diffuse alpha
-        // and normal map supply the fibers over the whole advancing front.
-        float distance=region==ConsumeAnatomy.BODY
-                ?.66F*Math.abs(p.y-1.27F)+.26F*Math.abs(p.x)+.025F*(1-n.z)
-                :.16F+.41F*Math.max(0,1.51F-p.y)+.035F*(1-n.z);
-        return new Point(p.x,p.y,p.z,n.x,n.y,n.z,a,b,weight,2.5F*u,2.5F*v,distance);
+        float along = region == ConsumeAnatomy.BODY ? (p.y - .75F) / .75F : (1.5F - p.y) / .75F;
+        return new Point(p.x,p.y,p.z,n.x,n.y,n.z,a,b,weight,2.5F*u,2.5F*v,Math.max(0,Math.min(1,along)));
     }
 
     /** The independent Mercer mesh supplies its actual posed weights and clothing surfaces. */
@@ -96,10 +94,23 @@ public final class ConsumeBodySurface {
             panels.add(new Panel(region,points,cols+1));
         }
     }
+    private final float[][] coverage=new float[3][33];
+    private static float local(ConsumeSkinGrowth.Weights weights,int region,double along) {
+        return region==0 ? ConsumeSkinPath.torsoCoverage(weights,along) : ConsumeSkinPath.armCoverage(weights,region==2,along);
+    }
     private static float powEdge(float n){float q=n*n;return q*q*q;}
 
-    public void draw(PoseStack stack,VertexConsumer out,int light,Matrix4f[] skin,int side,float reach,float seconds,float textureClock){
+    public void draw(PoseStack stack,VertexConsumer out,int light,Matrix4f[] skin,int side,float seconds,float waveAge,float mass,float textureClock){
         Vector3f p=new Vector3f(),other=new Vector3f(),n=new Vector3f(),otherN=new Vector3f(),base=new Vector3f();
+        var nativeWeights = ConsumeSkinPath.giverWeights(seconds);
+        var retainedWeights = ConsumeSkinPath.giverWeights(waveAge);
+        // Sample the three bind-space paths once for the entire skinned lattice.
+        for (int region=0; region<3; region++) {
+            for (int i=0; i<=32; i++) {
+                double along=i/32.0;
+                coverage[region][i] = Math.max(local(nativeWeights,region,along),mass*local(retainedWeights,region,along));
+            }
+        }
         // Each lattice vertex is skinned once, even where four neighbouring cells share it.
         for(var panel:panels){
             if(side!=-2&&(panel.region==ConsumeAnatomy.BODY||side>=0&&panel.region!=side+2))continue;
@@ -108,10 +119,12 @@ public final class ConsumeBodySurface {
             float du=.002F*textureClock,dv=.22F*textureClock;
             for(int i=0;i<grid.length;i++){
                 Point v=grid[i];
-                float local=Math.max(0,Math.min(1,(reach-v.distance)/.11F));
+                int region = panel.region==ConsumeAnatomy.BODY ? 0 : panel.region==ConsumeAnatomy.LEFT_ARM ? 2 : 1;
+                float cursor = v.along * 32;
+                int step = Math.min(31,(int)cursor);
+                float local = net.minecraft.util.Mth.lerp(cursor-step,coverage[region][step],coverage[region][step+1]);
                 if(local<=0){posed[7*i+6]=0;continue;}
-                local=local*local*(3-2*local);
-                float pulse=1+.14F*(float)Math.sin(seconds*8-18*v.distance);
+                float pulse=1+.14F*(float)Math.sin(textureClock*8-18*v.along);
                 float lift=(.003F+relief(v.u+du,v.v+dv)*pulse)*local;
                 base.set(v.x+v.nx*lift,v.y+v.ny*lift,v.z+v.nz*lift);
                 skin[v.a].transformPosition(base,p);skin[v.b].transformPosition(base,other);p.lerp(other,v.weight);

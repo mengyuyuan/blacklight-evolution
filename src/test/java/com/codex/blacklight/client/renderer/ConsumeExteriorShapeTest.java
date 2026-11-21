@@ -22,36 +22,61 @@ class ConsumeExteriorShapeTest {
         assertNull(strip(PAIR[6],6,pair(FRONT),.07F,.1));
         assertTrue(strip(PAIR[0],0,pair(FRONT),.07F,.1).points().length<base.points().length);
     }
-    @Test void foldMassHasSilhouetteOnBackAndFlankAndClearsHead(){
-        var surface=body(Vec3.ZERO);
-        var full=ConsumeResidueKnot.folds(surface,FRONT,false,1,2,Vec3.ZERO);
-        var mirror=ConsumeResidueKnot.folds(surface,FRONT,true,1,2,Vec3.ZERO);
-        double outside=0,back=0,radius=0,top=-1;
-        for(int f=0;f<full.length;f++){
-            var strip=full[f];
-            for(int i=0;i<strip.points().length;i++){
-                var p=strip.points()[i];double r=strip.widths()[i];
-                outside=Math.max(outside,p.x+r-surface.width());
-                back=Math.max(back,-p.z+r-surface.depth());
-                radius=Math.max(radius,r);top=Math.max(top,p.y+r);
-                var other=mirror[f].points()[i];assertEquals(-p.x,other.x,1e-8);assertEquals(p.z,other.z,1e-8);
-            }
-            assertTrue(strip.points()[0].x<surface.width());
-            assertTrue(strip.widths()[0]<.025&&strip.widths()[strip.widths().length-1]<.025);
-        }
-        assertTrue(outside>.16&&back>.15,"clump must bulge out from the two covered faces");
-        assertTrue(radius>.095);assertTrue(top<surface.half()+.04);
+
+    private static Strip[] folds(Surface body, Surface rightArm, Surface leftArm, Vec3 facing, float age, Vec3 movement) {
+        return ConsumeResidueKnot.folds(body,rightArm,leftArm,null,null,facing,1,age,3,movement);
     }
-    @Test void foldsContractAndFollowTheRealPoseDuringMovement(){
-        var skin=body(Vec3.ZERO);Vec3 velocity=new Vec3(.26,0,.09),shift=new Vec3(3,-1,2);
-        var full=ConsumeResidueKnot.folds(skin,FRONT,false,1,3,velocity);
-        var rotatedBody=new Surface(shift,UP,RIGHT.yRot(.8F),FRONT.yRot(.8F),skin.width(),skin.depth(),skin.half());
-        var rotated=ConsumeResidueKnot.folds(rotatedBody,FRONT.yRot(.8F),false,1,3,velocity.yRot(.8F));
-        var fading=ConsumeResidueKnot.folds(skin,FRONT,false,.08F,3,velocity);
-        assertEquals(0,ConsumeResidueKnot.folds(skin,FRONT,false,0,3,velocity).length);
-        for(int f=0;f<full.length;f++)for(int i=0;i<full[f].points().length;i++){
-            assertTrue(full[f].points()[i].yRot(.8F).add(shift).distanceTo(rotated[f].points()[i])<.0001);
-            assertTrue(fading[f].widths()[i]<full[f].widths()[i]*.2);
+    @Test void theSettledWeaveHasSeparateStrandsOnChestBackAndBothFlanks() {
+        var body=body(Vec3.ZERO);
+        var full=folds(body,null,null,FRONT,2.3F,Vec3.ZERO);
+        assertEquals(14,full.length);
+        int chest=0,back=0,left=0,right=0;
+        for(var strip:full) {
+            for(int i=0;i<strip.points().length;i++) {
+                var p=strip.points()[i];
+                if(strip.widths()[i]<.012)continue;
+                if(p.z>body.depth()+.017)chest++;
+                if(-p.z>body.depth()+.017)back++;
+                if(p.x>body.width()+.017)left++;
+                if(-p.x>body.width()+.017)right++;
+                assertTrue(p.y+strip.widths()[i]<body.half()+.035);
+            }
         }
+        assertTrue(Math.min(Math.min(chest,back),Math.min(left,right))>15);
+        Vec3 shift=new Vec3(3,-1,2),v=new Vec3(.23,0,.06);
+        var movedBody=new Surface(shift,UP,RIGHT.yRot(.82F),FRONT.yRot(.82F),body.width(),body.depth(),body.half());
+        var moved=folds(movedBody,null,null,FRONT.yRot(.82F),2.3F,v.yRot(.82F));
+        var original=folds(body,null,null,FRONT,2.3F,v);
+        for(int i=0;i<moved.length;i++)
+            assertTrue(moved[i].points()[4].distanceTo(shift.add(original[i].points()[4].yRot(.82F)))<.0001);
+    }
+
+    @Test void theTipWithdrawsAlongItsOwnCurveWhileTheMiddleStillHasThickness() {
+        var skin=body(Vec3.ZERO);
+        float peak=com.codex.blacklight.combat.ConsumeGiverEffect.REVERSE_SECONDS;
+        var before=folds(skin,null,null,FRONT,peak,Vec3.ZERO)[0];
+        var after=folds(skin,null,null,FRONT,peak+.63F,Vec3.ZERO)[0];
+        assertTrue(after.points()[0].distanceTo(before.points()[0])>.10);
+        assertTrue(after.points()[0].distanceTo(before.points()[6])<after.points()[0].distanceTo(before.points()[0]));
+        assertTrue(after.widths()[after.widths().length/2]>.025);
+        assertTrue(after.widths()[0]<after.widths()[after.widths().length/2]*.2);
+    }
+
+    @Test void posedArmsClearBeforeTheMiddleOfTheChestAndBack() {
+        var body=body(Vec3.ZERO);
+        var right=Surface.arm(new Vec3(-.32,.28,0),new Vec3(-.55,.01,-.14),RIGHT);
+        var left=Surface.arm(new Vec3(.32,.28,0),new Vec3(.47,.04,.21),RIGHT);
+        float peak=com.codex.blacklight.combat.ConsumeGiverEffect.REVERSE_SECONDS;
+        assertEquals(18,folds(body,right,left,FRONT,peak,Vec3.ZERO).length);
+        var full=ConsumeSkinPath.giverWeights(peak);
+        var returning=ConsumeSkinPath.giverWeights(peak+1.16F);
+        var late=ConsumeSkinPath.giverWeights(peak+1.8F);
+        assertTrue(ConsumeSkinPath.armCoverage(full,true,.72)>.8);
+        assertEquals(0,ConsumeSkinPath.armCoverage(returning,false,.72),.02);
+        assertTrue(ConsumeSkinPath.torsoCoverage(late,.54)>.75);
+        assertEquals(0,ConsumeSkinPath.armCoverage(late,true,.46),.02);
+        var remaining=folds(body,right,left,FRONT,peak+1.8F,Vec3.ZERO);
+        assertTrue(remaining.length>0);
+        assertEquals(0,folds(body,right,left,FRONT,6.66F,Vec3.ZERO).length);
     }
 }

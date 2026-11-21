@@ -82,6 +82,16 @@ public final class ConsumeGiverEffect {
         return gather * gather * (3 - 2 * gather) * retreat * retreat * (3 - 2 * retreat);
     }
 
+    /** Re-time the actor's material clock to the settled Minecraft receiver while keeping
+     * both halves of the same skeletal wave. Consecutive claims keep their individual clocks. */
+    public static float residueAge(ConsumeVisual scene, float elapsedSeconds) {
+        var window = window(scene);
+        if (window == null || !Float.isFinite(elapsedSeconds)) return Float.NaN;
+        if (elapsedSeconds < window.settled())
+            return REVERSE_SECONDS * (elapsedSeconds - window.start()) / (window.settled() - window.start());
+        return REVERSE_SECONDS + Math.max(0, elapsedSeconds - window.peak());
+    }
+
     public static float residueEnd(ConsumeVisual scene) {
         var window = window(scene);
         return window == null ? 0 : window.peak() + REVERSE_SECONDS;

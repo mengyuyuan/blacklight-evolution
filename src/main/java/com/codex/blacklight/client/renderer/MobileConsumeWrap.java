@@ -34,20 +34,25 @@ public final class MobileConsumeWrap {
     private static void draw(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffers,int light,
                              Matrix4f[] poses,float partial,MercerRig.Frame frame,int side){
         ConsumeVisual scene=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
-        if(!scene.active() || !player.isAlive() || player.isInvisible() || player.isSpectator())return;
-        long now=player.level().getGameTime();
-        float seconds=scene.elapsed(now,partial)/20F-ConsumeGiverEffect.cue(scene);
-        float reach=ConsumeGiverEffect.reach(seconds);
-        if(reach<=0)return;
+        if (!player.isAlive() || player.isInvisible() || player.isSpectator()) return;
+        long now = player.level().getGameTime();
+        var retained = ModAttachments.getData(player,ModAttachments.CONSUME_RESIDUE_VISUAL);
+        if (!scene.active() && !retained.active()) return;
+        float elapsed = scene.elapsed(now,partial)/20F, prior = retained.elapsed(now,partial)/20F;
+        float seconds = scene.active() ? elapsed - ConsumeGiverEffect.cue(scene) : Float.NaN;
+        float live = ConsumeGiverEffect.residue(scene,elapsed), tail = ConsumeGiverEffect.residue(retained,prior);
+        float mass = Math.max(live,tail);
+        float waveAge = live >= tail ? ConsumeGiverEffect.residueAge(scene,elapsed) : ConsumeGiverEffect.residueAge(retained,prior);
+        if (!(seconds >= 0 && seconds < ConsumeGiverEffect.END_SECONDS) && mass <= 0) return;
         // The source fragment program scrolls a tiled mesh UV using global time.
         float textureClock=(Math.floorMod(now,10000L)+partial)/20F;
         var out=buffers.getBuffer(ConsumeWeaveMaterial.mesh());
         if(frame!=null){
             var mesh=MercerPlayerMesh.get();
-            if(mesh!=null){mesh.consumeSurface().draw(stack,out,light,frame.skin(),side,reach,seconds,textureClock);return;}
+            if(mesh!=null){mesh.consumeSurface().draw(stack,out,light,frame.skin(),side,seconds,waveAge,mass,textureClock);return;}
         }
         for(int i=0;i<poses.length;i++)NativeSkin.posed[i].set(poses[i]).mul(NativeSkin.inverse[i]);
         boolean slim="slim".equals(player.getModelName());
-        (slim?NativeSkin.slim:NativeSkin.regular).draw(stack,out,light,NativeSkin.posed,side,reach,seconds,textureClock);
+        (slim?NativeSkin.slim:NativeSkin.regular).draw(stack,out,light,NativeSkin.posed,side,seconds,waveAge,mass,textureClock);
     }
 }
