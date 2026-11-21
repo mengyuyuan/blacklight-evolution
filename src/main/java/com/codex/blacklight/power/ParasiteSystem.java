@@ -40,8 +40,7 @@ public final class ParasiteSystem {
     public static boolean inject(ServerPlayer user,LivingEntity target){
         var level=user.serverLevel();
         if(target instanceof BlacklightHive hive){
-            if(!hive.isAlive())return false;
-            hive.parasiteBurst(user);
+            if(!hive.parasiteBurst(user))return false;
             level.playSound(null,hive.blockPosition(),SoundEvents.WARDEN_SONIC_BOOM,SoundSource.HOSTILE,3F,.5F);
             return true;
         }

@@ -52,6 +52,15 @@ public final class SurvivalEncounterGameTest {
         player.setPos(h.absoluteVec(new net.minecraft.world.phys.Vec3(16, 2, 30)));
         return player;
     }
+    static void finishWithMelee(ServerPlayer player, net.minecraft.world.entity.Mob target) {
+        var attack = player.damageSources().playerAttack(player);
+        target.hurt(attack, 1000000);
+        if (com.codex.blacklight.combat.ConsumeLastChance.awaitingFinisher(target)) {
+            target.invulnerableTime = 0;
+            target.hurt(player.damageSources().playerAttack(player), 1000000);
+        }
+    }
+
     @GameTest(template="quarantine_post",timeoutTicks=420)
     public static void gateProducesOneTrackableEvolved(GameTestHelper h) { escapee(h,false); }
 
@@ -104,6 +113,7 @@ public final class SurvivalEncounterGameTest {
         for(int x=0;x<3;x++)for(int z=0;z<5;z++)city.setChunkForced((origin.getX()>>4)+x,(origin.getZ()>>4)+z,true);
         player.teleportTo(city,desk.getX()+.5,desk.getY(),desk.getZ()+2.5,180,0);
         h.assertTrue(com.codex.blacklight.city.MotherPlazaStructure.chart(city),"seeded district available");
+        var deskState=city.getBlockState(desk);
         var truck=new com.codex.blacklight.entity.MilitaryVehicle[1];
         var state=player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
         state.infect(); state.setPrototypeMode(true);
@@ -121,6 +131,7 @@ public final class SurvivalEncounterGameTest {
             player.getPersistentData().remove("FutianWitnessUntil");
             com.codex.blacklight.world.FutianDispatch.read(city,desk,player);
             h.assertTrue(city.getBlockState(door).getValue(net.minecraft.world.level.block.DoorBlock.OPEN),"military clearance unlocks physical side door");
+            city.removeBlock(desk, false);
             player.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).remove("blacklight_dispatch_intersection");
             player.moveTo(origin.getX()+5.5,origin.getY()+9,origin.getZ()+58.5,0,0);
         }).thenWaitUntil(()->{
@@ -155,6 +166,11 @@ public final class SurvivalEncounterGameTest {
             player.stopRiding();player.moveTo(origin.getX()+80,origin.getY()+20,origin.getZ()+100,0,0);
         }).thenIdle(140).thenExecute(()->{
             h.assertTrue(player.getPersistentData().getLong("FutianWitnessUntil")<=city.getGameTime(),"breaking sight clears local pursuit");
+        }).thenWaitUntil(()->{
+            h.assertTrue(!city.getBlockState(door).getValue(net.minecraft.world.level.block.DoorBlock.OPEN),
+                    "the unlocked door expires even after the dispatch desk is destroyed");
+        }).thenExecute(()->{
+            city.setBlockAndUpdate(desk,deskState);
             city.getServer().getPlayerList().remove(player);
             for(int x=0;x<3;x++)for(int z=0;z<5;z++)city.setChunkForced((origin.getX()>>4)+x,(origin.getZ()>>4)+z,false);
         }).thenSucceed();
@@ -232,8 +248,11 @@ public final class SurvivalEncounterGameTest {
             var hosts=level.getEntitiesOfClass(GreeneHost.class,bounds,e->e.stage()==GreeneHost.SPENT);
             h.assertTrue(hosts.size()==1 && ConsumeSystem.eligible(hosts.get(0)),"the defeated shell releases one consumable Greene");
             forms[1]=hosts.get(0);
+            h.assertTrue(!com.codex.blacklight.infection.BlacklightInfectionSystem.infect(forms[1],audience),
+                    "exhausted Greene rejects the infection carried by a virus vial");
             h.assertTrue(!done(audience,"plaza_cleared") && BossSiteBlock.activate(level,console,audience).equals("active"),"consumption still pending");
-        }).thenIdle(24).thenExecute(()->{
+        }).thenIdle(56).thenExecute(()->{
+            h.assertTrue(forms[1].isAlive(), "the original spent human survives the conversion interval");
             var state=finisher.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
             state.infect();state.setPrototypeMode(true);
             var host=forms[1];
@@ -347,6 +366,12 @@ public final class SurvivalEncounterGameTest {
             new net.minecraft.world.phys.Vec3(0,1,0),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));
         h.assertTrue(boss.goliathFinisherReady(),"the fallen face unlocks a kill or consumption");
         boss.invulnerableTime=0;boss.hurt(source,100);
+        if (com.codex.blacklight.combat.ConsumeLastChance.used(boss) && boss.isAlive()) {
+            h.assertTrue(boss.getHealth()==1 && com.codex.blacklight.combat.ConsumeLastChance.awaitingFinisher(boss),
+                    "the first lethal attack leaves a final consume opportunity");
+            boss.invulnerableTime=0;
+            boss.hurt(source,100);
+        }
         h.assertTrue(!boss.isAlive(),"the operator completes the ordinary final blow");
     }
 
@@ -424,7 +449,7 @@ public final class SurvivalEncounterGameTest {
             var powers = p.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
             powers.infect();
             powers.setPrototypeMode(true);
-            hive.hurt(p.damageSources().playerAttack(p), 1000000);
+            finishWithMelee(p, hive);
             h.assertTrue(!hive.isAlive(), "the killed hive settles its loot");
             var drops=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,hive.getBoundingBox().inflate(3));
             h.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(ModItems.MOTHER_INTEL.get())), "real hive defeat drops the plaza dossier");

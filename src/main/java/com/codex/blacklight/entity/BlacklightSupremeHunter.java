@@ -107,6 +107,7 @@ public final class BlacklightSupremeHunter extends Monster {
         super.tick();
         if(level().isClientSide){clientEffects();return;}
         bossBar.setProgress(getHealth()/getMaxHealth());
+        bossBar.setColor(consumable() ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.RED);
         if(isAlive() && tickCount%20==0)refreshAudience();
         if(isBeingConsumed()||!isAlive()){if(heldId()>=0)releaseHeld(Vec3.ZERO,false);return;}
         trackThrown();
@@ -139,7 +140,6 @@ public final class BlacklightSupremeHunter extends Monster {
         float f=getHealth()/getMaxHealth();int want=f<=SupremeHunterBalance.PHASE_THREE?3:f<=SupremeHunterBalance.PHASE_TWO?2:1;
         if(want>phase()&&!move().armored(0)&&!weakened()&&move()!=SupremeHunterMove.LEG_COLLAPSE&&!isBeingConsumed()){
             entityData.set(PHASE,want);
-            bossBar.setColor(want==3?BossEvent.BossBarColor.PURPLE:BossEvent.BossBarColor.RED);
             begin(SupremeHunterMove.RAGE,getTarget());
             playSound(SoundEvents.WARDEN_ROAR,3F,.75F);
         }
@@ -347,27 +347,30 @@ public final class BlacklightSupremeHunter extends Monster {
     // ---- damage and reactions ----
     @Override public boolean hurt(DamageSource source,float amount){
         if(level().isClientSide||isBeingConsumed())return false;
-        if(amount>0&&source.getEntity() instanceof Player player&&deflects(source)){
-            amount*=SupremeHunterBalance.AIR_DEFLECT_FACTOR;
+        boolean deflected = amount > 0 && deflects(source);
+        boolean accepted = super.hurt(source, deflected ? amount * SupremeHunterBalance.AIR_DEFLECT_FACTOR : amount);
+        if (!accepted) return false;
+        if (deflected && source.getEntity() instanceof Player player) {
+            amount *= SupremeHunterBalance.AIR_DEFLECT_FACTOR;
             Vec3 d=player.position().subtract(position()).multiply(1,0,1).normalize();
             player.setDeltaMovement(d.x*1.1,.45,d.z*1.1);player.hurtMarked=true;
             playSound(SoundEvents.SHIELD_BLOCK,1.5F,.6F);
         }
-        boolean accepted=super.hurt(source,amount);
-        if(accepted&&isAlive())react(source,amount);
-        return accepted;
+        if(isAlive())react(source,amount);
+        return true;
     }
     public boolean deflects(DamageSource source){
         return !consumed && source.getEntity() instanceof Player player && source.getDirectEntity()==player
                 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !DevastatorDamage.isTrueDamage(source)
-                && !player.isPassenger() && airborne(player);
+                && !source.is(DamageTypeTags.IS_PROJECTILE) && !source.is(DamageTypeTags.IS_EXPLOSION)
+                && !player.isPassenger() && getBoundingBox().inflate(3).intersects(player.getBoundingBox()) && airborne(player);
     }
     /** Jumping swats and attacks from on top of the boss. onGround alone lags a tick behind teleports and knockback. */
     private boolean airborne(Player player){
         if(player.onGround()&&player.getY()<getY()+1)return false;
         var floor=level().clip(new net.minecraft.world.level.ClipContext(player.position(),player.position().subtract(0,1.2,0),
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,player));
-        return floor.getType()==net.minecraft.world.phys.HitResult.Type.MISS||player.getY()>getY()+1.5;
+        return floor.getType()==net.minecraft.world.phys.HitResult.Type.MISS;
     }
     private void react(DamageSource source,float amount){
         var move=move();int t=(int)(level().getGameTime()-entityData.get(STARTED));

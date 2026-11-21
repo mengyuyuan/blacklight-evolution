@@ -214,11 +214,10 @@ public final class BiomassSystem {
             if(now-s.changedAt()<ConsumeProgression.absorbTicks(p))return;
             BiomassReformation.prepare(p);
             var consumeReward=AssimilationSystem.quote(p,target);
-            target.invulnerableTime=0;
             // This is the completed consumption execution, not a normal attack.
             // Spore's calamities explicitly permit >= 10000 execution hits past their cap.
             float execution=(float)Math.min(Float.MAX_VALUE,Math.max(10000D,(double)target.getMaxHealth()*20));
-            boolean accepted=com.codex.blacklight.combat.ConsumeLastChance.execute(target,()->target.hurt(target.damageSources().playerAttack(p),execution));
+            boolean accepted=ConsumeSystem.executeConsumption(p,target,execution);
             // hurt/die dispatch synchronous external callbacks. The player may
             // die, travel, recall or leave this form while the prey is dying.
             // Do not overwrite that newer state with the old scene's full heal.

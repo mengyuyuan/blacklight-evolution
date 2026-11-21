@@ -1104,6 +1104,7 @@
   "item.blacklight.blacklight_brute_spawn_egg": "黑光重甲兽刷怪蛋",
   "item.blacklight.blacklight_hive_spawn_egg": "黑光蜂巢刷怪蛋",
   "boss.blacklight.phase": "%s · 阶段 %s",
+  "boss.blacklight.collapsing": "防护瓦解 · 核心正在显露",
   "boss.blacklight.exposed": "防护瓦解 · 反击窗口",
   "boss.blacklight.weakpoints": "防护部位 %s / %s",
   "entity.blacklight.blackwatch_helicopter": "黑色守望运输直升机",

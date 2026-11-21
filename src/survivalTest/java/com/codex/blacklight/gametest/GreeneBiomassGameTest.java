@@ -127,6 +127,42 @@ public final class GreeneBiomassGameTest {
         }).thenSucceed();
     }
 
+    @GameTest(template="lost_convoy",batch="supreme_absorption",timeoutTicks=120)
+    public static void biomassGetsTheSupremeConsumeMilestone(GameTestHelper h) {
+        var level=h.getLevel();
+        var slime=join(h,"supreme-absorber");
+        var state=slime.getData(ModAttachments.PLAYER_STATE);
+        state.infect();
+        state.setPrototypeMode(true);
+        var boss=com.codex.blacklight.registry.ModEntities.SUPREME_HUNTER.get().create(level);
+        try {
+            var at=h.absolutePos(new BlockPos(12,1,10));
+            var floor=new BlockPos(at.getX(),220,at.getZ());
+            level.setBlockAndUpdate(floor,Blocks.STONE.defaultBlockState());
+            var origin=net.minecraft.world.phys.Vec3.atBottomCenterOf(floor.above());
+            slime.setPos(origin);
+            h.assertTrue(BiomassSystem.begin(slime,false),"biomass separation begins");
+            boss.setPos(origin);
+            boss.setNoAi(true);
+            level.addFreshEntity(boss);
+            boss.setHealth(1);
+            boss.getPersistentData().putBoolean("BlacklightConsumeAwaitingFinisher",true);
+            slime.setPos(origin);
+            crawl(slime,level.getGameTime()-14);
+            tick(slime);
+            h.assertTrue(BiomassSystem.state(slime).victim()==boss.getId(),"biomass acquires weakened hunter through contact");
+            var mature=BiomassSystem.state(slime).absorb(boss.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS-10);
+            slime.setData(ModAttachments.BIOMASS_FORM,mature);
+            tick(slime);
+            h.assertTrue(!boss.isAlive() && BiomassSystem.state(slime).consumed() && done(slime,"supreme_hunter_consumed"),
+                    "biomass finishes the real execution and earns the consume milestone");
+        } finally {
+            boss.discard();
+            level.getServer().getPlayerList().remove(slime);
+        }
+        h.succeed();
+    }
+
     private static void crawl(ServerPlayer slime,long at){
         var crawling=BiomassSystem.state(slime).crawl(at);
         slime.setData(ModAttachments.BIOMASS_FORM,crawling);
