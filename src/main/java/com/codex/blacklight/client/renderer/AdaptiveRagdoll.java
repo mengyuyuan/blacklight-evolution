@@ -131,6 +131,25 @@ public final class AdaptiveRagdoll {
         return new Vec3[]{center.subtract(up),center.add(up),center.subtract(up).add(side),center.lerp(center.add(up),.24)};
     }
 
+    /** Retarget a source shoulder or knee to a submitted arm/leg when the receiver has one. */
+    static Vec3 consumeLimbJoint(LivingEntity entity,float partial,int region,Vec3 estimate,boolean knee){
+        var body=BODIES.get(entity);
+        if(body==null||scene!=entity.level())return estimate;
+        Vec3 closest=estimate;double distance=Double.POSITIVE_INFINITY;
+        for(var part:body.parts){
+            if(part.bind.region!=region||part.renderedAt!=scene.getGameTime()||Math.abs(part.renderedPartial-partial)>.02F
+                    ||part.renderedPosition==null||part.flow>=.985F)continue;
+            Vec3 axis=rotate(new Vec3(0,part.half.y*part.scale,0),part.renderedRotation);
+            // A single-block leg bends at its midpoint. A segmented rig can supply the actual limb seam.
+            for(int end=-1;end<=1;end+=knee?1:2){
+                Vec3 at=part.renderedPosition.add(axis.scale(end));
+                double error=at.distanceToSqr(estimate);
+                if(error<distance){distance=error;closest=at;}
+            }
+        }
+        return closest;
+    }
+
     public static boolean drawingQuillBody(LivingEntity host) {
         var body=BODIES.get(host);
         return body!=null && body.quill!=null && body.quill==QuillOrgan.extracting(host);

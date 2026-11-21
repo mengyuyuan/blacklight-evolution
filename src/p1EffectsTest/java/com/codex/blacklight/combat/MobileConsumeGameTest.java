@@ -167,6 +167,82 @@ public final class MobileConsumeGameTest {
         }
     }
 
+    @GameTest(template="wall_test",timeoutTicks=60,batch="reinforced_infected_consume")
+    public static void reinforcedCommonInfectedRetainsFullSceneWhenWeakened(GameTestHelper h){
+        for(int x=0;x<=8;x++)for(int z=0;z<=8;z++)
+            h.setBlock(x,1,z,net.minecraft.world.level.block.Blocks.STONE);
+        for(int variant:new int[]{ConsumeVariant.DEFAULT,ConsumeVariant.HEAD_STOMP,ConsumeVariant.BEATDOWN,ConsumeVariant.KNEE_HEAD})
+            checkReinforcedReceiver(h,variant);
+        h.succeed();
+    }
+    private static void checkReinforcedReceiver(GameTestHelper h,int variant){
+        var p=player(h,PowerForm.NONE);
+        var mob=h.spawn(com.codex.blacklight.registry.ModEntities.COMMON_INFECTED.get(),3,2,5);
+        mob.setNoAi(true);
+        mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(250);
+        mob.setHealth(mob.getMaxHealth());
+        ConsumeSystem.request(p);
+        h.assertTrue(!ConsumeSystem.active(p),"full-health reinforced infected was captured");
+        mob.setHealth(1);
+        h.assertTrue(ConsumeSystem.healthReady(p,mob)&&!ConsumeSystem.smallDirectReceiver(mob),
+                "reinforced infected changed to the direct class at low health");
+        int previous=ConsumeVariant.qaForced;
+        try {
+            ConsumeVariant.qaForced=variant;
+            enter(h,p,mob);
+        } finally {
+            ConsumeVariant.qaForced=previous;
+        }
+        var visual=mob.getData(ModAttachments.CONSUME_VISUAL);
+        int finish=ConsumeSequence.completionTick(PowerForm.NONE,false,visual.variant());
+        ConsumeSystem.travelIntent(p,true);
+        h.assertTrue(visual.variant()==variant,"wrong paired variant in test");
+        int elapsed=0;
+        while(!mob.isRemoved() && elapsed<finish+14){
+            h.assertTrue(ConsumeSystem.committed(p)&&p.getData(ModAttachments.MOBILE_CONSUME_START)<0,
+                    "paired execution cancelled or unlocked, variant="+variant+" tick="+elapsed);
+            tick(p);
+            elapsed++;
+        }
+        var recovery=p.getData(ModAttachments.CONSUME_RECOVERY);
+        h.assertTrue(mob.isRemoved()&&recovery.active()&&elapsed==finish+Math.max(0,recovery.landingDelay()),
+                "settlement did not follow the actual landing and recovery, variant="+variant+" tick="+elapsed);
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=60,batch="hunter_consume_recovery")
+    public static void allSixFormsRetainPairedHunterExecutionAndRecovery(GameTestHelper h){
+        for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,
+                PowerForm.MUSCLE_MASS,PowerForm.WHIPFIST,PowerForm.BLADE}) {
+            checkHunterRecovery(h,form);
+        }
+        h.succeed();
+    }
+    private static void checkHunterRecovery(GameTestHelper h,PowerForm form){
+        var p=player(h,form);
+        p.setPos(p.position().add(0,0,.55));
+        var hunter=h.spawn(com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HUNTER.get(),3,2,5);
+        hunter.setNoAi(true);
+        hunter.setHealth(hunter.getMaxHealth());
+        ConsumeSystem.request(p);
+        h.assertTrue(!hunter.isBeingConsumed(),"healthy hunter accepted a finisher");
+        hunter.setHealth(1);
+        ConsumeSystem.request(p);
+        h.assertTrue(hunter.isBeingConsumed(),"weakened hunter did not accept the mount");
+        ConsumeSystem.consume(p);
+        for(int i=0;i<60 && hunter.getData(ModAttachments.CONSUME_VISUAL).stage()!=ConsumeVisual.HUNTER_CONSUME;i++)tick(p);
+        var paired=hunter.getData(ModAttachments.CONSUME_VISUAL);
+        h.assertTrue(paired.stage()==ConsumeVisual.HUNTER_CONSUME&&paired.form()==PowerForm.NONE.ordinal(),
+                form+" replaced the shared hunter choreography with a human execution");
+        ConsumeSystem.travelIntent(p,true);
+        for(int i=1;i<HunterConsume.COMPLETE_TICKS;i++)tick(p);
+        h.assertTrue(ConsumeSystem.committed(p)&&!hunter.isConsumeRemains()&&p.getData(ModAttachments.MOBILE_CONSUME_START)<0,
+                "moving interrupted the hunter sequence before the source detach event");
+        tick(p);
+        h.assertTrue(hunter.isConsumeRemains()&&p.getData(ModAttachments.CONSUME_RECOVERY).equals(paired)&&paired.duration()>HunterConsume.COMPLETE_TICKS,
+                form+" lost the receiver remains or the actor's recovery at detach");
+        hunter.discard();
+    }
+
     @GameTest(template="wall_test",timeoutTicks=40,batch="mobile_static")
     public static void weakenedReceiverOutsideDirectClassKeepsItsOwnExecution(GameTestHelper h){
         var p=player(h,PowerForm.NONE);
