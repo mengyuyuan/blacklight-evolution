@@ -1,17 +1,29 @@
 #version 150
 in vec3 rgb,norm,wp;in vec2 texuv;flat in int surface;
-in float digested;uniform sampler2D animal;uniform float sceneLight;out vec4 color;uniform sampler2D atlas,civilian0,civilian1,civilian2,civilian3;uniform vec3 eye;uniform float time;
+in float digested;uniform sampler2D animal;uniform float sceneLight;out vec4 color;uniform sampler2D atlas,spiderSkin,civilian0,civilian1,civilian2,civilian3;uniform vec3 eye;uniform float time;
+uniform int liveForm;uniform float damage,coreFlash;uniform ivec2 lightUV;uniform sampler2D levelLight;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 vec4 civilian(int tile,vec2 uv){
     if(tile==0)return texture(civilian0,uv);if(tile==1)return texture(civilian1,uv);if(tile==2)return texture(civilian2,uv);return texture(civilian3,uv);
 }
 void main(){
- if(wp.y<-.012)discard;
+ if(liveForm==0 && wp.y<-.012)discard;
  vec3 c=rgb;vec3 n=normalize(norm);
  if(surface==1&&texuv.y<.8){vec2 at=texuv*vec2(2.,4.);vec4 tx=civilian(int(floor(at.x))+2*int(floor(at.y)),fract(at));if(tx.a<.42)discard;c*=tx.rgb;}
+ if(surface==7)c*=texture(atlas,texuv).rgb;
+ if(surface==8)c*=texture(spiderSkin,texuv).rgb;
  if(surface==6){vec4 tx=texture(animal,texuv);c*=tx.rgb;}
  if(surface==2){vec2 at=texuv*2.;vec4 tx=civilian(int(floor(at.x))+2*int(floor(at.y)),fract(at));if(tx.a<.42)discard;c*=tx.rgb;}
- if(surface==1 && wp.y>19. && time>18.2 && time<20.3) {
+ if(liveForm==1){
+   vec3 view=normalize(eye-wp);if(dot(n,view)<0.)n=-n;
+   vec3 sun=normalize(vec3(-.42,.78,-.48));float diffuse=.66+.31*max(0.,dot(n,sun))+.06*max(0.,n.y);
+   float wet=surface==7?smoothstep(.09,.24,c.r-c.g):0.;
+   float shine=.13*wet*pow(max(0.,dot(n,normalize(sun+view))),23.);
+   vec3 lit=(diffuse*c+shine*vec3(1.,.87,.82))*texelFetch(levelLight,lightUV,0).rgb;
+   lit=mix(lit,vec3(.98,.28,.25),damage*.28);lit=mix(lit,vec3(.98,.89,.80),coreFlash*.4);
+   color=vec4(lit,1);return;
+ }
+ if((surface==7||surface==1) && wp.y>19. && time>18.2 && time<20.3) {
    float charge=1.-smoothstep(.0,.42,abs(time-(19.05-.063*wp.x)));
    c+=charge*.52*vec3(.64,.20,.10);
  }

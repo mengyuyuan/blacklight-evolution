@@ -185,7 +185,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         posePrey(boss,t,partial,packedLight);
         System.arraycopy(bones,0,boneUpload,0,BONES);
         upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
-        bind(2,skins[0]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
+        bind(2,skins[0]);bind(3,skins[7]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
         if(t<14.5F)upload(11,clamberTexture,30,people,GL_RGBA,climbPose);
         bind(12,skins[5]);bind(13,skins[6]);
         float rotation=(float)Math.toRadians(180-boss.greeneBattle().collapseYaw());
@@ -195,7 +195,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         float light=.38F+.62F*Math.min(1,Math.max((packedLight>>20)&15,(packedLight>>4)&15)/15F);
         int absent=boss.greeneBattle().missingMoltActors();
         glDisable(GL_CULL_FACE);glEnable(GL_DEPTH_TEST);glDepthMask(true);glDisable(GL_BLEND);glUseProgram(model);
-        integer(model,"clamber",11);integer(model,"bones",0);integer(model,"actors",1);integer(model,"atlas",2);for(int i=0;i<4;i++)integer(model,"civilian"+i,7+i);
+        integer(model,"liveForm",0);integer(model,"clamber",11);integer(model,"bones",0);integer(model,"actors",1);integer(model,"atlas",2);integer(model,"spiderSkin",3);for(int i=0;i<4;i++)integer(model,"civilian"+i,7+i);
         integer(model,"paths",4);integer(model,"animal",6);integer(model,"absent",absent);
         glUniform3fv(u(model,"pivots"),pivots);glUniform3fv(u(model,"eye"),eye);scalar(model,"time",t);scalar(model,"sceneLight",light);
         mat(model,"camera",camera);mat(model,"root",new Matrix4f());boolean second=t>=13.2F;
@@ -217,8 +217,40 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             gridPass(mist,3,580,camera,eye,t,light);
         }
     }
+    static boolean drawColony(GreeneGoddessRenderer colony,float ticks,PoseStack stack,int light,int overlay){
+        var renderer=scene;
+        if(renderer==null)return false;
+        // The mesh is already resident after the transformation. Only joint poses change each frame.
+        var mc=Minecraft.getInstance();
+        int body=skin("textures/entity/greene_goddess_tissue.png");
+        int[] civilians=new int[4];
+        for(int i=0;i<civilians.length;i++)civilians[i]=mc.getTextureManager().getTexture(CommonInfectedRenderer.skin(i)).getId();
+        mc.gameRenderer.lightTexture().turnOnLightLayer();
+        int lightmap=RenderSystem.getShaderTexture(2);
+        try(var state=new State()){
+            colony.writeJointMatrices(ticks,renderer.boneUpload);
+            upload(0,renderer.dynamic[0],16,(JOINTS+3)/4,GL_RGBA,renderer.boneUpload);
+            bind(2,body);bind(14,lightmap);
+            int shader=renderer.model;
+            glUseProgram(shader);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);glEnable(GL_DEPTH_TEST);glDepthMask(true);
+            renderer.integer(shader,"liveForm",1);renderer.integer(shader,"kind",1);renderer.integer(shader,"bones",0);
+            renderer.integer(shader,"atlas",2);renderer.integer(shader,"levelLight",14);
+            for(int i=0;i<4;i++){bind(7+i,civilians[i]);renderer.integer(shader,"civilian"+i,7+i);}
+            renderer.scalar(shader,"damage",(overlay>>16)==3?1F:0F);
+            renderer.scalar(shader,"coreFlash",(overlay&15)/15F);
+            glUniform2i(renderer.u(shader,"lightUV"),(light>>4)&15,(light>>20)&15);
+            var view=new Matrix4f(RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
+            var eye=view.invert(new Matrix4f()).transformPosition(new org.joml.Vector3f());
+            glUniform3f(renderer.u(shader,"eye"),eye.x,eye.y,eye.z);
+            renderer.mat(shader,"camera",new Matrix4f(RenderSystem.getProjectionMatrix()).mul(view));
+            renderer.mat(shader,"root",new Matrix4f());
+            renderer.drawModel(1,1);
+        }
+        return true;
+    }
     public static void draw(EncounterMob boss,float partial,PoseStack stack,int light){
-        int[] skins=new int[7];skins[0]=skin("textures/entity/greene_goddess.png");
+        int[] skins=new int[8];skins[0]=skin("textures/entity/greene_goddess_tissue.png");
+        skins[7]=skin("textures/entity/greene_spider_brood.png");
         for(int i=0;i<4;i++)skins[i+1]=Minecraft.getInstance().getTextureManager().getTexture(CommonInfectedRenderer.skin(i)).getId();
         skins[5]=Minecraft.getInstance().getTextureManager().getTexture(ConsumeTendrilSegmentMesh.TEXTURE).getId();
         skins[6]=skin("textures/entity/consume_charcoal_skin.png");
@@ -236,7 +268,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         final int program=glGetInteger(GL_CURRENT_PROGRAM),vao=glGetInteger(GL_VERTEX_ARRAY_BINDING),buffer=glGetInteger(GL_ARRAY_BUFFER_BINDING);
         final int active=glGetInteger(GL_ACTIVE_TEXTURE),src=glGetInteger(GL_BLEND_SRC_RGB),dst=glGetInteger(GL_BLEND_DST_RGB),srcA=glGetInteger(GL_BLEND_SRC_ALPHA),dstA=glGetInteger(GL_BLEND_DST_ALPHA);
         final boolean blend=glIsEnabled(GL_BLEND),cull=glIsEnabled(GL_CULL_FACE),depth=glIsEnabled(GL_DEPTH_TEST),write=glGetBoolean(GL_DEPTH_WRITEMASK);
-        final int[] texture=new int[14];
+        final int[] texture=new int[15];
         State(){for(int i=0;i<texture.length;i++){glActiveTexture(GL_TEXTURE0+i);texture[i]=glGetInteger(GL_TEXTURE_BINDING_2D);}}
         private void toggle(int f,boolean on){if(on)glEnable(f);else glDisable(f);}
         public void close(){
