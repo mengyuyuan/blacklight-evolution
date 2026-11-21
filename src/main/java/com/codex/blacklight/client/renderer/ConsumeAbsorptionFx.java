@@ -24,6 +24,8 @@ public final class ConsumeAbsorptionFx {
         var data=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
         var owner=victim.level().getEntity(data.consumerId());if(owner==null)return Vec3.ZERO;
         if(data.stage()==ConsumeVisual.MOBILE_CONSUME && owner instanceof LivingEntity actor){
+            if(ChestConsumeTendrils.matches(data))
+                return ChestConsumeTendrils.actorPoints(actor,partial)[0].subtract(victim.getPosition(partial).add(placement));
             var carried=MobileConsumeCarry.center(victim,actor,data,partial);
             if(carried!=null)return carried.subtract(victim.getPosition(partial).add(placement));
             var chest=ConsumeTrauma.chest(actor,partial);
@@ -48,18 +50,14 @@ public final class ConsumeAbsorptionFx {
         float partial=event.getPartialTick();
         var camera=event.getCamera().getPosition();var stack=event.getPoseStack();var buffers=mc.renderBuffers().bufferSource();
         var type=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
-        RenderType slingType=null;
+        RenderType segmentType=null;
         for(var entity:mc.level.entitiesForRendering()){
             if(entity instanceof LivingEntity small&&!small.isRemoved()&&small.distanceToSqr(camera)<=96*96){
                 var v=ModAttachments.getData(small,ModAttachments.CONSUME_VISUAL);
-                if(v.active()&&SmallMobConsumeSling.applies(small,v)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity carrier){
-                    if(slingType==null)slingType=ConsumeWeaveMaterial.sling();
-                    SmallMobConsumeSling.draw(stack,buffers.getBuffer(slingType),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
-                            camera,small,carrier,v,partial);
-                }
                 var bridges=ChestConsumeTendrils.bridges(v);
                 if(bridges!=null&&!bridges.tracks().isEmpty()&&ConsumeSystem.smallDirectReceiver(small)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity owner){
-                    ChestConsumeTendrils.draw(stack,buffers.getBuffer(type),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
+                    if(segmentType==null)segmentType=RenderType.entityCutoutNoCull(ConsumeTendrilSegmentMesh.TEXTURE);
+                    ChestConsumeTendrils.draw(stack,buffers.getBuffer(segmentType),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
                             camera,small,owner,v,bridges,partial);
                     continue;
                 }
@@ -75,7 +73,7 @@ public final class ConsumeAbsorptionFx {
             stack.popPose();
         }
         buffers.endBatch(type);
-        if(slingType!=null)buffers.endBatch(slingType);
+        if(segmentType!=null)buffers.endBatch(segmentType);
     }
     private static void draw(LivingEntity mob,float partial,PoseStack stack,VertexConsumer out,int light,Vec3 to,ConsumeFracture.Phase phase) {
         Vec3 center=ConsumeSequence.contact(mob).subtract(mob.getPosition(partial));

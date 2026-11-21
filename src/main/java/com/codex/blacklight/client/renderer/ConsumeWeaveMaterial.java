@@ -18,15 +18,12 @@ import org.slf4j.Logger;
 public final class ConsumeWeaveMaterial extends RenderType {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final ResourceLocation SHADER = new ResourceLocation("blacklight", "consume_body");
-    private static final ResourceLocation CORD_SHADER=new ResourceLocation("blacklight","consume_carry_cord");
-    private static ShaderInstance shader,cordShader;
+    private static ShaderInstance shader;
     private static ResourceLocation texture(String name){
         return new ResourceLocation("blacklight","textures/entity/consume_body_"+name+".png");
     }
     private static final ResourceLocation BAKED=texture("weave");
-    private static final ResourceLocation CORD_TEXTURE=texture("cord");
     private static final RenderType MESH=material("blacklight_consume_body",texture("diffuse"),()->shader,false);
-    private static final RenderType SLING=material("blacklight_consume_carry",CORD_TEXTURE,()->cordShader,false);
     private static final RenderType RECEIVER=material("blacklight_consume_receiver",texture("diffuse"),()->shader,true);
     private static final RenderType BAKED_RECEIVER=create("blacklight_consume_receiver_flat",DefaultVertexFormat.NEW_ENTITY,
             VertexFormat.Mode.QUADS,1536,false,true,CompositeState.builder()
@@ -58,21 +55,15 @@ public final class ConsumeWeaveMaterial extends RenderType {
     public static void register(RegisterShadersEvent event) {
         // ShaderInstance belongs to Minecraft's reload lifecycle. Only retain
         // the registered load callback's instance, never the one it replaces.
-        shader = null;cordShader=null;
+        shader = null;
         try {
             event.registerShader(new ShaderInstance(event.getResourceProvider(), SHADER,
                     DefaultVertexFormat.NEW_ENTITY), loaded -> shader = loaded);
-            event.registerShader(new ShaderInstance(event.getResourceProvider(),CORD_SHADER,
-                    DefaultVertexFormat.NEW_ENTITY),loaded->cordShader=loaded);
         } catch (IOException error) {
             LOGGER.error("Could not load consume body shader; using baked consume material", error);
         }
     }
 
-    public static RenderType sling(){
-        return cordShader!=null&&!com.codex.blacklight.client.ShaderPackCompat.active()
-                ?SLING:RenderType.entityCutoutNoCull(CORD_TEXTURE);
-    }
     public static RenderType mesh(){
         return shader!=null&&!com.codex.blacklight.client.ShaderPackCompat.active()
                 ?MESH:RenderType.entityTranslucent(BAKED);

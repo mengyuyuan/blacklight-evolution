@@ -143,14 +143,5 @@
       "values": [
         0
       ]
-    },
-    {
-      "name": "CordSurface",
-      "type": "int",
-      "count": 1,
-      "values": [
-        0
-      ]
-    }
-  ]
+    }]
 }
