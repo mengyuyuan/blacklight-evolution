@@ -1,13 +1,16 @@
 #version 150
 in vec3 rgb,norm,wp;in vec2 texuv;flat in int surface;
-in float digested;uniform sampler2D animal;uniform float sceneLight;out vec4 color;uniform sampler2D atlas,skins;uniform vec3 eye;uniform float time;
+in float digested;uniform sampler2D animal;uniform float sceneLight;out vec4 color;uniform sampler2D atlas,civilian0,civilian1,civilian2,civilian3;uniform vec3 eye;uniform float time;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+vec4 civilian(int tile,vec2 uv){
+    if(tile==0)return texture(civilian0,uv);if(tile==1)return texture(civilian1,uv);if(tile==2)return texture(civilian2,uv);return texture(civilian3,uv);
+}
 void main(){
  if(wp.y<-.012)discard;
  vec3 c=rgb;vec3 n=normalize(norm);
- if(surface==1&&texuv.y<.8){vec4 tx=texture(atlas,texuv);if(tx.a<.42)discard;c*=tx.rgb;}
+ if(surface==1&&texuv.y<.8){vec2 at=texuv*vec2(2.,4.);vec4 tx=civilian(int(floor(at.x))+2*int(floor(at.y)),fract(at));if(tx.a<.42)discard;c*=tx.rgb;}
  if(surface==6){vec4 tx=texture(animal,texuv);c*=tx.rgb;}
- if(surface==2){vec4 tx=texture(skins,texuv);if(tx.a<.42)discard;c*=tx.rgb;}
+ if(surface==2){vec2 at=texuv*2.;vec4 tx=civilian(int(floor(at.x))+2*int(floor(at.y)),fract(at));if(tx.a<.42)discard;c*=tx.rgb;}
  if(surface==1 && wp.y>19. && time>18.2 && time<20.3) {
    float charge=1.-smoothstep(.0,.42,abs(time-(19.05-.063*wp.x)));
    c+=charge*.52*vec3(.64,.20,.10);
@@ -32,8 +35,8 @@ void main(){
  if(digested>.998)discard;
  c=mix(c,vec3(.185,.046,.058),smoothstep(.025,.36,digested)*.93);
  if(dot(n,eye-wp)<0.)n=-n;
- float light=.72+.50*max(0.,dot(n,normalize(vec3(-.43,.72,-.48))))+.14*max(0.,n.y);
- if(surface<3){c=pow(max(c,vec3(0)),vec3(.84))*(light+.07);
+ float light=.70+.32*max(0.,dot(n,normalize(vec3(-.43,.72,-.48))))+.08*max(0.,n.y);
+ if(surface<3){c=c*light;
    c+=vec3(.14,.055,.04)*pow(1.-abs(dot(n,normalize(eye-wp))),3.);
  }else c*=light;
  float fog=0.;

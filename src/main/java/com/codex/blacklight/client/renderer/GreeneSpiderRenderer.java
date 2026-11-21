@@ -8,6 +8,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> {
+    private static final ResourceLocation BROOD = ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/greene_spider_brood.png");
+    @Override public ResourceLocation getTextureLocation(GreeneSpider entity) { return BROOD; }
+
     public GreeneSpiderRenderer(EntityRendererProvider.Context context) {
         super(context, new DefaultedEntityGeoModel<GreeneSpider>(ResourceLocation.fromNamespaceAndPath("blacklight", "greene_spider")));
         shadowRadius = 2.2F;
