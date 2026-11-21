@@ -1,5 +1,8 @@
 package com.codex.blacklight.combat;
 
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+
 import java.util.List;
 
 /** Separate native CollisionHitTracks, decoded with the complete 276-byte layout.
@@ -63,5 +66,39 @@ public final class DevastatorCollision {
         double x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t,z=a.z+(b.z-a.z)*t;
         double dx=x-com.codex.blacklight.util.MathCompat.clamp(x,box.minX,box.maxX),dy=y-com.codex.blacklight.util.MathCompat.clamp(y,box.minY,box.maxY),dz=z-com.codex.blacklight.util.MathCompat.clamp(z,box.minZ,box.maxZ);
         return dx*dx+dy*dy+dz*dz;
+    }
+    /** Choose one visible bone within the authored sphere or moving capsule. */
+    public static HydraHurtContact.Contact skinContact(AnimatedHurtBody body, Vec3 from, Vec3 to, double radius,
+                                                        java.util.function.Predicate<Vec3> allowed) {
+        var bounds = new AABB(from, to).inflate(radius + 1e-6);
+        boolean stationary = from.equals(to);
+        HydraHurtContact.Contact best = null;
+        double bestFraction = Double.POSITIVE_INFINITY, bestDistance = Double.POSITIVE_INFINITY;
+        for (var region : body.hurtRegions(0)) {
+            if (!region.bounds().intersects(bounds)) continue;
+            for (var box : region.boxes()) {
+                if (!box.bounds.intersects(bounds)) continue;
+                Vec3 point, normal;
+                double fraction = 0;
+                if (stationary) {
+                    point = box.nearest(from);
+                    if (point.distanceToSqr(from) > radius * radius) continue;
+                    normal = from.subtract(point).normalize();
+                    if (normal.lengthSqr() < .01) normal = new Vec3(0, 1, 0);
+                } else {
+                    var hit = ProjectileSphereContact.sweep(from, to, radius, box);
+                    if (hit == null) continue;
+                    point = hit.point();
+                    normal = hit.normal();
+                    fraction = hit.fraction();
+                }
+                double distance = point.distanceToSqr(from);
+                if (fraction > bestFraction || (fraction == bestFraction && distance >= bestDistance) || !allowed.test(point)) continue;
+                bestFraction = fraction;
+                bestDistance = distance;
+                best = new HydraHurtContact.Contact(region.bone(), point, normal, com.codex.blacklight.infection.InfectedAttackStyle.CRUSH);
+            }
+        }
+        return best;
     }
 }

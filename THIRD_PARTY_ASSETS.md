@@ -152,3 +152,5 @@ Goliath and Elizabeth Greene use the authored bind geometry in `art/encounters` 
 Greene's projectile loops and the Hydra death sounds use project-authored or adapted Foley. The JAR includes their notices in `META-INF/licenses/blacklight-audio`. See [Greene projectile credits](art/encounters/greene-projectile-loop-audio-LICENSE.md) and [Hydra audio credits](art/creature-audio/hydra-death-LICENSE.md).
 
 The draw, swing and heavy variations ending in _2 and _3 under sounds/weapon/backspines use the credited Socapex combat recordings and artisticdude swishes, trimmed, pitched and layered for the shoulder organ. These six mixes are licensed under CC BY-SA 3.0.
+
+The eight Evolved weapon meshes use project-designed Minecraft geometry and pixel atlases. Their sources are tools/author_evolved_base_arms.py and tools/build_evolved_variants.py. The associated motion table retains its separate animation lineage.

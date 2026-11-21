@@ -14,24 +14,25 @@ public final class NetworkClientChecks {
     private static boolean respawnSent, done, settings;
     private static void write(String name,String text) throws Exception { Files.createDirectories(DIR); Files.writeString(DIR.resolve(name),text); }
     private static void check(boolean b,String reason) { if(!b) throw new IllegalStateException(reason); }
-    private static boolean mainShown() throws Exception {
-        var config=Class.forName("com.codex.blacklight.config.PassiveHudConfig"); var value=config.getField("SHOW_STACKS").get(null);
-        return (boolean)value.getClass().getMethod("get").invoke(value);
+    private static void verifyHiddenMarkers(){
+        for(String id:java.util.List.of("adaptation","tissue_regeneration")){
+            var type=net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getOptional(new net.minecraft.resources.ResourceLocation("blacklight",id)).orElseThrow();
+            var marker=new net.minecraft.world.effect.MobEffectInstance(type,200);
+            var presentation=net.minecraftforge.client.extensions.common.IClientMobEffectExtensions.of(marker);
+            check(!presentation.isVisibleInInventory(marker)&&!presentation.isVisibleInGui(marker),"Hidden Blacklight passive "+id);
+        }
     }
     private static void verifySettings(Minecraft mc) throws Exception {
         boolean installed=net.minecraftforge.fml.ModList.get().isLoaded("blacklight");
-        boolean main=installed&&mainShown(); boolean before=PassiveDisplayConfig.SHOW_STACKS.get();
-        PassiveDisplayConfig.toggle(); check(PassiveDisplayConfig.SHOW_STACKS.get()!=before,"potion switch toggles");
-        check(!installed||mainShown()==main,"potion setting must not change Blacklight");
-        check(Files.readString(mc.gameDirectory.toPath().resolve("config/adaptive_passives-client.toml")).contains("showPassiveStacks = "+!before),"potion preference saved");
-        PassiveDisplayConfig.toggle();
-        if(installed) {
-            var config=Class.forName("com.codex.blacklight.config.PassiveHudConfig"); config.getMethod("toggle").invoke(null);
-            check(mainShown()!=main,"main switch toggles"); check(PassiveDisplayConfig.SHOW_STACKS.get()==before,"main setting must not change potion HUD");
-            check(Files.readString(mc.gameDirectory.toPath().resolve("config/blacklight-client.toml")).contains("showPassiveStacks = "+!main),"main preference saved");
-            config.getMethod("toggle").invoke(null);
-        }
-        write("settings-pass","Independent toggles persisted and restored; neither changes the other.");
+        boolean before=PassiveDisplayConfig.SHOW_STACKS.get();
+        if(installed)verifyHiddenMarkers();
+        try{
+            PassiveDisplayConfig.toggle();
+            check(PassiveDisplayConfig.SHOW_STACKS.get()!=before,"Potion switch toggles");
+            check(Files.readString(mc.gameDirectory.toPath().resolve("config/adaptive_passives-client.toml")).contains("showPassiveStacks = "+!before),"Potion preference saved");
+            if(installed)verifyHiddenMarkers();
+        }finally{PassiveDisplayConfig.toggle();}
+        write("settings-pass","Potion preference persisted and restored independently of Blacklight markers.");
     }
     @SubscribeEvent public static void tick(ClientTickEvent e) {
         if(e.phase!=net.minecraftforge.event.TickEvent.Phase.END) return;

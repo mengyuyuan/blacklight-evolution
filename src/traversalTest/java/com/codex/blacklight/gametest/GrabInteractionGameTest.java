@@ -97,10 +97,26 @@ public final class GrabInteractionGameTest {
         h.assertTrue(cow.isRemoved()&&p.getHealth()==12&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints()==2,"queued consume and repeated input pay exactly once");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=30)
-    public static void primaryAndRepeatedGrabThrowAtReleaseFrameWithoutRewards(GameTestHelper h) {
-        for(var action:new Action[]{Action.THROW,Action.GRAB}) {
+    public static void grabKeyKeepsBodyAndPrimaryReleaseThrowsOnce(GameTestHelper h) {
+        for (boolean early : new boolean[]{false,true}) {
             var p=player(h);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
-            ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower()));ClawCombatSystem.handle(p,action);tick(p,5);
+            ClawCombatSystem.handle(p,Action.GRAB);
+            if (!early) {
+                tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+                ClawCombatSystem.handle(p,Action.GRAB);
+                ClawCombatSystem.handle(p,Action.GRAB_THROW_START);
+                ClawCombatSystem.handle(p,Action.GRAB_THROW_CANCEL);
+                ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);
+                h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GRAB_STAGE) == ConsumeVisual.HOLD,"repeated grab and cancelled release keep the body");
+            }
+            ClawCombatSystem.handle(p,Action.GRAB_THROW_START);
+            ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);
+            if (early) {
+                h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GRAB_STAGE) == ConsumeVisual.CAPTURE,"tap during capture waits for the hand");
+                tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+            }
+            p.setXRot(75);
+            tick(p,5);
             h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GRAB_STAGE)==ConsumeVisual.THROW,"throw waits for hand release");
             tick(p,1);ClawCombatSystem.handle(p,Action.THROW);ClawCombatSystem.handle(p,Action.CONSUME);
             h.assertTrue(cow.isAlive()&&com.codex.blacklight.registry.ModAttachments.getData(cow, ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.FLIGHT&&!com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CONSUMING),"throw releases hold and begins free flight");
@@ -115,6 +131,25 @@ public final class GrabInteractionGameTest {
             cow.discard();
         }
         h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=65)
+    public static void chargedPrimaryThrowsAlongDownwardReleaseAim(GameTestHelper h) {
+        var p=player(h);var cow=h.spawn(EntityType.COW,3,2,5);cow.setNoAi(true);
+        ClawCombatSystem.handle(p,Action.GRAB);
+        tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+        ClawCombatSystem.handle(p,Action.GRAB_THROW_START);
+        h.runAfterDelay(10,()->ClawCombatSystem.handle(p,Action.GRAB_THROW_START));
+        h.runAfterDelay(20,()->ClawCombatSystem.handle(p,Action.GRAB_THROW_START));
+        h.runAfterDelay(31,()->{
+            p.setXRot(70);
+            ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);
+            p.setXRot(-70);
+            tick(p,6);
+            var velocity=cow.getDeltaMovement();
+            h.assertTrue(velocity.y < -1.9 && velocity.z > .6,
+                    "fully charged body keeps downward pitch from the button release: "+velocity);
+            h.succeed();
+        });
     }
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void heldTargetFollowsWalkingAndTurning(GameTestHelper h) {
@@ -138,7 +173,7 @@ public final class GrabInteractionGameTest {
     }
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void carryingCanSprintTurnAndThrowWithoutStoppingOrHittingVictim(GameTestHelper h) {
-        var p=MovingCombatGameTest.player(h,PowerForm.CLAWS);p.setPos(p.position().add(2,0,0));
+        var p=player(h);p.setPos(h.absoluteVec(new Vec3(5,25,3)));
         var chicken=h.spawn(EntityType.CHICKEN,5,25,5);chicken.setNoAi(true);
         ConsumeSystem.request(p);tick(p,ConsumeVisual.captureDuration(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getActivePower()));float health=chicken.getHealth();
         double traveled=0;

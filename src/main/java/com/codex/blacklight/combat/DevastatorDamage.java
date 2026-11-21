@@ -17,7 +17,12 @@ public final class DevastatorDamage {
     public static boolean isTrueDamage(DamageSource source){return source.is(TYPE)||source.is(BulletdiveDamage.TYPE);}
     public static DamageSource source(ServerPlayer player){return new DamageSource(player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TYPE),player);}
     public static boolean hurt(ServerPlayer player,LivingEntity target,float healthDamage){
+        return hurt(player, target, healthDamage, null);
+    }
+    public static boolean hurt(ServerPlayer player, LivingEntity target, float healthDamage, HydraHurtContact.Contact contact) {
         if(!Float.isFinite(healthDamage)||healthDamage<=0||target.level()!=player.level()||!target.isAlive()||target.isRemoved())return false;
-        return target.hurt(source(player),healthDamage/CombatScale.units(target));
+        float amount = healthDamage / CombatScale.units(target);
+        var body = AnimatedHurtBody.of(target);
+        return contact != null && body != null ? body.hurtAt(source(player), amount, contact) : target.hurt(source(player), amount);
     }
 }

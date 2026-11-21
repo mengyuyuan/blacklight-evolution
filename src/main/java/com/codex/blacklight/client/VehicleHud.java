@@ -68,7 +68,7 @@ public final class VehicleHud {
         if(com.codex.blacklight.config.GunplayClientConfig.COMPACT_VEHICLE_HUD.get()&&!ClientClawEvents.targetInfoKey().isDown()){
             int w=146,x=g.guiWidth()-w-8,y=g.guiHeight()-100;
             var seatStatus=Component.translatable("hud.blacklight.vehicle_seat_status",seatName,VehicleControls.seatKey()).getString();
-            g.fill(x-4,y-4,x+w+4,y+54,0xB00C1116);
+            BlacklightUi.hud(g,x-5,y-4,x+w+4,y+54,BlacklightUi.GOLD);
             g.drawString(mc.font,mc.font.plainSubstrByWidth(seatStatus,w),x,y,0xFFD6D6D6,false);
             y+=12;
             g.drawString(mc.font,Component.literal(Math.round(vehicle.health())+" / "+Math.round(vehicle.maxHealth())+" HP"),x,y,0xFFE8EDD9,false);

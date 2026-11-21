@@ -44,7 +44,7 @@ public final class BlacklightHive extends Monster implements GeoEntity {
     @Override public void knockback(double strength,double x,double z){}
     @Override public void push(double x,double y,double z){}
     @Override public boolean hurt(DamageSource source,float amount){
-        if(com.codex.blacklight.combat.HiveDefense.fullDamage(source))return super.hurt(source,amount);
+        if(com.codex.blacklight.combat.ConsumeLastChance.executing(this) || com.codex.blacklight.combat.HiveDefense.fullDamage(source))return super.hurt(source,amount);
         if(level().isClientSide||level().getGameTime()<nextConventionalHit)return false;
         float chip=com.codex.blacklight.combat.HiveDefense.chipDamage(amount);
         if(chip<=0)return false;
@@ -178,12 +178,15 @@ public final class BlacklightHive extends Monster implements GeoEntity {
         }
     }
     /** Supreme Parasite injection: the hive dies at once and expels the Supreme Hunter. */
-    public void parasiteBurst(ServerPlayer player){
-        if(level().isClientSide||!isAlive())return;
+    public boolean parasiteBurst(ServerPlayer player){
+        if(level().isClientSide||!isAlive())return false;
+        var source = com.codex.blacklight.combat.DevastatorDamage.source(player);
+        invulnerableTime = 0;
+        boolean accepted = com.codex.blacklight.combat.ConsumeLastChance.execute(this, () -> hurt(source, getMaxHealth()*10));
+        if (!accepted || isAlive() || !rewarded) return false;
         if(level() instanceof ServerLevel s)s.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.6F,.02F,.03F),3F),getX(),getY()+1.5,getZ(),120,1.6,1.2,1.6,.1);
         SupremeHunterRewards.parasiteRelease(this,player);
-        hurt(com.codex.blacklight.combat.DevastatorDamage.source(player),getMaxHealth()*10);
-        if(isAlive()){setHealth(0);die(com.codex.blacklight.combat.DevastatorDamage.source(player));}
+        return true;
     }
     @Override public void die(DamageSource source){
         super.die(source);

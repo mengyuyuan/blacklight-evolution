@@ -27,6 +27,13 @@ public final class BackspineRack {
         if(morph.shoulder()<=.001F)return;
         var c=RoofPerformance.clock(player,partial);
         var chest=ScapulaMount.chest(poses);
-        RoofPerformance.rack(c,stack,buffers,light,chest,morph.shoulder(),-1);
+        for(int side=0;side<2;side++){
+            boolean right=(side==0)!=RooftopRig.reflect(c.key());
+            float receive=QuillReception.weight(player,partial,right);
+            var socket=new Matrix4f(chest).translate(right?.28F:-.28F,.90F,0)
+                    .rotateZ((right?1:-1)*receive*.16F).rotateX(-receive*.12F)
+                    .translate(right?-.28F:.28F,-.90F,0);
+            RoofPerformance.rack(c,stack,buffers,light,socket,morph.shoulder(),side);
+        }
     }
 }

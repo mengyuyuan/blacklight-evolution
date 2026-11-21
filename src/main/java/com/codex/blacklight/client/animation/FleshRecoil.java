@@ -71,7 +71,8 @@ public final class FleshRecoil {
         return switch (contact.strike) {
             case CLAW -> new Pose(-.14F*pitch, .51F*turn, .19F*turn, -.24F*pitch, .33F*weight, .68F*weight);
             case EDGE -> new Pose(-.21F*pitch, .70F*turn, .24F*turn, -.27F*pitch, .46F*weight, 1.12F*weight);
-            case QUILL -> new Pose(-.26F*pitch, .22F*turn, .13F*turn, -.32F*pitch, .23F*weight, .42F*weight);
+            case QUILL -> new Pose(-.31F*pitch, .34F*turn, .18F*turn, -.36F*pitch, .27F*weight, .46F*weight,
+                    (contact.region&24)!=0?1.6F*weight:0,(contact.region&6)!=0?.65F*turn:0);
             case FIST -> new Pose(-.32F*pitch, .20F*turn, .09F*turn, -.52F*pitch, .36F*weight, .8F*weight);
             case LASH -> new Pose(.18F*pitch, 1.03F*turn, .52F*turn, .30F*pitch, .94F*weight, 1.4F*weight);
             case HAMMER -> new Pose(.76F*pitch, .18F*turn, .30F*turn, .42F*pitch, .62F*weight,

@@ -48,13 +48,16 @@ public final class ConsumeTrauma {
         }
         if(!sites.isEmpty()){lashTime=time;lashSites=sites.toArray(Vec3[]::new);}
     }
+    final ConsumeImpactResponse response=new ConsumeImpactResponse();
+    private long hitScene=Long.MIN_VALUE;
+    private int hitOwner=-1;
     private int lastHit=-1;
     private int landedBlows;
     private final List<Shard> shards=new ArrayList<>();
     private Part struck;
     private Vec3 localImpact;
     private boolean crushed,groundPulp;
-    private double lastTime,impactTime;
+    private double impactTime;
     boolean open(){return struck!=null;}
     boolean groundAttachments(){return groundedScene || groundPulp;}
     private boolean groundedScene;
@@ -71,7 +74,9 @@ public final class ConsumeTrauma {
         return grip==null || owner.tickCount-grip.tick>1?Vec3.ZERO:grip.velocity[side];
     }
     public static void sampleActor(LivingEntity actor,PoseStack stack,Matrix4f[] bones,Matrix4f[] skin,float partial){
-        if(actor==null || ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
+        ChestConsumeTendrils.captureActor(actor,stack,bones,partial);
+        if(actor==null || !ConsumeVisual.consumeStage(ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)))return;
+        MountedBodyFit.capture(actor,stack);
         var skeleton=PlayerMotionController.skeleton();
         var palms=new Vec3[2];var fists=new Vec3[2];var forearms=new Vec3[10];
         for(int i=0;i<2;i++){
@@ -109,6 +114,56 @@ public final class ConsumeTrauma {
         CONTACTS.put(actor,new Contact(actor.level().getGameTime()+partial,palms,fists,sole,knee,forearms,
                 BlacklightBoneRendering.worldPoint(stack,bones[skeleton.searchJointByName("Chest").getId()].getTranslation(new Vector3f()))));
     }
+    /** Only real sampled hands or visible cutting edges qualify a native mounted contact. */
+    static Vec3[] mountSites(LivingEntity owner,ConsumeVisual visual,float partial){
+        double now=owner.level().getGameTime()+partial;
+        if(visual.form()==PowerForm.HAMMERFISTS.ordinal()){
+            var hammer=HAMMERS.get(owner);
+            if(hammer!=null&&Math.abs(now-hammer.time)<1.5)return hammer.sites;
+        }
+        var edges=MOUNT_EDGES.get(owner);
+        if(edges!=null&&Math.abs(now-edges.time)<1.5&&edges.form==visual.form()){
+            return edges.hands.values().stream().flatMap(java.util.Arrays::stream).toArray(Vec3[]::new);
+        }
+        var pose=CONTACTS.get(owner);
+        if(pose!=null&&Math.abs(now-pose.time)<1.5)return pose.forearms;
+        // First-person actor can be culled. Reconstruct the same animated wrist/forearm
+        // from its active pose; never snap a missed attack to the victim's centre.
+        var current=com.codex.blacklight.client.animation.NativeConsumePose.sample(owner,visual,"actor",partial);
+        if(current==null)return new Vec3[0];
+        var rig=PlayerMotionController.skeleton();var matrices=rig.getPoseMatrices(current);
+        Vec3 feet=owner.getPosition(partial);
+        float yaw=visual.stage()==ConsumeVisual.MOUNT_CONSUME?
+                com.codex.blacklight.client.animation.NativeConsumePose.facing(owner,visual.facing(),partial):visual.facing();
+        Vec3 front=Vec3.directionFromRotation(0,yaw),right=new Vec3(-front.z,0,front.x);
+        Vec3[] samples=new Vec3[8];
+        for(int i=0;i<2;i++){
+            String hand=i==0?"L":"R";
+            var tip=matrices[rig.searchJointByName("Tool_"+hand).getId()].getTranslation(new Vector3f());
+            var base=matrices[rig.searchJointByName("Hand_"+hand).getId()].getTranslation(new Vector3f());
+            for(int j=0;j<4;j++){
+                var p=new Vector3f(base).lerp(tip,j/3F);
+                samples[i*4+j]=feet.add(right.scale(.9375*p.x)).subtract(front.scale(.9375*p.z)).add(0,.9375*p.y,0);
+            }
+        }
+        return samples;
+    }
+    private record SharpSites(double time,int form,Map<String,Vec3[]> hands){}
+    private static final Map<LivingEntity,SharpSites> MOUNT_EDGES=new WeakHashMap<>();
+    static void mountEdges(LivingEntity owner,PowerForm form,String joint,Map<String,List<Vec3>> edges,float partial){
+        var points=new ArrayList<Vec3>();
+        for(var line:edges.values())for(int i=1;i<line.size();i++){
+            Vec3 a=line.get(i-1),b=line.get(i);int count=Math.min(12,Math.max(1,(int)Math.ceil(a.distanceTo(b)/.055)));
+            for(int j=0;j<=count;j++)points.add(a.lerp(b,j/(double)count));
+        }
+        if(points.isEmpty())return;
+        double now=owner.level().getGameTime()+partial;
+        var previous=MOUNT_EDGES.get(owner);
+        Map<String,Vec3[]> hands=previous!=null&&previous.time==now&&previous.form==form.ordinal()
+                ?previous.hands:new java.util.LinkedHashMap<>();
+        hands.put(joint,points.toArray(Vec3[]::new));
+        MOUNT_EDGES.put(owner,new SharpSites(now,form.ordinal(),hands));
+    }
     static boolean applies(PowerForm form,int variant){
         return ConsumeVariant.stealth(form,variant) || form==PowerForm.WHIPFIST && variant==ConsumeVariant.CLASSIC || form==PowerForm.HAMMERFISTS || form==PowerForm.MUSCLE_MASS && variant==ConsumeVariant.CLASSIC || form==PowerForm.CLAWS && variant==ConsumeVariant.CLASSIC ||
                 form==PowerForm.NONE && (variant==ConsumeVariant.DEFAULT || variant==ConsumeVariant.HEAD_STOMP || variant==ConsumeVariant.KNEE_HEAD || variant==ConsumeVariant.BEATDOWN);
@@ -124,6 +179,7 @@ public final class ConsumeTrauma {
 
     void contact(LivingEntity e,ConsumeVisual visual,ConsumeFracture.Phase phase,List<Part> parts,Vec3[] positions,float partial){
         if(!applies(phase.form(),visual.variant()) || !phase.nativeEvents())return;
+        if(hitScene!=visual.started()||hitOwner!=visual.consumerId()){hitScene=visual.started();hitOwner=visual.consumerId();lastHit=-1;landedBlows=0;}
         var profile=ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
         double now=e.level().getGameTime()+partial;
         int event=-1;
@@ -134,6 +190,7 @@ public final class ConsumeTrauma {
         }
         if(event<0)return;
         if(!(e.level().getEntity(visual.consumerId()) instanceof LivingEntity owner))return;
+        if(visual.stage()==ConsumeVisual.MOBILE_CONSUME&&ModAttachments.getData(owner,ModAttachments.GRAB_STAGE)!=ConsumeVisual.NONE)return;
         boolean stomp=visual.variant()==ConsumeVariant.HEAD_STOMP;
         boolean hammer=phase.form()==PowerForm.HAMMERFISTS;
         boolean knee=visual.variant()==ConsumeVariant.KNEE_HEAD;
@@ -170,10 +227,23 @@ public final class ConsumeTrauma {
         int region=head || hold&&!torsoHold?1:32;
         var hit=nearest(parts,positions,sites,region,partial);
         double contactRadius=blunt||punch||hold?.14:.065;
+        // If a different limb intercepts the strike, put its wound on that triangle.
+        // Keep the intended region for coincident clothing/skin samples.
+        var other=nearest(parts,positions,sites,0,partial);
+        if(other!=null&&(hit==null||Math.sqrt(other.distanceSquared())+.013<Math.sqrt(hit.distanceSquared())))hit=other;
         if(hit==null || hit.distanceSquared()>contactRadius*contactRadius)return;
+        if(hit.part().bind.region()!=region){
+            region=hit.part().bind.region();
+            if(head&&region!=1){
+                head=false;
+                blunt=true;
+            }
+        }
+        int before=hit.part().mesh.size(),revision=hit.part().meshRevision,initialShards=shards.size();
         lastHit=event;
-        struck=hit.part();localImpact=hit.local();lastTime=impactTime=now;crushed=head&&!blunt;
+        struck=hit.part();localImpact=hit.local();impactTime=now;crushed=head&&!blunt;
         Vec3 world=hit.world();
+        response.hit(e,owner,visual,event,world,positions[parts.indexOf(hit.part())],parts,positions,partial);
         Vec3 forward=Vec3.directionFromRotation(0,visual.facing());
         Vec3 jet=stomp?new Vec3(0,.22,0).add(forward.scale(-.32)).normalize():forward;
         if(blunt||hold||lash){
@@ -181,7 +251,26 @@ public final class ConsumeTrauma {
             Vec3 incoming=center.subtract(world).normalize();
             if(incoming.lengthSqr()<.5)incoming=forward;
             var turn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
-            if(punch){
+            if(tear){
+                Vec3 travel=world.subtract(owner.getPosition(partial).add(0,owner.getBbHeight()*.72,0));
+                cutAt(struck,hit.bind(),rotate(incoming,new Quaternionf(turn).conjugate()),rotate(travel.normalize(),new Quaternionf(turn).conjugate()),
+                        Math.min(.30,Math.max(.12,e.getBbWidth()*.34))/struck.scale);
+            }
+            var grip=ConsumeSurfaceResponse.of(visual.variant());
+            if(grip!=null){
+                Vec3 axis=new Vec3(0,1,0);
+                if(pose!=null&&hold){
+                    // Place both forearm impressions on independently confirmed surface triangles.
+                    Vec3[] first=java.util.Arrays.copyOfRange(pose.forearms,0,5),second=java.util.Arrays.copyOfRange(pose.forearms,5,10);
+                    var a=nearest(parts,positions,first,0,partial);var b=nearest(parts,positions,second,0,partial);
+                    boolean used=false;
+                    if(a!=null&&a.distanceSquared()<=contactRadius*contactRadius){grip(parts,positions,a,first[4].subtract(first[0]),visual,now,partial,grip);used=true;}
+                    if(b!=null&&b.distanceSquared()<=contactRadius*contactRadius&&(!used||a.world().distanceToSqr(b.world())>.07*.07)){
+                        grip(parts,positions,b,second[4].subtract(second[0]),visual,now,partial,grip);used=true;
+                    }
+                    if(!used)grip(parts,positions,hit,axis,visual,now,partial,grip);
+                }else grip(parts,positions,hit,axis,visual,now,partial,grip);
+            }else if(punch&&region==1){
                 chipHead(parts,positions,world,incoming,Math.min(4,++landedBlows),e.getBbWidth(),partial);
             }else if(blunt){
                 // One physical press crosses the head, its outer skin and any
@@ -196,7 +285,7 @@ public final class ConsumeTrauma {
                     if(AdaptiveRagdoll.bounds(part.mesh).distanceToSqr(centerLocal)<localRadius*localRadius)
                         part.press(centerLocal,rotate(incoming,inverse),localRadius,now,part==struck);
                 }
-            }else struck.imprintContact(localImpact,rotate(incoming,new Quaternionf(turn).conjugate()),
+            }else struck.imprintContact(hit.bind(),rotate(incoming,new Quaternionf(turn).conjugate()),
                     tear?FatalWeaponImpact.WHIP:FatalWeaponImpact.FIST);
             if(punch)struck.velocity=struck.velocity.add(incoming.scale(.075));
             if(tear)WoundBlood.rupture(e,region,world,incoming.scale(-1),false);
@@ -206,41 +295,90 @@ public final class ConsumeTrauma {
             // hammer or a head caught in the air still breaks freely.
             var floor=e.level().clip(new ClipContext(world.add(0,.05,0),world.add(0,-.8,0),
                     ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+            var crushTurn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
+            Vec3 inward=positions[parts.indexOf(struck)].subtract(world).normalize();
+            if(inward.lengthSqr()<.5)inward=forward;
+            cutAt(struck,hit.bind(),rotate(inward,new Quaternionf(crushTurn).conjugate()),null,
+                    Math.min(.27,Math.max(.10,e.getBbWidth()*.29))/struck.scale);
             groundPulp=(finishingPunch||stomp||hammer) && floor.getType()==HitResult.Type.BLOCK;
             double pavement=groundPulp?floor.getLocation().y:Double.NaN;
-            breakHead(parts,positions,world,pavement,stomp||groundPulp,partial);
+            breakHead(parts,positions,world,pavement,stomp||groundPulp,finishingPunch,partial);
             var stump=nearest(parts,positions,new Vec3[]{world},32,partial);
             if(stump!=null){struck=stump.part();localImpact=stump.local();}
         }else{
             Vec3 direction=world.subtract(owner.getPosition(partial).add(0,owner.getBbHeight()*.65,0)).normalize();
             if(direction.lengthSqr()<.5)direction=forward;
-            if(ConsumePlacementTrack.villagerReceiver(e)){
+            if(region==32&&ConsumePlacementTrack.villagerReceiver(e)){
                 var turn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
                 direction=rotate(new Vec3(0,0,1),turn.mul(struck.bind.rotation())).normalize();
-                var chest=AdaptiveRagdoll.villagerGrip(e,0,partial);
-                if(chest!=null)world=chest;
+                // Keep the measured wrist/triangle intersection through both robe layers.
             }
             jet=direction;
             for(int i=0;i<parts.size();i++){
-                var p=parts.get(i);if(p.bind.region()!=32)continue;
+                var p=parts.get(i);if(p.bind.region()!=region)continue;
                 var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
                 var inv=new Quaternionf(rotation).conjugate();
                 Vec3 center=p.center.add(rotate(world.subtract(positions[i]),inv).scale(1/p.scale));
+                if(p==hit.part())center=hit.bind();
                 if(center.distanceTo(p.center)>p.half.length()+.32)continue;
                 puncture(p,center,rotate(direction,inv),Math.min(.20,Math.max(.085,e.getBbWidth()*.25)),p==hit.part());
             }
         }
+        String kind=tear?"tear":blunt||hold?"dent":head?"crush":"pierce";
+        if(hit.part().meshRevision!=revision||shards.size()>initialShards)
+            ConsumeContactMarks.confirmed(e,visual,kind,event,hit.world(),hit.part().bind.region(),before,hit.part().mesh.size());
         com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Consume impact form={} variant={} age={} region={} gap={} shards={}",
                 phase.form(),visual.variant(),now-visual.started(),hit.part().bind.region(),Math.sqrt(hit.distanceSquared()),shards.size());
-        if(!blunt&&!hold&&!lash)WoundBlood.rupture(e,head?1:32,world,jet,head);
+        if(!blunt&&!hold&&!lash)WoundBlood.rupture(e,region,world,jet,head);
     }
 
-    private record SurfaceHit(Part part,Vec3 local,Vec3 world,double distanceSquared){}
+    private static void grip(List<Part> parts,Vec3[] posed,SurfaceHit hit,Vec3 cue,ConsumeVisual v,double now,float partial,ConsumeSurfaceResponse mode){
+        int idx=parts.indexOf(hit.part());
+        Vec3 inward=posed[idx].subtract(hit.world()).normalize();
+        if(inward.lengthSqr()<.5)inward=Vec3.directionFromRotation(0,v.facing());
+        int region=hit.part().bind.region();
+        for(int i=0;i<parts.size();i++){
+            var p=parts.get(i);if(p.bind.region()!=region||p.scale<.5)continue;
+            var inv=new Quaternionf(p.oldRotation).slerp(p.rotation,partial).conjugate();
+            Vec3 site=p==hit.part()?hit.bind():p.center.add(rotate(hit.world().subtract(posed[i]),inv).scale(1/p.scale));
+            double radius=Math.min(.46,Math.max(.20,p.half.length()*.91))/p.scale;
+            if(AdaptiveRagdoll.bounds(p.mesh).distanceToSqr(site)>radius*radius)continue;
+            Vec3 up=rotate(new Vec3(0,1,0),inv),line=rotate(cue,inv);
+            // Lifting and folding use vertical travel; collar and chest grips follow the actual forearm span.
+            Vec3 tangent=mode==ConsumeSurfaceResponse.NECK||mode==ConsumeSurfaceResponse.BEARHUG?line:up;
+            p.grip(ContactCompression.grip(site,rotate(inward,inv),tangent,radius,now,mode,v.consumerId(),v.started()));
+        }
+    }
+    static Vec3 gripTear(LivingEntity victim,LivingEntity owner,ConsumeVisual visual,List<Part> parts,Vec3[] at,float partial){
+        var left=musclePalm(owner,0,partial);var right=musclePalm(owner,1,partial);
+        if(left==null||right==null)return null;
+        Vec3 best=null,pull=right.subtract(left).normalize();
+        for(Vec3 palm:List.of(left,right)){
+            var hit=nearest(parts,at,new Vec3[]{palm},0,partial);
+            if(hit==null||hit.distanceSquared()>.14*.14)continue;
+            var part=hit.part();var rotation=new Quaternionf(part.oldRotation).slerp(part.rotation,partial).conjugate();
+            Vec3 inward=at[parts.indexOf(part)].subtract(hit.world()).normalize();
+            if(inward.lengthSqr()<.5)continue;
+            int before=part.mesh.size();
+            if(cutAt(part,hit.bind(),rotate(inward,rotation),rotate(pull,rotation),.15/part.scale)){
+                ConsumeContactMarks.confirmed(victim,visual,"tear",0,hit.world(),part.bind.region(),before,part.mesh.size());
+                if(best==null)best=hit.world();
+            }
+        }
+        return best;
+    }
+    static boolean cutAt(Part part,Vec3 site,Vec3 inward,Vec3 stroke,double radius){
+        var lining=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
+        var cut=stroke==null?ImpactChip.carve(part.mesh,site,inward,radius,0,lining):ImpactChip.groove(part.mesh,site,inward,stroke,radius,lining);
+        if(cut.cut()){part.mesh.clear();part.mesh.addAll(cut.skin());part.meshRevision++;}
+        return cut.cut();
+    }
+    private record SurfaceHit(Part part,Vec3 local,Vec3 bind,Vec3 world,double distanceSquared){}
     private static SurfaceHit nearest(List<Part> parts,Vec3[] positions,Vec3[] sites,int region,float partial){
         double best=Double.POSITIVE_INFINITY;
-        Vec3 local=null,world=null;Part hit=null;
+        Vec3 local=null,bind=null,world=null;Part hit=null;
         for(int i=0;i<parts.size();i++){
-            Part p=parts.get(i);if(p.bind.region()!=region || p.scale<.5)continue;
+            Part p=parts.get(i);if(region!=0&&p.bind.region()!=region || p.scale<.5)continue;
             var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
             var inverse=new Quaternionf(rotation).conjugate();
             for(Vec3 site:sites){
@@ -249,11 +387,15 @@ public final class ConsumeTrauma {
                 for(int j=0;j+3<skin.size();j+=4)for(int tri=1;tri<=2;tri++){
                     Vec3 at=SweptBladeSurface.closest(near,p.skinPoint(skin.get(j)),p.skinPoint(skin.get(j+tri)),p.skinPoint(skin.get(j+tri+1)));
                     double d=at.distanceToSqr(near)*p.scale*p.scale;
-                    if(d<best){best=d;hit=p;local=at;world=positions[i].add(rotate(at.subtract(p.center).scale(p.scale),rotation));}
+                    if(d<best){best=d;hit=p;local=at;
+                        var a=skin.get(j);var b=skin.get(j+tri);var c=skin.get(j+tri+1);
+                        var weights=ConsumeContactMarks.barycentric(at,p.skinPoint(a),p.skinPoint(b),p.skinPoint(c));
+                        bind=ConsumeContactMarks.weighted(weights,a.p,b.p,c.p);
+                        world=positions[i].add(rotate(at.subtract(p.center).scale(p.scale),rotation));}
                 }
             }
         }
-        return hit==null?null:new SurfaceHit(hit,local,world,best);
+        return hit==null?null:new SurfaceHit(hit,local,bind,world,best);
     }
 
     private void chipHead(List<Part> parts,Vec3[] positions,Vec3 impact,Vec3 inward,int count,double width,float partial){
@@ -280,12 +422,12 @@ public final class ConsumeTrauma {
                 double angle=(j+.5)*2*Math.PI/count+count*.87;
                 Vec3 kick=new Vec3(outward.x,0,outward.z).normalize().scale(.09)
                         .add(.065*Math.cos(angle),.095+.014*(j%3),.065*Math.sin(angle));
-                shards.add(new Shard(mesh,pivot,origin,rotation,kick,(j%2==0?1:-1)*.17,part.scale,false));
+                shards.add(new Shard(mesh,pivot,origin,rotation,kick,(j%2==0?1:-1)*.17,part.scale,false,false,impactTime));
             }
         }
     }
 
-    private void breakHead(List<Part> parts,Vec3[] positions,Vec3 impact,double pavement,boolean stomp,float partial){
+    private void breakHead(List<Part> parts,Vec3[] positions,Vec3 impact,double pavement,boolean stomp,boolean finishingPunch,float partial){
         for(int i=0;i<parts.size();i++){
             var p=parts.get(i);if(p.bind.region()!=1)continue;
             var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
@@ -301,47 +443,102 @@ public final class ConsumeTrauma {
                     Vec3 outward=pos.subtract(positions[i]).normalize().add(pos.subtract(impact).normalize().scale(.28));
                     Vec3 radial=new Vec3(outward.x,s*.035+t*.03,outward.z).normalize();
                     Vec3 kick=radial.scale(stomp?.145:.125).add(s*.022,stomp?.055:.10,t*.025);
+                    if(!stomp&&!groundPulp)kick=kick.add(response.fragmentImpulse());
                     if(groundPulp){
-                        // Compression and lateral spread happen on the impact surface.
-                        // Preserve the faceted outline rather than stacking red sheets in air.
-                        pos=new Vec3(pos.x,pavement+.018+(t+1)*.005,pos.z);
-                        kick=new Vec3(radial.x*.045,0,radial.z*.045);
+                        // The severed skin starts at its posed world position, clear of the contacted collider.
+                        double clearance=AdaptiveRagdoll.bounds(piece).getYsize()*p.scale*.34;
+                        pos=new Vec3(pos.x,Math.max(pos.y,pavement+clearance+.012),pos.z);
+                        kick=ConsumeShardMotion.eject(radial,s,t);
+                        if(finishingPunch&&t<0)kick=new Vec3(kick.x*.85,.038+.012*s,kick.z*.85);
                     }
-                    shards.add(new Shard(piece,middle,pos,rotation,kick,s*(.09+t*.025),p.scale,groundPulp));
+                    shards.add(new Shard(piece,middle,pos,rotation,kick,s*(.09+t*.025),p.scale,groundPulp,finishingPunch&&groundPulp&&t<0,impactTime));
                 }
             }
         }
     }
     private static final class Shard {
-        final List<Vertex> mesh;final Vec3 pivot;final Quaternionf initial;final double spin,scale;final boolean pulp;
-        Vec3 at,velocity;double angle;
-        Shard(List<Vertex> mesh,Vec3 pivot,Vec3 at,Quaternionf rot,Vec3 velocity,double spin,double scale,boolean pulp){
-            this.mesh=mesh;this.pivot=pivot;this.at=at;this.initial=new Quaternionf(rot);this.velocity=velocity;this.spin=spin;this.scale=scale;this.pulp=pulp;
+        final List<Vertex> mesh;
+        final Vec3 pivot;
+        final Quaternionf initial;
+        final double spin,scale,born,radius;
+        final boolean groundCrush,lowFlight;
+        Vec3 at,velocity;
+        double simulated,angle,flatten,lastLanding=Double.NEGATIVE_INFINITY;
+        Shard(List<Vertex> mesh,Vec3 pivot,Vec3 at,Quaternionf rot,Vec3 velocity,double spin,double scale,boolean groundCrush,boolean lowFlight,double born){
+            this.mesh=mesh;this.pivot=pivot;this.at=at;this.initial=new Quaternionf(rot);
+            this.velocity=velocity;this.spin=spin;this.scale=scale;this.groundCrush=groundCrush;this.lowFlight=lowFlight;this.born=simulated=born;
+            var box=AdaptiveRagdoll.bounds(mesh);
+            radius=Math.max(.012,Math.min(.17,Math.min(box.getXsize(),Math.min(box.getYsize(),box.getZsize()))*scale*.36));
+        }
+        double draw(float flow,double now){
+            double age=now-born;
+            if(lowFlight){
+                double release=Double.isFinite(firstLanding)?Math.min(12,firstLanding-born+1.5):12;
+                double blend=Math.max(0,Math.min(1,(age-release)/3));
+                return flow*blend*blend*(3-2*blend);
+            }
+            return ConsumeShardMotion.draw(groundCrush,flow,age);
+        }
+        double firstLanding=Double.NaN;
+        void advance(LivingEntity e,double now,float flow,Vec3 sink){
+            // An extra render pass in the same frame and different monitor refresh rates share the same physical steps.
+            simulated=Math.max(simulated,born+Math.floor(Math.max(0,now-born-12)*4)/4);
+            final double dt=.25;
+            while(simulated+dt<=now){
+                simulated+=dt;
+                double draw=draw(flow,simulated);
+                velocity=draw>.04?RagdollDrive.pull(at,velocity,sink,(float)draw,dt):velocity.add(0,-.049*dt,0);
+                Vec3 next=at.add(velocity.scale(dt));
+                double extent=radius*(1-draw);
+                if(draw<.36){
+                    Vec3 horizontal=new Vec3(next.x-at.x,0,next.z-at.z);
+                    if(horizontal.lengthSqr()>1e-8){
+                        var wall=e.level().clip(new ClipContext(at,at.add(horizontal).add(horizontal.normalize().scale(extent)),
+                                ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+                        if(wall.getType()==HitResult.Type.BLOCK){
+                            var n=Vec3.atLowerCornerOf(wall.getDirection().getNormal());
+                            if(n.y==0&&velocity.dot(n)<0){
+                                velocity=ConsumeShardMotion.bounce(velocity,n);
+                                Vec3 clear=wall.getLocation().add(n.scale(extent+.001));
+                                next=new Vec3(clear.x,next.y,clear.z);
+                            }
+                        }
+                    }
+                    double direction=velocity.y>0?1:-1;
+                    Vec3 from=new Vec3(next.x,at.y,next.z);
+                    var floor=e.level().clip(new ClipContext(from,next.add(0,direction*extent,0),
+                            ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+                    if(floor.getType()==HitResult.Type.BLOCK){
+                        Vec3 n=Vec3.atLowerCornerOf(floor.getDirection().getNormal());
+                        if(Math.abs(n.y)>.5&&velocity.dot(n)<0){
+                            if(n.y>0&&!Double.isFinite(firstLanding))firstLanding=simulated;
+                            if(n.y>0&&velocity.y<-.055){
+                                flatten=Math.min(.4,-velocity.y*1.35);
+                                lastLanding=simulated;
+                            }
+                            next=new Vec3(next.x,floor.getLocation().y+n.y*(extent+.001),next.z);
+                            velocity=ConsumeShardMotion.bounce(velocity,n);
+                        }
+                    }
+                }
+                angle+=spin*dt*Math.min(1,velocity.length()*6);
+                at=next;
+            }
         }
     }
     void fragments(LivingEntity e,double now,float flow,Vec3 sink,MultiBufferSource buffers,Matrix4f matrix,Matrix3f normals,Vec3 offset,int light){
-        if(shards.isEmpty())return;
-        double dt=Math.max(0,Math.min(2,now-lastTime));lastTime=now;
         for(var s:shards){
-            s.velocity=flow>.04?RagdollDrive.pull(s.at,s.velocity,sink,flow,dt):s.velocity.add(0,-.034*dt,0);
-            Vec3 to=s.at.add(s.velocity.scale(dt));
-            double radius=(s.pulp?.024:.055)*s.scale*(1-flow);
-            var floor=e.level().clip(new ClipContext(s.at.add(0,radius,0),to.add(0,-radius,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
-            if(floor.getType()==HitResult.Type.BLOCK && flow<.3){
-                to=floor.getLocation().add(Vec3.atLowerCornerOf(floor.getDirection().getNormal()).scale(radius));
-                s.velocity=s.velocity.multiply(.57,0,.57);
-            }else s.angle+=s.spin*dt;
-            s.at=to;
+            s.advance(e,now,flow,sink);
             var rot=new Quaternionf(s.initial).rotateXYZ((float)s.angle,(float)(s.angle*.67),0);
-            double scale=s.scale*(1-flow)*.67;
+            double draw=s.draw(flow,now);
+            double scale=s.scale*(1-draw)*.76;
+            double thickness=ConsumeShardMotion.thickness(s.flatten,now-s.lastLanding);
             for(var v:s.mesh){
-                Vec3 local=rotate(v.p.subtract(s.pivot).scale(scale),rot);
-                if(s.pulp)local=local.multiply(1.22,.105,1.2);
-                Vec3 pos=to.add(local).subtract(offset);
-                Vec3 n=new Vec3(normals.transform(rotate(v.n,rot).toVector3f())).normalize();
-                var material=s.pulp?net.minecraft.client.renderer.RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE):v.type;
-                int color=s.pulp?(s.spin>0?0xff6a202a:0xff923339):v.color;
-                v.emit(buffers.getBuffer(material),new Vec3(matrix.transformPosition(pos.toVector3f())),n,color,v.overlay,light);
+                Vec3 local=rotate(v.p.subtract(s.pivot).scale(scale),rot).multiply(1,thickness,1);
+                Vec3 pos=s.at.add(local).subtract(offset);
+                var normal=rotate(v.n,rot).multiply(1,1/thickness,1).normalize();
+                Vec3 n=new Vec3(normals.transform(normal.toVector3f())).normalize();
+                v.emit(buffers.getBuffer(v.type),new Vec3(matrix.transformPosition(pos.toVector3f())),n,v.color,v.overlay,light);
             }
         }
     }
@@ -356,7 +553,7 @@ public final class ConsumeTrauma {
     // Subtract a hexagonal tunnel from every surface, including front, back and clothing.
     private static void puncture(Part p,Vec3 entry,Vec3 axis,double radius,boolean lining){
         Vec3 u=axis.cross(Math.abs(axis.y)<.9?new Vec3(0,1,0):new Vec3(1,0,0)).normalize(),v=axis.cross(u);
-        var kept=new ArrayList<Vertex>();
+        var kept=new ArrayList<Vertex>();boolean penetrated=false;
         for(int j=0;j+3<p.mesh.size();j+=4){
             List<Vertex> inside=p.mesh.subList(j,j+4);
             for(int k=0;k<6 && !inside.isEmpty();k++){
@@ -372,6 +569,7 @@ public final class ConsumeTrauma {
             // Trace the actual clipped face, including the outer robe and far
             // panel. Recess the rim into the opening so it cannot hang off the skin.
             if(inside.size()>=3){
+                penetrated=true;
                 Vec3 center=Vec3.ZERO;
                 for(var corner:inside)center=center.add(corner.p);
                 center=center.scale(1.0/inside.size());
@@ -382,6 +580,7 @@ public final class ConsumeTrauma {
                 }
             }
         }
+        if(!penetrated)return;
         if(lining){
             double near=Double.POSITIVE_INFINITY,far=Double.NEGATIVE_INFINITY;
             for(var vertex:p.mesh){

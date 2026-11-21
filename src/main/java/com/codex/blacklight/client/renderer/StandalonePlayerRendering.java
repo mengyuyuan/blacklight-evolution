@@ -24,7 +24,7 @@ import net.minecraft.world.entity.HumanoidArm;
 public final class StandalonePlayerRendering {
     private static final Map<String,BlacklightPlayerRenderer> RENDERERS=new HashMap<>();
     private StandalonePlayerRendering() { }
-    private record HandContext(AbstractClientPlayer player,BlacklightPlayerRenderer renderer,float partial) { }
+    private record HandContext(AbstractClientPlayer player,BlacklightPlayerRenderer renderer,float partial,HumanoidArm consumeArm,FirstPersonConsumeTendrils.Scene weave,boolean probeOnly) { }
     private static HandContext hands;
     public static boolean nativeHandPass(){return hands!=null;}
     public static boolean allowFirstPersonHands(boolean mountedVehicle){return !mountedVehicle;}
@@ -39,15 +39,30 @@ public final class StandalonePlayerRendering {
         boolean biological=com.codex.blacklight.client.animation.WeaponMorphTiming.weapon(form)||morph.visible(false)||morph.visible(true);
         boolean armored=UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,event.getPartialTick())>0;
         boolean shielded=UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,event.getPartialTick())>0;
-        if(!biological&&!armored&&!shielded)return;
+        var weave=event.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND
+                ?FirstPersonConsumeTendrils.active(player,event.getPartialTick()):null;
+        if(!biological&&!armored&&!shielded&&weave==null)return;
         var renderer=RENDERERS.get(player.getModelName());if(renderer==null)return;
+        var access=(com.codex.blacklight.mixin.client.NativeHandRendererAccess)mc.gameRenderer.itemInHandRenderer;
+        if(!biological&&!armored&&weave!=null){
+            boolean bareMain=player.getMainHandItem().isEmpty(),freeOff=player.getOffhandItem().isEmpty()&&!shielded;
+            if(!bareMain&&!freeOff&&weave.envelope()<=.004F&&!shielded)return;
+            var arm=bareMain||!freeOff?player.getMainArm():player.getMainArm().getOpposite();
+            // With two held items, sample the vanilla grip without submitting another arm or hiding an item.
+            hands=new HandContext(player,renderer,event.getPartialTick(),arm,weave,!bareMain&&!freeOff);
+            try{drawVanillaArm(access,event,arm);}finally{hands=null;}
+            if(bareMain)event.setCanceled(true);
+            if(!shielded)return;
+            weave=null;
+        }
         if(event.getHand()==net.minecraft.world.InteractionHand.OFF_HAND){event.setCanceled(true);return;}
         if(biological||armored)event.setCanceled(true);
-        var access=(com.codex.blacklight.mixin.client.NativeHandRendererAccess)mc.gameRenderer.itemInHandRenderer;
-        hands=new HandContext(player,renderer,event.getPartialTick());
+        boolean drawLeft=armored||com.codex.blacklight.client.animation.WeaponMorphTiming.arm(form,true)||morph.visible(true);
+        var tetherArm=drawLeft?player.getMainArm():HumanoidArm.RIGHT;
+        hands=new HandContext(player,renderer,event.getPartialTick(),tetherArm,weave,false);
         try {
             if(biological||armored)drawVanillaArm(access,event,HumanoidArm.RIGHT);
-            if(armored||com.codex.blacklight.client.animation.WeaponMorphTiming.arm(form,true)||morph.visible(true))
+            if(drawLeft)
                 drawVanillaArm(access,event,HumanoidArm.LEFT);
             if(shielded)drawVanillaShield(access,event,renderer);
         }finally{hands=null;}
@@ -91,8 +106,8 @@ public final class StandalonePlayerRendering {
         var morph=WeaponMorphTracker.sample(event.getPlayer(),current.partial());
         boolean covered=com.codex.blacklight.client.model.BlockArmorModel.get().covers(event.getPlayer(),left?"left_arm":"right_arm",current.partial());
         // Vanilla draws the remaining skin while liquid has not yet covered the arm.
-        if(covered||morph.coverage(left)>=.72F)event.setCanceled(true);
-        current.renderer().renderPoweredArm(event.getPlayer(),event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight(),current.partial(),event.getArm()==HumanoidArm.LEFT);
+        if(current.probeOnly()||covered||morph.coverage(left)>=.72F)event.setCanceled(true);
+        current.renderer().renderPoweredArm(event.getPlayer(),event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight(),current.partial(),left,current.consumeArm()==event.getArm()?current.weave():null,current.probeOnly());
     }
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void player(RenderPlayerEvent.Pre event) {

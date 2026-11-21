@@ -130,7 +130,11 @@ public final class RooftopRig {
             ||key.startsWith("spines_ground_")&&!key.endsWith("_throw")||key.startsWith("spines_light_")&&!key.contains("_flight_");}
     public static float time(String key,float t){
         if(key.startsWith("spines_rack_"))return t/20;
-        if(key.equals("spines_scapula_deploy"))return ramp(t,0,17,0,1.0f);
+        if(key.equals("spines_scapula_deploy")){
+            if(t<5)return ramp(t,0,5,0,.21F);
+            if(t<9)return ramp(t,5,9,.21F,.76F);
+            return ramp(t,9,17,.76F,1);
+        }
         if(key.isEmpty()||key.startsWith("spines_scapula"))return 1.0f;
         if(key.startsWith("spines_light_")){
             if(key.endsWith("_lift"))return t<4?ramp(t,0,4,1.69f,1.98f):ramp(t,4,13,1.98f,2.20f);
@@ -171,6 +175,10 @@ public final class RooftopRig {
         if(since<0)return 1;
         float t=(float)((since-1.05-.35*(slot/2))/5.3);
         return ScapulaVolley.ease(t);
+    }
+    public static float deployFill(float tick,int slot){
+        float release=5.0F+1.15F*(slot%2)+1.45F*(slot/2);
+        return ScapulaVolley.ease((tick-release)/3.6F);
     }
     public int socketSlot(int node) { return socketSlot[node]; }
 
@@ -270,6 +278,84 @@ public final class RooftopRig {
         var delta=new Quaternionf().rotationTo(from.normalize(),to.normalize());
         bone.setTranslation(0,0,0).rotateLocal(delta).setTranslation(pivot);
     }
+    /** The hips follow the step. Attach the firing torso at the gait's waist,
+     * then carry its shoulders and arms together so the recoil stays articulated. */
+    public static void groundStride(Matrix4f[] shot, Matrix4f[] gait, float weight, boolean standby) {
+        if (weight <= 0) return;
+        var skeleton = NativeBind.skeleton;
+        int root = skeleton.rootJoint.getId(), torso = skeleton.torso.getId();
+        var original = shot.clone();
+        var shotWaist = new Matrix4f(original[root]).invert().mul(original[torso]);
+        var gaitWaist = new Matrix4f(gait[root]).invert().mul(gait[torso]);
+        var stepWaist = BoneTransform.fromMatrix(gaitWaist);
+        var fireWaist = BoneTransform.fromMatrix(shotWaist);
+        if (!standby) stepWaist.rotation().slerp(fireWaist.rotation(), .70F);
+
+        shot[root] = weight >= 1 ? gait[root] : BoneTransform.blend(BoneTransform.fromMatrix(original[root]),
+                BoneTransform.fromMatrix(gait[root]), weight).toMatrix();
+        shot[torso] = new Matrix4f(shot[root]).mul(BoneTransform.blend(fireWaist, stepWaist, weight).toMatrix());
+        var upperShift = new Matrix4f(shot[torso]).mul(new Matrix4f(original[torso]).invert());
+        for (var bone : skeleton.bones()) {
+            int id = bone.getId();
+            if (id == root || id == torso) continue;
+            int parentId = bone.parent().getId();
+            if (!standby && isUpperBody(bone, skeleton.torso)) {
+                shot[id] = new Matrix4f(upperShift).mul(original[id]);
+            } else if (weight >= 1) {
+                shot[id] = gait[id];
+            } else {
+                var from = new Matrix4f(original[parentId]).invert().mul(original[id]);
+                var to = new Matrix4f(gait[parentId]).invert().mul(gait[id]);
+                var local = BoneTransform.blend(BoneTransform.fromMatrix(from), BoneTransform.fromMatrix(to), weight);
+                shot[id] = new Matrix4f(shot[parentId]).mul(local.toMatrix());
+            }
+        }
+    }
+
+    private static boolean isUpperBody(BlacklightSkeleton.Bone bone, BlacklightSkeleton.Bone torso) {
+        for (var ancestor = bone.parent(); ancestor != null; ancestor = ancestor.parent())
+            if (ancestor == torso) return true;
+        return false;
+    }
+    public static float shoulderTurn(net.minecraft.world.phys.Vec3 direction,float facing,boolean rightLead){
+        if(direction.horizontalDistanceSqr()<1e-6)return 0;
+        float yaw=(float)Math.toDegrees(Math.atan2(-direction.x,direction.z));
+        float relative=net.minecraft.util.Mth.wrapDegrees(facing-yaw);
+        if(Math.abs(relative)>165)relative=rightLead?180:-180;
+        return net.minecraft.util.Mth.clamp(relative*.68F,-68,68);
+    }
+    public static float shoulderPitch(net.minecraft.world.phys.Vec3 direction){
+        return net.minecraft.util.Mth.clamp((float)Math.toDegrees(Math.atan2(direction.y,direction.horizontalDistance()))*.55F,-22,25);
+    }
+    public static void aimUpperBody(Matrix4f[] bones,float yaw,float pitch){
+        if(Math.abs(yaw)+Math.abs(pitch)<.02F)return;
+        var sk=NativeBind.skeleton;
+        var pivot=bones[sk.torso.getId()].getTranslation(new Vector3f());
+        var turn=new Matrix4f().translation(pivot).rotateY((float)Math.toRadians(yaw))
+                .rotateX((float)Math.toRadians(pitch)).translate(-pivot.x,-pivot.y,-pivot.z);
+        for(var bone:sk.bones())if(bone==sk.torso||isUpperBody(bone,sk.torso))
+            bones[bone.getId()]=new Matrix4f(turn).mul(bones[bone.getId()]);
+    }
+
+    /** Apply recoil at the actual release ticks; the legs continue their locomotion pose. */
+    public static void recoil(Matrix4f[] bones,String clip,float tick){
+        boolean light=clip.startsWith("spines_light_");
+        if(!light && !clip.endsWith("_throw") && !clip.endsWith("_charged"))return;
+        if(!light && !clip.startsWith("spines_ground_") && !clip.startsWith("spines_air_"))return;
+        float left=0,right=0,load=0;
+        for(int i=0;i<6;i++){
+            int release=releaseTick(clip,i);
+            if(release<0)continue;
+            float dt=tick-release;
+            float kick=ScapulaVolley.ease((dt+.15F)/1.15F)*(1-ScapulaVolley.ease((dt-.85F)/(light?2.8F:4.6F)));
+            float brace=ScapulaVolley.ease((dt+3)/2.3F)*(1-ScapulaVolley.ease((dt+.7F)/1.4F));
+            boolean rightSide=(i%2==0)!=reflect(clip);
+            if(rightSide)right=Math.max(right,kick);else left=Math.max(left,kick);
+            load=Math.max(load,brace);
+        }
+        aimUpperBody(bones,(right-left)*(light?7:10),load*(light?4:7)-Math.max(left,right)*(light?5:11));
+    }
+
     /** Keep the soles on their marks while the animated pelvis shifts weight into each knee. */
     public static void plantGroundShot(Matrix4f[] bones) {
         var skeleton = NativeBind.skeleton;

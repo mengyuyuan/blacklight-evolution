@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "blacklight:bulletdive",
-    "blacklight:devastator"
+    "blacklight:devastator",
+    "blacklight:quill_drain",
+    "blacklight:consume_contact"
   ]
 }

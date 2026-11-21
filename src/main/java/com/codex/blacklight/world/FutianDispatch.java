@@ -102,10 +102,8 @@ public final class FutianDispatch {
         if (!MotherPlazaStructure.matchesLot(level.getSeed(),origin) || level.players().stream().noneMatch(p -> !p.isSpectator() && near(p,origin,105))) return;
         var shift=station.shift;
         var now=level.getGameTime();
-        var desk=origin.offset(8,1,68);
-        if (!level.isPositionEntityTicking(desk) || !level.getBlockState(desk).is(com.codex.blacklight.registry.ModBlocks.FIELD_POST.get())) return;
-        if (shift.contains("DoorUntil") && now>=shift.getLong("DoorUntil")) {
-            var door=origin.offset(2,1,28);
+        var door=origin.offset(2,1,28);
+        if (shift.contains("DoorUntil") && now>=shift.getLong("DoorUntil") && level.hasChunkAt(door)) {
             if (level.getBlockState(door).is(Blocks.IRON_DOOR))
                 ((DoorBlock)Blocks.IRON_DOOR).setOpen(null,level,level.getBlockState(door),door,false);
             shift.remove("DoorUntil"); station.setChanged();
@@ -117,7 +115,8 @@ public final class FutianDispatch {
             for(var guard:guards) if(!guard.isPassenger() && guard.distanceToSqr(boss)<40*40 && guard.hasLineOfSight(boss))
                 guard.setTarget(boss);
         });
-        if (now>=shift.getLong("NextShift") && guards.stream().filter(g -> !g.isPassenger()).count()<2) {
+        if (now>=shift.getLong("NextShift") && level.isPositionEntityTicking(origin.offset(15,1,64))
+                && level.isPositionEntityTicking(origin.offset(9,1,66)) && guards.stream().filter(g -> !g.isPassenger()).count()<2) {
             deploy(level,origin.offset(15,1,64),origin,false);
             if (guards.stream().noneMatch(g -> g.commandRole()==com.codex.blacklight.military.MilitaryRole.COMMANDER))
                 deploy(level,origin.offset(9,1,66),origin,true);

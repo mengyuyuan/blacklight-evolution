@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HydraHurtContactTest {
-    private static final Vec3 SLUG_SAMPLE=new Vec3(.7389640237677464,5.112649713712703,.22943394222028923);
+    private static final Vec3 SLUG_SAMPLE=new Vec3(.8059021845,6.1141481542,.3027307278);
     private static List<HydraContact.Region> frame(int sourceFrame,int broken){
         return GreeneContact.regions(GreeneMotion.sample("idle",sourceFrame*20/24F,false),Vec3.ZERO,0,broken);
     }

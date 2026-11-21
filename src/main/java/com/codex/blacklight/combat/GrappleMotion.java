@@ -6,6 +6,14 @@ import net.minecraft.world.entity.LivingEntity;
 /** Shared source-pair selection and clock for capture and carrying. */
 public final class GrappleMotion {
     private GrappleMotion() {}
+    /** The exposed Greene braces face-to-face before breaking the grip. Both actors keep their own root. */
+    public static boolean greeneGrip(LivingEntity victim,ConsumeVisual visual) {
+        return victim instanceof com.codex.blacklight.world.GreeneHost &&
+                (visual.stage()==ConsumeVisual.CAPTURE || ConsumeVisual.carrying(visual.stage()));
+    }
+    public static int receiverTurn(LivingEntity victim,ConsumeVisual visual) {
+        return active(visual) && !greeneGrip(victim,visual) ? 0 : 180;
+    }
     public static boolean active(ConsumeVisual visual){return visual.stage()==ConsumeVisual.CAPTURE||visual.stage()==ConsumeVisual.HOLD||visual.stage()==ConsumeVisual.GRAB_ATTACK||visual.stage()==ConsumeVisual.AIR_THROW||visual.stage()==ConsumeVisual.AIR_HOLD;}
     public static String key(LivingEntity owner,ConsumeVisual visual){
         if(visual.stage()==ConsumeVisual.AIR_THROW)return AerialCarryMotion.THROW_KEY;
@@ -49,6 +57,11 @@ public final class GrappleMotion {
     /** The same body-relative grip is used by authority and receiver interpolation. */
     public static java.util.Optional<net.minecraft.world.phys.Vec3> carryAnchor(LivingEntity owner,LivingEntity victim,
             ConsumeVisual visual,net.minecraft.world.phys.Vec3 feet,float yaw,float partial) {
+        if(greeneGrip(victim,visual)) {
+            var front=net.minecraft.world.phys.Vec3.directionFromRotation(0,yaw);
+            double reach=(owner.getBbWidth()+victim.getBbWidth())*.5+.19;
+            return java.util.Optional.of(feet.add(front.scale(reach)).add(-front.z*.10,0,front.x*.10));
+        }
         boolean gliding=visual.stage()==ConsumeVisual.HOLD&&!owner.onGround()
                 &&com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.GLIDE_UNTIL)>=owner.level().getGameTime();
         float weight=visual.stage()==ConsumeVisual.AIR_THROW?0:com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.MOVEMENT_STATE).carryPosture().sample(owner.tickCount,gliding,partial);

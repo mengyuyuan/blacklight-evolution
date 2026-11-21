@@ -51,36 +51,8 @@ S=np.diag([-1.,1.,1.]);old_pivots={name:S@np.array(b['pivot']) for name,b in old
 scale=abs(old_pivots['head'][1])/abs(reference['Head'][1,3])
 new_pivots={name:S@reference[source][:3,3]*scale for name,source in mapping.items()}
 
-# The slender source hand has no finger chain. Its actual weighted skin gives
-# the bind direction: use only vertices fully assigned to Wrist_R, and the
-# distal fifth by distance from that wrist. This is a static authored-mesh fit,
-# not another animation/controller or a ground-height correction.
 raw_bind=source_world({'tracks':[]},0)
-thin_skin_node=next(n for n in nodes if n['type']==0x10040 and m.decoder.text8(n['payload'],4)[0]=='behemoth_R_ArmShape001_skin')
-thin_skin,_=m.decoder.m.streams(thin_skin_node)
-thin_wrist_index=next(i for i,(name,_,_) in enumerate(rig) if name=='Wrist_R')
-fully_weighted=((thin_skin['indices']==thin_wrist_index)&(thin_skin['weights']>.99)).any(axis=1)
-thin_points=thin_skin['position'][fully_weighted,:3]
-distances=np.linalg.norm(thin_points-raw_bind['Wrist_R'][:3,3],axis=1)
-distal=thin_points[distances>=np.quantile(distances,.8)]
-source_tip=distal.mean(axis=0)
-target_tip=S@(reference['Wrist_R']@np.linalg.inv(raw_bind['Wrist_R'])@np.r_[source_tip,1])[:3]*scale
-authored_tips=[]
-for i in range(4):
-    cube=old['left_finger_'+str(i)]['cubes'][1]
-    center=S@np.array(cube['pivot']);x,y,z=np.radians(cube['rotation'])*[-1,-1,1]
-    cx,sx,cy,sy,cz,sz=math.cos(x),math.sin(x),math.cos(y),math.sin(y),math.cos(z),math.sin(z)
-    q=np.array([[cz*cy,cz*sy*sx-sz*cx,cz*sy*cx+sz*sx],[sz*cy,sz*sy*sx+cz*cx,sz*sy*cx-cz*sx],[-sy,cy*sx,cy*cx]])
-    ends=[center+q[:,1]*cube['size'][1]/2,center-q[:,1]*cube['size'][1]/2]
-    authored_tips.append(max(ends,key=lambda point:np.linalg.norm(point-old_pivots['left_hand'])))
-authored_thin_axis=np.mean(authored_tips,axis=0)-old_pivots['left_hand']
-source_thin_axis=target_tip-new_pivots['left_hand']
-assert len(thin_points)==108 and len(distal)==22
-thin_fit={'skinNodeOffset':thin_skin_node['offset'],'joint':'Wrist_R','jointIndex':thin_wrist_index,
-          'fullyWeightedVertices':len(thin_points),'distalVertices':len(distal),
-          'selection':'weight > 0.99; farthest 20 percent by distance to raw-bind Wrist_R',
-          'sourceTipBind':source_tip.tolist(),'authoredTipBind':np.mean(authored_tips,axis=0).tolist(),
-          'operation':'Minimal rotation about unchanged wrist aligns authored mean claw-tip axis to actual source weighted hand axis; inherited uniform length scale unchanged. This is an MC mesh fit, not an original finger animation.'}
+thin_fit={'design':'The authored fingers retain the parent wrist orientation.'}
 aims={'torso':('head','Head')}
 for side,suffix in [('left','L'),('right','R')]:
     arm_suffix='R' if side=='left' else 'L'
@@ -101,8 +73,8 @@ for name,bone in old.items():
             # as length scale; otherwise the fingers retain the old rig's axis.
             rotation=bind[bone['parent']][:3,:3]/factor
         if name=='left_hand':
-            rotation=m.rotation_between(rotation@authored_thin_axis,source_thin_axis)@rotation
-            assert np.dot(m.unit(rotation@authored_thin_axis),m.unit(source_thin_axis))>1-1e-8
+            # Closed, compact claws clear the support floor during the giant fist's slam.
+            factor *= .48
         transform=np.eye(4);transform[:3,:3]=rotation*factor
         transform[:3,3]=new_pivots[name]-transform[:3,:3]@old_pivots[name]
         bind[name]=transform;factors[name]=factor

@@ -53,7 +53,7 @@ void main() {
         vec3 right = CurveReference - dot(CurveReference, tangent) * tangent;
         right /= max(length(right), 0.00001);
         vec3 up = cross(right, tangent);
-        float crossScale = CurveMetrics.w * max(0.08, 1.0 - t * 0.86);
+        float crossScale = CurveMetrics.w * (CurveMode > 1.5 ? 1.0 : max(0.08, 1.0 - t * 0.86));
         vec2 rotated = vec2(Position.x * CurveTwist.x - Position.z * CurveTwist.y,
                             Position.x * CurveTwist.y + Position.z * CurveTwist.x) * crossScale;
         localPosition = 2.0 * CurveB * one * t + CurveC * t * t

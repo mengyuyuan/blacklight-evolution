@@ -26,6 +26,8 @@ public final class ConsumeSystem {
     public static final float HEALTH_LIMIT = .15F;
     public static final float DIRECT_GRAB_MAX_HEALTH = 50F;
     private static final Map<ServerPlayer, Session> ACTIVE = new HashMap<>();
+    private record Absorbing(ServerPlayer owner,Session scene) {}
+    private static final Map<Mob,Absorbing> ABSORBING=new IdentityHashMap<>();
     public static final TagKey<EntityType<?>> CONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "consumable"));
     public static final TagKey<EntityType<?>> UNCONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "unconsumable"));
     public static final TagKey<EntityType<?>> PASSIVE = TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("blacklight", "consumable_without_weakening"));
@@ -36,7 +38,8 @@ public final class ConsumeSystem {
     static float chargeFraction(int ticks){return Math.max(0,Math.min(1,ticks/(float)THROW_CHARGE_TICKS));}
     /** Left button down while holding a body: start or renew the wind-up. */
     public static void startThrowCharge(ServerPlayer player){
-        var s=ACTIVE.get(player);if(s==null||!ConsumeVisual.holding(s.stage)||s.large||!valid(player,s))return;
+        var s=ACTIVE.get(player);if (s == null || s.large || s.consumeQueued || s.throwAim != null
+                || !(s.stage == ConsumeVisual.CAPTURE || ConsumeVisual.carrying(s.stage)) || !valid(player,s)) return;
         long now=player.level().getGameTime();
         if(s.chargeStart<0||now-s.chargeInput>25){
             s.chargeStart=now;
@@ -48,8 +51,15 @@ public final class ConsumeSystem {
     public static void releaseThrowCharge(ServerPlayer player){
         var s=ACTIVE.get(player);if(s==null)return;
         long now=player.level().getGameTime();
-        int ticks=s.chargeStart<0||now-s.chargeInput>25?0:(int)Math.min(THROW_CHARGE_TICKS,Math.max(0,now-s.chargeStart));
-        clearThrowCharge(player,s);s.throwCharge=ticks;throwTarget(player);
+        if (s.chargeStart < 0 || now - s.chargeInput > 25 || !valid(player,s)
+                || !(s.stage == ConsumeVisual.CAPTURE || ConsumeVisual.carrying(s.stage))) {
+            clearThrowCharge(player,s);
+            return;
+        }
+        s.throwCharge = (int)Math.min(THROW_CHARGE_TICKS, Math.max(0, now - s.chargeStart));
+        clearThrowCharge(player,s);
+        s.throwAim = selectThrowAim(player, s.victim);
+        if (ConsumeVisual.carrying(s.stage)) throwTarget(player);
     }
     public static void cancelThrowCharge(ServerPlayer player){var s=ACTIVE.get(player);if(s!=null)clearThrowCharge(player,s);}
     private static void clearThrowCharge(ServerPlayer player,Session s){
@@ -57,23 +67,123 @@ public final class ConsumeSystem {
         if(com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.GRAB_THROW_CHARGE)>=0){com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.GRAB_THROW_CHARGE,-1L);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.GRAB_THROW_CHARGE);}
     }
     private static final class Session {
-        final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large; float facing;
+        final ConsumeContactDamage contactDamage = new ConsumeContactDamage();
+        final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large, smallDirect; float facing;
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
         /** Held-throw charge, server game time; repeat START packets renew the lease like block throws. */
+        boolean travelRequested, grabQueued, bodyWeaveStarted;
+        ThrowAim throwAim;
         long chargeStart=-1,chargeInput=-1;int throwCharge; int landingDelay;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=ConsumeSequence.bruteMount(v)?v.yBodyRot:p.getYRot();
+            smallDirect=smallDirectReceiver(v);
             reward=com.codex.blacklight.power.AssimilationSystem.quote(p,v);
             heal=reward.healing();biomass=reward.biomass();ep=reward.ep();
         }
         Mob victim(){return victim;} PowerForm form(){return form;}
         Vec3 start(){return start;} int started(){return started;}
+        boolean gripSound,absorbSound;
+        int returnSoundTick;
+        String sound(String phase){
+            int audioStage=victim instanceof BlacklightHunter ? ConsumeVisual.HUNTER_CONSUME : stage;
+            return ConsumeImpactKind.forPhase(form,large,audioStage,variant,phase);
+        }
         PowerForm animationForm(){return stage==ConsumeVisual.HUNTER_CONSUME?PowerForm.NONE:form;}
         int duration(){return stage==ConsumeVisual.AIR_HOLD?AerialCarryMotion.holdDuration():stage==ConsumeVisual.AIR_THROW?AerialCarryMotion.duration():stage==ConsumeVisual.GRAB_ATTACK?HeldSlamMotion.duration():stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.ACTOR_TICKS:ConsumeSequence.duration(animationForm(),large,variant);}
         int completionTick(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.COMPLETE_TICKS:ConsumeSequence.completionTick(animationForm(),large,variant);}
         boolean committed(){return ConsumeVisual.consumeStage(stage);}
         float heal(){return heal;} int biomass(){return biomass;} int ep(){return ep;}
+    }
+    /** Travel input is sampled while the source strike still owns the body. */
+    public static void travelIntent(ServerPlayer player,boolean moving){
+        var s=ACTIVE.get(player);
+        if(s!=null)s.travelRequested=moving;
+    }
+    /** Direct-grab class, evaluated before the receiver starts shrinking or moving. */
+    public static boolean smallDirectReceiver(LivingEntity target) {
+        return !ConsumeSequence.large(target)&&!ConsumeSequence.boss(target)
+                &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host
+                    &&com.codex.blacklight.power.AssimilationSystem.requiresCoreWeakening(host))
+                &&canGrabAtFullHealth(target);
+    }
+
+    private static boolean canGrabAtFullHealth(LivingEntity target) {
+        if(target instanceof com.codex.blacklight.entity.MilitarySoldier
+                &&!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target))return true;
+        return com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
+                &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved());
+    }
+    private static boolean smallDirectScene(Session s) {
+        return s.smallDirect&&s.stage==ConsumeVisual.CONSUME&&!ConsumeVariant.stealth(s.form,s.variant);
+    }
+    private static int mobileAt(Session s) {
+        if(!smallDirectScene(s)||s.landingDelay<0)return Integer.MAX_VALUE;
+        var profile=ConsumeReceiverScene.profile(s.form,false,s.variant);
+        double at=ConsumeReceiverScene.absorptionSeconds(s.form,s.variant);
+        if(profile!=null)for(float hit:profile.hitSeconds())at=Math.max(at,hit);
+        return Double.isFinite(at)&&at>0?(int)Math.ceil(at*20-1e-4):Integer.MAX_VALUE;
+    }
+    private static void startTail(ServerPlayer p,Session s){
+        var mob=s.victim;
+        var visual=ModAttachments.getData(mob,ModAttachments.CONSUME_VISUAL).mobileTail();
+        var occupied=new java.util.BitSet();
+        for(var old:ABSORBING.values())if(old.owner()==p){
+            var existing=ModAttachments.getData(old.scene().victim,ModAttachments.MOBILE_CONSUME_CARRY);
+            if(existing.ownerId()==p.getId())occupied.set(existing.slot());
+        }
+        int slot=occupied.nextClearBit(0);
+        var carry=MobileConsumeCarry.start(p,mob,visual,slot);
+        ModAttachments.setData(mob,ModAttachments.MOBILE_CONSUME_CARRY,carry);ModAttachments.syncData(mob,ModAttachments.MOBILE_CONSUME_CARRY);
+        ACTIVE.remove(p);ABSORBING.put(mob,new Absorbing(p,s));
+        s.stage=ConsumeVisual.MOBILE_CONSUME;
+        ModAttachments.setData(mob,ModAttachments.CONSUME_VISUAL,visual);ModAttachments.syncData(mob,ModAttachments.CONSUME_VISUAL);
+        ModAttachments.setData(p,ModAttachments.MOBILE_CONSUME_START,p.level().getGameTime());ModAttachments.syncData(p,ModAttachments.MOBILE_CONSUME_START);
+        unlock(p);play(p,PlayerAction.CLAW_IDLE);
+        if(s.grabQueued)request(p,true);
+    }
+    private static void tickTails(ServerPlayer p){
+        if(ABSORBING.isEmpty())return;
+        for(var tail:List.copyOf(ABSORBING.values())){
+            if(tail.owner()!=p)continue;
+            var s=tail.scene();var mob=s.victim;
+            if(!ModAttachments.available(mob)){ABSORBING.remove(mob);continue;}
+            var visual=ModAttachments.getData(mob,ModAttachments.CONSUME_VISUAL);
+            if(!p.isAlive()||p.isRemoved()||p.isSpectator()||!ModAttachments.getData(p,ModAttachments.PLAYER_STATE).isPrototypeMode()
+                    ||p.isPassenger()||!mob.isAlive()||mob.isRemoved()||mob.level()!=p.level()||mob.isInvulnerable()||mob.isPassenger()||mob.isVehicle()||mob.isLeashed()
+                    ||visual.consumerId()!=p.getId()||visual.stage()!=ConsumeVisual.MOBILE_CONSUME){
+                ABSORBING.remove(mob);
+                if(visual.consumerId()==p.getId()&&visual.stage()==ConsumeVisual.MOBILE_CONSUME)release(mob);
+                continue;
+            }
+            var carry=MobileConsumeCarry.state(mob,visual);
+            if(carry!=null){
+                Vec3 goal=carry.feet(p.position(),p.yBodyRot,p,mob,visual,p.level().getGameTime());
+                Vec3 delta=goal.subtract(mob.position());
+                try(var owned=ConsumeControl.motion(mob)){
+                    mob.move(MoverType.SELF,delta.lengthSqr()>9?delta.normalize().scale(3):delta);
+                    mob.setDeltaMovement(Vec3.ZERO);mob.fallDistance=0;
+                }
+                mob.setYRot(p.yBodyRot);mob.setYHeadRot(p.yBodyRot);mob.yBodyRot=p.yBodyRot;
+            }
+            triggerBodyWeave(p,s,p.tickCount-s.started-s.landingDelay);
+            if(p.tickCount-s.started-s.landingDelay>=s.completionTick()&&ABSORBING.remove(mob,tail))finish(p,s);
+        }
+    }
+    private static void cancelTails(ServerPlayer p){
+        if(!p.isRemoved() && ModAttachments.getData(p,ModAttachments.CONSUME_BODY_VISUAL).active()){
+            ModAttachments.setData(p,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(p,ModAttachments.CONSUME_BODY_VISUAL);
+        }
+        if (!p.isRemoved() && ModAttachments.getData(p,ModAttachments.CONSUME_RESIDUE_VISUAL).active()) {
+            ModAttachments.setData(p, ModAttachments.CONSUME_RESIDUE_VISUAL, ConsumeVisual.EMPTY);
+            ModAttachments.syncData(p, ModAttachments.CONSUME_RESIDUE_VISUAL);
+        }
+        for(var tail:List.copyOf(ABSORBING.values()))if(tail.owner()==p){
+            ABSORBING.remove(tail.scene().victim);release(tail.scene().victim);
+        }
+        if(!p.isRemoved()&&ModAttachments.getData(p,ModAttachments.MOBILE_CONSUME_START)>=0){
+            ModAttachments.setData(p,ModAttachments.MOBILE_CONSUME_START,-1L);ModAttachments.syncData(p,ModAttachments.MOBILE_CONSUME_START);
+        }
     }
     public static boolean active(ServerPlayer player){return ACTIVE.containsKey(player);}
     public static int sessionAge(ServerPlayer player){var s=ACTIVE.get(player);return s==null?-1:player.tickCount-s.started;}
@@ -104,6 +214,10 @@ public final class ConsumeSystem {
         com.codex.blacklight.registry.ModAttachments.syncData(s.victim,ModAttachments.CONSUME_VISUAL);
         com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.GRAB_STAGE,stage);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.GRAB_STAGE);
         ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
+        if(!s.gripSound&&(ConsumeVisual.holding(stage)||s.committed())){
+            s.gripSound=true;
+            ConsumeSounds.phase(p,s.sound("grip"),ConsumeSequence.contact(s.victim),.94F,1F);
+        }
         if(s.committed())p.setDeltaMovement(Vec3.ZERO);
     }
     private static void play(ServerPlayer player, PlayerAction action) {
@@ -112,7 +226,12 @@ public final class ConsumeSystem {
     /** Right click confirms a held target. It can never acquire or auto-consume a new target. */
     public static void consume(ServerPlayer player) {
         var s=ACTIVE.get(player);if(s==null||!valid(player,s))return;
-        if(ConsumeVisual.acquiring(s.stage)){s.consumeQueued=true;return;}
+        if (ConsumeVisual.acquiring(s.stage)) {
+            clearThrowCharge(player,s);
+            s.throwAim = null;
+            s.consumeQueued = true;
+            return;
+        }
         if(!ConsumeVisual.holding(s.stage))return;
         s.consumeQueued=false;
         // Recheck at confirmation: healing or changed attributes must not bypass the gate.
@@ -120,6 +239,16 @@ public final class ConsumeSystem {
         beginConsume(player,s,ConsumeVariant.choose(s.form,s.large,player.getRandom()));
     }
     private static void beginConsume(ServerPlayer player,Session s,int variant){
+        if(s.victim instanceof com.codex.blacklight.world.GreeneHost host) {
+            if(!host.beginEscape(player)) { cancel(player); return; }
+            ACTIVE.remove(player);
+            clearThrowCharge(player,s);
+            clearRecovery(player);
+            release(host);
+            unlock(player);
+            play(player,PlayerAction.GRAB_REACH);
+            return;
+        }
         if(!ConsumeSequence.bruteMount(s.victim))s.facing=player.getYRot();
         s.consumeTargetStart=s.victim.position();
         s.variant=variant;
@@ -129,15 +258,17 @@ public final class ConsumeSystem {
         s.landingDelay=!s.large && gate>=0?-1:0;
         clearThrowCharge(player,s);
         phase(player,s,s.victim instanceof BlacklightHunter?ConsumeVisual.HUNTER_CONSUME:s.large?ConsumeVisual.MOUNT_CONSUME:ConsumeVisual.CONSUME);
+        s.returnSoundTick=ConsumeSequence.returnSoundTick(s.animationForm(),s.variant,s.stage,s.duration(),s.completionTick());
         if(!s.large&&ConsumeVariant.alternatives(s.form))
             PlayerActions.get().playVisual(player,"consume_"+ConsumeSequence.clipKey(s.animationForm(),false,s.variant)+"_actor",0);
         else play(player,s.large?PlayerAction.consumeLarge(s.animationForm()):PlayerAction.consume(s.form));
         com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene started: form={} target={} large={} clip={} duration={} origin={}",s.form,s.victim.getType(),s.large,ConsumeSequence.clipKey(s.animationForm(),s.large,s.variant),s.duration(),s.start);
     }
-    /** E again or primary attack starts a throw; release is synchronized to the arm swing. */
+    /** Primary attack starts the throw. The arm swing owns the physical release frame. */
     public static void throwTarget(ServerPlayer player) {
         var s=ACTIVE.get(player);if(s==null||!ConsumeVisual.holding(s.stage)||!valid(player,s))return;
         if(s.large){cancel(player);return;}
+        if (s.throwAim == null) s.throwAim = selectThrowAim(player,s.victim);
         boolean aerial=AerialCarryMotion.airborne(player)&&ConsumeSequence.humanoid(s.victim)&&!s.victim.isBaby()
                 &&(s.form==PowerForm.NONE||s.form==PowerForm.MUSCLE_MASS)&&AerialCarryMotion.available();
         if(aerial){
@@ -188,22 +319,49 @@ public final class ConsumeSystem {
                 feet.maxX-.05,feet.minY+.01,feet.maxZ-.05);
         return player.level().getBlockCollisions(player,support).iterator().hasNext();
     }
-    /** Creature flight law (see thrown): move by v, then v=(v-0.08)*0.98. Aim like block throws: locked or crosshair target, gravity solved. */
-    private static Vec3 aimThrow(ServerPlayer p,Mob body,double speed,float charge){
-        Vec3 from=body.position().add(0,body.getBbHeight()*.5,0),look=p.getLookAngle();
-        LivingEntity target=CombatTargeting.locked(p);
-        if(target==null||target==body||!p.hasLineOfSight(target)||p.distanceToSqr(target)>48*48){
-            target=null;double best=-1;
-            for(var e:p.level().getEntitiesOfClass(LivingEntity.class,p.getBoundingBox().inflate(48),e->e!=body&&CombatTargeting.selectable(p,e)&&p.hasLineOfSight(e))){
-                double dot=e.getBoundingBox().getCenter().subtract(p.getEyePosition()).normalize().dot(look);
-                double score=dot*8-p.distanceTo(e)/48.0;
-                if(dot>.94&&score>best){best=score;target=e;}
+    private record ThrowAim(Vec3 look, LivingEntity target) {}
+
+    /** Take one sight picture on button release, before the hand starts moving. */
+    private static ThrowAim selectThrowAim(ServerPlayer player, Mob body) {
+        Vec3 eye = player.getEyePosition(), look = player.getLookAngle();
+        LivingEntity locked = CombatTargeting.locked(player);
+        if (locked != null && locked != body && CombatTargeting.selectable(player,locked)
+                && CombatTargeting.visibleWithinRange(player,locked,48)) return new ThrowAim(look,locked);
+
+        Vec3 end = eye.add(look.scale(48));
+        LivingEntity aimed = null;
+        double best = Double.POSITIVE_INFINITY;
+        for (LivingEntity candidate : CombatTargeting.candidates(player, player.getBoundingBox().inflate(48),
+                e -> e != body && CombatTargeting.selectable(player,e) && CombatTargeting.visibleWithinRange(player,e,48))) {
+            // Direct intersections sort in front-to-back order. Only assist close to the reticle.
+            double score = Double.POSITIVE_INFINITY;
+            for (var box : CombatTargeting.hitboxes(candidate)) {
+                var hit = box.clip(eye,end);
+                if (box.contains(eye)) score = 0;
+                else if (hit.isPresent() && CombatTargeting.clearRay(player,eye,hit.get()))
+                    score = Math.min(score, eye.distanceToSqr(hit.get()));
+            }
+            if (!Double.isFinite(score)) {
+                Vec3 delta = CombatTargeting.lockPoint(player,candidate).subtract(eye);
+                double alignment = delta.normalize().dot(look);
+                if (alignment < .992) continue;
+                score = 48*48 + 1 + (1-alignment)*100000 + delta.length()/48;
+            }
+            if (score < best || score == best && aimed != null && candidate.getId() < aimed.getId()) {
+                best = score;
+                aimed = candidate;
             }
         }
-        // A free throw (no creature aimed) keeps the original camera throw and inherits half the
-        // carrier's running momentum; only an aimed creature gets the gravity-solved arc.
+        return new ThrowAim(look,aimed);
+    }
+
+    /** The body starts at the moving hand, with gravity and drag applied once per game tick. */
+    private static Vec3 aimThrow(ServerPlayer p,Mob body,ThrowAim intent,double speed,float charge){
+        Vec3 from=body.position().add(0,body.getBbHeight()*.5,0),look=intent.look();
         Vec3 carried=p.getDeltaMovement().multiply(.5,0,.5);
-        Vec3 free=look.scale(speed);free=new Vec3(free.x,Math.max(free.y,.12)+.28-.1*charge,free.z).add(carried);
+        Vec3 free=look.scale(speed).add(carried).add(0,(.28-.1*charge)*(1-Math.abs(look.y)),0);
+        LivingEntity target=intent.target();
+        if(target!=null && (!CombatTargeting.selectable(p,target)||!CombatTargeting.visibleWithinRange(p,target,48)))target=null;
         if(target==null)return free;
         Vec3 aim=CombatTargeting.lockPoint(p,target);
         Vec3 motion=target.onGround()?target.getDeltaMovement().multiply(1,0,1):Vec3.ZERO;
@@ -233,7 +391,7 @@ public final class ConsumeSystem {
         Vec3 delta=anchor(p,v).subtract(v.position());
         v.move(MoverType.SELF,delta.length()>speed?delta.normalize().scale(speed):delta);
         v.setDeltaMovement(Vec3.ZERO);v.fallDistance=0;
-        v.setYRot(p.getYRot()+(GrappleMotion.active(ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL))?0:180));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
+        v.setYRot(p.getYRot()+GrappleMotion.receiverTurn(v,ModAttachments.peekData(v, ModAttachments.CONSUME_VISUAL)));v.setYHeadRot(v.getYRot());v.yBodyRot=v.getYRot();
     }
 
     /** Ordinary human soldiers retain their grab class regardless of armour/health tuning. */
@@ -244,11 +402,8 @@ public final class ConsumeSystem {
         if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)return supreme.consumable()||consumer!=null&&supreme.isAlive()&&supreme.consumerId()==consumer.getId();
         if(target instanceof com.codex.blacklight.entity.EncounterMob boss&&boss.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return boss.goliathFinisherReady();
         float maximum=target.getMaxHealth();
-        boolean human=target instanceof com.codex.blacklight.entity.MilitarySoldier
-                && !com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target);
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (human || com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
-                    &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())
+                && (canGrabAtFullHealth(target)
                     || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
                 && com.codex.blacklight.power.AssimilationSystem.ready(target);
     }
@@ -269,14 +424,27 @@ public final class ConsumeSystem {
     }
     private ConsumeSystem() {}
 
-    public static void request(ServerPlayer player) {
+    public static void request(ServerPlayer player) {request(player,false);}
+    private static void request(ServerPlayer player,boolean queuedGrab) {
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         var acquiring=ACTIVE.get(player);
+        if(acquiring!=null&&acquiring.stage==ConsumeVisual.CONSUME){
+            int elapsed=player.tickCount-acquiring.started-Math.max(0,acquiring.landingDelay);
+            if(elapsed+4>=mobileAt(acquiring)){acquiring.grabQueued=true;acquiring.travelRequested=true;}
+            return;
+        }
         if(acquiring!=null&&ConsumeVisual.acquiring(acquiring.stage)){cancel(player);return;}
-        if (holding(player)) { throwTarget(player); return; }
+        if (acquiring != null && ConsumeVisual.holding(acquiring.stage)) {
+            if (acquiring.stage == ConsumeVisual.MOUNT_HOLD) cancel(player);
+            return;
+        }
         var state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
                 || ACTIVE.containsKey(player) || player.isPassenger()) return;
+        if (state.getActivePower() == PowerForm.BACKSPINES) {
+            QuillHarvest.recall(player);
+            return;
+        }
         if (com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).action() != ClawCombatState.Action.IDLE
                 || WeaponCombatSystem.busy(player)
                 || com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE).chargeTicks() > 0
@@ -288,11 +456,13 @@ public final class ConsumeSystem {
         double range = (form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3)+com.codex.blacklight.power.AssimilationSystem.grabBonus(player);
         // A lock supplies combat aim; it must not steal an explicit terrain grab.
         // A real creature intersecting the view ray before that block keeps grab priority.
-        if(BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
+        if(!queuedGrab&&BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
             if(!TerrainGrabSelection.start(player))message(player,TerrainGrabSelection.failureMessage(player));
             return;
         }
         var locked=CombatTargeting.locked(player);
+        var previous=ABSORBING.get(locked);
+        if(previous!=null&&previous.owner()==player)locked=null;
         Mob target;
         if(locked!=null) {
             target=locked instanceof Mob mob && eligible(mob) && grabInReach(player,mob,range)
@@ -306,6 +476,7 @@ public final class ConsumeSystem {
                             .thenComparingInt(Mob::getId)).orElse(null);
         }
         if (target == null) {
+            if(queuedGrab)return;
             if(BlockThrowSystem.canUse(player)){
                 if(TerrainGrabSelection.start(player))return;
                 message(player,TerrainGrabSelection.failureMessage(player));
@@ -319,15 +490,20 @@ public final class ConsumeSystem {
         if (target instanceof BlacklightHunter hunter && !hunter.claim(player)) return;
         if (target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme && !supreme.claim(player)) return;
         // Check awareness before clearing the target/attack state for the claim.
-        boolean stealth=StealthConsume.canStart(player,target,form);
+        boolean stealth=!(target instanceof com.codex.blacklight.world.GreeneHost) && StealthConsume.canStart(player,target,form);
         ImpactControl.cancel(target);
         if(target instanceof com.codex.blacklight.entity.BlacklightCommonInfected civilian)civilian.cancelAttack();
         if(target instanceof com.codex.blacklight.entity.BlacklightMutant mutant)mutant.cancelAttack();
         if(target instanceof com.codex.blacklight.entity.EncounterMob encounter)encounter.cancelAttack();
         Session session=new Session(target,player,form);ACTIVE.put(player,session);
+        var travel=ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE).wallInput();
+        session.travelRequested=travel.forward()!=0||travel.sideways()!=0;
         target.getNavigation().stop();target.setTarget(null);
-        boolean heavy=form==PowerForm.WHIPFIST&&(target instanceof BlacklightHunter||target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>4)&&player.distanceTo(target)>2.5;
-        phase(player,session,session.large?ConsumeVisual.MOUNT:heavy?ConsumeVisual.WHIP_PULL:ConsumeVisual.CAPTURE);session.lastPosition=player.position();
+        var selected=CombatTargeting.selectionFor(player,target);
+        boolean pull=form==PowerForm.WHIPFIST&&player.distanceTo(target)>2.5
+                &&(target instanceof BlacklightHunter||target.getBbWidth()*target.getBbWidth()*target.getBbHeight()>4)
+                &&!ConsumeSequence.boss(target)&&(selected==null||!selected.regional());
+        phase(player,session,pull?ConsumeVisual.WHIP_PULL:session.large?ConsumeVisual.MOUNT:ConsumeVisual.CAPTURE);session.lastPosition=player.position();
         com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.MOVEMENT_STATE).reset();
         com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.CONSUMING, true); com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.CONSUMING);
         var direction = (session.large?ConsumeSequence.contact(target):target.position()).subtract(player.position());
@@ -341,7 +517,7 @@ public final class ConsumeSystem {
         play(player,form==PowerForm.BLADE?PlayerAction.GRAB_BLADE:form==PowerForm.WHIPFIST?PlayerAction.GRAB_WHIP:PlayerAction.GRAB_REACH);
         if (form == PowerForm.WHIPFIST)
             com.codex.blacklight.registry.ModWeaponSounds.play(player, form, "swing", player.getEyePosition(), .52F, 1.16F);
-        else player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
+
     }
 
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
@@ -350,8 +526,21 @@ public final class ConsumeSystem {
         if (!(event.player instanceof ServerPlayer player)) return;
         Session claimed=ACTIVE.get(player);
         try(var motion=ConsumeControl.motion(player,claimed==null?null:claimed.victim)) {tickPlayer(player);}
+        // New paired motion may move this same player before the old receiver settles.
+        tickTails(player);
     }
     private static void tickPlayer(ServerPlayer player) {
+        var body=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        if(body.active() && (!player.isAlive() || !ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isPrototypeMode()
+                ||body.elapsed(player.level().getGameTime(),0)>ConsumeGiverEffect.tick(ConsumeGiverEffect.bodyEnd(body)))){
+            ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        }
+        var residue = ModAttachments.getData(player,ModAttachments.CONSUME_RESIDUE_VISUAL);
+        if (residue.active() && (!player.isAlive() || !ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isPrototypeMode()
+                || residue.elapsed(player.level().getGameTime(), 0) >= ConsumeGiverEffect.tick(ConsumeGiverEffect.residueEnd(residue)))) {
+            ModAttachments.setData(player, ModAttachments.CONSUME_RESIDUE_VISUAL, ConsumeVisual.EMPTY);
+            ModAttachments.syncData(player, ModAttachments.CONSUME_RESIDUE_VISUAL);
+        }
         var recovery=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.CONSUME_RECOVERY);
         if(recovery.active() && (recovery.phaseProgress(player.level().getGameTime(),0)>=1
                 ||!player.isAlive()||!com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isPrototypeMode()
@@ -379,10 +568,6 @@ public final class ConsumeSystem {
         if(ConsumeVisual.blocksTravel(session.stage))player.setDeltaMovement(0,player.getDeltaMovement().y,0);
         target.setDeltaMovement(Vec3.ZERO);
         if(session.stage==ConsumeVisual.GRAB_ATTACK){tickHeldAttack(player,session,elapsed);return;}
-        if(session.large) {
-            if(!mountTick(player,session,elapsed))return;
-            finish(player,session);return;
-        }
         if (session.form == PowerForm.WHIPFIST && elapsed == 14
                 && (session.stage == ConsumeVisual.WHIP_PULL || session.stage == ConsumeVisual.CAPTURE)
                 && player.hasLineOfSight(target))
@@ -396,20 +581,31 @@ public final class ConsumeSystem {
             float desired=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));
             float yaw=CombatPursuit.turn(player.getYRot(),player.getYRot(),desired,(float)(CombatMotion.whip(branch,"FaceTargetMaxTurnRate",180)/20),180);
             player.setYRot(yaw);player.setYHeadRot(yaw);player.yBodyRot=yaw;
-            if(distance<1.4&&Math.abs(delta.y)<1){
+            double stop=Math.max(1.2,(target.getBbWidth()+player.getBbWidth())*.5+.1);
+            if(distance<stop+.25&&Math.abs(delta.y)<Math.max(1,target.getBbHeight()*.5)){
                 player.setDeltaMovement(Vec3.ZERO);player.hurtMarked=true;
-                phase(player,session,ConsumeVisual.CAPTURE,14);return;
+                session.stuckTicks=0;
+                if(session.large)phase(player,session,ConsumeVisual.MOUNT);
+                else phase(player,session,ConsumeVisual.CAPTURE,14);
+                return;
             }
             if(player.horizontalCollision||player.position().distanceToSqr(session.lastPosition)<.0001)session.stuckTicks++;else session.stuckTicks=0;
             session.lastPosition=player.position();
             if(session.stuckTicks>=Math.ceil(CombatMotion.whip(branch,"MaxStuckTime",.5)*20)){cancel(player);return;}
+            // The fixed source pull window must allow a clear, in-range hunter to be reached.
+            // Seed just enough speed to close the remaining gap within that time budget.
+            if(session.pullSpeed==0)session.pullSpeed=Math.max(0,distance-stop)/Math.max(1,limit-elapsed);
             session.pullSpeed=Math.min(CombatMotion.whip(branch,"Velocity",40)*.87/20,
                     session.pullSpeed+CombatMotion.whip(branch,"Acceleration",10)*.87/400);
-            var horizontal=CombatMotion.chase(delta,1.2,session.pullSpeed);
+            var horizontal=CombatMotion.chase(delta,stop,session.pullSpeed);
             // Bounded arc clears terrain; collision and LOS remain authoritative.
             double arc=Math.min(1.2,CombatMotion.whip(branch,"ParabolicConstant",.7)*Math.min(distance,4));
             player.setDeltaMovement(horizontal.x,com.codex.blacklight.util.MathCompat.clamp((delta.y+arc)*.2,-.5,.4),horizontal.z);player.fallDistance=0;player.hurtMarked=true;
             return;
+        }
+        if(session.large) {
+            if(!mountTick(player,session,elapsed))return;
+            finish(player,session);return;
         }
         if(session.stage==ConsumeVisual.CAPTURE) {
             if(session.form==PowerForm.BLADE) {
@@ -433,6 +629,7 @@ public final class ConsumeSystem {
                 if(target.position().distanceToSqr(anchor(player,target))>.36){cancel(player);return;}
                 phase(player,session,ConsumeVisual.HOLD);message(player,"grab_held");
                 if(session.consumeQueued)consume(player);
+                else if(session.throwAim != null)throwTarget(player);
             }
             return;
         }
@@ -467,7 +664,7 @@ public final class ConsumeSystem {
                 boolean muscle=session.form==PowerForm.MUSCLE_MASS;float charge=chargeFraction(session.throwCharge);
                 // A full wind-up throws ~1.6x faster and deals ~2.5x damage; a tap keeps the old throw.
                 double speed=(muscle?2.3:1.55)*(1+.6*charge);float damage=(muscle?12:6)*(1+1.5F*charge);
-                target.setOnGround(false);target.setDeltaMovement(aimThrow(player,target,speed,charge));target.hurtMarked=true;
+                target.setOnGround(false);target.setDeltaMovement(aimThrow(player,target,session.throwAim,speed,charge));target.hurtMarked=true;
                 THROWN.put(target,new Thrown(player,40,target.getDeltaMovement(),damage,charge));
                 if(charge>=.9F&&player.level() instanceof net.minecraft.server.level.ServerLevel)
                     com.codex.blacklight.forge.PacketDistributor.sendToPlayer(player,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.2F));
@@ -488,27 +685,35 @@ public final class ConsumeSystem {
                 if(elapsed>=gate){
                     pairedPlacement(player,session,gate);
                     float t=ConsumeSequence.motionProgress(session.form,gate/(float)session.duration(),session.duration(),false,session.variant);
-                    var floor=ConsumePlacementTrack.landingSurface(target,target.position(),session.facing,session.variant,t,player.getY());
+                    var floor=ConsumePlacementTrack.landingContact(target,target.position(),session.facing,session.variant,t,player.getY());
                     if(floor.isPresent()){
-                        double delta=floor.getAsDouble()-target.getY();
+                        double delta=floor.get().y-target.getY();
                         target.move(MoverType.SELF,new Vec3(0,Math.max(-.32,Math.min(.32,delta)),0));
                     }
-                    if(floor.isEmpty() || Math.abs(target.getY()-floor.getAsDouble())>.055){
+                    if(floor.isEmpty() || Math.abs(target.getY()-floor.get().y)>.055){
                         if(elapsed-gate>=10)cancel(player);
                         return;
                     }
                     session.landingDelay=elapsed-gate;
                     var landed=ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).landed(session.landingDelay);
                     ModAttachments.setData(target,ModAttachments.CONSUME_VISUAL,landed);ModAttachments.syncData(target,ModAttachments.CONSUME_VISUAL);
+                    Vec3 at=floor.get();
+                    var landing=new com.codex.blacklight.network.ConsumeContactSoundPayload(target.getId(),player.getId(),
+                            landed.started(),com.codex.blacklight.network.ConsumeContactSoundPayload.LANDING,"body_land",at);
+                    for (ServerPlayer listener:player.serverLevel().players())
+                        if(listener==player || listener.position().distanceToSqr(at)<32*32)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(listener,landing);
                     return;
                 }
             }
             elapsed-=Math.max(0,session.landingDelay);
+            triggerBodyWeave(player,session,elapsed);
             pairedPlacement(player,session,elapsed);
             consumeEffects(player,session,elapsed);
             if(elapsed>=session.completionTick())finish(player,session);
+            else if((session.travelRequested||session.grabQueued)&&elapsed>=mobileAt(session))startTail(player,session);
             return;
         }
+        triggerBodyWeave(player,session,elapsed);
         // The body follows the strike, instead of sinking before the wind-up has finished.
         int impact=ConsumeVisual.impactTick(session.form);
         int settleStart=impact-(session.form==PowerForm.HAMMERFISTS?3:1);
@@ -519,16 +724,32 @@ public final class ConsumeSystem {
             double drop=Math.min(session.form==PowerForm.HAMMERFISTS?.32:.16,Math.max(0,target.getY()-player.getY()));
             target.move(MoverType.SELF,new Vec3(0,-drop,0));
         }
-        if (elapsed == impact) {
-            player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_STRONG,SoundSource.PLAYERS,
-                    session.form==PowerForm.HAMMERFISTS?.95F:.7F,session.form==PowerForm.HAMMERFISTS?.55F:.8F);
-        }
+        consumeEffects(player,session,elapsed);
         if (session.form() == PowerForm.HAMMERFISTS && elapsed == impact) {
             TerrainImpactEffects.heldBodyFloor(target, 26);
         }
         // Range and sight were checked when committing; scene motion cannot cancel absorption.
-        if (elapsed < session.completionTick()) return;
-        finish(player,session);
+        if(elapsed>=session.completionTick())finish(player,session);
+        else if((session.travelRequested||session.grabQueued)&&elapsed>=mobileAt(session))startTail(player,session);
+    }
+    private static void triggerBodyWeave(ServerPlayer player,Session session,int elapsed){
+        if (!session.absorbSound && elapsed>=session.returnSoundTick) {
+            session.absorbSound=true;
+            ConsumeSounds.phase(player,session.sound("absorb"),ConsumeSequence.contact(session.victim),1F,1F);
+        }
+        if (session.bodyWeaveStarted || !session.smallDirect) return;
+        var scene = ModAttachments.getData(session.victim,ModAttachments.CONSUME_VISUAL);
+        float start = ConsumeGiverEffect.exteriorStart(scene);
+        if (!Float.isFinite(start) || elapsed < ConsumeGiverEffect.tick(start)) return;
+        session.bodyWeaveStarted = true;
+        publishCoat(player, scene);
+    }
+    private static void publishCoat(ServerPlayer player,ConsumeVisual scene){
+        var current=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        // A slower receiver from a chain must never replace its successor on the player.
+        if(current.active() && current.started()>=scene.started())return;
+        ConsumeSounds.phase(player,"weave",player.position().add(0,player.getBbHeight()*.7,0),.86F,1F);
+        ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,scene);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
     }
     private static void tickHeldAttack(ServerPlayer player,Session session,int elapsed){
         var target=session.victim;
@@ -599,6 +820,7 @@ public final class ConsumeSystem {
         }
         if(session.stage==ConsumeVisual.MOUNT_HOLD)return false;
         consumeEffects(player,session,elapsed);
+        triggerBodyWeave(player,session,elapsed);
         return elapsed>=session.completionTick();
     }
     private static void pairedPlacement(ServerPlayer player,Session session,int elapsed) {
@@ -632,22 +854,23 @@ public final class ConsumeSystem {
         int contact=session.stage==ConsumeVisual.HUNTER_CONSUME?24:Math.round(session.duration()*ConsumeSequence.contact(animationForm,session.large))-1;
         var receiverScene=ConsumeReceiverScene.profile(animationForm,session.large,session.variant);
         Vec3 point=ConsumeSequence.contact(session.victim);
-        if(receiverScene!=null?receiverScene.impactAt(elapsed):elapsed==contact) {
-            boolean hammer=animationForm==PowerForm.HAMMERFISTS;
-            com.codex.blacklight.registry.ModInfectedSounds.play(session.victim,hammer?
-                    com.codex.blacklight.infection.InfectedSoundCue.CRUSH:animationForm==PowerForm.NONE?
-                    com.codex.blacklight.infection.InfectedSoundCue.PIERCE:com.codex.blacklight.infection.InfectedSoundCue.TEAR,point);
-            // Small receivers have client-side posed/physical bodies. Their blood follows
-            // that wound from the synchronized phase, not this upright server AABB.
-            if(ConsumeSequence.mountedStage(session.stage))
-                player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
-            session.victim.hurtTime=8;session.victim.hurtDuration=8;
-            player.serverLevel().broadcastEntityEvent(session.victim,(byte)2);
-            if(hammer){
-                var floor=session.victim.blockPosition().below();
-                player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),
-                        session.victim.getX(),session.victim.getY()+.1,session.victim.getZ(),24,.5,.1,.5,.1);
+        if(!session.large && !ConsumeSequence.paired(session.form,false,session.variant)){
+            receiverScene=null;
+            contact=ConsumeVisual.impactTick(session.form);
+        } else if (receiverScene == null && !session.large && animationForm == PowerForm.BLADE)
+            contact = Math.round(20 * ConsumeSequence.splitSeconds(animationForm, false, session.variant));
+        var scene=ModAttachments.getData(session.victim,ModAttachments.CONSUME_VISUAL);
+        int ordinal = session.contactDamage.strike(player, session.victim, receiverScene, contact, elapsed, scene);
+        if (ordinal >= 0) {
+            String sound=ConsumeImpactKind.forContact(scene,ordinal);
+            if (!session.large && ConsumeSequence.paired(animationForm,false,session.variant)){
+                var socket=ConsumePlacementTrack.impactSocket(player,scene,0);
+                if(socket!=null && socket.distanceToSqr(session.victim.position())<9)point=socket;
             }
+            var audio=new com.codex.blacklight.network.ConsumeContactSoundPayload(session.victim.getId(),player.getId(),
+                    scene.started(),ordinal,sound,point);
+            for (ServerPlayer listener:player.serverLevel().players())
+                if(listener==player || listener.position().distanceToSqr(point)<32*32)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(listener,audio);
         }
         if(ConsumeSequence.mountedStage(session.stage)&&(receiverScene!=null?elapsed>=receiverScene.effectSeconds()*20:
                 session.stage==ConsumeVisual.HUNTER_CONSUME?elapsed>=HunterConsume.EFFECT_REVERSE_SECONDS*20:t>.55F)&&elapsed%3==0) {
@@ -663,40 +886,61 @@ public final class ConsumeSystem {
         var identity=com.codex.blacklight.disguise.DisguiseIdentity.capture(target);
         com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene finished: form={} target={} large={} elapsed={}",session.form,target.getType(),session.large,player.tickCount-session.started);
         // Release before death callbacks; rewards are only paid once after successful completion.
-        var recovery=ModAttachments.peekData(target, ModAttachments.CONSUME_VISUAL);
-        ACTIVE.remove(player);
-        // Publish the recovery pose before the victim scene is cleared, so no client frame sees
-        // neither and drops the actor to its idle pose for a frame.
-        com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.CONSUME_RECOVERY,recovery);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.CONSUME_RECOVERY);
-        release(target);unlock(player);
-        if(ConsumeSequence.boss(target)) {
-            var source=target.damageSources().playerAttack(player);
-            if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)supreme.markConsumed();
-            target.invulnerableTime=0;
-            boolean accepted=ConsumeLastChance.execute(target,()->target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon
-                    ? dragon.hurt(dragon.head,source,Math.max(1000,dragon.getMaxHealth()*20))
-                    : target.hurt(source,Math.max(1000,target.getMaxHealth()*20)));
+        boolean paired=session.stage!=ConsumeVisual.MOBILE_CONSUME;
+        if(paired){
+            ACTIVE.remove(player,session);
+            var recovery=ModAttachments.getData(target,ModAttachments.CONSUME_VISUAL);
+            ModAttachments.setData(player,ModAttachments.CONSUME_RECOVERY,recovery);ModAttachments.syncData(player,ModAttachments.CONSUME_RECOVERY);
+            unlock(player);
+        }
+        var settledScene = ModAttachments.getData(target,ModAttachments.CONSUME_VISUAL);
+        release(target);
+        if(!defeatForConsume(player,target)){
+            if(paired)clearRecovery(player);
+            message(player,"consume_cancelled");return;
+        }
+        if(paired)play(player,PlayerAction.CLAW_IDLE);
+        if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
+        if (session.smallDirect && Float.isFinite(ConsumeGiverEffect.exteriorStart(settledScene))
+                && settledScene.started() >= ModAttachments.getData(player,ModAttachments.CONSUME_RESIDUE_VISUAL).started()) {
+            ModAttachments.setData(player, ModAttachments.CONSUME_RESIDUE_VISUAL, settledScene);
+            ModAttachments.syncData(player, ModAttachments.CONSUME_RESIDUE_VISUAL);
+        }
+        com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
+        com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
+        com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
+        ConsumeSounds.phase(player,session.sound("finish"),player.position().add(0,1,0),.96F,1F);
+        player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
+    }
+    /** Run the death callback while the absorber and the type of execution are still known. */
+    public static boolean executeConsumption(ServerPlayer player, Mob target, float damage) {
+        var source = target.damageSources().playerAttack(player);
+        target.invulnerableTime = 0;
+        return ConsumeLastChance.execute(target, () -> {
+            if (target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)
+                return supreme.finishConsumption(player, source, damage);
+            if (target instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon)
+                return dragon.hurt(dragon.head, source, damage);
+            return target.hurt(source, damage);
+        });
+    }
+
+    static boolean defeatForConsume(ServerPlayer player,Mob target) {
+        if(ConsumeSequence.boss(target) || target instanceof com.codex.blacklight.entity.BlacklightHive) {
+            boolean accepted = executeConsumption(player, target, Math.max(1000, target.getMaxHealth()*20));
             // Zero HP (or the dragon's DYING phase) alone does not prove death was accepted.
             if(!accepted||!((com.codex.blacklight.mixin.LivingDeathAccess)target).blacklight$deathAccepted()){
-                clearRecovery(player);message(player,"consume_cancelled");return;
+                return false;
             }
         } else if(target instanceof BlacklightHunter hunter){
             if(hunter.parasite())com.codex.blacklight.power.ParasiteSystem.consumedInfectedHunter(player);
             hunter.beginConsumeRemains();
         }
         else {
-            if(target instanceof com.codex.blacklight.world.GreeneHost host) host.absorbedBy(player);
+            if(target instanceof com.codex.blacklight.world.GreeneHost) return false;
             target.discard();
         }
-        // Locomotion owns the base layer; the client samples the remaining source
-        // pose independently, even after the receiver entity has disappeared.
-        play(player,PlayerAction.CLAW_IDLE);
-        if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
-        com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
-        com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
-        com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
-        player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, ConsumeVariant.stealth(session.form,session.variant)?.25F:.8F, .55F);
-        player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
+        return true;
     }
     private static void clearRecovery(ServerPlayer player) {
         if (!ModAttachments.available(player)) return;
@@ -720,6 +964,10 @@ public final class ConsumeSystem {
         clearRecovery(player);
         Session session = ACTIVE.remove(player);
         if (session == null) return;
+        var visibleCoat=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        if(session.bodyWeaveStarted && visibleCoat.active() && visibleCoat.started()==ModAttachments.getData(session.victim,ModAttachments.CONSUME_VISUAL).started()){
+            ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
+        }
         clearThrowCharge(player,session);
         release(session.victim());
         unlock(player);
@@ -735,6 +983,9 @@ public final class ConsumeSystem {
     }
     private static void release(Mob victim) {
         if (!ModAttachments.available(victim)) return;
+        if(ModAttachments.getData(victim,ModAttachments.MOBILE_CONSUME_CARRY).ownerId()>=0){
+            ModAttachments.setData(victim,ModAttachments.MOBILE_CONSUME_CARRY,MobileConsumeCarry.EMPTY);ModAttachments.syncData(victim,ModAttachments.MOBILE_CONSUME_CARRY);
+        }
         if(victim instanceof BlacklightHunter hunter)hunter.release();
         if(victim instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)supreme.release();
         com.codex.blacklight.registry.ModAttachments.setData(victim,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
@@ -814,21 +1065,22 @@ public final class ConsumeSystem {
     }
     /** Keep a confirmed scene intact. The actor still takes damage and can die. */
     @SubscribeEvent public static void protectReceiver(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
-        if(ACTIVE.values().stream().anyMatch(s->s.committed()&&s.victim==event.getEntity()))event.setCanceled(true);
+        if(ConsumeContactDamage.owns(event.getEntity(), event.getSource())) return;
+        if(ABSORBING.containsKey(event.getEntity())||ACTIVE.values().stream().anyMatch(s->s.committed()&&s.victim==event.getEntity()))event.setCanceled(true);
     }
     @SubscribeEvent public static void knockback(net.minecraftforge.event.entity.living.LivingKnockBackEvent event) {
-        if(grappleProtected(event.getEntity())
+        if(ABSORBING.containsKey(event.getEntity())||grappleProtected(event.getEntity())
                 ||ACTIVE.values().stream().anyMatch(s->s.victim==event.getEntity()))event.setCanceled(true);
     }
-    @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent e) { if (e.getEntity() instanceof ServerPlayer p) cancel(p); }
-    @SubscribeEvent public static void dimension(PlayerEvent.PlayerChangedDimensionEvent e) { if (e.getEntity() instanceof ServerPlayer p) cancel(p); }
+    @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent e) { if (e.getEntity() instanceof ServerPlayer p){cancelTails(p);cancel(p);} }
+    @SubscribeEvent public static void dimension(PlayerEvent.PlayerChangedDimensionEvent e) { if (e.getEntity() instanceof ServerPlayer p){cancelTails(p);cancel(p);} }
     /** Freeze the captured mob without writing NoAI, gravity, or invulnerability into its saved NBT. */
     @SubscribeEvent public static void freeze(com.codex.blacklight.combat.ForgeEntityTickEvent.Pre event) {
         if (event.getEntity().level().isClientSide || !(event.getEntity() instanceof Mob mob)) return;
         var visual = ModAttachments.peekData(mob, ModAttachments.CONSUME_VISUAL);
         if(visual.stage()==ConsumeVisual.FLIGHT) return;
         if (!visual.active()) return;
-        boolean claimed = ACTIVE.values().stream().anyMatch(session -> session.victim() == mob);
+        boolean claimed = ABSORBING.containsKey(mob)||ACTIVE.values().stream().anyMatch(session -> session.victim() == mob);
         if (claimed) event.setCanceled(true);
         else {
             com.codex.blacklight.registry.ModAttachments.setData(mob,ModAttachments.CONSUME_VISUAL, ConsumeVisual.EMPTY); com.codex.blacklight.registry.ModAttachments.syncData(mob,ModAttachments.CONSUME_VISUAL);
@@ -838,11 +1090,14 @@ public final class ConsumeSystem {
     @SubscribeEvent public static void removed(net.minecraftforge.event.entity.EntityLeaveLevelEvent event) {
         if (event.getLevel().isClientSide()) return;
         THROWN.remove(event.getEntity());
+        if(event.getEntity() instanceof ServerPlayer p)cancelTails(p);
+        else if(event.getEntity() instanceof Mob mob)ABSORBING.remove(mob);
         for (var entry : List.copyOf(ACTIVE.entrySet()))
             if (entry.getValue().victim() == event.getEntity() || entry.getKey() == event.getEntity()) cancel(entry.getKey());
     }
     @SubscribeEvent public static void stopping(net.minecraftforge.event.server.ServerStoppingEvent event) {
         for (var player : List.copyOf(ACTIVE.keySet())) cancel(player);
+        for(var tail:List.copyOf(ABSORBING.values()))cancelTails(tail.owner());
         THROWN.clear();
     }
 }

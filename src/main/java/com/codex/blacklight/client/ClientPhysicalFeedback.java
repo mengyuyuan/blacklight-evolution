@@ -99,6 +99,7 @@ public final class ClientPhysicalFeedback {
 
     @SubscribeEvent
     public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent event){if(event.phase != net.minecraftforge.event.TickEvent.Phase.END)return;
+        com.codex.blacklight.client.renderer.ConsumeContactAudio.tick();
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null
                 ||!com.codex.blacklight.mode.PrototypeModeSystem.isActive(minecraft.player)

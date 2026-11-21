@@ -45,11 +45,14 @@ final class SourceActionCamera {
             }
             highWater=Math.max(highWater,clock.seconds);
             SourceCameraEvents.Event active=null;Values from=Values.NEUTRAL;
+            // For a standing chest strike, a source offset of zero targets the action,
+            // while the Minecraft entity origin is at the soles of the feet.
+            double pivotHeight=clock.key.equals("consume_normal_actor")?player.getBbHeight()*.64/player.getScale():0;
             for(var event:events) {
                 if(!event.kind().equals("punchinCamera")||event.start()>clock.seconds)continue;
-                from=active==null?entryValue(event.start()):sample(active,from,event.start());active=event;
+                from=active==null?entryValue(event.start()):sample(active,from,event.start(),pivotHeight);active=event;
             }
-            current=active==null?entryValue(clock.seconds):sample(active,from,clock.seconds);
+            current=active==null?entryValue(clock.seconds):sample(active,from,clock.seconds,pivotHeight);
             previous=clock;facing=clock.facing;leaving=current;exitTime=0;
         }
         shake.update(dt);return current;
@@ -58,8 +61,8 @@ final class SourceActionCamera {
         if(time<entryAt-.001)return Values.NEUTRAL;
         return entry.blend(Values.NEUTRAL,net.minecraft.util.Mth.clamp((time-entryAt)/Math.max(.001,entryOut),0,1));
     }
-    private static Values sample(SourceCameraEvents.Event e,Values from,double time) {
-        double age=time-e.start();var target=new Values(e.dolly(),e.zoom(),e.reAim()?1:0,e.offset());
+    private static Values sample(SourceCameraEvents.Event e,Values from,double time,double pivotHeight) {
+        double age=time-e.start();var target=new Values(e.dolly(),e.zoom(),e.reAim()?1:0,e.offset().add(0,pivotHeight,0));
         double in=inSeconds(e.inTime());
         if(age<in)return from.blend(target,ease(age/in));
         if(time<e.end()-e.outTime())return target;
@@ -108,9 +111,12 @@ final class SourceActionCamera {
             if(victimTick!=tick) {
                 victimTick=tick;
                 cachedVictim=player.level().getEntitiesOfClass(LivingEntity.class,player.getBoundingBox().inflate(18),
-                        e->com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL).consumerId()==player.getId()).stream().findFirst().orElse(null);
+                        e->com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL).drivesActor(player.getId())).stream().findFirst().orElse(null);
             }
-            if(cachedVictim!=null&&!cachedVictim.isRemoved())return consumeClock(player,com.codex.blacklight.registry.ModAttachments.getData(cachedVictim, ModAttachments.CONSUME_VISUAL),partial);
+            if(cachedVictim!=null&&!cachedVictim.isRemoved()){
+                var scene=com.codex.blacklight.registry.ModAttachments.getData(cachedVictim, ModAttachments.CONSUME_VISUAL);
+                if(scene.drivesActor(player.getId()))return consumeClock(player,scene,partial);
+            }
         }
         var visual=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);var move=visual.spec();
         if(move==null)return null;

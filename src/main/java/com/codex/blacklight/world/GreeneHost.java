@@ -15,10 +15,15 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
 
 /** The same human rig is visible before the pump starts and after the Mother shell falls. */
 public final class GreeneHost extends PathfinderMob {
-    public static final int WAITING=0, CHANGING=1, OVERLAP=2, SPENT=3, BLOCKED=4;
+    public static final int WAITING=0, CHANGING=1, OVERLAP=2, SPENT=3, BLOCKED=4, ESCAPING=5;
+    public static final int TEAR=12, SUBMERGED=32, ESCAPE_END=46;
+    private static final EntityDataAccessor<org.joml.Vector3f> DRAIN = SynchedEntityData.defineId(GreeneHost.class, EntityDataSerializers.VECTOR3);
     public static final int BREAKOUT=106, CROSSFADE=35;
     private static final EntityDataAccessor<Integer> STAGE=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> START=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.LONG);
@@ -38,6 +43,7 @@ public final class GreeneHost extends PathfinderMob {
     @Override protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(STAGE,WAITING);
+        entityData.define(DRAIN,new org.joml.Vector3f());
         entityData.define(START,0L);
         entityData.define(WATCHING,-1);
         entityData.define(NOTICED,-1000L);
@@ -110,7 +116,7 @@ public final class GreeneHost extends PathfinderMob {
         super.tick();
         if (!(level() instanceof ServerLevel level) || station==null) return;
         // A piston, flowing water or a nearby large mob must not move the actor off the emergence pad.
-        if(stage()!=SPENT && pad!=null) {
+        if(stage()!=SPENT && stage()!=ESCAPING && pad!=null) {
             setPos(pad.getX()+.5,pad.getY(),pad.getZ()+.5);
             setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         }
@@ -135,6 +141,7 @@ public final class GreeneHost extends PathfinderMob {
             }
             case BLOCKED -> { if(tickCount%10==0) emerge(level); }
             case OVERLAP -> { if(++elapsed>=BREAKOUT+CROSSFADE) discard(); }
+            case ESCAPING -> tickEscape(level);
             case SPENT -> {
                 if(tickCount%60==1) for (var p:level.players()) if(p.distanceToSqr(this)<12*12 && !p.isSpectator())
                     p.displayClientMessage(Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab"),Component.keybind("key.use")),true);
@@ -177,18 +184,75 @@ public final class GreeneHost extends PathfinderMob {
         host.setHealth(1);
         return BossSiteData.get(level).transfer(level,mother,host);
     }
-    public void absorbedBy(ServerPlayer player) {
-        if(stage()!=SPENT) return;
-        if(station!=null && level() instanceof ServerLevel server && server.hasChunkAt(station)
-                && server.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(server);
-        BossSiteData.complete(this,player,2);
+    public Vec3 drainOffset() {
+        return new Vec3(entityData.get(DRAIN));
+    }
+
+    public Entity escapeWitness() {
+        return level().getEntity(entityData.get(WATCHING));
+    }
+
+    /** The spent human owns the reservation until the last underground knock, even if the finisher leaves. */
+    public boolean beginEscape(ServerPlayer player) {
+        if (stage()!=SPENT || !isAlive() || station==null || !(level() instanceof ServerLevel level)
+                || player.level()!=level || !player.isAlive() || player.isSpectator()) return false;
+        Vec3 end=position();
+        if (level.hasChunkAt(station)) {
+            var state=level.getBlockState(station);
+            if (state.getBlock() instanceof BossSiteBlock) {
+                var grate=station.relative(state.getValue(BossSiteBlock.FACING).getOpposite(),11);
+                var mouth=Vec3.atBottomCenterOf(grate);
+                if (distanceToSqr(mouth)<36 && level.clip(new ClipContext(position().add(0,.45,0),
+                        mouth.add(0,.45,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this)).getType()==HitResult.Type.MISS) end=mouth;
+            }
+        }
+        // A player can carry the host away from the grate. Find the local surface under the escape instead.
+        var floor=level.clip(new ClipContext(end.add(0,.25,0),end.add(0,-8,0),
+                ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
+        if (floor.getType()!=HitResult.Type.MISS) end=floor.getLocation();
+        entityData.set(DRAIN,end.subtract(position()).toVector3f());
+        notice(player);
+        var toward=player.position().subtract(position());
+        if(toward.horizontalDistanceSqr()>.001) setYRot((float)Math.toDegrees(Math.atan2(-toward.x,toward.z)));
+        yBodyRot=yBodyRotO=yHeadRot=yHeadRotO=getYRot();
+        setNoGravity(true);
+        setDeltaMovement(Vec3.ZERO);
+        BossSiteData.participant(this,player);
+        enter(ESCAPING,0);
+        // The grapple attachment is cleared immediately. Send the new pose first so clients never show the spent kneel between the two.
+        var changes = entityData.packDirty();
+        if (changes != null) level.getChunkSource().broadcastAndSend(this,
+                new net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket(getId(), changes));
+        level.playSound(null,blockPosition(),SoundEvents.SCULK_CATALYST_BLOOM,SoundSource.HOSTILE,.75F,.72F);
+        return true;
+    }
+
+    private void tickEscape(ServerLevel level) {
+        elapsed++;
+        var exit=position().add(drainOffset());
+        var drain=BlockPos.containing(exit);
+        if(elapsed==TEAR) {
+            level.playSound(null,blockPosition(),SoundEvents.SLIME_BLOCK_BREAK,SoundSource.HOSTILE,1F,.68F);
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,Blocks.NETHER_WART_BLOCK.defaultBlockState()),
+                    getX(),getY()+.96,getZ(),10,.12,.13,.12,.06);
+        } else if(elapsed==SUBMERGED) {
+            level.playSound(null,drain,SoundEvents.IRON_TRAPDOOR_CLOSE,SoundSource.BLOCKS,.85F,.64F);
+        } else if(elapsed==37 || elapsed==43) {
+            level.playSound(null,drain.below(elapsed==37?1:3),SoundEvents.STONE_HIT,SoundSource.BLOCKS,elapsed==37?.74F:.44F,.55F);
+        }
+        if(elapsed>=ESCAPE_END) {
+            if(level.hasChunkAt(station) && level.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(level);
+            BossSiteData.complete(this,null,2);
+            for (var observer:level.players()) if (observer.distanceToSqr(this)<24*24)
+                observer.displayClientMessage(Component.translatable("survival.blacklight.greene_escaped"),true);
+            discard();
+        }
     }
     @Override public boolean hurt(DamageSource source,float amount) {
         if(stage()==WAITING && !level().isClientSide && source.getEntity() instanceof ServerPlayer player){
             notice(player); alertTicks=80;
         }
-        return (source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)
-                || stage()==SPENT && com.codex.blacklight.combat.ConsumeLastChance.executing(this)) && super.hurt(source,amount);
+        return source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY) && super.hurt(source,amount);
     }
     @Override public boolean isPushable(){return false;}
     @Override public void remove(Entity.RemovalReason reason) {
@@ -199,12 +263,20 @@ public final class GreeneHost extends PathfinderMob {
         super.addAdditionalSaveData(tag);
         if(station!=null) tag.putLong("Station",station.asLong());
         if(pad!=null) tag.putLong("Surface",pad.asLong());
+        if(stage()==ESCAPING) {
+            var exit=drainOffset();
+            tag.putDouble("DrainX",exit.x); tag.putDouble("DrainY",exit.y); tag.putDouble("DrainZ",exit.z);
+        }
         tag.putInt("PlazaStage",stage()); tag.putInt("Elapsed",elapsed);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         station=tag.contains("Station")?BlockPos.of(tag.getLong("Station")):null;
         pad=tag.contains("Surface")?BlockPos.of(tag.getLong("Surface")):blockPosition();
-        enter(Math.max(WAITING,Math.min(BLOCKED,tag.getInt("PlazaStage"))),Math.max(0,tag.getInt("Elapsed")));
+        enter(Math.max(WAITING,Math.min(ESCAPING,tag.getInt("PlazaStage"))),Math.max(0,tag.getInt("Elapsed")));
+        if(stage()==ESCAPING) {
+            entityData.set(DRAIN,new Vec3(tag.getDouble("DrainX"),tag.getDouble("DrainY"),tag.getDouble("DrainZ")).toVector3f());
+            setNoGravity(true);
+        }
     }
 }

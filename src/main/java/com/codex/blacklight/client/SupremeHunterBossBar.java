@@ -17,12 +17,12 @@ public final class SupremeHunterBossBar {
     private static final class Trail {float shown=-1,trail=-1;long tick,seen;}
     private SupremeHunterBossBar(){}
     private static String key(Component name){return name.getContents() instanceof TranslatableContents t?t.getKey():"";}
-    static boolean ours(Component name){return java.util.Set.of(KEY,"boss.blacklight.phase","boss.blacklight.weakpoints","boss.blacklight.exposed").contains(key(name));}
+    static boolean ours(Component name){return java.util.Set.of(KEY,"boss.blacklight.phase","boss.blacklight.weakpoints","boss.blacklight.exposed","boss.blacklight.collapsing").contains(key(name));}
     @SubscribeEvent public static void bar(CustomizeGuiOverlayEvent.BossEventProgress event){
         var boss=event.getBossEvent();if(!ours(boss.getName()))return;
         var mc=Minecraft.getInstance();if(world!=mc.level){world=mc.level;TRAILS.clear();}
         String key=key(boss.getName());
-        if(key.equals("boss.blacklight.weakpoints")||key.equals("boss.blacklight.exposed")){defense(event,key.equals("boss.blacklight.exposed"));return;}
+        if(key.equals("boss.blacklight.weakpoints")||key.equals("boss.blacklight.exposed")||key.equals("boss.blacklight.collapsing")){defense(event,key.equals("boss.blacklight.exposed"));return;}
         event.setCanceled(true);event.setIncrement(30);
         var g=event.getGuiGraphics();var font=Minecraft.getInstance().font;
         int center=event.getX()+91,width=Math.min(300,g.guiWidth()-40),left=center-width/2,top=event.getY()+3,h=8;
@@ -40,7 +40,7 @@ public final class SupremeHunterBossBar {
         g.fill(left,top,left+width,top+h,0xFF1C0B0A);
         // damage trail, then live health with a darker lower half for depth
         g.fill(left,top,left+Math.round(width*state.trail),top+h,0xFFE8C9A0);
-        int fill=Math.round(width*p);boolean weak=supreme?p<=.12F:boss.getColor()==net.minecraft.world.BossEvent.BossBarColor.PURPLE;
+        int fill=Math.round(width*p);boolean weak=boss.getColor()==net.minecraft.world.BossEvent.BossBarColor.PURPLE;
         int hi=weak?0xFFB070FF:p<=.33F?0xFFD0322A:0xFFB3201A,lo=weak?0xFF5A2A90:p<=.33F?0xFF7A1410:0xFF6A100C;
         g.fill(left,top,left+fill,top+h/2,hi);g.fill(left,top+h/2,left+fill,top+h,lo);
         // sinew streaks

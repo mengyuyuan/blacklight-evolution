@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
+import com.codex.blacklight.entity.QuillOrgan;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -22,7 +22,12 @@ import org.joml.Vector3f;
 public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSupremeHunter> {
     private static final ResourceLocation SKIN=new ResourceLocation("blacklight","textures/entity/supreme_hunter_block.png");
     private static final ResourceLocation WHITE=new ResourceLocation("blacklight","textures/entity/claw_white.png");
-    private static final class State {String clip;float since;float[] from,last;double walked;Vec3 lastPos;float lastClock;}
+    private static final class State {
+        String clip;float since;float[] from,last;double walked;Vec3 lastPos;float lastClock;
+        SupremeHunterBlockRig.PosedBones bones;
+        java.util.UUID organ;
+        SupremeHunterBlockRig.SkinPoint wound;
+    }
     private final java.util.Map<BlacklightSupremeHunter,State> states=new java.util.WeakHashMap<>();
     public SupremeHunterRenderer(EntityRendererProvider.Context context){super(context);shadowRadius=1.75F;}
     @Override public ResourceLocation getTextureLocation(BlacklightSupremeHunter e){return SKIN;}
@@ -45,25 +50,57 @@ public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSuprem
     @Override public void render(BlacklightSupremeHunter e,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         var visual=com.codex.blacklight.registry.ModAttachments.getData(e,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         float consumeT=visual.active()?visual.progress(e.level().getGameTime(),partial):0;
-        if(consumeT<.995F)draw(e,partial,stack,buffers,light);
-        var owner=e.level().getEntity(e.consumerId());
-        if(owner!=null&&visual.active()){
-            Vec3 delta=owner.getPosition(partial).subtract(e.getPosition(partial));
-            ConsumedMobVisuals.whip(e,stack,buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,delta,ConsumedMobVisuals.tetherProgress(e,partial));
+        if(consumeT<.995F){
+            if(visual.stage()==com.codex.blacklight.combat.ConsumeVisual.MOUNT_CONSUME){
+                var skin=new ConsumeFracture(e,partial,stack,buffers,Vec3.ZERO);
+                draw(e,partial,stack,skin,light);
+                skin.finishMountedSurface();
+            }else draw(e,partial,stack,buffers,light);
         }
         super.render(e,yaw,partial,stack,buffers,light);
     }
-    private void draw(BlacklightSupremeHunter e,float partial,PoseStack stack,MultiBufferSource buffers,int light){
+    private State pose(BlacklightSupremeHunter e,float partial){
         var rig=SupremeHunterBlockRig.get();var s=states.computeIfAbsent(e,k->new State());
+        float clock=e.tickCount+partial;
+        if(s.bones!=null && clock==s.lastClock)return s;
         Vec3 pos=e.getPosition(partial);if(s.lastPos!=null)s.walked+=Math.min(2,Math.hypot(pos.x-s.lastPos.x,pos.z-s.lastPos.z));s.lastPos=pos;
-        float clock=e.tickCount+partial;float[] time={0};String key=clip(e,s,partial,time);
+        float[] time={0};String key=clip(e,s,partial,time);
         if(!key.equals(s.clip)){s.from=s.last;s.clip=key;s.since=clock;}
         float[] row=rig.sample(key,time[0]);
         float fade=Math.max(0,Math.min((clock-s.since)/4F,1));row=SupremeHunterBlockRig.blend(s.from,row,fade*fade*(3-2*fade));s.last=row;
-        int n=rig.names.length;var rot=new Quaternionf[n];var at=new Vector3f[n];
-        for(int i=0;i<n;i++){int o=i*4;rot[i]=new Quaternionf(row[o],row[o+1],row[o+2],row[o+3]);
-            int p=rig.parents[i];at[i]=p<0?new Vector3f(rig.pivots[i]).add(row[n*4],row[n*4+1],row[n*4+2])
-                :rot[p].transform(new Vector3f(rig.pivots[i]).sub(rig.pivots[p])).add(at[p]);}
+        s.bones=rig.pose(row);s.lastClock=clock;
+        return s;
+    }
+
+    QuillSkinContact.Surface wound(BlacklightSupremeHunter host,QuillOrgan organ,float partial){
+        var s=pose(host,partial);
+        Vec3 origin=host.getPosition(partial);
+        float yaw=Mth.rotLerp(partial,host.yBodyRotO,host.yBodyRot);
+        var turn=new Quaternionf().rotationY((float)Math.toRadians(180-yaw));
+        float scale=BlacklightSupremeHunter.SIZE/16F;
+        if(!organ.getUUID().equals(s.organ)){
+            var hit=organ.getPosition(partial).subtract(origin).toVector3f();
+            s.wound=SupremeHunterBlockRig.get().bind(s.bones,turn.transformInverse(hit).div(scale));
+            s.organ=organ.getUUID();
+        }
+        var contact=turn.transform(s.wound.position(s.bones).mul(scale));
+        var normal=turn.transform(s.wound.outward(s.bones));
+        int bone=s.wound.bone();
+        float[] xyz=s.wound.face().xyz();
+        java.util.function.IntFunction<Vec3> corner=i->{
+            var vertex=new Vector3f(xyz[i*3],xyz[i*3+1],xyz[i*3+2]).sub(SupremeHunterBlockRig.get().pivots[bone]);
+            s.bones.rotation()[bone].transform(vertex).add(s.bones.joint()[bone]);
+            return origin.add(new Vec3(turn.transform(vertex.mul(scale))));
+        };
+        return QuillSkinContact.Surface.face(origin.add(new Vec3(contact)),new Vec3(normal),corner.apply(0),corner.apply(1),corner.apply(3));
+    }
+
+    private void draw(BlacklightSupremeHunter e,float partial,PoseStack stack,MultiBufferSource buffers,int light){
+        var rig=SupremeHunterBlockRig.get();
+        var bones=pose(e,partial).bones;
+        var rot=bones.rotation();
+        var at=bones.joint();
+        Vec3 pos=e.getPosition(partial);
         stack.pushPose();
         float bodyYaw=Mth.rotLerp(partial,e.yBodyRotO,e.yBodyRot);
         stack.mulPose(Axis.YP.rotationDegrees(180-bodyYaw));float px=BlacklightSupremeHunter.SIZE/16F;stack.scale(px,px,px);
@@ -71,7 +108,16 @@ public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSuprem
         int overlay=OverlayTexture.pack(0,e.hurtTime>0||e.deathTime>0);
         int color=e.weakened()||e.isBeingConsumed()?0xFFFFB0A8:e.phase()>=3?0xFFE8A098:0xFFFFFFFF;
         var v=new Vector3f();var normal=new Vector3f();
-        for(var q:rig.quads){int b=q.bone();rot[b].transform(normal.set(q.nx(),q.ny(),q.nz()));
+        for(var q:rig.quads){int b=q.bone();
+            if(out instanceof ConsumeAnatomy.Consumer skin){
+                int region=ConsumeAnatomy.BODY;
+                for(int i=b;i>=0;i=rig.parents[i]){
+                    int id=ConsumeAnatomy.named(rig.names[i],-1);
+                    if(id>=0){region=id;break;}
+                }
+                skin.anatomy(region);
+            }
+            rot[b].transform(normal.set(q.nx(),q.ny(),q.nz()));
             for(int k=0;k<4;k++){v.set(q.xyz()[k*3],q.xyz()[k*3+1],q.xyz()[k*3+2]).sub(rig.pivots[b]);rot[b].transform(v).add(at[b]);
                 out.vertex(pose.pose(),v.x,v.y,v.z).color(color).uv(q.uv()[k*2],q.uv()[k*2+1]).overlayCoords(overlay).uv2(light).normal(pose.normal(),normal.x,normal.y,normal.z).endVertex();}
         }

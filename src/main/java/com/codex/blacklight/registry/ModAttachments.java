@@ -80,6 +80,11 @@ public final class ModAttachments {
             "glide_until", () -> AttachmentType.builder(() -> -1L)
                     .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
 
+    /** Start of the actor's mobile absorption tail; the receiver keeps its own existing scene clock. */
+    public static final Supplier<AttachmentType<Long>> MOBILE_CONSUME_START = ATTACHMENTS.register(
+            "mobile_consume_start", () -> AttachmentType.builder(() -> -1L)
+                    .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
+
     /** Server game time of infection onset; -1 denotes a pre-existing infection. */
     public static final Supplier<AttachmentType<Long>> INFECTION_START = ATTACHMENTS.register(
             "infection_start", () -> AttachmentType.builder(() -> -1L)
@@ -97,6 +102,9 @@ public final class ModAttachments {
 
     public static final Supplier<AttachmentType<Integer>> GRAB_STAGE = ATTACHMENTS.register(
             "grab_stage", () -> AttachmentType.builder(() -> 0)
+                    .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
+    public static final Supplier<AttachmentType<Integer>> QUILL_AIM_TARGET = ATTACHMENTS.register(
+            "quill_aim_target", () -> AttachmentType.builder(() -> -1)
                     .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_INT).build());
 
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.WeaponVisual>> WEAPON_VISUAL=ATTACHMENTS.register(
@@ -157,6 +165,20 @@ public final class ModAttachments {
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_RECOVERY = ATTACHMENTS.register(
             "consume_recovery", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
                     .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
+
+    /** Independent shader clock on the giver, including the mobile and post-settlement tail. */
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_BODY_VISUAL = ATTACHMENTS.register(
+            "consume_body_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
+                    .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
+
+    /** Last settled small receiver. A new grab can overlap its shoulder residue. */
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_RESIDUE_VISUAL = ATTACHMENTS.register(
+            "consume_residue_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
+                    .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
+
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.MobileConsumeCarry>> MOBILE_CONSUME_CARRY = ATTACHMENTS.register(
+            "mobile_consume_carry", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.MobileConsumeCarry.EMPTY)
+                    .sync(com.codex.blacklight.combat.MobileConsumeCarry.CODEC).build());
 
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_VISUAL = ATTACHMENTS.register(
             "consume_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)

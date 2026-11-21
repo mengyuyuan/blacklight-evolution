@@ -19,11 +19,16 @@ public abstract class LivingConsumePoseMixin {
     @Shadow protected EntityModel<?> model;
     @Inject(method="getOverlayCoords",at=@At("HEAD"),cancellable=true)
     private static void blacklight$corpseOverlay(LivingEntity entity,float white,org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Integer> ci){
+        if(com.codex.blacklight.client.animation.RagdollDrive.showingConsumeWound(entity)){
+            ci.setReturnValue(net.minecraft.client.renderer.texture.OverlayTexture.pack(white,false));
+            return;
+        }
         if(entity.isDeadOrDying()&&(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)||com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)))
             ci.setReturnValue(net.minecraft.client.renderer.texture.OverlayTexture.pack(white,com.codex.blacklight.client.animation.RagdollDrive.hurtFlash(entity)));
     }
     @Inject(method="setupRotations",at=@At("HEAD"),cancellable=true)
     private void blacklight$physicalRoot(LivingEntity entity,PoseStack stack,float bob,float bodyYaw,float partial,CallbackInfo ci){
+        com.codex.blacklight.client.renderer.QuillOrganRenderer.contractHost(entity,stack,partial);
         if(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)||com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)){
             stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-bodyYaw));ci.cancel();
         }

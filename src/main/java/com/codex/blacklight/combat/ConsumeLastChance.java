@@ -1,6 +1,9 @@
 package com.codex.blacklight.combat;
 
 import com.codex.blacklight.config.GameplayBalanceConfig;
+import com.codex.blacklight.entity.BackspineQuill;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.damagesource.DamageTypes;
 import com.codex.blacklight.registry.ModAttachments;
 import java.util.*;
 import java.util.function.BooleanSupplier;
@@ -14,10 +17,22 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
-/** One saved opportunity for an already weakened, consumable creature. */
+/** One saved opportunity on the first qualifying lethal hit from any weapon. */
 @EventBusSubscriber(modid="blacklight")
 public final class ConsumeLastChance {
     private static final String USED="BlacklightConsumeLastChanceUsed";
+    private static final String WAITING="BlacklightConsumeAwaitingFinisher";
+    private static final String LAST_ATTACK="BlacklightConsumeOpeningAttack";
+    public static boolean awaitingFinisher(Entity entity) {
+        return entity instanceof Mob mob && mob.getMaxHealth() >= ConsumeSystem.DIRECT_GRAB_MAX_HEALTH && mob.getHealth() <= 1
+                && mob.getPersistentData().getBoolean(WAITING) && GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE);
+    }
+    private static UUID actionId(DamageSource source) {
+        if (source.getDirectEntity() instanceof BackspineQuill quill) return quill.volleyId();
+        if (source.getDirectEntity() instanceof ServerPlayer player && source.is(DamageTypes.PLAYER_ATTACK))
+            return WeaponCombatSystem.currentAttackId(player);
+        return null;
+    }
     private record Hit(DamageSource source,long tick) {}
     private static final Map<Mob,Hit> HITS=new WeakHashMap<>();
     private static final ThreadLocal<Set<Mob>> EXECUTING=ThreadLocal.withInitial(()->Collections.newSetFromMap(new IdentityHashMap<>()));
@@ -38,19 +53,27 @@ public final class ConsumeLastChance {
     public static void incoming(LivingHurtEvent event){
         if(!(event.getEntity() instanceof Mob target)||target.level().isClientSide)return;
         HITS.remove(target);
+        if (awaitingFinisher(target) && !executing(target) && target.getPersistentData().hasUUID(LAST_ATTACK)
+                && target.getPersistentData().getUUID(LAST_ATTACK).equals(actionId(event.getSource()))) {
+            event.setCanceled(true);
+            return;
+        }
         if(event.isCanceled()||event.getAmount()<=0||!GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE)
                 ||used(target)||EXECUTING.get().contains(target)||CrossModCombat.administrative(event.getSource())
-                ||!(event.getSource().getEntity() instanceof ServerPlayer player)||!player.isAlive()||player.isSpectator()
-                ||player.level()!=target.level()||!ModAttachments.available(player)
-                ||!ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isInfected())return;
-        float maximum=target.getMaxHealth(),health=target.getHealth();
-        // Snapshot BEFORE the hit. A full-health one-shot is still a normal kill.
-        if(Float.isFinite(maximum)&&maximum>0&&health>0
-                &&health<=maximum*GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE_THRESHOLD)
+                ||!ownedHit(target,event.getSource()))return;
+         float maximum=target.getMaxHealth();
+        if(Float.isFinite(maximum) && maximum>=ConsumeSystem.DIRECT_GRAB_MAX_HEALTH && target.getHealth()>0
                 &&ConsumeSystem.eligibleBiomass(target))
             HITS.put(target,new Hit(event.getSource(),target.level().getGameTime()));
     }
-    @SubscribeEvent(priority=EventPriority.HIGHEST)
+    private static boolean ownedHit(Mob target,DamageSource source) {
+         if (source.getEntity() instanceof ServerPlayer player)
+             return player.isAlive() && !player.isSpectator() && player.level()==target.level()
+                     && ModAttachments.available(player) && ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isInfected();
+         // A saved parasite still ticks when its owner logs out or changes dimensions.
+         return source.getEntity()==null && source.is(QuillHarvest.DRAIN) && QuillHarvest.mark(target).hasUUID("owner");
+     }
+     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static void death(LivingDeathEvent event){
         if(!(event.getEntity() instanceof Mob target)||target.level().isClientSide)return;
         var hit=HITS.remove(target);
@@ -58,8 +81,21 @@ public final class ConsumeLastChance {
                 ||used(target)||EXECUTING.get().contains(target)
                 ||!GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE))return;
         target.getPersistentData().putBoolean(USED,true);
+        target.getPersistentData().putBoolean(WAITING,true);
+        UUID attack=actionId(hit.source());
+        if (attack!=null) target.getPersistentData().putUUID(LAST_ATTACK,attack);
         target.setHealth(1);
+        float yaw=hit.source().getEntity()==null?target.getYRot():hit.source().getEntity().getYRot();
+        ImpactControl.consumeOpening(target,yaw);
         event.setCanceled(true);
+    }
+    @SubscribeEvent public static void heal(net.minecraftforge.event.entity.living.LivingHealEvent event) {
+        if (!event.getEntity().level().isClientSide && awaitingFinisher(event.getEntity())) event.setCanceled(true);
+    }
+    @SubscribeEvent(priority=EventPriority.LOWEST)
+    public static void finish(net.minecraftforge.event.entity.living.LivingDamageEvent event) {
+        if (!ConsumeContactDamage.owns(event.getEntity(),event.getSource()) && awaitingFinisher(event.getEntity()) && event.getSource().getEntity()!=null && event.getAmount()>0
+                && event.getAmount()<1) event.setAmount(1);
     }
     @SubscribeEvent public static void stopped(ServerStoppedEvent event){HITS.keySet().removeIf(m->m.getServer()==event.getServer());}
 }

@@ -31,6 +31,32 @@ public final class ConsumeLastChanceGameTest {
     }
     private static Cow mob(GameTestHelper h){var m=EntityType.COW.create(h.getLevel());m.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100);m.setHealth(100);m.setNoAi(true);m.moveTo(h.absolutePos(new BlockPos(7,30,5)).getCenter());h.getLevel().addFreshEntity(m);return m;}
     private static void kill(ServerPlayer p,Mob m){m.invulnerableTime=0;m.hurt(p.damageSources().playerAttack(p),1000000);}
+    @GameTest(template="wall_test",timeoutTicks=80,batch="consume_actual_moves")
+    public static void authoredWeaponStrikesPreserveTheFirstLethalContact(GameTestHelper h){
+        for(var form:List.of(PowerForm.CLAWS,PowerForm.BLADE,PowerForm.WHIPFIST,PowerForm.HAMMERFISTS,PowerForm.MUSCLE_MASS)){
+            var p=player(h,true);var state=state(p);state.setPrototypeMode(true);state.unlock(form);state.activate(form);
+            ModAttachments.setData(p,ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
+            ModAttachments.setData(p,ModAttachments.INFINITE_EVOLUTION,ModAttachments.getData(p,ModAttachments.INFINITE_EVOLUTION).buy(EvolutionAttribute.STRENGTH,1000));
+            var origin=p.position();var m=EntityType.IRON_GOLEM.create(h.getLevel());
+            m.setNoAi(true);m.setNoGravity(true);h.getLevel().addFreshEntity(m);
+            try{
+                for(int swing=0;swing<2;swing++){
+                    p.setPos(origin);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);p.setOnGround(true);
+                    p.setYRot(0);p.setXRot(0);p.setYHeadRot(0);p.yBodyRot=p.yBodyRotO=0;
+                    m.setPos(origin.add(0,0,form==PowerForm.WHIPFIST?4:1.8));m.invulnerableTime=0;
+                    WeaponCombatSystem.request(p,false);
+                    var move=ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).spec();
+                    h.assertTrue(move!=null,form+" accepted the attack");
+                    for(int i=0;i<move.duration+12 && WeaponCombatSystem.busy(p);i++){
+                        p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+                    }
+                    h.assertTrue(swing==0?m.getHealth()==1 && m.isAlive():!m.isAlive(),form+" swing "+swing+" actual health "+m.getHealth());
+                    WeaponCombatSystem.cancel(p);p.tickCount+=25;
+                }
+            }finally{WeaponCombatSystem.cancel(p);p.discard();m.discard();}
+        }
+        h.succeed();
+    }
     @GameTest(template="wall_test",timeoutTicks=45,batch="consume_last_chance_reward")
     public static void weakenedCreatureSurvivesOnceAndOnlyTheRealKillPays(GameTestHelper h){
         var p=player(h,true);var m=mob(h);m.setHealth(15);var quote=AssimilationSystem.quote(p,m);kill(p,m);
@@ -39,12 +65,30 @@ public final class ConsumeLastChanceGameTest {
         h.runAfterDelay(6,()->{try{h.assertTrue(state(p).getBiomass()==CombatRewards.fraction(quote.biomass(),.5)&&state(p).getEvolutionPoints()==CombatRewards.fraction(quote.ep(),.5),"one actual death pays exactly half base rewards");h.succeed();}finally{m.discard();p.discard();}});
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="consume_last_chance_boundary")
-    public static void fullHealthAndAboveThresholdOneShotsStayNormalKills(GameTestHelper h){
-        var p=player(h,true);var full=mob(h);var above=mob(h);var weak=mob(h);
-        try{above.setHealth(15.1F);weak.setHealth(14.9F);kill(p,full);kill(p,above);kill(p,weak);
-            h.assertTrue(!full.isAlive()&&!above.isAlive()&&!ConsumeLastChance.used(full)&&!ConsumeLastChance.used(above),"protection cannot turn trash clearing into mandatory double hits");
-            h.assertTrue(weak.isAlive()&&weak.getHealth()==1,"below threshold protection works");
-        }finally{full.discard();above.discard();weak.discard();p.discard();}h.succeed();
+    public static void allFormsReserveLargePreyAndSmallPreyDieAtAnyHealth(GameTestHelper h){
+        var p=player(h,true);var state=state(p);state.setPrototypeMode(true);
+        var forms=List.of(PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS,PowerForm.NONE);
+        try {
+            for (var form:forms) {
+                state.unlock(form);state.activate(form);
+                var prey=mob(h);
+                try {
+                    kill(p,prey);
+                    h.assertTrue(prey.getHealth()==1 && ImpactControl.stunned(prey),form+" full-health 100 HP creature enters opening");
+                    prey.heal(20);h.assertTrue(prey.getHealth()==1,form+" retains one HP");
+                    prey.invulnerableTime=0;prey.hurt(p.damageSources().playerAttack(p),.25F);
+                    h.assertTrue(!prey.isAlive(),form+" next independent attack kills");
+                } finally {prey.discard();}
+            }
+            for(float max:List.of(20F,49F,50F,51F))for(float start:List.of(1F,max)){
+                var small=mob(h);
+                try{small.getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);small.setHealth(start);
+                    if(max<50)h.assertTrue(ConsumeSystem.healthReady(p,small),"low-health class directly consumable");
+                    kill(p,small);
+                    h.assertTrue(small.isAlive()==(max>=50),"boundary at "+start+" / "+max);
+                }finally{small.discard();}
+            }
+        } finally {p.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="consume_last_chance_save")
     public static void spentChanceSurvivesReloadAndInfectionReplacement(GameTestHelper h){
@@ -84,10 +128,10 @@ public final class ConsumeLastChanceGameTest {
         }finally{net.minecraftforge.common.MinecraftForge.EVENT_BUS.unregister(veto);m.discard();p.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40,batch="consume_last_chance_config")
-    public static void serverCanDisableOrChangeTheHealthThreshold(GameTestHelper h){
-        var p=player(h,true);var disabled=mob(h);var tuned=mob(h);boolean enabled=GameplayBalanceConfig.CONSUME_LAST_CHANCE.get();double threshold=GameplayBalanceConfig.CONSUME_LAST_CHANCE_THRESHOLD.get();
+    public static void serverCanDisableTheLargePreyOpening(GameTestHelper h){
+        var p=player(h,true);var disabled=mob(h);var tuned=mob(h);boolean enabled=GameplayBalanceConfig.CONSUME_LAST_CHANCE.get();
         try{GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(false);disabled.setHealth(10);kill(p,disabled);h.assertTrue(!disabled.isAlive(),"server switch respected");
-            GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(true);GameplayBalanceConfig.CONSUME_LAST_CHANCE_THRESHOLD.set(.2);tuned.setHealth(20);kill(p,tuned);h.assertTrue(tuned.isAlive()&&tuned.getHealth()==1,"server threshold respected");
-        }finally{GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(enabled);GameplayBalanceConfig.CONSUME_LAST_CHANCE_THRESHOLD.set(threshold);disabled.discard();tuned.discard();p.discard();}h.succeed();
+            GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(true);tuned.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50);tuned.setHealth(10);kill(p,tuned);h.assertTrue(tuned.isAlive()&&tuned.getHealth()==1,"50 HP target receives the enabled opening");
+        }finally{GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(enabled);disabled.discard();tuned.discard();p.discard();}h.succeed();
     }
 }

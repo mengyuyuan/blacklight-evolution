@@ -153,6 +153,26 @@ class EncounterMoveTest {
             return point;
         }
     }
+    @Test void supremeHunterParasiteTracksTheSameSkinAsTheHunterMoves(){
+        var rig=com.codex.blacklight.client.model.SupremeHunterBlockRig.get();
+        var idle=rig.pose(rig.sample("idle",0));
+        // Saved local impact on the hunter's broad physical hitbox, converted into model pixels.
+        var hit=new org.joml.Vector3f(-.8583152F,2.3803786F,1.2996728F).div(1.35F/16);
+        var wound=rig.bind(idle,hit);
+        assertTrue(wound.position(idle).distance(hit)>1,"the original contact was outside the mesh");
+        float maxTravel=0;
+        for(String clip:java.util.List.of("idle","walk","run","leg_collapse")){
+            for(int tick:new int[]{0,4,8,12,18}){
+                var bones=rig.pose(rig.sample(clip,tick));
+                var attached=wound.position(bones);
+                var projected=rig.bind(bones,attached);
+                assertTrue(projected.position(bones).distance(attached)<.001F,clip+" at "+tick);
+                assertEquals(1F,wound.outward(bones).length(),.001F);
+                maxTravel=Math.max(maxTravel,attached.distance(wound.position(idle)));
+            }
+        }
+        assertTrue(maxTravel>2,"the wound must follow the animation");
+    }
     @Test void sourceRetargetPreservesAuthoredNeutralPose(){var rig=com.codex.blacklight.client.model.SupremeHunterBlockRig.get();var rest=rig.sample("idle",0);for(String[] pair:new String[][]{{"Spine_3",""},{"Head","Spine_3"},{"Shoulder_R","Spine_3"},{"Elbow_R","Shoulder_R"},{"Hip_R",""}}){var q=com.codex.blacklight.client.model.EncounterSourceMotion.localDelta(rig,rest,rest,pair[0],pair[1]);assertEquals(0,q.x,.0001F);assertEquals(0,q.y,.0001F);assertEquals(0,q.z,.0001F);assertEquals(1,Math.abs(q.w),.0001F);}}
     @Test void authoredGeometryHasFiniteCubesAndInBoundsUv()throws Exception{
         var ids=new java.util.ArrayList<String>();for(var kind:EncounterKind.values())ids.add(kind.id);ids.add("recon_uav");

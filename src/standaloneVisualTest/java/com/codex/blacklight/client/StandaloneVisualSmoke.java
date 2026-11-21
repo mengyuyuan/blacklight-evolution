@@ -35,40 +35,39 @@ public final class StandaloneVisualSmoke {
     // Reuse the naturally lit flat-world surface. An artificial platform in an
     // initially empty high section can precede Forge's first skylight upload.
     private static final int STAGE_Y=-60;
-    private record Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson,boolean editor,float pitch,CameraType camera,boolean nativeCamera) {
-        Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson,boolean editor){this(name,form,utility,move,seconds,charge,firstPerson,editor,0,null,false);}
+    private record Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson,float pitch,CameraType camera,boolean nativeCamera) {
+        Shot(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,boolean charge,boolean firstPerson){this(name,form,utility,move,seconds,charge,firstPerson,0,null,false);}
     }
     private static final List<Shot> SHOTS=List.of(
-            new Shot("01_unarmed_idle",PowerForm.NONE,null,null,.6F,false,false,false),
-            new Shot("02_claws_idle",PowerForm.CLAWS,null,null,.6F,false,false,false),
-            new Shot("03_claws_attack",PowerForm.CLAWS,null,WeaponMove.CLAW_AUTO1,.28F,false,false,false),
-            new Shot("04_blade_idle",PowerForm.BLADE,null,null,.6F,false,false,false),
-            new Shot("05_blade_attack",PowerForm.BLADE,null,WeaponMove.BLADE_CUT,.31F,false,false,false),
-            new Shot("06_hammerfists_idle",PowerForm.HAMMERFISTS,null,null,.6F,false,false,false),
-            new Shot("07_hammerfists_charge",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_QUAKE,.35F,true,false,false),
-            new Shot("08_whipfist_idle",PowerForm.WHIPFIST,null,null,.6F,false,false,false),
-            new Shot("09_whipfist_attack",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.48F,false,false,false),
-            new Shot("10_muscle_mass_idle",PowerForm.MUSCLE_MASS,null,null,.6F,false,false,false),
-            new Shot("11_armor_idle",PowerForm.NONE,PowerForm.ARMOR,null,.6F,false,false,false),
-            new Shot("12_armor_blade",PowerForm.BLADE,PowerForm.ARMOR,null,.6F,false,false,false),
-            new Shot("13_shield_idle",PowerForm.NONE,PowerForm.SHIELD,null,.6F,false,false,false),
-            new Shot("14_first_person_claws",PowerForm.CLAWS,null,null,.6F,false,true,false),
-            new Shot("15_first_person_blade",PowerForm.BLADE,null,null,.6F,false,true,false),
-            new Shot("16_first_person_armor",PowerForm.NONE,PowerForm.ARMOR,null,.6F,false,true,false),
-            new Shot("17_first_person_shield",PowerForm.NONE,PowerForm.SHIELD,null,.6F,false,true,false),
-            new Shot("18_native_animation_editor",PowerForm.CLAWS,null,null,2.03F,false,false,true),
-            new Shot("19_walk_phase_a",PowerForm.NONE,null,null,.12F,false,false,false),
-            new Shot("20_walk_phase_b",PowerForm.NONE,null,null,.42F,false,false,false),
-            new Shot("21_sprint_phase_a",PowerForm.NONE,null,null,.10F,false,false,false),
-            new Shot("22_sprint_phase_b",PowerForm.NONE,null,null,.35F,false,false,false),
-            new Shot("23_wall_run",PowerForm.NONE,null,null,.20F,false,false,false),
-            new Shot("24_wall_climb",PowerForm.NONE,null,null,.25F,false,false,false),
-            new Shot("25_armor_wall_run",PowerForm.NONE,PowerForm.ARMOR,null,.20F,false,false,false),
-            new Shot("26_blade_grab_start",PowerForm.BLADE,null,null,0F,false,false,false),
-            new Shot("27_blade_throw_return",PowerForm.BLADE,null,null,.70F,false,false,false),
-            new Shot("28_blade_throw_between_keys",PowerForm.BLADE,null,null,.586F,false,false,false),
-            new Shot("29_native_front",PowerForm.NONE,null,null,.6F,false,false,false,0,CameraType.THIRD_PERSON_FRONT,true),
-            new Shot("30_native_back",PowerForm.NONE,null,null,.6F,false,false,false,0,CameraType.THIRD_PERSON_BACK,true),
+            new Shot("01_unarmed_idle",PowerForm.NONE,null,null,.6F,false,false),
+            new Shot("02_claws_idle",PowerForm.CLAWS,null,null,.6F,false,false),
+            new Shot("03_claws_attack",PowerForm.CLAWS,null,WeaponMove.CLAW_AUTO1,.28F,false,false),
+            new Shot("04_blade_idle",PowerForm.BLADE,null,null,.6F,false,false),
+            new Shot("05_blade_attack",PowerForm.BLADE,null,WeaponMove.BLADE_CUT,.31F,false,false),
+            new Shot("06_hammerfists_idle",PowerForm.HAMMERFISTS,null,null,.6F,false,false),
+            new Shot("07_hammerfists_charge",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_QUAKE,.35F,true,false),
+            new Shot("08_whipfist_idle",PowerForm.WHIPFIST,null,null,.6F,false,false),
+            new Shot("09_whipfist_attack",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.48F,false,false),
+            new Shot("10_muscle_mass_idle",PowerForm.MUSCLE_MASS,null,null,.6F,false,false),
+            new Shot("11_armor_idle",PowerForm.NONE,PowerForm.ARMOR,null,.6F,false,false),
+            new Shot("12_armor_blade",PowerForm.BLADE,PowerForm.ARMOR,null,.6F,false,false),
+            new Shot("13_shield_idle",PowerForm.NONE,PowerForm.SHIELD,null,.6F,false,false),
+            new Shot("14_first_person_claws",PowerForm.CLAWS,null,null,.6F,false,true),
+            new Shot("15_first_person_blade",PowerForm.BLADE,null,null,.6F,false,true),
+            new Shot("16_first_person_armor",PowerForm.NONE,PowerForm.ARMOR,null,.6F,false,true),
+            new Shot("17_first_person_shield",PowerForm.NONE,PowerForm.SHIELD,null,.6F,false,true),
+            new Shot("19_walk_phase_a",PowerForm.NONE,null,null,.12F,false,false),
+            new Shot("20_walk_phase_b",PowerForm.NONE,null,null,.42F,false,false),
+            new Shot("21_sprint_phase_a",PowerForm.NONE,null,null,.10F,false,false),
+            new Shot("22_sprint_phase_b",PowerForm.NONE,null,null,.35F,false,false),
+            new Shot("23_wall_run",PowerForm.NONE,null,null,.20F,false,false),
+            new Shot("24_wall_climb",PowerForm.NONE,null,null,.25F,false,false),
+            new Shot("25_armor_wall_run",PowerForm.NONE,PowerForm.ARMOR,null,.20F,false,false),
+            new Shot("26_blade_grab_start",PowerForm.BLADE,null,null,0F,false,false),
+            new Shot("27_blade_throw_return",PowerForm.BLADE,null,null,.70F,false,false),
+            new Shot("28_blade_throw_between_keys",PowerForm.BLADE,null,null,.586F,false,false),
+            new Shot("29_native_front",PowerForm.NONE,null,null,.6F,false,false,0,CameraType.THIRD_PERSON_FRONT,true),
+            new Shot("30_native_back",PowerForm.NONE,null,null,.6F,false,false,0,CameraType.THIRD_PERSON_BACK,true),
             fps("31_blade_live_idle",PowerForm.BLADE,null,null,.6F,0),
             fps("32_blade_look_down",PowerForm.BLADE,null,null,.6F,60),
             fps("33_blade_look_up",PowerForm.BLADE,null,null,.6F,-60),
@@ -87,24 +86,24 @@ public final class StandaloneVisualSmoke {
             fps("46_shield_look_up",PowerForm.NONE,PowerForm.SHIELD,null,.6F,-60),
             fps("47_shield_attack_down",PowerForm.NONE,PowerForm.SHIELD,WeaponMove.MUSCLE_JAB,.25F,60),
             fps("48_shield_attack_up",PowerForm.NONE,PowerForm.SHIELD,WeaponMove.MUSCLE_JAB,.25F,-60),
-            new Shot("49_native_back_orbit_180",PowerForm.NONE,null,null,.6F,false,false,false,0,CameraType.THIRD_PERSON_BACK,true),
+            new Shot("49_native_back_orbit_180",PowerForm.NONE,null,null,.6F,false,false,0,CameraType.THIRD_PERSON_BACK,true),
             fps("50_hammer_native_idle",PowerForm.HAMMERFISTS,null,null,.6F,0),
             fps("51_hammer_native_attack",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_QUAKE,.7F,0),
             fps("52_whip_native_idle",PowerForm.WHIPFIST,null,null,.6F,0),
             fps("53_whip_native_attack",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.48F,0),
             fps("54_muscle_native_idle",PowerForm.MUSCLE_MASS,null,null,.6F,0),
             fps("55_muscle_native_attack",PowerForm.MUSCLE_MASS,null,WeaponMove.MUSCLE_JAB,.25F,0),
-            new Shot("56_vision_baseline",PowerForm.NONE,null,null,.6F,false,false,false),
-            new Shot("57_thermal_alignment",PowerForm.NONE,PowerForm.THERMAL_VISION,null,.6F,false,false,false),
-            new Shot("58_whip_attachment",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.45F,false,false,false),
-            new Shot("59_hammer_ram_impact",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.466667F,false,false,false),
-            new Shot("60_hammer_ram_recovery",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.95F,false,false,false),
-            new Shot("61_hammer_ram_stand",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,2.4F,false,false,false),
-            new Shot("62_wall_run_phase_b",PowerForm.NONE,null,null,.45F,false,false,false),
-            new Shot("63_wall_run_right",PowerForm.NONE,null,null,.2F,false,false,false),
-            new Shot("64_wall_run_diag_left",PowerForm.NONE,null,null,.2F,false,false,false),
-            new Shot("65_live_wall_run",PowerForm.CLAWS,null,null,0,false,false,false),
-            new Shot("66_live_wall_climb",PowerForm.CLAWS,null,null,0,false,false,false))
+            new Shot("56_vision_baseline",PowerForm.NONE,null,null,.6F,false,false),
+            new Shot("57_thermal_alignment",PowerForm.NONE,PowerForm.THERMAL_VISION,null,.6F,false,false),
+            new Shot("58_whip_attachment",PowerForm.WHIPFIST,null,WeaponMove.WHIP_LASH,.45F,false,false),
+            new Shot("59_hammer_ram_impact",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.466667F,false,false),
+            new Shot("60_hammer_ram_recovery",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,1.95F,false,false),
+            new Shot("61_hammer_ram_stand",PowerForm.HAMMERFISTS,null,WeaponMove.HAMMER_RAM,2.4F,false,false),
+            new Shot("62_wall_run_phase_b",PowerForm.NONE,null,null,.45F,false,false),
+            new Shot("63_wall_run_right",PowerForm.NONE,null,null,.2F,false,false),
+            new Shot("64_wall_run_diag_left",PowerForm.NONE,null,null,.2F,false,false),
+            new Shot("65_live_wall_run",PowerForm.CLAWS,null,null,0,false,false),
+            new Shot("66_live_wall_climb",PowerForm.CLAWS,null,null,0,false,false))
             .stream().filter(StandaloneVisualSmoke::selected).toList();
     private static final String PROPERTY="blacklight.test.standaloneVisual";
     private static Path output;
@@ -119,7 +118,7 @@ public final class StandaloneVisualSmoke {
     private static final java.util.Map<KeyMapping,Boolean> savedKeys=new java.util.IdentityHashMap<>();
     private static final JsonArray captures=new JsonArray();
     private StandaloneVisualSmoke() { }
-    private static Shot fps(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,float pitch){return new Shot(name,form,utility,move,seconds,false,true,false,pitch,CameraType.FIRST_PERSON,true);}
+    private static Shot fps(String name,PowerForm form,PowerForm utility,WeaponMove move,float seconds,float pitch){return new Shot(name,form,utility,move,seconds,false,true,pitch,CameraType.FIRST_PERSON,true);}
     private static CameraType camera(Shot shot){return shot.camera()!=null?shot.camera():shot.firstPerson()?CameraType.FIRST_PERSON:wall(shot)!=com.codex.blacklight.movement.WallTraversal.Mode.NONE?CameraType.THIRD_PERSON_BACK:CameraType.THIRD_PERSON_FRONT;}
     private static boolean selected(Shot shot) {
         String filter=System.getProperty("blacklight.test.standaloneVisual.shots","");
@@ -201,9 +200,8 @@ public final class StandaloneVisualSmoke {
         var shot=SHOTS.get(index);
         if(!queued) {
             PlayerMotionController.clearPreview(client.player);
-            if(client.screen instanceof com.codex.blacklight.client.screen.AnimationTunerScreen)client.setScreen(null);
             // Minecraft suppresses the entire RenderHand pipeline while F1 hides the HUD.
-            client.options.hideGui=!shot.editor()&&!shot.firstPerson();client.options.fov().set(shot.firstPerson()?70:60);
+            client.options.hideGui=!shot.firstPerson();client.options.fov().set(shot.firstPerson()?70:60);
             client.options.setCameraType(camera(shot));
             var uuid=client.player.getUUID();serverReady=false;
             server.execute(()->{
@@ -231,7 +229,6 @@ public final class StandaloneVisualSmoke {
                 orbitMouseY=-client.gameRenderer.getMainCamera().getXRot()/.15F;
                 if(!com.codex.blacklight.client.camera.PrototypeChaseCamera.mouse(1200,orbitMouseY))throw new IllegalStateException("Native BACK orbit mouse was not owned");
             }
-            if(shot.editor())client.setScreen(new com.codex.blacklight.client.screen.AnimationTunerScreen());
             preview=true;stageAt=tick+15;return;
         }
         if(shot.move()!=null)com.codex.blacklight.registry.ModAttachments.setData(client.player, ModAttachments.WEAPON_VISUAL,new WeaponVisual(shot.move().ordinal(),client.level.getGameTime(),180,shot.charge(),shot.seconds()));
@@ -245,7 +242,6 @@ public final class StandaloneVisualSmoke {
         if(wall(shot)==com.codex.blacklight.movement.WallTraversal.Mode.RUN)
             return shot.name().contains("diag_left")?"basic_wall_run_diag_left":shot.name().endsWith("right")?"basic_wall_run_right":"basic_wall_run_up";
         if(wall(shot)==com.codex.blacklight.movement.WallTraversal.Mode.CLIMB)return "basic_wall_climb_up";
-        if(shot.editor())return "charged_jump";
         if(shot.move()==null)return shot.firstPerson()?com.codex.blacklight.client.animation.FirstPersonPose.idle(shot.form()):"basic_idle";
         return shot.charge()?LocalWeaponMotion.find(shot.move().id).flatMap(LocalWeaponMotion.Definition::charge).map(LocalWeaponMotion.Charge::animation).orElseThrow():shot.move().id;
     }
@@ -286,7 +282,7 @@ public final class StandaloneVisualSmoke {
     // invocation. Forge 1.20's FOV event is too late to establish the view matrix.
     public static void observerCamera(net.minecraft.client.Camera view,float partial) {
         if(!initialized||disabled||completed||!preview||index>=SHOTS.size())return;
-        var shot=SHOTS.get(index);if(shot.firstPerson()||shot.editor()||shot.nativeCamera())return;
+        var shot=SHOTS.get(index);if(shot.firstPerson()||shot.nativeCamera())return;
         var player=Minecraft.getInstance().player;if(player==null)return;
         var pose=com.codex.blacklight.client.animation.BlacklightRenderPose.sample(player,partial);
         var skeleton=PlayerMotionController.skeleton();
@@ -387,7 +383,6 @@ public final class StandaloneVisualSmoke {
     }
     private static void finish(Minecraft client) {
         completed=true;PlayerMotionController.clearPreview(client.player);com.codex.blacklight.registry.ModAttachments.setData(client.player, ModAttachments.WEAPON_VISUAL,WeaponVisual.EMPTY);
-        if(client.screen instanceof com.codex.blacklight.client.screen.AnimationTunerScreen)client.setScreen(null);
         client.options.setCameraType(previousCamera);client.options.fov().set(previousFov);client.options.hideGui=previousGui;client.options.pauseOnLostFocus=previousPause;
         savedKeys.forEach(KeyMapping::setDown);if(previousMouse)client.mouseHandler.grabMouse();else client.mouseHandler.releaseMouse();client.updateTitle();
         writeReport(true,null);BlacklightNeoMod.LOGGER.info("Standalone visual QA completed {} real-frame captures",captures.size());

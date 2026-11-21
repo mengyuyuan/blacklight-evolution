@@ -10,6 +10,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 import com.codex.blacklight.combat.QuillWedge;
+import com.codex.blacklight.combat.QuillHarvest;
 
 /** Each detached quill travels and collides with the world independently. */
 public final class BackspineQuill extends ThrowableItemProjectile {
@@ -52,6 +53,11 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         return body==null?target.getUUID():body.getUUID();
     }
     private float damage=4;
+    private java.util.UUID aimTarget, volleyId;
+    public java.util.UUID volleyId(){return volleyId;}
+    public void setVolleyId(java.util.UUID id){volleyId=id;}
+    public java.util.UUID aimTarget(){return aimTarget;}
+    public void setAimTarget(java.util.UUID target){aimTarget=target;}
     private boolean canWedge, canPierceWedge, piercingWedge;
     private LivingEntity wedgedTarget;
     public void setWedgeSkills(boolean wedge, boolean pierce) {
@@ -68,6 +74,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
     @Override protected Item getDefaultItem(){return Items.BONE;}
     @Override protected float getGravity(){return .008F;}
     @Override protected boolean canHitEntity(Entity other){
+        if(QuillHarvest.protectedPet(other))return false;
         var owner=getOwner();
         if(owner!=null&&(owner==other||owner.isAlliedTo(other)))return false;
         if(owner instanceof Player source&&other instanceof Player target&&!source.canHarmPlayer(target))return false;
@@ -95,6 +102,8 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         var site = canWedge && owner != null && living != null && intersection.isPresent() && volleySlot() == 0 && !piercingWedge
                 ? QuillWedge.site(receiver, living, from, end, entry) : null;
         boolean wedge = heavy() && site != null && QuillWedge.matches(receiver, owner.getUUID(), site, now);
+        boolean harvestable=owner instanceof net.minecraft.server.level.ServerPlayer p
+                && com.codex.blacklight.combat.QuillHarvest.canHarvestImpact(p,living);
         if (ownVolley) living.invulnerableTime = 0;
         boolean accepted = false;
         wedgedTarget = wedge ? living : null;
@@ -105,6 +114,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             if (ownVolley && !accepted) living.invulnerableTime = immunity;
         }
         if (accepted && living != null && owner instanceof net.minecraft.server.level.ServerPlayer player) {
+            com.codex.blacklight.combat.QuillHarvest.impact(player,living,entry,roofIndex(),harvestable);
             if (site != null && (!heavy() || wedge)) QuillWedge.accepted(receiver, owner.getUUID(), site, now, heavy());
             com.codex.blacklight.combat.QuillImpact.hit(player, living, site == null ? entry : site.point(),
                     direction, heavy(), volleySlot());
@@ -124,7 +134,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             var state=server.getBlockState(hit.getBlockPos());
             var point=hit.getLocation().add(Vec3.atLowerCornerOf(hit.getDirection().getNormal()).scale(.035));
             var material = state.getSoundType(server, hit.getBlockPos(), this);
-            float gain = volleySlot() == 0 ? (heavy() ? .72F : .5F) : .14F;
+            float gain = volleySlot() == 0 ? (heavy() ? .98F : .82F) : .24F;
             server.playSound(null, point.x, point.y, point.z, material.getHitSound(), net.minecraft.sounds.SoundSource.PLAYERS,
                     gain * material.getVolume(), material.getPitch() * (heavy() ? .84F : 1.16F));
             server.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,state),
@@ -205,6 +215,22 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             if(start<0&&!level().isClientSide){start=level().getGameTime();entityData.set(START,start);}
             int age=start<0?0:(int)Math.min(Integer.MAX_VALUE,Math.max(0,level().getGameTime()-start));
             if(age<=span+1)setDeltaMovement(velocity(age,span));
+            if(age>=span && !piercingWedge && aimTarget!=null && level() instanceof net.minecraft.server.level.ServerLevel server
+                    && server.getEntity(aimTarget) instanceof Mob prey && prey.isAlive()
+                    && !QuillHarvest.protectedPet(prey)
+                    && !com.codex.blacklight.combat.CombatTargeting.multipart(prey)){
+                // The authored release clears the shoulder first. Keep the central quill on its
+                // committed target during the long flight, still using normal block/entity collisions.
+                double speed=entityData.get(TRAVEL).length();
+                var point=prey.getBoundingBox().getCenter();
+                if(prey instanceof net.minecraft.world.entity.animal.Animal)
+                    point=point.add(0,Math.max(0,prey.getEyeY()-point.y)*.65,0);
+                double lead=Math.min(3,position().distanceTo(point)/Math.max(.1,speed));
+                var travel=point.add(prey.getDeltaMovement().scale(lead)).subtract(position());
+                var direction=getDeltaMovement().normalize().lerp(travel.normalize(),.35).normalize();
+                setDeltaMovement(direction.scale(speed));
+                hasImpulse=true;
+            }
         }
         if(level().isClientSide){
             System.arraycopy(passed,0,passed,1,passed.length-1);
@@ -222,7 +248,9 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         entityData.set(id,new org.joml.Vector3f(tag.getFloat(key+"X"),tag.getFloat(key+"Y"),tag.getFloat(key+"Z")));
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){
+        if(volleyId!=null)tag.putUUID("QuillVolley",volleyId);
         super.addAdditionalSaveData(tag);tag.putFloat("QuillDamage",damage);tag.putInt("FalxSide",side());tag.putBoolean("QuillHeavy",heavy());
+        if(aimTarget!=null)tag.putUUID("QuillAimTarget",aimTarget);
         tag.putBoolean("CanWedge", canWedge);
         tag.putBoolean("CanPierceWedge", canPierceWedge);
         tag.putBoolean("PiercingWedge", piercingWedge);
@@ -239,7 +267,9 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         saveVector(tag,"Travel",TRAVEL);saveVector(tag,"Bow",BOW);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){
+        volleyId=tag.hasUUID("QuillVolley")?tag.getUUID("QuillVolley"):null;
         super.readAdditionalSaveData(tag);if(tag.contains("QuillDamage"))damage=tag.getFloat("QuillDamage");
+        aimTarget=tag.hasUUID("QuillAimTarget")?tag.getUUID("QuillAimTarget"):null;
         setWedgeSkills(tag.getBoolean("CanWedge"), tag.getBoolean("CanPierceWedge"));
         piercingWedge = tag.getBoolean("PiercingWedge");
         setVolleySlot(tag.getInt("VolleySlot"));

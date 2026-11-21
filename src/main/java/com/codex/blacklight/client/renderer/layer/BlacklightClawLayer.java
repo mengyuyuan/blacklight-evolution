@@ -55,6 +55,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         renderFirstPerson(player,stack,buffer,light,poses,partial,-1);
     }
     public void renderFirstPerson(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffer,int light,org.joml.Matrix4f[] poses,float partial,int side) {
+        com.codex.blacklight.client.renderer.MobileConsumeWrap.renderArm(player,stack,buffer,light,poses,partial,side);
         renderParts(player,stack,buffer,light,poses,partial,side,false);
     }
 
@@ -69,6 +70,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                                float partialTicks) {
         var state = com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
         var form = state.getActivePower();
+        com.codex.blacklight.client.renderer.MobileConsumeWrap.render(player,poseStack,buffer,packedLight,poses,partialTicks,((com.codex.blacklight.client.model.BlacklightPlayerModel)getParentModel()).mercerFrame());
         if(com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0){
             for(int side=0;side<2;side++){
                 var bone=com.codex.blacklight.animation.PlayerMotionController.skeleton().searchJointByName(side==0?"Tool_R":"Tool_L");
@@ -114,8 +116,6 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                              org.joml.Matrix4f[] poses,float partial,int side,boolean thirdPerson) {
         var morph=WeaponMorphTracker.sample(player,partial);
         var parts=morph.parts();
-        if(ClawTransformSettings.preview()&&(morph.target()==PowerForm.NONE||morph.target()==PowerForm.CLAWS))
-            parts=java.util.List.of(new WeaponMorphTracker.Part(PowerForm.CLAWS,BiomassSurface.Frame.stable(1)));
         var hammer=com.codex.blacklight.client.renderer.WeaponScaleRenderer.sample(player,partial);
         // All wave frequencies repeat after 50,000 ticks. Reduce before casting
         // to float so old worlds retain sub-tick liquid motion.
@@ -190,7 +190,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         float whipLimit=model.anchor("tether_R",new org.joml.Vector3f(0,.30F,.05F)).y+.02F;
         try(var cutting=com.codex.blacklight.client.renderer.ConsumeBladeContact.begin(player,form,model,mirror?"Hand_L":"Hand_R",poseStack,partial)){
             renderMesh(model,mirror ? "Hand_L" : "Hand_R",poseStack,buffer,packedLight,morphProgress,
-                    claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?whipLimit:Float.POSITIVE_INFINITY,hammer,surface,time);
+                    claw ? (float) ClawTransformSettings.talonLength(side) : 1,wristDelta,extendingWhip?(com.codex.blacklight.client.renderer.WhipTetherRenderer.deployedGrab(player)?ClawArmModel.DEPLOYED_GRAB:whipLimit):Float.POSITIVE_INFINITY,hammer,surface,time);
         }
         if(!mirror&&!extendingWhip&&form==PowerForm.WHIPFIST)
             renderMesh(model,"Tip_R",poseStack,buffer,packedLight,morphProgress,1,null,Float.POSITIVE_INFINITY,null,surface,time);

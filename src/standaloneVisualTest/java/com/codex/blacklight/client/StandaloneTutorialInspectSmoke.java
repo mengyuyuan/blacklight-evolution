@@ -37,7 +37,7 @@ public final class StandaloneTutorialInspectSmoke {
             if(++ticks<25||capture)return;ticks=0;
             switch(step){
                 case 0 -> {checkGif();capture=true;}
-                case 1 -> {category(4);select(3);require(selected().equals("groundspike_graveyard"),"Click selects locked/owned skills");capture=true;}
+                case 1 -> {category("COMBAT");select(3);require(selected().equals("groundspike_graveyard"),"Click selects locked/owned skills");capture=true;}
                 case 2 -> {
                     remap(mc.options.keyAttack,InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_R));
                     remap(mc.options.keyUse,InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_Y));
@@ -49,9 +49,9 @@ public final class StandaloneTutorialInspectSmoke {
                 }
                 case 4 -> {saved.forEach(KeyMapping::setKey);KeyMapping.resetMapping();
                     require(com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.PLAYER_STATE).getEvolutionPoints()==oldEP,"Selection and remapping never purchase skills");
-                    category(8);screen.mouseClicked((int)value("detailX")+15,screen.height-18,0);capture=true;}
-                case 5 -> {require(com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking()!=initialBreaking,"Server-authoritative settings synchronized");screen.mouseClicked((int)value("detailX")+15,screen.height-18,0);category(7);capture=true;}
-                case 6 -> {mc.options.guiScale().set(4);mc.resizeDisplay();screen=(UpgradeScreen)mc.screen;category(4);select(2);capture=true;}
+                    category("SETTINGS");screen.mouseClicked((int)value("detailX")+15,screen.height-18,0);capture=true;}
+                case 5 -> {require(com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.SKILL_SETTINGS).bulletdiveBlockBreaking()!=initialBreaking,"Server-authoritative settings synchronized");screen.mouseClicked((int)value("detailX")+15,screen.height-18,0);category("ATTRIBUTES");capture=true;}
+                case 6 -> {mc.options.guiScale().set(4);mc.resizeDisplay();screen=(UpgradeScreen)mc.screen;category("COMBAT");select(2);capture=true;}
                 case 7 -> {checkGif();screen.mouseScrolled(screen.width-20,100,0,-20);capture=true;}
                 case 8 -> {
                     remap(SkillBindings.find("key.blacklight.upgrades"),InputConstants.Type.KEYSYM.getOrCreate(org.lwjgl.glfw.GLFW.GLFW_KEY_O));
@@ -68,7 +68,13 @@ public final class StandaloneTutorialInspectSmoke {
     private static void remap(KeyMapping key,InputConstants.Key value){saved.putIfAbsent(key,key.getKey());key.setKey(value);KeyMapping.resetMapping();}
     private static Object value(String name)throws Exception{var f=UpgradeScreen.class.getDeclaredField(name);f.setAccessible(true);return f.get(screen);}
     private static String selected()throws Exception{return (String)value("selected");}
-    private static void category(int index){int stride=Math.max(14,Math.min(27,(screen.height-54)/9));screen.mouseClicked(15,48+index*stride+4,0);}
+    private static void category(String name)throws Exception{
+        var current=(Enum<?>)value("category");
+        var categories=current.getDeclaringClass().getEnumConstants();
+        int stride=Math.max(14,Math.min(27,(screen.height-54)/categories.length));
+        for(var c:categories)if(c.name().equals(name)){screen.mouseClicked(15,48+c.ordinal()*stride+4,0);return;}
+        throw new AssertionError("Unknown screen category "+name);
+    }
     private static void select(int index)throws Exception{screen.mouseClicked((int)value("listX")+20,48+index*31+5,0);}
     private static void checkGif()throws Exception{Object gif=value("gif");var field=gif.getClass().getDeclaredField("textureId");field.setAccessible(true);require(field.get(gif)!=null,"Animated GIF uploaded to native GPU texture");}
     private static void require(boolean condition,String message){if(!condition)throw new IllegalStateException(message);checks.add(message);}

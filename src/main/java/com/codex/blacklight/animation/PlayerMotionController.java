@@ -325,12 +325,12 @@ public final class PlayerMotionController {
                     float envelope=net.minecraft.util.Mth.clamp(Math.min(actionSeconds/.10F,(action.duration()-actionSeconds)/.16F),0,1);
                     return BlacklightPose.interpolatePose(base,sampled,envelope);
                 }
-                return !entity.onGround()?NativeLandingPose.blendUpper(base,sampled,1):scapulaStride(entity,runtime,base,sampled);
+                return !entity.onGround()?NativeLandingPose.blendUpper(base,sampled,1):scapulaStride(entity,partial,base,sampled);
             }
             if(action.clipId().startsWith("spines_ground")||action.clipId().startsWith("spines_air")){
                 if(runtime.spineDrawFrom!=null&&action.clipId().equals(runtime.previousAction)&&actionSeconds<.10F)
                     sampled=BlacklightPose.interpolatePose(runtime.spineDrawFrom,sampled,actionSeconds/.10F);
-                if(action.clipId().startsWith("spines_ground"))return entity.onGround()?scapulaStride(entity,runtime,base,sampled):base;
+                if(action.clipId().startsWith("spines_ground"))return entity.onGround()?scapulaStride(entity,partial,base,sampled):base;
                 if(!action.clipId().endsWith("_draw")){
                     float exit=net.minecraft.util.Mth.clamp((action.duration()-actionSeconds)/.16F,0,1);
                     return BlacklightPose.interpolatePose(base,sampled,exit);
@@ -373,10 +373,11 @@ public final class PlayerMotionController {
         }
         return base;
     }
-    private static BlacklightPose scapulaStride(LivingEntity entity,Runtime runtime,BlacklightPose base,BlacklightPose shot){
-        if(!movingGrounded(entity,runtime))return shot;
-        float speed=(float)Math.max(entity.getDeltaMovement().horizontalDistance(),LocomotionVisualState.get(entity.getId()).speed());
-        return BlacklightPose.interpolatePose(shot,NativeLandingPose.blendUpper(base,shot,1),Math.min(.85F,speed*4));
+    private static BlacklightPose scapulaStride(LivingEntity entity,float partial,BlacklightPose base,BlacklightPose shot){
+        float weight=spineStride(entity,partial);
+        if(weight<=0)return shot;
+        var walkingShot=NativeLandingPose.blendUpper(base,shot,1);
+        return weight>=1?walkingShot:BlacklightPose.interpolatePose(shot,walkingShot,weight);
     }
     private static boolean movingGrounded(LivingEntity entity,Runtime runtime) {
         return entity.onGround()&&(runtime.phase!=null&&runtime.phase.isGroundMovement()

@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 
 /** Slot zero is the original blade. The same socket transform seats and releases each satellite. */
 public final class ScapulaVolley {
+    public static final int OPENING_SHOT_DAMAGE = 4;
     private ScapulaVolley() {}
 
     public static int pairs(boolean aerialThrow, boolean charged) {
