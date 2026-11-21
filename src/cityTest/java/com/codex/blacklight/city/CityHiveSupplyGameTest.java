@@ -125,6 +125,49 @@ public final class CityHiveSupplyGameTest {
             net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(CitySystem.class);
         }
     }
+    @GameTest(template="wall_test",timeoutTicks=600,batch="city_supply_flying_brood")
+    public static void cityPortRejectsBlockedFlightAndPaysOnceForARealFlyer(GameTestHelper h){
+        var f=new Fixture(h);
+        h.runAfterDelay(260,()->{
+            var level=f.level;var port=f.port(0);var outside=f.outside(0);
+            var oldEcology=CityEcologyData.get(level);int day=OutbreakConfig.DAY_TICKS.get();
+            var threshold=com.codex.blacklight.config.GameplayBalanceConfig.STAGE_DAYS[0];int first=threshold.get();
+            try{
+                var active=new OutbreakData();active.start(0);
+                level.getServer().overworld().getDataStorage().set("blacklight_outbreak",active);
+                level.getDataStorage().set("blacklight_city_ecology",new CityEcologyData());
+                OutbreakConfig.DAY_TICKS.set(200);threshold.set(1);CityEcology.release(level,port);
+                f.stock().receive(64);f.tick();f.data.hiveBroodTicks[0]=CityConfig.HIVE_BROOD_INTERVAL.get();
+                int balance=f.stock().reserve(),clock=f.data.hiveBroodTicks[0];
+                h.assertTrue(CityEcology.stage(level,port)>=1,"the real city hatch belongs to a progressed infection district");
+                f.set(outside.above(),Blocks.STONE.defaultBlockState());
+                h.assertTrue(CityHiveSupply.hatchFlyer(level,f.data,0,port)==null && f.stock().reserve()==balance
+                        && f.data.hiveBroodTicks[0]==clock && f.data.hiveBirths[0]==0,"a blocked outlet refunds the full meal and the shared hatch clock");
+                f.set(outside.above(),Blocks.AIR.defaultBlockState());
+                var child=CityHiveSupply.hatchFlyer(level,f.data,0,port);
+                h.assertTrue(child instanceof com.codex.blacklight.entity.EncounterMob m && m.kind()==com.codex.blacklight.entity.EncounterKind.FLYER
+                        && child.isNoGravity() && child.getTags().contains("BlacklightCityPopulation"),
+                        "the open city mouth releases a living flying brood and counts it as a resident");
+                h.assertTrue(f.stock().reserve()==balance-ColonySupply.broodCost(OutbreakRules.Tier.GROWING)
+                        && f.data.hiveBroodTicks[0]==0 && f.data.hiveBirths[0]==1
+                        && CityHiveSupply.hatchFlyer(level,f.data,0,f.port(1))==null,"all seven ports share one payment and one birth");
+                child.discard();
+                // Repeat on the unmodified map after restoring the fixture's cleared outlet geometry.
+                f.changed.forEach((at,original)->level.setBlock(at,original,3));
+                f.data.hiveBroodTicks[0]=clock;
+                for(int index=0;index<7;index++)CityEcology.release(level,f.port(index));
+                // Select a flying brood on this disposable server, then drive the normal city production tick.
+                level.random.setSeed(14L);
+                CitySystem.updateLoadedCity(level,220);
+                var born=level.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,new AABB(port).inflate(100),
+                        mob->mob.isAlive() && mob.kind()==com.codex.blacklight.entity.EncounterKind.FLYER && mob.getTags().contains("BlacklightCityPopulation"));
+                h.assertTrue(born.size()==1 && f.data.hiveBirths[0]==2
+                        && f.stock().reserve()==balance-2*ColonySupply.broodCost(OutbreakRules.Tier.GROWING),
+                        "the city scheduler releases one paid flyer on the original Futian map");
+            }finally{level.getDataStorage().set("blacklight_city_ecology",oldEcology);OutbreakConfig.DAY_TICKS.set(day);threshold.set(first);f.close();}
+            h.succeed();
+        });
+    }
     @GameTest(template="wall_test",timeoutTicks=420,batch="city_supply_empty")
     public static void anUnfedAuthoredHiveCannotGenerateBroodFromLoadedTime(GameTestHelper h){var f=new Fixture(h);f.schedule(100,340);h.runAfterDelay(360,()->{try{h.assertTrue(f.stock().reserve()==0&&f.stock().queued()==0&&f.data.hiveLoadedTicks[0]==0&&f.data.hiveBroodTicks[0]==0&&f.data.hiveBirths[0]==0,"loaded time without actual food cannot mature or produce a free child");h.assertTrue(CityHiveSupply.hatch(f.level,f.data,0,f.port(0),OutbreakRules.Tier.FRESH)==null,"the old authored producer cannot bypass its empty resource chain");}finally{f.close();}h.succeed();});}
     @GameTest(template="wall_test",timeoutTicks=820,batch="city_supply_actual_food")

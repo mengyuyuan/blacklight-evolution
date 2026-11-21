@@ -7,6 +7,7 @@ import com.codex.blacklight.disguise.DisguiseSystem;
 import com.codex.blacklight.entity.MilitarySoldier;
 import com.codex.blacklight.firearms.AmmoState;
 import com.codex.blacklight.firearms.FirearmItem;
+import com.codex.blacklight.mode.PrototypeModeSystem;
 import com.codex.blacklight.military.MilitaryOrder;
 import com.codex.blacklight.military.MilitaryOrganizationSystem;
 import com.codex.blacklight.military.MilitaryRank;
@@ -70,6 +71,32 @@ public final class MilitaryIdentityLibraryGameTest {
         com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE, state);
         player.getInventory().clearContent(); player.getInventory().setItem(7, new ItemStack(Items.IRON_INGOT, 7));
         return player;
+    }
+
+    @GameTest(template = "blackwatch_arena", timeoutTicks = 80)
+    public static void modeExitRestoresPlayerDuringAndAfterDisguise(GameTestHelper h) {
+        var player = player(h);
+        var state = ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
+        var soldier = member(h, false, MilitaryRole.TROOPER, 4);
+        DisguiseSystem.captured(player, DisguiseIdentity.capture(soldier));
+        var library = ModAttachments.getData(player, ModAttachments.DISGUISE_LIBRARY);
+        DisguiseSystem.request(player);
+        h.assertTrue(DisguiseSystem.morphing(player), "identity transition started");
+        PrototypeModeSystem.handle(player, false);
+        h.assertTrue(ModAttachments.getData(player, ModAttachments.DISGUISE_MORPH).equals(DisguiseMorph.EMPTY), "mode exit cancels pending contact in the same tick");
+        PrototypeModeSystem.handle(player, true);
+        h.onEachTick(() -> { player.tickCount++; DisguiseSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player)); });
+        h.runAfterDelay(20, () -> {
+            h.assertTrue(!DisguiseSystem.active(player), "old contact cannot reapply the uniform after re-entry");
+            DisguiseSystem.request(player);
+            h.runAfterDelay(20, () -> {
+                h.assertTrue(DisguiseSystem.active(player), "player is wearing the captured soldier appearance");
+                PrototypeModeSystem.handle(player, false);
+                h.assertTrue(!state.isPrototypeMode() && !DisguiseSystem.active(player), "ordinary mode restores the player");
+                h.assertTrue(library.equals(ModAttachments.getData(player, ModAttachments.DISGUISE_LIBRARY)) && ModAttachments.getData(player, ModAttachments.DISGUISE_IDENTITY).valid(), "collected and selected identity remain available");
+                h.succeed();
+            });
+        });
     }
 
     private static void appearance(GameTestHelper h, DisguiseIdentity identity, MilitarySoldier source,

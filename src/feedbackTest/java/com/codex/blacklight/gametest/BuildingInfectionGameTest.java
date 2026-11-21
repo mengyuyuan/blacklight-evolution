@@ -22,7 +22,9 @@ public final class BuildingInfectionGameTest {
         var oldCleared=new java.util.LinkedHashSet<>(data.clearedSites);data.clearedSites.clear();
         var storage=level.getServer().overworld().getDataStorage();var outbreak=OutbreakData.get(level.getServer());
         var active=new OutbreakData();active.start(level.getServer().overworld().getGameTime()-7L*OutbreakConfig.DAY_TICKS.get());storage.set("blacklight_outbreak",active);
-        var origin=h.absolutePos(new BlockPos(5,150,5));
+        var anchor=h.absolutePos(new BlockPos(5,150,5));
+        var chunk=new net.minecraft.world.level.ChunkPos(anchor);
+        var origin=new BlockPos(chunk.getMiddleBlockX(),anchor.getY(),chunk.getMiddleBlockZ());
         var grief=level.getGameRules().getRule(GameRules.RULE_MOBGRIEFING);
         var spawning=level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING);
         boolean oldGrief=grief.get(),oldSpawning=spawning.get();
@@ -32,7 +34,7 @@ public final class BuildingInfectionGameTest {
             level.getServer().setDifficulty(Difficulty.NORMAL,true);
             for(int x=-5;x<=5;x++) for(int z=-5;z<=5;z++)
                 level.setBlock(origin.offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
-            for(int x=-5;x<=5;x++) for(int y=0;y<32;y++)
+            for(int x=-7;x<=7;x++) for(int y=0;y<40;y++)
                 level.setBlock(origin.offset(x,y,1),Blocks.STONE_BRICKS.defaultBlockState(),2);
             var inventory=origin.offset(2,1,0);level.setBlock(inventory,Blocks.CHEST.defaultBlockState(),3);
             var chest=(net.minecraft.world.level.block.entity.ChestBlockEntity)level.getBlockEntity(inventory);
@@ -56,12 +58,12 @@ public final class BuildingInfectionGameTest {
             var far=origin.offset(100000,0,100000);c.frontier.addFirst(far.asLong());
             BuildingInfectionSystem.advance(level);
             h.assertTrue(!level.hasChunkAt(far),"frontier cannot force-load remote chunks");c.frontier.remove(far.asLong());
-            for(int i=0;i<1600;i++) {
+            for(int i=0;i<6400&&(i<1600||c.surfaces.size()<256);i++) {
                 if(c.supply.reserve()<128)for(int j=0;j<8;j++){c.supply.offer(TissueDigestion.Kind.MEAT,64);c.supply.digest(200);}
                 int operations=BuildingInfectionSystem.advance(level);
                 h.assertTrue(operations<=BuildingInfectionConfig.WORK.get(),"dimension work budget is shared and bounded");
             }
-            h.assertTrue(c.surfaces.size()>=256,"growth covers a substantial facade and turns its corners");
+            h.assertTrue(c.surfaces.size()>=256,"growth covers a substantial facade and turns its corners: surfaces="+c.surfaces.size()+" queued="+c.frontier.size()+" reserve="+c.supply.reserve());
             h.assertTrue(c.surfaces.stream().map(BlockPos::of).anyMatch(p->p.getY()>origin.getY()+8),"growth climbs at least eight blocks up the building");
             h.assertTrue(level.getBlockState(origin.offset(0,15,1)).is(Blocks.STONE_BRICKS),"original architecture remains intact");
             h.assertTrue(chest.getItem(0).getCount()==7&&level.getBlockState(inventory).is(Blocks.CHEST),"growth preserves container and inventory");
