@@ -285,6 +285,8 @@ public final class WeaponCutContact {
             boolean generic=AnimatedHurtBody.of(victim)==null && !RagdollImpact.legacyBody(victim);
             var receiverZones=generic?List.of(new Zone(32,victim.getBoundingBox().move(victim.position().scale(-1)))):zones(victim);
             Map<Double,List<HydraContact.Region>> hydraPoses=new HashMap<>();
+            var open=GoliathLockPart.openOn(AnimatedHurtBody.of(victim));
+            Map<Double,List<HydraContact.Region>> weakPoses=new HashMap<>();
             for(int i=1;i<frames.size();i++){
                 Frame a=frames.get(i-1),b=frames.get(i);
                 if(a.faces().size()!=b.faces().size())continue;
@@ -301,9 +303,18 @@ public final class WeaponCutContact {
                         float facing=net.minecraft.util.Mth.rotLerp((float)alpha,victim.yBodyRotO,victim.yBodyRot);
                         Vec3 wa=first.a().lerp(last.a(),t),wb=first.b().lerp(last.b(),t),wc=first.c().lerp(last.c(),t);
                         if(victim instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()){
-                            String key="32:"+last.edge();if(found.containsKey(key))continue;
+                            String key="32:"+last.edge();
+                            var prior=found.get(key);
+                            if(prior!=null && (open==null || open.acceptsDamage(prior.receivingBone())))continue;
                             var regions=hydraPoses.computeIfAbsent(alpha,k->hydra.hurtRegions(k.floatValue()-1));
-                            var touch=HydraHurtContact.triangle(regions,wa,wb,wc,travel,com.codex.blacklight.infection.InfectedAttackStyle.TEAR);
+                            var style=com.codex.blacklight.infection.InfectedAttackStyle.TEAR;
+                            HydraHurtContact.Contact touch=null;
+                            if(open!=null){
+                                var weak=weakPoses.computeIfAbsent(alpha,k->regions.stream().filter(r->open.acceptsDamage(r.bone())).toList());
+                                touch=HydraHurtContact.triangle(weak,wa,wb,wc,travel,style);
+                                if(touch!=null&&!CombatTargeting.clearRay(attacker,attacker.getEyePosition(),touch.point()))touch=null;
+                            }
+                            if(touch==null&&prior==null)touch=HydraHurtContact.triangle(regions,wa,wb,wc,travel,style);
                             if(touch!=null&&CombatTargeting.clearRay(attacker,attacker.getEyePosition(),touch.point())){
                                 Vec3 edge=first.tip().lerp(last.tip(),t).subtract(first.root().lerp(last.root(),t));
                                 Vec3 normal=edge.cross(travel).normalize();

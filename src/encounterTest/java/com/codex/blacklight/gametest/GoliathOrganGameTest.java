@@ -35,11 +35,21 @@ public final class GoliathOrganGameTest {
         pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);pig.setHealth(1000);
         boolean[] reached={false,false,false,false,false};double[] highest={mob.getY()};long[] landedAt={-1};
         h.runAfterDelay(4,()->{
-            hit(mob,"torso",10000);hit(mob,"torso",10000);
-            h.assertTrue(mob.isAlive()&&mob.getHealth()>=mob.getMaxHealth()*.63F&&!ConsumeSystem.healthReady(mob),"ordinary body hits cannot skip to the finisher");
+            hit(mob,"torso_lower",50);hit(mob,"torso_lower",50);
+            h.assertTrue(mob.isAlive()&&!ConsumeSystem.healthReady(mob),"two armored hits open the head without a premature finisher");
             h.assertTrue(mob.goliathWindow()==GoliathWindow.HEAD,"poise breaks to an opening head");
-            hit(mob,"head",100);h.assertTrue(mob.goliathWindow()==GoliathWindow.KNEE,"head hit exposes knee");
-            hit(mob,"right_shin",100);h.assertTrue(mob.goliathWindow()==GoliathWindow.LEG_FALL&&mob.broken(0)&&!mob.broken(1),"actual knee break drops to crawl");
+            hit(mob,"neck_top",100);h.assertTrue(mob.goliathWindow()==GoliathWindow.KNEE,"Neck_2 routes to head damage");
+            var skin=mob.hurtRegions(0);
+            var contacts=java.util.stream.Stream.of("torso_lower","left_shin").map(bone->{
+                var region=skin.stream().filter(r->r.bone().equals(bone)).findFirst().orElseThrow();
+                return new WeaponCutContact.Contact(32,"blade",region.boxes().get(0).center,new Vec3(1,0,0),new Vec3(0,1,0)).onBody(bone);
+            }).toList();
+            var cut=new WeaponCutContact.Report(WeaponCutContact.Kind.SLICE,contacts);
+            var selected=HydraHurtContact.reportedContact(skin,cut,mob.goliathWindow().part);
+            h.assertTrue(selected!=null&&selected.bone().equals("left_shin"),"a confirmed second contact gets credit on the linked Knee_L");
+            mob.invulnerableTime=0;
+            h.assertTrue(mob.hurtAt(mob.damageSources().generic(),100,selected),"accepted the swept knee hit");
+            h.assertTrue(mob.goliathWindow()==GoliathWindow.LEG_FALL&&mob.broken(0)&&!mob.broken(1),"actual knee break drops to crawl");
             h.assertTrue(mob.hurtRegions(0).stream().filter(r->GoliathLockPart.forSkin(r.bone())==GoliathLockPart.RIGHT_LEG).allMatch(r->r.boxes().isEmpty()),"every severed leg box disappears immediately");
             var saved=new CompoundTag();mob.saveWithoutId(saved);
             var copy=EncounterEntities.CREATURES.get(EncounterKind.GOLIATH).get().create(h.getLevel());copy.load(saved);
@@ -79,6 +89,25 @@ public final class GoliathOrganGameTest {
         });
     }
 
+    @GameTest(template="blackwatch_arena",batch="goliath_armored_death",timeoutTicks=30)
+    public static void armorSlowsConventionalDamageWithoutAnImmortalPhase(GameTestHelper h){
+        var level=h.getLevel();
+        for(int mask:new int[]{0,1,3}){
+            var mob=EncounterEntities.CREATURES.get(EncounterKind.GOLIATH).get().create(level);
+            var save=new CompoundTag();mob.saveWithoutId(save);
+            save.putInt("EncounterBroken",mask);mob.load(save);
+            mob.setNoAi(true);mob.setPos(h.absoluteVec(new Vec3(7,2,7)));level.addFreshEntity(mob);
+            try{
+                float hp=Math.max(1,mob.getMaxHealth()*(mask==0?.64F:mask==1?.31F:.01F));
+                mob.setHealth(hp);
+                hit(mob,"torso_lower",50);
+                h.assertTrue(mob.getHealth()<hp,"ordinary hit crosses former floor with mask "+mask);
+                for(int i=0;i<40&&mob.isAlive();i++)hit(mob,"torso_lower",1000);
+                h.assertTrue(!mob.isAlive(),"sustained body damage can kill with mask "+mask);
+            }finally{mob.discard();}
+        }
+        h.succeed();
+    }
     @GameTest(template="blackwatch_arena",batch="goliath_organ_gap",timeoutTicks=130)
     public static void missingStreetBelowClawsPreventsAPlantedArm(GameTestHelper h){
         for(int x=0;x<=15;x++)for(int z=0;z<=28;z++){
