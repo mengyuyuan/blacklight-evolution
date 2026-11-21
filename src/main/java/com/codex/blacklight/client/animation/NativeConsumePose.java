@@ -54,6 +54,7 @@ public final class NativeConsumePose {
             });
             for(String joint:new String[]{"Root","Thigh_L","Thigh_R","Leg_L","Leg_R","Knee_L","Knee_R"})copy.orElseEmpty(joint).rotation().identity();
         }
+        if(role.equals("actor"))com.codex.blacklight.client.renderer.ConsumeBodyImpact.actor(entity,visual,copy,partial);
         return blendCarry(entity,visual,key,copy,partial);
     }
     public static boolean actor(LivingEntity entity,BlacklightPose pose,float partial) {

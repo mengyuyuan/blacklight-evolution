@@ -339,16 +339,46 @@ public final class MobileConsumeGameTest {
         target.setNoAi(true); target.setHealth(1);
         var scene=ConsumeReceiverScene.profile(PowerForm.NONE,false,ConsumeVariant.BEATDOWN);
         var strikes=new ConsumeContactDamage();
+        var visual=new ConsumeVisual(p.getId(),0,100,PowerForm.NONE.ordinal(),ConsumeVisual.CONSUME,0,p.position(),ConsumeVariant.BEATDOWN);
+        float lastLoss=0;
         for (int index=0;index<scene.hitSeconds().size();index++) {
             int at=Math.round(scene.hitSeconds().get(index)*20);
             float previous=target.getHealth();
-            h.assertTrue(strikes.strike(p,target,scene,0,at-1,false)<0 && target.getHealth()==previous,"early damage");
-            h.assertTrue(strikes.strike(p,target,scene,0,at,false)==index,"wrong contact ordinal");
+            h.assertTrue(strikes.strike(p,target,scene,0,at-1,visual)<0 && target.getHealth()==previous,"early damage");
+            h.assertTrue(strikes.strike(p,target,scene,0,at,visual)==index,"wrong contact ordinal");
             float after=target.getHealth();
+            float loss=previous-after;
+            h.assertTrue(loss>lastLoss,"successive beat should carry more damage: "+index);
+            lastLoss=loss;
             h.assertTrue(after<previous && after>=.25F,"missing nonlethal contact "+index+" hp "+previous+" -> "+after);
-            h.assertTrue(strikes.strike(p,target,scene,0,at,false)<0 && target.getHealth()==after,"duplicate contact");
+            h.assertTrue(strikes.strike(p,target,scene,0,at,visual)<0 && target.getHealth()==after,"duplicate contact");
         }
         h.assertTrue(target.isAlive(),"receiver died before settlement");
         h.succeed();
     }
+    @GameTest(template="wall_test",timeoutTicks=40,batch="consume_contact_damage")
+    public static void woundChangesHealthAtItsOwnContact(GameTestHelper h) {
+        var owner=player(h,PowerForm.NONE);
+        float previousLoss=0;
+        int[] variants={ConsumeVariant.KNEE_HEAD,ConsumeVariant.DEFAULT,ConsumeVariant.HEAD_STOMP};
+        for(int i=0;i<variants.length;i++){
+            int variant=variants[i];
+            var victim=h.spawn(EntityType.COW,3+i,2,5);
+            victim.setNoAi(true);
+            float start=victim.getHealth();
+            var scene=ConsumeReceiverScene.profile(PowerForm.NONE,false,variant);
+            var visual=new ConsumeVisual(owner.getId(),0,100,PowerForm.NONE.ordinal(),ConsumeVisual.CONSUME,0,owner.position(),variant);
+            var strikes=new ConsumeContactDamage();
+            int tick=Math.round(scene.hitSeconds().get(0)*20);
+            h.assertTrue(strikes.strike(owner,victim,scene,0,tick-1,visual)<0 && victim.getHealth()==start,"damage before contact");
+            h.assertTrue(strikes.strike(owner,victim,scene,0,tick,visual)==0,"contact missing");
+            String cue=ConsumeImpactKind.forContact(visual,0);
+            float loss=start-victim.getHealth();
+            h.assertTrue(loss>previousLoss && victim.isAlive(),"wrong wound damage: "+cue+" "+loss);
+            com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume wound {} hp {} -> {}",cue,start,victim.getHealth());
+            previousLoss=loss;
+        }
+        h.succeed();
+    }
+
 }

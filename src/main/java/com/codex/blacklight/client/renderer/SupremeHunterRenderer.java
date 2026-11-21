@@ -57,11 +57,6 @@ public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSuprem
                 skin.finishMountedSurface();
             }else draw(e,partial,stack,buffers,light);
         }
-        var owner=e.level().getEntity(e.consumerId());
-        if(owner!=null&&visual.active()){
-            Vec3 delta=owner.getPosition(partial).subtract(e.getPosition(partial));
-            ConsumedMobVisuals.whip(e,stack,buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,delta,ConsumedMobVisuals.tetherProgress(e,partial));
-        }
         super.render(e,yaw,partial,stack,buffers,light);
     }
     private State pose(BlacklightSupremeHunter e,float partial){

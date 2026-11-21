@@ -67,7 +67,7 @@ class ConsumeImpactKindTest {
             return JsonParser.parseReader(new InputStreamReader(in,StandardCharsets.UTF_8)).getAsJsonObject();
         }
     }
-    @Test void allReachableEventsAndPhasesResolveToTwoUniqueRecordingsAndBothSubtitles() throws Exception {
+    @Test void contactsAndSurfacesHaveThreeTakesAndLifecyclePhasesHaveTwo() throws Exception {
         var all=new HashSet<>(Set.of("quill_extract","quill_return","quill_merge","weave"));
         for(var form:FORMS) {
             for(int stage:List.of(ConsumeVisual.CONSUME,ConsumeVisual.MOUNT_CONSUME,ConsumeVisual.HUNTER_CONSUME)) {
@@ -85,12 +85,20 @@ class ConsumeImpactKindTest {
         }
         assertEquals(all,ConsumeImpactKind.registeredCues());
         var events=json("sounds.json");var en=json("lang/en_us.json");var zh=json("lang/zh_cn.json");
+        all.addAll(List.of("body_land_stone","body_land_wood","body_land_soil","body_land_metal"));
+        var landing=events.getAsJsonObject("consume.body_land");
+        var fallback=landing.getAsJsonArray("sounds").get(0).getAsJsonObject();
+        assertEquals("event",fallback.get("type").getAsString());
+        assertEquals("blacklight:consume.body_land_stone",fallback.get("name").getAsString());
+        assertTrue(en.has(landing.get("subtitle").getAsString()));
+        assertTrue(zh.has(landing.get("subtitle").getAsString()));
         var hashes=new HashSet<String>();
         for(String cue:all) {
             assertTrue(cue.length()<=16,cue);
             var event=events.getAsJsonObject("consume."+cue);assertNotNull(event,cue);
             var sub=event.get("subtitle").getAsString();assertTrue(en.has(sub),sub);assertTrue(zh.has(sub),sub);
-            var sounds=event.getAsJsonArray("sounds");assertEquals(2,sounds.size());
+            boolean phase=cue.startsWith("grip_")||cue.startsWith("absorb_")||cue.startsWith("finish_");
+            var sounds=event.getAsJsonArray("sounds");assertEquals(phase?2:3,sounds.size(),cue);
             for(var sound:sounds) {
                 var file=sound.getAsJsonObject().get("name").getAsString().replace("blacklight:","/assets/blacklight/sounds/")+".ogg";
                 try(var stream=getClass().getResourceAsStream(file)) {
@@ -100,6 +108,6 @@ class ConsumeImpactKindTest {
                 }
             }
         }
-        assertEquals(126,hashes.size());
+        assertEquals(174,hashes.size());
     }
 }

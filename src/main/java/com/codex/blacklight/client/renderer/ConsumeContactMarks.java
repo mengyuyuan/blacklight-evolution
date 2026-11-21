@@ -27,7 +27,7 @@ public final class ConsumeContactMarks {
     static void confirmed(LivingEntity victim,ConsumeVisual visual,String kind,int ordinal,Vec3 world,int region,int before,int after){
         if(victim.isRemoved()||!visual.consuming()||!Double.isFinite(world.lengthSqr()))return;
         if(!SEEN.computeIfAbsent(victim,k->new SceneHits()).accept(visual.started(),visual.consumerId(),kind,ordinal))return;
-        ConsumeContactAudio.confirmed(victim,visual,kind,ordinal,world);
+        ConsumeContactAudio.confirmed(victim,visual,kind,ordinal,world,region);
         if(observer!=null)observer.accept(new Hit(victim,visual,kind,ordinal,world,region,before,after));
     }
     static String mountedKind(ConsumeVisual visual){

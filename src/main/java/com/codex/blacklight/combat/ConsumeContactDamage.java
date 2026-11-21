@@ -16,6 +16,7 @@ public final class ConsumeContactDamage {
     private record Strike(Mob victim, DamageSource source, float minimumHealth) {}
     private static final ThreadLocal<Strike> CURRENT = new ThreadLocal<>();
     private int next;
+    private float startingHealth;
 
     public static boolean owns(LivingEntity target, DamageSource source) {
         var current = CURRENT.get();
@@ -35,7 +36,8 @@ public final class ConsumeContactDamage {
         return Math.min(damage, Math.max(0, target.getHealth() - current.minimumHealth));
     }
 
-    int strike(ServerPlayer owner, Mob victim, ConsumeReceiverScene.Profile scene, int singleContact, int elapsed, boolean hunter) {
+    int strike(ServerPlayer owner, Mob victim, ConsumeReceiverScene.Profile scene, int singleContact, int elapsed, ConsumeVisual visual) {
+        boolean hunter = visual.stage() == ConsumeVisual.HUNTER_CONSUME;
         int count = hunter ? 2 : scene == null ? 1 : scene.hitSeconds().size();
         if (next >= count) return -1;
         int tick = scene == null ? singleContact : Math.round(scene.hitSeconds().get(next) * 20);
@@ -43,7 +45,9 @@ public final class ConsumeContactDamage {
         if (elapsed < tick) return -1;
         int ordinal = next++;
         float health = victim.getHealth();
-        float budget = (health - Math.min(.25F, health * .25F)) / (count - ordinal + 1);
+        if (ordinal == 0) startingHealth = health;
+        var wound = ConsumeWound.forCue(ConsumeImpactKind.forContact(visual, ordinal));
+        float budget = wound.damage(startingHealth, health);
         apply(owner,victim,health,budget);
         return ordinal;
     }
@@ -51,7 +55,7 @@ public final class ConsumeContactDamage {
     /** The embedded organ wounds a still-living, eligible host when it first opens for extraction. */
     public static void quillPuncture(ServerPlayer owner, Mob victim) {
         float health=victim.getHealth();
-        apply(owner,victim,health,(health - Math.min(.25F,health*.25F))*.25F);
+        apply(owner,victim,health,ConsumeWound.QUILL_PUNCTURE.damage(health,health));
     }
 
     private static void apply(ServerPlayer owner,Mob victim,float health,float budget) {

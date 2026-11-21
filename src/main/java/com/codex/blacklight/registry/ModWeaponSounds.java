@@ -36,6 +36,10 @@ public final class ModWeaponSounds {
                 EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
             }
         }
+        for(String cue:List.of("body_land","body_land_stone","body_land_wood","body_land_soil","body_land_metal")){
+            String id="consume."+cue;
+            EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
+        }
         for(String cue:com.codex.blacklight.combat.ConsumeImpactKind.registeredCues()) {
             String id="consume."+cue;
             EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));

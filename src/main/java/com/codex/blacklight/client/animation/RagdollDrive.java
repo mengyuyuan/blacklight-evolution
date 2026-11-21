@@ -20,7 +20,12 @@ public final class RagdollDrive {
         // A throw release carries no wound and must not pretend another hit occurred.
         if(!hit.refinement()&&!hit.wounds().isEmpty())HURT_FLASH.put(e,new HurtFlashWindow(e.level().getGameTime(),10));
     }
+    public static boolean showingConsumeWound(LivingEntity e){
+        return !e.isRemoved() && ModAttachments.getData(e,ModAttachments.CONSUME_VISUAL).consuming();
+    }
     public static boolean hurtFlash(LivingEntity e){
+        // The local tear and the receiver's skin stay readable through the recoil.
+        if(showingConsumeWound(e))return false;
         var flash=HURT_FLASH.get(e);boolean active=flash!=null&&flash.active(e.level().getGameTime());
         if(flash!=null&&!active)HURT_FLASH.remove(e);
         return active||!e.isDeadOrDying()&&!e.isRemoved()&&e.hurtTime>0;
