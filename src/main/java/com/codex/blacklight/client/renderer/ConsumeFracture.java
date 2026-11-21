@@ -77,15 +77,9 @@ public final class ConsumeFracture implements MultiBufferSource {
             float seconds=v.elapsed(mob.level().getGameTime(),partial)/20F;
             // Some source branches begin the consume shader before spawnGib.
             // Never pull the complete body away before its actual separation.
-            float sourceAbsorb=com.codex.blacklight.combat.ConsumeReceiverScene.absorptionSeconds(form,v.variant());
-            float flowStart=Math.clamp(sourceAbsorb,scene.deformSeconds(),scene.finishSeconds()-.05F);
-            float flowEnd=scene.finishSeconds();
-            if(v.variant()==com.codex.blacklight.combat.ConsumeVariant.BEATDOWN && form==PowerForm.NONE){
-                // The FIG starts tendrils at frame 88 and consumes its receiver
-                // at 115. Keep frame 99's impact in place before the body returns.
-                flowStart=scene.hitSeconds().get(scene.hitSeconds().size()-1)+.06F;
-                flowEnd=sourceAbsorb;
-            }
+            float flowStart=com.codex.blacklight.combat.ConsumeReceiverScene.flowStartSeconds(form,v.variant(),scene);
+            float flowEnd=form==PowerForm.NONE && v.variant()==com.codex.blacklight.combat.ConsumeVariant.BEATDOWN
+                    ? com.codex.blacklight.combat.ConsumeReceiverScene.absorptionSeconds(form,v.variant()) : scene.finishSeconds();
             return new Phase(form,Math.clamp(seconds/scene.finishSeconds(),0,1),
                     smooth((seconds-scene.deformSeconds())/scene.settleSeconds()),
                     smooth((seconds-flowStart)/(flowEnd-flowStart)),

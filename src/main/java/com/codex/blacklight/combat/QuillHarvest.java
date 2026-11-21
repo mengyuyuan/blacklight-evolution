@@ -138,7 +138,10 @@ public final class QuillHarvest {
             if(q!=null && q.phase()==QuillOrgan.ROOT) selected.add(q);
         }
         selected.sort(Comparator.comparingDouble(q->q.distanceToSqr(p)));
-        if(selected.isEmpty()) return;
+        if(selected.isEmpty()) {
+            p.displayClientMessage(Component.translatable("message.blacklight.no_quill_recall",(int)radius),true);
+            return;
+        }
         Vec3 first=selected.get(0).position().subtract(p.position()).yRot((float)Math.toRadians(p.yBodyRot));
         boolean right=first.x<0;
         BackspineCombat.prepareReception(p,right);

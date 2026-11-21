@@ -157,9 +157,9 @@ public final class QuillOrgan extends Entity {
         if(p!=null)entityData.set(ACTOR,p.getId());
         long t=age();
         if(t==PIERCE_TICK){
-            sound(InfectedSoundCue.BURST,leadSound?.74F:.24F,.83F);
-            sound(InfectedSoundCue.PIERCE,leadSound?.83F:.32F,leadSound?.74F:1.13F);
-            if(mob!=null){mob.animateHurt(0);level().broadcastEntityEvent(mob,(byte)2);}
+            if(p!=null && p.level()==level())ConsumeSounds.phase(p,"quill_extract",position(),leadSound?1F:.42F,leadSound?1F:1.08F);
+            if(!collected && mob!=null && QuillHarvest.available(p,mob))
+                ConsumeContactDamage.quillPuncture(p,mob);
         }
         if(t==PIERCE_TICK || t==SECOND_DRAW_TICK || t==RELEASE_TICK-1){
             var red=new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.52F,.027F,.055F),.72F);
@@ -169,7 +169,7 @@ public final class QuillOrgan extends Entity {
         if(t==SECOND_DRAW_TICK)sound(InfectedSoundCue.RETRACT,leadSound?.59F:.18F,.91F);
         if(t<RELEASE_TICK)return;
         if(!collected && (mob==null || !QuillHarvest.finish(p,mob,this))){phase(ROOT);return;}
-        sound(InfectedSoundCue.TEAR,.72F,1.14F);
+        if(p!=null && p.level()==level())ConsumeSounds.phase(p,"quill_return",position(),leadSound?.96F:.38F,1F);
         phase(RETURN);
         if(p!=null)entityData.set(ACTOR,p.getId());
     }
@@ -200,7 +200,7 @@ public final class QuillOrgan extends Entity {
         Vec3 end=shoulder(p);
         if(phase()==RETURN && p.getHealth()<p.getMaxHealth())
             end=end.add(new Vec3(arrivesRight()?-.34:.34,.18,-.31).yRot((float)Math.toRadians(-p.yBodyRot)));
-        if(age()==1)sound(InfectedSoundCue.LAUNCH,.5F,1.28F);
+        if(phase()==REJOIN && age()==1)sound(InfectedSoundCue.LAUNCH,.5F,1.28F);
         double distance=position().distanceTo(end);
         if(distance>2){
             double curve=Math.min(1,distance*.12);
@@ -221,9 +221,11 @@ public final class QuillOrgan extends Entity {
                 return;
             }
         }
+        if(phase()==RETURN)ConsumeSounds.phase(p,"quill_merge",end,leadSound?.9F:.38F,1.06F);
         if(supply<=0){discard();return;}
         if(Double.isNaN(orbitPhase))orbitPhase=freeAngle(p);
-        phase(ORBIT);sound(InfectedSoundCue.RETRACT,.28F,1.38F);
+        if(phase()==REJOIN)sound(InfectedSoundCue.RETRACT,.28F,1.38F);
+        phase(ORBIT);
     }
     private double freeAngle(ServerPlayer p){
         var others=level().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(QUILL_ORBIT_RADIUS.get()+2),
@@ -299,7 +301,9 @@ public final class QuillOrgan extends Entity {
         if(elapsed==6)sound(InfectedSoundCue.MEND,.43F,1.14F);
         if(elapsed<11)return;
         float fraction=initial>0?supply/(float)initial:1;
-        CriticalMassSystem.healFromConsume(p,heal*fraction);sound(InfectedSoundCue.MEND,.52F,.85F);discard();
+        CriticalMassSystem.healFromConsume(p,heal*fraction);
+        ConsumeSounds.phase(p,"quill_merge",seam,.98F,1F);
+        discard();
     }
     @Override protected void addAdditionalSaveData(CompoundTag n){
         if(owner!=null)n.putUUID("owner",owner);if(host!=null)n.putUUID("host",host);if(target!=null)n.putUUID("target",target);

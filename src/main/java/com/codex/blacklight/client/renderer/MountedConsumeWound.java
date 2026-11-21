@@ -16,10 +16,13 @@ import org.joml.Vector3f;
 public final class MountedConsumeWound {
     public record Sample(int victim,double seconds,int sites,int vertices,double gap,Vec3 struck,Vec3 closestSite,Vec3 owner){}
     public static java.util.function.Consumer<Sample> observer;
+    public record Response(int victim,int owner,long start,String mode,int ordinal,int region,double age,
+                           int submitted,int displaced,double maximum,double rms){}
+    public static java.util.function.Consumer<Response> responseObserver;
     private record Anchor(RenderType layer,int index,int triangle,int count,int region,Vec3 bary,Vec3 tangentBary,double radius,String kind,int event){}
     private record Site(Anchor anchor,Vec3 world,double gap){}
     private static final class Session {
-        final long start;final int owner;final List<Anchor> anchors=new ArrayList<>();
+        final long start;final int owner;final List<Anchor> anchors=new ArrayList<>();final Map<Anchor,Double> since=new HashMap<>();
         Session(ConsumeVisual v){start=v.started();owner=v.consumerId();}
     }
     private static final Map<LivingEntity,Session> SESSIONS=new WeakHashMap<>();
@@ -48,8 +51,17 @@ public final class MountedConsumeWound {
         double start=hunter?(event==0?HunterConsume.EFFECT_BEGIN_SECONDS:HunterConsume.EFFECT_REVERSE_SECONDS):
                 ConsumeSequence.contact(PowerForm.values()[visual.form()],true)*(visual.duration()-1)/20.;
         Site candidate=null;
-        if(!accepted&&now>=start&&now<start+.35){
+        PowerForm form=PowerForm.values()[visual.form()];
+        boolean fit=!hunter&&!ConsumeSequence.bruteMount(victim)&&(form==PowerForm.NONE||form==PowerForm.MUSCLE_MASS||form==PowerForm.HAMMERFISTS);
+        if(!accepted&&now>=start-(fit?.25:0)&&now<start+.35){
             Vec3[] sites=ConsumeTrauma.mountSites(owner,visual,partial);
+            if(fit){
+                Site nearby=closest(streams,world,sites,.70,.12,"dent",event,false);
+                if(nearby!=null){
+                    Vec3 point=Arrays.stream(sites).min(Comparator.comparingDouble(v->v.distanceToSqr(nearby.world))).orElse(null);
+                    if(point!=null)MountedBodyFit.align(owner,victim,visual,start,nearby.world,point,now);
+                }
+            }
             double reach=Math.min(.20,Math.max(.085,owner.getBbWidth()*.22));
             if(observer!=null){
                 Site nearest=closest(streams,world,sites,16,.12,"dent",event,false);
@@ -57,7 +69,7 @@ public final class MountedConsumeWound {
                 observer.accept(new Sample(victim.getId(),now,sites.length,streams.values().stream().mapToInt(c->c.vertices.size()).sum(),
                         nearest==null?Double.NaN:Math.sqrt(nearest.gap),nearest==null?null:nearest.world,closestSite,owner.getPosition(partial)));
             }
-            candidate=closest(streams,world,sites,reach,Math.min(.31,Math.max(.12,victim.getBbWidth()*.12)),
+            if(now>=start)candidate=closest(streams,world,sites,fit?Math.min(reach,.065):reach,Math.min(.31,Math.max(.12,victim.getBbWidth()*.12)),
                     ConsumeContactMarks.mountedKind(visual),event,hunter);
         }
         var marks=new ArrayList<>(session.anchors);
@@ -76,8 +88,13 @@ public final class MountedConsumeWound {
             var mark=marks.get(n);if(centers.get(n)==null||directions.get(n).lengthSqr()<.5)continue;
             var layer=streams.get(mark.layer);int before=layer.vertices.size();
             if(!cut(layer,mark,centers.get(n),directions.get(n),strokes.get(n)))continue;
-            if(candidate!=null&&mark==candidate.anchor){
-                session.anchors.add(mark);
+            boolean first=candidate!=null&&mark==candidate.anchor;
+            double strike=first?now:session.since.getOrDefault(mark,now);
+            var motion=MountedSurfaceResponse.of(PowerForm.values()[visual.form()],hunter,mark.event);
+            motion.apply(layer.vertices,centers.get(n),directions.get(n),strokes.get(n),mark.radius,(now-strike)*20,
+                    victim.getId(),visual,mark.event,mask(mark.region));
+            if(first){
+                session.anchors.add(mark);session.since.put(mark,now);
                 ConsumeContactMarks.confirmed(victim,visual,mark.kind,mark.event,candidate.world,mask(mark.region),before,layer.vertices.size());
             }
         }

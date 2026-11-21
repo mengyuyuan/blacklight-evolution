@@ -11,7 +11,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Use the rendered contact position when available; remote and off-camera impacts use the server position. */
 public final class ConsumeContactAudio {
-    private record Cue(String kind,Vec3 point){}
+    private record Cue(String kind,Vec3 point,int owner,float gain,float pitch){}
     private static final ConsumeContactMix<Cue> mix=new ConsumeContactMix<>();
     private static ClientLevel world;
     private ConsumeContactAudio(){}
@@ -25,19 +25,32 @@ public final class ConsumeContactAudio {
         var current=level();
         if(current==null||victim.level()!=current||Minecraft.getInstance().isPaused()||!scene.consuming()||ordinal<0)return;
         var key=new ConsumeContactMix.Strike(victim.getId(),scene.consumerId(),scene.started(),ordinal);
+        kind=com.codex.blacklight.combat.ConsumeImpactKind.forContact(scene,ordinal);
         if(ModWeaponSounds.event("consume."+kind)!=null)
-            mix.local(key,new Cue(kind,point),current.getGameTime(),cue->play(current,cue));
+            mix.local(key,new Cue(kind,point,scene.consumerId(),1F,1F),current.getGameTime(),cue->play(current,cue));
     }
     public static void receive(ConsumeContactSoundPayload data){
         var current=level();if(current==null)return;
+        var cue=new Cue(data.kind(),data.point(),data.owner(),data.gain(),data.pitch());
+        if(data.ordinal()==ConsumeContactSoundPayload.PHASE) {
+            play(current,cue);
+            return;
+        }
         var key=new ConsumeContactMix.Strike(data.victim(),data.owner(),data.started(),data.ordinal());
-        mix.server(key,new Cue(data.kind(),data.point()),current.getGameTime());
+        mix.server(key,cue,current.getGameTime());
     }
     private static void play(ClientLevel level,Cue cue){
         var sound=ModWeaponSounds.event("consume."+cue.kind());
         if(sound==null)return;
         var point=cue.point();
-        level.playLocalSound(point.x,point.y,point.z,sound,SoundSource.PLAYERS,.99F,1F,false);
+        var mc=Minecraft.getInstance();
+        if(mc.player!=null && cue.owner()==mc.player.getId() && mc.getCameraEntity()==mc.player) {
+            var ear=mc.gameRenderer.getMainCamera().getPosition();
+            var offset=point.subtract(ear);
+            // Keep left/right placement when the execution camera dollies away from the performer's body.
+            if(offset.lengthSqr()>6.25)point=ear.add(offset.normalize().scale(2.5));
+        }
+        level.playLocalSound(point.x,point.y,point.z,sound,SoundSource.PLAYERS,cue.gain(),cue.pitch(),false);
     }
     public static void tick(){
         var current=level();if(current==null||Minecraft.getInstance().isPaused())return;

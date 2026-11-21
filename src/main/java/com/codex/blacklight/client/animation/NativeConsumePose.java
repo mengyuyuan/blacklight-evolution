@@ -111,6 +111,7 @@ public final class NativeConsumePose {
         float enter=PhaseEntryBlend.CONSUME_ACTOR.weight(entity,visual.started(),visual.stage(),partial,4F);
         pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,sample,enter).getJointTransformData());
         if(stage==ConsumeVisual.MOUNT_CONSUME&&ConsumeSequence.bruteMount(victims.getFirst()))fitBruteRider(entity,victims.getFirst(),visual,pose,partial,true);
+        else if(stage==ConsumeVisual.MOUNT_CONSUME)com.codex.blacklight.client.renderer.MountedBodyFit.apply(entity,victims.getFirst(),visual,pose,partial,facing(entity,visual.facing(),partial));
         return true;
     }
     private static void fitBruteRider(LivingEntity actor,LivingEntity victim,ConsumeVisual visual,BlacklightPose pose,float partial,boolean consuming){
