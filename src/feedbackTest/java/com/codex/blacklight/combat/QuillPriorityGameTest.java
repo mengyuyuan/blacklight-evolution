@@ -199,6 +199,35 @@ public final class QuillPriorityGameTest {
         }finally{for(var e:scraps)e.discard();for(var m:mobs)m.discard();level.getServer().getPlayerList().remove(p);}
     }
 
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_live_extract")
+    public static void liveRecallPuncturesBeforeRewardAndDoesNotKillTheHost(GameTestHelper h){
+        var p=join(h,"QuillExtract"); var mobs=new ArrayList<Mob>();
+        QuillOrgan organ=null;
+        try {
+            p.setPos(h.absolutePos(new BlockPos(5,140,5)).getCenter());
+            var state=QuillHarvest.state(p);
+            state.infect(); state.setPrototypeMode(true);
+            state.unlock(PowerForm.BACKSPINES); state.activate(PowerForm.BACKSPINES);
+            var victim=spawn(p,mobs,EntityType.COW,0,3,10,1);
+            QuillHarvest.plant(p,victim,victim.getBoundingBox().getCenter(),0);
+            QuillHarvest.recall(p);
+            organ=(QuillOrgan)p.serverLevel().getEntity(QuillHarvest.mark(victim).getUUID("organ"));
+            h.assertTrue(organ!=null && organ.phase()==QuillOrgan.EXTRACT,"recall did not start");
+            float hp=victim.getHealth(); int ep=state.getEvolutionPoints();
+            var saved=organ.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            saved.putLong("age",QuillOrgan.PIERCE_TICK);organ.load(saved);organ.tick();
+            h.assertTrue(victim.getHealth()>0 && victim.getHealth()<hp,"no nonlethal puncture on live host");
+            h.assertTrue(state.getEvolutionPoints()==ep,"premature reward");
+            releaseHarvest(organ);
+            h.assertTrue(organ.phase()==QuillOrgan.RETURN && victim.isRemoved(),"failed to return to owner");
+            h.succeed();
+        } finally {
+            if(organ!=null)organ.discard();
+            for(var mob:mobs)mob.discard();
+            p.serverLevel().getServer().getPlayerList().remove(p);
+        }
+    }
+
     private static void releaseHarvest(QuillOrgan root){
         var saved=root.saveWithoutId(new net.minecraft.nbt.CompoundTag());
         saved.putLong("age",QuillOrgan.RELEASE_TICK);

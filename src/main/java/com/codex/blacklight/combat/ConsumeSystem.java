@@ -77,6 +77,11 @@ public final class ConsumeSystem {
         Mob victim(){return victim;} PowerForm form(){return form;}
         Vec3 start(){return start;} int started(){return started;}
         boolean gripSound,absorbSound;
+        int returnSoundTick;
+        String sound(String phase){
+            int audioStage=victim instanceof BlacklightHunter ? ConsumeVisual.HUNTER_CONSUME : stage;
+            return ConsumeImpactKind.forPhase(form,large,audioStage,variant,phase);
+        }
         PowerForm animationForm(){return stage==ConsumeVisual.HUNTER_CONSUME?PowerForm.NONE:form;}
         int duration(){return stage==ConsumeVisual.AIR_HOLD?AerialCarryMotion.holdDuration():stage==ConsumeVisual.AIR_THROW?AerialCarryMotion.duration():stage==ConsumeVisual.GRAB_ATTACK?HeldSlamMotion.duration():stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.ACTOR_TICKS:ConsumeSequence.duration(animationForm(),large,variant);}
         int completionTick(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.COMPLETE_TICKS:ConsumeSequence.completionTick(animationForm(),large,variant);}
@@ -201,7 +206,7 @@ public final class ConsumeSystem {
         ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
         if(!s.gripSound&&(ConsumeVisual.holding(stage)||s.committed())){
             s.gripSound=true;
-            com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"consume.grip",ConsumeSequence.contact(s.victim),.86F,1F);
+            ConsumeSounds.phase(p,s.sound("grip"),ConsumeSequence.contact(s.victim),.94F,1F);
         }
         if(s.committed())p.setDeltaMovement(Vec3.ZERO);
     }
@@ -228,6 +233,7 @@ public final class ConsumeSystem {
         s.landingDelay=!s.large && gate>=0?-1:0;
         clearThrowCharge(player,s);
         phase(player,s,s.victim instanceof BlacklightHunter?ConsumeVisual.HUNTER_CONSUME:s.large?ConsumeVisual.MOUNT_CONSUME:ConsumeVisual.CONSUME);
+        s.returnSoundTick=ConsumeSequence.returnSoundTick(s.animationForm(),s.variant,s.stage,s.duration(),s.completionTick());
         if(!s.large&&ConsumeVariant.alternatives(s.form))
             PlayerActions.get().playVisual(player,"consume_"+ConsumeSequence.clipKey(s.animationForm(),false,s.variant)+"_actor",0);
         else play(player,s.large?PlayerAction.consumeLarge(s.animationForm()):PlayerAction.consume(s.form));
@@ -651,10 +657,7 @@ public final class ConsumeSystem {
             double drop=Math.min(session.form==PowerForm.HAMMERFISTS?.32:.16,Math.max(0,target.getY()-player.getY()));
             target.move(MoverType.SELF,new Vec3(0,-drop,0));
         }
-        if (elapsed == impact) {
-            player.level().playSound(null,target.blockPosition(),SoundEvents.PLAYER_ATTACK_STRONG,SoundSource.PLAYERS,
-                    session.form==PowerForm.HAMMERFISTS?.95F:.7F,session.form==PowerForm.HAMMERFISTS?.55F:.8F);
-        }
+        consumeEffects(player,session,elapsed);
         if (session.form() == PowerForm.HAMMERFISTS && elapsed == impact) {
             TerrainImpactEffects.heldBodyFloor(target, 26);
         }
@@ -667,9 +670,9 @@ public final class ConsumeSystem {
                 &&Float.isFinite(ConsumeGiverEffect.cue(s.form,s.variant));
     }
     private static void triggerBodyWeave(ServerPlayer player,Session session,int elapsed){
-        if (!session.absorbSound && elapsed>=Math.max(1,session.completionTick()-10)) {
+        if (!session.absorbSound && elapsed>=session.returnSoundTick) {
             session.absorbSound=true;
-            com.codex.blacklight.registry.ModWeaponSounds.spatial(player,"consume.absorb",ConsumeSequence.contact(session.victim),.90F,1F);
+            ConsumeSounds.phase(player,session.sound("absorb"),ConsumeSequence.contact(session.victim),1F,1F);
         }
         if(session.bodyWeaveStarted||!eligibleForCoat(session))return;
         if(elapsed<ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(session.form,session.variant)))return;
@@ -679,7 +682,8 @@ public final class ConsumeSystem {
     private static void publishCoat(ServerPlayer player,ConsumeVisual scene){
         var current=ModAttachments.getData(player,ModAttachments.CONSUME_BODY_VISUAL);
         // Old receivers can finish after a newer grab. Keep the latest fired callback.
-        if(current.active()&&coatTime(current)>coatTime(scene))return;
+        if(current.active() && (current.equals(scene) || coatTime(current)>coatTime(scene)))return;
+        ConsumeSounds.phase(player,"weave",player.position().add(0,player.getBbHeight()*.7,0),.86F,1F);
         ModAttachments.setData(player,ModAttachments.CONSUME_BODY_VISUAL,scene);ModAttachments.syncData(player,ModAttachments.CONSUME_BODY_VISUAL);
     }
     private static long coatTime(ConsumeVisual scene){
@@ -766,6 +770,7 @@ public final class ConsumeSystem {
         }
         if(session.stage==ConsumeVisual.MOUNT_HOLD)return false;
         consumeEffects(player,session,elapsed);
+        triggerBodyWeave(player,session,elapsed);
         return elapsed>=session.completionTick();
     }
     private static void pairedPlacement(ServerPlayer player,Session session,int elapsed) {
@@ -799,7 +804,10 @@ public final class ConsumeSystem {
         int contact=session.stage==ConsumeVisual.HUNTER_CONSUME?24:Math.round(session.duration()*ConsumeSequence.contact(animationForm,session.large))-1;
         var receiverScene=ConsumeReceiverScene.profile(animationForm,session.large,session.variant);
         Vec3 point=ConsumeSequence.contact(session.victim);
-        if (receiverScene == null && !session.large && animationForm == PowerForm.BLADE)
+        if(!session.large && !ConsumeSequence.paired(session.form,false,session.variant)){
+            receiverScene=null;
+            contact=ConsumeVisual.impactTick(session.form);
+        } else if (receiverScene == null && !session.large && animationForm == PowerForm.BLADE)
             contact = Math.round(20 * ConsumeSequence.splitSeconds(animationForm, false, session.variant));
         int ordinal = session.contactDamage.strike(player, session.victim, receiverScene, contact, elapsed, session.stage == ConsumeVisual.HUNTER_CONSUME);
         if(ordinal >= 0) {
@@ -810,7 +818,7 @@ public final class ConsumeSystem {
             var audio=new com.codex.blacklight.network.ConsumeContactSoundPayload(session.victim.getId(),player.getId(),
                     scene.started(),ordinal,sound,point);
             for (ServerPlayer listener:player.serverLevel().players())
-                if(listener.position().distanceToSqr(point)<32*32)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(listener,audio);
+                if(listener==player || listener.position().distanceToSqr(point)<32*32)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(listener,audio);
             // Small receivers have client-side posed/physical bodies. Their blood follows
             // that wound from the synchronized phase, not this upright server AABB.
             if(ConsumeSequence.mountedStage(session.stage))
@@ -854,8 +862,7 @@ public final class ConsumeSystem {
         com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
-        com.codex.blacklight.registry.ModWeaponSounds.spatial(player,"consume.finish",player.position().add(0,1,0),
-                ConsumeVariant.stealth(session.form,session.variant)?.68F:.94F,1F);
+        ConsumeSounds.phase(player,session.sound("finish"),player.position().add(0,1,0),.96F,1F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }
     /** Run the death callback while the absorber and the type of execution are still known. */

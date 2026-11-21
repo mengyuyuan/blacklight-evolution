@@ -1971,5 +1971,824 @@
         "type": "event"
       }
     ]
+  },
+  "consume.chest_drive": {
+    "subtitle": "subtitle.blacklight.consume.chest_drive",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/chest_drive_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/chest_drive_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.heel_stamp": {
+    "subtitle": "subtitle.blacklight.consume.heel_stamp",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/heel_stamp_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heel_stamp_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.knee_bump": {
+    "subtitle": "subtitle.blacklight.consume.knee_bump",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/knee_bump_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/knee_bump_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.beat_jab": {
+    "subtitle": "subtitle.blacklight.consume.beat_jab",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/beat_jab_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_jab_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.beat_hook": {
+    "subtitle": "subtitle.blacklight.consume.beat_hook",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/beat_hook_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_hook_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.beat_cross": {
+    "subtitle": "subtitle.blacklight.consume.beat_cross",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/beat_cross_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_cross_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.beat_drive": {
+    "subtitle": "subtitle.blacklight.consume.beat_drive",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/beat_drive_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_drive_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.beat_crush": {
+    "subtitle": "subtitle.blacklight.consume.beat_crush",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/beat_crush_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_crush_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.neck_snap": {
+    "subtitle": "subtitle.blacklight.consume.neck_snap",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/neck_snap_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/neck_snap_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.rib_squeeze": {
+    "subtitle": "subtitle.blacklight.consume.rib_squeeze",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/rib_squeeze_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/rib_squeeze_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.joint_lock": {
+    "subtitle": "subtitle.blacklight.consume.joint_lock",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/joint_lock_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/joint_lock_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.choke_press": {
+    "subtitle": "subtitle.blacklight.consume.choke_press",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/choke_press_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/choke_press_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.throat_rip": {
+    "subtitle": "subtitle.blacklight.consume.throat_rip",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/throat_rip_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/throat_rip_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.claw_shear": {
+    "subtitle": "subtitle.blacklight.consume.claw_shear",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/claw_shear_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/claw_shear_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.skull_click": {
+    "subtitle": "subtitle.blacklight.consume.skull_click",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/skull_click_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/skull_click_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.blade_split": {
+    "subtitle": "subtitle.blacklight.consume.blade_split",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/blade_split_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/blade_split_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.head_drop": {
+    "subtitle": "subtitle.blacklight.consume.head_drop",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/head_drop_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/head_drop_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.hammer_press": {
+    "subtitle": "subtitle.blacklight.consume.hammer_press",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/hammer_press_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hammer_press_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.hook_rend": {
+    "subtitle": "subtitle.blacklight.consume.hook_rend",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/hook_rend_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hook_rend_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.lash_bite": {
+    "subtitle": "subtitle.blacklight.consume.lash_bite",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/lash_bite_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/lash_bite_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.lash_recoil": {
+    "subtitle": "subtitle.blacklight.consume.lash_recoil",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/lash_recoil_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/lash_recoil_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.arm_wrench": {
+    "subtitle": "subtitle.blacklight.consume.arm_wrench",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/arm_wrench_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/arm_wrench_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.heart_grab": {
+    "subtitle": "subtitle.blacklight.consume.heart_grab",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/heart_grab_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heart_grab_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.heart_slap": {
+    "subtitle": "subtitle.blacklight.consume.heart_slap",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/heart_slap_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heart_slap_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_fist": {
+    "subtitle": "subtitle.blacklight.consume.mount_fist",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_fist_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_fist_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_claw": {
+    "subtitle": "subtitle.blacklight.consume.mount_claw",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_claw_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_claw_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_blade": {
+    "subtitle": "subtitle.blacklight.consume.mount_blade",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_blade_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_blade_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_maul": {
+    "subtitle": "subtitle.blacklight.consume.mount_maul",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_maul_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_maul_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_cable": {
+    "subtitle": "subtitle.blacklight.consume.mount_cable",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_cable_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_cable_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.mount_heave": {
+    "subtitle": "subtitle.blacklight.consume.mount_heave",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/mount_heave_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_heave_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.hunter_jaw": {
+    "subtitle": "subtitle.blacklight.consume.hunter_jaw",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/hunter_jaw_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hunter_jaw_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.hunter_rend": {
+    "subtitle": "subtitle.blacklight.consume.hunter_rend",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/hunter_rend_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hunter_rend_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.quill_extract": {
+    "subtitle": "subtitle.blacklight.consume.quill_extract",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/quill_extract_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_extract_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.quill_return": {
+    "subtitle": "subtitle.blacklight.consume.quill_return",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/quill_return_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_return_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.quill_merge": {
+    "subtitle": "subtitle.blacklight.consume.quill_merge",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/quill_merge_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_merge_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.weave": {
+    "subtitle": "subtitle.blacklight.consume.weave",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/weave_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/weave_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_bare": {
+    "subtitle": "subtitle.blacklight.consume.grip_bare",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_bare_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_bare_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_bare": {
+    "subtitle": "subtitle.blacklight.consume.absorb_bare",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_bare_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_bare_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_bare": {
+    "subtitle": "subtitle.blacklight.consume.finish_bare",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_bare_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_bare_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_quiet": {
+    "subtitle": "subtitle.blacklight.consume.grip_quiet",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_quiet_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_quiet_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_quiet": {
+    "subtitle": "subtitle.blacklight.consume.absorb_quiet",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_quiet_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_quiet_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_quiet": {
+    "subtitle": "subtitle.blacklight.consume.finish_quiet",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_quiet_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_quiet_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_claw": {
+    "subtitle": "subtitle.blacklight.consume.grip_claw",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_claw_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_claw_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_claw": {
+    "subtitle": "subtitle.blacklight.consume.absorb_claw",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_claw_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_claw_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_claw": {
+    "subtitle": "subtitle.blacklight.consume.finish_claw",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_claw_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_claw_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_blade": {
+    "subtitle": "subtitle.blacklight.consume.grip_blade",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_blade_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_blade_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_blade": {
+    "subtitle": "subtitle.blacklight.consume.absorb_blade",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_blade_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_blade_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_blade": {
+    "subtitle": "subtitle.blacklight.consume.finish_blade",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_blade_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_blade_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_hammer": {
+    "subtitle": "subtitle.blacklight.consume.grip_hammer",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_hammer_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_hammer_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_hammer": {
+    "subtitle": "subtitle.blacklight.consume.absorb_hammer",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_hammer_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_hammer_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_hammer": {
+    "subtitle": "subtitle.blacklight.consume.finish_hammer",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_hammer_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_hammer_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_lash": {
+    "subtitle": "subtitle.blacklight.consume.grip_lash",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_lash_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_lash_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_lash": {
+    "subtitle": "subtitle.blacklight.consume.absorb_lash",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_lash_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_lash_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_lash": {
+    "subtitle": "subtitle.blacklight.consume.finish_lash",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_lash_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_lash_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_muscle": {
+    "subtitle": "subtitle.blacklight.consume.grip_muscle",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_muscle_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_muscle_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_muscle": {
+    "subtitle": "subtitle.blacklight.consume.absorb_muscle",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_muscle_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_muscle_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_muscle": {
+    "subtitle": "subtitle.blacklight.consume.finish_muscle",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_muscle_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_muscle_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_mount": {
+    "subtitle": "subtitle.blacklight.consume.grip_mount",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_mount_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_mount_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_mount": {
+    "subtitle": "subtitle.blacklight.consume.absorb_mount",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_mount_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_mount_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_mount": {
+    "subtitle": "subtitle.blacklight.consume.finish_mount",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_mount_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_mount_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.grip_hunter": {
+    "subtitle": "subtitle.blacklight.consume.grip_hunter",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/grip_hunter_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/grip_hunter_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb_hunter": {
+    "subtitle": "subtitle.blacklight.consume.absorb_hunter",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/absorb_hunter_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/absorb_hunter_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish_hunter": {
+    "subtitle": "subtitle.blacklight.consume.finish_hunter",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/finish_hunter_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/finish_hunter_2",
+        "attenuation_distance": 28
+      }
+    ]
   }
 }

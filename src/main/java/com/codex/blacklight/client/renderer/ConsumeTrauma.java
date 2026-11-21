@@ -76,6 +76,7 @@ public final class ConsumeTrauma {
     public static void sampleActor(LivingEntity actor,PoseStack stack,Matrix4f[] bones,Matrix4f[] skin,float partial){
         ChestConsumeTendrils.captureActor(actor,stack,bones,partial);
         if(actor==null || !ConsumeVisual.consumeStage(ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)))return;
+        MountedBodyFit.capture(actor,stack);
         var skeleton=PlayerMotionController.skeleton();
         var palms=new Vec3[2];var fists=new Vec3[2];var forearms=new Vec3[10];
         for(int i=0;i<2;i++){
@@ -255,7 +256,21 @@ public final class ConsumeTrauma {
                 cutAt(struck,hit.bind(),rotate(incoming,new Quaternionf(turn).conjugate()),rotate(travel.normalize(),new Quaternionf(turn).conjugate()),
                         Math.min(.30,Math.max(.12,e.getBbWidth()*.34))/struck.scale);
             }
-            if(punch&&region==1){
+            var grip=ConsumeSurfaceResponse.of(visual.variant());
+            if(grip!=null){
+                Vec3 axis=new Vec3(0,1,0);
+                if(pose!=null&&hold){
+                    // Place both forearm impressions on independently confirmed surface triangles.
+                    Vec3[] first=java.util.Arrays.copyOfRange(pose.forearms,0,5),second=java.util.Arrays.copyOfRange(pose.forearms,5,10);
+                    var a=nearest(parts,positions,first,0,partial);var b=nearest(parts,positions,second,0,partial);
+                    boolean used=false;
+                    if(a!=null&&a.distanceSquared()<=contactRadius*contactRadius){grip(parts,positions,a,first[4].subtract(first[0]),visual,now,partial,grip);used=true;}
+                    if(b!=null&&b.distanceSquared()<=contactRadius*contactRadius&&(!used||a.world().distanceToSqr(b.world())>.07*.07)){
+                        grip(parts,positions,b,second[4].subtract(second[0]),visual,now,partial,grip);used=true;
+                    }
+                    if(!used)grip(parts,positions,hit,axis,visual,now,partial,grip);
+                }else grip(parts,positions,hit,axis,visual,now,partial,grip);
+            }else if(punch&&region==1){
                 chipHead(parts,positions,world,incoming,Math.min(4,++landedBlows),e.getBbWidth(),partial);
             }else if(blunt){
                 // One physical press crosses the head, its outer skin and any
@@ -317,6 +332,23 @@ public final class ConsumeTrauma {
         if(!blunt&&!hold&&!lash)WoundBlood.rupture(e,region,world,jet,head);
     }
 
+    private static void grip(List<Part> parts,Vec3[] posed,SurfaceHit hit,Vec3 cue,ConsumeVisual v,double now,float partial,ConsumeSurfaceResponse mode){
+        int idx=parts.indexOf(hit.part());
+        Vec3 inward=posed[idx].subtract(hit.world()).normalize();
+        if(inward.lengthSqr()<.5)inward=Vec3.directionFromRotation(0,v.facing());
+        int region=hit.part().bind.region();
+        for(int i=0;i<parts.size();i++){
+            var p=parts.get(i);if(p.bind.region()!=region||p.scale<.5)continue;
+            var inv=new Quaternionf(p.oldRotation).slerp(p.rotation,partial).conjugate();
+            Vec3 site=p==hit.part()?hit.bind():p.center.add(rotate(hit.world().subtract(posed[i]),inv).scale(1/p.scale));
+            double radius=Math.min(.46,Math.max(.20,p.half.length()*.91))/p.scale;
+            if(AdaptiveRagdoll.bounds(p.mesh).distanceToSqr(site)>radius*radius)continue;
+            Vec3 up=rotate(new Vec3(0,1,0),inv),line=rotate(cue,inv);
+            // Lifting and folding use vertical travel; collar and chest grips follow the actual forearm span.
+            Vec3 tangent=mode==ConsumeSurfaceResponse.NECK||mode==ConsumeSurfaceResponse.BEARHUG?line:up;
+            p.grip(ContactCompression.grip(site,rotate(inward,inv),tangent,radius,now,mode,v.consumerId(),v.started()));
+        }
+    }
     static Vec3 gripTear(LivingEntity victim,LivingEntity owner,ConsumeVisual visual,List<Part> parts,Vec3[] at,float partial){
         var left=musclePalm(owner,0,partial);var right=musclePalm(owner,1,partial);
         if(left==null||right==null)return null;

@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 public final class ConsumeImpactResponse {
     enum Impact {
         HAMMER(1.65,.23,3.4), GRIP(1.35,.17,3.2), KNEE(1.2,.16,2.9),
-        LASH_FIRST(.9,.12,4.7), LASH_RETURN(1.45,.22,3.4), GRAPPLE(.9,.11,2.8), CUT(1.05,.075,2.7);
+        LASH_FIRST(.9,.12,4.7), LASH_RETURN(1.45,.22,3.4), NECK(.85,.09,3.7), HUG(1.25,.11,4.8), NELSON(.95,.13,4.15), GUILLOTINE(1.15,.17,3.6), JUGULAR(.75,.19,3.1), CUT(1.05,.075,2.7);
         final double stop,travel,rejoin;
         Impact(double stop,double travel,double rejoin){this.stop=stop;this.travel=travel;this.rejoin=rejoin;}
     }
@@ -28,6 +28,8 @@ public final class ConsumeImpactResponse {
     private long sequence=Long.MIN_VALUE;
     private double begin;
     private Vec3 ownerBase=Vec3.ZERO,drive=Vec3.ZERO;
+    private Vec3 forward=Vec3.ZERO,side=Vec3.ZERO;
+    private double contactSide;
     private Impact impact;
 
     static Impact profile(String clip,int strike){
@@ -37,7 +39,11 @@ public final class ConsumeImpactResponse {
             case "normal_knee_head" -> Impact.KNEE;
             case "whip_lash" -> strike==0?Impact.LASH_FIRST:Impact.LASH_RETURN;
             case "muscle_heart" -> strike==1?Impact.GRIP:null;
-            case "stealth_neck","stealth_bearhug","stealth_nelson","stealth_guillotine","stealth_jugular" -> Impact.GRAPPLE;
+            case "stealth_neck" -> Impact.NECK;
+            case "stealth_bearhug" -> Impact.HUG;
+            case "stealth_nelson" -> Impact.NELSON;
+            case "stealth_guillotine" -> Impact.GUILLOTINE;
+            case "stealth_jugular" -> Impact.JUGULAR;
             case "claws","blade","muscle","whip" -> Impact.CUT;
             default -> null;
         };
@@ -82,6 +88,8 @@ public final class ConsumeImpactResponse {
         record(victim,actor,visual,hit,victim.level().getGameTime()+partial);
         ownerBase=actor.getPosition(partial);
         Vec3 facing=Vec3.directionFromRotation(0,visual.facing());
+        forward=facing;side=new Vec3(facing.z,0,-facing.x);
+        contactSide=contact.subtract(center).dot(side)<0?-1:1;
         Vec3 inward=center.subtract(contact).normalize();
         if(hit==Impact.LASH_FIRST||hit==Impact.LASH_RETURN){
             Vec3 towards=ownerBase.add(0,actor.getBbHeight()*.62,0).subtract(center).normalize();
@@ -93,6 +101,27 @@ public final class ConsumeImpactResponse {
         }
         atContact.clear();
         for(int i=0;i<parts.size();i++)atContact.put(parts.get(i),positions[i]);
+    }
+
+    /** Relative travel at the head, shoulders and elbows while the confirmed grip loads, holds and releases. */
+    static Vec3 heldMotion(Impact hit,int region,double age,double contactSide,Vec3 forward,Vec3 side){
+        boolean head=region==1,arm=region==2||region==4,torso=region==32;
+        if(!head&&!arm&&!torso)return Vec3.ZERO;
+        double lateral=0,vertical=0,depth=0,release;
+        double sign=region==2?1:-1;
+        switch(hit){
+            case KNEE->{vertical=head?.135:torso?.055:.022;depth=head?.085:.03;release=3.9;}
+            case NECK->{lateral=(head?.139:arm?.034:.056)*contactSide;depth=head?-.068:.025;release=5.9;}
+            case HUG->{vertical=head?-.07:arm?.056:-.10;lateral=arm?-.14*sign:0;depth=head?-.066:-.106;release=7.4;}
+            case NELSON->{vertical=arm?.162:torso?.089:-.068;lateral=arm?.075*sign:0;depth=head?.106:-.051;release=6.8;}
+            case GUILLOTINE->{vertical=head?-.153:arm?.02:-.087;depth=head?-.141:torso?-.089:-.034;release=6.4;}
+            case JUGULAR->{lateral=(head?-.165:torso?-.076:-.032)*contactSide;vertical=head?.083:.018;release=4.7;}
+            default->{return Vec3.ZERO;}
+        }
+        double onset=Math.max(0,Math.min(1,(age+.23)/(head?.92:1.25)));
+        double fade=Math.max(0,Math.min(1,(release-age)/2.2));
+        double load=onset*onset*(3-2*onset)*fade*fade*(3-2*fade);
+        return side.scale(lateral*load).add(forward.scale(depth*load)).add(0,vertical*load,0);
     }
 
     void apply(LivingEntity victim,LivingEntity actor,ConsumeVisual visual,List<AdaptiveRagdoll.Part> parts,
@@ -107,7 +136,8 @@ public final class ConsumeImpactResponse {
             var part=parts.get(i);Vec3 start=atContact.get(part);
             if(start==null)continue;
             Vec3 at=resume<1?start.add(translation).lerp(positions[i],resume):positions[i];
-            positions[i]=at.add(drive.scale(displacement(impact,age,part.bind.region())));
+            int region=part.bind.region();
+            positions[i]=at.add(drive.scale(displacement(impact,age,region))).add(heldMotion(impact,region,age,contactSide,forward,side));
         }
     }
     Vec3 fragmentImpulse(){return impact==Impact.HAMMER||impact==Impact.GRIP?drive.scale(.054):Vec3.ZERO;}

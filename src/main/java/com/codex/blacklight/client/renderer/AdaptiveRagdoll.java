@@ -694,6 +694,11 @@ public final class AdaptiveRagdoll {
             Vec3 rest=imprint==null?vertex.p:imprint.apply(vertex.p);
             return compression==null?rest:compression.point(rest);
         }
+        void grip(ContactCompression field){
+            if(compression!=null&&compression.sameGrip(field.scene,field.actor,field.started))compression.addGrip(field);
+            else compression=field;
+            meshRevision++;
+        }
         void press(Vec3 contact,Vec3 travel,double radius,double clock,boolean markContact){
             compression=new ContactCompression(contact,travel,radius,clock);
             if(markContact)mark=StrikeMark.attach(this,contact,travel,FatalWeaponImpact.FIST,radius);
@@ -2505,7 +2510,7 @@ public final class AdaptiveRagdoll {
             var normalMatrix=new Matrix3f(matrix).invert().transpose();
             int hurtV=OverlayTexture.v(RagdollDrive.hurtFlash(entity));
             double clock=scene.getGameTime()+partial;
-            for(var p:parts)if(p.compression!=null)p.compression.strength=ContactCompression.weight(clock-p.compression.started);
+            for(var p:parts)if(p.compression!=null)p.compression.strength=p.compression.weightAt(clock-p.compression.started);
             var connected=connectedPose(partial);
             var phase=RagdollDrive.captured(entity)?ConsumeFracture.phase(entity,partial):null;
             if(phase!=null)trauma.contact(entity,com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL),phase,parts,connected.positions(),partial);
@@ -2517,9 +2522,16 @@ public final class AdaptiveRagdoll {
                 int light=LevelRenderer.getLightColor(scene,BlockPos.containing(at));
                 var mark=p.impactMark();
                 var skins=new ArrayList<List<Vertex>>();skins.add(p.visibleSkin());skins.addAll(p.incisions.values());skins.add(mark);
+                boolean audit=ConsumeSurfaceResponse.observer!=null&&p.compression!=null&&p.compression.mode()!=null;
+                int submitted=0,moved=0;double squared=0,peak=0;Vec3 peakOffset=Vec3.ZERO;
                 if(!trauma.hides(p))for(var skin:skins)for(var v:skin){
                     Vec3 rest=skin==mark || p.imprint==null?v.p:p.imprint.apply(v.p);
                     Vec3 posed=p.compression==null?rest:p.compression.point(rest);
+                    if(audit&&skin==skins.get(0)){
+                        Vec3 delta=posed.subtract(rest).scale(p.scale);double distance=delta.lengthSqr();
+                        submitted++;squared+=distance;if(distance>1e-8)moved++;
+                        if(distance>peak){peak=distance;peakOffset=rotate(delta,turn);}
+                    }
                     Vec3 point=transform(matrix,at.add(rotate(posed.subtract(p.center).scale(p.scale),turn)).subtract(offset));
                     Vec3 surfaceNormal=p.compression==null?v.n:p.compression.normal(rest,v.n);
                     Vec3 normal=vec(normalMatrix.transform(rotate(surfaceNormal,turn).toVector3f())).normalize();
@@ -2528,6 +2540,9 @@ public final class AdaptiveRagdoll {
                     var out=receiver==null?buffers.getBuffer(v.type):receiver.skinBuffer(v.type,p.bind.region,v.p);
                     v.emit(out,point,normal,color,OverlayTexture.pack(v.overlay&0xffff,hurtV),light);
                 }
+                if(audit&&submitted>0)ConsumeSurfaceResponse.observer.accept(new ConsumeSurfaceResponse.Sample(entity.getId(),p.compression.actor,
+                        p.compression.scene,p.compression.mode().name(),p.bind.region(),clock-p.compression.started,
+                        submitted,moved,Math.sqrt(peak),Math.sqrt(squared/submitted),peakOffset));
                 if(phase!=null&&phase.opening()>0){
                     double radius=Math.max(.03,p.half.length()*.35*p.scale);
                     var previous=roots.get(p.bind.region);

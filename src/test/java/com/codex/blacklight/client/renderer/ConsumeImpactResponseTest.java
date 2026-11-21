@@ -14,8 +14,11 @@ class ConsumeImpactResponseTest {
         assertEquals(Impact.KNEE,profile("normal_knee_head",0));
         assertEquals(Impact.LASH_FIRST,profile("whip_lash",0));assertEquals(Impact.LASH_RETURN,profile("whip_lash",1));
         for(String c:new String[]{"claws","blade","whip","muscle"})assertEquals(Impact.CUT,profile(c,0),c);
-        for(String c:new String[]{"stealth_neck","stealth_bearhug","stealth_nelson","stealth_guillotine","stealth_jugular"})
-            assertEquals(Impact.GRAPPLE,profile(c,0));
+        assertEquals(Impact.NECK,profile("stealth_neck",0));
+        assertEquals(Impact.HUG,profile("stealth_bearhug",0));
+        assertEquals(Impact.NELSON,profile("stealth_nelson",0));
+        assertEquals(Impact.GUILLOTINE,profile("stealth_guillotine",0));
+        assertEquals(Impact.JUGULAR,profile("stealth_jugular",0));
     }
     @Test void everyResponseStopsAtContactThenReturnsMonotonicallyToTheActualClock(){
         for(var hit:Impact.values()){

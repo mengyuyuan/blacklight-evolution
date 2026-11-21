@@ -44,8 +44,19 @@ public final class ConsumeContactDamage {
         int ordinal = next++;
         float health = victim.getHealth();
         float budget = (health - Math.min(.25F, health * .25F)) / (count - ordinal + 1);
+        apply(owner,victim,health,budget);
+        return ordinal;
+    }
+
+    /** The embedded organ wounds a still-living, eligible host when it first opens for extraction. */
+    public static void quillPuncture(ServerPlayer owner, Mob victim) {
+        float health=victim.getHealth();
+        apply(owner,victim,health,(health - Math.min(.25F,health*.25F))*.25F);
+    }
+
+    private static void apply(ServerPlayer owner,Mob victim,float health,float budget) {
         float amount = budget / com.codex.blacklight.power.CombatScale.units(victim);
-        if (amount <= 0 || !victim.isAlive()) return ordinal;
+        if (amount <= 0 || !victim.isAlive()) return;
         var type = owner.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TYPE);
         var source = new DamageSource(type, owner);
         var previous = CURRENT.get();
@@ -57,6 +68,5 @@ public final class ConsumeContactDamage {
             if (previous == null) CURRENT.remove();
             else CURRENT.set(previous);
         }
-        return ordinal;
     }
 }

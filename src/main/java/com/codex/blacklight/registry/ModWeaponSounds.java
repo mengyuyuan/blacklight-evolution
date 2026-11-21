@@ -36,6 +36,10 @@ public final class ModWeaponSounds {
                 EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
             }
         }
+        for(String cue:com.codex.blacklight.combat.ConsumeImpactKind.registeredCues()) {
+            String id="consume."+cue;
+            EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
+        }
         for(String form:List.of("armor","shield"))
             for(String cue:List.of("deploy","retract","hit","heavy","deflect","break")){
                 if(form.equals("armor")&&cue.equals("break"))continue;
