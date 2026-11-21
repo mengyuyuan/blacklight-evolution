@@ -21,13 +21,26 @@ public final class MilitaryTactics {
             if(now-soldier.radioStarted()>=RADIO_TICKS){deploy(soldier);soldier.cancelRadio();tag.putLong("RadioReady",now+1200);}
             return true;
         }
-        boolean officer=soldier.commandRole()==MilitaryRole.OFFICER||soldier.commandRole()==MilitaryRole.COMMANDER||soldier.commandRole()==MilitaryRole.TEAM_LEADER;
-        if(officer&&tag.getLong("RadioReady")<=now&&tag.getLong("UavLeaseUntil")<=now&&soldier.hasLineOfSight(target)&&soldier.distanceToSqr(target)>64){soldier.beginRadio();BlackwatchSquadSystem.release(soldier);return true;}
-        return false;
+        boolean blackwatch=soldier.faction()==MilitaryFaction.BLACKWATCH;
+        boolean airReady=blackwatch && tag.getLong("AirSupportReady")<=now;
+        if(tag.getLong("RadioReady")>now || (!airReady && tag.getLong("UavLeaseUntil")>now)
+                || soldier.distanceToSqr(target)<=64 || !soldier.hasLineOfSight(target))return false;
+        boolean leader=soldier.commandRole()!=MilitaryRole.TROOPER;
+        // An isolated patrol can report a sighting even when its officer is absent.
+        if(!leader && (!blackwatch || soldier.tickCount%20!=0 || !patrolCaller(soldier,target)))return false;
+        soldier.beginRadio();BlackwatchSquadSystem.release(soldier);return true;
+    }
+    private static boolean patrolCaller(MilitarySoldier soldier,LivingEntity target){
+        return soldier.level().getEntitiesOfClass(MilitarySoldier.class,soldier.getBoundingBox().inflate(28),
+                ally->ally!=soldier && ally.faction()==MilitaryFaction.BLACKWATCH && ally.tacticsAvailable()
+                        && ally.getTarget()==target && ally.hasLineOfSight(target) && ally.distanceToSqr(target)>64
+                        && (ally.radioStarted()>=0 || ally.getPersistentData().getLong("RadioReady")<=ally.level().getGameTime()
+                            && (ally.commandRole()!=MilitaryRole.TROOPER || ally.getId()<soldier.getId()))).isEmpty();
     }
     private static void deploy(MilitarySoldier soldier){
         if(soldier.faction()==MilitaryFaction.BLACKWATCH&&com.codex.blacklight.military.aircraft.HelicopterSupport.request(soldier))return;
-        if(!(soldier.level() instanceof ServerLevel level)||level.getEntitiesOfClass(MilitaryUav.class,soldier.getBoundingBox().inflate(40)).size()>=2)return;
+        if(!(soldier.level() instanceof ServerLevel level)||soldier.getPersistentData().getLong("UavLeaseUntil")>level.getGameTime()
+                ||level.getEntitiesOfClass(MilitaryUav.class,soldier.getBoundingBox().inflate(40)).size()>=2)return;
         var uav=com.codex.blacklight.registry.EncounterEntities.UAV.get().create(level);if(uav==null)return;
         Vec3 pos=soldier.position().add(0,3,0);uav.setPos(pos);
         if(!level.hasChunkAt(uav.blockPosition())||!level.noCollision(uav)||!level.getWorldBorder().isWithinBounds(uav.blockPosition()))return;

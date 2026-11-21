@@ -38,18 +38,28 @@ public final class CityHiveSupply {
     }
     public static boolean ready(CityData data,int hive){return !data.destroyed(hive)&&data.hiveSustained[hive]&&data.hiveBroodTicks[hive]>=CityConfig.HIVE_BROOD_INTERVAL.get()&&data.hiveSupply[hive].reserve()>=ColonySupply.broodCost(OutbreakRules.Tier.FRESH);}
     public static Mob hatch(ServerLevel level,CityData data,int hive,BlockPos pos,OutbreakRules.Tier tier){
-        return hatch(level,data,hive,pos,tier,false);
+        return hatch(level,data,hive,pos,tier,Brood.GROUND);
     }
-    public static Mob hatchHydra(ServerLevel level,CityData data,int hive,BlockPos pos){return hatch(level,data,hive,pos,OutbreakRules.Tier.ANCIENT,true);}
-    private static Mob hatch(ServerLevel level,CityData data,int hive,BlockPos pos,OutbreakRules.Tier tier,boolean hydra){
+    private enum Brood { GROUND, HYDRA, FLYER }
+    static Mob hatchFlyer(ServerLevel level,CityData data,int hive,BlockPos pos){
+        return hatch(level,data,hive,pos,OutbreakRules.Tier.GROWING,Brood.FLYER);
+    }
+    public static Mob hatchHydra(ServerLevel level,CityData data,int hive,BlockPos pos){return hatch(level,data,hive,pos,OutbreakRules.Tier.ANCIENT,Brood.HYDRA);}
+    private static Mob hatch(ServerLevel level,CityData data,int hive,BlockPos pos,OutbreakRules.Tier tier,Brood brood){
         var p=port(level,pos);if(p==null||p.hive!=hive||!ready(data,hive)||!live(level,data,p)||!CityConfig.SPAWNS.get()||!data.population)return null;
-        int stage=CityEcology.stage(level,pos);if((tier==OutbreakRules.Tier.MATURE||tier==OutbreakRules.Tier.HUNTER)&&stage<2||tier==OutbreakRules.Tier.ANCIENT&&stage<3)return null;
+        int stage=CityEcology.stage(level,pos);
+        if(brood==Brood.FLYER && stage<1)return null;
+        if((tier==OutbreakRules.Tier.MATURE||tier==OutbreakRules.Tier.HUNTER)&&stage<2||tier==OutbreakRules.Tier.ANCIENT&&stage<3)return null;
         var stock=data.hiveSupply[hive];int cost=ColonySupply.broodCost(tier);if(!stock.pay(cost))return null;
         var state=level.getBlockState(pos);var outside=pos.relative(state.getValue(CityHatchBlock.FACING),3).below();
         // Reserve the single organism's brood before external join callbacks can reenter another mouth.
         data.hiveBroodTicks[hive]=0;boolean committed=false;
         try{
-            Mob child=hydra?WorldOutbreakSystem.spawnHydraAt(level,outside):WorldOutbreakSystem.spawnAt(level,outside,tier);
+            Mob child=switch(brood){
+                case FLYER->AirPopulation.fromCityPort(level,outside,state.getValue(CityHatchBlock.FACING));
+                case HYDRA->WorldOutbreakSystem.spawnHydraAt(level,outside);
+                case GROUND->WorldOutbreakSystem.spawnAt(level,outside,tier);
+            };
             if(child==null)return null;
             // Entity-join callbacks may destroy the organism or its emitting port.
             // Do not publish success to a caller that would reopen the missing hatch.

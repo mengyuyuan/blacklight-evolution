@@ -1,6 +1,7 @@
 package com.codex.blacklight.mode;
 
 import com.codex.blacklight.combat.ClawCombatSystem;
+import com.codex.blacklight.disguise.DisguiseSystem;
 import com.codex.blacklight.animation.PlayerActions;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.state.BlacklightState;
@@ -25,7 +26,15 @@ public final class PrototypeModeSystem {
                     "message.blacklight.prototype_mode_requires_infection"), true);
             return;
         }
-        if (state.isPrototypeMode() == enabled) return;
+        if (!enabled) DisguiseSystem.endForModeExit(player);
+        if (state.isPrototypeMode() == enabled) {
+            // A client still displaying the old disguise can repeat its exit request.
+            if (!enabled) {
+                player.syncData(ModAttachments.DISGUISE_MORPH);
+                player.syncData(ModAttachments.PLAYER_STATE);
+            }
+            return;
+        }
 
         com.codex.blacklight.combat.WeaponCombatSystem.cancel(player);
         PowerForm previous=state.getActivePower();
