@@ -252,7 +252,8 @@ public final class DevastatorEffectRenderer {
                     living.getBoundingBox().getCenter().add(living.getPosition(partial).subtract(living.position())):
                     chest.add(Math.cos(angle)*radius*(.30+.65*noise(branch+6,frame.session())),
                             (noise(branch+41,frame.session())-.35)*radius*.42,Math.sin(angle)*radius*(.30+.65*noise(branch+6,frame.session())));
-            Vec3 root=outwardRoot(body,target,branch);
+            var profile=owner instanceof Player?P1TendrilTrack.select("barrage",branch):null;
+            Vec3 root=profile!=null?profile.root(body,target):outwardRoot(body,target,branch);
             double distance=root.distanceTo(target),delay=noise(branch+7,frame.session())*.16;
             double arrival=contact==null?Double.NaN:contact.at()-(frame.effectStartSeconds()-.4);
             var clock=contact==null?new Arrival(.4+delay,30*DevastatorEffectTimeline.WORLD_SCALE):
@@ -260,7 +261,7 @@ public final class DevastatorEffectRenderer {
             double reverseAt=DevastatorEffectTimeline.TENDRIL_RETRACT_START+delay;
             if(contact!=null)reverseAt=Math.max(reverseAt,arrival+DevastatorEffectTimeline.PAIN_CONTACT_DWELL);
             double extent=DevastatorEffectTimeline.strand(elapsed,clock.launch(),reverseAt,distance,
-                    clock.speed(),350*DevastatorEffectTimeline.WORLD_SCALE);
+                    clock.speed(),(profile==null?350:profile.reverse())*DevastatorEffectTimeline.WORLD_SCALE);
             if(extent<.01)continue;
             Vec3 end=root.lerp(target,extent);
             double localAge=Math.max(0,elapsed-clock.launch()),remaining=Math.max(0,reverseAt-elapsed);
@@ -279,10 +280,13 @@ public final class DevastatorEffectRenderer {
             double width=(.3+noise(branch+9,frame.session())*.4)
                     *(1-.09*ramp+.09*ramp*Math.sin(localAge*frequency+branch*.73));
             width=com.codex.blacklight.util.MathCompat.clamp(width,.3,.7);
-            nativeStrand(stack,light,"tendril_segment",root,control,end,width,255,angle);
+            if (profile!=null) {
+                boolean detailed=contact!=null && branch<5 && chest.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())<24*24;
+                profile.render(stack,light,root,end,localAge,remaining,angle,detailed);
+            } else nativeStrand(stack,light,AuthoredDevastatorMesh.skillModel(owner,"tendril_segment"),root,control,end,width,255,angle);
             if(contact!=null&&extent>.97){
                 Vec3 tipDirection=end.subtract(control).normalize();
-                nativeStrand(stack,light,"tendril_spike",end.subtract(tipDirection.scale(.40)),end.subtract(tipDirection.scale(.20)),end.add(tipDirection.scale(.22)),.9,255,angle);
+                nativeStrand(stack,light,AuthoredDevastatorMesh.skillModel(owner,"tendril_spike"),end.subtract(tipDirection.scale(.40)),end.subtract(tipDirection.scale(.20)),end.add(tipDirection.scale(.22)),.9,255,angle);
             }
         }
     }
@@ -300,8 +304,12 @@ public final class DevastatorEffectRenderer {
         Vec3 end=eye.add(direction.scale(distance));
         double elapsed=frame.elapsedSeconds()-frame.effectStartSeconds();
         Vec3 across=direction.cross(new Vec3(0,1,0)).normalize();if(across.lengthSqr()<.1)across=new Vec3(1,0,0);
+        var move=com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.WEAPON_VISUAL).spec();
+        String family=move!=null&&move.aerial()?"airPain":"pain";
         for(int branch=0;branch<10;branch++){
-            Vec3 root=hand(owner,partial,(branch&1)!=0).add(across.scale((branch/2-2)*.10));
+            var profile=owner instanceof Player?P1TendrilTrack.select(family,branch):null;
+            Vec3 root=profile==null?hand(owner,partial,(branch&1)!=0).add(across.scale((branch/2-2)*.10)):
+                    hand(owner,partial,profile.joint().equals("Wrist_L"));
             double delay=(branch%3)*.666667;
             Vec3 destination=end;
             boolean fixedContact=branch==0&&contactTarget instanceof LivingEntity&&Float.isFinite(contact.at());
@@ -311,9 +319,8 @@ public final class DevastatorEffectRenderer {
             if(fixedContact)destination=CombatTargeting.multipart((LivingEntity)contactTarget)?
                     CombatTargeting.closestPoint(root,(LivingEntity)contactTarget):contactTarget.getBoundingBox().getCenter();
             double strandDistance=root.distanceTo(destination);
-            var move=com.codex.blacklight.registry.ModAttachments.getData(owner, ModAttachments.WEAPON_VISUAL).spec();
             double sourceWindow=move!=null&&move.aerial()?1.666667:1.333333;
-            double forward=Math.max((branch==0?35:30)*.8176232451,strandDistance/sourceWindow);
+            double forward=Math.max((profile!=null?profile.forward():(branch==0?35:30))*DevastatorEffectTimeline.WORLD_SCALE,strandDistance/sourceWindow);
             // Each burst reaches its real target distance, then returns to its
             // wrist at the recovered native reverse velocity. The brief contact
             // dwell is a presentation adaptation, not a decoded native callback.
@@ -330,9 +337,10 @@ public final class DevastatorEffectRenderer {
             Vec3 tip=root.lerp(destination,extent);
             double wave=Math.sin(elapsed*(2+branch%4)+branch)*(.15+branch%3*.175)*.8176232451;
             Vec3 curve=root.lerp(tip,.5).add(across.scale(wave)).add(0,wave*.5,0);
-            nativeStrand(stack,light,"tendril_segment",root,curve,tip,new double[]{1,1.5,2,1.6}[branch%4],255,0);
+            if (profile!=null) profile.render(stack,light,root,tip,elapsed-delay,reverseAt-elapsed,branch*.73,branch<3);
+            else nativeStrand(stack,light,AuthoredDevastatorMesh.skillModel(owner,"tendril_segment"),root,curve,tip,new double[]{1,1.5,2,1.6}[branch%4],255,0);
             Vec3 tipDirection=destination.subtract(root).normalize();
-            if(extent>.97)nativeStrand(stack,light,"tendril_spike",tip.subtract(tipDirection.scale(.7)),tip.subtract(tipDirection.scale(.35)),tip.add(tipDirection.scale(.3)),2.8,255,0);
+            if(extent>.97)nativeStrand(stack,light,AuthoredDevastatorMesh.skillModel(owner,"tendril_spike"),tip.subtract(tipDirection.scale(.7)),tip.subtract(tipDirection.scale(.35)),tip.add(tipDirection.scale(.3)),2.8,255,0);
         }
     }
     private static void graveyard(PoseStack stack,VertexConsumer ignored,LivingEntity owner,Frame frame,
@@ -343,24 +351,31 @@ public final class DevastatorEffectRenderer {
             double angle=spike*2.3999632297+frame.session()*.017;
             double fraction=spike<18?.05+.28*noise(spike+31,frame.session()):.28+.7*noise(spike+31,frame.session());
             var contact=spike<targetCount?frame.contacts().get(spike):null;
-            var target=contact==null?null:level.getEntity(contact.targetId());
-            if(contact!=null&&(!(target instanceof LivingEntity)||!Float.isFinite(contact.at())))continue;
-            Vec3 base=target==null?frame.origin().add(Math.cos(angle)*radius*fraction,0,Math.sin(angle)*radius*fraction):target.position();
-            var surface=level.clip(new ClipContext(base.add(0,3,0),base.add(0,-8,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));
-            if(surface.getType()!=HitResult.Type.BLOCK||surface.getDirection()!=net.minecraft.core.Direction.UP)continue;
-            base=surface.getLocation();double delay=noise(spike+12,frame.session())*.25;
+            Vec3 base;
+            if(contact!=null){
+                base=contact.groundAnchor();
+                if(base==null||!Float.isFinite(contact.at()))continue;
+            }else{
+                Vec3 at=frame.origin().add(Math.cos(angle)*radius*fraction,0,Math.sin(angle)*radius*fraction);
+                var surface=level.clip(new ClipContext(at.add(0,3,0),at.add(0,-8,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,owner));
+                if(surface.getType()!=HitResult.Type.BLOCK||surface.getDirection()!=net.minecraft.core.Direction.UP)continue;
+                base=surface.getLocation();
+            }
+            double delay=noise(spike+12,frame.session())*.25;
             double end=frame.effectEndSeconds()-frame.effectStartSeconds();
             double rise=.2+.3*noise(spike+13,frame.session());
             if(contact!=null){
                 double due=Math.max(0,contact.at()-frame.effectStartSeconds());
                 rise=Math.min(rise,due);delay=Math.max(0,due-rise);
             }
-            double reverseAt=end-.2-.25+noise(spike+12,frame.session())*.25;
+            double reverseAt=contact!=null?end-.2:end-.45+noise(spike+12,frame.session())*.25;
             double growth=rise>1e-8?DevastatorEffectTimeline.spike(elapsed,delay,rise,reverseAt):
                     elapsed>=delay?1-DevastatorEffectTimeline.smooth((elapsed-reverseAt)/.2):0;
             if(growth<.005)continue;
             String size=new String[]{"small","mid","large"}[spike%3];
-            nativeSpike(stack,light,"groundspike_"+(spike<9?"cluster_":"")+size,base,(float)angle,growth,1,255);
+            // The targeted DevastatorGroundSpikeSingle* TOD entries all bind single drawables.
+            boolean cluster=spike<9 && contact==null;
+            nativeSpike(stack,light,AuthoredDevastatorMesh.skillModel(owner,"groundspike_"+(cluster?"cluster_":"")+size),base,(float)angle,growth,1,255);
         }
     }
     private static void dive(PoseStack stack,VertexConsumer ignored,LivingEntity owner,float partial,
@@ -375,7 +390,7 @@ public final class DevastatorEffectRenderer {
         packedSinceFlush+=count;
         if(packedSinceFlush>=16_384){com.codex.blacklight.client.ShaderPackCompat.buffers().endBatch();packedSinceFlush=0;}
     }
-    private static void nativeStrand(PoseStack stack,int light,String id,Vec3 root,Vec3 control,Vec3 tip,double width,int alpha,double twist){
+    static void nativeStrand(PoseStack stack,int light,String id,Vec3 root,Vec3 control,Vec3 tip,double width,int alpha,double twist){
         if(renderedVertices+AuthoredDevastatorMesh.vertices(id)>MAX_VERTICES_PER_FRAME)return;
         int count=AuthoredDevastatorMesh.strand(stack,com.codex.blacklight.client.ShaderPackCompat.buffers(),light,id,root,control,tip,width,alpha,twist);
         if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;flushPacked(count);}
@@ -389,7 +404,7 @@ public final class DevastatorEffectRenderer {
         return new Arrival(launch,Math.max(sourceSpeed,distance/available));
     }
     private static void nativeSpike(PoseStack stack,int light,String id,Vec3 base,float yaw,double growth,double size,int alpha){
-        if(base.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())>12*12)id+="_lod";
+        if(!id.startsWith("skill_") && base.distanceToSqr(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition())>12*12)id+="_lod";
         if(renderedVertices+AuthoredDevastatorMesh.vertices(id)>MAX_VERTICES_PER_FRAME)return;
         int count=AuthoredDevastatorMesh.spike(stack,com.codex.blacklight.client.ShaderPackCompat.buffers(),light,id,base,yaw,growth,size,alpha);
         if(count>0){renderedBranches++;renderedVertices+=count;renderedQuads+=count/4;flushPacked(count);}

@@ -23,6 +23,29 @@ public final class MovementState {
     private boolean jumpHeld;
     private boolean previousJumpHeld;
     private boolean dashRequested;
+    private boolean evadeRequested, evading;
+    private net.minecraft.world.phys.Vec3 wallRunOrigin;
+    private float evadeYaw;
+    public float evadeYaw() { return evadeYaw; }
+    public void requestEvade(float yaw) { dashRequested=true; evadeRequested=true; evadeYaw=yaw; }
+    public boolean evading() { return evading; }
+    public boolean takeAirDashRequest() {
+        if (!dashRequested) return false;
+        if (airDashes>0 && dashTicks>0 && dashTicks<=2) return false;
+        boolean evade=evadeRequested;
+        consumeDashRequest();
+        if (!canAirDash()) return false;
+        evading=evade;
+        return true;
+    }
+    public void observeWallRun(WallTraversal.Mode previous,WallTraversal.Frame frame,net.minecraft.world.phys.Vec3 feet) {
+        if (frame.mode()!=WallTraversal.Mode.RUN) { wallRunOrigin=null; return; }
+        if (previous!=WallTraversal.Mode.RUN || wallRunOrigin==null) wallRunOrigin=feet;
+        var travel=feet.subtract(wallRunOrigin);
+        double sideways=travel.x*wallTraversal.normalZ()-travel.z*wallTraversal.normalX();
+        double climb=Math.max(0,travel.y);
+        if (climb*climb+sideways*sideways>=1) airDashes=maxAirDashes;
+    }
     private boolean forwardHeld;
     private boolean sprinting;
     private net.minecraft.world.phys.Vec3 sprintDrive = net.minecraft.world.phys.Vec3.ZERO;
@@ -128,7 +151,7 @@ public final class MovementState {
     public boolean jumpPressed() { return jumpHeld && !previousJumpHeld; }
     public boolean jumpReleased() { return !jumpHeld && previousJumpHeld; }
     public void finishInputTick() { previousJumpHeld = jumpHeld; }
-    public boolean consumeDashRequest() { boolean value = dashRequested; dashRequested = false; return value; }
+    public boolean consumeDashRequest() { boolean value = dashRequested; dashRequested = false; evadeRequested=false; return value; }
     public boolean forwardHeld() { return forwardHeld; }
     public boolean sprinting() { return sprinting; }
     public boolean runningAnimation() { return runningAnimation; }
@@ -199,6 +222,7 @@ public final class MovementState {
     public double dashDirectionX() { return dashDirectionX; }
     public double dashDirectionZ() { return dashDirectionZ; }
     public void land() {
+        consumeDashRequest(); evading=false; wallRunOrigin=null;
         airDashes = maxAirDashes;
         dashTicks = 0;
         wallNormalX = 0.0D;
@@ -254,5 +278,5 @@ public final class MovementState {
     }
     public Mode mode() { return mode; }
     public void setMode(Mode mode) { if (dashTicks == 0 && chargeTicks == 0) this.mode = mode; }
-    public void reset() { hopTicks=hopCooldown=0; clearSprintDrive(); cameraYaw=Float.NaN; jumpInput.reset(); wallTraversal.reset();forwardInput=sidewaysInput=0;detachHeld=false; jumpHeld = false; previousJumpHeld = false; dashRequested = false; forwardHeld = false; sprinting = false; chargeTicks = 0; chargeOffGroundTicks = 0; dashTicks = 0; airDashes = maxAirDashes; dashDirectionX = 0.0D; dashDirectionZ = 0.0D; runningAnimation = false; sprintColliding = false; wallNormalX = 0.0D; wallNormalZ = 0.0D; airborne = false; peakFallSpeed = 0.0D; airborneApexY = Double.NaN; landingRecoveryTicks = 0; landingStrength = LandingImpact.Strength.NONE; wallStallTicks = 0; lastWallY = Double.NaN; wallJumpCooldownTicks = 0; wallChargeTicks = 0; wallVaultTicks = 0; mode = Mode.NORMAL; }
+    public void reset() { evadeRequested=evading=false; wallRunOrigin=null; hopTicks=hopCooldown=0; clearSprintDrive(); cameraYaw=Float.NaN; jumpInput.reset(); wallTraversal.reset();forwardInput=sidewaysInput=0;detachHeld=false; jumpHeld = false; previousJumpHeld = false; dashRequested = false; forwardHeld = false; sprinting = false; chargeTicks = 0; chargeOffGroundTicks = 0; dashTicks = 0; airDashes = maxAirDashes; dashDirectionX = 0.0D; dashDirectionZ = 0.0D; runningAnimation = false; sprintColliding = false; wallNormalX = 0.0D; wallNormalZ = 0.0D; airborne = false; peakFallSpeed = 0.0D; airborneApexY = Double.NaN; landingRecoveryTicks = 0; landingStrength = LandingImpact.Strength.NONE; wallStallTicks = 0; lastWallY = Double.NaN; wallJumpCooldownTicks = 0; wallChargeTicks = 0; wallVaultTicks = 0; mode = Mode.NORMAL; }
 }

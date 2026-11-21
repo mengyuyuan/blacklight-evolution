@@ -29,7 +29,7 @@ public record ConsumeVisual(int consumerId, long started, int duration, int form
     public ConsumeVisual(int consumerId,long started,int duration,int form,int stage,float facing){this(consumerId,started,duration,form,stage,facing,net.minecraft.world.phys.Vec3.ZERO);}
     public ConsumeVisual(int consumerId,long started,int duration,int form,int stage){this(consumerId,started,duration,form,stage,0);}
     public static final int NONE=0, CAPTURE=1, HOLD=2, CONSUME=3, THROW=4, FLIGHT=5, WHIP_PULL=6,
-            MOUNT=7,MOUNT_HOLD=8,MOUNT_CONSUME=9,HUNTER_CONSUME=10,GRAB_ATTACK=11,AIR_THROW=12,AIR_HOLD=13;
+            MOUNT=7,MOUNT_HOLD=8,MOUNT_CONSUME=9,HUNTER_CONSUME=10,GRAB_ATTACK=11,AIR_THROW=12,AIR_HOLD=13,MOBILE_CONSUME=14;
     public static boolean acquiring(int stage){return stage==CAPTURE||stage==WHIP_PULL||stage==MOUNT;}
     public static boolean carrying(int stage){return stage==HOLD||stage==AIR_HOLD;}
     public static boolean holding(int stage){return carrying(stage)||stage==MOUNT_HOLD;}
@@ -42,7 +42,9 @@ public record ConsumeVisual(int consumerId, long started, int duration, int form
         public void encode(FriendlyByteBuf b,ConsumeVisual v){b.writeVarInt(v.consumerId);b.writeVarLong(v.started);b.writeVarInt(v.duration);b.writeVarInt(v.form);b.writeVarInt(v.stage);b.writeFloat(v.facing);b.writeDouble(v.origin.x);b.writeDouble(v.origin.y);b.writeDouble(v.origin.z);b.writeVarInt(v.variant);b.writeVarInt(v.landingDelay);}
     };
     public boolean active() { return consumerId >= 0; }
-    public static boolean consumeStage(int stage){return stage==CONSUME||stage==MOUNT_CONSUME||stage==HUNTER_CONSUME;}
+    public static boolean consumeStage(int stage){return stage==CONSUME||stage==MOBILE_CONSUME||stage==MOUNT_CONSUME||stage==HUNTER_CONSUME;}
+    public boolean drivesActor(int actorId){return consumerId==actorId && stage!=MOBILE_CONSUME && stage!=FLIGHT;}
+    public ConsumeVisual mobileTail(){return new ConsumeVisual(consumerId,started,duration,form,MOBILE_CONSUME,facing,origin,variant,landingDelay);}
     public boolean consuming() { return active() && consumeStage(stage); }
     public float phaseProgress(long now,float partial) { return com.codex.blacklight.util.MathCompat.clamp(elapsed(now,partial)/Math.max(1,duration),0,1); }
     public float progress(long now,float partial) { return consuming()?phaseProgress(now,partial):0; }

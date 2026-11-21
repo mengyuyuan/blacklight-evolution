@@ -32,6 +32,9 @@ public final class WeaponCombatSystem {
     private record PendingCut(LivingEntity victim,boolean lethal,Vec3 previousPosition,int expires,Set<String> edges,Map<String,WeaponCutContact.Contact> blades){}
     private static final class Session {
         final UUID attackId=UUID.randomUUID();
+        double clawSlideSpeed;
+        float groundTravelCharge;
+        boolean sprintBlade;
         long cutStroke=++nextCutStroke;
         int cutWindow=-1;
         final WeaponMove move;int started;final int created;float yaw,previousYaw;Vec3 direction;float clipOffset;double pursuitTravel;
@@ -66,9 +69,11 @@ public final class WeaponCombatSystem {
     public static int sessionAge(ServerPlayer p){var s=ACTIVE.get(p);return s==null?-1:p.tickCount-s.created;}
     /** Authored contacts are over: movement, dodge and jump may take the actor back. */
     public static boolean cancelableRecovery(ServerPlayer p){
-        var s=ACTIVE.get(p);if(s==null||s.charging||s.traveling||s.queued!=null||s.move.landingAttack())return false;
-        if(s.move.aerial()&&!s.move.airCombo())return false;
-        return p.tickCount-s.started>=s.move.end;
+        var s=ACTIVE.get(p);if(s==null||s.charging||s.traveling||s.hitstop>0||s.early!=null||s.queued!=null||s.move.landingAttack())return false;
+        if(!s.move.supportsEvadeRecovery())return false;
+        if(s.move==WeaponMove.CLAW_POUNCE && !s.pounceCommitted)return false;
+        if(CombatMotion.freeFlight(s.move) && s.focus()==null && !s.mobilityFinished)return false;
+        return p.tickCount-s.started>=s.move.evadeRecoveryTick();
     }
     /** A form swap cancels only a weapon-owned action, never a grab or devastator. */
     public static boolean canSwitchForm(ServerPlayer p){
@@ -197,12 +202,22 @@ public final class WeaponCombatSystem {
             var delta=CombatTargeting.aimPoint(p,p.position(),target).subtract(p.position());
             heading=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));
         }
+        double clawSlideSpeed=0;
+        if (charging && move==WeaponMove.CLAW_SPRINT && p.onGround()) {
+            var movement=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE);
+            var forward=Vec3.directionFromRotation(0,heading);
+            double entry=Math.max(p.getDeltaMovement().dot(forward),movement.sprintDrive(p.tickCount).dot(forward));
+            // P1 GroundSlide maximum 20 source units/s, using the existing .87 retarget scale.
+            clawSlideSpeed=Math.min(.87,Math.max(0,entry));
+        }
         if(p.onGround()&&(LocalWeaponMotion.find(move.id).isPresent()||WeaponMotionProfile.forMove(move)!=null)){
             // An attack begins from its own step curve, without inherited sprint inertia.
             p.setDeltaMovement(0,p.getDeltaMovement().y,0);p.xxa=0;p.zza=0;p.hurtMarked=true;
         }
         Session s=new Session(p,move,clipOffset,heading);s.charging=charging;s.input=input;s.releaseDirection=CombatMotion.flightDirection(s.yaw,p.getXRot());ACTIVE.put(p,s);CHAINS.remove(p);com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).cancelLandingRecovery();
         if(CombatMotion.stationaryWhip(move)&&!p.onGround()){p.setDeltaMovement(Vec3.ZERO);p.hurtMarked=true;}
+        s.clawSlideSpeed=clawSlideSpeed;
+        s.sprintBlade=move==WeaponMove.BLADE_RUSH && p.isSprinting();
         s.target=target;s.mechanicalTarget=mechanical;
         s.locked=s.mechanicalTarget!=null||target!=null&&CombatTargeting.locked(p)==target;rememberTargets(p,s);
         s.lastTargetPosition=target==null?null:target.position();
@@ -236,7 +251,15 @@ public final class WeaponCombatSystem {
         java.util.function.Predicate<LivingEntity> eligible=v->CombatTargeting.selectable(p,v)
                 &&CombatTargeting.inReach(p,v,range)&&CombatTargeting.visible(p,v);
         var locked=CombatTargeting.locked(p);
-        if(locked!=null)return eligible.test(locked)?locked:null;
+        if(locked!=null) {
+            // An explicitly aimed dash can select the body it is about to reach. Contacts still use local hitboxes.
+            if(move==WeaponMove.MUSCLE_RUSH || move==WeaponMove.BLADE_RUSH) {
+                double advance=move==WeaponMove.MUSCLE_RUSH?12*.87:(p.isSprinting()?17.5:10)*.87;
+                if(CombatTargeting.selectable(p,locked) && CombatTargeting.inReach(p,locked,AttackReach.reach(p,move)+advance)
+                        && CombatTargeting.visible(p,locked)) return locked;
+            }
+            return eligible.test(locked)?locked:null;
+        }
         var active=ACTIVE.get(p);
         // Releasing a held press retains its victim. New presses / combo steps
         // use the user's nearest-in-front policy, not an invented native score.
@@ -321,6 +344,11 @@ public final class WeaponCombatSystem {
             com.codex.blacklight.animation.NativeRootMotion.hammerComboStep(p,visual,s.yaw);
         }
         if(s.charging){
+            if (!p.onGround()) s.clawSlideSpeed=0;
+            if (s.clawSlideSpeed>0) {
+                com.codex.blacklight.animation.NativeRootMotion.groundAdvance(p,s.direction,s.clawSlideSpeed,s.target);
+                s.clawSlideSpeed=Math.max(0,s.clawSlideSpeed-60*.87/400);
+            }
             if(s.move.aerial()&&!s.move.landingAttack()&&p.onGround()){cancel(p);return;}
             if(s.move.aerial()&&!CombatMotion.stationaryWhip(s.move)&&!p.onGround()){
                 var velocity=p.getDeltaMovement();
@@ -352,8 +380,11 @@ public final class WeaponCombatSystem {
                 var released=ACTIVE.get(p);released.fullyCharged=full;released.jumpQueued=s.jumpQueued;released.queued=s.queued;released.queuedHeld=s.queuedHeld;released.queuedTarget=s.queuedTarget;released.early=s.early;released.earlyHeld=s.earlyHeld;
                 // Some source moves strengthen the same release clip instead of
                 // selecting a second animation. Preserve their actual held charge.
+                float heldFraction=(float)com.codex.blacklight.util.MathCompat.clamp((t-minimum)/(double)charge.holdTicks(),0,1);
                 if(move==WeaponMove.AIR_KICK||move==WeaponMove.AIR_PAIN||move==WeaponMove.CLAW_POUNCE||move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP||move==WeaponMove.HAMMER_RAM||move==WeaponMove.BLADE_RUSH)
-                    released.chargePower=(float)com.codex.blacklight.util.MathCompat.clamp((t-minimum)/(double)charge.holdTicks(),0,1);
+                    released.chargePower=heldFraction;
+                released.groundTravelCharge=heldFraction;
+                released.sprintBlade=s.sprintBlade && move==WeaponMove.BLADE_RUSH;
             }
             return;
         }
@@ -365,7 +396,8 @@ public final class WeaponCombatSystem {
             double release=definition.charge().orElseThrow().releaseTime();
             double from=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t-1,s.clipOffset,definition.transitionSeconds())-release;
             double to=com.codex.blacklight.animation.NativeRootMotion.weaponClock(t,s.clipOffset,definition.transitionSeconds())-release;
-            com.codex.blacklight.animation.NativeRootMotion.bladeRush(p,s.direction,CombatMotion.bladeRushStep(s.chargePower,from,to),s.target);
+            double advance=s.sprintBlade?CombatMotion.sprintBladeStep(s.chargePower,from,to):CombatMotion.bladeRushStep(s.chargePower,from,to);
+            com.codex.blacklight.animation.NativeRootMotion.bladeRush(p,s.direction,advance,s.target);
         }
         if(s.move==WeaponMove.CLAW_POUNCE){
             tickPounce(p,s,t);t=p.tickCount-s.started;
@@ -447,7 +479,7 @@ public final class WeaponCombatSystem {
         }else if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
             s.groundEffect=true;CombatImpactEffects.ground(p,s.move,s.direction);
         }
-        com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw);
+        com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw, s.groundTravelCharge);
         if(physicalQuake&&!s.groundEffect&&t<s.move.end){
             var ground=HammerQuakeContact.sweep(p,s.move,t,s.clipOffset,safeFeet(p,s),s.previousYaw,s.yaw);
             if(ground!=null){
@@ -504,7 +536,7 @@ public final class WeaponCombatSystem {
         // Keep all authored contacts, then let movement leave the recovery.
         // Buffered combos have priority; committed aerial/landing travel keeps its owner.
         var travelInput=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.MOVEMENT_STATE).wallInput();
-        if(s.queued==null&&(!s.move.aerial()||s.move.airCombo())&&t>=s.move.end
+        if(s.queued==null&&(!s.move.aerial()||s.move.airCombo())&&t>=s.move.end && !finishingDashStep(s,t)
                 &&(travelInput.forward()!=0||travelInput.sideways()!=0)){
             cancel(p);return;
         }
@@ -523,6 +555,13 @@ public final class WeaponCombatSystem {
             if(s.move.basicCombo())CHAINS.put(p,new Chain(p.tickCount,s.move,s.form,s.target));
             finish(p);
         }
+    }
+    private static boolean finishingDashStep(Session s,int tick){
+        if(!s.sprintBlade && s.move!=WeaponMove.MUSCLE_RUSH)return false;
+        var definition=LocalWeaponMotion.find(s.move.id).orElseThrow();
+        float release=definition.charge().orElseThrow().releaseTime();
+        float time=com.codex.blacklight.animation.NativeRootMotion.weaponClock(tick,s.clipOffset,definition.transitionSeconds())-release;
+        return time < (s.sprintBlade ? 29F/30 : CombatMotion.GroundStep.MUSCLE_RUSH.end);
     }
     private static void rememberTargets(ServerPlayer p,Session s){
         s.previousTargets.clear();

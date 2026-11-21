@@ -80,6 +80,11 @@ public final class ModAttachments {
             "glide_until", () -> AttachmentType.builder(() -> -1L)
                     .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
 
+    /** Start of the actor's mobile absorption tail; the receiver keeps its own existing scene clock. */
+    public static final Supplier<AttachmentType<Long>> MOBILE_CONSUME_START = ATTACHMENTS.register(
+            "mobile_consume_start", () -> AttachmentType.builder(() -> -1L)
+                    .sync(com.codex.blacklight.forge.codec.ByteBufCodecs.VAR_LONG).build());
+
     /** Server game time of infection onset; -1 denotes a pre-existing infection. */
     public static final Supplier<AttachmentType<Long>> INFECTION_START = ATTACHMENTS.register(
             "infection_start", () -> AttachmentType.builder(() -> -1L)

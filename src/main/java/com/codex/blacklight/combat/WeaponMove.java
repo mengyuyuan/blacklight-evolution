@@ -111,6 +111,12 @@ public enum WeaponMove {
     public boolean shared(){return form==PowerForm.NONE;}
     public boolean accepts(PowerForm active){return form==active||shared()&&supports(active)||active==PowerForm.NONE&&form==PowerForm.MUSCLE_MASS;}
     public boolean aerial(){return name().startsWith("AIR_")||name().startsWith("DEV_AIR_")||this==BULLETDIVE_DROP||this==CLAW_POUNCE||this==BLADE_DIVE||this==HAMMER_DROP||uncharged()==WHIP_AIR||this==MUSCLE_AIR||this==HAMMER_RAM||uncharged()==HAMMER_COMBO_SPECIAL;}
+    /** A physical claw or whip edge can still make contact during its three exit ticks. */
+    public int evadeRecoveryTick(){return this==CLAW_POUNCE || CombatMotion.stationaryWhip(this)?Math.min(duration,end+3):end;}
+    public boolean supportsEvadeRecovery(){
+        return !landingAttack() && (!aerial() || airCombo() || this==CLAW_POUNCE
+                || CombatMotion.stationaryWhip(this) || CombatMotion.freeFlight(this));
+    }
     public boolean airCombo(){return this==AIR_AUTO1||this==AIR_AUTO2||this==AIR_AUTO3||this==AIR_AUTO4;}
     public boolean hammerComboSlam(){return this==HAMMER_COMBO_SPECIAL||this==HAMMER_COMBO_SPECIAL_CHARGED;}
     public boolean landingAttack(){return this==BLADE_DIVE||this==HAMMER_DROP||this==HAMMER_RAM||this==AIR_GROUND_POUND||uncharged()==HAMMER_COMBO_SPECIAL;}

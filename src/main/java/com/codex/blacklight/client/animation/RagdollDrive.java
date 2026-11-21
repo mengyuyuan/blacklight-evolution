@@ -71,6 +71,7 @@ public final class RagdollDrive {
     public static boolean attached(LivingEntity e) {
         if(!captured(e))return false;
         var v=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
+        if(v.stage()==com.codex.blacklight.combat.ConsumeVisual.MOBILE_CONSUME)return false;
         if(!v.consuming())return true;
         return v.motionProgress(e.level().getGameTime(),1)<ConsumePlacementTrack.gripEnd(PowerForm.values()[v.form()]);
     }

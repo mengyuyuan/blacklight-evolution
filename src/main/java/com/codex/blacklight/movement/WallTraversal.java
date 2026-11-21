@@ -27,6 +27,9 @@ public final class WallTraversal {
     private boolean finishedOnTop;
     /** Back + jump on a wall turns away and springs off. Unlimited: wall running already climbs freely. */
     public static final double KICK_OUT=.62,KICK_UP=.95;
+    static final int VAULT_OUT_TICKS = 3;
+    static final double VAULT_OUT = .36, VAULT_UP = .72;
+    boolean needsVaultProbe() { return stallTicks >= 2; }
     private boolean kickedOff;
     public boolean kickedOff(){return kickedOff;}
     public int chargeTicks(){return chargeTicks;}
@@ -73,7 +76,7 @@ public final class WallTraversal {
         boolean reachableTop = Double.isFinite(surface.ledgeY());
         boolean lowObstacle = !wasAttached && surface.grounded() && input.sprint() && !input.jump()
                 && reachableTop && surface.ledgeY() > y + 1.0 && surface.ledgeY() <= y + 2.05;
-        boolean wallTop = wasAttached && !surface.torso() && reachableTop
+        boolean wallTop = wasAttached && !surface.torso() && surface.lower() && reachableTop
                 && surface.ledgeY() >= y - 1.5 && surface.ledgeY() <= y + .85
                 && (input.forward() > 0 || mode == Mode.LEAP);
         if (lowObstacle || wallTop) {
@@ -106,9 +109,9 @@ public final class WallTraversal {
         double lateral = input.sideways()*speed/length;
         boolean stuck = vertical > .05 && surface.blockedAbove() && Double.isFinite(lastY) && y-lastY < .02;
         stallTicks = stuck ? stallTicks+1 : 0; lastY = y;
-        if (stallTicks >= 3) {
+        if (stallTicks >= 3 && reachableTop) {
             mode = Mode.VAULT; arcTicks = 0; stallTicks = 0;
-            mantleTop = Double.NaN;
+            mantleTop = surface.ledgeY();
             carrySpeed = input.sprint() ? com.codex.blacklight.util.MathCompat.clamp(runSpeed * .75, .40, .90) : .24;
             return finishMantle(input, surface, y);
         }
@@ -128,17 +131,18 @@ public final class WallTraversal {
             clearSurface(); detachTicks = 4;
             return idle();
         }
-        if (mode == Mode.VAULT && arcTicks <= 3) return frame(-.32, .72, 0);
-        if (!Double.isFinite(mantleTop) && Double.isFinite(surface.ledgeY())) mantleTop = surface.ledgeY();
-        double rise = Double.isFinite(mantleTop) ? mantleTop + .06 - y : 0;
-        boolean feetBelowLip = Double.isFinite(mantleTop) && y < mantleTop + .02;
+        if (mode == Mode.VAULT && arcTicks <= VAULT_OUT_TICKS) return frame(-VAULT_OUT, VAULT_UP, 0);
+        double rise = mantleTop + .06 - y;
+        boolean feetBelowLip = y < mantleTop - 1.0e-5;
         if (feetBelowLip && surface.blockedAbove()) {
             clearSurface(); detachTicks = 4;
             return idle();
         }
-        double vertical = feetBelowLip ? com.codex.blacklight.util.MathCompat.clamp(rise * .7, .08, .55) : -.10;
-        double inward = input.forward() > 0 ? carrySpeed : 0;
-        // Normal movement collision clips inward travel until the feet clear the lip.
+        // Minecraft resolves Y before horizontal movement. Dropping below the edge
+        // here makes the following inward step collide with the same face again.
+        double vertical = feetBelowLip ? com.codex.blacklight.util.MathCompat.clamp(rise * .7, .08, .55)
+                : surface.centerSupported() ? -.10 : Math.max(-.10, Math.min(0, mantleTop - y));
+        double inward = input.forward() > 0 && !(mode == Mode.VAULT && feetBelowLip) ? carrySpeed : 0;
         return frame(inward, vertical, 0);
     }
 

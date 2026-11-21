@@ -82,6 +82,70 @@ public final class CombatMotion {
     }
     public static double tossGravity(){return value(fields(WeaponMove.HAMMER_RAM,"jump"),"Gravity",45)*.87/400;}
     public static boolean directionalDive(WeaponMove move){return move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP;}
+    /** Forward displacement within a release. Bounds are FIG frames at 30 Hz. */
+    public enum GroundStep {
+        CLAW_AUTO1(0, 4, 0.75, 1.5),
+        CLAW_AUTO2(0, 5, 0.6, 1.35),
+        CLAW_AUTO3(0, 4, 0.6, 1.8),
+        CLAW_SPRINT(0, 4, 1, 5),
+        MUSCLE_JAB(2, 5, 1, 3),
+        MUSCLE_CROSS(0, 5, 1.5, 3),
+        MUSCLE_COMBO_C(2, 7, 1, 4),
+        MUSCLE_SUPERMAN(0, 10, 3, 6),
+        COMBO_KICK1(0, 4, 1.5, 3),
+        COMBO_KICK2(0, 5, 1.5, 3),
+        COMBO_KNEE(2, 10, 2, 5),
+        COMBO_SPIN(0, 3, 1.5, 3),
+        COMBO_AXE(0, 3, 0.5, 1),
+        COMBO_SPIN_LEFT(0, 3, 1, 2.5),
+        COMBO_AXE_HANDLE(0, 9, 1, 2),
+        COMBO_BACKHAND(0, 10, 1, 3),
+        COMBO_MACH(3, 10, 2, 5),
+        MUSCLE_RUSH(0, 10, 5, 12),
+        BLADE_CUT(0, 4, 1.5, 4),
+        BLADE_RETURN(3, 7, 1, 2.5),
+        BLADE_COMBO_C(0, 3, 1, 3),
+        BLADE_COMBO_C2(0, 3, 1, 3),
+        BLADE_COMBO_D(2, 5, 1.5, 2.5),
+        HAMMER_JAB(5, 8, 1, 2),
+        HAMMER_HOOK(7, 15, 1, 2),
+        HAMMER_COMBO_C(5, 10, 1.5, 3),
+        HAMMER_COMBO_D(1, 10, 1.25, 2.5);
+
+        public final float begin, end;
+        private final double minimum, maximum;
+        GroundStep(int startFrame,int endFrame,double minimum,double maximum) {
+            this.begin=startFrame/30F;this.end=endFrame/30F;
+            this.minimum=minimum;this.maximum=maximum;
+        }
+        private static final Map<WeaponMove,GroundStep> MOVES=new EnumMap<>(WeaponMove.class);
+        static {
+            for (var step:values()) MOVES.put(WeaponMove.valueOf(step.name()),step);
+        }
+        public static GroundStep forMove(WeaponMove move){return MOVES.get(move.uncharged());}
+        public double advance(float charge,float seconds){return (minimum+(maximum-minimum)*charge)*.87*seconds/(end-begin);}
+    }
+
+    /** Original claw profile API for callers that only need its release duration. */
+    public record ClawStep(float seconds,double minimum,double maximum) {
+        double distance(float charge){return (minimum+(maximum-minimum)*charge)*.87;}
+        public double advance(float charge,float elapsed){return distance(charge)*elapsed/seconds;}
+    }
+    public static ClawStep clawStep(WeaponMove move){
+        if(move.form!=com.codex.blacklight.power.PowerForm.CLAWS)return null;
+        var step=GroundStep.forMove(move);
+        return step==null?null:new ClawStep(step.end-step.begin,step.minimum,step.maximum);
+    }
+
+    /** The sprint blade owner has a separate, non-overlapping deceleration track. */
+    public static double sprintBladeStep(float charge,double from,double to) {
+        if(to<=from)return 0;
+        double overlap=Math.max(0,Math.min(to,14.0/30)-Math.max(from,5.0/30));
+        double drive=(7+3*charge)*.87*overlap/(9.0/30);
+        double a=net.minecraft.util.Mth.clamp(from-14.0/30,0,.5);
+        double b=net.minecraft.util.Mth.clamp(to-14.0/30,0,.5);
+        return drive+.87*30*(b-a)*(1-a-b);
+    }
     public static double bladeRushStep(float charge,double fromRelease,double toRelease){
         var f=fields(WeaponMove.BLADE_RUSH,"displacement");
         // Callback times belong to the release, while the installed pose includes

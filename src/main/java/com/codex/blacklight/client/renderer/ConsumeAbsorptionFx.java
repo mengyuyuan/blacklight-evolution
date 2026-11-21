@@ -23,6 +23,11 @@ public final class ConsumeAbsorptionFx {
     public static Vec3 destination(LivingEntity victim,float partial,Vec3 placement) {
         var data=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
         var owner=victim.level().getEntity(data.consumerId());if(owner==null)return Vec3.ZERO;
+        if(data.stage()==ConsumeVisual.MOBILE_CONSUME && owner instanceof LivingEntity actor){
+            var chest=ConsumeTrauma.chest(actor,partial);
+            if(chest==null)chest=actor.getPosition(partial).add(0,actor.getBbHeight()*.63,0);
+            return chest.subtract(victim.getPosition(partial).add(placement));
+        }
         if(owner instanceof LivingEntity actor && ConsumeVisual.groundGate(data.form(),data.variant())>=0){
             Vec3 fitted=ConsumeTrauma.chest(actor,partial);
             if(fitted!=null)return fitted.subtract(victim.getPosition(partial).add(placement));
