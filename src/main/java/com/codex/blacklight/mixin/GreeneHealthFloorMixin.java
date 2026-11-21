@@ -15,8 +15,6 @@ public abstract class GreeneHealthFloorMixin {
         nextHealth = com.codex.blacklight.combat.ConsumeContactDamage.healthFloor((LivingEntity)(Object)this, nextHealth);
         if((Object)this instanceof EncounterMob owner&&owner.greeneOwnDamageActive()&&owner.isAlive()&&Float.isFinite(nextHealth))
             return Math.max(nextHealth,owner.greeneMinimumHealth());
-        if((Object)this instanceof EncounterMob boss&&boss.goliathHealthGuard()&&boss.isAlive()&&Float.isFinite(nextHealth))
-            return Math.max(nextHealth,boss.goliathHealthFloor());
         return nextHealth;
     }
 }
