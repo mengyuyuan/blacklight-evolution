@@ -56,6 +56,12 @@ public final class EvolvedVariantsGameTest {
     @GameTest(template="wall_test",timeoutTicks=180,batch="variant_quill")
     public static void rangedAiFiresRealCollidingProjectiles(GameTestHelper h){
         var body=host(h,EvolvedArchetype.SENSORY);
+        // Keep the actual projectile lane above the shared melee and ecology arenas.
+        var lane=h.absolutePos(new BlockPos(5,80,5));
+        for(var pos:BlockPos.betweenClosed(lane.offset(-3,-1,-3),lane.offset(3,-1,15)))
+            h.getLevel().setBlock(pos,Blocks.STONE.defaultBlockState(),2);
+        body.setPos(lane.getX()+.5,lane.getY(),lane.getZ()+.5);
+        body.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         var target=enemy(h,body,12);
         // Exercise the attack AI against this target even when another suite has living mobs nearby.
         body.targetSelector.removeAllGoals(goal->true);

@@ -82,7 +82,10 @@ public final class WeaponCombatGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void comboHistoryExpiresAndCannotSurviveCancellationOrFormChange(GameTestHelper h){
+    public static void comboHistoryExpiresAndCannotSurviveCancellationOrFormChange(GameTestHelper h) throws Exception {
+        withoutActorHitstop(()->checkComboReset(h));
+    }
+    private static void checkComboReset(GameTestHelper h){
         MovingCombatGameTest.supportFloor(h,1);
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"combo-reset"));
         p.setPos(h.absoluteVec(new Vec3(4,2,3)));p.setYRot(0);p.setOnGround(true);p.tickCount=100;
