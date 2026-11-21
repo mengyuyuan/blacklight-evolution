@@ -20,6 +20,9 @@ public final class GreeneBattleCycle {
     public static final int EMERGE_GATE_TICKS=6,EMERGE_CLIP_TICKS=163,EMERGE_ATTACK_TICKS=80,EMERGE_TARGET_TICKS=27;
     public static final double SOURCE_DEPTH=20,SOURCE_TOLERANCE=.75;
     private final EncounterMob owner;
+    public static final int MOLTING=8;
+    final GreeneMolt molt=new GreeneMolt();
+    public int missingMoltActors(){return owner.level().isClientSide?client().getInt("MoltAbsent"):molt.absent();}
     private final GreeneBrood brood=new GreeneBrood();
     private final GreeneEmergenceHit emergence;
     private int stage,age,exposureAge,selectedHold=GreeneMotion.DEFAULT_HOLD_TICKS,recoveryRemaining,previousDown;
@@ -80,10 +83,10 @@ public final class GreeneBattleCycle {
     public boolean openingPending(){return owner.level().isClientSide?client().getBoolean("OpeningPending"):openingPending;}
     public float minimumHealth(){return minimumHealth;}
     public boolean coreDamageable(){return owner.level().isClientSide?client().getBoolean("CoreDamageable"):coreDamageable;}
-    public boolean controlsRoot(){int s=stage();return s>=SUBMERGING&&s<=EMERGING;}
+    public boolean controlsRoot(){int s=stage();return s>=SUBMERGING&&s<=MOLTING;}
     public boolean targetable(){if(openingPending())return false;return switch(stage()){
         case SUBMERGING -> age(0)<16;
-        case UNDERGROUND,EMERGE_WAIT -> false;
+        case UNDERGROUND,EMERGE_WAIT,MOLTING -> false;
         case EMERGING -> age(0)>=EMERGE_TARGET_TICKS;
         default -> true;
     };}
@@ -139,9 +142,20 @@ public final class GreeneBattleCycle {
     private void rise(){previousDown=age;enter(RISING);}
     private void beginSubmerge(){
         coreDamageable=false;stunPending=false;recoveryPending=false;floorPending=false;
+        if(owner.greeneOutbreak()){
+            if(armourWave==1){
+                owner.cancelAttack();collapseYaw=owner.yBodyRot;takeRoot();enter(MOLTING);molt.tick(owner,0);
+            }else finishAirborneWave();
+            return;
+        }
         undergroundRemaining=UNDERGROUND_TICKS;surfaceY=owner.getY();goalY=surfaceY-SOURCE_DEPTH*scale();
         takeRoot();enter(SUBMERGING);brood.onSubmerge(owner,waveCount);
         if(!live())dispose();
+    }
+    private void finishAirborneWave(){
+        armourWave=waveCount;owner.greeneRestoreAppendages(armourWave);
+        minimumHealth=GreeneBattleHealth.releaseFloorOnEmergence(owner.getHealth(),owner.getMaxHealth())?0:owner.getHealth();
+        releaseRoot();enter(GUARDED);
     }
     private void takeRoot(){
         if(!rootControlled){savedNoGravity=owner.isNoGravity();savedNoPhysics=owner.noPhysics;rootControlled=true;}
@@ -217,6 +231,11 @@ public final class GreeneBattleCycle {
         age++;if(exposed()){exposureAge++;if(recoveryRemaining>0)recoveryRemaining--;}
         processFloor();processStun();if(!live()){dispose();return;}
         if(controlsRoot())takeRoot();
+        if(stage==MOLTING){
+            if(molt.tick(owner,age))publish();
+            if(age>=GreeneMolt.DURATION){molt.clear(owner);finishAirborneWave();}
+            return;
+        }
         brood.tick(owner);if(!live()){dispose();return;}tickHydras();if(!live()){dispose();return;}
         switch(stage){
             case COLLAPSING -> {if(age>=COLLAPSE_TICKS)enterDown();}
@@ -257,12 +276,12 @@ public final class GreeneBattleCycle {
     }
     public void dispose(){
         if(owner.level().isClientSide||disposed)return;
-        disposed=true;emergence.clear();brood.dispose(owner);releaseRoot();publish();
+        disposed=true;molt.clear(owner);emergence.clear();brood.dispose(owner);releaseRoot();publish();
     }
     private void publish(){
         if(owner.level().isClientSide)return;
         long now=owner.level().getGameTime();var data=new CompoundTag();
-        data.putFloat("CollapseYaw",collapseYaw);data.putInt("Stage",stage);data.putInt("Age",age);data.putLong("Started",now-age);
+        data.putInt("MoltAbsent",molt.absent());data.putFloat("CollapseYaw",collapseYaw);data.putInt("Stage",stage);data.putInt("Age",age);data.putLong("Started",now-age);
         data.putInt("ExposureAge",exposureAge);data.putLong("CollapseStarted",now-exposureAge);data.putInt("ExposureTotal",exposureDuration());
         data.putInt("PreviousDown",previousDown);data.putInt("ArmourWave",armourWave);data.putBoolean("CoreDamageable",coreDamageable);
         data.putFloat("HandoffAge",handoffAge);data.putLong("HandoffAt",handoffAt);data.putBoolean("Frozen",disposed);
@@ -271,7 +290,7 @@ public final class GreeneBattleCycle {
     }
     public CompoundTag save(){
         refreshHealthScale();
-        var t=new CompoundTag();t.putFloat("CollapseYaw",collapseYaw);t.putInt("Version",4);t.putBoolean("OpeningPending",openingPending);t.putFloat("HealthBasis",healthBasis);t.putInt("Stage",stage);t.putInt("Age",age);t.putInt("ExposureAge",exposureAge);
+        var t=new CompoundTag();if(stage==MOLTING)t.put("Molt",molt.save());t.putFloat("CollapseYaw",collapseYaw);t.putInt("Version",4);t.putBoolean("OpeningPending",openingPending);t.putFloat("HealthBasis",healthBasis);t.putInt("Stage",stage);t.putInt("Age",age);t.putInt("ExposureAge",exposureAge);
         t.putInt("Hold",selectedHold);t.putInt("RecoveryRemaining",recoveryRemaining);t.putInt("PreviousDown",previousDown);t.putInt("UndergroundRemaining",undergroundRemaining);
         t.putInt("WaveCount",waveCount);t.putInt("ArmourWave",armourWave);t.putFloat("MinimumHealth",minimumHealth);t.putFloat("InitialStunnedHealth",initialStunnedHealth);
         t.putBoolean("CoreDamageable",coreDamageable);t.putBoolean("StunPending",stunPending);t.putBoolean("RecoveryPending",recoveryPending);
@@ -286,7 +305,7 @@ public final class GreeneBattleCycle {
         beforeLoad();
         initialized=true;disposed=false;lastTick=owner.level().getGameTime();handoffAge=-1;handoffAt=Long.MIN_VALUE;
         collapseYaw=t.contains("CollapseYaw",99)&&Float.isFinite(t.getFloat("CollapseYaw"))?t.getFloat("CollapseYaw"):owner.getYRot();
-        stage=Math.max(0,Math.min(7,t.getInt("Stage")));age=bounded(t,"Age",100000);exposureAge=bounded(t,"ExposureAge",100000);
+        molt.load(t.getCompound("Molt"));stage=Math.max(0,Math.min(MOLTING,t.getInt("Stage")));age=bounded(t,"Age",100000);exposureAge=bounded(t,"ExposureAge",100000);
         // Missing markers are already-existing encounters, never a fresh spawn.
         openingPending=t.getInt("Version")>=4&&t.getBoolean("OpeningPending")&&stage==GUARDED;
         selectedHold=GreeneMotion.hold(t.getInt("Hold"));recoveryRemaining=bounded(t,"RecoveryRemaining",COLLAPSE_TICKS+2400);

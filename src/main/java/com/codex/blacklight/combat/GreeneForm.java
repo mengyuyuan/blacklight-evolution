@@ -11,16 +11,17 @@ import org.joml.Vector3f;
 
 /** Both peers select the shell from the persisted armour wave and follow the same combat torso. */
 public enum GreeneForm {
-    SPIDER("spider", .82F), GODDESS("goddess", .54F);
+    SPIDER("spider"), GODDESS("goddess");
+    public static final float OUTBREAK_SCALE=2F;
 
+    public static final float GODDESS_RIG_SCALE=1.02663666F;
+    private static final float SPIDER_SCALE=1.9824204F;
     private record Patch(Vec3 center, Vec3 half) {}
     private final List<Patch> patches;
-    private final float scale;
     private static final int TORSO = Arrays.asList(GreeneMotion.table().bones).indexOf("torso");
     private static final Matrix4f REST_INVERSE = GreeneMotion.table().transforms(GreeneMotion.sample("idle",0,true))[TORSO].invert();
 
-    GreeneForm(String key, float scale) {
-        this.scale = scale;
+    GreeneForm(String key) {
         try (var stream = GreeneForm.class.getResourceAsStream("/assets/blacklight/models/greene_form_contacts.json");
              var reader = new InputStreamReader(Objects.requireNonNull(stream), StandardCharsets.UTF_8)) {
             var result = new ArrayList<Patch>();
@@ -38,7 +39,7 @@ public enum GreeneForm {
     }
 
     public Matrix4f transform(Matrix4f[] combatPose, float yaw) {
-        return new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).mul(combatPose[TORSO]).mul(REST_INVERSE).scale(scale);
+        return new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).mul(combatPose[TORSO]).mul(REST_INVERSE).scale(this==SPIDER?SPIDER_SCALE:OUTBREAK_SCALE);
     }
 
     /** The carapace and its legs, or the forearms and basal spiral, carry the three armour pools. */
@@ -57,6 +58,7 @@ public enum GreeneForm {
 
     void addSurfaces(List<GreeneContact.Surface> out, Matrix4f[] pose, float yaw, Vec3 origin, int broken) {
         var m = transform(pose,yaw);
+        if(this==GODDESS)m.scale(GODDESS_RIG_SCALE);
         var x = new Vec3(m.transformDirection(new Vector3f(1,0,0)));
         var y = new Vec3(m.transformDirection(new Vector3f(0,1,0)));
         var z = new Vec3(m.transformDirection(new Vector3f(0,0,1)));

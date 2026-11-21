@@ -1,5 +1,7 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GreeneMolt;
+
 import com.codex.blacklight.city.*;
 import com.codex.blacklight.combat.*;
 import com.codex.blacklight.infection.InfectedAttackStyle;
@@ -28,7 +30,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.UUID;
 
 /** Rooted P1 hydra. The planted variant grows into an owner-operated dimension entrance. */
-public final class BlacklightHydra extends Monster implements GeoEntity,AnimatedHurtBody {
+public final class BlacklightHydra extends Monster implements GeoEntity,AnimatedHurtBody, GreeneMolt.Captive {
     private static final EntityDataAccessor<Boolean> PLANTED=SynchedEntityData.defineId(BlacklightHydra.class,EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> GROWTH=SynchedEntityData.defineId(BlacklightHydra.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> BODY_SIZE=SynchedEntityData.defineId(BlacklightHydra.class,EntityDataSerializers.FLOAT);
@@ -176,7 +178,14 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
         ContactEffects.body(this,tissue,c.style()==InfectedAttackStyle.CRUSH,sound);
     }
     public static AttributeSupplier.Builder attributes(){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,180).add(Attributes.ATTACK_DAMAGE,14).add(Attributes.MOVEMENT_SPEED,0).add(Attributes.KNOCKBACK_RESISTANCE,1).add(Attributes.FOLLOW_RANGE,18);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(DEATH_AGE,-1);b.define(DEATH_KIND,HydraDeath.NORMAL);b.define(COMBAT_RECOIL,-1F);b.define(COMBAT_STARTED,0L);b.define(SCENE_PLAYER,-1);b.define(PLANTED,false);b.define(GROWTH,1F);b.define(BODY_SIZE,1.6F);b.define(ACTION,0);b.define(TIME,0);b.define(FEED_TARGET,-1);b.define(HELD,-1);b.define(PICKUP,new org.joml.Vector3f());b.define(PREVIOUS,-1);b.define(PREVIOUS_TIME,0);}
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> MOLT_CAPTIVE=
+            SynchedEntityData.defineId(BlacklightHydra.class,net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    @Override public void setMoltCaptive(boolean value){entityData.set(MOLT_CAPTIVE,value);}
+    private boolean moltCaptive(){return entityData.get(MOLT_CAPTIVE);}
+    @Override public boolean shouldRenderAtSqrDistance(double distance){
+        return !moltCaptive() && super.shouldRenderAtSqrDistance(distance);
+    }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOLT_CAPTIVE,false);b.define(DEATH_AGE,-1);b.define(DEATH_KIND,HydraDeath.NORMAL);b.define(COMBAT_RECOIL,-1F);b.define(COMBAT_STARTED,0L);b.define(SCENE_PLAYER,-1);b.define(PLANTED,false);b.define(GROWTH,1F);b.define(BODY_SIZE,1.6F);b.define(ACTION,0);b.define(TIME,0);b.define(FEED_TARGET,-1);b.define(HELD,-1);b.define(PICKUP,new org.joml.Vector3f());b.define(PREVIOUS,-1);b.define(PREVIOUS_TIME,0);}
     @Override protected void registerGoals(){}
     @Override protected boolean shouldDespawnInPeaceful(){return false;}
     @Override public boolean isPushable(){return false;}
@@ -276,7 +285,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
     }
     @Override public void tick(){try{tickHydra();}finally{updateParts();}}
     private void tickHydra(){
-        super.tick();setDeltaMovement(0,getDeltaMovement().y,0);
+        super.tick();if(moltCaptive())return;setDeltaMovement(0,getDeltaMovement().y,0);
         if(level().isClientSide||!isAlive())return;
         if(expiredArrival){discard();return;}
         var level=(ServerLevel)level();
@@ -724,8 +733,8 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
     }
     @Override public boolean hurt(DamageSource source,float amount){boolean accepted=super.hurt(source,amount);if(accepted&&!level().isClientSide&&isAlive()&&transporting())abortTravel();return accepted;}
     @Override public void remove(RemovalReason reason){if(combatCargo!=null&&!combatCargo.released())combatCargo.discard();destination.release();if(!level().isClientSide)if(heldPlayer()!=null)restorePassenger(heldPlayer());releaseHeld();super.remove(reason);}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putFloat("BodySize",bodySize());tag.putBoolean("ArrivalOnly",arrivalOnly);tag.putBoolean("Planted",planted());if(owner!=null)tag.putUUID("Planter",owner);tag.putInt("GrowthAge",age);tag.putInt("Feeds",feeds);tag.putInt("SpreadCursor",spreadCursor);if(link!=null)tag.put("HydraLink",link.save());saveGreene(tag);saveNativeDeath(tag);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){deathEpoch++;super.readAdditionalSaveData(tag);if(tag.contains("BodySize"))setBodySize(tag.getFloat("BodySize"));link=HydraLink.load(tag.getCompound("HydraLink"));expiredArrival=tag.getBoolean("ArrivalOnly")&&link==null;waitForDeparture=true;entityData.set(PLANTED,tag.getBoolean("Planted"));owner=tag.hasUUID("Planter")?tag.getUUID("Planter"):null;age=HydraGrowth.age(tag.getInt("GrowthAge"));feeds=HydraGrowth.feeds(tag.getInt("Feeds"));spreadCursor=Math.clamp(tag.getInt("SpreadCursor"),0,169);entityData.set(GROWTH,planted()?HydraGrowth.progress(age,feeds):1F);finishAction();cooldown=100;loadGreene(tag);loadNativeDeath(tag);}
+    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);if(moltCaptive())tag.putBoolean("GreeneMoltCaptive",true);tag.putFloat("BodySize",bodySize());tag.putBoolean("ArrivalOnly",arrivalOnly);tag.putBoolean("Planted",planted());if(owner!=null)tag.putUUID("Planter",owner);tag.putInt("GrowthAge",age);tag.putInt("Feeds",feeds);tag.putInt("SpreadCursor",spreadCursor);if(link!=null)tag.put("HydraLink",link.save());saveGreene(tag);saveNativeDeath(tag);}
+    @Override public void readAdditionalSaveData(CompoundTag tag){deathEpoch++;super.readAdditionalSaveData(tag);setMoltCaptive(tag.getBoolean("GreeneMoltCaptive"));if(tag.contains("BodySize"))setBodySize(tag.getFloat("BodySize"));link=HydraLink.load(tag.getCompound("HydraLink"));expiredArrival=tag.getBoolean("ArrivalOnly")&&link==null;waitForDeparture=true;entityData.set(PLANTED,tag.getBoolean("Planted"));owner=tag.hasUUID("Planter")?tag.getUUID("Planter"):null;age=HydraGrowth.age(tag.getInt("GrowthAge"));feeds=HydraGrowth.feeds(tag.getInt("Feeds"));spreadCursor=Math.clamp(tag.getInt("SpreadCursor"),0,169);entityData.set(GROWTH,planted()?HydraGrowth.progress(age,feeds):1F);finishAction();cooldown=100;loadGreene(tag);loadNativeDeath(tag);}
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){
         c.add(new AnimationController<>(this,"body",5,s->{
             String clip=HydraMotion.clip(action());

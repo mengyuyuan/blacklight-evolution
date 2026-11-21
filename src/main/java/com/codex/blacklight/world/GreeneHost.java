@@ -243,11 +243,6 @@ public final class GreeneHost extends PathfinderMob {
         if(elapsed>=ESCAPE_END) {
             if(level.hasChunkAt(station) && level.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(level);
             BossSiteData.complete(this,null,2);
-            if(level.dimension()==com.codex.blacklight.city.CityTravel.WORLD) {
-                var desk=station.offset(-8,0,40);
-                for(var observer:level.players()) if(observer.distanceToSqr(this)<48*48)
-                    observer.sendSystemMessage(Component.translatable("survival.blacklight.greene_pursuit_clue",desk.getX(),desk.getZ()));
-            }
             for (var observer:level.players()) if (observer.distanceToSqr(this)<24*24)
                 observer.displayClientMessage(Component.translatable("survival.blacklight.greene_escaped"),true);
             discard();
