@@ -48,6 +48,7 @@ public final class GameplayBalanceConfig {
     public static final ModConfigSpec.DoubleValue QUILL_ORBIT_RADIUS;
     public static final ModConfigSpec.IntValue QUILL_AUTO_RANGE;
     public static final ModConfigSpec.IntValue QUILL_AUTO_INTERVAL;
+    public static final ModConfigSpec.IntValue QUILL_AUTO_PERCENT;
     public static final ModConfigSpec.DoubleValue QUILL_AUTO_DAMAGE;
     static {
         var b=new ModConfigSpec.Builder();
@@ -157,6 +158,7 @@ public final class GameplayBalanceConfig {
         QUILL_AUTO_COST = b.defineInRange("sortieCost", 2, 0, 1000);
         QUILL_ORBIT_RADIUS = b.comment("Horizontal orbit radius around the player in blocks.").defineInRange("orbitRadius", 2.3, 0.65, 8.0);
         QUILL_AUTO_RANGE = b.defineInRange("enemyRadius", 64, 1, 128);
+        QUILL_AUTO_PERCENT = b.defineInRange("autoVolleyPercent", 40, 1, 100);
         QUILL_AUTO_INTERVAL = b.defineInRange("sortieIntervalTicks", 16, 1, 1200);
         QUILL_AUTO_DAMAGE = b.defineInRange("sortieDamage", 3.0, 0, 1000);
         b.pop();

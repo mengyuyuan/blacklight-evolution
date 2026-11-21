@@ -28,7 +28,10 @@ public final class QuillHarvest {
     private static final String VOLLEY = "BlacklightNextQuillSortie";
     public static final ResourceKey<DamageType> DRAIN = ResourceKey.create(Registries.DAMAGE_TYPE,
             ResourceLocation.fromNamespaceAndPath("blacklight", "quill_drain"));
+    public static final ResourceKey<DamageType> VOLLEY_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            ResourceLocation.fromNamespaceAndPath("blacklight","quill_volley"));
     private static final Map<ServerPlayer, Long> EMPTY_HINT = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Long> NEXT_FORMATION = new WeakHashMap<>();
     private QuillHarvest() {}
     @SubscribeEvent public static void serverStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
         updateQuillDefaults();
@@ -240,18 +243,79 @@ public final class QuillHarvest {
         }
         return selected;
     }
-    public static TargetSelection sortie(ServerPlayer p) {
-        if (!active(p) || state(p).getActivePower()!=PowerForm.BACKSPINES) return null;
+    static TargetSelection focus(ServerPlayer p, double range) {
+        var lock=CombatTargeting.lockedSelection(p);
+        if(lock!=null && !protectedPet(lock.target()) && !ConsumeLastChance.awaitingFinisher(lock.target())
+                && lock.visibleWithinRange(p,range))return lock;
+        var eye=p.getEyePosition();
+        var wall=p.pick(range,1,false).getLocation();
+        var box=new net.minecraft.world.phys.AABB(eye,wall).inflate(1);
+        var candidates=p.level().getEntities(p,box,e->ExplicitTarget.selectable(p,e)
+                && !protectedPet(e) && !ConsumeLastChance.awaitingFinisher(e));
+        var boss=TargetSelection.aimedBoss(p,candidates,eye,wall,1,range);
+        if(boss!=null)return boss;
+        var hit=net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p.level(),p,eye,wall,box,
+                e->e.isPickable() && !(e instanceof com.codex.blacklight.entity.GreenePart)
+                        && !new TargetSelection(e,-1).regional() && ExplicitTarget.selectable(p,e)
+                        && !protectedPet(e) && !ConsumeLastChance.awaitingFinisher(e));
+        if(hit==null)return null;
+        var aimed=TargetSelection.fromHit(hit.getEntity());
+        return aimed.visibleWithinRange(p,range)?aimed:null;
+    }
+    public static void dispatch(ServerPlayer p) {
         long now=p.level().getGameTime();
-        if (now<p.getPersistentData().getLong(VOLLEY)) return null;
-        var target=attackTarget(p,QUILL_AUTO_RANGE.get(),true);
-        p.getPersistentData().putLong(VOLLEY,now+(target==null?4:QUILL_AUTO_INTERVAL.get()));
-        return target;
+        var clock=p.getPersistentData();
+        boolean cooling=now<clock.getLong(VOLLEY);
+        if(cooling && now<NEXT_FORMATION.getOrDefault(p,0L))return;
+        NEXT_FORMATION.put(p,now+4);
+        var organs=p.level().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(QUILL_ORBIT_RADIUS.get()+3),
+                q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner()));
+        organs.sort(Comparator.comparingInt(Entity::getId));
+        arrange(organs);
+        if(cooling)return;
+        clock.putLong(VOLLEY,now+4);
+        if(organs.isEmpty())return;
+        if(!active(p) || state(p).getActivePower()!=PowerForm.BACKSPINES
+                || organs.stream().noneMatch(q->q.count()>0 && q.supply()>=QUILL_AUTO_COST.get()))return;
+        var focused=focus(p,QUILL_AUTO_RANGE.get());
+        var target=focused!=null?focused:attackTarget(p,QUILL_AUTO_RANGE.get(),true);
+        if(target==null)return;
+        clock.putLong(VOLLEY,now+QUILL_AUTO_INTERVAL.get());
+        int first=Math.floorMod(clock.getInt("BlacklightQuillFirst"),organs.size());
+        clock.putInt("BlacklightQuillFirst",(first+1)%organs.size());
+        var wave=new QuillFormation.Wave(focused!=null?100:QUILL_AUTO_PERCENT.get());
+        boolean audible=true;
+        for(int i=0;i<organs.size();i++){
+            var organ=organs.get((first+i)%organs.size());
+            if(organ.supply()<QUILL_AUTO_COST.get())continue;
+            long number=wave.take(organ.count());
+            if(number==0)continue;
+            organ.launch(p,target,number,audible);
+            audible=false;
+        }
+        arrange(organs);
+    }
+    private static void arrange(List<QuillOrgan> organs){
+        int[] visible=new int[organs.size()];
+        int total=0;
+        for(int pass=0;total<QuillFormation.VISIBLE_SLOTS;pass++){
+            int before=total;
+            for(int i=0;i<organs.size() && total<QuillFormation.VISIBLE_SLOTS;i++){
+                var organ=organs.get(i);
+                if(organ.phase()==QuillOrgan.ORBIT && pass<organ.count()){visible[i]++;total++;}
+            }
+            if(total==before)break;
+        }
+        int slot=0;
+        for(int i=0;i<organs.size();i++){
+            organs.get(i).arrange(slot,visible[i],total);
+            slot+=visible[i];
+        }
     }
     @SubscribeEvent public static void wounded(LivingDamageEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || event.getNewDamage()<=0 || !active(p) || p.getHealth()>=p.getMaxHealth()) return;
         var shards=p.serverLevel().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(Math.max(5,QUILL_ORBIT_RADIUS.get()+1.5)),
-                q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner()));
+                q->q.phase()==QuillOrgan.ORBIT && q.count()>0 && q.supply()>0 && p.getUUID().equals(q.owner()));
         if (!shards.isEmpty()) shards.get(p.getRandom().nextInt(shards.size())).liquefy();
     }
 }
