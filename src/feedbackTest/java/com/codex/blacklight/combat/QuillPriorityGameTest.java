@@ -129,6 +129,65 @@ public final class QuillPriorityGameTest {
         });
     }
 
+    @GameTest(template="wall_test",timeoutTicks=125,batch="goliath_followup_swing")
+    public static void independentPrimaryAttackCanFinishAnArmoredGoliath(GameTestHelper h){
+        checkGoliathFollowup(h,false);
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=125,batch="goliath_followup_parasite")
+    public static void primaryAttackCanFinishTheOpeningLeftByQuills(GameTestHelper h){
+        checkGoliathFollowup(h,true);
+    }
+
+    private static void checkGoliathFollowup(GameTestHelper h,boolean parasite){
+        var player=join(h,parasite?"QuillFollowup":"MeleeFollowup");
+        var level=h.getLevel();
+        var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(com.codex.blacklight.entity.EncounterKind.GOLIATH).get().create(level);
+        var state=QuillHarvest.state(player);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.HAMMERFISTS);state.activate(PowerForm.HAMMERFISTS);
+        boss.moveTo(h.absolutePos(new BlockPos(6,90,6)).getCenter());
+        boss.setNoAi(true);boss.setNoGravity(true);level.addFreshEntity(boss);
+        player.setNoGravity(true);player.setPos(boss.position());
+        Runnable swing=()->{
+            var torso=boss.hurtRegions(0).stream().filter(r->r.bone().equals("torso_lower")).findFirst().orElseThrow().boxes().get(0);
+            var surface=torso.nearest(torso.center.add(0,0,-50));
+            player.setPos(surface.add(0,-1,-1));player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);player.setOnGround(true);
+            player.setXRot(0);player.setYRot(0);player.setYHeadRot(0);player.yBodyRot=player.yBodyRotO=0;
+            WeaponCombatSystem.request(player,false);
+            h.assertTrue(WeaponCombatSystem.busy(player),"server accepted a primary strike");
+            // The embedded test client sends no movement packets to drive a player's combat clock.
+            var move=ModAttachments.getData(player,ModAttachments.WEAPON_VISUAL).spec();
+            for(int tick=0;tick<move.duration+12 && WeaponCombatSystem.busy(player);tick++){
+                player.tickCount++;
+                WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,player));
+            }
+        };
+        h.runAfterDelay(3,()->{
+            boss.setHealth(.02F);
+            if(parasite){
+                for(int i=0;i<10;i++)QuillHarvest.plant(player,boss,boss.position().add(0,1,0),0);
+                boss.tickCount+=20-boss.tickCount%20;
+                QuillHarvest.tick(new ForgeEntityTickEvent.Post(boss));
+            }else swing.run();
+        });
+        h.runAfterDelay(50,()->{
+            h.assertTrue(boss.getHealth()==1 && ConsumeLastChance.awaitingFinisher(boss),"first lethal contact offers execution, hp="+boss.getHealth());
+            swing.run();
+        });
+        h.runAfterDelay(98,()->{
+            try{
+                h.assertTrue(!boss.isAlive() && ((com.codex.blacklight.mixin.LivingDeathAccess)(Mob)boss).blacklight$deathAccepted(),
+                        "an independent primary strike finishes the boss, hp="+boss.getHealth());
+                h.succeed();
+            }finally{
+                WeaponCombatSystem.cancel(player);
+                var mark=QuillHarvest.mark(boss);
+                if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
+                boss.discard();level.getServer().getPlayerList().remove(player);
+            }
+        });
+    }
+
     @GameTest(template="wall_test",timeoutTicks=80,batch="quill_hunter_damage")
     public static void supremeHunterDistinguishesQuillsFromThrownDebris(GameTestHelper h){
         var p=join(h,"HunterDamage");
@@ -379,17 +438,45 @@ public final class QuillPriorityGameTest {
         return p;
     }
 
-    @GameTest(template="wall_test", timeoutTicks=80)
+    @GameTest(template="wall_test", timeoutTicks=240)
     public static void runningFireSpreadsParasitesAndRecallsAtRange(GameTestHelper h) {
+        // A full terrain chunk can still be waiting for its entity section to start ticking.
+        var start=h.absolutePos(new BlockPos(5,180,5));
         var level=h.getLevel();
         var p=join(h,"QuillSpread");
-        p.setPos(h.absolutePos(new BlockPos(5,180,5)).getCenter());
+        var middle=start.offset(48,0,0).getCenter();
+        p.connection.teleport(middle.x,middle.y,middle.z,0,0);
+        p.setNoGravity(true);
+        var chunks=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=start.getX()>>4;x<=(start.getX()+97)>>4;x++){
+            for(int z=start.getZ()>>4;z<=(start.getZ()+3)>>4;z++){
+                var chunk=new net.minecraft.world.level.ChunkPos(x,z);
+                chunks.add(chunk);
+                if(level.setChunkForced(x,z,true))forced.add(chunk);
+                level.getChunk(x,z);
+            }
+        }
+        h.startSequence().thenWaitUntil(()->{
+            for(var chunk:chunks)
+                h.assertTrue(level.isPositionEntityTicking(chunk.getBlockAt(0,start.getY(),0)),"waiting for distant quill hosts to tick");
+        }).thenExecute(()->{
+            try{checkRunningFire(h,start,p);}
+            finally{
+                for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);
+                level.getServer().getPlayerList().remove(p);
+            }
+        }).thenSucceed();
+    }
+
+    private static void checkRunningFire(GameTestHelper h,BlockPos start,ServerPlayer p) {
+        var level=h.getLevel();
+        p.setPos(start.getCenter());
         var mobs=new ArrayList<Mob>();
         var shard=new QuillOrgan(com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get(),level);
         try {
             var state=QuillHarvest.state(p);
             state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
-            for(int d=0;d<=96;d+=16)level.getChunk(p.blockPosition().offset(d,0,0).getX()>>4,p.blockPosition().getZ()>>4);
             var cow=spawn(p,mobs,EntityType.COW,64,0,20,20);
             QuillHarvest.plant(p,cow,cow.getBoundingBox().getCenter(),0);
             var root=(QuillOrgan)level.getEntity(QuillHarvest.mark(cow).getUUID("organ"));
@@ -433,7 +520,6 @@ public final class QuillPriorityGameTest {
             shard.load(inFlight);
             for(int t=0;t<45 && shard.phase()==QuillOrgan.STRIKE;t++)shard.tick();
             h.assertTrue(QuillHarvest.mark(distant).getInt("layers")==2,"a second accepted orbit hit adds another layer");
-            h.succeed();
         } finally {
             shard.discard();CombatTargeting.requestLock(p,-1);
             for(var mob:mobs){
@@ -441,7 +527,6 @@ public final class QuillPriorityGameTest {
                 if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
                 mob.discard();
             }
-            level.getServer().getPlayerList().remove(p);
         }
     }
 
