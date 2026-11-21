@@ -209,6 +209,41 @@ public final class MobileConsumeGameTest {
                 "settlement did not follow the actual landing and recovery, variant="+variant+" tick="+elapsed);
     }
 
+    @GameTest(template="wall_test",timeoutTicks=130,batch="late_actor_material")
+    public static void clawsBodyEventStillStartsAfterReceiverSettlement(GameTestHelper h){
+        var p=player(h,PowerForm.CLAWS);
+        var mob=h.spawn(EntityType.VILLAGER,3,2,5);
+        mob.setNoAi(true);
+        int old=ConsumeVariant.qaForced;
+        try{
+            ConsumeVariant.qaForced=ConsumeVariant.CLASSIC;
+            ConsumeSystem.request(p);
+            ConsumeSystem.consume(p);
+            for(int i=0;i<50&&mob.getData(ModAttachments.CONSUME_VISUAL).stage()!=ConsumeVisual.CONSUME;i++)tick(p);
+        } finally {ConsumeVariant.qaForced=old;}
+        var scene=mob.getData(ModAttachments.CONSUME_VISUAL);
+        h.assertTrue(scene.stage()==ConsumeVisual.CONSUME&&scene.variant()==ConsumeVariant.CLASSIC,
+                "did not enter the claw head-crush clip");
+        int cue=ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(scene));
+        int finish=ConsumeSequence.completionTick(PowerForm.CLAWS,false,scene.variant());
+        h.assertTrue(finish<cue,"fixture requires an independent actor event after receiver settlement");
+        ConsumeSystem.travelIntent(p,true);
+        for(int i=1;i<=cue;i++){
+            int frame=i;
+            h.runAfterDelay(frame,()->{
+                tick(p);
+                var body=p.getData(ModAttachments.CONSUME_BODY_VISUAL);
+                if(frame<cue)h.assertTrue(!body.active(),"coat started early at "+frame);
+                if(frame==finish)h.assertTrue(mob.isRemoved(),"receiver waited for the giver event");
+                if(frame==cue){
+                    h.assertTrue(body.active()&&body.started()==scene.started()&&body.variant()==scene.variant(),
+                            "late source callback lost on the moving player");
+                    h.succeed();
+                }
+            });
+        }
+    }
+
     @GameTest(template="wall_test",timeoutTicks=60,batch="hunter_consume_recovery")
     public static void allSixFormsRetainPairedHunterExecutionAndRecovery(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.HAMMERFISTS,

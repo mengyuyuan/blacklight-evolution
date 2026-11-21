@@ -58,6 +58,8 @@ public final class ConsumeSystem {
         s.chargeStart=-1;s.chargeInput=-1;
         if(player.getData(ModAttachments.GRAB_THROW_CHARGE)>=0){player.setData(ModAttachments.GRAB_THROW_CHARGE,-1L);player.syncData(ModAttachments.GRAB_THROW_CHARGE);}
     }
+    // Some source callbacks occur after the shorter MC receiver has settled.
+    private static final java.util.Map<ServerPlayer,List<ConsumeVisual>> PENDING_COATS=new java.util.WeakHashMap<>();
     private static final class Session {
         final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large, smallDirect; float facing;
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
@@ -150,10 +152,12 @@ public final class ConsumeSystem {
                 }
                 mob.setYRot(p.yBodyRot);mob.setYHeadRot(p.yBodyRot);mob.yBodyRot=p.yBodyRot;
             }
+            triggerBodyWeave(p,s,p.tickCount-s.started-s.landingDelay);
             if(p.tickCount-s.started-s.landingDelay>=s.completionTick()&&ABSORBING.remove(mob,tail))finish(p,s);
         }
     }
     private static void cancelTails(ServerPlayer p){
+        PENDING_COATS.remove(p);
         if(!p.isRemoved() && p.getData(ModAttachments.CONSUME_BODY_VISUAL).active()){
             p.setData(ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);p.syncData(ModAttachments.CONSUME_BODY_VISUAL);
         }
@@ -459,9 +463,10 @@ public final class ConsumeSystem {
         tickTails(player);
     }
     private static void tickPlayer(ServerPlayer player) {
+        tickPendingCoats(player);
         var body=player.getData(ModAttachments.CONSUME_BODY_VISUAL);
         if(body.active() && (!player.isAlive() || !player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode()
-                ||body.elapsed(player.level().getGameTime(),0)>body.duration()+18)){
+                ||body.elapsed(player.level().getGameTime(),0)>ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(body)+ConsumeGiverEffect.END_SECONDS))){
             player.setData(ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);player.syncData(ModAttachments.CONSUME_BODY_VISUAL);
         }
         var recovery=player.getData(ModAttachments.CONSUME_RECOVERY);
@@ -652,13 +657,36 @@ public final class ConsumeSystem {
         if(elapsed>=session.completionTick())finish(player,session);
         else if((session.travelRequested||session.grabQueued)&&elapsed>=mobileAt(session))startTail(player,session);
     }
+    private static boolean eligibleForCoat(Session s){
+        return s.smallDirect&&(s.stage==ConsumeVisual.CONSUME||s.stage==ConsumeVisual.MOBILE_CONSUME)
+                &&Float.isFinite(ConsumeGiverEffect.cue(s.form,s.variant));
+    }
     private static void triggerBodyWeave(ServerPlayer player,Session session,int elapsed){
-        if(!smallDirectScene(session)||session.bodyWeaveStarted)return;
-        float cue=ConsumeReceiverScene.absorptionSeconds(session.form,session.variant);
-        if(elapsed<(int)Math.ceil(cue*20-.0001F))return;
+        if(session.bodyWeaveStarted||!eligibleForCoat(session))return;
+        if(elapsed<ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(session.form,session.variant)))return;
         session.bodyWeaveStarted=true;
-        var scene=session.victim.getData(ModAttachments.CONSUME_VISUAL);
+        publishCoat(player,session.victim.getData(ModAttachments.CONSUME_VISUAL));
+    }
+    private static void publishCoat(ServerPlayer player,ConsumeVisual scene){
+        var current=player.getData(ModAttachments.CONSUME_BODY_VISUAL);
+        // Old receivers can finish after a newer grab. Keep the latest fired callback.
+        if(current.active()&&coatTime(current)>coatTime(scene))return;
         player.setData(ModAttachments.CONSUME_BODY_VISUAL,scene);player.syncData(ModAttachments.CONSUME_BODY_VISUAL);
+    }
+    private static long coatTime(ConsumeVisual scene){
+        return scene.started()+Math.max(0,scene.landingDelay())+ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(scene));
+    }
+    private static void tickPendingCoats(ServerPlayer player){
+        var pending=PENDING_COATS.get(player);
+        if(pending==null)return;
+        if(!player.isAlive()||!player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode()){PENDING_COATS.remove(player);return;}
+        long now=player.level().getGameTime();
+        pending.removeIf(scene->{
+            if(now<coatTime(scene))return false;
+            publishCoat(player,scene);
+            return true;
+        });
+        if(pending.isEmpty())PENDING_COATS.remove(player);
     }
     private static void tickHeldAttack(ServerPlayer player,Session session,int elapsed){
         var target=session.victim;
@@ -800,6 +828,7 @@ public final class ConsumeSystem {
             player.setData(ModAttachments.CONSUME_RECOVERY,recovery);player.syncData(ModAttachments.CONSUME_RECOVERY);
             unlock(player);
         }
+        var lateCoat=!session.bodyWeaveStarted&&eligibleForCoat(session)?target.getData(ModAttachments.CONSUME_VISUAL):null;
         release(target);
         if(!defeatForConsume(player,target)){
             if(paired)clearRecovery(player);
@@ -807,6 +836,7 @@ public final class ConsumeSystem {
         }
         if(paired)play(player,PlayerAction.CLAW_IDLE);
         if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
+        if(lateCoat!=null)PENDING_COATS.computeIfAbsent(player,key->new java.util.ArrayList<>()).add(lateCoat);
         com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
@@ -865,7 +895,8 @@ public final class ConsumeSystem {
         clearRecovery(player);
         Session session = ACTIVE.remove(player);
         if (session == null) return;
-        if(session.bodyWeaveStarted){
+        var visibleCoat=player.getData(ModAttachments.CONSUME_BODY_VISUAL);
+        if(session.bodyWeaveStarted&&visibleCoat.equals(session.victim.getData(ModAttachments.CONSUME_VISUAL))){
             player.setData(ModAttachments.CONSUME_BODY_VISUAL,ConsumeVisual.EMPTY);player.syncData(ModAttachments.CONSUME_BODY_VISUAL);
         }
         clearThrowCharge(player,session);
@@ -996,6 +1027,7 @@ public final class ConsumeSystem {
     }
     @SubscribeEvent public static void stopping(net.neoforged.neoforge.event.server.ServerStoppingEvent event) {
         for (var player : List.copyOf(ACTIVE.keySet())) cancel(player);
+        PENDING_COATS.clear();
         for(var tail:List.copyOf(ABSORBING.values()))cancelTails(tail.owner());
         THROWN.clear();
     }

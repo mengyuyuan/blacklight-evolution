@@ -38,7 +38,6 @@ public final class MercerPlayerMesh {
                 surface.addMercerFace(part.region,positions,normals,first,second,weight);
             }
         }
-        ConsumeBodyCords.add(surface,false,rig);
         return consumeSurface=surface;
     }
     private final MercerRig rig;

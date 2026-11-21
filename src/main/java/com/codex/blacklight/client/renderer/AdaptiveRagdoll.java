@@ -2349,6 +2349,12 @@ public final class AdaptiveRagdoll {
                     &&scene.getEntity(mobileVisual.consumerId()) instanceof LivingEntity owner){
                 Vec3 center=com.codex.blacklight.combat.MobileConsumeCarry.center(entity,owner,mobileVisual,partial);
                 if(center!=null){
+                    if(ChestConsumeTendrils.matches(mobileVisual)){
+                        // FIG 531712 gives the chest punch a one-second return to the moving Spine_3.
+                        float seconds=mobileVisual.elapsed(scene.getGameTime(),partial)/20F-55F/30;
+                        Vec3 spine=ChestConsumeTendrils.actorPoints(owner,partial)[0];
+                        center=center.lerp(spine,RagdollDrive.smooth(seconds));
+                    }
                     carryVisibleSkin(result.positions(),center,mobileVisual.started(),partial,flow);
                     return result;
                 }

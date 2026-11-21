@@ -5,9 +5,8 @@ import com.codex.blacklight.animation.PlayerMotionController;
 import com.codex.blacklight.client.model.ConsumeBodySurface;
 import com.codex.blacklight.client.model.MercerPlayerMesh;
 import com.codex.blacklight.client.model.MercerRig;
-import com.codex.blacklight.combat.ConsumeReceiverScene;
+import com.codex.blacklight.combat.ConsumeGiverEffect;
 import com.codex.blacklight.combat.ConsumeVisual;
-import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -35,19 +34,10 @@ public final class MobileConsumeWrap {
                              Matrix4f[] poses,float partial,MercerRig.Frame frame,int side){
         ConsumeVisual scene=player.getData(ModAttachments.CONSUME_BODY_VISUAL);
         if(!scene.active() || !player.isAlive() || player.isInvisible() || player.isSpectator())return;
-        PowerForm form=PowerForm.values()[scene.form()];
-        float cue=ConsumeReceiverScene.absorptionSeconds(form,scene.variant());
         long now=player.level().getGameTime();
-        float seconds=scene.elapsed(now,partial)/20F-cue;
-        var profile=ConsumeReceiverScene.profile(form,false,scene.variant());
-        float finish=profile==null?scene.duration()/20F:profile.finishSeconds();
-        // The source track reverses after 2.3 s. A shorter MC receiver scene releases
-        // the outer coat on settlement, leaving the last fibers on the moving player.
-        float reverse=Math.max(.35F,Math.min(2.3F,finish-cue));
-        float tail=.54F;
-        if(seconds<0 || seconds>=reverse+tail)return;
-        float peak=Math.min(.54F,Math.max(.42F,.29F*reverse));
-        float reach=seconds<reverse ? peak*seconds/reverse : peak*(1-(seconds-reverse)/tail);
+        float seconds=scene.elapsed(now,partial)/20F-ConsumeGiverEffect.cue(scene);
+        float reach=ConsumeGiverEffect.reach(seconds);
+        if(reach<=0)return;
         // The source fragment program scrolls a tiled mesh UV using global time.
         float textureClock=(Math.floorMod(now,10000L)+partial)/20F;
         var out=buffers.getBuffer(ConsumeWeaveMaterial.mesh());
