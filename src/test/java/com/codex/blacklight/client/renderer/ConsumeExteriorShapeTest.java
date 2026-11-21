@@ -29,16 +29,17 @@ class ConsumeExteriorShapeTest {
     @Test void theSettledWeaveHasSeparateStrandsOnChestBackAndBothFlanks() {
         var body=body(Vec3.ZERO);
         var full=folds(body,null,null,FRONT,2.3F,Vec3.ZERO);
-        assertEquals(14,full.length);
+        assertEquals(12,full.length);
         int chest=0,back=0,left=0,right=0;
         for(var strip:full) {
             for(int i=0;i<strip.points().length;i++) {
                 var p=strip.points()[i];
-                if(strip.widths()[i]<.012)continue;
-                if(p.z>body.depth()+.017)chest++;
-                if(-p.z>body.depth()+.017)back++;
-                if(p.x>body.width()+.017)left++;
-                if(-p.x>body.width()+.017)right++;
+                assertTrue(strip.widths()[i] < .022, "Each fibre has to read separately at player scale");
+                if(strip.widths()[i]<.005)continue;
+                if(p.z>body.depth()+.003)chest++;
+                if(-p.z>body.depth()+.003)back++;
+                if(p.x>body.width()+.003)left++;
+                if(-p.x>body.width()+.003)right++;
                 assertTrue(p.y+strip.widths()[i]<body.half()+.035);
             }
         }
@@ -56,10 +57,13 @@ class ConsumeExteriorShapeTest {
         float peak=com.codex.blacklight.combat.ConsumeGiverEffect.REVERSE_SECONDS;
         var before=folds(skin,null,null,FRONT,peak,Vec3.ZERO)[0];
         var after=folds(skin,null,null,FRONT,peak+.63F,Vec3.ZERO)[0];
-        assertTrue(after.points()[0].distanceTo(before.points()[0])>.10);
-        assertTrue(after.points()[0].distanceTo(before.points()[6])<after.points()[0].distanceTo(before.points()[0]));
-        assertTrue(after.widths()[after.widths().length/2]>.025);
-        assertTrue(after.widths()[0]<after.widths()[after.widths().length/2]*.2);
+        int last = after.points().length - 1, previousLast = before.points().length - 1;
+        assertEquals(0, after.points()[0].distanceTo(before.points()[0]), .001, "root stays inside the jacket");
+        assertTrue(after.points()[last].distanceTo(before.points()[previousLast]) > .09);
+        assertTrue(after.points()[last].distanceTo(before.points()[previousLast * 3 / 4])
+                < after.points()[last].distanceTo(before.points()[previousLast]));
+        assertTrue(after.widths()[last/2] > .009);
+        assertTrue(after.widths()[last] < after.widths()[last/2] * .12);
     }
 
     @Test void posedArmsClearBeforeTheMiddleOfTheChestAndBack() {
@@ -67,7 +71,7 @@ class ConsumeExteriorShapeTest {
         var right=Surface.arm(new Vec3(-.32,.28,0),new Vec3(-.55,.01,-.14),RIGHT);
         var left=Surface.arm(new Vec3(.32,.28,0),new Vec3(.47,.04,.21),RIGHT);
         float peak=com.codex.blacklight.combat.ConsumeGiverEffect.REVERSE_SECONDS;
-        assertEquals(18,folds(body,right,left,FRONT,peak,Vec3.ZERO).length);
+        assertEquals(16,folds(body,right,left,FRONT,peak,Vec3.ZERO).length);
         var full=ConsumeSkinPath.giverWeights(peak);
         var returning=ConsumeSkinPath.giverWeights(peak+1.16F);
         var late=ConsumeSkinPath.giverWeights(peak+1.8F);
