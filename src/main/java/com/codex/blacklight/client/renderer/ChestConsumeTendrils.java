@@ -1,6 +1,7 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.animation.PlayerMotionController;
+import com.codex.blacklight.client.renderer.ConsumeBridgeTracks.*;
 import com.codex.blacklight.client.ClientCarryPlacement;
 import com.codex.blacklight.client.animation.ConsumeVictimPose;
 import com.codex.blacklight.combat.*;
@@ -17,15 +18,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-/** Four parent-to-receiver tracks called by normal chest punch at source frame 35. */
+/** Tracks from the receiver FIG root to its authored grab-slot endpoint, on the current posed bodies. */
 final class ChestConsumeTendrils {
-    private record Track(double delay,double scale,double speed,double circle,double roll,double pitch) {}
-    // alex_fig FIG branch 92, offsets 543164, 543360, 543556 and 543752.
-    private static final Track[] TRACKS={
-        new Track(0,.3,2,.3,60,160),new Track(2/30.0,.2,4,.3,90,70),
-        new Track(3/30.0,.5,4,.2,45,45),new Track(4/30.0,.3,5,.2,-90,45)
-    };
-    private static final int SEGMENTS=10;
     private record ActorPose(WeakReference<Level> level,double clock,Vec3[] points) {}
     private static final Map<LivingEntity,ActorPose> ACTORS=new WeakHashMap<>();
 
@@ -33,6 +27,16 @@ final class ChestConsumeTendrils {
     static boolean matches(ConsumeVisual v){
         return (v.stage()==ConsumeVisual.CONSUME||v.stage()==ConsumeVisual.MOBILE_CONSUME)
                 &&v.form()==PowerForm.NONE.ordinal()&&ConsumeSequence.key(PowerForm.NONE,v.variant()).equals("normal");
+    }
+    static Cue bridges(ConsumeVisual visual){
+        if(visual.stage()!=ConsumeVisual.CONSUME&&visual.stage()!=ConsumeVisual.MOBILE_CONSUME)return null;
+        var forms=PowerForm.values();
+        if(visual.form()<0||visual.form()>=forms.length)return null;
+        var form=forms[visual.form()];
+        return switch(form){
+            case NONE,CLAWS,BLADE,HAMMERFISTS,MUSCLE_MASS,WHIPFIST -> ConsumeBridgeTracks.forClip(ConsumeSequence.key(form,visual.variant()));
+            default -> null;
+        };
     }
     static void captureActor(LivingEntity actor,PoseStack stack,Matrix4f[] bones,float partial){
         if(actor==null||actor.isRemoved()||StandalonePlayerRendering.nativeHandPass())return;
@@ -98,7 +102,7 @@ final class ChestConsumeTendrils {
         double s=t*t,t3=s*t;
         return start.scale(2*t3-3*s+1).add(from.scale(t3-2*s+t)).add(end.scale(3*s-2*t3)).add(to.scale(t3-s));
     }
-    private static Vec3[] route(Vec3 root,Vec3 tip,BodySurface actor,BodySurface receiver,Vec3 outward,Track track){
+    private static Vec3[] route(Vec3 root,Vec3 tip,BodySurface actor,BodySurface receiver,Vec3 outward,Track track,double elapsed){
         // The source joints sit inside the flesh. Only their attachment spans enter the body.
         // Bound the free spans to the clothing surface without adding an orbit around either model.
         double padding=Math.min(actor.radius*.23,track.circle()*DevastatorEffectTimeline.WORLD_SCALE*.24);
@@ -106,38 +110,59 @@ final class ChestConsumeTendrils {
         double rise=Math.sin(Math.toRadians(track.pitch()))*track.circle()*DevastatorEffectTimeline.WORLD_SCALE*.45;
         Vec3 exit=actor.rim(root,outward,rise,padding),entry=receiver.rim(tip,outward,-rise*.4,receiverPad);
         Vec3 from=entry.subtract(root).scale(.30),to=tip.subtract(exit).scale(.30);
-        var path=new Vec3[SEGMENTS+1];
-        for(int i=0;i<=SEGMENTS;i++){
-            if(i<2)path[i]=hermite(root,exit,exit.subtract(root),from,i/2.0);
-            else if(i<=8){
-                Vec3 point=hermite(exit,entry,from,to,(i-2)/6.0);
+        int segments=track.segments(),bound=segments==5?1:2,entryIndex=segments-bound;
+        var path=new Vec3[segments+1];
+        for(int i=0;i<=segments;i++){
+            if(i<bound)path[i]=hermite(root,exit,exit.subtract(root),from,i/(double)bound);
+            else if(i<=entryIndex){
+                double t=(i-bound)/(double)(entryIndex-bound);
+                Vec3 point=hermite(exit,entry,from,to,t);
+                if(track.target()==Target.SHOULDER_R){
+                    // FIG 547760 stores speed 10, wavelength 5, amplitude .1 and a .1 s rise.
+                    double scale=DevastatorEffectTimeline.WORLD_SCALE;
+                    double wave=Math.sin((elapsed*10-t*entry.subtract(exit).length()/scale)*Math.PI*2/5);
+                    point=point.add(actor.axis.scale(wave*.1*scale*Math.min(1,elapsed/.1)*Math.sin(Math.PI*t)));
+                }
                 point=actor.keepOutside(point,outward,padding);
                 path[i]=receiver.keepOutside(point,outward,receiverPad);
-            }else path[i]=hermite(entry,tip,to,tip.subtract(entry),(i-8)/2.0);
+            }else path[i]=hermite(entry,tip,to,tip.subtract(entry),(i-entryIndex)/(double)bound);
         }
         return path;
     }
-    /** Reveal the same ten spans by distance along their constrained curve. */
+    /** Reveal the authored spans by distance along their constrained curve. */
     private static Vec3[] grow(Vec3[] path,double travel,Vec3 camera){
+        int segments=path.length-1;
         double[] distance=new double[path.length];
         for(int j=1;j<path.length;j++)distance[j]=distance[j-1]+path[j].subtract(path[j-1]).length();
         Vec3[] result=new Vec3[path.length];
-        if(travel>=distance[SEGMENTS]){
-            for(int j=0;j<=SEGMENTS;j++)result[j]=path[j].subtract(camera);
+        if(travel>=distance[segments]){
+            for(int j=0;j<=segments;j++)result[j]=path[j].subtract(camera);
         }else{
             int next=1;
-            for(int j=0;j<=SEGMENTS;j++){
-                double at=distance[j]*travel/Math.max(1e-8,distance[SEGMENTS]);
-                while(next<SEGMENTS&&distance[next]<at)next++;
+            for(int j=0;j<=segments;j++){
+                double at=distance[j]*travel/Math.max(1e-8,distance[segments]);
+                while(next<segments&&distance[next]<at)next++;
                 double local=(at-distance[next-1])/Math.max(1e-8,distance[next]-distance[next-1]);
                 result[j]=path[next-1].lerp(path[next],local).subtract(camera);
             }
         }
         return result;
     }
-    static void draw(PoseStack stack,VertexConsumer out,int light,Vec3 camera,LivingEntity mob,LivingEntity owner,ConsumeVisual v,float partial){
+    private static Vec3 sourceBone(Vec3[] actor,Source bone){
+        return bone==Source.HIP_L?actor[2].add(actor[2].subtract(actor[1])):actor[bone.ordinal()];
+    }
+    private static Vec3 targetBone(Vec3[] joints,Target bone,LivingEntity mob,float partial){
+        if(bone.ordinal()<4)return joints[bone.ordinal()];
+        Vec3 pelvis=joints[0],neck=joints[1],left=joints[2].subtract(pelvis),up=neck.subtract(pelvis);
+        if(bone==Target.HIP_R)return pelvis.subtract(left);
+        boolean knee=bone==Target.KNEE_R,armLeft=bone==Target.SHOULDER_L;
+        Vec3 estimate=knee?pelvis.subtract(up.scale(.86)).subtract(left):
+                neck.subtract(up.scale(.12)).add(left.scale(armLeft?2:-2));
+        return AdaptiveRagdoll.consumeLimbJoint(mob,partial,knee?8:armLeft?4:2,estimate,knee);
+    }
+    static void draw(PoseStack stack,VertexConsumer out,int light,Vec3 camera,LivingEntity mob,LivingEntity owner,ConsumeVisual v,Cue cue,float partial){
         if(mob.isRemoved()||owner.isRemoved()||mob.level()!=owner.level())return;
-        double age=v.elapsed(mob.level().getGameTime(),partial)/20.0-35/30.0;
+        double age=v.elapsed(mob.level().getGameTime(),partial)/20.0-cue.frame()/30.0;
         if(age<=0)return;
         double remaining=1-ConsumeFracture.phase(mob,partial).returnFlow();
         if(remaining<.015)return;
@@ -149,17 +174,18 @@ final class ChestConsumeTendrils {
         Vec3 side=roots[2].subtract(roots[1]).normalize();
         if(side.lengthSqr()<.1)side=left(owner.yBodyRot);
         side=actor.radial(side);Vec3 forward=actor.axis.cross(side).normalize();
-        for(int i=0;i<TRACKS.length;i++){
-            Track tr=TRACKS[i];double elapsed=age-tr.delay();
+        for(Track tr:cue.tracks()){
+            double elapsed=age-tr.delayFrames()/30.0;
             if(elapsed<=0)continue;
             // Hip_R exits the right flank; the track ending at Hip_L follows the opposite flank.
-            double sign=(i==1||i==3)?-1:1;
+            double sign=(tr.source()==Source.HIP_R||tr.source()==Source.SPINE_2)?-1:1;
             Vec3 outward=side.scale(sign).add(forward.scale(.55*Math.cos(Math.toRadians(tr.roll())))).normalize();
-            Vec3[] path=route(roots[i],tips[i],actor,receiver,outward,tr);
+            Vec3[] path=route(sourceBone(roots,tr.source()),targetBone(tips,tr.target(),mob,partial),actor,receiver,outward,tr,elapsed);
             Vec3[] points=grow(path,elapsed*tr.speed()*DevastatorEffectTimeline.WORLD_SCALE,camera);
+            int segments=tr.segments();
             double[] widths=new double[points.length];
-            for(int j=0;j<=SEGMENTS;j++)
-                widths[j]=.107*DevastatorEffectTimeline.WORLD_SCALE*tr.scale()*remaining*(1-.45*j/SEGMENTS)*Math.min(1,elapsed*20);
+            for(int j=0;j<=segments;j++)
+                widths[j]=.107*DevastatorEffectTimeline.WORLD_SCALE*tr.scale()*remaining*(1-.45*j/segments)*Math.min(1,elapsed*20);
             ConsumeTendrils.sweep(stack,out,light,points,widths,outward,true);
         }
     }

@@ -22,8 +22,11 @@ public final class AssimilationSystem {
     }
     private AssimilationSystem(){}
     public static boolean tissue(Mob target){return target instanceof BlacklightInfectedHost h&&!h.hasMultipartBody()&&!h.devourerIdentity();}
+    public static boolean requiresCoreWeakening(BlacklightInfectedHost host){
+        return tissue(host)&&host.tissueAge()>=TissueGrowth.MATURITY_TICKS;
+    }
     public static boolean ready(LivingEntity target){
-        if(!(target instanceof BlacklightInfectedHost h)||!tissue(h)||h.tissueAge()<TissueGrowth.MATURITY_TICKS)return true;
+        if(!(target instanceof BlacklightInfectedHost h)||!requiresCoreWeakening(h))return true;
         float fraction=target.getHealth()/target.getMaxHealth();
         return fraction<=(TissueCore.quality(h.tissueAge())>=2?.10F:.15F)
                 &&(TissueCore.quality(h.tissueAge())<2||h.tissueCoreFracture()>=1);

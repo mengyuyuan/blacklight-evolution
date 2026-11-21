@@ -86,11 +86,17 @@ public final class ConsumeSystem {
     }
     /** Direct-grab class, evaluated before the receiver starts shrinking or moving. */
     public static boolean smallDirectReceiver(LivingEntity target) {
-        if(ConsumeSequence.large(target)||ConsumeSequence.boss(target)
-                ||target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())return false;
+        return !ConsumeSequence.large(target)&&!ConsumeSequence.boss(target)
+                &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host
+                    &&com.codex.blacklight.power.AssimilationSystem.requiresCoreWeakening(host))
+                &&canGrabAtFullHealth(target);
+    }
+
+    private static boolean canGrabAtFullHealth(LivingEntity target) {
+        if(target instanceof com.codex.blacklight.entity.MilitarySoldier
+                &&!com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target))return true;
         return com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
-                ||target instanceof com.codex.blacklight.entity.MilitarySoldier
-                ||target instanceof com.codex.blacklight.entity.BlacklightCommonInfected;
+                &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved());
     }
     private static boolean smallDirectScene(Session s) {
         return s.smallDirect&&s.stage==ConsumeVisual.CONSUME&&!ConsumeVariant.stealth(s.form,s.variant);
@@ -327,11 +333,8 @@ public final class ConsumeSystem {
         if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)return supreme.consumable()||consumer!=null&&supreme.isAlive()&&supreme.consumerId()==consumer.getId();
         if(target instanceof com.codex.blacklight.entity.EncounterMob boss&&boss.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return boss.goliathFinisherReady();
         float maximum=target.getMaxHealth();
-        boolean human=target instanceof com.codex.blacklight.entity.MilitarySoldier
-                && !com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(target);
         return target.isAlive() && Float.isFinite(maximum) && maximum>0
-                && (human || com.codex.blacklight.power.CombatScale.originalMaximum(target)<DIRECT_GRAB_MAX_HEALTH
-                    &&!(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())
+                && (canGrabAtFullHealth(target)
                     || target.getHealth()<=maximum*(consumer==null?HEALTH_LIMIT:com.codex.blacklight.power.ConsumeProgression.healthLimit(com.codex.blacklight.power.ConsumeProgression.progress(consumer))))
                 && com.codex.blacklight.power.AssimilationSystem.ready(target);
     }

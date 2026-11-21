@@ -2,7 +2,6 @@ package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.combat.ConsumeReceiverScene;
 import com.codex.blacklight.combat.ConsumeSystem;
-import com.codex.blacklight.combat.ConsumeVariant;
 import com.codex.blacklight.combat.ConsumeVisual;
 import com.codex.blacklight.combat.MobileConsumeCarry;
 import com.codex.blacklight.power.PowerForm;
@@ -17,20 +16,23 @@ import net.minecraft.world.phys.Vec3;
  * small receiver. Each bundle samples that receiver's own clock, pose and carry slot. */
 final class SmallMobConsumeSling {
     private static final Vec3 UP=new Vec3(0,1,0);
-    // Roots alternate between shoulders and the opposite flank. The outer turns bind
-    // the chest and hips at different heights and leave the head, extremities and gaps visible.
-    private record Cord(double side,double rootHeight,double upper,double lower,double radius,double delay,double turn){}
-    private static final Cord[] CORDS={
-            new Cord( 1,.95,.53,-.32,.051,0,.21),new Cord(-1,.85,.39,-.46,.044,.075,-.22),
-            new Cord( 1,.25,.03,-.57,.039,.14,.50),new Cord(-1,.48,.60,-.08,.038,.17,-.36),
-            new Cord( 1,.74,.43,-.23,.019,.09,.58),new Cord(-1,.91,.31,-.54,.016,.21,-.57),
-            new Cord(-1,.20,.06,-.44,.023,.26,.45)};
+    // Signed revolutions are measured between the two shoulder/hip leads.
+    // The main cable winds around both bodies; the thinner crossing cables grip the receiver.
+    private record Cord(double side, double rootHeight, double upper, double lower,
+                        double radius, double delay, double phase, double turns, boolean bothBodies) {}
+    private static final Cord[] CORDS = {
+            new Cord( 1, .96,  .94, -.96, .050, 0,    1.38, -3.05, true),
+            new Cord(-1, .86,  .79, -.86, .036, .07, -1.26,  1.84, false),
+            new Cord(-1, .38, -.59,  .76, .025, .14, -1.82, -1.36, true),
+            new Cord( 1, .28, -.28, -.80, .031, .11,  1.56,  -.49, false),
+            new Cord(-1, .76,  .62, -.05, .019, .21, -1.71,   .63, false)
+    };
     private SmallMobConsumeSling(){}
 
     static boolean applies(LivingEntity victim,ConsumeVisual scene){
-        return (scene.stage()==ConsumeVisual.CONSUME||scene.stage()==ConsumeVisual.MOBILE_CONSUME)
-                &&!ConsumeVariant.stealth(PowerForm.values()[scene.form()],scene.variant())
-                &&ConsumeSystem.smallDirectReceiver(victim);
+        // The reference chest punch shows an exterior wrap. Other finishers dispatch
+        // their own FIG bridges and retain their own receiver silhouettes.
+        return ChestConsumeTendrils.matches(scene)&&ConsumeSystem.smallDirectReceiver(victim);
     }
     private static double smooth(double x){x=Math.max(0,Math.min(1,x));return x*x*(3-2*x);}
 
@@ -84,31 +86,61 @@ final class SmallMobConsumeSling {
         double scale=Math.min(1.28,Math.max(.68,victim.getBbWidth()/.61));
         Vec3 drag=owner.getPosition(1).subtract(owner.getPosition(0));
         if(drag.lengthSqr()>.16)drag=drag.normalize().scale(.40);
+        CoilFrame frame=new CoilFrame(waist,upper,axis,outward,across,actorRadius,
+                center,mobAxis,around,rim,radius,half,drag);
         for(int i=0;i<CORDS.length;i++){
-            Cord c=CORDS[i];double growth=Math.min(1,Math.max(0,(time-begin-c.delay)/.48));
+            Cord c=CORDS[i];
+            double growth=smooth((time-begin-c.delay)/.48);
             if(growth<=0)continue;
-            Vec3 side=across.scale(c.side),root=waist.lerp(upper,c.rootHeight);
-            Vec3 hold=root.add(side.scale(actorRadius*.83)).add(outward.scale(-actorRadius*.25));
-            Vec3 crest=root.add(side.scale(actorRadius*(1.18+.13*Math.abs(c.turn))))
-                    .add(axis.scale(c.rootHeight>.65?.12:.02)).add(outward.scale(actorRadius*.36));
-            Vec3 returnRoot=waist.lerp(upper,c.rootHeight>.6?.22:.7).subtract(side.scale(actorRadius*.74));
-            Vec3 returnCrest=returnRoot.subtract(side.scale(actorRadius*.53)).add(outward.scale(actorRadius*.53));
-            Vec3[] path=new Vec3[9];
-            path[0]=hold;path[1]=crest;
-            for(int j=0;j<5;j++){
-                double u=j*.25;
-                double angle=c.side*(1.37-2.85*u)+c.turn;
-                double r=radius*(1.08+.16*Math.sin(Math.PI*u))+.04*(1-release);
-                path[j+2]=center.add(mobAxis.scale(half*(c.upper+(c.lower-c.upper)*u)))
-                        .add(around.scale(r*Math.cos(angle))).add(rim.scale(r*Math.sin(angle)))
-                        .subtract(drag.scale(.28*Math.sin(Math.PI*u)*(1-release)));
-            }
-            path[7]=returnCrest;path[8]=returnRoot;
-            // The last fibers slide back along their own route; no cable remains attached
-            // to the player's next target when this receiver finishes.
-            sweep(stack,out,light,camera,path,c.radius*scale,growth,release,i,time);
+            Vec3[] path=coilPath(i,frame,release);
+            // Keep the courses separated even on short receivers and juvenile mobs.
+            double pitch=half*Math.abs(c.upper-c.lower)/Math.abs(c.turns);
+            double width=Math.min(c.radius*scale,Math.max(.012,pitch*.32));
+            sweep(stack,out,light,camera,path,width,growth,release,i,time);
         }
     }
+
+    record CoilFrame(Vec3 waist, Vec3 chest, Vec3 actorAxis, Vec3 outward, Vec3 across,
+                     double actorRadius, Vec3 center, Vec3 mobAxis, Vec3 around, Vec3 rim,
+                     double mobRadius, double halfHeight, Vec3 drag) {}
+
+    static Vec3[] coilPath(int index, CoilFrame f, double release){
+        Cord c=CORDS[index];
+        int segments=(int)Math.ceil(16*Math.abs(c.turns));
+        Vec3[] path=new Vec3[segments+5];
+        Vec3 side=f.across.scale(c.side),root=f.waist.lerp(f.chest,c.rootHeight);
+        path[0]=root.add(side.scale(f.actorRadius*.83)).subtract(f.outward.scale(f.actorRadius*.25));
+        path[1]=root.add(side.scale(f.actorRadius*1.23)).add(f.actorAxis.scale(c.rootHeight>.65?.12:.02))
+                .add(f.outward.scale(f.actorRadius*.27));
+        for(int j=0;j<=segments;j++){
+            double u=j/(double)segments;
+            double angle=c.phase+2*Math.PI*c.turns*u+.13*Math.sin(2*Math.PI*u);
+            double cosine=Math.cos(angle),sine=Math.sin(angle);
+            double level=c.upper+(c.lower-c.upper)*u;
+            // A shallow oblique path crosses the ribs; the tips still sit below the face.
+            level+=.095*Math.sin(angle+.5*index)*Math.sin(Math.PI*u);
+            double clearance=(1-release)*(.031+.012*Math.cos(2*angle+.6*index));
+            double receiverRadius=f.mobRadius*1.11+clearance;
+            Vec3 receiverEdge=f.center.add(f.mobAxis.scale(f.halfHeight*level))
+                    .add(f.around.scale(cosine*receiverRadius)).add(f.rim.scale(sine*receiverRadius));
+            if(c.bothBodies){
+                // On the back half, the same strand follows the player's posed back and flanks.
+                // The outer half follows the prey even when its torso tilts during the carry.
+                double height=.50+level*.73;
+                double actorRadius=f.actorRadius*1.14+clearance;
+                Vec3 actorEdge=f.waist.lerp(f.chest,height)
+                        .add(f.outward.scale(cosine*actorRadius)).add(f.across.scale(sine*actorRadius));
+                receiverEdge=actorEdge.lerp(receiverEdge,smooth((cosine+.48)/.96));
+            }
+            path[j+2]=receiverEdge.subtract(f.drag.scale(.18*Math.sin(Math.PI*u)*(1-release)));
+        }
+        int last=path.length-1;
+        Vec3 returnRoot=f.waist.lerp(f.chest,c.lower>0?.79:.16).subtract(side.scale(f.actorRadius*.76));
+        path[last-1]=returnRoot.subtract(side.scale(f.actorRadius*.46)).add(f.outward.scale(f.actorRadius*.37));
+        path[last]=returnRoot;
+        return path;
+    }
+
     private static Vec3 sample(Vec3[] p,double t){
         double x=Math.min(1,Math.max(0,t))*(p.length-1);int i=Math.min(p.length-2,(int)x);
         double u=x-i,v=u*u,w=v*u;
@@ -118,7 +150,7 @@ final class SmallMobConsumeSling {
     }
     private static void sweep(PoseStack stack,VertexConsumer out,int light,Vec3 camera,Vec3[] path,
                               double width,double growth,double release,int id,double time){
-        final int steps=30,sides=7;
+        final int steps=Math.max(30,(int)Math.ceil((path.length-1)*1.6*growth*(1-release*.86))),sides=7;
         Vec3 previous=null,normal=UP;
         Vec3[] previousRing=new Vec3[sides],previousNormals=new Vec3[sides];
         Vec3[] ring=new Vec3[sides],normals=new Vec3[sides];
@@ -136,7 +168,7 @@ final class SmallMobConsumeSling {
             Vec3 binormal=tangent.cross(normal).normalize();
             double r=width*(1-.86*release)*(.12+.88*Math.pow(Math.max(0,Math.sin(Math.PI*u)),.50))
                     *Math.min(1,growth*4)*(1+.09*Math.sin(13*t-time*5+id));
-            double v=t*2.8+id*.38-time*.20;
+            double v=t*(path.length-1)*.31+id*.38-time*.20;
             for(int s=0;s<sides;s++){
                 double theta=2*Math.PI*s/sides+1.6*t+.31*id;
                 Vec3 n=normal.scale(Math.cos(theta)).add(binormal.scale(Math.sin(theta)));
