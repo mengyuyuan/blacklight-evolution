@@ -114,9 +114,13 @@ public class PlayerEffectGameTest {
         });
         h.runAfterDelay(24,()->{
             h.assertTrue(shard.isRemoved()&&!GroundSpikePin.held(mob)&&!ImpactControl.stunned(mob),"withdraw did not release");
+            // A live cow may already be walking away from the pin in any direction.
+            // Measure the requested displacement from its position on this tick.
+            Vec3 released=mob.position();
             mob.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(.55,0,0));
+            h.assertTrue(mob.getX()-released.x>.12,"released target could not step from "+released+" to "+mob.position());
         });
-        h.runAfterDelay(27,()->{h.assertTrue(mob.getX()>spot.x+.12,"released target cannot move");mob.discard();for(var c:tickets)h.getLevel().setChunkForced(c.x,c.z,false);h.getLevel().removePlayerImmediately(p,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);h.succeed();});
+        h.runAfterDelay(27,()->{h.assertTrue(!GroundSpikePin.held(mob),"withdrawn shaft recaptured its target");mob.discard();for(var c:tickets)h.getLevel().setChunkForced(c.x,c.z,false);h.getLevel().removePlayerImmediately(p,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);h.succeed();});
         });
     }
 }

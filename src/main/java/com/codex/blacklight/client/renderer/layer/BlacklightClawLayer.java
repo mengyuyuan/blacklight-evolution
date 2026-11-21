@@ -55,6 +55,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
         renderFirstPerson(player,stack,buffer,light,poses,partial,-1);
     }
     public void renderFirstPerson(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffer,int light,org.joml.Matrix4f[] poses,float partial,int side) {
+        com.codex.blacklight.client.renderer.MobileConsumeWrap.renderArm(player,stack,buffer,light,poses,partial,side);
         renderParts(player,stack,buffer,light,poses,partial,side,false);
     }
 
@@ -69,7 +70,7 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
                                float partialTicks) {
         var state = player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
         var form = state.getActivePower();
-        com.codex.blacklight.client.renderer.MobileConsumeWrap.render(player,poseStack,buffer,packedLight,poses,partialTicks);
+        com.codex.blacklight.client.renderer.MobileConsumeWrap.render(player,poseStack,buffer,packedLight,poses,partialTicks,((com.codex.blacklight.client.model.BlacklightPlayerModel)getParentModel()).mercerFrame());
         if(player.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL).kind()>=0){
             for(int side=0;side<2;side++){
                 var bone=com.codex.blacklight.animation.PlayerMotionController.skeleton().searchJointByName(side==0?"Tool_R":"Tool_L");

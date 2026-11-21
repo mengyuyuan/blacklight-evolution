@@ -22,6 +22,25 @@ public final class MercerPlayerMesh {
     private record Vertex(Vector3f p,Vector3f n,Vector3f blink,float u,float v,int a,int b,float weight) { }
     private record Part(int region,boolean shoulder,Vertex[] vertices) { }
     private final List<Part> parts=new ArrayList<>();
+    private ConsumeBodySurface consumeSurface;
+    public ConsumeBodySurface consumeSurface() {
+        if(consumeSurface!=null)return consumeSurface;
+        var surface=new ConsumeBodySurface();
+        Vector3f[] positions=new Vector3f[4], normals=new Vector3f[4];
+        int[] first=new int[4],second=new int[4];float[] weight=new float[4];
+        for(var part:parts){
+            if(part.region!=ConsumeAnatomy.BODY&&part.region!=ConsumeAnatomy.RIGHT_ARM&&part.region!=ConsumeAnatomy.LEFT_ARM)continue;
+            for(int j=0;j<part.vertices.length;j+=4){
+                for(int i=0;i<4;i++){
+                    var v=part.vertices[j+i];positions[i]=v.p;normals[i]=v.n;
+                    first[i]=v.a;second[i]=v.b;weight[i]=v.weight;
+                }
+                surface.addMercerFace(part.region,positions,normals,first,second,weight);
+            }
+        }
+        ConsumeBodyCords.add(surface,false,rig);
+        return consumeSurface=surface;
+    }
     private final MercerRig rig;
     private final float restHeight;
     private static MercerPlayerMesh instance;

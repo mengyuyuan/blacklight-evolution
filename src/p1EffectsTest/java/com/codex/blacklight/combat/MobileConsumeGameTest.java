@@ -48,7 +48,9 @@ public final class MobileConsumeGameTest {
                 if(frame<=release)com.codex.blacklight.movement.PrototypeMovementSystem.acceptInput(p,false,false,1,0,false,false);
                 if(frame==release-1)h.assertTrue(ConsumeSystem.committed(p)&&ConsumeControl.ownsMotion(p),"strike was cut before its consume marker");
                 tick(p);
+                if(frame==release-1)h.assertTrue(!p.getData(ModAttachments.CONSUME_BODY_VISUAL).active(),"giver shader started before its own cue");
                 if(frame==release){
+                    h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(old),"walking restarted or lost the giver shader clock");
                     var current=first.getData(ModAttachments.CONSUME_VISUAL);
                     h.assertTrue(current.stage()==ConsumeVisual.MOBILE_CONSUME&&current.started()==old.started()&&current.variant()==old.variant(),"receiver clock or action changed");
                     h.assertTrue(p.getData(ModAttachments.MOBILE_CONSUME_START)==p.level().getGameTime()&&!ConsumeControl.ownsMotion(p)&&!ConsumeSystem.active(p),"player still locked to receiver");
@@ -84,7 +86,9 @@ public final class MobileConsumeGameTest {
         int finish=ConsumeSequence.completionTick(PowerForm.NONE,false,visual.variant());
         for(int i=1;i<finish;i++)tick(p);
         h.assertTrue(ConsumeSystem.committed(p)&&!target.isRemoved()&&p.getData(ModAttachments.MOBILE_CONSUME_START)<0,"stationary execution entered mobile branch");
+        h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(visual),"stationary consume never applied the giver material");
         tick(p);
+        h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(visual),"settlement discarded the residual coat");
         h.assertTrue(target.isRemoved()&&p.getData(ModAttachments.CONSUME_RECOVERY).active()&&p.getHealth()==12,"stationary recovery or reward lost");
         h.succeed();
     }

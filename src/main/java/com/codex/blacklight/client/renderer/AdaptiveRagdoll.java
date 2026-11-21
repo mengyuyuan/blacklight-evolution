@@ -98,6 +98,22 @@ public final class AdaptiveRagdoll {
         return body.quill==organ ? body.quillSink(partial) : body.physicalWound(organ.getPosition(partial),partial);
     }
 
+    /** Four receiver joints retargeted onto its currently rendered torso, including compression and rotation. */
+    static Vec3[] chestConsumeJoints(LivingEntity entity,float partial){
+        var body=BODIES.get(entity);
+        if(body==null||scene!=entity.level())return null;
+        Part torso=null;
+        for(var part:body.parts){
+            if(part.bind.region==32&&part.renderedAt==scene.getGameTime()&&part.renderedPosition!=null
+                    &&part.flow<.985F&&(torso==null||part.half.lengthSqr()>torso.half.lengthSqr()))torso=part;
+        }
+        if(torso==null)return null;
+        var center=torso.renderedPosition;
+        var up=rotate(new Vec3(0,torso.half.y*torso.scale,0),torso.renderedRotation);
+        var side=rotate(new Vec3(torso.half.x*torso.scale*.52,0,0),torso.renderedRotation);
+        return new Vec3[]{center.subtract(up),center.add(up),center.subtract(up).add(side),center.lerp(center.add(up),.24)};
+    }
+
     public static boolean drawingQuillBody(LivingEntity host) {
         var body=BODIES.get(host);
         return body!=null && body.quill!=null && body.quill==QuillOrgan.extracting(host);
