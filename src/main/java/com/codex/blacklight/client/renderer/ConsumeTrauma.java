@@ -49,6 +49,8 @@ public final class ConsumeTrauma {
         if(!sites.isEmpty()){lashTime=time;lashSites=sites.toArray(Vec3[]::new);}
     }
     final ConsumeImpactResponse response=new ConsumeImpactResponse();
+    private long hitScene=Long.MIN_VALUE;
+    private int hitOwner=-1;
     private int lastHit=-1;
     private int landedBlows;
     private final List<Shard> shards=new ArrayList<>();
@@ -73,7 +75,7 @@ public final class ConsumeTrauma {
     }
     public static void sampleActor(LivingEntity actor,PoseStack stack,Matrix4f[] bones,Matrix4f[] skin,float partial){
         ChestConsumeTendrils.captureActor(actor,stack,bones,partial);
-        if(actor==null || ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME)return;
+        if(actor==null || !ConsumeVisual.consumeStage(ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)))return;
         var skeleton=PlayerMotionController.skeleton();
         var palms=new Vec3[2];var fists=new Vec3[2];var forearms=new Vec3[10];
         for(int i=0;i<2;i++){
@@ -111,6 +113,56 @@ public final class ConsumeTrauma {
         CONTACTS.put(actor,new Contact(actor.level().getGameTime()+partial,palms,fists,sole,knee,forearms,
                 BlacklightBoneRendering.worldPoint(stack,bones[skeleton.searchJointByName("Chest").getId()].getTranslation(new Vector3f()))));
     }
+    /** Only real sampled hands or visible cutting edges qualify a native mounted contact. */
+    static Vec3[] mountSites(LivingEntity owner,ConsumeVisual visual,float partial){
+        double now=owner.level().getGameTime()+partial;
+        if(visual.form()==PowerForm.HAMMERFISTS.ordinal()){
+            var hammer=HAMMERS.get(owner);
+            if(hammer!=null&&Math.abs(now-hammer.time)<1.5)return hammer.sites;
+        }
+        var edges=MOUNT_EDGES.get(owner);
+        if(edges!=null&&Math.abs(now-edges.time)<1.5&&edges.form==visual.form()){
+            return edges.hands.values().stream().flatMap(java.util.Arrays::stream).toArray(Vec3[]::new);
+        }
+        var pose=CONTACTS.get(owner);
+        if(pose!=null&&Math.abs(now-pose.time)<1.5)return pose.forearms;
+        // First-person actor can be culled. Reconstruct the same animated wrist/forearm
+        // from its active pose; never snap a missed attack to the victim's centre.
+        var current=com.codex.blacklight.client.animation.NativeConsumePose.sample(owner,visual,"actor",partial);
+        if(current==null)return new Vec3[0];
+        var rig=PlayerMotionController.skeleton();var matrices=rig.getPoseMatrices(current);
+        Vec3 feet=owner.getPosition(partial);
+        float yaw=visual.stage()==ConsumeVisual.MOUNT_CONSUME?
+                com.codex.blacklight.client.animation.NativeConsumePose.facing(owner,visual.facing(),partial):visual.facing();
+        Vec3 front=Vec3.directionFromRotation(0,yaw),right=new Vec3(-front.z,0,front.x);
+        Vec3[] samples=new Vec3[8];
+        for(int i=0;i<2;i++){
+            String hand=i==0?"L":"R";
+            var tip=matrices[rig.searchJointByName("Tool_"+hand).getId()].getTranslation(new Vector3f());
+            var base=matrices[rig.searchJointByName("Hand_"+hand).getId()].getTranslation(new Vector3f());
+            for(int j=0;j<4;j++){
+                var p=new Vector3f(base).lerp(tip,j/3F);
+                samples[i*4+j]=feet.add(right.scale(.9375*p.x)).subtract(front.scale(.9375*p.z)).add(0,.9375*p.y,0);
+            }
+        }
+        return samples;
+    }
+    private record SharpSites(double time,int form,Map<String,Vec3[]> hands){}
+    private static final Map<LivingEntity,SharpSites> MOUNT_EDGES=new WeakHashMap<>();
+    static void mountEdges(LivingEntity owner,PowerForm form,String joint,Map<String,List<Vec3>> edges,float partial){
+        var points=new ArrayList<Vec3>();
+        for(var line:edges.values())for(int i=1;i<line.size();i++){
+            Vec3 a=line.get(i-1),b=line.get(i);int count=Math.min(12,Math.max(1,(int)Math.ceil(a.distanceTo(b)/.055)));
+            for(int j=0;j<=count;j++)points.add(a.lerp(b,j/(double)count));
+        }
+        if(points.isEmpty())return;
+        double now=owner.level().getGameTime()+partial;
+        var previous=MOUNT_EDGES.get(owner);
+        Map<String,Vec3[]> hands=previous!=null&&previous.time==now&&previous.form==form.ordinal()
+                ?previous.hands:new java.util.LinkedHashMap<>();
+        hands.put(joint,points.toArray(Vec3[]::new));
+        MOUNT_EDGES.put(owner,new SharpSites(now,form.ordinal(),hands));
+    }
     static boolean applies(PowerForm form,int variant){
         return ConsumeVariant.stealth(form,variant) || form==PowerForm.WHIPFIST && variant==ConsumeVariant.CLASSIC || form==PowerForm.HAMMERFISTS || form==PowerForm.MUSCLE_MASS && variant==ConsumeVariant.CLASSIC || form==PowerForm.CLAWS && variant==ConsumeVariant.CLASSIC ||
                 form==PowerForm.NONE && (variant==ConsumeVariant.DEFAULT || variant==ConsumeVariant.HEAD_STOMP || variant==ConsumeVariant.KNEE_HEAD || variant==ConsumeVariant.BEATDOWN);
@@ -126,6 +178,7 @@ public final class ConsumeTrauma {
 
     void contact(LivingEntity e,ConsumeVisual visual,ConsumeFracture.Phase phase,List<Part> parts,Vec3[] positions,float partial){
         if(!applies(phase.form(),visual.variant()) || !phase.nativeEvents())return;
+        if(hitScene!=visual.started()||hitOwner!=visual.consumerId()){hitScene=visual.started();hitOwner=visual.consumerId();lastHit=-1;landedBlows=0;}
         var profile=ConsumeReceiverScene.profile(phase.form(),false,visual.variant());
         double now=e.level().getGameTime()+partial;
         int event=-1;
@@ -136,6 +189,7 @@ public final class ConsumeTrauma {
         }
         if(event<0)return;
         if(!(e.level().getEntity(visual.consumerId()) instanceof LivingEntity owner))return;
+        if(visual.stage()==ConsumeVisual.MOBILE_CONSUME&&ModAttachments.getData(owner,ModAttachments.GRAB_STAGE)!=ConsumeVisual.NONE)return;
         boolean stomp=visual.variant()==ConsumeVariant.HEAD_STOMP;
         boolean hammer=phase.form()==PowerForm.HAMMERFISTS;
         boolean knee=visual.variant()==ConsumeVariant.KNEE_HEAD;
@@ -172,7 +226,19 @@ public final class ConsumeTrauma {
         int region=head || hold&&!torsoHold?1:32;
         var hit=nearest(parts,positions,sites,region,partial);
         double contactRadius=blunt||punch||hold?.14:.065;
+        // If a different limb intercepts the strike, put its wound on that triangle.
+        // Keep the intended region for coincident clothing/skin samples.
+        var other=nearest(parts,positions,sites,0,partial);
+        if(other!=null&&(hit==null||Math.sqrt(other.distanceSquared())+.013<Math.sqrt(hit.distanceSquared())))hit=other;
         if(hit==null || hit.distanceSquared()>contactRadius*contactRadius)return;
+        if(hit.part().bind.region()!=region){
+            region=hit.part().bind.region();
+            if(head&&region!=1){
+                head=false;
+                blunt=true;
+            }
+        }
+        int before=hit.part().mesh.size(),revision=hit.part().meshRevision,initialShards=shards.size();
         lastHit=event;
         struck=hit.part();localImpact=hit.local();lastTime=impactTime=now;crushed=head&&!blunt;
         Vec3 world=hit.world();
@@ -184,7 +250,12 @@ public final class ConsumeTrauma {
             Vec3 incoming=center.subtract(world).normalize();
             if(incoming.lengthSqr()<.5)incoming=forward;
             var turn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
-            if(punch){
+            if(tear){
+                Vec3 travel=world.subtract(owner.getPosition(partial).add(0,owner.getBbHeight()*.72,0));
+                cutAt(struck,hit.bind(),rotate(incoming,new Quaternionf(turn).conjugate()),rotate(travel.normalize(),new Quaternionf(turn).conjugate()),
+                        Math.min(.30,Math.max(.12,e.getBbWidth()*.34))/struck.scale);
+            }
+            if(punch&&region==1){
                 chipHead(parts,positions,world,incoming,Math.min(4,++landedBlows),e.getBbWidth(),partial);
             }else if(blunt){
                 // One physical press crosses the head, its outer skin and any
@@ -199,7 +270,7 @@ public final class ConsumeTrauma {
                     if(AdaptiveRagdoll.bounds(part.mesh).distanceToSqr(centerLocal)<localRadius*localRadius)
                         part.press(centerLocal,rotate(incoming,inverse),localRadius,now,part==struck);
                 }
-            }else struck.imprintContact(localImpact,rotate(incoming,new Quaternionf(turn).conjugate()),
+            }else struck.imprintContact(hit.bind(),rotate(incoming,new Quaternionf(turn).conjugate()),
                     tear?FatalWeaponImpact.WHIP:FatalWeaponImpact.FIST);
             if(punch)struck.velocity=struck.velocity.add(incoming.scale(.075));
             if(tear)WoundBlood.rupture(e,region,world,incoming.scale(-1),false);
@@ -209,6 +280,11 @@ public final class ConsumeTrauma {
             // hammer or a head caught in the air still breaks freely.
             var floor=e.level().clip(new ClipContext(world.add(0,.05,0),world.add(0,-.8,0),
                     ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+            var crushTurn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
+            Vec3 inward=positions[parts.indexOf(struck)].subtract(world).normalize();
+            if(inward.lengthSqr()<.5)inward=forward;
+            cutAt(struck,hit.bind(),rotate(inward,new Quaternionf(crushTurn).conjugate()),null,
+                    Math.min(.27,Math.max(.10,e.getBbWidth()*.29))/struck.scale);
             groundPulp=(finishingPunch||stomp||hammer) && floor.getType()==HitResult.Type.BLOCK;
             double pavement=groundPulp?floor.getLocation().y:Double.NaN;
             breakHead(parts,positions,world,pavement,stomp||groundPulp,partial);
@@ -217,33 +293,60 @@ public final class ConsumeTrauma {
         }else{
             Vec3 direction=world.subtract(owner.getPosition(partial).add(0,owner.getBbHeight()*.65,0)).normalize();
             if(direction.lengthSqr()<.5)direction=forward;
-            if(ConsumePlacementTrack.villagerReceiver(e)){
+            if(region==32&&ConsumePlacementTrack.villagerReceiver(e)){
                 var turn=new Quaternionf(struck.oldRotation).slerp(struck.rotation,partial);
                 direction=rotate(new Vec3(0,0,1),turn.mul(struck.bind.rotation())).normalize();
-                var chest=AdaptiveRagdoll.villagerGrip(e,0,partial);
-                if(chest!=null)world=chest;
+                // Keep the measured wrist/triangle intersection through both robe layers.
             }
             jet=direction;
             for(int i=0;i<parts.size();i++){
-                var p=parts.get(i);if(p.bind.region()!=32)continue;
+                var p=parts.get(i);if(p.bind.region()!=region)continue;
                 var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
                 var inv=new Quaternionf(rotation).conjugate();
                 Vec3 center=p.center.add(rotate(world.subtract(positions[i]),inv).scale(1/p.scale));
+                if(p==hit.part())center=hit.bind();
                 if(center.distanceTo(p.center)>p.half.length()+.32)continue;
                 puncture(p,center,rotate(direction,inv),Math.min(.20,Math.max(.085,e.getBbWidth()*.25)),p==hit.part());
             }
         }
+        String kind=tear?"tear":blunt||hold?"dent":head?"crush":"pierce";
+        if(hit.part().meshRevision!=revision||shards.size()>initialShards)
+            ConsumeContactMarks.confirmed(e,visual,kind,event,hit.world(),hit.part().bind.region(),before,hit.part().mesh.size());
         com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Consume impact form={} variant={} age={} region={} gap={} shards={}",
                 phase.form(),visual.variant(),now-visual.started(),hit.part().bind.region(),Math.sqrt(hit.distanceSquared()),shards.size());
-        if(!blunt&&!hold&&!lash)WoundBlood.rupture(e,head?1:32,world,jet,head);
+        if(!blunt&&!hold&&!lash)WoundBlood.rupture(e,region,world,jet,head);
     }
 
-    private record SurfaceHit(Part part,Vec3 local,Vec3 world,double distanceSquared){}
+    static Vec3 gripTear(LivingEntity victim,LivingEntity owner,ConsumeVisual visual,List<Part> parts,Vec3[] at,float partial){
+        var left=musclePalm(owner,0,partial);var right=musclePalm(owner,1,partial);
+        if(left==null||right==null)return null;
+        Vec3 best=null,pull=right.subtract(left).normalize();
+        for(Vec3 palm:List.of(left,right)){
+            var hit=nearest(parts,at,new Vec3[]{palm},0,partial);
+            if(hit==null||hit.distanceSquared()>.14*.14)continue;
+            var part=hit.part();var rotation=new Quaternionf(part.oldRotation).slerp(part.rotation,partial).conjugate();
+            Vec3 inward=at[parts.indexOf(part)].subtract(hit.world()).normalize();
+            if(inward.lengthSqr()<.5)continue;
+            int before=part.mesh.size();
+            if(cutAt(part,hit.bind(),rotate(inward,rotation),rotate(pull,rotation),.15/part.scale)){
+                ConsumeContactMarks.confirmed(victim,visual,"tear",0,hit.world(),part.bind.region(),before,part.mesh.size());
+                if(best==null)best=hit.world();
+            }
+        }
+        return best;
+    }
+    static boolean cutAt(Part part,Vec3 site,Vec3 inward,Vec3 stroke,double radius){
+        var lining=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
+        var cut=stroke==null?ImpactChip.carve(part.mesh,site,inward,radius,0,lining):ImpactChip.groove(part.mesh,site,inward,stroke,radius,lining);
+        if(cut.cut()){part.mesh.clear();part.mesh.addAll(cut.skin());part.meshRevision++;}
+        return cut.cut();
+    }
+    private record SurfaceHit(Part part,Vec3 local,Vec3 bind,Vec3 world,double distanceSquared){}
     private static SurfaceHit nearest(List<Part> parts,Vec3[] positions,Vec3[] sites,int region,float partial){
         double best=Double.POSITIVE_INFINITY;
-        Vec3 local=null,world=null;Part hit=null;
+        Vec3 local=null,bind=null,world=null;Part hit=null;
         for(int i=0;i<parts.size();i++){
-            Part p=parts.get(i);if(p.bind.region()!=region || p.scale<.5)continue;
+            Part p=parts.get(i);if(region!=0&&p.bind.region()!=region || p.scale<.5)continue;
             var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
             var inverse=new Quaternionf(rotation).conjugate();
             for(Vec3 site:sites){
@@ -252,11 +355,15 @@ public final class ConsumeTrauma {
                 for(int j=0;j+3<skin.size();j+=4)for(int tri=1;tri<=2;tri++){
                     Vec3 at=SweptBladeSurface.closest(near,p.skinPoint(skin.get(j)),p.skinPoint(skin.get(j+tri)),p.skinPoint(skin.get(j+tri+1)));
                     double d=at.distanceToSqr(near)*p.scale*p.scale;
-                    if(d<best){best=d;hit=p;local=at;world=positions[i].add(rotate(at.subtract(p.center).scale(p.scale),rotation));}
+                    if(d<best){best=d;hit=p;local=at;
+                        var a=skin.get(j);var b=skin.get(j+tri);var c=skin.get(j+tri+1);
+                        var weights=ConsumeContactMarks.barycentric(at,p.skinPoint(a),p.skinPoint(b),p.skinPoint(c));
+                        bind=ConsumeContactMarks.weighted(weights,a.p,b.p,c.p);
+                        world=positions[i].add(rotate(at.subtract(p.center).scale(p.scale),rotation));}
                 }
             }
         }
-        return hit==null?null:new SurfaceHit(hit,local,world,best);
+        return hit==null?null:new SurfaceHit(hit,local,bind,world,best);
     }
 
     private void chipHead(List<Part> parts,Vec3[] positions,Vec3 impact,Vec3 inward,int count,double width,float partial){
@@ -360,7 +467,7 @@ public final class ConsumeTrauma {
     // Subtract a hexagonal tunnel from every surface, including front, back and clothing.
     private static void puncture(Part p,Vec3 entry,Vec3 axis,double radius,boolean lining){
         Vec3 u=axis.cross(Math.abs(axis.y)<.9?new Vec3(0,1,0):new Vec3(1,0,0)).normalize(),v=axis.cross(u);
-        var kept=new ArrayList<Vertex>();
+        var kept=new ArrayList<Vertex>();boolean penetrated=false;
         for(int j=0;j+3<p.mesh.size();j+=4){
             List<Vertex> inside=p.mesh.subList(j,j+4);
             for(int k=0;k<6 && !inside.isEmpty();k++){
@@ -376,6 +483,7 @@ public final class ConsumeTrauma {
             // Trace the actual clipped face, including the outer robe and far
             // panel. Recess the rim into the opening so it cannot hang off the skin.
             if(inside.size()>=3){
+                penetrated=true;
                 Vec3 center=Vec3.ZERO;
                 for(var corner:inside)center=center.add(corner.p);
                 center=center.scale(1.0/inside.size());
@@ -386,6 +494,7 @@ public final class ConsumeTrauma {
                 }
             }
         }
+        if(!penetrated)return;
         if(lining){
             double near=Double.POSITIVE_INFINITY,far=Double.NEGATIVE_INFINITY;
             for(var vertex:p.mesh){

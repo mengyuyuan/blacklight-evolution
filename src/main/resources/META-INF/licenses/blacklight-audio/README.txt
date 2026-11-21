@@ -13,3 +13,5 @@ The derived audio cues under assets/blacklight/sounds/weapons and assets/blackli
 License links: https://creativecommons.org/licenses/by-sa/3.0/ and https://creativecommons.org/publicdomain/zero/1.0/
 
 The draw, swing and heavy variations ending in _2 and _3 under sounds/weapon/backspines use the credited Socapex combat recordings and artisticdude swishes, trimmed, pitched and layered for the shoulder organ. These six mixes are licensed under CC BY-SA 3.0.
+
+The combat remix applies new gain staging, soft limiting and mono Vorbis encoding to the six weapon banks and shoulder quill recordings. The recordings mixed for the new consume and skill cues come from the same attributed weapon Foley library listed above. These modifications and the resulting files under sounds/consume and sounds/skill are distributed under CC BY-SA 3.0. The shoulder impact events also reference these mixes. The recipe is tools/build_combat_audio_mix.py. Pass --baseline a pre-remix release JAR, --project the checkout and --evidence an output directory. No commercial game sound recordings were used in the remix.

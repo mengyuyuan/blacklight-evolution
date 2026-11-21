@@ -21,6 +21,14 @@ public final class TerrainImpactEffects {
     public record Surface(BlockHitResult hit,double angle,int ring,int index) {}
     private TerrainImpactEffects() {}
 
+    static void weaponGroundSound(net.minecraft.server.level.ServerPlayer owner,
+            com.codex.blacklight.power.PowerForm form,BlockHitResult hit,float gain,float pitch) {
+        if(hit.getType()!=HitResult.Type.BLOCK)return;
+        var pos=hit.getBlockPos();
+        var material=owner.level().getBlockState(pos).getSoundType(owner.level(),pos,owner);
+        com.codex.blacklight.registry.ModWeaponSounds.play(owner,form,"ground",hit.getLocation(),
+                gain*material.getVolume(),pitch*material.getPitch());
+    }
     static void surfaceSound(Entity actor, BlockHitResult contact, float volume, float pitch) {
         if (contact.getType() != HitResult.Type.BLOCK) return;
         var level = actor.level();

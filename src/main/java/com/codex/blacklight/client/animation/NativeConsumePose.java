@@ -138,6 +138,18 @@ public final class NativeConsumePose {
         return true;
     }
     public static float facing(LivingEntity actor,float fallback,float partial){
+        // Mounted roots are placed at the creature's back. Only body yaw follows the
+        // actual target, as on the server; camera orbit remains free.
+        if(ModAttachments.getData(actor,ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT_CONSUME){
+            var matches=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),
+                    e->ModAttachments.getData(e,ModAttachments.CONSUME_VISUAL).drivesActor(actor.getId())&&ModAttachments.getData(e,ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.MOUNT_CONSUME);
+            if(!matches.isEmpty()){
+                var target=matches.get(0);
+                if(ConsumeSequence.bruteMount(target))return ModAttachments.getData(target,ModAttachments.CONSUME_VISUAL).facing();
+                var aim=ConsumeSequence.contact(target).subtract(actor.getPosition(partial));
+                if(aim.horizontalDistanceSqr()>1e-9)return (float)Math.toDegrees(Math.atan2(-aim.x,aim.z));
+            }
+        }
         if(ConsumeVisual.holding(com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)))
             return net.minecraft.util.Mth.rotLerp(partial,actor.yRotO,actor.getYRot());
         if(com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.AIR_THROW&&com.codex.blacklight.registry.ModAttachments.getData(actor, ModAttachments.GRAB_STAGE)!=ConsumeVisual.GRAB_ATTACK)return fallback;

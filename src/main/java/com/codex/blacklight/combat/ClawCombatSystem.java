@@ -312,7 +312,7 @@ public final class ClawCombatSystem {
                 if (target.hurt(player.damageSources().playerAttack(player),
                         clawDamage(state, 16.0F))) {
                     if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
-                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, false, null);
+                    WeaponImpact.contact(player, target, ImpactTier.HEAVY, true, null);
                 }
             }
             hitHulls(player,sweep,clawDamage(state,16F),alreadyHit,Integer.MAX_VALUE);
@@ -350,6 +350,8 @@ public final class ClawCombatSystem {
                             clawDamage(state, 9.0F))) {
                         if(!CombatTargeting.anchoredBody(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
                         hitCount++;
+                        if(hitCount==1)com.codex.blacklight.registry.ModWeaponSounds.play(player,
+                                com.codex.blacklight.power.PowerForm.CLAWS,"hit",target.getBoundingBox().getCenter(),.88F,1.04F);
                         ClawPhysicalEffects.onComboTargetHit(player, target, false);
                     }
                 }
@@ -425,7 +427,7 @@ public final class ClawCombatSystem {
                     case AUTO_3 -> WeaponMove.CLAW_AUTO3;
                     default -> WeaponMove.CLAW_AUTO1;
                 };
-                WeaponImpact.contact(player,target,ImpactTier.of(move),false,null,move,player.position());
+                WeaponImpact.contact(player,target,ImpactTier.of(move),hitCount==1,null,move,player.position());
             }
         }
         hitCount+=hitHulls(player,sweep,damage,new HashSet<>(),maxTargets-targets.size());

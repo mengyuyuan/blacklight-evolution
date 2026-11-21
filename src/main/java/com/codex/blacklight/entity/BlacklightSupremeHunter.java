@@ -346,7 +346,8 @@ public final class BlacklightSupremeHunter extends Monster {
 
     // ---- damage and reactions ----
     @Override public boolean hurt(DamageSource source,float amount){
-        if(level().isClientSide||isBeingConsumed())return false;
+        if(level().isClientSide)return false;
+        if(isBeingConsumed())return com.codex.blacklight.combat.ConsumeContactDamage.owns(this,source) && super.hurt(source,amount);
         boolean deflected = amount > 0 && deflects(source);
         boolean accepted = super.hurt(source, deflected ? amount * SupremeHunterBalance.AIR_DEFLECT_FACTOR : amount);
         if (!accepted) return false;

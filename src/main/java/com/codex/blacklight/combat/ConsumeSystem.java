@@ -61,6 +61,7 @@ public final class ConsumeSystem {
     // Some source callbacks occur after the shorter MC receiver has settled.
     private static final java.util.Map<ServerPlayer,List<ConsumeVisual>> PENDING_COATS=new java.util.WeakHashMap<>();
     private static final class Session {
+        final ConsumeContactDamage contactDamage = new ConsumeContactDamage();
         final Mob victim; final PowerForm form; final float heal; final int biomass, ep; final boolean large, smallDirect; float facing;
         final com.codex.blacklight.power.AssimilationSystem.Yield reward;
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
@@ -75,6 +76,7 @@ public final class ConsumeSystem {
         }
         Mob victim(){return victim;} PowerForm form(){return form;}
         Vec3 start(){return start;} int started(){return started;}
+        boolean gripSound,absorbSound;
         PowerForm animationForm(){return stage==ConsumeVisual.HUNTER_CONSUME?PowerForm.NONE:form;}
         int duration(){return stage==ConsumeVisual.AIR_HOLD?AerialCarryMotion.holdDuration():stage==ConsumeVisual.AIR_THROW?AerialCarryMotion.duration():stage==ConsumeVisual.GRAB_ATTACK?HeldSlamMotion.duration():stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.ACTOR_TICKS:ConsumeSequence.duration(animationForm(),large,variant);}
         int completionTick(){return stage==ConsumeVisual.HUNTER_CONSUME?HunterConsume.COMPLETE_TICKS:ConsumeSequence.completionTick(animationForm(),large,variant);}
@@ -197,6 +199,10 @@ public final class ConsumeSystem {
         com.codex.blacklight.registry.ModAttachments.syncData(s.victim,ModAttachments.CONSUME_VISUAL);
         com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.GRAB_STAGE,stage);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.GRAB_STAGE);
         ConsumeControl.releaseControls(p);ConsumeControl.releaseControls(s.victim);
+        if(!s.gripSound&&(ConsumeVisual.holding(stage)||s.committed())){
+            s.gripSound=true;
+            com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"consume.grip",ConsumeSequence.contact(s.victim),.86F,1F);
+        }
         if(s.committed())p.setDeltaMovement(Vec3.ZERO);
     }
     private static void play(ServerPlayer player, PlayerAction action) {
@@ -449,7 +455,7 @@ public final class ConsumeSystem {
         play(player,form==PowerForm.BLADE?PlayerAction.GRAB_BLADE:form==PowerForm.WHIPFIST?PlayerAction.GRAB_WHIP:PlayerAction.GRAB_REACH);
         if (form == PowerForm.WHIPFIST)
             com.codex.blacklight.registry.ModWeaponSounds.play(player, form, "swing", player.getEyePosition(), .52F, 1.16F);
-        else player.level().playSound(null, target.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM, SoundSource.PLAYERS, .9F, .65F);
+
     }
 
     @SubscribeEvent public static void tick(PlayerTickEvent event) {
@@ -661,6 +667,10 @@ public final class ConsumeSystem {
                 &&Float.isFinite(ConsumeGiverEffect.cue(s.form,s.variant));
     }
     private static void triggerBodyWeave(ServerPlayer player,Session session,int elapsed){
+        if (!session.absorbSound && elapsed>=Math.max(1,session.completionTick()-10)) {
+            session.absorbSound=true;
+            com.codex.blacklight.registry.ModWeaponSounds.spatial(player,"consume.absorb",ConsumeSequence.contact(session.victim),.90F,1F);
+        }
         if(session.bodyWeaveStarted||!eligibleForCoat(session))return;
         if(elapsed<ConsumeGiverEffect.tick(ConsumeGiverEffect.cue(session.form,session.variant)))return;
         session.bodyWeaveStarted=true;
@@ -789,17 +799,22 @@ public final class ConsumeSystem {
         int contact=session.stage==ConsumeVisual.HUNTER_CONSUME?24:Math.round(session.duration()*ConsumeSequence.contact(animationForm,session.large))-1;
         var receiverScene=ConsumeReceiverScene.profile(animationForm,session.large,session.variant);
         Vec3 point=ConsumeSequence.contact(session.victim);
-        if(receiverScene!=null?receiverScene.impactAt(elapsed):elapsed==contact) {
+        if (receiverScene == null && !session.large && animationForm == PowerForm.BLADE)
+            contact = Math.round(20 * ConsumeSequence.splitSeconds(animationForm, false, session.variant));
+        int ordinal = session.contactDamage.strike(player, session.victim, receiverScene, contact, elapsed, session.stage == ConsumeVisual.HUNTER_CONSUME);
+        if(ordinal >= 0) {
             boolean hammer=animationForm==PowerForm.HAMMERFISTS;
-            com.codex.blacklight.registry.ModInfectedSounds.play(session.victim,hammer?
-                    com.codex.blacklight.infection.InfectedSoundCue.CRUSH:animationForm==PowerForm.NONE?
-                    com.codex.blacklight.infection.InfectedSoundCue.PIERCE:com.codex.blacklight.infection.InfectedSoundCue.TEAR,point);
+            var scene=ModAttachments.getData(session.victim,ModAttachments.CONSUME_VISUAL);
+            String sound=ConsumeImpactKind.forContact(animationForm,session.large,session.stage,session.variant,ordinal,
+                    receiverScene==null?1:receiverScene.hitSeconds().size());
+            var audio=new com.codex.blacklight.network.ConsumeContactSoundPayload(session.victim.getId(),player.getId(),
+                    scene.started(),ordinal,sound,point);
+            for (ServerPlayer listener:player.serverLevel().players())
+                if(listener.position().distanceToSqr(point)<32*32)com.codex.blacklight.forge.PacketDistributor.sendToPlayer(listener,audio);
             // Small receivers have client-side posed/physical bodies. Their blood follows
             // that wound from the synchronized phase, not this upright server AABB.
             if(ConsumeSequence.mountedStage(session.stage))
                 player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
-            session.victim.hurtTime=8;session.victim.hurtDuration=8;
-            player.serverLevel().broadcastEntityEvent(session.victim,(byte)2);
             if(hammer){
                 var floor=session.victim.blockPosition().below();
                 player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),
@@ -839,7 +854,8 @@ public final class ConsumeSystem {
         com.codex.blacklight.city.MilitaryCampaignSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
-        player.level().playSound(null, player.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, ConsumeVariant.stealth(session.form,session.variant)?.25F:.8F, .55F);
+        com.codex.blacklight.registry.ModWeaponSounds.spatial(player,"consume.finish",player.position().add(0,1,0),
+                ConsumeVariant.stealth(session.form,session.variant)?.68F:.94F,1F);
         player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
     }
     /** Run the death callback while the absorber and the type of execution are still known. */
@@ -995,6 +1011,7 @@ public final class ConsumeSystem {
     }
     /** Keep a confirmed scene intact. The actor still takes damage and can die. */
     @SubscribeEvent public static void protectReceiver(net.minecraftforge.event.entity.living.LivingHurtEvent event) {
+        if(ConsumeContactDamage.owns(event.getEntity(), event.getSource())) return;
         if(ABSORBING.containsKey(event.getEntity())||ACTIVE.values().stream().anyMatch(s->s.committed()&&s.victim==event.getEntity()))event.setCanceled(true);
     }
     @SubscribeEvent public static void knockback(net.minecraftforge.event.entity.living.LivingKnockBackEvent event) {

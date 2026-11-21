@@ -18,7 +18,7 @@ public final class ModWeaponSounds {
     static {
         for(String form:List.of("none","claws","blade","hammerfists","whipfist","muscle_mass"))
             registerWeaponCues(form,List.of("swing","hit","heavy","ground","morph"));
-        registerWeaponCues("backspines",List.of("draw","swing","heavy","morph"));
+        registerWeaponCues("backspines",List.of("draw","swing","hit","heavy","ground","morph"));
     }
     private static void registerWeaponCues(String form,List<String> cues){
         for(String cue:cues){
@@ -27,6 +27,15 @@ public final class ModWeaponSounds {
         }
     }
     static {
+        for (String group : List.of("consume","skill")) {
+            var cues = group.equals("consume")
+                    ? List.of("grip","pierce","cleave","tear","dent","crush","slash","absorb","finish")
+                    : List.of("charge","groundspike","tendril","pain","dive");
+            for (String cue : cues) {
+                String id=group+"."+cue;
+                EVENTS.put(id,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
+            }
+        }
         for(String form:List.of("armor","shield"))
             for(String cue:List.of("deploy","retract","hit","heavy","deflect","break")){
                 if(form.equals("armor")&&cue.equals("break"))continue;
@@ -54,8 +63,18 @@ public final class ModWeaponSounds {
     public static void register(IEventBus bus){SOUNDS.register(bus);}
     /** Shared unarmed/air clips still use the equipped weapon's sound bank. */
     public static PowerForm equipped(ServerPlayer player){return ModAttachments.getData(player,ModAttachments.PLAYER_STATE).getActivePower();}
+    public static SoundEvent event(String id){
+        var entry=EVENTS.get(id);return entry==null?null:entry.get();
+    }
+    public static void spatial(ServerPlayer player,String id,Vec3 at,float volume,float pitch){
+        var sound=event(id);if(sound==null)return;
+        player.level().playSound(null,at.x,at.y,at.z,sound,SoundSource.PLAYERS,volume,pitch);
+    }
     public static void play(ServerPlayer player,PowerForm form,String cue,Vec3 at,float volume,float pitch){
-        var sound=EVENTS.get("weapon."+form.id()+"."+cue);if(sound==null)return;
+        var sound=EVENTS.get("weapon."+form.id()+"."+cue);
+        if(sound==null)sound=EVENTS.get("weapon.none."+cue);
+        if(sound==null)return;
+        if(!cue.equals("morph"))volume=Math.min(1F,volume*1.21F);
         player.level().playSound(null,at.x,at.y,at.z,sound.get(),SoundSource.PLAYERS,volume,pitch*(.97F+player.getRandom().nextFloat()*.06F));
     }
 }

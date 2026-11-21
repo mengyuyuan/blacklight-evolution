@@ -77,9 +77,10 @@ public final class CombatScale {
     /** Forge applies this once at its actual damage-before-absorption boundary. */
     public static float finalDamage(LivingEntity entity,net.minecraft.world.damagesource.DamageSource source,float damage){
         damage=com.codex.blacklight.compat.CultivationCompatibility.afterCultivationDefense(entity,source,damage);
-        return com.codex.blacklight.infection.TissueCompetition.finalDamage(entity,source,
+        float scaled = com.codex.blacklight.infection.TissueCompetition.finalDamage(entity,source,
                 com.codex.blacklight.combat.CrossModCombat.defend(entity,source,
                         InfiniteEvolutionSystem.damage(entity,source,damageUnits(entity,AssimilationSystem.damage(entity,source,damage)))));
+        return com.codex.blacklight.combat.ConsumeContactDamage.limitDamage(entity,source,scaled);
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void heal(LivingHealEvent event){

@@ -134,7 +134,12 @@ for index in range(3):
     if [n['payload'] for n in segment_skel['children'] if n['type']==0x23001]!=[n['payload'] for n in skel['children'] if n['type']==0x23001]:
         raise ValueError('Segment joint auxiliary records differ from core: '+skeleton_name)
     regions=[]
-    for suffix in ('Jaw_3','Head','Jaw_1','Spine_5','Jaw_2','Spine_4','Spine_3','Spine_2','Spine_1','Spine_Base'):
+    # Lock the established per-child channel order for the independent close-combat track.
+    indices=[
+        ('Jaw_3','Head','Jaw_1','Spine_5','Jaw_2','Spine_4','Spine_3','Spine_2','Spine_1','Spine_Base'),
+        ('Spine_1','Spine_2','Spine_Base','Spine_3','Spine_4','Spine_5','Head','Jaw_1','Jaw_2','Jaw_3'),
+        ('Spine_Base','Spine_1','Spine_2','Spine_3','Spine_4','Spine_5','Head','Jaw_2','Jaw_3','Jaw_1')]
+    for suffix in indices[index]:
         src=prefix+'_'+suffix
         leaf='weak_'+str(index)+'_'+src
         pivot=(S@bind[src][:3,3]*scale).tolist()

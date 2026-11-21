@@ -116,6 +116,7 @@ public final class DevastatorSystem {
                 move.id,s.id,p.getGameProfile().getName(),p.getY(),p.onGround());
         movement.cancelCharge();movement.consumeDashRequest();movement.clearSprintDrive();
         com.codex.blacklight.registry.ModAttachments.setData(p,ModAttachments.GLIDE_UNTIL,-1L);com.codex.blacklight.registry.ModAttachments.syncData(p,ModAttachments.GLIDE_UNTIL);
+        com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"skill.charge",p.position(),.80F,1F);
         play(p,s,true,0,-1);publish(p,s);return true;
     }
     private static void play(ServerPlayer p,Session s,boolean charging,float offset,float heldPose){
@@ -158,6 +159,10 @@ public final class DevastatorSystem {
                         s.move.id,s.id,age,s.released);
                 if(kind(s.move)==2&&s.target!=null&&s.target.isAlive()&&ExplicitTarget.visibleWithinRange(p,s.target,s.timing.radius()))
                     s.direction=ExplicitTarget.point(p,s.target).subtract(p.getEyePosition()).normalize();
+                if(s.move!=WeaponMove.BULLETDIVE_DROP && s.move!=WeaponMove.DEV_AIR_GROUNDSPIKE) {
+                    String cue=switch(kind(s.move)){case 0->"groundspike";case 1->"tendril";default->"pain";};
+                    com.codex.blacklight.registry.ModWeaponSounds.spatial(p,"skill."+cue,s.origin,1F,1F);
+                }
                 play(p,s,false,charge.releaseTime(),-1);publish(p,s);
             }
             return;
@@ -181,6 +186,8 @@ public final class DevastatorSystem {
                 s.landed=true;s.phase=LAND;s.phaseTick=p.tickCount;s.released=p.level().getGameTime();s.origin=p.position();
                 com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Devastator land {} session={} y={} onGround={} fallHeight={} peakDown={}",
                         s.move.id,s.id,p.getY(),p.onGround(),Math.max(0,s.highest-s.origin.y),s.peakDown);
+                com.codex.blacklight.registry.ModWeaponSounds.spatial(p,
+                        s.move==WeaponMove.BULLETDIVE_DROP?"skill.dive":"skill.groundspike",s.origin,1F,.98F);
                 if(s.move==WeaponMove.BULLETDIVE_DROP){
                     var terrain=BulletdiveTerrain.begin(p,s.id,s.origin,Math.max(0,s.highest-s.origin.y));
                     { // Bulletdive shockwave ring: the surface buckles outward from the crater.

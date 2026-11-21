@@ -1256,5 +1256,21 @@
   "death.attack.blacklight.quill_drain": "%1$s 被体内的骨刺汲尽了生物质",
   "death.attack.blacklight.quill_drain.player": "%1$s 被 %2$s 种下的骨刺汲尽了生物质",
   "message.blacklight.quill_empty": "生物质不足",
-  "entity.blacklight.quill_organ": "寄生骨刺"
+  "entity.blacklight.quill_organ": "寄生骨刺",
+  "subtitle.blacklight.consume.grip": "抓住目标",
+  "subtitle.blacklight.consume.pierce": "刺入",
+  "subtitle.blacklight.consume.cleave": "劈开",
+  "subtitle.blacklight.consume.tear": "组织撕裂",
+  "subtitle.blacklight.consume.dent": "钝击",
+  "subtitle.blacklight.consume.crush": "重压碎裂",
+  "subtitle.blacklight.consume.slash": "刃口划过",
+  "subtitle.blacklight.consume.absorb": "组织回收",
+  "subtitle.blacklight.consume.finish": "吞噬完成",
+  "subtitle.blacklight.skill.charge": "蓄力",
+  "subtitle.blacklight.skill.groundspike": "地刺爆发",
+  "subtitle.blacklight.skill.tendril": "触手爆发",
+  "subtitle.blacklight.skill.pain": "集中打击释放",
+  "subtitle.blacklight.skill.dive": "俯冲撞地",
+  "subtitle.blacklight.weapon.backspines.hit": "肩刺刺入",
+  "subtitle.blacklight.weapon.backspines.ground": "肩刺撞地"
 }

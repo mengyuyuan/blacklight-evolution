@@ -62,7 +62,7 @@ public final class AdaptiveRagdoll {
     private record History(double time,Map<Object,Node> nodes) {}
     record Node(Object key,Object parent,Vec3 pivot,Quaternionf rotation,int region) {}
     private AdaptiveRagdoll() {}
-    public static void invalidateModels(){PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();}
+    public static void invalidateModels(){PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();CombatSurfaceWounds.clear();}
 
     /** Preserve a small terrain accommodation when the native renderer takes over,
      * then settle smoothly to that renderer's own pose. Never move gameplay state. */
@@ -303,7 +303,7 @@ public final class AdaptiveRagdoll {
     }
     private static void reset(){
         var level=Minecraft.getInstance().level;
-        if(scene!=level){scene=level;PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();}
+        if(scene!=level){scene=level;PENDING.clear();NATIVE_FATAL.clear();BODIES.clear();HISTORY.clear();COOLDOWN.clear();RELEASES.clear();QuillWounds.clear();CombatSurfaceWounds.clear();}
     }
     private static void releaseNativeBoss(LivingEntity e){
         BODIES.remove(e);PENDING.remove(e);RELEASES.remove(e);COOLDOWN.remove(e);
@@ -347,7 +347,9 @@ public final class AdaptiveRagdoll {
     /** Called once around the actual dispatcher render, including custom entity renderers. */
     public static Frame begin(Entity entity,PoseStack stack,MultiBufferSource buffers,float partial){
         reset();
-        if(!(entity instanceof LivingEntity e)||!supports(e)||e.isInvisible()||scene==null)return null;
+        if(!(entity instanceof LivingEntity e)||e.isInvisible()||scene==null)return null;
+        // Player wounds can follow the standing skin while vanilla keeps control of the pose.
+        if(!supports(e)&&!(e instanceof net.minecraft.world.entity.player.Player && CombatSurfaceWounds.active(e)))return null;
         resumeNativeFatal(e);
         // Keep collecting native pose history for a later death, while clearing
         // any prior physical body after a cancelled consume/old impact packet.
@@ -360,12 +362,15 @@ public final class AdaptiveRagdoll {
         }
         var player=Minecraft.getInstance().player;
         if(player==null||player.distanceToSqr(e)>64*64)return null;
-        return new Frame(e,stack,buffers,partial,active(e)||!COOLDOWN.containsKey(e)&&QuillWounds.has(e));
+        return new Frame(e,stack,buffers,partial,active(e)||!COOLDOWN.containsKey(e)&&(QuillWounds.has(e)||CombatSurfaceWounds.active(e)));
     }
     static void consumeBlades(LivingEntity actor,com.codex.blacklight.power.PowerForm form,Map<String,List<Vec3>> edges,float partial){
         for(var body:BODIES.values()){
             var visual=com.codex.blacklight.registry.ModAttachments.getData(body.entity, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
-            if(visual.consuming()&&visual.consumerId()==actor.getId()&&visual.form()==form.ordinal())body.consumeBlades(edges,partial);
+            // A released receiver still belongs to this owner while a new victim can be grabbed.
+            // Its retained mesh keeps old wounds. Fresh moving blades belong only to the held execution.
+            if(visual.stage()==com.codex.blacklight.combat.ConsumeVisual.CONSUME
+                    &&visual.consumerId()==actor.getId()&&visual.form()==form.ordinal())body.consumeBlades(edges,partial);
         }
     }
     /** A host's detached appearance supplies the skeleton, never a second physical body. */
@@ -524,8 +529,10 @@ public final class AdaptiveRagdoll {
                     QuillTendrils.fit(QuillOrgan.extracting(entity),entity,origin,vertices,partial);
                     for(var v:untouched)v.emit(output.getBuffer(v.type),v.p,v.n,v.color,v.overlay,v.light);
                     var body=BODIES.get(entity);
-                    if(body==null&&QuillWounds.has(entity)){
-                        vertices=QuillWounds.decorate(entity,vertices,nodes,partial);
+                    if(body==null&&(QuillWounds.has(entity)||CombatSurfaceWounds.active(entity))){
+                        if(QuillWounds.has(entity)) vertices=QuillWounds.decorate(entity,vertices,nodes,partial);
+                        if(!active(entity)&&CombatSurfaceWounds.active(entity))
+                            vertices=CombatSurfaceWounds.live(entity,vertices,nodes,partial);
                         if(!active(entity)){
                             var normal=new Matrix3f(inverseNormal).invert();
                             for(var v:vertices)v.emit(output.getBuffer(v.type),transform(entry,v.p.subtract(origin)),
@@ -553,6 +560,8 @@ public final class AdaptiveRagdoll {
                         var organ=penetrating(entity);
                         if(organ!=null)body.burst(organ);
                     }
+                    if(CombatSurfaceWounds.needsBody(entity,body.parts))
+                        CombatSurfaceWounds.body(entity,body.parts,body.connectedPose(partial).positions(),partial);
                     body.render(entry,output,origin,partial);
                 }else {
                     com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Generic ragdoll fallback id={} reason={} vertices={}",entity.getId(),overflow?"invalid-coordinates":"no-compatible-vertices",vertices.size());
@@ -1580,7 +1589,18 @@ public final class AdaptiveRagdoll {
                 Vec3 left=rotate(new Vec3(1,0,0),orientation).normalize();
                 var poses=new IdentityHashMap<Part,RagdollPoseHistory.Pose>();
                 for(var p:parts)poses.put(p,new RagdollPoseHistory.Pose(poseTime,p.pos,p.rotation,p.scale));
-                if(!completeSection(torso.pos,left,"gib:"+consumeSplit,torso,poses))return;
+                Vec3 palmWound=null;
+                if(scene.getEntity(visual.consumerId()) instanceof LivingEntity actor){
+                    Vec3[] contactPose=parts.stream().map(part->part.pos).toArray(Vec3[]::new);
+                    palmWound=ConsumeTrauma.gripTear(entity,actor,visual,parts,contactPose,1);
+                }
+                Vec3 sectionAt=torso.pos;
+                if(palmWound!=null){
+                    // The hands pull the two sides apart; retain the midline but place the seam at the actual grip height.
+                    Vec3 offset=palmWound.subtract(torso.pos);
+                    sectionAt=torso.pos.add(offset.subtract(left.scale(offset.dot(left))));
+                }
+                if(!completeSection(sectionAt,left,"gib:"+consumeSplit,torso,poses))return;
                 rebuildJoints();
                 separateCuts();
                 holdFragment(actorWrist(1),1);
@@ -1629,6 +1649,8 @@ public final class AdaptiveRagdoll {
             lastVisibleEdge=scene.getGameTime()+partial;
             consumeSection("gib:"+visual.started(),edges,partial);
         }
+        long grazedScene=Long.MIN_VALUE;
+        int grazedOwner=-1;
         void consumeSection(String event,Map<String,List<Vec3>> edges,float partial){
             var visual=com.codex.blacklight.registry.ModAttachments.getData(entity, com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
             if(sectionEvents.contains(event)||sectionEvents.contains("gib:"+visual.started()))return;
@@ -1644,7 +1666,10 @@ public final class AdaptiveRagdoll {
                 var part=parts.get(i);var turn=new Quaternionf(part.oldRotation).slerp(part.rotation,partial);
                 poses.put(part,new RagdollPoseHistory.Pose((double)now+partial,connected.positions()[i],turn,part.scale));
             }
-            Part contacted=null;ContactSection.Plane contact=null;
+            Part contacted=null,grazed=null;ContactSection.Plane contact=null,graze=null;
+            Vec3 grazeTravel=null;
+            double age=(now+partial-visual.started())/20.;
+            boolean canGraze=(grazedScene!=visual.started()||grazedOwner!=visual.consumerId())&&age>=split-.18&&age<=split+.24;
             // Collect every visible profile before choosing the same stroke
             // so the first wing contact cannot pre-empt the other sharp side.
             for(var edge:edges.entrySet()){
@@ -1665,6 +1690,11 @@ public final class AdaptiveRagdoll {
                 if(surface.overlaps(new Vec3(box.minX,box.minY,box.minZ),new Vec3(box.maxX,box.maxY,box.maxZ),0)){
                     var fresh=ContactSection.contact(surface.triangles(),struck.mesh.stream().map(v->v.p).toList());
                     if(fresh!=null){
+                        if(canGraze&&grazed==null){
+                            grazed=struck;graze=fresh;
+                            var blade=edge.getValue();
+                            grazeTravel=rotate(blade.get(blade.size()-1).subtract(blade.get(0)),new Quaternionf(pose.rotation()).conjugate());
+                        }
                         struck.sectionContacts.put(base,fresh);
                         struck.consumeCutTicks.put(base,now);
                     }
@@ -1680,10 +1710,23 @@ public final class AdaptiveRagdoll {
                 if(found!=null&&(contacted==null||central&&!previousCentral||central==previousCentral&&struck.volume()>contacted.volume())){contacted=struck;contact=found;}
             }
             }
+            if(grazed!=null){
+                Vec3 inward=grazed.center.subtract(graze.point()).normalize();
+                if(inward.lengthSqr()<.5)inward=graze.normal();
+                int before=grazed.mesh.size();
+                if(ConsumeTrauma.cutAt(grazed,graze.point(),inward,grazeTravel,.145/grazed.scale)){
+                    grazedScene=visual.started();grazedOwner=visual.consumerId();
+                    ConsumeContactMarks.confirmed(entity,visual,"slash",0,sectionPosition(grazed,graze.point(),poses),
+                            grazed.bind.region(),before,grazed.mesh.size());
+                }
+            }
             if(contacted!=null){
                 var pose=poses.get(contacted);
                 Vec3 at=sectionPosition(contacted,contact.point(),poses),normal=rotate(contact.normal(),pose.rotation());
+                int before=parts.stream().mapToInt(p->p.mesh.size()).sum();
                 if(completeSection(at,normal,event,contacted,poses)){
+                    ConsumeContactMarks.confirmed(entity,visual,"cleave",0,at,contacted.bind.region(),before,
+                            parts.stream().mapToInt(p->p.mesh.size()).sum());
                     rebuildJoints();separateCuts();
                     if(consumeSplit==visual.started())holdFragment(actorWrist(partial),0);
                 }

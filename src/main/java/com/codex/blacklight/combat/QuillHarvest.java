@@ -13,7 +13,6 @@ import net.minecraft.resources.*;
 import net.minecraft.server.level.*;
 import net.minecraft.world.damagesource.*;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.Vec3;
@@ -200,11 +199,13 @@ public final class QuillHarvest {
     }
     static TargetSelection attackTarget(ServerPlayer p, double range, boolean orbit,int preferredId) {
         var lock = CombatTargeting.lockedSelection(p);
-        if (lock!=null) return !protectedPet(lock.target()) && (!orbit || !ConsumeLastChance.awaitingFinisher(lock.target())) && lock.visibleWithinRange(p,range) ? lock : null;
+        if (lock != null && !protectedPet(lock.target())
+                && (!orbit || !ConsumeLastChance.awaitingFinisher(lock.target()))
+                && lock.visibleWithinRange(p, range)) return lock;
 
         var candidates = p.serverLevel().getEntitiesOfClass(Mob.class,p.getBoundingBox().inflate(range),
-                mob -> !protectedPet(mob) && (!orbit || !ConsumeLastChance.awaitingFinisher(mob)) && (mob instanceof Enemy || mob.getTarget()==p || !orbit && mob instanceof Animal)
-                        && CombatTargeting.selectable(p,mob));
+                mob -> CombatTargeting.selectable(p, mob) && !protectedPet(mob)
+                        && (!orbit || (!ConsumeLastChance.awaitingFinisher(mob) && (mob instanceof Enemy || mob.getTarget() == p))));
 
         if (candidates.isEmpty()) return null;
         Set<UUID> incoming = new HashSet<>();
@@ -220,7 +221,7 @@ public final class QuillHarvest {
         int tied = 0;
         for (var mob : candidates) {
             int priority = 0;
-            // Within each coverage group, prioritize enemies over passive wildlife.
+            // Within each coverage group, prioritize enemies over peaceful mobs.
             if (mob.getPersistentData().contains(MARK) && mark(mob).hasUUID("owner")) priority = 4;
             else if (incoming.contains(mob.getUUID())) priority = 2;
             if (!(mob instanceof Enemy) && mob.getTarget()!=p) priority++;

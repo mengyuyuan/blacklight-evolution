@@ -64,7 +64,14 @@ def add_feet(geometry, motion, reader, rig, clips, nodes):
                 size=np.array([14.,8.,20.]) if len(templates)==1 else np.array([4.,4.5,10.])
                 offset=np.array([0.,-1.,-3.]) if len(templates)==1 else np.array([(toe-1)*4.6,-2.,-5.])
                 center=bind[joint][:3,3]+offset/pixels
-                cubes.append(fitted_cube(template,joint,center-size/(2*pixels),center+size/(2*pixels)))
+                cube=fitted_cube(template,joint,center-size/(2*pixels),center+size/(2*pixels))
+                # Rest the planted sole on block Y=0 during the full kneel. The ankle
+                # and toe joints have different local axes; offsets are model pixels.
+                if side=='right':
+                    pad=[-1,2,0] if len(templates)==1 else [.5,-2,0]
+                    for field in ('origin','pivot'):
+                        cube[field]=[round(value+shift,6) for value,shift in zip(cube[field],pad)]
+                cubes.append(cube)
             bones.append(dict(name=name, parent=animated, pivot=[0, 0, 0], cubes=cubes))
 
     for clip in motion['clips'].values():
