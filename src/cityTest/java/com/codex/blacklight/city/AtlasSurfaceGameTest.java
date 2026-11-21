@@ -11,6 +11,48 @@ import net.neoforged.neoforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class AtlasSurfaceGameTest {
     @GameTest(template="wall_test",timeoutTicks=600)
+    public static void bothRegionalMountainsContinueAcrossTheSurveyEdgeAndReachTheSea(GameTestHelper h){
+        for(int[] edge:new int[][]{{109056,-52224,0,-1},{13130752,-1305152,1,0}}){
+            int x=edge[0],z=edge[1],dx=edge[2],dz=edge[3];
+            int last=WorldAtlas.ground(x-dx,z-dz);
+            h.assertTrue(last>1000,"surveyed mountain has its original summit");
+            int first=WorldAtlas.ground(x+dx,z+dz);
+            h.assertTrue(Math.abs(first-last)<=4,"one step off the surveyed area cannot drop to sea level");
+            for(int d=0;d<=3072;d++){
+                int next=WorldAtlas.ground(x+dx*d,z+dz*d);
+                h.assertTrue(Math.abs(next-last)<=4,"adjacent margin heights at "+d+": "+last+"/"+next);
+                last=next;
+            }
+            h.assertTrue(last==48,"the transition joins the original distant sea floor");
+        }
+        h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=600)
+    public static void importedFutianStreetsReachTheirSurveyedRoads(GameTestHelper h){
+        long seed=h.getLevel().getSeed();
+        for(int[] endpoints:new int[][]{{505,-12},{1173,-17}}){
+            var entry=WorldTerrain.column(seed,0,endpoints[0]);
+            h.assertTrue(!entry.state(63).isAir()&&entry.state(64).isAir(),"original detail-core road is accessible");
+            int prev=63;
+            for(int x=-1;x>=endpoints[1];x--){
+                int z=endpoints[0];
+                var c=WorldTerrain.column(seed,x,z);
+                int surface=z==505?c.bridge:c.ground;
+                var pavement=c.state(surface);
+                h.assertTrue(c.road==6&&(pavement.is(Blocks.GRAY_CONCRETE)||pavement.is(Blocks.WHITE_CONCRETE))
+                        &&Math.abs(surface-prev)<=1&&c.state(surface+1).isAir(),
+                        "gap at "+x+","+z+" pavement="+pavement+" height="+surface+" previous="+prev);
+                prev=surface;
+            }
+        }
+        // The other city's projected detail core meets its western approach at a different elevation.
+        var losAngeles=WorldTerrain.column(seed,13129400,-1280513);
+        var approach=WorldTerrain.column(seed,13129399,-1280513);
+        h.assertTrue(losAngeles.scenery&&losAngeles.state(losAngeles.ground+1).isAir()&&approach.atGrade
+                &&Math.abs(losAngeles.ground-approach.ground)<=1,"the Los Angeles core road joins its surveyed approach");
+        h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=600)
     public static void generatedStreetsFollowTheApproachAndTheFoundationStaysStructural(GameTestHelper h){
         var world=h.getLevel().getServer().getLevel(CityTravel.WORLD);
         long seed=world.getSeed();

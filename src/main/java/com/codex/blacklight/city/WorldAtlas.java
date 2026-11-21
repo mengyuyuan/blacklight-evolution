@@ -64,9 +64,13 @@ final class WorldAtlas {
     }
     static Tile tile(int x,int z){return CACHE.get(new Cell(Math.floorDiv(x,TILE),Math.floorDiv(z,TILE)),WorldAtlas::load);}
     private static Tile load(Cell cell){
+        String key=cell.x+"_"+cell.z;
         for(var region:REGIONS)if(region.cells.contains(cell)){
-            String key=cell.x+"_"+cell.z;
             return new Tile(json(region.id+"/"+key+".json.gz",true),region.profiles,key);
+        }
+        for(var region:REGIONS){
+            var fringe=region.profiles.getAsJsonObject("fringe").get(key);
+            if(fringe!=null)return new Tile(cell,fringe.getAsString());
         }
         return Tile.OCEAN;
     }
@@ -76,6 +80,14 @@ final class WorldAtlas {
         final int x,z;final short[] heights;final List<Feature> features;
         private final byte[] dry; private final short[] cuts;
         private Tile(){x=z=0;heights=null;dry=null;cuts=null;features=List.of();}
+        private Tile(Cell cell,String fringe){
+            x=cell.x*TILE;z=cell.z*TILE;heights=new short[GRID*GRID];dry=null;cuts=null;features=List.of();
+            var bytes=new ByteArrayInputStream(Base64.getDecoder().decode(fringe));
+            try(var input=new DataInputStream(new java.util.zip.InflaterInputStream(bytes))){
+                for(int i=0;i<heights.length;i++)heights[i]=input.readShort();
+                if(input.read()!=-1)throw new IOException("Extra elevation samples");
+            }catch(IOException ex){throw new IllegalStateException("Invalid atlas margin "+cell,ex);}
+        }
         Tile(JsonObject object,JsonObject profiles,String key){
             x=object.get("x").getAsInt()*TILE;z=object.get("z").getAsInt()*TILE;
             var e=object.getAsJsonArray("e");if(e.size()!=GRID*GRID)throw new IllegalStateException("Invalid elevation grid");
@@ -87,6 +99,11 @@ final class WorldAtlas {
                 for(int i=0;i<values.size();i+=2)cuts[values.get(i).getAsInt()]=values.get(i+1).getAsShort();
             }else cuts=null;
             var fs=new ArrayList<Feature>();for(var f:object.getAsJsonArray("f"))fs.add(new Feature(f.getAsJsonObject(),profiles));
+            var links=profiles.getAsJsonObject("links").getAsJsonArray(key);
+            if(links!=null){
+                for(var link:links)fs.add(new Feature(link.getAsJsonObject(),profiles));
+                fs.sort(Comparator.comparingInt(f->f.kind));
+            }
             features=List.copyOf(fs);
         }
         int height(int wx,int wz){
