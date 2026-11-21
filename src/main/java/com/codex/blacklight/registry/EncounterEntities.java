@@ -29,6 +29,12 @@ public final class EncounterEntities {
     public static final DeferredHolder<Item,Item> LEGACY_BRAWLER_EGG=legacyEgg("brawler",LEGACY_BRAWLER,0x381e22,0x9c7161);
     public static final DeferredHolder<EntityType<?>,EntityType<MilitaryUav>> UAV=ENTITIES.register("recon_uav",()->EntityType.Builder.<MilitaryUav>of(MilitaryUav::new,MobCategory.MONSTER).sized(1.95F,1.76F).clientTrackingRange(14).updateInterval(1).build("recon_uav"));
     public static final DeferredHolder<EntityType<?>,EntityType<EncounterProjectile>> PROJECTILE=ENTITIES.register("encounter_projectile",()->EntityType.Builder.<EncounterProjectile>of(EncounterProjectile::new,MobCategory.MISC).sized(.3F,.3F).clientTrackingRange(12).updateInterval(1).build("encounter_projectile"));
+    public static final DeferredHolder<EntityType<?>,EntityType<GreeneSpider>> GREENE_SPIDER = ENTITIES.register("greene_spider",
+            () -> EntityType.Builder.<GreeneSpider>of(GreeneSpider::new, MobCategory.MISC)
+                    .sized(1.0F, 2.0F).clientTrackingRange(16).build("greene_spider"));
+    public static final DeferredHolder<EntityType<?>,EntityType<GreeneGoddess>> GREENE_GODDESS = ENTITIES.register("greene_goddess",
+            () -> EntityType.Builder.<GreeneGoddess>of(GreeneGoddess::new, MobCategory.MISC)
+                    .sized(0.5F, 1.0F).clientTrackingRange(16).build("greene_goddess"));
     public static final DeferredHolder<EntityType<?>,EntityType<GreeneHost>> GREENE_HOST=ENTITIES.register("greene_host",()->EntityType.Builder.<GreeneHost>of(GreeneHost::new,MobCategory.CREATURE).sized(.6F,1.82F).clientTrackingRange(14).build("greene_host"));
     public static final DeferredHolder<EntityType<?>,EntityType<GreeneProjectile>> GREENE_PROJECTILE=ENTITIES.register("greene_projectile",()->EntityType.Builder.<GreeneProjectile>of(GreeneProjectile::new,MobCategory.MISC).sized(.3F,.3F).clientTrackingRange(12).updateInterval(1).build("greene_projectile"));
     public static final DeferredHolder<EntityType<?>,EntityType<GreeneSegmentCorpse>> GREENE_SEGMENT_CORPSE=ENTITIES.register("greene_segment_corpse",()->EntityType.Builder.<GreeneSegmentCorpse>of(GreeneSegmentCorpse::new,MobCategory.MISC).sized(.1F,.1F).clientTrackingRange(16).updateInterval(1).build("greene_segment_corpse"));

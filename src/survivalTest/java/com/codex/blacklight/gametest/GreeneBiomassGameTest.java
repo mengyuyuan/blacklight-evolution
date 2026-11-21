@@ -50,6 +50,7 @@ public final class GreeneBiomassGameTest {
         var pad=h.absolutePos(new BlockPos(16,2,16));
         var near=new AABB(pad).inflate(6);
         var mother=new EncounterMob[1];
+        var escaping=new GreeneHost[1];
         // The Forge fixture may be underground. Stop loose gravel falling onto the stage.
         for(var roof:BlockPos.betweenClosed(pad.offset(-5,15,-5),pad.offset(5,15,5)))
             level.setBlockAndUpdate(roof,Blocks.STONE.defaultBlockState());
@@ -111,7 +112,22 @@ public final class GreeneBiomassGameTest {
             var mature=BiomassSystem.state(slime).absorb(host.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS-10);
             slime.setData(ModAttachments.BIOMASS_FORM,mature);
             tick(slime);
-            h.assertTrue(!host.isAlive() && BiomassSystem.state(slime).consumed(),"accepted execution reforms the consumer");
+            escaping[0]=host;
+            h.assertTrue(host.isAlive() && host.stage()==GreeneHost.ESCAPING && BiomassSystem.state(slime).consumed(),"torn tissue reforms the consumer while Greene escapes alive");
+            h.assertTrue(!host.beginEscape(operator) && !BiomassSystem.edible(slime,host),"a second player cannot reclaim the escaping host");
+            h.assertTrue(!done(operator,"plaza_cleared") && BossSiteBlock.activate(level,station,operator).equals("active"),"pump remains reserved during the escape");
+        }).thenIdle(16).thenExecute(()->{
+            var host=escaping[0];
+            var snapshot=host.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            var restored=com.codex.blacklight.registry.EncounterEntities.GREENE_HOST.get().create(level);
+            restored.load(snapshot);
+            h.assertTrue(restored.stage()==GreeneHost.ESCAPING && restored.age(0)==host.age(0)
+                    && restored.drainOffset().distanceToSqr(host.drainOffset())<1e-6 && !restored.beginEscape(operator),
+                    "save preserves the escape clock, drain and committed stage");
+        }).thenWaitUntil(()->{
+            h.assertTrue(escaping[0].isRemoved(),"Greene has slipped away");
+        }).thenExecute(()->{
+            var host=escaping[0];
             h.assertTrue(done(slime,"plaza_cleared") && done(operator,"plaza_cleared"),"finisher and operator both receive the plaza reward");
             var cores=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,host.getBoundingBox().inflate(6),
                     item -> item.getItem().is(com.codex.blacklight.registry.ModItems.MOTHER_CORE.get()));
@@ -125,6 +141,42 @@ public final class GreeneBiomassGameTest {
             level.getServer().getPlayerList().remove(slime);
             level.getServer().getPlayerList().remove(operator);
         }).thenSucceed();
+    }
+
+    @GameTest(template="lost_convoy",batch="supreme_absorption",timeoutTicks=120)
+    public static void biomassGetsTheSupremeConsumeMilestone(GameTestHelper h) {
+        var level=h.getLevel();
+        var slime=join(h,"supreme-absorber");
+        var state=slime.getData(ModAttachments.PLAYER_STATE);
+        state.infect();
+        state.setPrototypeMode(true);
+        var boss=com.codex.blacklight.registry.ModEntities.SUPREME_HUNTER.get().create(level);
+        try {
+            var at=h.absolutePos(new BlockPos(12,1,10));
+            var floor=new BlockPos(at.getX(),220,at.getZ());
+            level.setBlockAndUpdate(floor,Blocks.STONE.defaultBlockState());
+            var origin=net.minecraft.world.phys.Vec3.atBottomCenterOf(floor.above());
+            slime.setPos(origin);
+            h.assertTrue(BiomassSystem.begin(slime,false),"biomass separation begins");
+            boss.setPos(origin);
+            boss.setNoAi(true);
+            level.addFreshEntity(boss);
+            boss.setHealth(1);
+            boss.getPersistentData().putBoolean("BlacklightConsumeAwaitingFinisher",true);
+            slime.setPos(origin);
+            crawl(slime,level.getGameTime()-14);
+            tick(slime);
+            h.assertTrue(BiomassSystem.state(slime).victim()==boss.getId(),"biomass acquires weakened hunter through contact");
+            var mature=BiomassSystem.state(slime).absorb(boss.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS-10);
+            slime.setData(ModAttachments.BIOMASS_FORM,mature);
+            tick(slime);
+            h.assertTrue(!boss.isAlive() && BiomassSystem.state(slime).consumed() && done(slime,"supreme_hunter_consumed"),
+                    "biomass finishes the real execution and earns the consume milestone");
+        } finally {
+            boss.discard();
+            level.getServer().getPlayerList().remove(slime);
+        }
+        h.succeed();
     }
 
     private static void crawl(ServerPlayer slime,long at){

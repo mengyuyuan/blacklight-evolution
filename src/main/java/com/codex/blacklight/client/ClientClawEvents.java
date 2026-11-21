@@ -93,6 +93,8 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.UAV.get(),com.codex.blacklight.client.renderer.UavRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SPIDER.get(), com.codex.blacklight.client.renderer.GreeneSpiderRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_GODDESS.get(), com.codex.blacklight.client.renderer.GreeneGoddessRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_HOST.get(),com.codex.blacklight.client.renderer.GreeneHostRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SEGMENT_CORPSE.get(),com.codex.blacklight.client.renderer.GreeneSegmentCorpseRenderer::new);
         event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
