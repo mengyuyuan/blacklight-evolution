@@ -274,6 +274,13 @@ public final class SurvivalEncounterGameTest {
                 finisher.tickCount++;
                 ConsumeSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(finisher));
             }
+            h.assertTrue(host.isAlive() && host.stage()==GreeneHost.ESCAPING,"manual consume starts a live escape");
+            var separation = host.position().subtract(finisher.position());
+            var facing = net.minecraft.world.phys.Vec3.directionFromRotation(0, finisher.getYRot());
+            h.assertTrue(separation.dot(facing) >= 0.59 && separation.horizontalDistance() < 1.1,
+                    "Greene breaks free within reach in front of the player: " + separation);
+            h.assertTrue(!ConsumeSystem.active(finisher) && !ConsumeSystem.eligible(host),"grapple releases control and the escape cannot be acquired again");
+            h.assertTrue(!host.beginEscape(audience),"a second finisher cannot start a duplicate escape");
         }).thenWaitUntil(()->{
             h.assertTrue(forms[1].isRemoved() && done(finisher,"plaza_cleared") && done(audience,"plaza_cleared"),
                     "completed consume pays both players: removed="+forms[1].isRemoved()+" operator="+done(audience,"plaza_cleared")+" finisher="+done(finisher,"plaza_cleared"));

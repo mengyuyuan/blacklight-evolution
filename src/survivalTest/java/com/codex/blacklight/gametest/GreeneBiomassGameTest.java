@@ -50,6 +50,7 @@ public final class GreeneBiomassGameTest {
         var pad=h.absolutePos(new BlockPos(16,2,16));
         var near=new AABB(pad).inflate(6);
         var mother=new EncounterMob[1];
+        var escaping=new GreeneHost[1];
         // The Forge fixture may be underground. Stop loose gravel falling onto the stage.
         for(var roof:BlockPos.betweenClosed(pad.offset(-5,15,-5),pad.offset(5,15,5)))
             level.setBlockAndUpdate(roof,Blocks.STONE.defaultBlockState());
@@ -111,7 +112,22 @@ public final class GreeneBiomassGameTest {
             var mature=BiomassSystem.state(slime).absorb(host.getId(),level.getGameTime()-BiomassState.ABSORB_TICKS-10);
             slime.setData(ModAttachments.BIOMASS_FORM,mature);
             tick(slime);
-            h.assertTrue(!host.isAlive() && BiomassSystem.state(slime).consumed(),"accepted execution reforms the consumer");
+            escaping[0]=host;
+            h.assertTrue(host.isAlive() && host.stage()==GreeneHost.ESCAPING && BiomassSystem.state(slime).consumed(),"torn tissue reforms the consumer while Greene escapes alive");
+            h.assertTrue(!host.beginEscape(operator) && !BiomassSystem.edible(slime,host),"a second player cannot reclaim the escaping host");
+            h.assertTrue(!done(operator,"plaza_cleared") && BossSiteBlock.activate(level,station,operator).equals("active"),"pump remains reserved during the escape");
+        }).thenIdle(16).thenExecute(()->{
+            var host=escaping[0];
+            var snapshot=host.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            var restored=com.codex.blacklight.registry.EncounterEntities.GREENE_HOST.get().create(level);
+            restored.load(snapshot);
+            h.assertTrue(restored.stage()==GreeneHost.ESCAPING && restored.age(0)==host.age(0)
+                    && restored.drainOffset().distanceToSqr(host.drainOffset())<1e-6 && !restored.beginEscape(operator),
+                    "save preserves the escape clock, drain and committed stage");
+        }).thenWaitUntil(()->{
+            h.assertTrue(escaping[0].isRemoved(),"Greene has slipped away");
+        }).thenExecute(()->{
+            var host=escaping[0];
             h.assertTrue(done(slime,"plaza_cleared") && done(operator,"plaza_cleared"),"finisher and operator both receive the plaza reward");
             var cores=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,host.getBoundingBox().inflate(6),
                     item -> item.getItem().is(com.codex.blacklight.registry.ModItems.MOTHER_CORE.get()));

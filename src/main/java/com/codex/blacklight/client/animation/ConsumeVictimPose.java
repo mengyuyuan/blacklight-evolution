@@ -47,6 +47,7 @@ public final class ConsumeVictimPose {
         var p=reaction(entity,partial);float h=entity.getBbHeight(),g=p.grounded();
         var matrix=new org.joml.Matrix4f();
         var visual=entity.getData(ModAttachments.CONSUME_VISUAL);
+        if(GrappleMotion.greeneGrip(entity,visual))return matrix;
         if(entity instanceof com.codex.blacklight.entity.BlacklightHunter&&NativeReceiverPose.available(entity,partial))return matrix;
         if(com.codex.blacklight.combat.ConsumeSequence.bruteMount(entity)&&com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))return matrix;
         if(com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))
@@ -131,6 +132,7 @@ public final class ConsumeVictimPose {
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
         try {
+        if(GrappleMotion.greeneGrip(entity,entity.getData(ModAttachments.CONSUME_VISUAL)))return;
         var parasite=com.codex.blacklight.entity.QuillOrgan.extracting(entity);
         if(parasite!=null){quillStruggle(model,entity,parasite,partial);return;}
         if (!entity.getData(ModAttachments.CONSUME_VISUAL).active()) { hit(model,entity,partial); return; }

@@ -1,6 +1,9 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.world.GreeneHost;
+import com.codex.blacklight.combat.ConsumeVisual;
+import com.codex.blacklight.combat.GrappleMotion;
+import com.codex.blacklight.registry.ModAttachments;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -30,6 +33,14 @@ public final class GreeneHostRenderer extends MobRenderer<GreeneHost,GreeneHostR
             super.setupAnim(host,walk,speed,time,yaw,pitch);
             float t=host.age(time-host.tickCount);
             float partial=time-host.tickCount;
+            if(host.stage()==GreeneHost.ESCAPING) {
+                brace(1,ease(t,1,6)*(1-ease(t,GreeneHost.TEAR,8)),ease(t,GreeneHost.TEAR,14));
+                return;
+            }
+            var visual=host.getData(ModAttachments.CONSUME_VISUAL);
+            boolean held=GrappleMotion.greeneGrip(host,visual);
+            float grip=held ? visual.stage()==ConsumeVisual.CAPTURE
+                    ? ease(host.level().getGameTime()-visual.started()+partial,0,12) : 1 : 0;
             float attention=host.attention(partial);
             float pulse=Mth.sin(time*.11F);
             boolean spent=host.stage()==GreeneHost.SPENT;
@@ -42,7 +53,8 @@ public final class GreeneHostRenderer extends MobRenderer<GreeneHost,GreeneHostR
                 flinch=recoil*(1-ease(t,55,17));
                 arch=ease(t,72,22);
             }
-            if(spent && com.codex.blacklight.combat.ConsumeControl.protectedEntity(host)) kneel=0;
+            if(held) kneel=1-grip;
+            else if(spent && com.codex.blacklight.combat.ConsumeControl.protectedEntity(host)) kneel=0;
             body.y+=kneel*8; body.xRot+=kneel*.78F-arch*.5F+ .022F*pulse;
             body.zRot+=kneel*.17F+flinch*.15F;
             head.y+=kneel*10; head.z-=kneel*5;
@@ -59,9 +71,22 @@ public final class GreeneHostRenderer extends MobRenderer<GreeneHost,GreeneHostR
             leftLeg.y+=kneel*4;rightLeg.y+=kneel*3;
             if(spent && kneel>0){
                 float push=(float)Math.pow(Math.max(0,Mth.sin(time*.065F)),4);
-                body.y-=push*2;head.y-=push*2;head.zRot+=.26F;leftArm.xRot-=push*.35F;
+                body.y-=push*2;head.y-=push*2;head.zRot+=.26F*kneel;leftArm.xRot-=push*.35F;
                 hat.copyFrom(head);
             }
+            if(held) brace(grip,0,0);
+        }
+
+        private void brace(float weight,float shove,float dive) {
+            head.xRot+=weight*(.24F-.53F*shove+.52F*dive);
+            head.yRot-=weight*.32F*dive;
+            body.xRot+=weight*(.13F-.38F*shove+.70F*dive);
+            rightArm.xRot-=weight*(.72F+1.03F*shove+.74F*dive);
+            leftArm.xRot-=weight*(.54F+.38F*shove+.90F*dive);
+            leftArm.zRot-=weight*.31F*shove;
+            rightLeg.xRot-=weight*.56F*dive;
+            leftLeg.xRot+=weight*.48F*dive;
+            hat.copyFrom(head);
         }
         private void rootPartsReset(){
             head.resetPose();hat.resetPose();body.resetPose();leftArm.resetPose();rightArm.resetPose();leftLeg.resetPose();rightLeg.resetPose();
@@ -70,6 +95,11 @@ public final class GreeneHostRenderer extends MobRenderer<GreeneHost,GreeneHostR
     @Override public void render(GreeneHost host,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light) {
         boolean changing=host.stage()==GreeneHost.CHANGING||host.stage()==GreeneHost.BLOCKED||host.stage()==GreeneHost.OVERLAP;
         float t=host.age(partial);
+        shadowRadius=host.stage()==GreeneHost.ESCAPING ? .32F*(1-ease(t,GreeneHost.TEAR,8)) : .32F;
+        if(host.stage()==GreeneHost.ESCAPING) {
+            renderEscape(host,yaw,partial,stack,buffers,light,t);
+            return;
+        }
         if(!changing || t<GreeneHost.BREAKOUT+18) super.render(host,yaw,partial,stack,buffers,light);
         if(host.stage()==GreeneHost.WAITING || (changing && t<64)){
             stack.pushPose();stack.mulPose(Axis.YP.rotationDegrees(-host.getYRot()));
@@ -119,7 +149,75 @@ public final class GreeneHostRenderer extends MobRenderer<GreeneHost,GreeneHostR
         }
         stack.popPose();
     }
+    private void renderEscape(GreeneHost host,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light,float t) {
+        Vec3 drain=host.drainOffset();
+        float slide=ease(t,GreeneHost.TEAR,18);
+        float sink=ease(t,21,GreeneHost.SUBMERGED-21);
+        Vec3 body=drain.scale(slide);
+        double travel=Math.hypot(drain.x,drain.z);
+        double heading=Math.toRadians(yaw);
+        Vec3 forward=travel>.18 ? new Vec3(drain.x/travel,0,drain.z/travel) : new Vec3(-Math.sin(heading),0,Math.cos(heading));
+        float dive=ease(t,GreeneHost.TEAR,11);
+        var out=buffers.getBuffer(RenderType.entityCutoutNoCull(BiomassGeometry.TEXTURE));
+        float opening=ease(t,6,10)*(1-ease(t,GreeneHost.SUBMERGED,6));
+        if(opening>.005F) {
+            Vec3 mouth=drain.add(0,.025,0);
+            BiomassGeometry.ellipsoid(stack,out,light,mouth,.62*opening,.024,.49*opening,t,0xff180e16);
+            for(int side:new int[]{-1,1}) {
+                Vec3 lip=mouth.add(side*.47*opening,0,0);
+                BiomassGeometry.strand(stack,out,light,new Vec3[]{mouth.add(0,0,-.46*opening),
+                        lip.add(0,.055*opening,-.18*opening),lip.add(0,.035*opening,.22*opening),
+                        mouth.add(.03*opening,0,.47*opening)},.065*opening,.018*opening);
+            }
+        }
+        if(t<GreeneHost.SUBMERGED) {
+            stack.pushPose();
+            stack.translate(body.x,body.y-1.85*sink,body.z);
+            // Lead with the reaching arm and head, then let the hips tip past the rim.
+            stack.translate(0,.70,0);
+            stack.mulPose(new org.joml.Quaternionf().rotationAxis((58*dive+62*sink)*Mth.DEG_TO_RAD,
+                    (float)forward.z,0,(float)-forward.x));
+            stack.translate(0,-.70,0);
+            stack.scale(1-.37F*sink,1-.18F*sink,1-.37F*sink);
+            super.render(host,yaw,partial,stack,buffers,light);
+            stack.popPose();
+        }
+        // MobRenderer can switch buffer types; acquire the strand consumer again after drawing the skin.
+        out=buffers.getBuffer(RenderType.entityCutoutNoCull(BiomassGeometry.TEXTURE));
+        Vec3 origin=host.getPosition(partial);
+        var witness=host.escapeWitness();
+        if(witness!=null && t<GreeneHost.TEAR+4 && witness.distanceToSqr(host)<9) {
+            Vec3 chest=witness.getPosition(partial).subtract(origin).add(0,witness.getBbHeight()*.65,0);
+            for(int side:new int[]{-1,1}) {
+                Vec3 right=new Vec3(Math.cos(Math.toRadians(yaw)),0,Math.sin(Math.toRadians(yaw))).scale(side);
+                Vec3 start=chest.add(right.scale(.19));
+                float pull=(1-ease(t,GreeneHost.TEAR,4))*ease(t,0,5);
+                if(pull<=.01F) continue;
+                Vec3 tip=start.lerp(body.add(right.scale(.20)).add(0,1.13,0),pull);
+                Vec3 coil=start.lerp(tip,.64).add(right.scale(.18*(1-ease(t,4,7))+.04)).add(0,.05,0);
+                BiomassGeometry.strand(stack,out,light,new Vec3[]{start,coil,tip},.066*pull,.021*pull);
+            }
+        }
+        if(t>=GreeneHost.TEAR) {
+            float drop=ease(t,GreeneHost.TEAR,13);
+            double angle=Math.toRadians(yaw);
+            Vec3 tissue=new Vec3(-Math.sin(angle)*.24*drop,1.03*(1-drop)+.13*drop+.32*Math.sin(Math.PI*drop),Math.cos(angle)*.24*drop);
+            float beat=.92F+.08F*Mth.sin(t*.74F);
+            BiomassGeometry.ellipsoid(stack,out,light,tissue,.14*beat,.10*beat,.12*beat,t,0xff8b3439);
+        }
+        float reach=ease(t,5,13);
+        float vanish=ease(t,21,16);
+        if(reach<=.01F || vanish>=1) return;
+        for(int side:new int[]{-1,1}) {
+            double a=Math.toRadians(yaw);
+            var ridge=new Vec3(side*Math.cos(a),0,side*Math.sin(a));
+            Vec3 root=body.add(ridge.scale(.14)).add(0,.43*(1-vanish),0);
+            Vec3 elbow=root.lerp(drain,.35).add(ridge.scale(.24*(1-vanish))).add(0,.15*(1-vanish),0);
+            Vec3 tip=root.lerp(drain.add(0,.025,0),reach);
+            BiomassGeometry.strand(stack,out,light,new Vec3[]{root,elbow,tip},.094*reach*(1-vanish),.022*(1-vanish));
+        }
+    }
     @Override public boolean shouldRender(GreeneHost host,net.minecraft.client.renderer.culling.Frustum camera,double x,double y,double z){
-        return host.shouldRender(x,y,z)&&camera.isVisible(host.getBoundingBox().inflate(2.5,1.8,2.5));
+        return host.shouldRender(x,y,z)&&camera.isVisible(host.stage()==GreeneHost.ESCAPING ? host.getBoundingBox().expandTowards(host.drainOffset()).inflate(1) : host.getBoundingBox().inflate(2.5,1.8,2.5));
     }
 }

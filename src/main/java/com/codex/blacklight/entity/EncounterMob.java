@@ -210,7 +210,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             Vec3 origin=skinOrigin(partial);
             float facing=skinYaw(partial);
             if(kind==EncounterKind.ELIZABETH_GREENE){
-                var regions=GreeneContact.regions(GreeneMotion.pose(this,partial),origin,facing,entityData.get(BROKEN));
+                var regions=GreeneContact.regions(GreeneMotion.pose(this,partial),origin,facing,entityData.get(BROKEN),GreeneForm.of(this));
                 return greeneBattle.targetable()?regions:regions.stream().map(r->new HydraContact.Region(r.bone(),List.of(),r.bounds())).toList();
             }
             return GoliathContact.regions(GoliathMotion.pose(this,partial),origin,facing,entityData.get(BROKEN),GoliathPresentation.SCALE);
@@ -274,6 +274,16 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         setNoGravity(kind.flying);if(kind.boss)setPersistenceRequired();
         if(kind==EncounterKind.ELIZABETH_GREENE)greeneBattle.initializeNew();
     }
+    // A render-only animation instance belongs to this boss and is never added to the level.
+    private GreeneSpider spiderShell;
+    public GreeneSpider greeneSpiderShell() {
+        if(spiderShell==null) {
+            spiderShell=new GreeneSpider(com.codex.blacklight.registry.EncounterEntities.GREENE_SPIDER.get(),level());
+            spiderShell.setYRot(180);
+        }
+        return spiderShell;
+    }
+
     public EncounterKind kind(){return kind;}public String asset(){return kind.id;}
     public EncounterMove move(){return EncounterMove.byId(entityData.get(MOVE));}
     public float moveAge(float partial){return Math.max(0,level().getGameTime()-entityData.get(START)+partial);}

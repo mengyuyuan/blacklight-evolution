@@ -45,7 +45,7 @@ public final class ClientCarryPlacement {
             if(allowed.subtract(offset).lengthSqr()>1e-8)continue;
             var old=carryAnchor(owner.getPosition(0),previousYaw,owner.xRotO,owner,victim,visual,0);
             victim.setPos(next);victim.xo=old.x;victim.yo=old.y;victim.zo=old.z;
-            float turn=GrappleMotion.active(visual)?0:180;
+            float turn=GrappleMotion.receiverTurn(victim,visual);
             // Retire the stale independent receiver interpolation while the server
             // explicitly assigns this body to its carrier. New release packets resume it.
             victim.lerpTo(next.x,next.y,next.z,yaw+turn,victim.getXRot(),0);
