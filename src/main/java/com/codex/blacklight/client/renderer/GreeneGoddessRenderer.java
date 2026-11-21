@@ -2,6 +2,7 @@ package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.entity.GreeneGoddess;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -18,8 +19,12 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     private static final ResourceLocation COLONY = new ResourceLocation("blacklight","models/greene_outbreak_fullbody.mesh.gz");
     private final ResourceLocation mesh;
     private static final ResourceLocation SKIN = new ResourceLocation("blacklight","textures/entity/greene_goddess.png");
-    private record Group(float[] transforms, float[] vertices, int[] colors) {}
-    private Group[] groups;
+    private record Group(float[] transforms, float[] vertices, int[] colors, int skin) {}
+    private volatile Group[] groups;
+    private java.util.concurrent.CompletableFuture<Void> loading;
+    void warm(){
+        if(groups==null && loading==null)loading=java.util.concurrent.CompletableFuture.runAsync(this::load,net.minecraft.Util.backgroundExecutor());
+    }
     private int frames, fps;
 
     public GreeneGoddessRenderer(EntityRendererProvider.Context context) { this(context,false); }
@@ -51,19 +56,28 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
                     for(int c=0;c<8;c++) vertices[8*i+c]=in.readFloat();
                     colors[i]=in.readInt();
                 }
-                parts[p]=new Group(transforms,vertices,colors);
+                int skinIndex=-1;
+                if(vertices.length>0 && vertices[4]<.8f){
+                    float u=0,vv=0;for(int i=0;i<count;i++){u+=vertices[i*8+3];vv+=vertices[i*8+4];}
+                    int col=(int)(2*u/count),row=(int)(4*vv/count);skinIndex=col+2*row;
+                    for(int i=0;i<count;i++){vertices[i*8+3]=vertices[i*8+3]*2-col;vertices[i*8+4]=vertices[i*8+4]*4-row;}
+                }
+                parts[p]=new Group(transforms,vertices,colors,skinIndex);
             }
-            groups=parts;
+            java.util.Arrays.sort(parts,java.util.Comparator.comparingInt(Group::skin));groups=parts;
         } catch(IOException e) { throw new IllegalStateException("Cannot load the Greene full-body mesh",e); }
     }
     void draw(float ticks,PoseStack stack,MultiBufferSource buffers,int light,int overlay) {
-        if(groups==null) load();
+        if(groups==null){warm();loading.join();}
         float sample=(ticks*fps/20F)%frames;
         int frame=(int)sample, a=frame*7, b=((frame+1)%frames)*7;
         float mix=sample-frame;
-        var out=buffers.getBuffer(RenderType.entityCutoutNoCull(SKIN));
+        VertexConsumer out=null;int skinIndex=-2;
         var q=new Quaternionf(); var next=new Quaternionf();
         for(var group:groups) {
+            if(skinIndex!=group.skin()){
+                skinIndex=group.skin();out=buffers.getBuffer(RenderType.entityCutoutNoCull(skinIndex<0?SKIN:CommonInfectedRenderer.skin(skinIndex)));
+            }
             var t=group.transforms();
             stack.pushPose();
             stack.translate(t[a]+mix*(t[b]-t[a]), t[a+1]+mix*(t[b+1]-t[a+1]), t[a+2]+mix*(t[b+2]-t[a+2]));

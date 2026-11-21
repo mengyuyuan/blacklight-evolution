@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class CommonInfectedRenderer extends HumanoidMobRenderer<BlacklightCommonInfected,CommonInfectedModel> {
     private static final ResourceLocation[] TEXTURES=java.util.stream.IntStream.range(0,4)
             .mapToObj(i->new ResourceLocation("blacklight","textures/entity/infected_civilian_"+i+".png")).toArray(ResourceLocation[]::new);
+    static ResourceLocation skin(int appearance){return TEXTURES[appearance];}
     public CommonInfectedRenderer(EntityRendererProvider.Context context) {
         super(context,new CommonInfectedModel(CommonInfectedModel.layer().bakeRoot()),.45F);
     }

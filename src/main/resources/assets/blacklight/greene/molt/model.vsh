@@ -14,7 +14,7 @@ vec3 at(int row,float u){
  return mix(texelFetch(paths,ivec2(i,row),0).xyz,texelFetch(paths,ivec2(min(15,i+1),row),0).xyz,fract(x));
 }
 
-uniform int absent; uniform int row0;uniform vec3 hit[3];uniform float drain,radius;out float digested;
+uniform sampler2D clamber;uniform int absent; uniform int row0;uniform vec3 hit[3];uniform float drain,radius;out float digested;
 vec3 siphon(vec3 p,vec3 local,int row,float progress,float d){
  float delay=.43*clamp(d,0.,1.);
  float a=smoothstep(delay,1.+delay,1.45*progress);
@@ -34,21 +34,13 @@ void main(){
  digested=0.;
  int j=int(joint+.1);vec3 p=pos, n=normal;rgb=ink;texuv=uv;surface=kind;
  if(kind==0 || kind==1){
-   mat4 bone=mat4(texelFetch(bones,ivec2((j%2)*4+0,j/2),0),texelFetch(bones,ivec2((j%2)*4+1,j/2),0),texelFetch(bones,ivec2((j%2)*4+2,j/2),0),texelFetch(bones,ivec2((j%2)*4+3,j/2),0));
+   mat4 bone=mat4(texelFetch(bones,ivec2((j%4)*4+0,j/4),0),texelFetch(bones,ivec2((j%4)*4+1,j/4),0),texelFetch(bones,ivec2((j%4)*4+2,j/4),0),texelFetch(bones,ivec2((j%4)*4+3,j/4),0));
    p=(root*bone*vec4(p,1)).xyz;if(kind==0)p*=.9912102;n=mat3(root)*mat3(bone)*n;
  }else if(kind==2){
    int i=gl_InstanceID;if(i<12 && (absent & (1<<i))!=0){gl_Position=vec4(2.,2.,2.,1.);return;}vec4 a=texelFetch(actors,ivec2(0,i),0), b=texelFetch(actors,ivec2(1,i),0),d=texelFetch(actors,ivec2(2,i),0);
-   float wave=sin(b.x),climb=b.y,lean=b.z;
-   if(j>=2){bool left=j<6;int paired=(j-2)%4;float side=left?1.:-1.;int base=left?2:6;
-     if(paired<2){float swing=mix(.25+wave*.79*side,1.30+wave*.75*side,climb);
-       if(paired==1)hinge(p,n,pivots[base+1],rx(.45+.45*climb+.26*wave*side));
-       hinge(p,n,pivots[base],rz(side*(.08+.27*climb))*rx(swing));
-     }else{if(paired==3)hinge(p,n,pivots[base+3],rx(-.55-.40*wave*side));
-       hinge(p,n,pivots[base+2],rx(.15-.75*wave*side+.35*climb));}
-   }
-   if(j==1)hinge(p,n,pivots[1],rx(lean*.42-.2*climb));
-   mat3 r=ry(a.w)*rz(d.x)*rx(-lean);
-   p=a.xyz+.5*(vec3(0,.65,0)+r*(p-vec3(0,.65,0)));n=r*n;
+   vec4 x=texelFetch(clamber,ivec2(j*3,i),0),y=texelFetch(clamber,ivec2(j*3+1,i),0),z=texelFetch(clamber,ivec2(j*3+2,i),0);
+   vec4 v=vec4(p,1.);
+   p=vec3(dot(x,v),dot(y,v),dot(z,v));n=vec3(dot(x.xyz,n),dot(y.xyz,n),dot(z.xyz,n));
    p=siphon(p,pos,i,d.z,length(pos-vec3(0,1.14,0))/1.4);
    texuv=vec2((uv.x+mod(d.y,2.))*.5,(uv.y+floor(d.y*.5))*.5);
  }else if(kind==6){

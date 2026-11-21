@@ -1,5 +1,5 @@
 #version 150
-in vec3 wpos;in vec2 surf;in float alphaField,fold,tear,skin;uniform vec3 eye;uniform float time;uniform float sceneLight;out vec4 color;
+in vec3 wpos;in vec2 surf;in float alphaField,fold,tear,skin;uniform vec3 eye;uniform float time;uniform float sceneLight;uniform sampler2D skinMap;out vec4 color;
 void main(){
  if(alphaField<0. || wpos.y<.008)discard;
  vec3 n=normalize(cross(dFdx(wpos),dFdy(wpos)));vec3 v=normalize(eye-wpos);
@@ -16,6 +16,7 @@ void main(){
  c+=vec3(.128,.028,.018)*returning*smoothstep(.47,.91,strands);
  vec3 L=normalize(vec3(-.6,.78,-.42));
  float spec=pow(max(0.,dot(normalize(L+v),n)),26.);
+ c=mix(c,texture(skinMap,fract(surf*vec2(16.,10.))).rgb,.46);
  c*=.67+.64*max(0.,dot(n,L));c+=spec*(.15+.35*fibre)*vec3(.78,.64,.61);
  float rim=pow(1.-max(0.,dot(n,v)),3.);
  c+=rim*vec3(.115,.069,.052);

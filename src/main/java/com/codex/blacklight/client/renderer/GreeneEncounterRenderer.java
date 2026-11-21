@@ -26,6 +26,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             super.render(boss,yaw,partial,stack,buffers,light);
             return;
         }
+        GreeneMoltRenderer.warm();goddess.warm();
         if(boss.greeneStage()==com.codex.blacklight.combat.GreeneBattleCycle.MOLTING){
             GreeneMoltRenderer.draw(boss,partial,stack,light);
             return;
