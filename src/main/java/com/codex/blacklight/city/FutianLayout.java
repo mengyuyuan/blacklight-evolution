@@ -60,7 +60,9 @@ public final class FutianLayout {
         private final FutianMap.Tile tile;
         private final FutianCivicCentre.Geometry geometry;
         final int top;
+        private final com.codex.blacklight.world.GreeneHiveCave.Column den;
         Column(long seed,int x,int z,FutianMap.Tile tile){
+            den=com.codex.blacklight.world.GreeneHiveCave.at(seed,x,z);
             this.seed=seed;this.x=x;this.z=z;this.tile=tile;
             geometry=FutianCivicCentre.geometry(x,z);
             top=Math.max(72,Math.max(tile==null?63:tile.top(x&15,z&15),
@@ -70,7 +72,7 @@ public final class FutianLayout {
             if(y<0||y>=FutianMap.HEIGHT)return Blocks.VOID_AIR.defaultBlockState();
             if(y>top)return Blocks.AIR.defaultBlockState();
             var base=y<63||tile==null?FutianMap.state(x,y,z):tile.state(x&15,y,z&15);
-            if(y<63)return base;
+            if(y<63)return den==null?base:den.replace(y,base);
             return finishOverlay(seed,x,y,z,FutianCivicCentre.state(x,y,z,base,geometry));
         }
     }

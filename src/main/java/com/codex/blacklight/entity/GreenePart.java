@@ -15,8 +15,9 @@ public final class GreenePart extends PartEntity<EncounterMob> {
     public final int slot;
     GreenePart(EncounterMob parent,int slot){super(parent);this.slot=slot;}
     void bounds(AABB now,AABB next){setPos(now.getCenter());setBoundingBox(now.minmax(next).inflate(.04));}
-    public Optional<Vec3> clip(Vec3 from,Vec3 to){return getParent().hurtRegions(HydraPicking.partial(this)).get(slot).boxes().stream().map(b->b.clip(from,to)).flatMap(Optional::stream).min(Comparator.comparingDouble(from::distanceToSqr));}
-    public boolean contains(Vec3 point){return getParent().hurtRegions(HydraPicking.partial(this)).get(slot).boxes().stream().anyMatch(b->b.contains(point));}
+    private List<HydraContact.Box> surface(){var regions=getParent().hurtRegions(HydraPicking.partial(this));return slot<regions.size()?regions.get(slot).boxes():List.of();}
+    public Optional<Vec3> clip(Vec3 from,Vec3 to){return surface().stream().map(b->b.clip(from,to)).flatMap(Optional::stream).min(Comparator.comparingDouble(from::distanceToSqr));}
+    public boolean contains(Vec3 point){return surface().stream().anyMatch(b->b.contains(point));}
     @Override protected void defineSynchedData(){}
     @Override protected void readAdditionalSaveData(CompoundTag tag){}
     @Override protected void addAdditionalSaveData(CompoundTag tag){}
@@ -25,7 +26,8 @@ public final class GreenePart extends PartEntity<EncounterMob> {
         if(!owner.isAlive() || owner.isRemoved())return false;
         if(owner.kind()==EncounterKind.GOLIATH)
             return !GoliathLockPart.severed(GoliathContact.regionBones().get(slot),owner.goliathBrokenMask());
-        return owner.greeneBattle().targetable() && (slot>=owner.kind().weakParts() || !owner.broken(slot));
+        if(owner.spider.first())return slot<SpiderAnatomy.NAMES.size() && !owner.hurtRegions(0).get(slot).boxes().isEmpty();
+        return slot<GreeneContact.regionBones().size() && owner.greeneBattle().targetable() && (slot>=owner.kind().weakParts() || !owner.broken(slot));
     }
     @Override public boolean isPickable(){return hasSurface()&&!ConsumeControl.protectedEntity(getParent());}
     @Override public boolean isPushable(){return false;}

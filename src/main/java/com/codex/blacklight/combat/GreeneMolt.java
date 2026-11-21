@@ -53,6 +53,7 @@ public final class GreeneMolt {
         if(!(boss.level() instanceof ServerLevel level))return false;
         if (age == 0) shockwave.begin(boss, level);
         shockwave.tick(boss, level, age);
+        boss.spider.actions.moltBrood(level,age);
         int prior=absent;
         for(int i=0;i<SLOTS;i++){
             if(age<Source.TABLE.spawn[i] || (absent&(1<<i))!=0)continue;
@@ -63,13 +64,19 @@ public final class GreeneMolt {
             }
             Vec3 p=position(boss,i,age);
             if((spawned&(1<<i))==0){
-                Mob mob=i<12?ModEntities.COMMON_INFECTED.get().create(level):i==12?ModEntities.BLACKLIGHT_HYDRA.get().create(level):ModEntities.BLACKLIGHT_HUNTER.get().create(level);
+                var type=i<12?ModEntities.COMMON_INFECTED.get():i==12?ModEntities.BLACKLIGHT_HYDRA.get():ModEntities.BLACKLIGHT_HUNTER.get();
+                var nearby=level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(52),m->m.getType()==type && m.isAlive()
+                    && !m.getPersistentData().hasUUID(OWNER) && !ConsumeControl.protectedEntity(m)
+                    && m.getPersistentData().hasUUID("EncounterOwner") && boss.getUUID().equals(m.getPersistentData().getUUID("EncounterOwner")));
+                Mob mob=nearby.stream().min(java.util.Comparator.comparingDouble(m->m.distanceToSqr(p))).orElse(null);
+                boolean fresh=mob==null;
+                if(fresh)mob=type.create(level);
                 if(mob==null)continue;
                 ((Captive)mob).setMoltCaptive(true);
                 mob.moveTo(p.x,p.y,p.z,0,0);mob.setNoAi(true);mob.setNoGravity(true);mob.noPhysics=true;
                 mob.setSilent(true);mob.setInvisible(true);mob.setPersistenceRequired();
                 mob.getPersistentData().putUUID(OWNER,boss.getUUID());mob.getPersistentData().putLong(HOME,boss.blockPosition().asLong());
-                if(!level.addFreshEntity(mob)) {absent|=1<<i;continue;}
+                if(fresh && !level.addFreshEntity(mob)) {absent|=1<<i;continue;}
                 captives[i]=mob.getUUID();spawned|=1<<i;actor=mob;
             }else if(actor==null){
                 // During a chunk reload the owner may start ticking before its neighbouring captive is restored.

@@ -328,6 +328,7 @@ public final class BlacklightCommonInfected extends Monster implements GreeneMol
             if(!isAlive()||isRemoved()){host.discard();return null;}
             for(var effect:getActiveEffects())host.addEffect(new net.minecraft.world.effect.MobEffectInstance(effect));
             for(var slot:EquipmentSlot.values())host.setItemSlot(slot,getItemBySlot(slot).copyAndClear());
+            com.codex.blacklight.combat.QuillHarvest.transferTumor(this,host,level);
             discard();return host;
         }finally{promoting=false;}
     }

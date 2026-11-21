@@ -57,6 +57,10 @@ public final class QuillOrgan extends Entity {
     public int layers(){return entityData.get(LAYERS);}
     public float energy(){return entityData.get(ENERGY);}
     public int actor(){return entityData.get(ACTOR);}
+    public boolean transferRoot(Mob previous,Mob next){
+        if(phase()!=ROOT || !previous.getUUID().equals(host))return false;
+        host=next.getUUID();entityData.set(HOST,next.getId());setPos(QuillHarvest.anchor(next,QuillHarvest.mark(next)));return true;
+    }
     public int hostId(){return entityData.get(HOST);}
     public UUID owner(){return owner;}
     public UUID strikeTarget(){return phase()==STRIKE ? target : null;}

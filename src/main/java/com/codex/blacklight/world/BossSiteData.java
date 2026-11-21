@@ -24,6 +24,7 @@ public final class BossSiteData extends SavedData {
     static BossSiteData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(BossSiteData::load, BossSiteData::new, "blacklight_boss_sites");
     }
+    final java.util.Set<Long> preparedDenChunks=new java.util.HashSet<>();
     boolean occupied(BlockPos pos) { return active.containsKey(pos.asLong()); }
     void reserve(BlockPos pos, Entity boss, ServerPlayer operator) {
         boss.getPersistentData().putLong(HOME, pos.asLong());
@@ -103,6 +104,7 @@ public final class BossSiteData extends SavedData {
     }
     static BossSiteData load(CompoundTag tag) {
         var data = new BossSiteData();
+        for(long chunk:tag.getLongArray("DenChunks"))data.preparedDenChunks.add(chunk);
         for (Tag entry : tag.getList("sites", Tag.TAG_COMPOUND)) {
             var site = (CompoundTag) entry;
             if (site.hasUUID("boss")) data.active.put(site.getLong("pos"), site.getUUID("boss"));
@@ -114,6 +116,7 @@ public final class BossSiteData extends SavedData {
         return data;
     }
     @Override public CompoundTag save(CompoundTag tag) {
+        tag.putLongArray("DenChunks",preparedDenChunks.stream().mapToLong(Long::longValue).toArray());
         var sites = new ListTag();
         active.forEach((pos, id) -> {
             var entry = new CompoundTag();

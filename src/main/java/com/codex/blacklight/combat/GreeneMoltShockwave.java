@@ -69,9 +69,12 @@ final class GreeneMoltShockwave {
             double angle = direction + ((i + 1) / 2) * (i % 2 == 0 ? -1 : 1) * Math.PI / 12;
             double x = boss.getX() + (RADIUS + 2) * Math.cos(angle);
             double z = boss.getZ() + (RADIUS + 2) * Math.sin(angle);
-            BlockPos ground = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                    BlockPos.containing(x, boss.getY(), z));
-            Vec3 target = new Vec3(x, ground.getY(), z);
+            var from=new Vec3(x,boss.getY()+9,z);
+            var ray=level.clip(new net.minecraft.world.level.ClipContext(from,from.add(0,-19,0),
+                    net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,boss));
+            if(ray.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK)continue;
+            Vec3 target=ray.getLocation().add(0,.012,0);
+            BlockPos ground=BlockPos.containing(target);
             if (!level.getWorldBorder().isWithinBounds(ground) || !level.getBlockState(ground.below()).blocksMotion()
                     || !level.getFluidState(ground.below()).isEmpty()
                     || !level.noCollision(player, player.getBoundingBox().move(target.subtract(player.position())))) continue;

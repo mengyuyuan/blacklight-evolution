@@ -27,11 +27,17 @@ public final class SurvivalGuide {
         if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         if(event.player instanceof ServerPlayer player && player.tickCount%20==0
                 && player.level().dimension()==com.codex.blacklight.city.CityTravel.WORLD
-                && player.distanceToSqr(668.5,64,830.5)<32*32 && !player.isSpectator()
+                && !player.isSpectator()
                 && done(player,"plaza_cleared") && !done(player,"greene_outbreak"))GreeneOutbreak.arrive(player);
     }
     @SubscribeEvent public static void captive(net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent event){
-        if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide)com.codex.blacklight.combat.GreeneMolt.orphanCheck(mob);
+        if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide){
+            com.codex.blacklight.combat.GreeneMolt.orphanCheck(mob);
+            if(mob.getPersistentData().getBoolean("GreeneBroodFall")){
+                mob.fallDistance=0;
+                if(mob.onGround())mob.getPersistentData().remove("GreeneBroodFall");
+            }
+        }
     }
     private static boolean done(ServerPlayer player, String name) {
         var advancement = player.server.getAdvancements().getAdvancement(new ResourceLocation("blacklight", name));
