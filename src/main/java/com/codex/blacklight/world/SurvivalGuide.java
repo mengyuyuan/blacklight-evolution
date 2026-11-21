@@ -62,7 +62,8 @@ public final class SurvivalGuide {
             if (!player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
                 next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
                         : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-            } else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
+            } else if (done(player,"greene_pursuit")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
+            else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
             else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
             else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
             else if (done(player,"containment_decoder")) next=Component.translatable("survival.blacklight.journal.containment_decoder");

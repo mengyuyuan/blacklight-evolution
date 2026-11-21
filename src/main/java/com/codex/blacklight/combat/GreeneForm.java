@@ -41,14 +41,30 @@ public enum GreeneForm {
         return new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).mul(combatPose[TORSO]).mul(REST_INVERSE).scale(scale);
     }
 
-    void addSurfaces(List<GreeneContact.Surface> out, Matrix4f[] pose, float yaw, Vec3 origin) {
+    /** The carapace and its legs, or the forearms and basal spiral, carry the three armour pools. */
+    private int armourSlot(Vec3 center) {
+        if(this==SPIDER) {
+            if(center.x < -3.25) return 1;
+            if(center.x > 3.25) return 0;
+            if(center.y<7 && center.z<0) return 2;
+        } else {
+            if(center.y<6.0) return 2;
+            if(center.y<16 && center.x < -2.6) return 1;
+            if(center.y<16 && center.x > 1.35) return 0;
+        }
+        return -1;
+    }
+
+    void addSurfaces(List<GreeneContact.Surface> out, Matrix4f[] pose, float yaw, Vec3 origin, int broken) {
         var m = transform(pose,yaw);
         var x = new Vec3(m.transformDirection(new Vector3f(1,0,0)));
         var y = new Vec3(m.transformDirection(new Vector3f(0,1,0)));
         var z = new Vec3(m.transformDirection(new Vector3f(0,0,1)));
         for (var patch : patches) {
             var center = origin.add(new Vec3(m.transformPosition(patch.center.toVector3f())));
-            out.add(new GreeneContact.Surface("torso", HydraContact.affine(center,patch.half,x,y,z)));
+            int slot=armourSlot(patch.center);
+            String region=slot>=0 && (broken & (1<<slot))==0 ? "weak_"+slot : "torso";
+            out.add(new GreeneContact.Surface(region, HydraContact.affine(center,patch.half,x,y,z)));
         }
     }
 }

@@ -210,7 +210,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             Vec3 origin=skinOrigin(partial);
             float facing=skinYaw(partial);
             if(kind==EncounterKind.ELIZABETH_GREENE){
-                var regions=GreeneContact.regions(GreeneMotion.pose(this,partial),origin,facing,entityData.get(BROKEN),GreeneForm.of(this));
+                var regions=GreeneContact.regions(GreeneMotion.pose(this,partial),origin,facing,entityData.get(BROKEN),greenePursuit()?GreeneForm.of(this):null,greeneStrikingSlot());
                 return greeneBattle.targetable()?regions:regions.stream().map(r->new HydraContact.Region(r.bone(),List.of(),r.bounds())).toList();
             }
             return GoliathContact.regions(GoliathMotion.pose(this,partial),origin,facing,entityData.get(BROKEN),GoliathPresentation.SCALE);
@@ -274,6 +274,18 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         setNoGravity(kind.flying);if(kind.boss)setPersistenceRequired();
         if(kind==EncounterKind.ELIZABETH_GREENE)greeneBattle.initializeNew();
     }
+    private static final EntityDataAccessor<Boolean> GREENE_PURSUIT =
+            SynchedEntityData.defineId(EncounterMob.class, EntityDataSerializers.BOOLEAN);
+    public boolean greenePursuit() { return entityData.get(GREENE_PURSUIT); }
+    public int greeneStrikingSlot() {
+        var side=greeneCloseSide();
+        return side==null?-1:side.segment();
+    }
+    public void startGreenePursuit() {
+        entityData.set(GREENE_PURSUIT,true);
+        greeneBattle.beginOpeningAtSurface();
+    }
+
     // A render-only animation instance belongs to this boss and is never added to the level.
     private GreeneSpider spiderShell;
     public GreeneSpider greeneSpiderShell() {
@@ -386,7 +398,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     }
     public boolean broken(int slot){return (entityData.get(BROKEN)&(1<<slot))!=0;}
     public static AttributeSupplier.Builder attributes(EncounterKind kind){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,kind.health).add(Attributes.ATTACK_DAMAGE,kind.damage).add(Attributes.MOVEMENT_SPEED,kind.speed).add(Attributes.FOLLOW_RANGE,kind==EncounterKind.ELIZABETH_GREENE?GreeneMissileFlight.RANGE:32).add(Attributes.KNOCKBACK_RESISTANCE,kind.boss?.85:.4);}
-    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(PLAZA_TARGET,java.util.Optional.empty());b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);b.define(GOLIATH_WINDOW,0);}
+    @Override protected void defineSynchedData(SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(GREENE_PURSUIT,false);b.define(MOVE,0);b.define(PHASE,0);b.define(BROKEN,0);b.define(START,0L);b.define(EXPOSED,0L);b.define(EXPOSED_START,0L);b.define(GUARD_HIT,-100000L);b.define(GREENE_HOLD,GreeneMotion.DEFAULT_HOLD_TICKS);b.define(GREENE_HIT,-100000L);b.define(FLIGHT,0);b.define(FLIGHT_PREVIOUS,0);b.define(FLIGHT_START,0L);b.define(FLIGHT_PREVIOUS_AGE,0F);b.define(FLIGHT_PITCH,0F);b.define(FLIGHT_BODY,new CompoundTag());b.define(GREENE_PROGRAM,0);b.define(GREENE_CLOSE_SIDE,-1);b.define(GREENE_CLOSE_START,0L);b.define(PLAZA_TARGET,java.util.Optional.empty());b.define(GREENE_BATTLE,new CompoundTag());b.define(CHARGE_PHASE,-1);b.define(CHARGE_PHASE_START,0F);b.define(GOLIATH_CRASH_SAMPLE,0L);b.define(GOLIATH_WINDOW,0);}
     @Override protected void registerGoals(){goalSelector.addGoal(0,new FloatGoal(this));goalSelector.addGoal(2,new FightGoal());goalSelector.addGoal(7,new WaterAvoidingRandomStrollGoal(this,.65));targetSelector.addGoal(1,new HurtByTargetGoal(this));targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,LivingEntity.class,15,true,false,this::enemy));}
     public boolean enemy(LivingEntity target){
         if(target instanceof com.codex.blacklight.world.GreeneHost||target==null||target==this||!target.isAlive()||target.isRemoved()||target.level()!=level()||isAlliedTo(target))return false;
@@ -1092,7 +1104,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             // Copy the dying child's visible pose BEFORE the final break can
             // enter collapse. Commit BROKEN before the spawn callback, so a
             // reentrant save cannot spawn this corpse twice from the same hit.
-            GreeneSegmentCorpse corpse=kind==EncounterKind.ELIZABETH_GREENE?new GreeneSegmentCorpse(this,slot):null;
+            GreeneSegmentCorpse corpse=kind==EncounterKind.ELIZABETH_GREENE&&(!greenePursuit()||greeneStrikingSlot()==slot)?new GreeneSegmentCorpse(this,slot):null;
             if(corpse!=null) {
                 var point=physicalContact&&incomingContact!=null?incomingContact.point():hurtRegions(0).get(slot).bounds().getCenter();
                 GreeneFeedback.broken(this,point);
@@ -1385,7 +1397,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     @Override public void setId(int id){super.setId(id);if(parts!=null)for(int i=0;i<parts.length;i++)parts[i].setId(id+i+1);if(flyerParts!=null)for(int i=0;i<flyerParts.length;i++)flyerParts[i].setId(id+i+1);if(greeneParts!=null)for(int i=0;i<greeneParts.length;i++)greeneParts[i].setId(id+i+1);}
     @Override public void startSeenByPlayer(ServerPlayer p){super.startSeenByPlayer(p);if(kind.boss){bar.addPlayer(p);if(kind!=EncounterKind.ALEX_MERCER)defenseBar.addPlayer(p);}}
     @Override public void stopSeenByPlayer(ServerPlayer p){super.stopSeenByPlayer(p);bar.removePlayer(p);defenseBar.removePlayer(p);}
-    @Override public void addAdditionalSaveData(CompoundTag tag){if(kind==EncounterKind.ELIZABETH_GREENE)greeneBattle.refreshHealthScale();super.addAdditionalSaveData(tag);tag.putInt("EncounterPhase",phase());tag.putInt("EncounterSequence",sequence);tag.putInt("EncounterBroken",entityData.get(BROKEN));tag.putLong("EncounterExposed",entityData.get(EXPOSED));tag.putLong("EncounterExposedStart",entityData.get(EXPOSED_START));for(int i=0;i<3;i++)tag.putFloat("EncounterArmor"+i,armor[i]);
+    @Override public void addAdditionalSaveData(CompoundTag tag){if(kind==EncounterKind.ELIZABETH_GREENE)greeneBattle.refreshHealthScale();super.addAdditionalSaveData(tag);if(greenePursuit())tag.putBoolean("GreenePursuit",true);tag.putInt("EncounterPhase",phase());tag.putInt("EncounterSequence",sequence);tag.putInt("EncounterBroken",entityData.get(BROKEN));tag.putLong("EncounterExposed",entityData.get(EXPOSED));tag.putLong("EncounterExposedStart",entityData.get(EXPOSED_START));for(int i=0;i<3;i++)tag.putFloat("EncounterArmor"+i,armor[i]);
         if(kind==EncounterKind.GOLIATH){
             tag.putInt("GoliathWindow",goliathWindow().ordinal());
             if(exposed())tag.putLong("GoliathCrashSample",goliathCrashSample());
@@ -1403,6 +1415,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         greeneFeedback.resetObservation();Arrays.fill(greeneFlash,-100000L);
         if(kind==EncounterKind.ELIZABETH_GREENE)greeneStateEpoch++;
         super.readAdditionalSaveData(tag);
+        entityData.set(GREENE_PURSUIT,tag.getBoolean("GreenePursuit"));
         entityData.set(PHASE,Math.max(0,Math.min(kind==EncounterKind.ELIZABETH_GREENE?3:2,tag.getInt("EncounterPhase"))));
         sequence=Math.max(0,tag.getInt("EncounterSequence"));entityData.set(BROKEN,tag.getInt("EncounterBroken")&((1<<parts.length)-1));
         if(kind==EncounterKind.ELIZABETH_GREENE){

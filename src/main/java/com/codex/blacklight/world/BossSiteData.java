@@ -66,6 +66,10 @@ public final class BossSiteData extends SavedData {
         if (!boss.getUUID().equals(data.active.get(boss.getPersistentData().getLong(HOME)))) return;
         participant(boss, killer);
         if(boss.kind()==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE) {
+            if(boss.greenePursuit()) {
+                complete(boss,killer,4);
+                return;
+            }
             GreeneHost.releaseFrom(boss,level,BlockPos.of(boss.getPersistentData().getLong(HOME)));
             return;
         }
@@ -85,6 +89,7 @@ public final class BossSiteData extends SavedData {
         }
         rewards.setDirty();
         data.release(boss);
+        if (bit==4) return; // The pursuit advancement pays its XP once per participant.
         boss.spawnAtLocation(bit == 1 ? com.codex.blacklight.registry.ModItems.HEAVY_ARMOR_CORE.get()
                 : com.codex.blacklight.registry.ModItems.MOTHER_CORE.get());
     }
@@ -92,6 +97,7 @@ public final class BossSiteData extends SavedData {
         var bits = pending.remove(player.getUUID());
         if (bits == null) return;
         if ((bits & 1) != 0) GrowthSystem.award(player, "convoy_cleared");
+        if ((bits & 4) != 0) GrowthSystem.award(player,"greene_pursuit");
         if ((bits & 2) != 0) GrowthSystem.award(player, "plaza_cleared");
         setDirty();
     }
