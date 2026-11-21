@@ -207,6 +207,21 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         glUniform3fv(u(model,"pivots"),pivots);glUniform3fv(u(model,"eye"),eye);scalar(model,"time",t);scalar(model,"sceneLight",light);
         mat(model,"camera",camera);mat(model,"root",new Matrix4f());boolean second=t>=13.2F;
         integer(model,"kind",3);glBindVertexArray(fissures);glDrawArrays(GL_TRIANGLES,0,fissureCount);
+        int severed=0;
+        var bends=new float[16];
+        for(int i=0;i<8;i++){
+            if(boss.spider.severed(i))severed|=1<<i;
+            String suffix=(i<4?"L":"R")+(i%4+1);
+            bends[2*i]=boss.spider.fold("coxa_"+suffix,partial);
+            bends[2*i+1]=boss.spider.fold("tibia_"+suffix,partial);
+        }
+        integer(model,"severed",severed);glUniform2fv(u(model,"legBends"),bends);
+        if(second){
+            System.arraycopy(timeline,131*frameSize,boneUpload,0,BONES);
+            upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);
+            integer(model,"kind",0);drawModel(0,1);
+            System.arraycopy(bones,0,boneUpload,0,BONES);upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);
+        }
         integer(model,"kind",second?1:0);drawModel(second?1:0,1);if(t<14.5F){integer(model,"kind",2);drawModel(2,people);}
         integer(model,"kind",6);
         for(int i=0;i<4;i++){

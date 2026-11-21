@@ -49,6 +49,7 @@ public final class ClawCombatSystem {
     }
 
     public static void handle(ServerPlayer player, ClawActionPayload.Action request) {
+        if(request==ClawActionPayload.Action.SPIDER_ESCAPE){SpiderActions.escape(player);return;}
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         if(request==ClawActionPayload.Action.TERRAIN_GRAB_KEEPALIVE){TerrainGrabSelection.keepAlive(player);return;}
         if(request==ClawActionPayload.Action.TERRAIN_GRAB_RELEASE){TerrainGrabSelection.release(player);return;}
@@ -70,6 +71,7 @@ public final class ClawCombatSystem {
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_START) { ConsumeSystem.startThrowCharge(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_RELEASE) { ConsumeSystem.releaseThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.IMPLANT_HELD) { ConsumeSystem.implantHeld(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_CANCEL) { ConsumeSystem.cancelThrowCharge(player); return; }
         if (player.getData(ModAttachments.CONSUMING)) return;
         if (request == ClawActionPayload.Action.CYCLE_FORM) { com.codex.blacklight.power.PowerFormSystem.cycle(player); return; }

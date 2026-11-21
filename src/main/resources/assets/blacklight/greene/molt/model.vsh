@@ -1,6 +1,8 @@
 #version 150
 in vec3 pos,normal,ink;in vec2 uv;in float joint;
 uniform mat4 camera,root;uniform sampler2D bones,actors;
+uniform int severed; uniform vec2 legBends[8];
+const vec3 legJoint[16]=vec3[16](vec3(3.26562,5.22297,-1.25000),vec3(6.04688,9.63932,-3.42188),vec3(3.78125,4.07980,-0.46875),vec3(7.46875,7.68422,-0.90625),vec3(3.50000,4.26225,1.23438),vec3(3.75000,6.98466,2.59375),vec3(3.35938,3.60484,2.03125),vec3(5.46875,5.93191,3.54688),vec3(-1.54688,4.86653,-0.60938),vec3(-4.54688,9.62314,-2.59375),vec3(-1.84375,4.12370,0.10938),vec3(-7.31250,7.87852,0.28125),vec3(-1.56250,4.59460,1.76562),vec3(-2.54688,7.51469,3.04688),vec3(-1.85938,3.40105,2.43750),vec3(-4.20312,5.87183,3.79688));
 uniform int kind; uniform float time;uniform vec3 pivots[12];
 out vec3 rgb, norm,wp;out vec2 texuv;flat out int surface;
 mat3 rx(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,s,0,-s,c);}
@@ -34,6 +36,14 @@ void main(){
  digested=0.;
  int j=int(joint+.1);vec3 p=pos, n=normal;rgb=ink;texuv=uv;surface=kind;
  if(kind==0 || kind==1){
+   if(kind==0 && j>=13 && j<=28){
+     int k=j-13,leg=k/2;
+     if(k%2==1){
+       if((severed & (1<<leg))!=0){gl_Position=vec4(2.,2.,2.,1.);return;}
+       hinge(p,n,legJoint[k],rz(legBends[leg].y));
+     }
+     hinge(p,n,legJoint[leg*2],rz(legBends[leg].x));
+   }
    if(kind==0)surface=8;else if(j<35)surface=7;
    mat4 bone=mat4(texelFetch(bones,ivec2((j%4)*4+0,j/4),0),texelFetch(bones,ivec2((j%4)*4+1,j/4),0),texelFetch(bones,ivec2((j%4)*4+2,j/4),0),texelFetch(bones,ivec2((j%4)*4+3,j/4),0));
    p=(root*bone*vec4(p,1)).xyz;if(kind==0)p*=.9912102;n=mat3(root)*mat3(bone)*n;

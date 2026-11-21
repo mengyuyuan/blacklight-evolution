@@ -140,6 +140,11 @@ public final class GreeneBattleCycle {
         if((stage==DOWN||stage==RISING)&&GreeneBattleHealth.recoveryRequested(initialStunnedHealth,owner.getHealth(),owner.getMaxHealth()))recoveryPending=true;
     }
     private void rise(){previousDown=age;enter(RISING);}
+    public void spiderKilled(){
+        if(!owner.spider.live())return;
+        owner.spider.actions.leaveShell();owner.cancelAttack();waveCount=2;collapseYaw=owner.yBodyRot;takeRoot();
+        enter(MOLTING);molt.tick(owner,0);
+    }
     private void beginSubmerge(){
         coreDamageable=false;stunPending=false;recoveryPending=false;floorPending=false;
         if(owner.greeneOutbreak()){
@@ -153,7 +158,8 @@ public final class GreeneBattleCycle {
         if(!live())dispose();
     }
     private void finishAirborneWave(){
-        armourWave=waveCount;owner.greeneRestoreAppendages(armourWave);
+        boolean born=stage==MOLTING;armourWave=waveCount;owner.greeneRestoreAppendages(armourWave);
+        if(born){owner.setHealth(owner.getMaxHealth());coreDamageable=false;}
         minimumHealth=GreeneBattleHealth.releaseFloorOnEmergence(owner.getHealth(),owner.getMaxHealth())?0:owner.getHealth();
         releaseRoot();enter(GUARDED);
     }
@@ -191,6 +197,7 @@ public final class GreeneBattleCycle {
     public void beginOpeningAtSurface(){
         if(owner.level().isClientSide || !openingPending)return;
         openingPending=false;choosePlayer();surfaceY=owner.getY();
+        if(owner.spider.first()){minimumHealth=0;coreDamageable=true;enter(GUARDED);return;}
         // Start one model pixel above the feet so vanilla's initial 0.1% ray step stays outside the floor.
         surfaceY=surface(1.0/16);goalY=surfaceY;
         coreDamageable=false;emergeElapsed=-1;hydrasSpawned=false;nextHydra=1;
@@ -235,6 +242,10 @@ public final class GreeneBattleCycle {
             if(molt.tick(owner,age))publish();
             if(age>=GreeneMolt.DURATION){molt.clear(owner);finishAirborneWave();}
             return;
+        }
+        if(owner.spider.first()){
+            if(stage!=GUARDED){if(rootControlled){owner.setPos(owner.getX(),surfaceY,owner.getZ());releaseRoot();}enter(GUARDED);}
+            owner.spider.tick();return;
         }
         brood.tick(owner);if(!live()){dispose();return;}tickHydras();if(!live()){dispose();return;}
         switch(stage){

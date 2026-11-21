@@ -118,10 +118,18 @@ public final class BlacklightInfectedHost extends Monster {
     public void setEvolvedAction(String action){if(level().isClientSide)return;var tag=new CompoundTag();if(!action.isEmpty()){tag.putString("Move",action);tag.putLong("Started",level().getGameTime());}entityData.set(EVOLVED_ACTION,tag);}
     public void setEvolvedAction(String action,LivingEntity target){setEvolvedAction(action);if(level().isClientSide||action.isEmpty())return;var tag=entityData.get(EVOLVED_ACTION).copy();tag.putInt("Target",target.getId());entityData.set(EVOLVED_ACTION,tag);}
     private void publishEvolvedState(int stage){var tag=new CompoundTag();tag.putInt("Stage",stage);tag.putInt("Elapsed",evolvedMorphTicks);tag.putLong("SampledAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
-    public boolean beginEvolvedMetamorphosis(){
+    public boolean beginEvolvedMetamorphosis(){return beginEvolvedMetamorphosis(false);}
+    public boolean beginGreeneEvolution(){return beginEvolvedMetamorphosis(true);}
+    private boolean beginEvolvedMetamorphosis(boolean catalyzed){
         if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
-                ||!com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
-        if(evolvedChoice().isEmpty()){
+                ||!catalyzed && !com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
+        if(catalyzed){
+            var variants=com.codex.blacklight.infection.EvolvedArchetype.values();
+            var variant=variants[getRandom().nextInt(variants.length)];
+            var base=com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID());
+            var choice=new com.codex.blacklight.infection.EvolvedMapping.Choice(base.form(),variant.id(),variant.bias(),base.table(),base.seed(),base.fallback(),base.scores());
+            var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(choice));entityData.set(HOST,data);
+        }else if(evolvedChoice().isEmpty()){
             var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID())));entityData.set(HOST,data);
         }
         evolvedMorphTicks=0;publishEvolvedState(1);nativeCombat.interrupt();clearTissueStrike();organAbilities.interrupt();getNavigation().stop();setTarget(null);return true;
