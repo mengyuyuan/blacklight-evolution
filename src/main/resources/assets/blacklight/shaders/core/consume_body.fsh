@@ -6,6 +6,7 @@ uniform sampler2D Sampler3;
 uniform sampler2D Sampler4;
 uniform mat4 ModelViewMat;
 uniform vec4 ColorModulator;
+uniform int CordSurface;
 uniform float FogStart;
 uniform float FogEnd;
 uniform vec4 FogColor;
@@ -39,8 +40,10 @@ void main(){
     // char_alex_cloth lit_PR. Alpha-composite this coat over the already-lit clothing.
     float x=1.-clamp(vertexColor.a,0.,1.);
     float opacity=1.-x*pow(1.-(1.-x)*tissue.a,8.);
+    if(CordSurface!=0)opacity=vertexColor.a;
     if(opacity<.006)discard;
     vec2 xy=texture(Sampler3,texCoord).ag*2.-1.;
+    if(CordSurface!=0)xy*=.14;
     vec3 mapNormal=vec3(xy,sqrt(max(0.,1.-dot(xy,xy))));
     vec3 n=normalize(viewNormal);
     vec3 dp1=dFdx(viewPosition),dp2=dFdy(viewPosition);
@@ -53,6 +56,12 @@ void main(){
     vec3 env=texture(Sampler4,cubeAtlas(normalize(r))).rgb;
     float diffuse=.54+.30*max(0.,dot(n,normalize(viewLight0)))+.16*max(0.,dot(n,normalize(viewLight1)));
     vec3 color=tissue.rgb*diffuse+env*(.33*tissue.a);
+    if(CordSurface!=0){
+        vec3 view=-normalize(viewPosition);
+        float rim=pow(1.-abs(dot(n,view)),3.);
+        float glint=pow(max(0.,dot(n,normalize(view+normalize(viewLight0)))),43.);
+        color=tissue.rgb*diffuse+env*(.14+.22*rim)+vec3(.30*glint);
+    }
     color*=lightMapColor.rgb*ColorModulator.rgb;
     color=mix(overlayColor.rgb,color,overlayColor.a);
     fragColor=linear_fog(vec4(color,opacity*ColorModulator.a),vertexDistance,FogStart,FogEnd,FogColor);

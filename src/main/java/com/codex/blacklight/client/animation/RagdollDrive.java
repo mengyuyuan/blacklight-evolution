@@ -48,6 +48,8 @@ public final class RagdollDrive {
     /** Per-part absorption front. Connected tissue keeps its joints until it reaches the sink. */
     public static float partFlow(LivingEntity e,int region,float partial) {
         float f=flow(e,partial);if(f<=0)return 0;
+        var visual=ModAttachments.peekData(e,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
+        if(MobileConsumeCarry.state(e,visual)!=null)f=MobileConsumeCarry.contraction(f);
         var style=ConsumeFracture.phase(e,partial).style();
         float delay=switch(style) {
             case HEAD_CRUSH,HEAD_IMPACT -> region==1?0:region==32?.10F:.20F;

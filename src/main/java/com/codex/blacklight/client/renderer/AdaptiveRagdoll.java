@@ -100,6 +100,23 @@ public final class AdaptiveRagdoll {
         return body.quill==organ ? body.quillSink(partial) : body.physicalWound(organ.getPosition(partial),partial);
     }
 
+    /** Remaining drawn skin extent for the outer carry strands. A negative value means
+     * the receiver still uses its ordinary renderer and has no physical mesh to sample. */
+    static float carrySkinFraction(LivingEntity mob,float partial){
+        var body=BODIES.get(mob);
+        if(body==null||scene!=mob.level()||!active(mob))return -1;
+        double full=0,visible=0;
+        for(var part:body.parts){
+            double rest=part.half.length();
+            full=Math.max(full,rest);
+            if(part.renderedAt==scene.getGameTime() && Math.abs(part.renderedPartial-partial)<.011F
+                    && part.renderedPosition!=null && part.flow<.995F){
+                visible=Math.max(visible,rest*part.scale);
+            }
+        }
+        return full>0?(float)Math.min(1,visible/full):0;
+    }
+
     /** Four receiver joints retargeted onto its currently rendered torso, including compression and rotation. */
     static Vec3[] chestConsumeJoints(LivingEntity entity,float partial){
         var body=BODIES.get(entity);
@@ -2238,6 +2255,35 @@ public final class AdaptiveRagdoll {
             for(var joint:joints)if(!joint.severed)links.add(new RagdollConstraintMotion.Link(ids.get(joint.parent),ids.get(joint.child)));
             return RagdollConstraintMotion.supported(contacts,links);
         }
+        private long carriedScene=Long.MIN_VALUE;
+        private double carriedSeen;
+        private Vec3 carriedEntryOffset;
+        private Vec3[] carriedEntryParts;
+        private void carryVisibleSkin(Vec3[] points,Vec3 center,long sceneStart,float partial,float flow){
+            int body=parts.indexOf(root);
+            if(body<0)return;
+            Vec3 raw=points[body];
+            double clock=scene.getGameTime()+partial;
+            if(carriedScene!=sceneStart||carriedEntryParts==null||carriedEntryParts.length!=parts.size()){
+                carriedScene=sceneStart;carriedSeen=clock;
+                Vec3 previous=root.renderedPosition!=null&&clock-root.renderedAt<3?root.renderedPosition:raw;
+                carriedEntryOffset=previous.subtract(center);
+                carriedEntryParts=new Vec3[parts.size()];
+                for(int i=0;i<parts.size();i++){
+                    var part=parts.get(i);
+                    carriedEntryParts[i]=part.renderedPosition!=null&&clock-part.renderedAt<3
+                            ?part.renderedPosition.subtract(previous):points[i].subtract(raw);
+                }
+            }
+            float blend=RagdollDrive.smooth((float)((clock-carriedSeen)/4));
+            Vec3 anchor=center.add(carriedEntryOffset.scale(1-blend));
+            double span=1-.97*com.codex.blacklight.combat.MobileConsumeCarry.contraction(flow);
+            for(int i=0;i<parts.size();i++){
+                Vec3 relative=points[i].subtract(raw).scale(span);
+                points[i]=anchor.add(carriedEntryParts[i].lerp(relative,blend));
+            }
+        }
+
         RagdollJointProjection.Result connectedPose(float partial){
             boolean paired=pairedReceiver();
             RagdollJointProjection.Result result;
@@ -2281,6 +2327,15 @@ public final class AdaptiveRagdoll {
                 }
             }
             float flow=RagdollDrive.flow(entity,partial);
+            var mobileVisual=com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+            if(mobileVisual.stage()==com.codex.blacklight.combat.ConsumeVisual.MOBILE_CONSUME
+                    &&scene.getEntity(mobileVisual.consumerId()) instanceof LivingEntity owner){
+                Vec3 center=com.codex.blacklight.combat.MobileConsumeCarry.center(entity,owner,mobileVisual,partial);
+                if(center!=null){
+                    carryVisibleSkin(result.positions(),center,mobileVisual.started(),partial,flow);
+                    return result;
+                }
+            }
             if(flow>0){
                 // Keep the socket and skin together as the final visible tissue returns.
                 var sink=RagdollDrive.sink(entity,partial);

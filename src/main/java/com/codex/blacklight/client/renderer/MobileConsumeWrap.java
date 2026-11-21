@@ -44,9 +44,9 @@ public final class MobileConsumeWrap {
         // The source track reverses after 2.3 s. A shorter MC receiver scene releases
         // the outer coat on settlement, leaving the last fibers on the moving player.
         float reverse=Math.max(.35F,Math.min(2.3F,finish-cue));
-        float tail=.72F;
+        float tail=.54F;
         if(seconds<0 || seconds>=reverse+tail)return;
-        float peak=Math.min(.805F,Math.max(.53F,.35F*reverse));
+        float peak=Math.min(.54F,Math.max(.42F,.29F*reverse));
         float reach=seconds<reverse ? peak*seconds/reverse : peak*(1-(seconds-reverse)/tail);
         // The source fragment program scrolls a tiled mesh UV using global time.
         float textureClock=(Math.floorMod(now,10000L)+partial)/20F;

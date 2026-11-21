@@ -57,6 +57,12 @@ public final class ClientCarryPlacement {
     /** Render-time pairing avoids the receiver's network interpolation trailing the actor. */
     public static Vec3 consumeOffset(LivingEntity victim,float partial){
         var visual=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
+        if(visual.stage()==ConsumeVisual.MOBILE_CONSUME){
+            var mobile=MobileConsumeCarry.state(victim,visual);
+            if(mobile!=null&&victim.level().getEntity(visual.consumerId()) instanceof LivingEntity owner)
+                return mobile.predictedFeet(victim,owner,visual,partial).subtract(victim.getPosition(partial));
+            return Vec3.ZERO;
+        }
         if(visual.stage()!=ConsumeVisual.CONSUME&&visual.stage()!=ConsumeVisual.HOLD&&visual.stage()!=ConsumeVisual.AIR_HOLD&&visual.stage()!=ConsumeVisual.AIR_THROW&&visual.stage()!=ConsumeVisual.GRAB_ATTACK)return Vec3.ZERO;
         var carrier=victim.level().getEntity(visual.consumerId());if(!(carrier instanceof LivingEntity owner))return Vec3.ZERO;
         var form=PowerForm.values()[net.minecraft.util.Mth.clamp(visual.form(),0,PowerForm.values().length-1)];
