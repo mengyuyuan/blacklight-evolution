@@ -261,7 +261,13 @@ public final class ClientClawEvents {
         }
         if(state.isPrototypeMode() && com.codex.blacklight.registry.ModAttachments.getData(minecraft.player, ModAttachments.CONSUMING)
                 && (SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))) {
-            event.setCanceled(true);tickGrabButtons();return;
+            boolean down = event.getAction() == GLFW.GLFW_PRESS;
+            boolean attack = SkillBindings.mouse(minecraft.options.keyAttack,event.getButton());
+            boolean use = SkillBindings.mouse(minecraft.options.keyUse,event.getButton());
+            event.setCanceled(true);
+            tickGrabButtons(attack ? down : SkillBindings.down(minecraft.options.keyAttack),
+                    use ? down : SkillBindings.down(minecraft.options.keyUse));
+            return;
         }
         if(com.codex.blacklight.mode.PrototypeSurvivalLock.holdingPlacementItem(minecraft.player)||com.codex.blacklight.firearms.FirearmsCombat.holdingFirearm(minecraft.player)||com.codex.blacklight.item.ParasiteSyringeItem.held(minecraft.player))return;
         if (!state.isInfected() || !state.isPrototypeMode()
@@ -304,31 +310,39 @@ public final class ClientClawEvents {
     /** Raw callbacks and polling share the same edge latch: one click sends one intent. */
     private static void tickGrabButtons() {
         var mc=Minecraft.getInstance();if(mc.getWindow()==null)return;
-        long window=mc.getWindow().getWindow();
-        boolean left=SkillBindings.down(mc.options.keyAttack);
-        boolean right=SkillBindings.down(mc.options.keyUse);
+        tickGrabButtons(SkillBindings.down(mc.options.keyAttack), SkillBindings.down(mc.options.keyUse));
+    }
+
+    private static void tickGrabButtons(boolean left, boolean right) {
+        var mc=Minecraft.getInstance();
         if(ClientBlockThrowInput.poll(left,right)){lastGrabLeft=left;lastGrabRight=right;return;}
         if(mc.player!=null&&mc.screen==null&&mc.isWindowActive()&&com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.CONSUMING)) {
             clearLeftAttackHold();
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
             int stage=com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE);
             boolean holding=com.codex.blacklight.combat.ConsumeVisual.holding(stage);
+            boolean throwable = com.codex.blacklight.combat.ConsumeVisual.carrying(stage)
+                    || stage == com.codex.blacklight.combat.ConsumeVisual.CAPTURE;
             if(right&&!lastGrabRight&&(holding||com.codex.blacklight.combat.ConsumeVisual.acquiring(stage))){
                 if(grabThrowCharging)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_CANCEL));
                 grabThrowCharging=false;
                 PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.CONSUME));
             }
-            else if(holding&&!right){
+            else if (stage == com.codex.blacklight.combat.ConsumeVisual.MOUNT_HOLD && left && !lastGrabLeft && !right) {
+                PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.THROW));
+            }
+            else if(throwable&&!right){
                 // Hold to wind up, release to throw: same lease scheme as block throws.
                 if(left&&!lastGrabLeft){PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));grabThrowCharging=true;grabThrowSentAt=mc.player.tickCount;}
                 else if(left&&grabThrowCharging&&mc.player.tickCount-grabThrowSentAt>=10){PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));grabThrowSentAt=mc.player.tickCount;}
                 else if(!left&&lastGrabLeft&&grabThrowCharging){
+                    mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot(
+                            mc.player.getYRot(), mc.player.getXRot(), mc.player.onGround()));
                     ClientMovementEvents.sendAttackDirection(mc);
-                    PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_START));
                     PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_RELEASE));grabThrowCharging=false;
                 }
             }
-            if(!holding)grabThrowCharging=false;
+            if(!throwable)grabThrowCharging=false;
         } else if(grabThrowCharging){
             if(mc.getConnection()!=null)PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB_THROW_CANCEL));
             grabThrowCharging=false;

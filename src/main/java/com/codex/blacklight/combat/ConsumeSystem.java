@@ -38,7 +38,8 @@ public final class ConsumeSystem {
     static float chargeFraction(int ticks){return Math.max(0,Math.min(1,ticks/(float)THROW_CHARGE_TICKS));}
     /** Left button down while holding a body: start or renew the wind-up. */
     public static void startThrowCharge(ServerPlayer player){
-        var s=ACTIVE.get(player);if(s==null||!ConsumeVisual.holding(s.stage)||s.large||!valid(player,s))return;
+        var s=ACTIVE.get(player);if (s == null || s.large || s.consumeQueued || s.throwAim != null
+                || !(s.stage == ConsumeVisual.CAPTURE || ConsumeVisual.carrying(s.stage)) || !valid(player,s)) return;
         long now=player.level().getGameTime();
         if(s.chargeStart<0||now-s.chargeInput>25){
             s.chargeStart=now;
@@ -50,8 +51,15 @@ public final class ConsumeSystem {
     public static void releaseThrowCharge(ServerPlayer player){
         var s=ACTIVE.get(player);if(s==null)return;
         long now=player.level().getGameTime();
-        int ticks=s.chargeStart<0||now-s.chargeInput>25?0:(int)Math.min(THROW_CHARGE_TICKS,Math.max(0,now-s.chargeStart));
-        clearThrowCharge(player,s);s.throwCharge=ticks;throwTarget(player);
+        if (s.chargeStart < 0 || now - s.chargeInput > 25 || !valid(player,s)
+                || !(s.stage == ConsumeVisual.CAPTURE || ConsumeVisual.carrying(s.stage))) {
+            clearThrowCharge(player,s);
+            return;
+        }
+        s.throwCharge = (int)Math.min(THROW_CHARGE_TICKS, Math.max(0, now - s.chargeStart));
+        clearThrowCharge(player,s);
+        s.throwAim = selectThrowAim(player, s.victim);
+        if (ConsumeVisual.carrying(s.stage)) throwTarget(player);
     }
     public static void cancelThrowCharge(ServerPlayer player){var s=ACTIVE.get(player);if(s!=null)clearThrowCharge(player,s);}
     private static void clearThrowCharge(ServerPlayer player,Session s){
@@ -65,6 +73,7 @@ public final class ConsumeSystem {
         Vec3 start,lastPosition,consumeTargetStart; int started, stage=ConsumeVisual.CAPTURE,stuckTicks,variant;double pullSpeed;boolean releaseLogged,consumeQueued;
         /** Held-throw charge, server game time; repeat START packets renew the lease like block throws. */
         boolean travelRequested, grabQueued, bodyWeaveStarted;
+        ThrowAim throwAim;
         long chargeStart=-1,chargeInput=-1;int throwCharge; int landingDelay;
         Session(Mob v, ServerPlayer p, PowerForm f) {
             victim=v; form=f; start=p.position(); started=p.tickCount; large=ConsumeSequence.large(v); facing=ConsumeSequence.bruteMount(v)?v.yBodyRot:p.getYRot();
@@ -217,7 +226,12 @@ public final class ConsumeSystem {
     /** Right click confirms a held target. It can never acquire or auto-consume a new target. */
     public static void consume(ServerPlayer player) {
         var s=ACTIVE.get(player);if(s==null||!valid(player,s))return;
-        if(ConsumeVisual.acquiring(s.stage)){s.consumeQueued=true;return;}
+        if (ConsumeVisual.acquiring(s.stage)) {
+            clearThrowCharge(player,s);
+            s.throwAim = null;
+            s.consumeQueued = true;
+            return;
+        }
         if(!ConsumeVisual.holding(s.stage))return;
         s.consumeQueued=false;
         // Recheck at confirmation: healing or changed attributes must not bypass the gate.
@@ -250,10 +264,11 @@ public final class ConsumeSystem {
         else play(player,s.large?PlayerAction.consumeLarge(s.animationForm()):PlayerAction.consume(s.form));
         com.codex.blacklight.BlacklightNeoMod.LOGGER.info("Consume scene started: form={} target={} large={} clip={} duration={} origin={}",s.form,s.victim.getType(),s.large,ConsumeSequence.clipKey(s.animationForm(),s.large,s.variant),s.duration(),s.start);
     }
-    /** E again or primary attack starts a throw; release is synchronized to the arm swing. */
+    /** Primary attack starts the throw. The arm swing owns the physical release frame. */
     public static void throwTarget(ServerPlayer player) {
         var s=ACTIVE.get(player);if(s==null||!ConsumeVisual.holding(s.stage)||!valid(player,s))return;
         if(s.large){cancel(player);return;}
+        if (s.throwAim == null) s.throwAim = selectThrowAim(player,s.victim);
         boolean aerial=AerialCarryMotion.airborne(player)&&ConsumeSequence.humanoid(s.victim)&&!s.victim.isBaby()
                 &&(s.form==PowerForm.NONE||s.form==PowerForm.MUSCLE_MASS)&&AerialCarryMotion.available();
         if(aerial){
@@ -304,22 +319,49 @@ public final class ConsumeSystem {
                 feet.maxX-.05,feet.minY+.01,feet.maxZ-.05);
         return player.level().getBlockCollisions(player,support).iterator().hasNext();
     }
-    /** Creature flight law (see thrown): move by v, then v=(v-0.08)*0.98. Aim like block throws: locked or crosshair target, gravity solved. */
-    private static Vec3 aimThrow(ServerPlayer p,Mob body,double speed,float charge){
-        Vec3 from=body.position().add(0,body.getBbHeight()*.5,0),look=p.getLookAngle();
-        LivingEntity target=CombatTargeting.locked(p);
-        if(target==null||target==body||!p.hasLineOfSight(target)||p.distanceToSqr(target)>48*48){
-            target=null;double best=-1;
-            for(var e:p.level().getEntitiesOfClass(LivingEntity.class,p.getBoundingBox().inflate(48),e->e!=body&&CombatTargeting.selectable(p,e)&&p.hasLineOfSight(e))){
-                double dot=e.getBoundingBox().getCenter().subtract(p.getEyePosition()).normalize().dot(look);
-                double score=dot*8-p.distanceTo(e)/48.0;
-                if(dot>.94&&score>best){best=score;target=e;}
+    private record ThrowAim(Vec3 look, LivingEntity target) {}
+
+    /** Take one sight picture on button release, before the hand starts moving. */
+    private static ThrowAim selectThrowAim(ServerPlayer player, Mob body) {
+        Vec3 eye = player.getEyePosition(), look = player.getLookAngle();
+        LivingEntity locked = CombatTargeting.locked(player);
+        if (locked != null && locked != body && CombatTargeting.selectable(player,locked)
+                && CombatTargeting.visibleWithinRange(player,locked,48)) return new ThrowAim(look,locked);
+
+        Vec3 end = eye.add(look.scale(48));
+        LivingEntity aimed = null;
+        double best = Double.POSITIVE_INFINITY;
+        for (LivingEntity candidate : CombatTargeting.candidates(player, player.getBoundingBox().inflate(48),
+                e -> e != body && CombatTargeting.selectable(player,e) && CombatTargeting.visibleWithinRange(player,e,48))) {
+            // Direct intersections sort in front-to-back order. Only assist close to the reticle.
+            double score = Double.POSITIVE_INFINITY;
+            for (var box : CombatTargeting.hitboxes(candidate)) {
+                var hit = box.clip(eye,end);
+                if (box.contains(eye)) score = 0;
+                else if (hit.isPresent() && CombatTargeting.clearRay(player,eye,hit.get()))
+                    score = Math.min(score, eye.distanceToSqr(hit.get()));
+            }
+            if (!Double.isFinite(score)) {
+                Vec3 delta = CombatTargeting.lockPoint(player,candidate).subtract(eye);
+                double alignment = delta.normalize().dot(look);
+                if (alignment < .992) continue;
+                score = 48*48 + 1 + (1-alignment)*100000 + delta.length()/48;
+            }
+            if (score < best || score == best && aimed != null && candidate.getId() < aimed.getId()) {
+                best = score;
+                aimed = candidate;
             }
         }
-        // A free throw (no creature aimed) keeps the original camera throw and inherits half the
-        // carrier's running momentum; only an aimed creature gets the gravity-solved arc.
+        return new ThrowAim(look,aimed);
+    }
+
+    /** The body starts at the moving hand, with gravity and drag applied once per game tick. */
+    private static Vec3 aimThrow(ServerPlayer p,Mob body,ThrowAim intent,double speed,float charge){
+        Vec3 from=body.position().add(0,body.getBbHeight()*.5,0),look=intent.look();
         Vec3 carried=p.getDeltaMovement().multiply(.5,0,.5);
-        Vec3 free=look.scale(speed);free=new Vec3(free.x,Math.max(free.y,.12)+.28-.1*charge,free.z).add(carried);
+        Vec3 free=look.scale(speed).add(carried).add(0,(.28-.1*charge)*(1-Math.abs(look.y)),0);
+        LivingEntity target=intent.target();
+        if(target!=null && (!CombatTargeting.selectable(p,target)||!CombatTargeting.visibleWithinRange(p,target,48)))target=null;
         if(target==null)return free;
         Vec3 aim=CombatTargeting.lockPoint(p,target);
         Vec3 motion=target.onGround()?target.getDeltaMovement().multiply(1,0,1):Vec3.ZERO;
@@ -392,7 +434,10 @@ public final class ConsumeSystem {
             return;
         }
         if(acquiring!=null&&ConsumeVisual.acquiring(acquiring.stage)){cancel(player);return;}
-        if (holding(player)) { throwTarget(player); return; }
+        if (acquiring != null && ConsumeVisual.holding(acquiring.stage)) {
+            if (acquiring.stage == ConsumeVisual.MOUNT_HOLD) cancel(player);
+            return;
+        }
         var state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
                 || ACTIVE.containsKey(player) || player.isPassenger()) return;
@@ -584,6 +629,7 @@ public final class ConsumeSystem {
                 if(target.position().distanceToSqr(anchor(player,target))>.36){cancel(player);return;}
                 phase(player,session,ConsumeVisual.HOLD);message(player,"grab_held");
                 if(session.consumeQueued)consume(player);
+                else if(session.throwAim != null)throwTarget(player);
             }
             return;
         }
@@ -618,7 +664,7 @@ public final class ConsumeSystem {
                 boolean muscle=session.form==PowerForm.MUSCLE_MASS;float charge=chargeFraction(session.throwCharge);
                 // A full wind-up throws ~1.6x faster and deals ~2.5x damage; a tap keeps the old throw.
                 double speed=(muscle?2.3:1.55)*(1+.6*charge);float damage=(muscle?12:6)*(1+1.5F*charge);
-                target.setOnGround(false);target.setDeltaMovement(aimThrow(player,target,speed,charge));target.hurtMarked=true;
+                target.setOnGround(false);target.setDeltaMovement(aimThrow(player,target,session.throwAim,speed,charge));target.hurtMarked=true;
                 THROWN.put(target,new Thrown(player,40,target.getDeltaMovement(),damage,charge));
                 if(charge>=.9F&&player.level() instanceof net.minecraft.server.level.ServerLevel)
                     com.codex.blacklight.forge.PacketDistributor.sendToPlayer(player,new com.codex.blacklight.network.PhysicalFeedbackPayload(com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,1.2F));
