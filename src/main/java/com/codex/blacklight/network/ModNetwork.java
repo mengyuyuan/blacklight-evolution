@@ -20,7 +20,7 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-91-mobile-groundspike")
+        event.registrar("standalone-92-consume-contact-audio")
                 .playToClient(ContactEffectsPayload.TYPE,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
                 .playToServer(ContextActionPayload.TYPE,ContextActionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)com.codex.blacklight.combat.ContextActionSystem.request(player);}))
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
@@ -127,6 +127,9 @@ public final class ModNetwork {
                 })
                 .playToClient(MovementTuningPayload.TYPE, MovementTuningPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> com.codex.blacklight.client.ClientMovementTuning.receive(payload.snapshot()));
+                })
+                .playToClient(ConsumeContactSoundPayload.TYPE, ConsumeContactSoundPayload.STREAM_CODEC, (payload, context) -> {
+                    context.enqueueWork(() -> com.codex.blacklight.client.renderer.ConsumeContactAudio.receive(payload));
                 })
                 .playToClient(PhysicalFeedbackPayload.TYPE, PhysicalFeedbackPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> ClientPhysicalFeedback.accept(payload));

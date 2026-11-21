@@ -48,7 +48,7 @@ public final class CrossModCombat {
                 && CrossModDamageRules.externalNamespace(namespace(attacker.getMainHandItem()));
     }
     public static boolean enhanced(LivingEntity victim, DamageSource source) {
-        return !source.is(QuillHarvest.DRAIN) && !(source instanceof NativeAttackSource) && !victim.level().isClientSide && !(victim instanceof Player)
+        return !source.is(QuillHarvest.DRAIN) && !source.is(ConsumeContactDamage.TYPE) && !(source instanceof NativeAttackSource) && !victim.level().isClientSide && !(victim instanceof Player)
                 && CrossModCombatConfig.LEGACY_ADVANTAGE.get() && CrossModCombatConfig.OFFENSE.get() && nativeAttack(source)
                 && CrossModDamageRules.externalNamespace(namespace(victim));
     }

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class GreeneHealthFloorMixin {
     @ModifyArg(method="actuallyHurt",at=@At(value="INVOKE",target="Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"),index=0)
     private float blacklight$greeneHealthFloor(float nextHealth){
+        nextHealth = com.codex.blacklight.combat.ConsumeContactDamage.healthFloor((LivingEntity)(Object)this, nextHealth);
         if((Object)this instanceof EncounterMob owner&&owner.greeneOwnDamageActive()&&owner.isAlive()&&Float.isFinite(nextHealth))
             return Math.max(nextHealth,owner.greeneMinimumHealth());
         if((Object)this instanceof EncounterMob boss&&boss.goliathHealthGuard()&&boss.isAlive()&&Float.isFinite(nextHealth))

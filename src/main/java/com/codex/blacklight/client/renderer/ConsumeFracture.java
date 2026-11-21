@@ -27,6 +27,8 @@ public final class ConsumeFracture implements MultiBufferSource {
             this(form,progress,opening,returnFlow,contact,style,false);
         }
     }
+    private final LivingEntity receiver;
+    private final float renderPartial;
     private final MultiBufferSource target;
     private final Matrix4f frame,inverse;
     private final Vector3f sink;
@@ -112,6 +114,7 @@ public final class ConsumeFracture implements MultiBufferSource {
     }
     public void bindModel(EntityModel<?> model){modelParts.putAll(ConsumeAnatomy.model(model));}
     public ConsumeFracture(LivingEntity mob,float partial,PoseStack stack,MultiBufferSource target,Vec3 destination) {
+        receiver=mob;renderPartial=partial;
         this.target=target;phase=phase(mob,partial);seed=mob.getId();
         headOnly=mob.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.HUNTER_CONSUME;
         sourcedReceiver=phase.nativeEvents();
@@ -154,6 +157,22 @@ public final class ConsumeFracture implements MultiBufferSource {
                 (type.mode()!=VertexFormat.Mode.QUADS&&type.mode()!=VertexFormat.Mode.TRIANGLES))return target.getBuffer(type);
         return streams.computeIfAbsent(type,Collector::new);
     }
+    /** Custom native rigs retain their own pose and colour. Only the contacted polygons change. */
+    public void finishMountedSurface(){
+        for(var layer:streams.values())layer.flush();
+        var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        MountedConsumeWound.apply(receiver,receiver.getData(ModAttachments.CONSUME_VISUAL),renderPartial,streams,v->{
+            var p=frame.transformPosition(new Vector3f(v.p));return camera.add(p.x,p.y,p.z);
+        });
+        for(var entry:streams.entrySet()){
+            var out=target.getBuffer(entry.getKey());
+            for(var v:entry.getValue().vertices){
+                var p=frame.transformPosition(new Vector3f(v.p));
+                out.addVertex(p.x,p.y,p.z).setColor(v.r,v.g,v.b,v.a).setUv(v.u,v.v).setOverlay(v.overlay).setLight(v.light).setNormal(v.nx,v.ny,v.nz);
+            }
+        }
+        streams.clear();
+    }
     public void finish() {
         // One set of posed part pivots for skin, clothing and copied layers.
         Vector3f[] lo=new Vector3f[centers.length],hi=new Vector3f[centers.length];
@@ -162,6 +181,12 @@ public final class ConsumeFracture implements MultiBufferSource {
             c.flush();for(var v:c.vertices)for(int a=0;a<centers.length;a++)if(v.weights[a]>.15F){lo[a].min(v.p);hi[a].max(v.p);present[a]=true;}
         }
         for(int a=0;a<centers.length;a++)if(present[a]){centers[a].set(lo[a]).add(hi[a]).mul(.5F);radii[a]=Math.clamp(lo[a].distance(hi[a])*.25F,.05F,.55F);}
+        var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        var paired=receiver.getData(ModAttachments.CONSUME_VISUAL);
+        MountedConsumeWound.apply(receiver,paired,renderPartial,streams,v->{
+            var p=displaced(v.p,MountedConsumeWound.anatomy(v)*divisions);
+            return camera.add(p.x,p.y,p.z);
+        });
         cutCenter.set(centers[ConsumeAnatomy.BODY]);
         if(bisect)preparePieces();
         for(var entry:streams.entrySet()){
@@ -383,11 +408,11 @@ public final class ConsumeFracture implements MultiBufferSource {
         Vector3f p=displaced(source,part);
         out.addVertex(p.x,p.y,p.z).setColor(color).setUv(.5F,.5F).setOverlay(OverlayTexture.NO_OVERLAY).setLight(0x00c000c0).setNormal(0,1,0);
     }
-    private static final class V {
+    static final class V {
         Vector3f p;float[] weights;int r=255,g=255,b=255,a=255,overlay=OverlayTexture.NO_OVERLAY,light;float u,v,nx,ny=1,nz;
         V mix(V b,float t){V c=new V();c.p=new Vector3f(p).lerp(b.p,t);c.weights=new float[ConsumeAnatomy.COUNT];for(int i=0;i<c.weights.length;i++)c.weights[i]=weights[i]+(b.weights[i]-weights[i])*t;c.r=(int)(r+(b.r-r)*t);c.g=(int)(g+(b.g-g)*t);c.b=(int)(this.b+(b.b-this.b)*t);c.a=(int)(a+(b.a-a)*t);c.u=u+(b.u-u)*t;c.v=v+(b.v-v)*t;c.overlay=overlay;c.light=light;c.nx=nx+(b.nx-nx)*t;c.ny=ny+(b.ny-ny)*t;c.nz=nz+(b.nz-nz)*t;return c;}
     }
-    private final class Collector implements VertexConsumer,ConsumeAnatomy.Consumer {
+    final class Collector implements VertexConsumer,ConsumeAnatomy.Consumer {
         final boolean quads;final List<V> vertices=new ArrayList<>();V current;float[] weights={1,0,0,0,0,0,0};
         Collector(RenderType type){quads=type.mode()==VertexFormat.Mode.QUADS;}
         @Override public void anatomy(int part){weights=new float[ConsumeAnatomy.COUNT];weights[Math.clamp(part,0,weights.length-1)]=1;}

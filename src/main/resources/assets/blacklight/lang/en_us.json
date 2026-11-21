@@ -1256,5 +1256,21 @@
   "death.attack.blacklight.quill_drain": "%1$s was drained by a parasitic quill",
   "death.attack.blacklight.quill_drain.player": "%1$s was drained by %2$s's parasitic quill",
   "message.blacklight.quill_empty": "Insufficient biomass",
-  "entity.blacklight.quill_organ": "Parasitic quill"
+  "entity.blacklight.quill_organ": "Parasitic quill",
+  "subtitle.blacklight.consume.grip": "Closes grip",
+  "subtitle.blacklight.consume.pierce": "Piercing impact",
+  "subtitle.blacklight.consume.cleave": "Cleaving impact",
+  "subtitle.blacklight.consume.tear": "Tissue tears",
+  "subtitle.blacklight.consume.dent": "Blunt impact",
+  "subtitle.blacklight.consume.crush": "Crushing impact",
+  "subtitle.blacklight.consume.slash": "Slashing impact",
+  "subtitle.blacklight.consume.absorb": "Biomass draws inward",
+  "subtitle.blacklight.consume.finish": "Absorption completes",
+  "subtitle.blacklight.skill.charge": "Power gathers",
+  "subtitle.blacklight.skill.groundspike": "Groundspikes erupt",
+  "subtitle.blacklight.skill.tendril": "Tendrils burst",
+  "subtitle.blacklight.skill.pain": "Focused strike releases",
+  "subtitle.blacklight.skill.dive": "Dive impacts",
+  "subtitle.blacklight.weapon.backspines.hit": "Quill pierces",
+  "subtitle.blacklight.weapon.backspines.ground": "Quill strikes ground"
 }

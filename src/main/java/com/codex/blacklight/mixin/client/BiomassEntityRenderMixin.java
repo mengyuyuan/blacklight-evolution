@@ -43,6 +43,14 @@ public abstract class BiomassEntityRenderMixin {
                 AdaptiveRagdoll.drawQuillTethers(mob,stack,source,light,partial);
                 return;
             }
+            if(owner==null && entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon mob
+                    && mob.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).stage()==com.codex.blacklight.combat.ConsumeVisual.MOUNT_CONSUME){
+                var skin=new com.codex.blacklight.client.renderer.ConsumeFracture(mob,partial,stack,source,net.minecraft.world.phys.Vec3.ZERO);
+                original.call(renderer,entity,yaw,partial,stack,skin,light);
+                if(tissue!=null)com.codex.blacklight.client.renderer.InfectedMorphology.flush(mob,skin);
+                skin.finishMountedSurface();
+                return;
+            }
             if(owner==null){
                 var receiver=com.codex.blacklight.client.renderer.ChestConsumeReceiver.begin(entity,stack,source,partial);
                 var skin=receiver==null?source:receiver;

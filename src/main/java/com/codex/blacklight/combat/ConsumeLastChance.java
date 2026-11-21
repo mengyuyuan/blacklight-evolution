@@ -94,7 +94,7 @@ public final class ConsumeLastChance {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void finish(net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre event) {
-        if (awaitingFinisher(event.getEntity()) && event.getSource().getEntity()!=null && event.getNewDamage()>0
+        if (!ConsumeContactDamage.owns(event.getEntity(),event.getSource()) && awaitingFinisher(event.getEntity()) && event.getSource().getEntity()!=null && event.getNewDamage()>0
                 && event.getNewDamage()<1) event.setNewDamage(1);
     }
     @SubscribeEvent public static void stopped(ServerStoppedEvent event){HITS.keySet().removeIf(m->m.getServer()==event.getServer());}

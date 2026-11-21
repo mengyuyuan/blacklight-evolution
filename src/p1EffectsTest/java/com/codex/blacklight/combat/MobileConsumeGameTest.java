@@ -260,7 +260,7 @@ public final class MobileConsumeGameTest {
         hunter.setHealth(hunter.getMaxHealth());
         ConsumeSystem.request(p);
         h.assertTrue(!hunter.isBeingConsumed(),"healthy hunter accepted a finisher");
-        hunter.setHealth(1);
+        hunter.setHealth(form == PowerForm.CLAWS ? hunter.getMaxHealth() * .05F : form == PowerForm.BLADE ? .2F : 1F);
         ConsumeSystem.request(p);
         h.assertTrue(hunter.isBeingConsumed(),"weakened hunter did not accept the mount");
         ConsumeSystem.consume(p);
@@ -269,7 +269,18 @@ public final class MobileConsumeGameTest {
         h.assertTrue(paired.stage()==ConsumeVisual.HUNTER_CONSUME&&paired.form()==PowerForm.NONE.ordinal(),
                 form+" replaced the shared hunter choreography with a human execution");
         ConsumeSystem.travelIntent(p,true);
-        for(int i=1;i<HunterConsume.COMPLETE_TICKS;i++)tick(p);
+        float previousHealth=hunter.getHealth();
+        int injuryCount=0;
+        for(int i=1;i<HunterConsume.COMPLETE_TICKS;i++){
+            tick(p);
+            if(hunter.getHealth()<previousHealth){
+                h.assertTrue(hunter.getHealth() >= previousHealth * .49F, "a single amplified contact emptied the execution health budget");
+                injuryCount++;
+            }
+            previousHealth=hunter.getHealth();
+            h.assertTrue(hunter.isAlive(),"hunter died before the finishing frame");
+        }
+        h.assertTrue(injuryCount==2,"expected two hunter contact wounds, observed "+injuryCount);
         h.assertTrue(ConsumeSystem.committed(p)&&!hunter.isConsumeRemains()&&p.getData(ModAttachments.MOBILE_CONSUME_START)<0,
                 "moving interrupted the hunter sequence before the source detach event");
         tick(p);
@@ -303,12 +314,41 @@ public final class MobileConsumeGameTest {
         var target=h.spawn(EntityType.COW,3,2,5);target.setNoAi(true);enter(h,p,target);
         var visual=target.getData(ModAttachments.CONSUME_VISUAL);
         int finish=ConsumeSequence.completionTick(PowerForm.NONE,false,visual.variant());
-        for(int i=1;i<finish;i++)tick(p);
+        float original=target.getHealth();
+        target.hurt(target.damageSources().generic(),99);
+        h.assertTrue(target.getHealth()==original,"external damage leaked into the execution");
+        boolean injured=false;
+        for(int i=1;i<finish;i++){
+            tick(p);
+            if(target.getHealth()<original)injured=true;
+            h.assertTrue(target.isAlive(),"an intermediate contact executed the receiver");
+        }
+        h.assertTrue(injured,"the paired contact never dealt actual damage");
         h.assertTrue(ConsumeSystem.committed(p)&&!target.isRemoved()&&p.getData(ModAttachments.MOBILE_CONSUME_START)<0,"stationary execution entered mobile branch");
         h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(visual),"stationary consume never applied the giver material");
         tick(p);
         h.assertTrue(p.getData(ModAttachments.CONSUME_BODY_VISUAL).equals(visual),"settlement discarded the residual coat");
         h.assertTrue(target.isRemoved()&&p.getData(ModAttachments.CONSUME_RECOVERY).active()&&p.getHealth()==12,"stationary recovery or reward lost");
+        h.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=40,batch="consume_contact_damage")
+    public static void everyBeatdownContactDamagesOnceWithoutEarlyDeath(GameTestHelper h) {
+        var p=player(h,PowerForm.NONE);
+        var target=h.spawn(EntityType.COW,3,2,5);
+        target.setNoAi(true); target.setHealth(1);
+        var scene=ConsumeReceiverScene.profile(PowerForm.NONE,false,ConsumeVariant.BEATDOWN);
+        var strikes=new ConsumeContactDamage();
+        for (int index=0;index<scene.hitSeconds().size();index++) {
+            int at=Math.round(scene.hitSeconds().get(index)*20);
+            float previous=target.getHealth();
+            h.assertTrue(strikes.strike(p,target,scene,0,at-1,false)<0 && target.getHealth()==previous,"early damage");
+            h.assertTrue(strikes.strike(p,target,scene,0,at,false)==index,"wrong contact ordinal");
+            float after=target.getHealth();
+            h.assertTrue(after<previous && after>=.25F,"missing nonlethal contact "+index+" hp "+previous+" -> "+after);
+            h.assertTrue(strikes.strike(p,target,scene,0,at,false)<0 && target.getHealth()==after,"duplicate contact");
+        }
+        h.assertTrue(target.isAlive(),"receiver died before settlement");
         h.succeed();
     }
 }

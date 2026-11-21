@@ -36,8 +36,7 @@ public final class CombatImpactEffects {
         hammerEmitters(p,move,center,radius);
         var form = com.codex.blacklight.registry.ModWeaponSounds.equipped(p);
         boolean hammer = form == PowerForm.HAMMERFISTS;
-        com.codex.blacklight.registry.ModWeaponSounds.play(p, form, "ground", center, hammer ? .72F : 1F, move.quake() ? .9F : 1F);
-        TerrainImpactEffects.surfaceSound(p, hit, hammer ? .88F : .62F, move.quake() ? .75F : .9F);
+        TerrainImpactEffects.weaponGroundSound(p,form,hit,hammer?.92F:1F,move.quake()?.90F:1F);
         PacketDistributor.sendToPlayer(p,new PhysicalFeedbackPayload(move.quake()?PhysicalFeedbackPayload.Effect.GROUND_SPIKE:PhysicalFeedbackPayload.Effect.CLAW_HEAVY,move.quake()?1:.42F));
         return true;
     }

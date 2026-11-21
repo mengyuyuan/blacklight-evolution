@@ -93,10 +93,40 @@
       "skeleton": "mother_segment_2_skeleton",
       "regions": [
         {
-          "leaf": "weak_1_Slug_02_Jaw_3",
-          "sourceJoint": "Slug_02_Jaw_3",
+          "leaf": "weak_1_Slug_02_Spine_1",
+          "sourceJoint": "Slug_02_Spine_1",
           "design": "authored_greene_segment.py",
-          "authoredUvCube": 7
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_2",
+          "sourceJoint": "Slug_02_Spine_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_Base",
+          "sourceJoint": "Slug_02_Spine_Base",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_3",
+          "sourceJoint": "Slug_02_Spine_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_4",
+          "sourceJoint": "Slug_02_Spine_4",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_1_Slug_02_Spine_5",
+          "sourceJoint": "Slug_02_Spine_5",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
         },
         {
           "leaf": "weak_1_Slug_02_Head",
@@ -111,46 +141,16 @@
           "authoredUvCube": 7
         },
         {
-          "leaf": "weak_1_Slug_02_Spine_5",
-          "sourceJoint": "Slug_02_Spine_5",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
           "leaf": "weak_1_Slug_02_Jaw_2",
           "sourceJoint": "Slug_02_Jaw_2",
           "design": "authored_greene_segment.py",
           "authoredUvCube": 7
         },
         {
-          "leaf": "weak_1_Slug_02_Spine_4",
-          "sourceJoint": "Slug_02_Spine_4",
+          "leaf": "weak_1_Slug_02_Jaw_3",
+          "sourceJoint": "Slug_02_Jaw_3",
           "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_1_Slug_02_Spine_3",
-          "sourceJoint": "Slug_02_Spine_3",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_1_Slug_02_Spine_2",
-          "sourceJoint": "Slug_02_Spine_2",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_1_Slug_02_Spine_1",
-          "sourceJoint": "Slug_02_Spine_1",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_1_Slug_02_Spine_Base",
-          "sourceJoint": "Slug_02_Spine_Base",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
+          "authoredUvCube": 7
         }
       ]
     },
@@ -159,50 +159,8 @@
       "skeleton": "mother_segment_3_skeleton",
       "regions": [
         {
-          "leaf": "weak_2_Slug_03_Jaw_3",
-          "sourceJoint": "Slug_03_Jaw_3",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 7
-        },
-        {
-          "leaf": "weak_2_Slug_03_Head",
-          "sourceJoint": "Slug_03_Head",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 2
-        },
-        {
-          "leaf": "weak_2_Slug_03_Jaw_1",
-          "sourceJoint": "Slug_03_Jaw_1",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 7
-        },
-        {
-          "leaf": "weak_2_Slug_03_Spine_5",
-          "sourceJoint": "Slug_03_Spine_5",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_2_Slug_03_Jaw_2",
-          "sourceJoint": "Slug_03_Jaw_2",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 7
-        },
-        {
-          "leaf": "weak_2_Slug_03_Spine_4",
-          "sourceJoint": "Slug_03_Spine_4",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_2_Slug_03_Spine_3",
-          "sourceJoint": "Slug_03_Spine_3",
-          "design": "authored_greene_segment.py",
-          "authoredUvCube": 1
-        },
-        {
-          "leaf": "weak_2_Slug_03_Spine_2",
-          "sourceJoint": "Slug_03_Spine_2",
+          "leaf": "weak_2_Slug_03_Spine_Base",
+          "sourceJoint": "Slug_03_Spine_Base",
           "design": "authored_greene_segment.py",
           "authoredUvCube": 1
         },
@@ -213,10 +171,52 @@
           "authoredUvCube": 1
         },
         {
-          "leaf": "weak_2_Slug_03_Spine_Base",
-          "sourceJoint": "Slug_03_Spine_Base",
+          "leaf": "weak_2_Slug_03_Spine_2",
+          "sourceJoint": "Slug_03_Spine_2",
           "design": "authored_greene_segment.py",
           "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_3",
+          "sourceJoint": "Slug_03_Spine_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_4",
+          "sourceJoint": "Slug_03_Spine_4",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Spine_5",
+          "sourceJoint": "Slug_03_Spine_5",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 1
+        },
+        {
+          "leaf": "weak_2_Slug_03_Head",
+          "sourceJoint": "Slug_03_Head",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 2
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_2",
+          "sourceJoint": "Slug_03_Jaw_2",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_3",
+          "sourceJoint": "Slug_03_Jaw_3",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
+        },
+        {
+          "leaf": "weak_2_Slug_03_Jaw_1",
+          "sourceJoint": "Slug_03_Jaw_1",
+          "design": "authored_greene_segment.py",
+          "authoredUvCube": 7
         }
       ]
     }

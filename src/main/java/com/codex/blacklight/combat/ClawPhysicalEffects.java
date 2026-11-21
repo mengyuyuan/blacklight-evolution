@@ -104,9 +104,7 @@ public final class ClawPhysicalEffects {
                 radius * 0.18D, 0.12D, radius * 0.18D, 0.025D);
         var contact = level.clip(new net.minecraft.world.level.ClipContext(center.add(0, .1, 0), center.add(0, -1.1, 0),
                 net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, player));
-        TerrainImpactEffects.surfaceSound(player, contact, .95F, .72F);
-        com.codex.blacklight.registry.ModWeaponSounds.play(player, com.codex.blacklight.power.PowerForm.CLAWS,
-                "ground", center, .84F, .84F);
+        TerrainImpactEffects.weaponGroundSound(player,com.codex.blacklight.power.PowerForm.CLAWS,contact,.92F,.84F);
         feedback(player, PhysicalFeedbackPayload.Effect.GROUND_SPIKE, 1.4F);
     }
 

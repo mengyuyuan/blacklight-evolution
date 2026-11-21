@@ -72,6 +72,9 @@ for name,bone in old.items():
             # Leaf geometry must inherit the parent's bind orientation as well
             # as length scale; otherwise the fingers retain the old rig's axis.
             rotation=bind[bone['parent']][:3,:3]/factor
+        if name=='left_hand':
+            # Closed, compact claws clear the support floor during the giant fist's slam.
+            factor *= .48
         transform=np.eye(4);transform[:3,:3]=rotation*factor
         transform[:3,3]=new_pivots[name]-transform[:3,:3]@old_pivots[name]
         bind[name]=transform;factors[name]=factor

@@ -1771,5 +1771,205 @@
       "blacklight:weapon/backspines/heavy_2",
       "blacklight:weapon/backspines/heavy_3"
     ]
+  },
+  "consume.grip": {
+    "subtitle": "subtitle.blacklight.consume.grip",
+    "sounds": [
+      {
+        "name": "blacklight:consume/grip_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/grip_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.pierce": {
+    "subtitle": "subtitle.blacklight.consume.pierce",
+    "sounds": [
+      {
+        "name": "blacklight:consume/pierce_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/pierce_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.cleave": {
+    "subtitle": "subtitle.blacklight.consume.cleave",
+    "sounds": [
+      {
+        "name": "blacklight:consume/cleave_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/cleave_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.tear": {
+    "subtitle": "subtitle.blacklight.consume.tear",
+    "sounds": [
+      {
+        "name": "blacklight:consume/tear_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/tear_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.dent": {
+    "subtitle": "subtitle.blacklight.consume.dent",
+    "sounds": [
+      {
+        "name": "blacklight:consume/dent_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/dent_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.crush": {
+    "subtitle": "subtitle.blacklight.consume.crush",
+    "sounds": [
+      {
+        "name": "blacklight:consume/crush_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/crush_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.slash": {
+    "subtitle": "subtitle.blacklight.consume.slash",
+    "sounds": [
+      {
+        "name": "blacklight:consume/slash_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/slash_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.absorb": {
+    "subtitle": "subtitle.blacklight.consume.absorb",
+    "sounds": [
+      {
+        "name": "blacklight:consume/absorb_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/absorb_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.finish": {
+    "subtitle": "subtitle.blacklight.consume.finish",
+    "sounds": [
+      {
+        "name": "blacklight:consume/finish_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/finish_2",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "skill.charge": {
+    "subtitle": "subtitle.blacklight.skill.charge",
+    "sounds": [
+      {
+        "name": "blacklight:skill/charge_1",
+        "attenuation_distance": 38
+      },
+      {
+        "name": "blacklight:skill/charge_2",
+        "attenuation_distance": 38
+      }
+    ]
+  },
+  "skill.groundspike": {
+    "subtitle": "subtitle.blacklight.skill.groundspike",
+    "sounds": [
+      {
+        "name": "blacklight:skill/groundspike_1",
+        "attenuation_distance": 38
+      },
+      {
+        "name": "blacklight:skill/groundspike_2",
+        "attenuation_distance": 38
+      }
+    ]
+  },
+  "skill.tendril": {
+    "subtitle": "subtitle.blacklight.skill.tendril",
+    "sounds": [
+      {
+        "name": "blacklight:skill/tendril_1",
+        "attenuation_distance": 38
+      },
+      {
+        "name": "blacklight:skill/tendril_2",
+        "attenuation_distance": 38
+      }
+    ]
+  },
+  "skill.pain": {
+    "subtitle": "subtitle.blacklight.skill.pain",
+    "sounds": [
+      {
+        "name": "blacklight:skill/pain_1",
+        "attenuation_distance": 38
+      },
+      {
+        "name": "blacklight:skill/pain_2",
+        "attenuation_distance": 38
+      }
+    ]
+  },
+  "skill.dive": {
+    "subtitle": "subtitle.blacklight.skill.dive",
+    "sounds": [
+      {
+        "name": "blacklight:skill/dive_1",
+        "attenuation_distance": 38
+      },
+      {
+        "name": "blacklight:skill/dive_2",
+        "attenuation_distance": 38
+      }
+    ]
+  },
+  "weapon.backspines.hit": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.hit",
+    "sounds": [
+      {
+        "name": "blacklight:consume.pierce",
+        "type": "event"
+      }
+    ]
+  },
+  "weapon.backspines.ground": {
+    "subtitle": "subtitle.blacklight.weapon.backspines.ground",
+    "sounds": [
+      {
+        "name": "blacklight:consume.crush",
+        "type": "event"
+      }
+    ]
   }
 }
