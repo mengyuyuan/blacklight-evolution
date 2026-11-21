@@ -12,7 +12,9 @@ import net.minecraft.world.phys.Vec3;
 public final class HelicopterSupport {
     public static boolean request(MilitarySoldier caller){
         if(!(caller.level() instanceof ServerLevel level)||caller.faction()!=MilitaryFaction.BLACKWATCH||!caller.tacticsAvailable())return false;
-        return request(caller,caller.position(),null);
+        var target=caller.getTarget();
+        boolean observed=target!=null && caller.validTarget(target) && caller.hasLineOfSight(target);
+        return request(caller,observed?target.position():caller.position(),observed?target:null);
     }
     public static boolean request(MilitaryUav scanner,net.minecraft.world.entity.LivingEntity target){
         if(scanner==null||!scanner.confirmedForSupport(target))return false;
@@ -27,6 +29,7 @@ public final class HelicopterSupport {
                 ||level.getEntitiesOfClass(MilitarySoldier.class,caller.getBoundingBox().inflate(64)).size()>16)return false;
         var helicopter=ModEntities.BLACKWATCH_HELICOPTER.get().create(level);if(helicopter==null)return false;
         Vec3 landing=helicopter.deployment().findSite(reference);
+        if(landing==null && observed!=null && caller instanceof MilitarySoldier)landing=helicopter.deployment().findSite(caller.position());
         if(landing==null){tag.putString("AirSupportLastResult","no_supported_rappel_site");return false;}
         Vec3 origin=null;
         for(int distance:new int[]{40,32,24}){

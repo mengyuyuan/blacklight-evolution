@@ -341,6 +341,7 @@ public final class WorldOutbreakSystem {
             // Probability belongs to the batch, not to each placement retry.
             int batchRoll=level.random.nextInt(100);
             if(!CityEcology.ambientAllowed(level,player.blockPosition(),batchRoll))continue;
+            int flyerRoll=level.random.nextInt(100);
             int playerBirths=0,quota=GameplayBalanceConfig.birthsPerPlayer(CityEcology.zone(level,player.blockPosition()));
             for(int attempt=0;attempt<GameplayBalanceConfig.SPAWN_ATTEMPTS.get()&&playerBirths<quota;attempt++){
             int minimum=GameplayBalanceConfig.SPAWN_MIN.get(),maximum=Math.max(minimum,GameplayBalanceConfig.SPAWN_MAX.get());
@@ -355,7 +356,10 @@ public final class WorldOutbreakSystem {
                     ||players.stream().anyMatch(p->p.distanceToSqr(pos.getCenter())<(double)safety*safety))continue;
             var tier=OutbreakRules.ambientTier(CityEcology.stage(level,pos),(int)common,developed,mature,ancient,
                     OutbreakConfig.COMMON_RESERVE.get(),CityEcology.populationCap(level,pos),level.random.nextDouble());
-            if(spawnAt(level,pos,tier)!=null){births++;playerBirths++;total++;allMobs++;if(CityEcology.zone(level,pos)!=DistrictThreat.Zone.GREEN&&level.random.nextDouble()<GameplayBalanceConfig.SEED_CHANCE.get())seed(level,pos);if(births>=OutbreakConfig.BATCH.get())break;
+            boolean airborne=AirPopulation.wantsFlyer(CityEcology.stage(level,pos),flyerRoll)
+                    &&AirPopulation.spawnFlyer(level,pos);
+            if(airborne)flyerRoll=100;
+            if(airborne||spawnAt(level,pos,tier)!=null){births++;playerBirths++;total++;allMobs++;if(CityEcology.zone(level,pos)!=DistrictThreat.Zone.GREEN&&level.random.nextDouble()<GameplayBalanceConfig.SEED_CHANCE.get())seed(level,pos);if(births>=OutbreakConfig.BATCH.get())break;
                 var newborn=level.getEntitiesOfClass(Mob.class,player.getBoundingBox().inflate(96),m->m.isAlive()&&nativeMob(m));
                 common=newborn.stream().filter(m->m instanceof com.codex.blacklight.entity.BlacklightCommonInfected).count();developed=0;mature=0;ancient=0;
                 for(var body:newborn)if(body instanceof BlacklightInfectedHost host&&!host.hasMultipartBody()){developed++;if(host.tissueAge()>=TissueGrowth.MATURITY_TICKS)mature++;if(host.tissueAge()>=TissueGrowth.ANCIENT_TICKS)ancient++;}
