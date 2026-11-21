@@ -43,6 +43,7 @@ public final class NativeConsumePose {
                 time=follow+(time-follow)*release;
             }
         }
+        time=com.codex.blacklight.client.renderer.ConsumeImpactResponse.poseSeconds(entity,visual,partial,time);
         BlacklightPose copy=new BlacklightPose();MotionLibrary.pose(key,time,false).getJointTransformData().forEach((name,transform)->copy.getJointTransformData().put(name,transform.copy()));
         if(mounted&&role.equals("victim")){
             // A giant reacts at the contact site; a small receiver's whole-body toss must not tow it.

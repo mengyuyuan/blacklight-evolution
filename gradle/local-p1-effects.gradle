@@ -1,13 +1,1 @@
-// Optional private VFX build. The exporter writes this overlay outside the source checkout.
-if (project.hasProperty('localP1Effects')) {
-    def overlay = file(project.property('localP1Effects')).canonicalFile
-    if (!new File(overlay,'assets/blacklight/particles/hammer_fire.json').isFile())
-        throw new GradleException("localP1Effects must point to an exported P1 resource directory")
-    tasks.named('processResources',ProcessResources) {
-        from(overlay)
-        eachFile { entry ->
-            def replacement = new File(overlay,entry.path)
-            if (replacement.isFile() && replacement.canonicalFile != entry.file.canonicalFile) entry.exclude()
-        }
-    }
-}
+// Historical export hook retired. Release resources come from src/main/resources.

@@ -5,6 +5,7 @@ exported. Native local ROT/TRAN/SCL helpers retain nonuniform scale and inherite
 shear; static inverse-bind leaves keep the authored bind geometry unchanged.
 """
 from pathlib import Path
+from authored_greene_segment import segment_shape
 import copy, hashlib, importlib.util, json, math, re, struct, sys
 sys.dont_write_bytecode=True
 ROOT=Path(__file__).resolve().parents[1]
@@ -132,41 +133,18 @@ for index in range(3):
     segment_skel=next(n for n in nodes if n['type']==0x23000 and m.decoder.text8(n['payload'])[0]==skeleton_name)
     if [n['payload'] for n in segment_skel['children'] if n['type']==0x23001]!=[n['payload'] for n in skel['children'] if n['type']==0x23001]:
         raise ValueError('Segment joint auxiliary records differ from core: '+skeleton_name)
-    name='mother_segment_'+str(number)+'_'+prefix+'Shape'
-    positions,weights,names,metadata=skin(name)
-    node=next(n for n in nodes if n['offset']==metadata['nodeOffset'])
-    group=next(n for n in node['children'] if n['type']==0x10020)
-    indices=next(n['payload'] for n in group['children'] if n['type']==0x10013)
-    triangles=np.frombuffer(indices,dtype='<u2',offset=12).reshape(-1,3)
-    if triangles.max()>=len(positions):raise ValueError('Segment triangle outside vertex buffer')
-    dominant=weights.argmax(1);regions=[]
-    for joint_index,src in enumerate(names):
-        if not src.startswith(prefix+'_'):raise ValueError('Unexpected segment palette joint '+src)
-        # Include each triangle incident to a dominantly weighted vertex. The
-        # resulting measured boxes overlap at the original skin seams instead
-        # of opening arbitrary gaps between sampled vertex rings. This is a
-        # rigid cuboid adaptation, not original weighted mesh rendering.
-        incident=triangles[np.any(dominant[triangles]==joint_index,axis=1)]
-        selected=np.unique(incident)
-        if not len(selected):raise ValueError('Empty source segment region '+src)
-        support=positions[selected];lo=support.min(0);hi=support.max(0)
-        geometry_points=support@S*scale;origin=geometry_points.min(0);size=geometry_points.max(0)-origin
-        if np.any(size<=0):raise ValueError('Degenerate source segment region '+src)
+    regions=[]
+    for suffix in ('Jaw_3','Head','Jaw_1','Spine_5','Jaw_2','Spine_4','Spine_3','Spine_2','Spine_1','Spine_Base'):
+        src=prefix+'_'+suffix
         leaf='weak_'+str(index)+'_'+src
-        # Retain only this project's authored texture pixels. Original meshes
-        # supply measured anatomy and bone ownership, never UVs or texture data.
-        old_uv=old['weak_'+str(index)]['cubes'][7 if '_Jaw_' in src else 2 if src.endswith('_Head') else 1]['uv']
-        cube={'origin':origin.tolist(),'size':size.tolist(),'uv':copy.deepcopy(old_uv)}
+        pivot=(S@bind[src][:3,3]*scale).tolist()
+        origin,size=segment_shape(index,suffix,pivot)
+        uv_index=7 if suffix.startswith('Jaw_') else 2 if suffix=='Head' else 1
+        cube={'origin':origin,'size':size,'uv':copy.deepcopy(old['weak_'+str(index)]['cubes'][uv_index]['uv'])}
         leaf_source[leaf]=src
-        leafs[leaf]={'name':leaf,'parent':'native_'+src,'pivot':(S@bind[src][:3,3]*scale).tolist(),'cubes':[cube]}
-        regions.append({'leaf':leaf,'sourceJoint':src,'dominantVertices':int(np.sum(dominant==joint_index)),
-                        'supportVertices':len(selected),'supportTriangles':len(incident),
-                        'sourceBindBounds':[lo.tolist(),hi.tolist()],
-                        'sourceBindJoint':bind[src][:3,3].tolist(),'authoredUvCube':7 if '_Jaw_' in src else 2 if src.endswith('_Head') else 1})
-    segment_records.append({'segment':index,'template':'Mother_Segment_'+str(number),'grabSlot':'Segment'+str(number),
-                            'skin':metadata,'skeleton':skeleton_name,'skeletonOffset':segment_skel['offset'],
-                            'sameCoreSkeletonJoints':len(rig),'maxBindMatrixDifference':0.,
-                            'sourceBindBounds':[positions.min(0).tolist(),positions.max(0).tolist()], 'regions':regions})
+        leafs[leaf]={'name':leaf,'parent':'native_'+src,'pivot':pivot,'cubes':[cube]}
+        regions.append({'leaf':leaf,'sourceJoint':src,'design':'authored_greene_segment.py','authoredUvCube':uv_index})
+    segment_records.append({'segment':index,'skeleton':skeleton_name,'regions':regions})
 
 required={src for src in leaf_source.values()}
 for src in list(required):
@@ -304,7 +282,7 @@ report={'schema':1,'state':'native hierarchy and authored skin ownership correct
         'axes':'Original source X equals runtime model X. Geometry JSON X is opposite, matching source Horn vs authored lateral horns and source Body_Root vs authored host.',
         'nativeHelpers':len(native),'bones':len(bones),'sourceSkins':{k:v[3] for k,v in skins.items()},'assignments':assignments,
         'parentScaleCompensation':compensated,
-        'bindPolicy':'Core authored cube coordinates/rotations/sizes/UVs remain byte-value identical. The legacy independent weakpoint ring is replaced by source segment region boxes with existing authored UVs. Native bind multiplied by the static inverse-bind leaf is identity.',
+        'bindPolicy':'Core authored cube coordinates/rotations/sizes/UVs remain byte-value identical. The legacy independent weakpoint ring is replaced by independently sized Minecraft cuffs and petals with existing authored UVs. Native bind multiplied by the static inverse-bind leaf is identity.',
         'classification':'Authored cube center in scaled source bind space; inverse-distance mean of eight nearest source skin vertices chooses a rigid joint. Horns explicitly retain Horn. This rigid cuboid mapping is an MC adaptation of blended native skin, not a copied mesh.',
         'checks':checks,'socketBindModelPixels':(bind['Mouth'][:3,3]*scale).tolist(),
         'segmentSource':'greene-segment-shared-pose-source.json',
@@ -316,11 +294,11 @@ segment_report={'schema':1,'state':'Source shared-pose segment binding replaces 
                 'script':{'figOffset':66452,'function':'P4 MotherSpawnSegments','attachInstructions':'098..104','sharePoseInstructions':'105..108','physicsEnableInstructions':'109..112','exclusionGroupInstructions':'113..116',
                           'sequence':'Spawn Mother_Segment_i at core position/orientation; attach to Segment+i with empty child joint, mode 0; go_SharePose(core, child); phys_EnablePhysics(child,true); phys_SetExclusionGroup(child,coreGroup). RestoreSegments/P5 repeats attach and SharePose.'},
                 'replacement':{'removedLegacyRingCubes':sum(len(old['weak_'+str(i)]['cubes']) for i in range(3)),'sourceBoundSegmentCubes':sum(len(s['regions']) for s in segment_records),'unchangedAuthoredCoreCubes':len(assignments)},
-                'geometryPolicy':'For each actual source palette joint, the cuboid bounds all vertices of triangles incident to at least one vertex whose maximum skin weight is that joint. The three jaws remain separate. Only measured boxes and native pose channels are exported; original triangles/UVs/textures are not copied.',
+                'geometryPolicy':'Project-designed cuff and jaw dimensions attach to the animated joints.',
                 'axes':'geometry = diag(-1,1,1) * sourceBind * existingPixelsPerSourceUnit; runtime model mirrors geometry X back. Core cuboids and all existing texture pixels remain unchanged.',
                 'segments':segment_records,'checks':checks,
                 'limits':['No Java, Gradle, unit/GameTests, game/client or visual acceptance run.', 'Rigid bounding cuboids can overfill curved native surfaces and do not implement weighted vertex blending.', 'Segment detach/dead-body presentation remains separate work; this change corrects attached live segment geometry and pose.']}
-(ROOT/'art/encounters/greene-segment-shared-pose-source.json').write_text(json.dumps(segment_report,indent=2)+'\n',encoding='utf8')
+(ROOT/'art/encounters/greene-authored-segment-bind.json').write_text(json.dumps(segment_report,indent=2)+'\n',encoding='utf8')
 socket_fixtures=[]
 for key,frame in [('idle',0),('VOLLEY',32),('VOLLEY',72),('exposed',150)]:
     _,world,_=local_matrices(decoded[clips[key]],frame)
@@ -328,7 +306,7 @@ for key,frame in [('idle',0),('VOLLEY',32),('VOLLEY',72),('exposed',150)]:
         socket=table['sockets']['VomitGun'+str(slot)]
         point=(K@world['Mouth']@np.r_[socket['sourceOffset'],1])[:3]/16
         socket_fixtures.append({'clip':key,'frame':frame,'slot':slot,'pointModelBlocks':point.tolist()})
-(ROOT/'src/test/resources/greene-skin-reference.json').write_text(json.dumps({'sourceSha256':table['sourceSha256'],'method':'Direct original native local matrices and authored core / measured segment bind cube centers; independent of exported pose rows.','fixtures':fixtures,'segments':segment_fixtures,'segmentsDeath':segment_death_fixtures,'sockets':socket_fixtures,'spine':spine_fixtures},indent=2)+'\n',encoding='utf8')
+(ROOT/'src/test/resources/greene-skin-reference.json').write_text(json.dumps({'sourceSha256':table['sourceSha256'],'method':'Direct original native local matrices and authored core / authored petal and cuff centers; independent of exported pose rows.','fixtures':fixtures,'segments':segment_fixtures,'segmentsDeath':segment_death_fixtures,'sockets':socket_fixtures,'spine':spine_fixtures},indent=2)+'\n',encoding='utf8')
 print(json.dumps({'bones':len(bones),'cuboids':len(assignments)+sum(len(s['regions']) for s in segment_records),
                   'sourceFrames':sum(c['frames'] for c in checks),'maxAffineError':max(c['maxAffineCoefficientError'] for c in checks),
                   'mappedCuboids':{n:len(b['cubes']) for n,b in leafs.items()}}))

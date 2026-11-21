@@ -117,26 +117,53 @@ public final class AdaptiveRagdoll {
         return full>0?(float)Math.min(1,visible/full):0;
     }
 
-    /** Four receiver joints retargeted onto its currently rendered torso, including compression and rotation. */
+    /** The renderer captures the model's actual part pivots before integrating the rigid bodies. */
     static Vec3[] chestConsumeJoints(LivingEntity entity,float partial){
         var body=BODIES.get(entity);
         if(body==null||scene!=entity.level())return null;
         Part torso=null;
         for(var part:body.parts){
-            if(part.bind.region==32&&part.renderedAt==scene.getGameTime()&&part.renderedPosition!=null
-                    &&part.flow<.985F&&(torso==null||part.half.lengthSqr()>torso.half.lengthSqr()))torso=part;
+            if(part.bind.region==32&&submittedSocketPart(body,part,partial)
+                    &&(torso==null||part.volume()>torso.volume()))torso=part;
         }
         if(torso==null)return null;
-        var center=torso.renderedPosition;
-        var up=rotate(new Vec3(0,torso.half.y*torso.scale,0),torso.renderedRotation);
-        var side=rotate(new Vec3(torso.half.x*torso.scale*.52,0,0),torso.renderedRotation);
-        return new Vec3[]{center.subtract(up),center.add(up),center.subtract(up).add(side),center.lerp(center.add(up),.24)};
+        Vec3 center=torso.renderedPosition;
+        Vec3 up=rotate(new Vec3(0,torso.half.y*torso.scale,0),torso.renderedRotation);
+        Vec3 side=rotate(new Vec3(torso.half.x*torso.scale*.52,0,0),torso.renderedRotation);
+        Vec3 neck=consumePivot(body,1,partial,center.add(up));
+        // The longest outer layer can be a floor-length robe. The two leg pivots give the
+        // hips even while the robe is compressed or rotated independently of its wearer.
+        Vec3 lower=center.subtract(up);
+        Vec3 hipR=consumePivot(body,8,partial,lower.subtract(side));
+        Vec3 hipL=consumePivot(body,16,partial,lower.add(side));
+        return ConsumeSocketFit.receiver(hipR,hipL,neck);
+    }
+
+    private static boolean submittedSocketPart(Body body,Part part,float partial){
+        return part.renderedAt==scene.getGameTime()&&Math.abs(part.renderedPartial-partial)<.021F
+                &&part.renderedPosition!=null&&part.flow<.985F&&!body.trauma.hides(part);
+    }
+
+    /** Use the proximal model pivot. Children such as a shin, nose or hat must not supply it. */
+    private static Vec3 consumePivot(Body body,int region,float partial,Vec3 estimate){
+        Vec3 result=estimate;
+        double nearest=Double.POSITIVE_INFINITY;
+        for(var part:body.parts){
+            if(part.bind.region!=region||!submittedSocketPart(body,part,partial)||!part.contains(part.bind.pivot))continue;
+            var parent=body.bindNodes.get(part.bind.parent);
+            if(parent!=null&&parent.region==region)continue;
+            Vec3 point=part.renderedPosition.add(rotate(part.bind.pivot.subtract(part.center).scale(part.scale),part.renderedRotation));
+            double distance=point.distanceToSqr(estimate);
+            if(distance<nearest){nearest=distance;result=point;}
+        }
+        return result;
     }
 
     /** Retarget a source shoulder or knee to a submitted arm/leg when the receiver has one. */
     static Vec3 consumeLimbJoint(LivingEntity entity,float partial,int region,Vec3 estimate,boolean knee){
         var body=BODIES.get(entity);
         if(body==null||scene!=entity.level())return estimate;
+        if(!knee)return consumePivot(body,region,partial,estimate);
         Vec3 closest=estimate;double distance=Double.POSITIVE_INFINITY;
         for(var part:body.parts){
             if(part.bind.region!=region||part.renderedAt!=scene.getGameTime()||Math.abs(part.renderedPartial-partial)>.02F
@@ -1019,6 +1046,7 @@ public final class AdaptiveRagdoll {
         }
     }
     private static final class Body {
+        final ConsumeSkinPath materialBind;
         int attachmentVertices,unboundAttachmentVertices;
         double recoveryDuration=RagdollRecovery.DURATION;boolean bruteRecovery,bruteGetup;
         List<Vertex> nativeSkin=List.of();
@@ -1126,6 +1154,7 @@ public final class AdaptiveRagdoll {
             bindNodes=new LinkedHashMap<>(nodes);bindParents=new IdentityHashMap<>(parents);
             var grouped=new LinkedHashMap<Object,List<Vertex>>();for(var v:vertices)grouped.computeIfAbsent(v.key,k->new ArrayList<>()).add(v);
             for(var g:grouped.entrySet())parts.add(new Part(g.getKey(),g.getValue(),nodes.get(g.getKey())));
+            materialBind=ConsumeSkinPath.bind(parts);
             parts.sort(Comparator.comparingDouble(Part::volume).reversed());
             root=RagdollRootSelection.pick(parts,p->p.key,k->{var node=nodes.get(k);return node==null?parents.get(k):node.parent;},p->p.bind.region,Part::volume);
             // Merge small decorative bones into an ancestor instead of creating hundreds of joints.
@@ -1305,6 +1334,11 @@ public final class AdaptiveRagdoll {
                 parts.remove(source);parts.addAll(halves);
             }
             appliedCuts+=replacements.size();sectionEvents.add(key);cutSurfaces.add(surfaces.get(0));
+            if(pairedGibs){
+                var visual=com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
+                if(scene.getEntity(visual.consumerId()) instanceof LivingEntity owner)
+                    trauma.response.separated(entity,owner,visual,section.normal(),parts,scene.getGameTime());
+            }
             WoundBlood.meshSection(entity,struck.bind.region,key);
             return true;
         }
@@ -1557,7 +1591,7 @@ public final class AdaptiveRagdoll {
                         Vec3 contact=villagerGrip(entity,half*.22F,1);
                         var release=destination==null || contact==null?ConsumeTrauma.releaseMotion(actor,side)
                                 :RagdollDrive.limit(destination.subtract(contact).scale(.75),.95);
-                        for(var part:parts)if(part.consumeHalf==half)part.velocity=release;
+                        for(var part:parts)if(part.consumeHalf==half)part.velocity=release.add(left.scale(half*.055));
                     }
                 }
             }else {
@@ -2311,6 +2345,10 @@ public final class AdaptiveRagdoll {
                 for(int i=0;i<parts.size();i++)positions[i]=parts.get(i).target;
                 var visual=com.codex.blacklight.registry.ModAttachments.getData(entity,com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
                 var form=com.codex.blacklight.power.PowerForm.values()[visual.form()];
+                float split=com.codex.blacklight.combat.ConsumeSequence.splitSeconds(form,false,visual.variant());
+                ConsumeImpactResponse.windup(visual,split-visual.elapsed(scene.getGameTime(),partial)/20F,parts,positions);
+                if(scene.getEntity(visual.consumerId()) instanceof LivingEntity carrier)
+                    trauma.response.apply(entity,carrier,visual,parts,positions,partial);
                 double weight=com.codex.blacklight.combat.ConsumePlacementTrack.groundWeight(form,visual.variant(),visual.motionProgress(scene.getGameTime(),partial));
                 weight*=1-RagdollDrive.smooth((RagdollDrive.flow(entity,partial)-.15F)/.37F);
                 if(weight>0){
@@ -2419,6 +2457,8 @@ public final class AdaptiveRagdoll {
             if(appliedCuts!=before){rebuildJoints();separateCuts();}
         }
         void render(Matrix4f matrix,MultiBufferSource buffers,Vec3 offset,float partial){
+            var receiver=buffers instanceof ChestConsumeReceiver coat?coat:null;
+            if(receiver!=null)receiver.bindSkin(materialBind);
             var normalMatrix=new Matrix3f(matrix).invert().transpose();
             int hurtV=OverlayTexture.v(RagdollDrive.hurtFlash(entity));
             double clock=scene.getGameTime()+partial;
@@ -2442,7 +2482,8 @@ public final class AdaptiveRagdoll {
                     Vec3 normal=vec(normalMatrix.transform(rotate(surfaceNormal,turn).toVector3f())).normalize();
                     int color=p.compression==null?v.color:p.compression.shade(posed.distanceTo(rest),v.color);
                     if(p.flow>0){int r=(color>>>16)&255,g=(color>>>8)&255,b=color&255;color=(color&0xff000000)|((int)(r*(1-p.flow*.45F))<<16)|((int)(g*(1-p.flow*.85F))<<8)|(int)(b*(1-p.flow*.8F));}
-                    v.emit(buffers.getBuffer(v.type),point,normal,color,OverlayTexture.pack(v.overlay&0xffff,hurtV),light);
+                    var out=receiver==null?buffers.getBuffer(v.type):receiver.skinBuffer(v.type,p.bind.region,v.p);
+                    v.emit(out,point,normal,color,OverlayTexture.pack(v.overlay&0xffff,hurtV),light);
                 }
                 if(phase!=null&&phase.opening()>0){
                     double radius=Math.max(.03,p.half.length()*.35*p.scale);
