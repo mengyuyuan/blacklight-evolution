@@ -1982,6 +1982,10 @@
       {
         "name": "blacklight:consume/score/chest_drive_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/chest_drive_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -1994,6 +1998,10 @@
       },
       {
         "name": "blacklight:consume/score/heel_stamp_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heel_stamp_3",
         "attenuation_distance": 28
       }
     ]
@@ -2008,6 +2016,10 @@
       {
         "name": "blacklight:consume/score/knee_bump_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/knee_bump_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2020,6 +2032,10 @@
       },
       {
         "name": "blacklight:consume/score/beat_jab_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_jab_3",
         "attenuation_distance": 28
       }
     ]
@@ -2034,6 +2050,10 @@
       {
         "name": "blacklight:consume/score/beat_hook_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_hook_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2046,6 +2066,10 @@
       },
       {
         "name": "blacklight:consume/score/beat_cross_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_cross_3",
         "attenuation_distance": 28
       }
     ]
@@ -2060,6 +2084,10 @@
       {
         "name": "blacklight:consume/score/beat_drive_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_drive_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2072,6 +2100,10 @@
       },
       {
         "name": "blacklight:consume/score/beat_crush_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/beat_crush_3",
         "attenuation_distance": 28
       }
     ]
@@ -2086,6 +2118,10 @@
       {
         "name": "blacklight:consume/score/neck_snap_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/neck_snap_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2098,6 +2134,10 @@
       },
       {
         "name": "blacklight:consume/score/rib_squeeze_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/rib_squeeze_3",
         "attenuation_distance": 28
       }
     ]
@@ -2112,6 +2152,10 @@
       {
         "name": "blacklight:consume/score/joint_lock_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/joint_lock_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2124,6 +2168,10 @@
       },
       {
         "name": "blacklight:consume/score/choke_press_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/choke_press_3",
         "attenuation_distance": 28
       }
     ]
@@ -2138,6 +2186,10 @@
       {
         "name": "blacklight:consume/score/throat_rip_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/throat_rip_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2150,6 +2202,10 @@
       },
       {
         "name": "blacklight:consume/score/claw_shear_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/claw_shear_3",
         "attenuation_distance": 28
       }
     ]
@@ -2164,6 +2220,10 @@
       {
         "name": "blacklight:consume/score/skull_click_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/skull_click_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2176,6 +2236,10 @@
       },
       {
         "name": "blacklight:consume/score/blade_split_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/blade_split_3",
         "attenuation_distance": 28
       }
     ]
@@ -2190,6 +2254,10 @@
       {
         "name": "blacklight:consume/score/head_drop_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/head_drop_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2202,6 +2270,10 @@
       },
       {
         "name": "blacklight:consume/score/hammer_press_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hammer_press_3",
         "attenuation_distance": 28
       }
     ]
@@ -2216,6 +2288,10 @@
       {
         "name": "blacklight:consume/score/hook_rend_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hook_rend_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2228,6 +2304,10 @@
       },
       {
         "name": "blacklight:consume/score/lash_bite_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/lash_bite_3",
         "attenuation_distance": 28
       }
     ]
@@ -2242,6 +2322,10 @@
       {
         "name": "blacklight:consume/score/lash_recoil_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/lash_recoil_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2254,6 +2338,10 @@
       },
       {
         "name": "blacklight:consume/score/arm_wrench_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/arm_wrench_3",
         "attenuation_distance": 28
       }
     ]
@@ -2268,6 +2356,10 @@
       {
         "name": "blacklight:consume/score/heart_grab_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heart_grab_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2280,6 +2372,10 @@
       },
       {
         "name": "blacklight:consume/score/heart_slap_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/heart_slap_3",
         "attenuation_distance": 28
       }
     ]
@@ -2294,6 +2390,10 @@
       {
         "name": "blacklight:consume/score/mount_fist_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_fist_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2306,6 +2406,10 @@
       },
       {
         "name": "blacklight:consume/score/mount_claw_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_claw_3",
         "attenuation_distance": 28
       }
     ]
@@ -2320,6 +2424,10 @@
       {
         "name": "blacklight:consume/score/mount_blade_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_blade_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2332,6 +2440,10 @@
       },
       {
         "name": "blacklight:consume/score/mount_maul_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_maul_3",
         "attenuation_distance": 28
       }
     ]
@@ -2346,6 +2458,10 @@
       {
         "name": "blacklight:consume/score/mount_cable_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_cable_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2358,6 +2474,10 @@
       },
       {
         "name": "blacklight:consume/score/mount_heave_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/mount_heave_3",
         "attenuation_distance": 28
       }
     ]
@@ -2372,6 +2492,10 @@
       {
         "name": "blacklight:consume/score/hunter_jaw_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hunter_jaw_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2384,6 +2508,10 @@
       },
       {
         "name": "blacklight:consume/score/hunter_rend_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/hunter_rend_3",
         "attenuation_distance": 28
       }
     ]
@@ -2398,6 +2526,10 @@
       {
         "name": "blacklight:consume/score/quill_extract_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_extract_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2410,6 +2542,10 @@
       },
       {
         "name": "blacklight:consume/score/quill_return_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_return_3",
         "attenuation_distance": 28
       }
     ]
@@ -2424,6 +2560,10 @@
       {
         "name": "blacklight:consume/score/quill_merge_2",
         "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/quill_merge_3",
+        "attenuation_distance": 28
       }
     ]
   },
@@ -2436,6 +2576,10 @@
       },
       {
         "name": "blacklight:consume/score/weave_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/weave_3",
         "attenuation_distance": 28
       }
     ]
@@ -2788,6 +2932,83 @@
       {
         "name": "blacklight:consume/score/finish_hunter_2",
         "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.body_land_stone": {
+    "subtitle": "subtitle.blacklight.consume.body_land_stone",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/body_land_stone_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_stone_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_stone_3",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.body_land_wood": {
+    "subtitle": "subtitle.blacklight.consume.body_land_wood",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/body_land_wood_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_wood_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_wood_3",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.body_land_soil": {
+    "subtitle": "subtitle.blacklight.consume.body_land_soil",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/body_land_soil_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_soil_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_soil_3",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.body_land_metal": {
+    "subtitle": "subtitle.blacklight.consume.body_land_metal",
+    "sounds": [
+      {
+        "name": "blacklight:consume/score/body_land_metal_1",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_metal_2",
+        "attenuation_distance": 28
+      },
+      {
+        "name": "blacklight:consume/score/body_land_metal_3",
+        "attenuation_distance": 28
+      }
+    ]
+  },
+  "consume.body_land": {
+    "subtitle": "subtitle.blacklight.consume.body_land",
+    "sounds": [
+      {
+        "name": "blacklight:consume.body_land_stone",
+        "type": "event"
       }
     ]
   }

@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 public record ConsumeContactSoundPayload(int victim,int owner,long started,int ordinal,String kind,Vec3 point,float gain,float pitch) implements CustomPacketPayload {
     /** A negative ordinal denotes a lifecycle cue sent directly to the performer. */
     public static final int PHASE = -1;
+    public static final int LANDING = -2;
     public ConsumeContactSoundPayload(int victim,int owner,long started,int ordinal,String kind,Vec3 point) {
         this(victim,owner,started,ordinal,kind,point,1F,1F);
     }

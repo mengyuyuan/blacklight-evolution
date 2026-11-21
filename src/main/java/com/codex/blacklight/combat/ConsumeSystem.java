@@ -624,18 +624,23 @@ public final class ConsumeSystem {
                 if(elapsed>=gate){
                     pairedPlacement(player,session,gate);
                     float t=ConsumeSequence.motionProgress(session.form,gate/(float)session.duration(),session.duration(),false,session.variant);
-                    var floor=ConsumePlacementTrack.landingSurface(target,target.position(),session.facing,session.variant,t,player.getY());
+                    var floor=ConsumePlacementTrack.landingContact(target,target.position(),session.facing,session.variant,t,player.getY());
                     if(floor.isPresent()){
-                        double delta=floor.getAsDouble()-target.getY();
+                        double delta=floor.get().y-target.getY();
                         target.move(MoverType.SELF,new Vec3(0,Math.max(-.32,Math.min(.32,delta)),0));
                     }
-                    if(floor.isEmpty() || Math.abs(target.getY()-floor.getAsDouble())>.055){
+                    if(floor.isEmpty() || Math.abs(target.getY()-floor.get().y)>.055){
                         if(elapsed-gate>=10)cancel(player);
                         return;
                     }
                     session.landingDelay=elapsed-gate;
                     var landed=ModAttachments.peekData(target,ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY).landed(session.landingDelay);
                     target.setData(ModAttachments.CONSUME_VISUAL,landed);target.syncData(ModAttachments.CONSUME_VISUAL);
+                    Vec3 at=floor.get();
+                    var landing=new com.codex.blacklight.network.ConsumeContactSoundPayload(target.getId(),player.getId(),
+                            landed.started(),com.codex.blacklight.network.ConsumeContactSoundPayload.LANDING,"body_land",at);
+                    for (ServerPlayer listener:player.serverLevel().players())
+                        if(listener==player || listener.position().distanceToSqr(at)<32*32)net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(listener,landing);
                     return;
                 }
             }
@@ -810,25 +815,18 @@ public final class ConsumeSystem {
             contact=ConsumeVisual.impactTick(session.form);
         } else if (receiverScene == null && !session.large && animationForm == PowerForm.BLADE)
             contact = Math.round(20 * ConsumeSequence.splitSeconds(animationForm, false, session.variant));
-        int ordinal = session.contactDamage.strike(player, session.victim, receiverScene, contact, elapsed, session.stage == ConsumeVisual.HUNTER_CONSUME);
-        if(ordinal >= 0) {
-            boolean hammer=animationForm==PowerForm.HAMMERFISTS;
-            var scene=session.victim.getData(ModAttachments.CONSUME_VISUAL);
-            String sound=ConsumeImpactKind.forContact(animationForm,session.large,session.stage,session.variant,ordinal,
-                    receiverScene==null?1:receiverScene.hitSeconds().size());
+        var scene=session.victim.getData(ModAttachments.CONSUME_VISUAL);
+        int ordinal = session.contactDamage.strike(player, session.victim, receiverScene, contact, elapsed, scene);
+        if (ordinal >= 0) {
+            String sound=ConsumeImpactKind.forContact(scene,ordinal);
+            if (!session.large && ConsumeSequence.paired(animationForm,false,session.variant)){
+                var socket=ConsumePlacementTrack.impactSocket(player,scene,0);
+                if(socket!=null && socket.distanceToSqr(session.victim.position())<9)point=socket;
+            }
             var audio=new com.codex.blacklight.network.ConsumeContactSoundPayload(session.victim.getId(),player.getId(),
                     scene.started(),ordinal,sound,point);
             for (ServerPlayer listener:player.serverLevel().players())
                 if(listener==player || listener.position().distanceToSqr(point)<32*32)net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(listener,audio);
-            // Small receivers have client-side posed/physical bodies. Their blood follows
-            // that wound from the synchronized phase, not this upright server AABB.
-            if(ConsumeSequence.mountedStage(session.stage))
-                player.serverLevel().sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.28F,.018F,.025F),.75F),point.x,point.y,point.z,9,.14,.12,.14,.08);
-            if(hammer){
-                var floor=session.victim.blockPosition().below();
-                player.serverLevel().sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,player.level().getBlockState(floor)),
-                        session.victim.getX(),session.victim.getY()+.1,session.victim.getZ(),24,.5,.1,.5,.1);
-            }
         }
         if(ConsumeSequence.mountedStage(session.stage)&&(receiverScene!=null?elapsed>=receiverScene.effectSeconds()*20:
                 session.stage==ConsumeVisual.HUNTER_CONSUME?elapsed>=HunterConsume.EFFECT_REVERSE_SECONDS*20:t>.55F)&&elapsed%3==0) {

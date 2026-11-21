@@ -1336,5 +1336,10 @@
   "subtitle.blacklight.consume.finish_mount": "重型吞噬收口",
   "subtitle.blacklight.consume.grip_hunter": "猎手抓牢",
   "subtitle.blacklight.consume.absorb_hunter": "猎手组织回流",
-  "subtitle.blacklight.consume.finish_hunter": "猎手吞噬收口"
+  "subtitle.blacklight.consume.finish_hunter": "猎手吞噬收口",
+  "subtitle.blacklight.consume.body_land_stone": "身体撞上石面",
+  "subtitle.blacklight.consume.body_land_wood": "身体撞上木板",
+  "subtitle.blacklight.consume.body_land_soil": "身体撞上松软地面",
+  "subtitle.blacklight.consume.body_land_metal": "身体撞上金属表面",
+  "subtitle.blacklight.consume.body_land": "身体撞地"
 }

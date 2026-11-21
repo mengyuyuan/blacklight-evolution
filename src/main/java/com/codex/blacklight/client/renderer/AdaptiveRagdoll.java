@@ -2512,10 +2512,15 @@ public final class AdaptiveRagdoll {
             var connected=connectedPose(partial);
             var phase=RagdollDrive.captured(entity)?ConsumeFracture.phase(entity,partial):null;
             if(phase!=null)trauma.contact(entity,entity.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL),phase,parts,connected.positions(),partial);
+            var recoil=quill==null?ConsumeBodyImpact.receiver(entity,entity.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL),partial):ConsumeBodyImpact.quill(entity,quill,partial);
             var roots=new LinkedHashMap<Integer,ConsumeTendrils.Attachment>();
             for(int i=0;i<parts.size();i++){var p=parts.get(i);
                 if(p.flow>.995F)continue;
                 var turn=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);var at=connected.positions()[i];
+                if(recoil!=null){
+                    at=recoil.point(at);
+                    turn.premul(recoil.rotation);
+                }
                 p.renderedPosition=at;p.renderedRotation=new Quaternionf(turn);p.renderedPartial=partial;p.renderedAt=scene.getGameTime();
                 int light=LevelRenderer.getLightColor(scene,BlockPos.containing(at));
                 var mark=p.impactMark();

@@ -57,7 +57,7 @@ public final class ConsumeTrauma {
     private Part struck;
     private Vec3 localImpact;
     private boolean crushed,groundPulp;
-    private double lastTime,impactTime;
+    private double impactTime;
     boolean open(){return struck!=null;}
     boolean groundAttachments(){return groundedScene || groundPulp;}
     private boolean groundedScene;
@@ -241,7 +241,7 @@ public final class ConsumeTrauma {
         }
         int before=hit.part().mesh.size(),revision=hit.part().meshRevision,initialShards=shards.size();
         lastHit=event;
-        struck=hit.part();localImpact=hit.local();lastTime=impactTime=now;crushed=head&&!blunt;
+        struck=hit.part();localImpact=hit.local();impactTime=now;crushed=head&&!blunt;
         Vec3 world=hit.world();
         response.hit(e,owner,visual,event,world,positions[parts.indexOf(hit.part())],parts,positions,partial);
         Vec3 forward=Vec3.directionFromRotation(0,visual.facing());
@@ -302,7 +302,7 @@ public final class ConsumeTrauma {
                     Math.min(.27,Math.max(.10,e.getBbWidth()*.29))/struck.scale);
             groundPulp=(finishingPunch||stomp||hammer) && floor.getType()==HitResult.Type.BLOCK;
             double pavement=groundPulp?floor.getLocation().y:Double.NaN;
-            breakHead(parts,positions,world,pavement,stomp||groundPulp,partial);
+            breakHead(parts,positions,world,pavement,stomp||groundPulp,finishingPunch,partial);
             var stump=nearest(parts,positions,new Vec3[]{world},32,partial);
             if(stump!=null){struck=stump.part();localImpact=stump.local();}
         }else{
@@ -422,12 +422,12 @@ public final class ConsumeTrauma {
                 double angle=(j+.5)*2*Math.PI/count+count*.87;
                 Vec3 kick=new Vec3(outward.x,0,outward.z).normalize().scale(.09)
                         .add(.065*Math.cos(angle),.095+.014*(j%3),.065*Math.sin(angle));
-                shards.add(new Shard(mesh,pivot,origin,rotation,kick,(j%2==0?1:-1)*.17,part.scale,false));
+                shards.add(new Shard(mesh,pivot,origin,rotation,kick,(j%2==0?1:-1)*.17,part.scale,false,false,impactTime));
             }
         }
     }
 
-    private void breakHead(List<Part> parts,Vec3[] positions,Vec3 impact,double pavement,boolean stomp,float partial){
+    private void breakHead(List<Part> parts,Vec3[] positions,Vec3 impact,double pavement,boolean stomp,boolean finishingPunch,float partial){
         for(int i=0;i<parts.size();i++){
             var p=parts.get(i);if(p.bind.region()!=1)continue;
             var rotation=new Quaternionf(p.oldRotation).slerp(p.rotation,partial);
@@ -445,46 +445,100 @@ public final class ConsumeTrauma {
                     Vec3 kick=radial.scale(stomp?.145:.125).add(s*.022,stomp?.055:.10,t*.025);
                     if(!stomp&&!groundPulp)kick=kick.add(response.fragmentImpulse());
                     if(groundPulp){
-                        // Compression and lateral spread happen on the impact surface.
-                        // Preserve the faceted outline rather than stacking red sheets in air.
-                        pos=new Vec3(pos.x,pavement+.018+(t+1)*.005,pos.z);
-                        kick=new Vec3(radial.x*.045,0,radial.z*.045);
+                        // The severed skin starts at its posed world position, clear of the contacted collider.
+                        double clearance=AdaptiveRagdoll.bounds(piece).getYsize()*p.scale*.34;
+                        pos=new Vec3(pos.x,Math.max(pos.y,pavement+clearance+.012),pos.z);
+                        kick=ConsumeShardMotion.eject(radial,s,t);
+                        if(finishingPunch&&t<0)kick=new Vec3(kick.x*.85,.038+.012*s,kick.z*.85);
                     }
-                    shards.add(new Shard(piece,middle,pos,rotation,kick,s*(.09+t*.025),p.scale,groundPulp));
+                    shards.add(new Shard(piece,middle,pos,rotation,kick,s*(.09+t*.025),p.scale,groundPulp,finishingPunch&&groundPulp&&t<0,impactTime));
                 }
             }
         }
     }
     private static final class Shard {
-        final List<Vertex> mesh;final Vec3 pivot;final Quaternionf initial;final double spin,scale;final boolean pulp;
-        Vec3 at,velocity;double angle;
-        Shard(List<Vertex> mesh,Vec3 pivot,Vec3 at,Quaternionf rot,Vec3 velocity,double spin,double scale,boolean pulp){
-            this.mesh=mesh;this.pivot=pivot;this.at=at;this.initial=new Quaternionf(rot);this.velocity=velocity;this.spin=spin;this.scale=scale;this.pulp=pulp;
+        final List<Vertex> mesh;
+        final Vec3 pivot;
+        final Quaternionf initial;
+        final double spin,scale,born,radius;
+        final boolean groundCrush,lowFlight;
+        Vec3 at,velocity;
+        double simulated,angle,flatten,lastLanding=Double.NEGATIVE_INFINITY;
+        Shard(List<Vertex> mesh,Vec3 pivot,Vec3 at,Quaternionf rot,Vec3 velocity,double spin,double scale,boolean groundCrush,boolean lowFlight,double born){
+            this.mesh=mesh;this.pivot=pivot;this.at=at;this.initial=new Quaternionf(rot);
+            this.velocity=velocity;this.spin=spin;this.scale=scale;this.groundCrush=groundCrush;this.lowFlight=lowFlight;this.born=simulated=born;
+            var box=AdaptiveRagdoll.bounds(mesh);
+            radius=Math.max(.012,Math.min(.17,Math.min(box.getXsize(),Math.min(box.getYsize(),box.getZsize()))*scale*.36));
+        }
+        double draw(float flow,double now){
+            double age=now-born;
+            if(lowFlight){
+                double release=Double.isFinite(firstLanding)?Math.min(12,firstLanding-born+1.5):12;
+                double blend=Math.max(0,Math.min(1,(age-release)/3));
+                return flow*blend*blend*(3-2*blend);
+            }
+            return ConsumeShardMotion.draw(groundCrush,flow,age);
+        }
+        double firstLanding=Double.NaN;
+        void advance(LivingEntity e,double now,float flow,Vec3 sink){
+            // An extra render pass in the same frame and different monitor refresh rates share the same physical steps.
+            simulated=Math.max(simulated,born+Math.floor(Math.max(0,now-born-12)*4)/4);
+            final double dt=.25;
+            while(simulated+dt<=now){
+                simulated+=dt;
+                double draw=draw(flow,simulated);
+                velocity=draw>.04?RagdollDrive.pull(at,velocity,sink,(float)draw,dt):velocity.add(0,-.049*dt,0);
+                Vec3 next=at.add(velocity.scale(dt));
+                double extent=radius*(1-draw);
+                if(draw<.36){
+                    Vec3 horizontal=new Vec3(next.x-at.x,0,next.z-at.z);
+                    if(horizontal.lengthSqr()>1e-8){
+                        var wall=e.level().clip(new ClipContext(at,at.add(horizontal).add(horizontal.normalize().scale(extent)),
+                                ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+                        if(wall.getType()==HitResult.Type.BLOCK){
+                            var n=Vec3.atLowerCornerOf(wall.getDirection().getNormal());
+                            if(n.y==0&&velocity.dot(n)<0){
+                                velocity=ConsumeShardMotion.bounce(velocity,n);
+                                Vec3 clear=wall.getLocation().add(n.scale(extent+.001));
+                                next=new Vec3(clear.x,next.y,clear.z);
+                            }
+                        }
+                    }
+                    double direction=velocity.y>0?1:-1;
+                    Vec3 from=new Vec3(next.x,at.y,next.z);
+                    var floor=e.level().clip(new ClipContext(from,next.add(0,direction*extent,0),
+                            ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
+                    if(floor.getType()==HitResult.Type.BLOCK){
+                        Vec3 n=Vec3.atLowerCornerOf(floor.getDirection().getNormal());
+                        if(Math.abs(n.y)>.5&&velocity.dot(n)<0){
+                            if(n.y>0&&!Double.isFinite(firstLanding))firstLanding=simulated;
+                            if(n.y>0&&velocity.y<-.055){
+                                flatten=Math.min(.4,-velocity.y*1.35);
+                                lastLanding=simulated;
+                            }
+                            next=new Vec3(next.x,floor.getLocation().y+n.y*(extent+.001),next.z);
+                            velocity=ConsumeShardMotion.bounce(velocity,n);
+                        }
+                    }
+                }
+                angle+=spin*dt*Math.min(1,velocity.length()*6);
+                at=next;
+            }
         }
     }
     void fragments(LivingEntity e,double now,float flow,Vec3 sink,MultiBufferSource buffers,Matrix4f matrix,Matrix3f normals,Vec3 offset,int light){
-        if(shards.isEmpty())return;
-        double dt=Math.max(0,Math.min(2,now-lastTime));lastTime=now;
         for(var s:shards){
-            s.velocity=flow>.04?RagdollDrive.pull(s.at,s.velocity,sink,flow,dt):s.velocity.add(0,-.034*dt,0);
-            Vec3 to=s.at.add(s.velocity.scale(dt));
-            double radius=(s.pulp?.024:.055)*s.scale*(1-flow);
-            var floor=e.level().clip(new ClipContext(s.at.add(0,radius,0),to.add(0,-radius,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,e));
-            if(floor.getType()==HitResult.Type.BLOCK && flow<.3){
-                to=floor.getLocation().add(Vec3.atLowerCornerOf(floor.getDirection().getNormal()).scale(radius));
-                s.velocity=s.velocity.multiply(.57,0,.57);
-            }else s.angle+=s.spin*dt;
-            s.at=to;
+            s.advance(e,now,flow,sink);
             var rot=new Quaternionf(s.initial).rotateXYZ((float)s.angle,(float)(s.angle*.67),0);
-            double scale=s.scale*(1-flow)*.67;
+            double draw=s.draw(flow,now);
+            double scale=s.scale*(1-draw)*.76;
+            double thickness=ConsumeShardMotion.thickness(s.flatten,now-s.lastLanding);
             for(var v:s.mesh){
-                Vec3 local=rotate(v.p.subtract(s.pivot).scale(scale),rot);
-                if(s.pulp)local=local.multiply(1.22,.105,1.2);
-                Vec3 pos=to.add(local).subtract(offset);
-                Vec3 n=new Vec3(normals.transform(rotate(v.n,rot).toVector3f())).normalize();
-                var material=s.pulp?net.minecraft.client.renderer.RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE):v.type;
-                int color=s.pulp?(s.spin>0?0xff6a202a:0xff923339):v.color;
-                v.emit(buffers.getBuffer(material),new Vec3(matrix.transformPosition(pos.toVector3f())),n,color,v.overlay,light);
+                Vec3 local=rotate(v.p.subtract(s.pivot).scale(scale),rot).multiply(1,thickness,1);
+                Vec3 pos=s.at.add(local).subtract(offset);
+                var normal=rotate(v.n,rot).multiply(1,1/thickness,1).normalize();
+                Vec3 n=new Vec3(normals.transform(normal.toVector3f())).normalize();
+                v.emit(buffers.getBuffer(v.type),new Vec3(matrix.transformPosition(pos.toVector3f())),n,v.color,v.overlay,light);
             }
         }
     }

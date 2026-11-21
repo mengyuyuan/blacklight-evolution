@@ -29,6 +29,8 @@ public final class ConsumeFracture implements MultiBufferSource {
     }
     private final LivingEntity receiver;
     private final float renderPartial;
+    private ConsumeBodyImpact.Frame recoil;
+    private Vec3 renderCamera;
     private final MultiBufferSource target;
     private final Matrix4f frame,inverse;
     private final Vector3f sink;
@@ -152,16 +154,21 @@ public final class ConsumeFracture implements MultiBufferSource {
         return streams.computeIfAbsent(type,Collector::new);
     }
     /** Custom native rigs retain their own pose and colour. Only the contacted polygons change. */
+    private Vector3f surfacePoint(Vector3f local){
+        var p=frame.transformPosition(local);
+        return recoil==null?p:recoil.cameraPoint(p,renderCamera);
+    }
     public void finishMountedSurface(){
         for(var layer:streams.values())layer.flush();
         var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        renderCamera=camera;recoil=ConsumeBodyImpact.receiver(receiver,receiver.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL),renderPartial);
         MountedConsumeWound.apply(receiver,receiver.getData(ModAttachments.CONSUME_VISUAL),renderPartial,streams,v->{
-            var p=frame.transformPosition(new Vector3f(v.p));return camera.add(p.x,p.y,p.z);
+            var p=surfacePoint(new Vector3f(v.p));return camera.add(p.x,p.y,p.z);
         });
         for(var entry:streams.entrySet()){
             var out=target.getBuffer(entry.getKey());
             for(var v:entry.getValue().vertices){
-                var p=frame.transformPosition(new Vector3f(v.p));
+                var p=surfacePoint(new Vector3f(v.p));
                 out.addVertex(p.x,p.y,p.z).setColor(v.r,v.g,v.b,v.a).setUv(v.u,v.v).setOverlay(v.overlay).setLight(v.light).setNormal(v.nx,v.ny,v.nz);
             }
         }
@@ -177,6 +184,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         for(int a=0;a<centers.length;a++)if(present[a]){centers[a].set(lo[a]).add(hi[a]).mul(.5F);radii[a]=Math.clamp(lo[a].distance(hi[a])*.25F,.05F,.55F);}
         var camera=net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         var paired=receiver.getData(ModAttachments.CONSUME_VISUAL);
+        renderCamera=camera;recoil=ConsumeBodyImpact.receiver(receiver,receiver.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL),renderPartial);
         MountedConsumeWound.apply(receiver,paired,renderPartial,streams,v->{
             var p=displaced(v.p,MountedConsumeWound.anatomy(v)*divisions);
             return camera.add(p.x,p.y,p.z);
@@ -257,19 +265,19 @@ public final class ConsumeFracture implements MultiBufferSource {
         if(bisect){
             // Two coherent halves: attached head/limbs share their half's transform.
             float sign=d==0?-1:1,open=phase.opening(),flow=phase.returnFlow();
-            if(open<=0)return frame.transformPosition(new Vector3f(p));
+            if(open<=0)return surfacePoint(new Vector3f(p));
             float shrink=com.codex.blacklight.combat.CorpseFragmentMotion.shrink(flow),travel=physicalPull?0:smooth((flow-.30F)/.70F);
             Vector3f pivotPiece=pieceCenter[d];
             Vector3f offset=new Vector3f(side).mul(sign*(spread*.65F+Math.min(fragmentAge,.6F)*.12F)*open)
                     .fma(com.codex.blacklight.combat.CorpseFragmentMotion.drop(fragmentAge,pieceFloor[d])*open,up);
             Vector3f result=new Vector3f(p).sub(pivotPiece).rotate(pieceRotation(d))
                     .mul(1-shrink*.997F).add(pivotPiece).fma(1-travel,offset);
-            return frame.transformPosition(result.add(new Vector3f(sink).sub(pivotPiece).mul(travel)));
+            return surfacePoint(result.add(new Vector3f(sink).sub(pivotPiece).mul(travel)));
         }
         if(headOnly) {
-            if(part!=ConsumeAnatomy.HEAD)return frame.transformPosition(new Vector3f(p));
+            if(part!=ConsumeAnatomy.HEAD)return surfacePoint(new Vector3f(p));
             float flow=phase.returnFlow();
-            return frame.transformPosition(new Vector3f(p).sub(pivot).mul(1-flow*.999F)
+            return surfacePoint(new Vector3f(p).sub(pivot).mul(1-flow*.999F)
                     .add(pivot).add(new Vector3f(sink).sub(pivot).mul(flow)));
         }
         float open=sourcedReceiver?phase.opening():opening(part),flow=phase.returnFlow();
@@ -282,7 +290,7 @@ public final class ConsumeFracture implements MultiBufferSource {
             Vector3f anchor=phase.style()==Style.LASH&&present[ConsumeAnatomy.HEAD]?centers[ConsumeAnatomy.HEAD]:centers[ConsumeAnatomy.BODY];
             Vector3f local=new Vector3f(p).sub(anchor);
             if(phase.style()==Style.CHEST_ABSORB&&part==ConsumeAnatomy.BODY)local.z*=1-.20F*open;
-            return frame.transformPosition(local.mul(1-shrink*.997F)
+            return surfacePoint(local.mul(1-shrink*.997F)
                     .add(anchor).add(new Vector3f(sink).sub(anchor).mul(travel)));
         }
 
@@ -300,7 +308,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         }
         Vector3f result=local.mul(1-shrink*.997F).add(pivot).fma(1-travel,offset);
         result.add(new Vector3f(sink).sub(pivot).mul(travel));
-        return frame.transformPosition(result);
+        return surfacePoint(result);
     }
     private void emit(VertexConsumer out,V v,int piece){
         Vector3f p=displaced(v.p,piece);

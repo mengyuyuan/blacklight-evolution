@@ -1336,5 +1336,10 @@
   "subtitle.blacklight.consume.finish_mount": "Heavy absorption seals",
   "subtitle.blacklight.consume.grip_hunter": "Hunter grip closes",
   "subtitle.blacklight.consume.absorb_hunter": "Hunter tissue draws inward",
-  "subtitle.blacklight.consume.finish_hunter": "Hunter absorption seals"
+  "subtitle.blacklight.consume.finish_hunter": "Hunter absorption seals",
+  "subtitle.blacklight.consume.body_land_stone": "Body lands on stone",
+  "subtitle.blacklight.consume.body_land_wood": "Body lands on timber",
+  "subtitle.blacklight.consume.body_land_soil": "Body lands on earth",
+  "subtitle.blacklight.consume.body_land_metal": "Body lands on metal",
+  "subtitle.blacklight.consume.body_land": "Body hits the ground"
 }

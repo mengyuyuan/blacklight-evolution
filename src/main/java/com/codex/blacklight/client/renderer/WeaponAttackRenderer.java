@@ -24,6 +24,8 @@ public final class WeaponAttackRenderer {
             if(!(entity instanceof Player player)||player.distanceToSqr(camera)>96*96)continue;
             var visual=player.getData(ModAttachments.WEAPON_VISUAL);var move=visual.spec();if(move==null)continue;
             if(visual.traveling())continue;
+            if(move.form==PowerForm.WHIPFIST && player instanceof net.minecraft.client.player.AbstractClientPlayer client
+                    && WhipTetherRenderer.deployedGrab(client))continue;
             double tick=visual.attackPose()>=0?visual.attackPose()*20:mc.level.getGameTime()+partial-visual.started();
             var definition=LocalWeaponMotion.find(move.id);
             WhipCurve sourceCurve=null;
