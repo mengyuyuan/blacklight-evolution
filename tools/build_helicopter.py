@@ -8,7 +8,7 @@ bones={'body':[0,0,0],'rotor':[0,4.05,0],'tail_rotor':[-.45,2.85,-5.8],
        'door_left':[-1.46,1.15,-.2],'door_right':[1.46,1.15,-.2],
        'cockpit_left':[-1.4,1.4,2.6],'cockpit_right':[1.4,1.4,2.6],
        'gun':[0,1,3.6],'pod_left':[-1.9,1.4,1.3],'pod_right':[1.9,1.4,1.3],
-       'rapid_left':[-2.6542,1.4,1.3],'rapid_right':[2.6542,1.4,1.3]}
+       'rapid_left':[-2.66,1.4,1.3],'rapid_right':[2.66,1.4,1.3]}
 parts=[]
 colors={'armor':'#283439','edge':'#52616A','dark':'#121A1E','glass':'#46717C',
         'rubber':'#202426','metal':'#9BA9AC','seat':'#374844','white':'#A5B2A8','red':'#BE4237','green':'#439A70','yellow':'#BA9B47'}
@@ -116,20 +116,19 @@ for side in (-1,1):
     box(f'inner_pylon_{side}',[x-.09,1.46,1.12],[x+.09,1.74,1.48],'dark',bone)
     for dx in (-.095,.095):
         box(f'rack_rail_{side}_{dx}',[x+dx-.028,1.40,.67],[x+dx+.028,1.47,1.93],'metal',bone)
-    for z in (.88,1.72):box(f'rack_crossbeam_{side}_{z}',[x-.1962,1.30,z-.035],[x+.1962,1.50,z+.035],'edge',bone)
+    for z in (.88,1.72):box(f'rack_crossbeam_{side}_{z}',[x-.2,1.30,z-.035],[x+.2,1.50,z+.035],'edge',bone)
     for slot,(dx,dy,dz) in enumerate(hellfire_slots):
         xx=x+dx;yy=1.4+dy;zz=1.3+dz;missile=f'hellfire_{side}_{slot}';bones[missile]=[xx,yy,zz]
-        # 1.454355-long original missile mesh; .52 in MissileProfile is unrelated
-        # to its visible bounds. Stepped nose, bands, fins and clips are authored.
-        box(missile+'_body',[xx-.055,yy-.055,zz-.727178],[xx+.055,yy+.055,zz+.48],'armor',missile)
-        for i,(begin,end,radius) in enumerate(((.48,.58,.048),(.58,.66,.036),(.66,.727177,.02))):
+        # Stepped pixel hull, cap and fins fit the rack's free space.
+        box(missile+'_body',[xx-.055,yy-.055,zz-.70],[xx+.055,yy+.055,zz+.48],'armor',missile)
+        for i,(begin,end,radius) in enumerate(((.48,.58,.048),(.58,.66,.036),(.66,.70,.02))):
             box(missile+f'_nose_{i}',[xx-radius,yy-radius,zz+begin],[xx+radius,yy+radius,zz+end],'dark',missile)
         box(missile+'_band',[xx-.057,yy-.057,zz+.25],[xx+.057,yy+.057,zz+.29],'yellow',missile)
-        box(missile+'_nozzle',[xx-.044,yy-.044,zz-.729],[xx+.044,yy+.044,zz-.704],'dark',missile)
-        box(missile+'_tail_horizontal',[xx-.1088517,yy-.012,zz-.63],[xx+.1088517,yy+.012,zz-.40],'edge',missile)
-        box(missile+'_tail_vertical',[xx-.012,yy-.1413175,zz-.63],[xx+.012,yy+.1413175,zz-.40],'edge',missile)
+        box(missile+'_nozzle',[xx-.044,yy-.044,zz-.706],[xx+.044,yy+.044,zz-.681],'dark',missile)
+        box(missile+'_tail_horizontal',[xx-.12,yy-.012,zz-.63],[xx+.12,yy+.012,zz-.40],'edge',missile)
+        box(missile+'_tail_vertical',[xx-.012,yy-.15,zz-.63],[xx+.012,yy+.15,zz-.40],'edge',missile)
         for z in (-.3,.13):box(missile+f'_clip_{z}',[xx-.062,yy+.052,zz+z-.03],[xx+.062,yy+.10,zz+z+.03],'metal',missile)
-    px=side*2.6542;pod='rapid_left' if side<0 else 'rapid_right'
+    px=side*2.66;pod='rapid_left' if side<0 else 'rapid_right'
     box(f'rapid_pylon_{side}',[px-.08,1.52,1.1],[px+.08,1.75,1.5],'dark',pod)
     box(f'rapid_core_{side}',[px-.17,1.23,.552],[px+.17,1.57,2.048],'armor',pod)
     for k in range(8):
@@ -178,10 +177,7 @@ for part in parts:
                     for row in (top+3,bottom-3):draw.point((corner,row),fill=tone(18))
     x+=uw+3;row_h=max(row_h,uh)
 model={'schemaVersion':1,'textureWidth':1024,'textureHeight':1024,'bones':bones,'parts':parts}
-for root in (ROOT,Path('D:/blacklight-evolution-forge-1.20.1')):
+for root in (ROOT,):
     asset=root/'src/main/resources/assets/blacklight';(asset/'military').mkdir(parents=True,exist_ok=True)
     (asset/'military/helicopter-model.json').write_text(json.dumps(model,indent=2)+'\n','utf8')
     image.save(asset/'textures/entity/blackwatch_helicopter.png')
-    for lang,label in [('zh_cn','黑色守望运输直升机'),('en_us','Blackwatch Transport Helicopter')]:
-        p=asset/f'lang/{lang}.json';data=json.loads(p.read_text('utf8'));data['entity.blacklight.blackwatch_helicopter']=label;p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n','utf8')
-print(json.dumps({'parts':len(parts),'bones':len(bones),'atlas':[1024,1024]}))

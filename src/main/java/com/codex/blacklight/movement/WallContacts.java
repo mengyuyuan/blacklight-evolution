@@ -17,7 +17,8 @@ public final class WallContacts {
         // Let vanilla step over a ledge before treating it as a wall. Both sides
         // must make this decision, otherwise one frame switches RUN to CLIMB.
         if (!wall.attached() && torso != null && TerrainTraversal.canStepPast(player, into,
-                Math.max(.72, player.getDeltaMovement().horizontalDistance()))) {
+                Math.max(.72, player.getDeltaMovement().horizontalDistance()),
+                Vec3.atLowerCornerOf(torso.getDirection().getOpposite().getNormal()))) {
             torso = null;
             lower = null;
         }
@@ -36,7 +37,9 @@ public final class WallContacts {
         if (!wall.attached() && torso!=null && torso.getLocation().subtract(player.position()).horizontalDistance()>player.getBbWidth()*.5+.22) torso=null;
         boolean ceiling=!player.level().noCollision(player,player.getBoundingBox().move(0,.12,0));
         double ledgeY = Double.NaN;
-        if (wall.attached() || player.onGround() && torso != null && com.codex.blacklight.power.UtilityPowerSystem.parkourAllowed(player)) {
+        if (ceiling && wall.needsVaultProbe()) {
+            ledgeY = TerrainTraversal.vaultLanding(player, into);
+        } else if (wall.attached() || player.onGround() && torso != null && com.codex.blacklight.power.UtilityPowerSystem.parkourAllowed(player)) {
             Vec3 inward = wall.attached() ? into : normal.scale(-1);
             double distance = Math.max(.72, contact == null ? 0
                     : contact.getLocation().subtract(player.position()).horizontalDistance() + player.getBbWidth() * .5 + .10);

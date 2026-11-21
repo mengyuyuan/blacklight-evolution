@@ -76,11 +76,5 @@ public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity
                 &&mob.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH &&ClientTargetLock.entityTarget()==mob
                 ? ClientTargetLock.selection(mob).goliathPart() : null;
         try{if(progress<.995F)super.render(entity,yaw,partial,stack,fragments==null?buffer:fragments,light);if(fragments!=null)fragments.finish();}finally{highlightedPart=previousPart;stack.popPose();}
-        var owner=entity.level().getEntity(visual.consumerId());
-        if(owner!=null&&visual.active()){
-            var delta=owner.getPosition(partial).subtract(entity.getPosition(partial));
-            var out=buffer.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-            ConsumedMobVisuals.whip(entity,stack,out,light,delta,ConsumedMobVisuals.tetherProgress(entity,partial));
-        }
     }
 }

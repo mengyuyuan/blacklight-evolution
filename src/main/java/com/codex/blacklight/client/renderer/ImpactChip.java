@@ -14,12 +14,20 @@ final class ImpactChip {
     }
 
     static Result carve(List<Vertex> mesh, Vec3 site, Vec3 inward, double radius, int pieces, RenderType lining) {
-        Vec3 u = inward.cross(Math.abs(inward.y) < .9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0)).normalize();
-        Vec3 v = inward.cross(u);
+        return cut(mesh,site,inward,radius,pieces,lining,null);
+    }
+    /** Slender five-sided gouge. The longest dimension follows the observed tangential stroke. */
+    static Result groove(List<Vertex> mesh,Vec3 site,Vec3 inward,Vec3 stroke,double radius,RenderType lining){
+        return cut(mesh,site,inward,radius,0,lining,stroke);
+    }
+    private static Result cut(List<Vertex> mesh,Vec3 site,Vec3 inward,double radius,int pieces,RenderType lining,Vec3 stroke){
+        Vec3 u=stroke==null?Vec3.ZERO:stroke.subtract(inward.scale(stroke.dot(inward))).normalize();
+        if(u.lengthSqr()<.5)u=inward.cross(Math.abs(inward.y)<.9?new Vec3(0,1,0):new Vec3(1,0,0)).normalize();
+        Vec3 v=inward.cross(u);
         List<Plane> planes = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             double a = 2 * Math.PI * i / 5;
-            Vec3 n = u.scale(Math.cos(a)).add(v.scale(Math.sin(a)));
+            Vec3 n = u.scale(Math.cos(a)).add(v.scale(Math.sin(a)*(stroke==null?1:3.0)));
             planes.add(new Plane(n, n.dot(site) + radius * (i == 2 ? .8 : 1)));
         }
         planes.add(new Plane(inward, inward.dot(site) + .8 * radius));
@@ -27,7 +35,7 @@ final class ImpactChip {
 
         List<Vertex> skin = new ArrayList<>(mesh.size());
         List<List<Vertex>> patch = new ArrayList<>();
-        Vec3 recess = inward.scale(.46 * radius);
+        Vec3 recess = inward.scale((stroke==null?.46:.27) * radius);
         for (int i = 0; i + 3 < mesh.size(); i += 4) {
             List<Vertex> face = mesh.subList(i, i + 4);
             List<Vertex> inside = face;

@@ -15,7 +15,7 @@ import java.util.*;
  * Copies are drawn over the real terrain; the world itself is never edited. */
 public final class TerrainRipple {
     private record Cell(BlockPos pos,BlockState state,double distance,float jitter,float yaw){}
-    private record Wave(ClientLevel level,Vec3 centre,double radius,float height,double speed,double started,List<Cell> cells){}
+    private record Wave(ClientLevel level,Vec3 centre,double radius,float height,double speed,double started,List<Cell> cells,boolean exposed){}
     private static final List<Wave> WAVES=new ArrayList<>();
     private static final int MAX_CELLS=900,MAX_WAVES=6;
     private static final double LIFT_TICKS=5;
@@ -58,7 +58,17 @@ public final class TerrainRipple {
         if(cells.size()>MAX_CELLS){cells.sort(Comparator.comparingDouble(Cell::distance));cells.subList(MAX_CELLS,cells.size()).clear();}
         if(WAVES.size()>=MAX_WAVES)WAVES.remove(0);
         float height=.18F+.72F*strength;double speed=.8+.35*strength;
-        WAVES.add(new Wave(level,centre,radius,height,speed,started,List.copyOf(cells)));
+        WAVES.add(new Wave(level,centre,radius,height,speed,started,List.copyOf(cells),false));
+    }
+
+    static void consume(ClientLevel level,com.codex.blacklight.combat.ConsumeGroundSurface.Surface surface,
+                        com.codex.blacklight.combat.ConsumeGroundSurface.Load load,long seed,double started){
+        var cells=new ArrayList<Cell>(surface.tiles().size());
+        var rng=new Random(seed);
+        for(var tile:surface.tiles())cells.add(new Cell(tile.pos(),tile.state(),tile.distance(),
+                .88F+.22F*rng.nextFloat(),(rng.nextFloat()-.5F)*.24F));
+        if(WAVES.size()>=MAX_WAVES)WAVES.remove(0);
+        WAVES.add(new Wave(level,surface.contact(),load.radius,load.height,load.speed,started,List.copyOf(cells),true));
     }
 
     public static void render(PoseStack stack,Vec3 camera,double time){
@@ -83,12 +93,14 @@ public final class TerrainRipple {
                 stack.pushPose();
                 stack.translate(c.pos.getX()+.5,c.pos.getY()+h,c.pos.getZ()+.5);
                 // Tip the outer edge up, as if the ground buckled from the centre.
-                stack.mulPose(com.mojang.math.Axis.of(new org.joml.Vector3f((float)out.z,0,(float)-out.x)).rotation(-tilt));
+                if(len>1e-4)stack.mulPose(com.mojang.math.Axis.of(new org.joml.Vector3f((float)out.z,0,(float)-out.x)).rotation(-tilt));
                 stack.mulPose(com.mojang.math.Axis.YP.rotation(c.yaw*h));
                 stack.scale(1.002F,1.002F,1.002F);
                 stack.translate(-.5,0,-.5);
                 // Batched model keeps biome tint and terrain lighting of the real block.
-                dispatcher.renderBatched(c.state,c.pos,level,stack,buffers.getBuffer(net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(c.state)),false,RANDOM);
+                // Lifted faces receive the light of the exposed air column, including local sky and block light.
+                var lightingPos=w.exposed?c.pos.above():c.pos;
+                dispatcher.renderBatched(c.state,lightingPos,level,stack,buffers.getBuffer(net.minecraft.client.renderer.ItemBlockRenderTypes.getChunkRenderType(c.state)),false,RANDOM);
                 stack.popPose();
             }
         }

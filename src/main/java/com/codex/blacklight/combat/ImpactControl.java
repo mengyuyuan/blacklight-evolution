@@ -34,6 +34,7 @@ public final class ImpactControl {
         publish(mob,new HitReaction(now,40,HitReaction.STAGGER,yaw,ImpactProfile.BODY));return true;
     }
     public static boolean begin(LivingEntity entity,ImpactProfile profile,float yaw){
+        if(entity.isAlive()&&GroundSpikePin.held(entity))return false;
         if(NativeBossBodyControl.ownsPose(entity)){if(!entity.level().isClientSide)cancel(entity);return false;}
         if(entity.isRemoved()){if(entity instanceof Mob mob)ACTIVE.remove(mob);return false;}
         if(entity instanceof com.codex.blacklight.entity.BlacklightHive){cancel(entity);return false;}
@@ -97,7 +98,7 @@ public final class ImpactControl {
         entity.setData(ModAttachments.HIT_REACTION,state);entity.syncData(ModAttachments.HIT_REACTION);
     }
     public static void cancel(LivingEntity entity){
-        if(entity instanceof Mob mob)ACTIVE.remove(mob);
+        if(entity instanceof Mob mob){GroundSpikePin.forget(mob);ACTIVE.remove(mob);}
         if(entity.isRemoved())return;
         if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
@@ -128,6 +129,7 @@ public final class ImpactControl {
         }
         if(!control.consume(now)&&mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved()
                 &&now-control.flightStarted()>=com.codex.blacklight.infection.EvolvedPoise.MAX_CONTROL_TICKS){cancel(mob);return;}
+        if(GroundSpikePin.tick(mob))return;
         mob.getNavigation().stop();mob.setXxa(0);mob.setZza(0);
         if(hit.kind()==HitReaction.DOWN){
             var v=mob.getDeltaMovement();mob.setDeltaMovement(v.x*.45,v.y,v.z*.45);

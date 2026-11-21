@@ -37,6 +37,21 @@ public enum GoliathLockPart {
         };
     }
 
+    /** P2 damage routing includes nearby joints that remain visible after this limb is severed. */
+    public boolean acceptsDamage(String bone) {
+        if(bone==null)return false;
+        return switch(bone) {
+            case "torso","neck_base","neck_top" -> this==HEAD; // Spine_3 and Neck_2
+            case "left_shin","left_calf","left_foot","left_toes" -> this==RIGHT_LEG; // Knee_L and Ankle_L
+            default -> forSkin(bone)==this;
+        };
+    }
+
+    static GoliathLockPart openOn(AnimatedHurtBody body) {
+        return body instanceof EncounterMob mob && mob.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH
+                && mob.exposed() ? mob.goliathWindow().part : null;
+    }
+
     public static boolean severed(String bone, int broken) {
         var part=forSkin(bone);
         return part==RIGHT_LEG && (broken & 1)!=0 || part==RIGHT_ARM && (broken & 2)!=0;

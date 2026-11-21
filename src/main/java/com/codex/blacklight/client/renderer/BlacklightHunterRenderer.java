@@ -14,10 +14,8 @@ public final class BlacklightHunterRenderer extends AnatomicalGeoRenderer<Blackl
     private static final ResourceLocation SKIN = ResourceLocation.fromNamespaceAndPath("blacklight", "textures/entity/hunter_connected.png");
     public BlacklightHunterRenderer(EntityRendererProvider.Context context) { super(context, new BlacklightHunterModel()); shadowRadius = .65F; }
     @Override public void render(BlacklightHunter entity, float yaw, float partial, PoseStack stack, MultiBufferSource buffer, int light) {
-        var owner = entity.level().getEntity(entity.consumerId());
         var visual = entity.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         float t = visual.active() ? visual.progress(entity.level().getGameTime(), partial) : 0;
-        Vec3 delta = owner == null ? Vec3.ZERO : owner.getPosition(partial).subtract(entity.getPosition(partial));
         stack.pushPose();
         var placement=com.codex.blacklight.client.ClientCarryPlacement.consumeOffset(entity,partial);
         if(visual.active())stack.translate(placement.x,placement.y,placement.z);
@@ -25,7 +23,6 @@ public final class BlacklightHunterRenderer extends AnatomicalGeoRenderer<Blackl
         if (visual.active()) com.codex.blacklight.client.animation.ConsumeVictimPose.body(entity, stack, partial);
         else if(!entity.committedAttack()&&!com.codex.blacklight.client.animation.NativeReceiverPose.available(entity,partial))com.codex.blacklight.client.animation.HitBodyPose.apply(entity,stack,partial);
         try{if(t<.995F)super.render(entity, yaw, partial, stack, fragments==null?buffer:fragments, light);if(fragments!=null)fragments.finish();}finally{stack.popPose();}
-        if(owner!=null && visual.active())ConsumedMobVisuals.whip(entity,stack,buffer.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,delta,ConsumedMobVisuals.tetherProgress(entity,partial));
     }
     @Override public void renderRecursively(com.mojang.blaze3d.vertex.PoseStack pose, com.codex.blacklight.entity.BlacklightHunter entity,
             software.bernie.geckolib.cache.object.GeoBone bone, net.minecraft.client.renderer.RenderType type,

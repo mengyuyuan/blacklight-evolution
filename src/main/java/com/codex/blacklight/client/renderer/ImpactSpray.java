@@ -197,6 +197,29 @@ public final class ImpactSpray {
         }
     }
 
+    /** Low, widening plumes leave the receiver and settle over the original collision point. */
+    static void groundDust(PoseStack pose, VertexConsumer out, Vec3 camera, Vec3 at, double ticks,
+                           int blockColor, float size, long seed, int light) {
+        if (ticks<0 || ticks>=20) return;
+        int r=(blockColor>>16)&255, g=(blockColor>>8)&255, b=blockColor&255;
+        int tint=((r*3+180)/4<<16)|((g*3+161)/4<<8)|(b*3+143)/4;
+        for (int i=0;i<12;i++) {
+            long strand=seed+i*59L;
+            double age=(ticks-(i<5?0:.5+unit(strand)*2.5))/20.0;
+            double life=.43+unit(strand+1)*.40;
+            if(age<0 || age>=life)continue;
+            double t=age/life;
+            double angle=(i+unit(strand+2)*.65)*Math.PI*2/12;
+            Vec3 outwards=new Vec3(Math.cos(angle),0,Math.sin(angle));
+            double travel=(.04+(1-Math.pow(1-t,3))*(.52+unit(strand+3)*.55))*size;
+            double lift=(.065+Math.sin(t*Math.PI*.78)*(.09+.19*unit(strand+4)))*size;
+            var point=at.add(outwards.scale(travel)).add(0,lift,0);
+            double radius=(.08+Math.sqrt(t)*.26)*size;
+            double opacity=126*Math.min(1,(age+.012)/.045)*(1-t)*(1-t);
+            soft(pose,out,camera,point,outwards,radius*1.40,radius*.75,tint,opacity,light,strand,true);
+        }
+    }
+
     private static Vec3 rim(Vec3 along, Vec3 side, double angle, double length, double width,
                             long seed, int index, boolean cloud) {
         double x = Math.cos(angle), y = Math.sin(angle);

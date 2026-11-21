@@ -32,13 +32,10 @@ public final class QuillOrganRenderer extends EntityRenderer<QuillOrgan> {
     private static double pulse(double t,double center,double width){double x=(t-center)/width;return Math.exp(-x*x);}
     public static void contractHost(net.minecraft.world.entity.LivingEntity host,PoseStack pose,float partial){
         var q=QuillOrgan.extracting(host);if(q==null)return;
-        float age=q.age()+partial;
-        Vec3 pivot=q.getPosition(partial).subtract(host.getPosition(partial));
-        float snap=(float)pulse(age,QuillOrgan.PIERCE_TICK+.25,.88);
-        pose.translate(pivot.x,pivot.y,pivot.z);
-        pose.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((float)(pivot.x>=0?1:-1)*8*snap));
-        pose.scale(1-.07F*snap,1+.05F*snap,1-.06F*snap);
-        pose.translate(-pivot.x,-pivot.y,-pivot.z);
+        if(!AdaptiveRagdoll.active(host)){
+            var hit=ConsumeBodyImpact.quill(host,q,partial);
+            ConsumeBodyImpact.poseAt(hit,pose,host.getPosition(partial));
+        }
     }
     private static void penetration(QuillOrgan q,net.minecraft.world.entity.Mob host,PoseStack pose,
                                     VertexConsumer mesh,int light,float partial,double age,Vec3 anchor){

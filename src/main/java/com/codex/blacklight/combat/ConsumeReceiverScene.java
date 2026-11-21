@@ -69,6 +69,11 @@ public final class ConsumeReceiverScene {
             }
         };
     }
+    public static float flowStartSeconds(PowerForm form,int variant,Profile scene) {
+        if (form==PowerForm.NONE && variant==ConsumeVariant.BEATDOWN)
+            return scene.hitSeconds().get(scene.hitSeconds().size()-1)+.06F;
+        return net.minecraft.util.Mth.clamp(absorptionSeconds(form,variant),scene.deformSeconds(),scene.finishSeconds()-.05F);
+    }
     public static float clipSeconds(PowerForm form,int variant) {
         return LocalVisualMotion.find("consume_"+ConsumeSequence.key(form,variant)+"_actor")
                 .map(clip -> {

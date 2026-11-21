@@ -50,11 +50,12 @@ public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSuprem
     @Override public void render(BlacklightSupremeHunter e,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         var visual=e.getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL);
         float consumeT=visual.active()?visual.progress(e.level().getGameTime(),partial):0;
-        if(consumeT<.995F)draw(e,partial,stack,buffers,light);
-        var owner=e.level().getEntity(e.consumerId());
-        if(owner!=null&&visual.active()){
-            Vec3 delta=owner.getPosition(partial).subtract(e.getPosition(partial));
-            ConsumedMobVisuals.whip(e,stack,buffers.getBuffer(RenderType.entityCutoutNoCull(WHITE)),light,delta,ConsumedMobVisuals.tetherProgress(e,partial));
+        if(consumeT<.995F){
+            if(visual.stage()==com.codex.blacklight.combat.ConsumeVisual.MOUNT_CONSUME){
+                var skin=new ConsumeFracture(e,partial,stack,buffers,Vec3.ZERO);
+                draw(e,partial,stack,skin,light);
+                skin.finishMountedSurface();
+            }else draw(e,partial,stack,buffers,light);
         }
         super.render(e,yaw,partial,stack,buffers,light);
     }
@@ -107,7 +108,16 @@ public final class SupremeHunterRenderer extends EntityRenderer<BlacklightSuprem
         int overlay=OverlayTexture.pack(0,e.hurtTime>0||e.deathTime>0);
         int color=e.weakened()||e.isBeingConsumed()?0xFFFFB0A8:e.phase()>=3?0xFFE8A098:0xFFFFFFFF;
         var v=new Vector3f();var normal=new Vector3f();
-        for(var q:rig.quads){int b=q.bone();rot[b].transform(normal.set(q.nx(),q.ny(),q.nz()));
+        for(var q:rig.quads){int b=q.bone();
+            if(out instanceof ConsumeAnatomy.Consumer skin){
+                int region=ConsumeAnatomy.BODY;
+                for(int i=b;i>=0;i=rig.parents[i]){
+                    int id=ConsumeAnatomy.named(rig.names[i],-1);
+                    if(id>=0){region=id;break;}
+                }
+                skin.anatomy(region);
+            }
+            rot[b].transform(normal.set(q.nx(),q.ny(),q.nz()));
             for(int k=0;k<4;k++){v.set(q.xyz()[k*3],q.xyz()[k*3+1],q.xyz()[k*3+2]).sub(rig.pivots[b]);rot[b].transform(v).add(at[b]);
                 out.addVertex(pose,v.x,v.y,v.z).setColor(color).setUv(q.uv()[k*2],q.uv()[k*2+1]).setOverlay(overlay).setLight(light).setNormal(pose,normal.x,normal.y,normal.z);}
         }

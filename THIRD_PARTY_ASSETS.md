@@ -47,22 +47,13 @@ source hashes continue to identify the original inputs. License files are unchan
 
 ## Independent runtime and authored resources
 
-The 2026-10-25 Evolved sample uses standard Minecraft player cuboid dimensions,
-a project-authored 64x64 Runner1-inspired tactical skin. The adapted arm surfaces
-retain the locally decoded `evolved_1stRunner_Blades_geo_runner1_arm_bladeShape`
-geometry: its cutting profile, dorsal hooks and tendon openings are fitted to
-Minecraft shoulder/elbow proportions. Source hashes and the adaptation are
-recorded in `docs/design/evolved-complete-arms.json`. Source game torso/head
-meshes and game textures are not embedded. `evolved-poses.data` contains the complete
-67-joint Prototype 2 Evolved hierarchy and 27 locally decoded action/stance channels;
-the original clip names and input hashes are recorded in
-`docs/design/evolved-form-motion-sources.json`. The body retains
-Minecraft-sized rest proportions. The original parent hierarchy, elbow, knee,
-and action rotations drive the surface. Anatomical aim frames and bone lengths
-adapt those channels to the standard block body, retaining the source's -Z
-forward axis. `tools/fit_p2_evolved_arms.py` adapts the source arm geometry and
-authors new pixel materials; the player weapon mesh is not used for these arms.
-The reference channels retain their source lineage.
+The Evolved bodies use Minecraft player cuboids and the project's 64x64 tactical
+skin. The blades, hammers, shields, claws and tendrils use local beveled rings
+and pixel atlases. Rebuild all eight runtime meshes with
+`python tools/build_evolved_variants.py` (Python and Pillow).
+The separate animation table `evolved-poses.data` retains its source-derived
+joint hierarchy and motion channels. Historical fitted surfaces remain in the
+research record and are outside runtime resources.
 
 The Evolved combat revision also samples original motion-root travel. Minecraft
 collision, navigation, contact windows and server damage are project code;
@@ -173,19 +164,6 @@ independent player skeleton. `art/motion-profile/basic_dodge_roll.json` includes
 source hash and frame segments. The source's end frame 55 is clamped to the
 actual last frame 52. Six invulnerability ticks and MC displacement are gameplay
 adaptations, not verified original values.
-
-## Additional P2-derived Evolved weapon surfaces (2026-10-27)
-
-`models/evolved_variants/` adds fitted weapon geometry from locally extracted
-Prototype 2 `alex_hammerfist3`, `alex_claws3`, `alex_tendril3`, `heller_shield_3`,
-`alex_claws2`, and `alex_tendril2`, alongside the previously disclosed Runner1 blades.
-These surfaces remain source-game derivatives; they are not claimed as original
-weapon geometry. Original topology is fitted onto the existing 67-joint MC rig.
-Source colour regions are mapped to a small MC vertex palette; original game texture
-files are not shipped. The model JSON and `docs/design/evolved-variants-geometry.json`
-record source hashes and face counts. The new character clothing details and special
-combat behavior are mod adaptations, not claims that those named variants or
-mechanics exist unchanged in Prototype 2. Existing source-derived asset notices apply.
 
 ## Whole municipal Los Angeles Arnis scenery (2026-10-26)
 

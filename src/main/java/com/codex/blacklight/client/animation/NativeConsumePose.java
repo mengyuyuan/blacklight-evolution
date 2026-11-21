@@ -43,6 +43,7 @@ public final class NativeConsumePose {
                 time=follow+(time-follow)*release;
             }
         }
+        time=com.codex.blacklight.client.renderer.ConsumeImpactResponse.poseSeconds(entity,visual,partial,time);
         BlacklightPose copy=new BlacklightPose();MotionLibrary.pose(key,time,false).getJointTransformData().forEach((name,transform)->copy.getJointTransformData().put(name,transform.copy()));
         if(mounted&&role.equals("victim")){
             // A giant reacts at the contact site; a small receiver's whole-body toss must not tow it.
@@ -53,13 +54,14 @@ public final class NativeConsumePose {
             });
             for(String joint:new String[]{"Root","Thigh_L","Thigh_R","Leg_L","Leg_R","Knee_L","Knee_R"})copy.orElseEmpty(joint).rotation().identity();
         }
+        if(role.equals("actor"))com.codex.blacklight.client.renderer.ConsumeBodyImpact.actor(entity,visual,copy,partial);
         return blendCarry(entity,visual,key,copy,partial);
     }
     public static boolean actor(LivingEntity entity,BlacklightPose pose,float partial) {
         if(recovery(entity,pose,partial,false))return true;
         int stage=entity.getData(ModAttachments.GRAB_STAGE);
         if(stage!=ConsumeVisual.CONSUME&&stage!=ConsumeVisual.CAPTURE&&stage!=ConsumeVisual.HOLD&&stage!=ConsumeVisual.AIR_HOLD&&stage!=ConsumeVisual.AIR_THROW&&stage!=ConsumeVisual.GRAB_ATTACK&&!ConsumeSequence.mountedStage(stage))return false;
-        var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==entity.getId());
+        var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).drivesActor(entity.getId()));
         // The victim scene may clear one packet before CONSUMING/GRAB_STAGE; keep sampling the recovery copy.
         if(victims.isEmpty())return recovery(entity,pose,partial,true);
         var visual=victims.getFirst().getData(ModAttachments.CONSUME_VISUAL);
@@ -111,6 +113,7 @@ public final class NativeConsumePose {
         float enter=PhaseEntryBlend.CONSUME_ACTOR.weight(entity,visual.started(),visual.stage(),partial,4F);
         pose.getJointTransformData().putAll(BlacklightPose.interpolatePose(pose,sample,enter).getJointTransformData());
         if(stage==ConsumeVisual.MOUNT_CONSUME&&ConsumeSequence.bruteMount(victims.getFirst()))fitBruteRider(entity,victims.getFirst(),visual,pose,partial,true);
+        else if(stage==ConsumeVisual.MOUNT_CONSUME)com.codex.blacklight.client.renderer.MountedBodyFit.apply(entity,victims.getFirst(),visual,pose,partial,facing(entity,visual.facing(),partial));
         return true;
     }
     private static void fitBruteRider(LivingEntity actor,LivingEntity victim,ConsumeVisual visual,BlacklightPose pose,float partial,boolean consuming){
@@ -138,10 +141,22 @@ public final class NativeConsumePose {
         return true;
     }
     public static float facing(LivingEntity actor,float fallback,float partial){
+        // Mounted roots are placed at the creature's back. Only body yaw follows the
+        // actual target, as on the server; camera orbit remains free.
+        if(actor.getData(ModAttachments.GRAB_STAGE)==ConsumeVisual.MOUNT_CONSUME){
+            var matches=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),
+                    e->e.getData(ModAttachments.CONSUME_VISUAL).drivesActor(actor.getId())&&e.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.MOUNT_CONSUME);
+            if(!matches.isEmpty()){
+                var target=matches.getFirst();
+                if(ConsumeSequence.bruteMount(target))return target.getData(ModAttachments.CONSUME_VISUAL).facing();
+                var aim=ConsumeSequence.contact(target).subtract(actor.getPosition(partial));
+                if(aim.horizontalDistanceSqr()>1e-9)return (float)Math.toDegrees(Math.atan2(-aim.x,aim.z));
+            }
+        }
         if(ConsumeVisual.holding(actor.getData(ModAttachments.GRAB_STAGE)))
             return net.minecraft.util.Mth.rotLerp(partial,actor.yRotO,actor.getYRot());
         if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.AIR_THROW&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.GRAB_ATTACK)return fallback;
-        var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==actor.getId());
+        var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).drivesActor(actor.getId()));
         return victims.isEmpty()?fallback:victims.getFirst().getData(ModAttachments.CONSUME_VISUAL).facing();
     }
 }

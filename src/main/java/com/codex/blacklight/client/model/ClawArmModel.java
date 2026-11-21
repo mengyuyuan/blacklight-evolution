@@ -36,6 +36,9 @@ public final class ClawArmModel extends Model {
     private boolean textured;
     private final java.util.BitSet strikingPlate = new java.util.BitSet();
 
+    public static final float DEPLOYED_GRAB=Float.NEGATIVE_INFINITY;
+    private final java.util.BitSet whipTerminal=new java.util.BitSet();
+
     public ResourceLocation texture() { return texture; }
     public ResourceLocation emissiveTexture() { return emissiveTexture; }
     public org.joml.Vector3f anchor(String name, org.joml.Vector3f fallback) {
@@ -57,6 +60,11 @@ public final class ClawArmModel extends Model {
             if (root.has("anchors")) for (var entry : root.getAsJsonObject("anchors").entrySet()) {
                 var p = entry.getValue().getAsJsonArray();
                 anchors.put(entry.getKey(), new org.joml.Vector3f(p.get(0).getAsFloat(), p.get(1).getAsFloat(), p.get(2).getAsFloat()));
+            }
+            if(asset.equals("form_whipfist"))for(var entry:root.getAsJsonObject("parts").entrySet()){
+                if(!com.codex.blacklight.client.renderer.WhipGrabMesh.terminal(entry.getKey()))continue;
+                var part=entry.getValue().getAsJsonObject();int first=part.get("start").getAsInt();
+                whipTerminal.set(first,first+part.get("count").getAsInt());
             }
             if (asset.equals("form_hammerfists")) {
                 for (var entry : root.getAsJsonObject("parts").entrySet()) {
@@ -214,7 +222,7 @@ public final class ClawArmModel extends Model {
         for (int faceIndex=0;faceIndex<faces.length;faceIndex++) {
             Triangle face=faces[faceIndex];
             if (face.emissive != emissivePass) continue;
-            if(forearm&&Math.max(face.points[0][1],Math.max(face.points[1][1],face.points[2][1]))>distalLimit)continue;
+            if(forearm&&(distalLimit==DEPLOYED_GRAB?whipTerminal.get(faceIndex):Math.max(face.points[0][1],Math.max(face.points[1][1],face.points[2][1]))>distalLimit))continue;
             // QUADS require a repeated final vertex for triangular authored surfaces.
             for (int v=0;v<4;v++) {
                 int corner = Math.min(v,2), index = face.vertices[corner], offset = index * 6;

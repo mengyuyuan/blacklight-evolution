@@ -25,6 +25,12 @@ public final class ModParticles {
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> CONTACT_DUST =
             PARTICLES.register("contact_dust", () -> new SimpleParticleType(false));
 
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HAMMER_WAVE_DUST = PARTICLES.register("hammer_wave_dust", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HAMMER_FIRE = PARTICLES.register("hammer_fire", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HAMMER_BURST_DUST = PARTICLES.register("hammer_burst_dust", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HAMMER_DIRT = PARTICLES.register("hammer_dirt", () -> new SimpleParticleType(false));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> HAMMER_DEBRIS = PARTICLES.register("hammer_debris", () -> new SimpleParticleType(false));
+
     private ModParticles() {
     }
 

@@ -134,7 +134,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             var state=server.getBlockState(hit.getBlockPos());
             var point=hit.getLocation().add(Vec3.atLowerCornerOf(hit.getDirection().getNormal()).scale(.035));
             var material = state.getSoundType(server, hit.getBlockPos(), this);
-            float gain = volleySlot() == 0 ? (heavy() ? .72F : .5F) : .14F;
+            float gain = volleySlot() == 0 ? (heavy() ? .98F : .82F) : .24F;
             server.playSound(null, point.x, point.y, point.z, material.getHitSound(), net.minecraft.sounds.SoundSource.PLAYERS,
                     gain * material.getVolume(), material.getPitch() * (heavy() ? .84F : 1.16F));
             server.sendParticles(new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,state),

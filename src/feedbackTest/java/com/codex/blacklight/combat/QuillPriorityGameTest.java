@@ -57,6 +57,138 @@ public final class QuillPriorityGameTest {
             h.succeed();
         } finally {root.discard();cow.discard();h.getLevel().getServer().getPlayerList().remove(p);}
     }
+    @GameTest(template="wall_test",timeoutTicks=60,batch="goliath_parasite_damage")
+    public static void implantedQuillsDrainThroughOldFloorsWithoutKnockdowns(GameTestHelper h){
+        var player=join(h,"GoliathQuill");
+        var level=h.getLevel();
+        var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(com.codex.blacklight.entity.EncounterKind.GOLIATH).get().create(level);
+        try {
+            var state=QuillHarvest.state(player);state.infect();state.setPrototypeMode(true);
+            player.setPos(h.absolutePos(new BlockPos(5,130,5)).getCenter());
+            boss.setPos(player.position().add(5,0,0));boss.setNoAi(true);level.addFreshEntity(boss);
+            for(int i=0;i<10;i++)QuillHarvest.plant(player,boss,boss.position().add(0,1,0),0);
+            float max=boss.getMaxHealth();
+            double expected=max*QuillHarvest.drainPercent(player,10)/100;
+            for(double ratio:new double[]{1,.64,.31,.01}){
+                boss.setHealth((float)(max*ratio));
+                float before=boss.getHealth();
+                boss.tickCount+=20;
+                QuillHarvest.tick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(boss));
+                double loss=before-boss.getHealth();
+                h.assertTrue(Math.abs(loss-expected)<Math.max(.0001,Math.ulp(max)*2),
+                        "Goliath parasite at "+ratio+" HP: expected "+expected+", actual "+loss);
+            }
+            boss.setHealth(max);
+            for(int i=0;i<100;i++){
+                boss.tickCount+=20;QuillHarvest.tick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(boss));
+                h.assertTrue(boss.goliathWindow()==GoliathWindow.NONE,"parasite ticks must never open another stagger");
+            }
+            boss.setHealth((float)(expected*.5));boss.tickCount+=20;QuillHarvest.tick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(boss));
+            h.assertTrue(ConsumeLastChance.awaitingFinisher(boss)&&ConsumeSystem.healthReady(player,boss),
+                    "first lethal parasite tick keeps a usable execution opportunity");
+            h.assertTrue(QuillHarvest.available(player,boss),"parasite can be recalled after a lethal opening");
+            var root=(QuillOrgan)level.getEntity(QuillHarvest.mark(boss).getUUID("organ"));
+            h.assertTrue(QuillHarvest.finish(player,boss,root)&&!boss.isAlive(),"parasite execution reaches accepted death");
+            h.succeed();
+        }finally{
+            var mark=QuillHarvest.mark(boss);
+            if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
+            boss.discard();level.getServer().getPlayerList().remove(player);
+        }
+    }
+    @GameTest(template="wall_test",timeoutTicks=420,batch="goliath_parasite_recovery")
+    public static void plantedQuillsKeepDrainingAfterOneRealStagger(GameTestHelper h){
+        var player=join(h,"QuillRecovery");
+        var level=h.getLevel();
+        var state=QuillHarvest.state(player);
+        state.infect();state.setPrototypeMode(true);
+        player.setPos(h.absolutePos(new BlockPos(5,8,5)).getCenter());
+        var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(com.codex.blacklight.entity.EncounterKind.GOLIATH).get().create(level);
+        boss.setPos(player.position().add(4,0,0));
+        boss.setNoAi(true);boss.setNoGravity(true);level.addFreshEntity(boss);
+        for(int i=0;i<10;i++)QuillHarvest.plant(player,boss,boss.position().add(0,1,0),0);
+        boss.hurt(level.damageSources().generic(),50);
+        boss.invulnerableTime=0;
+        boss.hurt(level.damageSources().generic(),50);
+        h.assertTrue(boss.goliathWindow()==GoliathWindow.HEAD,"two direct hits cause real stagger");
+        long start=level.getGameTime();
+        float initial=boss.getHealth();
+        float perPulse=boss.getMaxHealth()*(float)QuillHarvest.drainPercent(player,10)/100;
+        h.onEachTick(()->{
+            if(level.getGameTime()-start>62)
+                h.assertTrue(boss.goliathWindow()==GoliathWindow.NONE,"the same parasites reopened a recovered stagger");
+        });
+        h.runAfterDelay(390,()->{
+            try{
+                h.assertTrue(boss.isAlive() && initial-boss.getHealth()>=18*perPulse,"parasites remain active across recovery");
+                h.succeed();
+            }finally{
+                var mark=QuillHarvest.mark(boss);
+                if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
+                boss.discard();level.getServer().getPlayerList().remove(player);
+            }
+        });
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=125,batch="goliath_followup_swing")
+    public static void independentPrimaryAttackCanFinishAnArmoredGoliath(GameTestHelper h){
+        checkGoliathFollowup(h,false);
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=125,batch="goliath_followup_parasite")
+    public static void primaryAttackCanFinishTheOpeningLeftByQuills(GameTestHelper h){
+        checkGoliathFollowup(h,true);
+    }
+
+    private static void checkGoliathFollowup(GameTestHelper h,boolean parasite){
+        var player=join(h,parasite?"QuillFollowup":"MeleeFollowup");
+        var level=h.getLevel();
+        var boss=com.codex.blacklight.registry.EncounterEntities.CREATURES.get(com.codex.blacklight.entity.EncounterKind.GOLIATH).get().create(level);
+        var state=QuillHarvest.state(player);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.HAMMERFISTS);state.activate(PowerForm.HAMMERFISTS);
+        boss.moveTo(h.absolutePos(new BlockPos(6,90,6)).getCenter());
+        boss.setNoAi(true);boss.setNoGravity(true);level.addFreshEntity(boss);
+        player.setNoGravity(true);player.setPos(boss.position());
+        Runnable swing=()->{
+            var torso=boss.hurtRegions(0).stream().filter(r->r.bone().equals("torso_lower")).findFirst().orElseThrow().boxes().get(0);
+            var surface=torso.nearest(torso.center.add(0,0,-50));
+            player.setPos(surface.add(0,-1,-1));player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);player.setOnGround(true);
+            player.setXRot(0);player.setYRot(0);player.setYHeadRot(0);player.yBodyRot=player.yBodyRotO=0;
+            WeaponCombatSystem.request(player,false);
+            h.assertTrue(WeaponCombatSystem.busy(player),"server accepted a primary strike");
+            // The embedded test client sends no movement packets to drive a player's combat clock.
+            var move=player.getData(ModAttachments.WEAPON_VISUAL).spec();
+            for(int tick=0;tick<move.duration+12 && WeaponCombatSystem.busy(player);tick++){
+                player.tickCount++;
+                WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(player));
+            }
+        };
+        h.runAfterDelay(3,()->{
+            boss.setHealth(.02F);
+            if(parasite){
+                for(int i=0;i<10;i++)QuillHarvest.plant(player,boss,boss.position().add(0,1,0),0);
+                boss.tickCount+=20-boss.tickCount%20;
+                QuillHarvest.tick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(boss));
+            }else swing.run();
+        });
+        h.runAfterDelay(50,()->{
+            h.assertTrue(boss.getHealth()==1 && ConsumeLastChance.awaitingFinisher(boss),"first lethal contact offers execution, hp="+boss.getHealth());
+            swing.run();
+        });
+        h.runAfterDelay(98,()->{
+            try{
+                h.assertTrue(!boss.isAlive() && ((com.codex.blacklight.mixin.LivingDeathAccess)(Mob)boss).blacklight$deathAccepted(),
+                        "an independent primary strike finishes the boss, hp="+boss.getHealth());
+                h.succeed();
+            }finally{
+                WeaponCombatSystem.cancel(player);
+                var mark=QuillHarvest.mark(boss);
+                if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
+                boss.discard();level.getServer().getPlayerList().remove(player);
+            }
+        });
+    }
+
     @GameTest(template="wall_test",timeoutTicks=80,batch="quill_hunter_damage")
     public static void supremeHunterDistinguishesQuillsFromThrownDebris(GameTestHelper h){
         var p=join(h,"HunterDamage");
@@ -200,6 +332,35 @@ public final class QuillPriorityGameTest {
         }finally{for(var e:scraps)e.discard();for(var m:mobs)m.discard();level.getServer().getPlayerList().remove(p);}
     }
 
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_live_extract")
+    public static void liveRecallPuncturesBeforeRewardAndDoesNotKillTheHost(GameTestHelper h){
+        var p=join(h,"QuillExtract"); var mobs=new ArrayList<Mob>();
+        QuillOrgan organ=null;
+        try {
+            p.setPos(h.absolutePos(new BlockPos(5,140,5)).getCenter());
+            var state=QuillHarvest.state(p);
+            state.infect(); state.setPrototypeMode(true);
+            state.unlock(PowerForm.BACKSPINES); state.activate(PowerForm.BACKSPINES);
+            var victim=spawn(p,mobs,EntityType.COW,0,3,10,1);
+            QuillHarvest.plant(p,victim,victim.getBoundingBox().getCenter(),0);
+            QuillHarvest.recall(p);
+            organ=(QuillOrgan)p.serverLevel().getEntity(QuillHarvest.mark(victim).getUUID("organ"));
+            h.assertTrue(organ!=null && organ.phase()==QuillOrgan.EXTRACT,"recall did not start");
+            float hp=victim.getHealth(); int ep=state.getEvolutionPoints();
+            var saved=organ.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            saved.putLong("age",QuillOrgan.PIERCE_TICK);organ.load(saved);organ.tick();
+            h.assertTrue(victim.getHealth()>0 && victim.getHealth()<hp,"no nonlethal puncture on live host");
+            h.assertTrue(state.getEvolutionPoints()==ep,"premature reward");
+            releaseHarvest(organ);
+            h.assertTrue(organ.phase()==QuillOrgan.RETURN && victim.isRemoved(),"failed to return to owner");
+            h.succeed();
+        } finally {
+            if(organ!=null)organ.discard();
+            for(var mob:mobs)mob.discard();
+            p.serverLevel().getServer().getPlayerList().remove(p);
+        }
+    }
+
     private static void releaseHarvest(QuillOrgan root){
         var saved=root.saveWithoutId(new net.minecraft.nbt.CompoundTag());
         saved.putLong("age",QuillOrgan.RELEASE_TICK);
@@ -280,17 +441,45 @@ public final class QuillPriorityGameTest {
         return p;
     }
 
-    @GameTest(template="wall_test", timeoutTicks=80)
+    @GameTest(template="wall_test", timeoutTicks=240)
     public static void runningFireSpreadsParasitesAndRecallsAtRange(GameTestHelper h) {
+        // A full terrain chunk can still be waiting for its entity section to start ticking.
+        var start=h.absolutePos(new BlockPos(5,180,5));
         var level=h.getLevel();
         var p=join(h,"QuillSpread");
-        p.setPos(h.absolutePos(new BlockPos(5,180,5)).getCenter());
+        var middle=start.offset(48,0,0).getCenter();
+        p.connection.teleport(middle.x,middle.y,middle.z,0,0);
+        p.setNoGravity(true);
+        var chunks=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=start.getX()>>4;x<=(start.getX()+97)>>4;x++){
+            for(int z=start.getZ()>>4;z<=(start.getZ()+3)>>4;z++){
+                var chunk=new net.minecraft.world.level.ChunkPos(x,z);
+                chunks.add(chunk);
+                if(level.setChunkForced(x,z,true))forced.add(chunk);
+                level.getChunk(x,z);
+            }
+        }
+        h.startSequence().thenWaitUntil(()->{
+            for(var chunk:chunks)
+                h.assertTrue(level.isPositionEntityTicking(chunk.getBlockAt(0,start.getY(),0)),"waiting for distant quill hosts to tick");
+        }).thenExecute(()->{
+            try{checkRunningFire(h,start,p);}
+            finally{
+                for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);
+                level.getServer().getPlayerList().remove(p);
+            }
+        }).thenSucceed();
+    }
+
+    private static void checkRunningFire(GameTestHelper h,BlockPos start,ServerPlayer p) {
+        var level=h.getLevel();
+        p.setPos(start.getCenter());
         var mobs=new ArrayList<Mob>();
         var shard=new QuillOrgan(com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get(),level);
         try {
             var state=QuillHarvest.state(p);
             state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
-            for(int d=0;d<=96;d+=16)level.getChunk(p.blockPosition().offset(d,0,0).getX()>>4,p.blockPosition().getZ()>>4);
             var cow=spawn(p,mobs,EntityType.COW,64,0,20,20);
             QuillHarvest.plant(p,cow,cow.getBoundingBox().getCenter(),0);
             var root=(QuillOrgan)level.getEntity(QuillHarvest.mark(cow).getUUID("organ"));
@@ -334,7 +523,6 @@ public final class QuillPriorityGameTest {
             shard.load(inFlight);
             for(int t=0;t<45 && shard.phase()==QuillOrgan.STRIKE;t++)shard.tick();
             h.assertTrue(QuillHarvest.mark(distant).getInt("layers")==2,"a second accepted orbit hit adds another layer");
-            h.succeed();
         } finally {
             shard.discard();CombatTargeting.requestLock(p,-1);
             for(var mob:mobs){
@@ -342,7 +530,6 @@ public final class QuillPriorityGameTest {
                 if(mark.hasUUID("organ") && level.getEntity(mark.getUUID("organ")) instanceof QuillOrgan organ)organ.discard();
                 mob.discard();
             }
-            level.getServer().getPlayerList().remove(p);
         }
     }
 

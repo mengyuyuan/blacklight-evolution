@@ -34,6 +34,15 @@ public final class TargetLockHud {
         world=new WorldFrame(mc.level,frame,new Matrix4f(event.getModelViewMatrix()),new Matrix4f(event.getProjectionMatrix()),
                 event.getCamera().getPosition(),event.getPartialTick().getGameTimeDeltaPartialTick(false));
     }
+    /** Clip coordinates from the same world draw as this frame's first-person hand. */
+    public static org.joml.Vector4f handTarget(Vec3 at){
+        var w=world;
+        if(w==null||w.level!=Minecraft.getInstance().level||w.frame!=frame)return null;
+        var d=at.subtract(w.camera);
+        var p=new org.joml.Vector4f((float)d.x,(float)d.y,(float)d.z,1);
+        w.view.transform(p);
+        return w.projection.transform(p);
+    }
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
         var mc=Minecraft.getInstance();var g=event.getGuiGraphics();
         readyCount=0;

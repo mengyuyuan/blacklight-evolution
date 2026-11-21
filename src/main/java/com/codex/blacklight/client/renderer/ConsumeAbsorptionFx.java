@@ -23,6 +23,15 @@ public final class ConsumeAbsorptionFx {
     public static Vec3 destination(LivingEntity victim,float partial,Vec3 placement) {
         var data=victim.getData(ModAttachments.CONSUME_VISUAL);
         var owner=victim.level().getEntity(data.consumerId());if(owner==null)return Vec3.ZERO;
+        if(data.stage()==ConsumeVisual.MOBILE_CONSUME && owner instanceof LivingEntity actor){
+            if(ChestConsumeTendrils.matches(data))
+                return ChestConsumeTendrils.actorPoints(actor,partial)[0].subtract(victim.getPosition(partial).add(placement));
+            var carried=MobileConsumeCarry.center(victim,actor,data,partial);
+            if(carried!=null)return carried.subtract(victim.getPosition(partial).add(placement));
+            var chest=ConsumeTrauma.chest(actor,partial);
+            if(chest==null)chest=actor.getPosition(partial).add(0,actor.getBbHeight()*.63,0);
+            return chest.subtract(victim.getPosition(partial).add(placement));
+        }
         if(owner instanceof LivingEntity actor && ConsumeVisual.groundGate(data.form(),data.variant())>=0){
             Vec3 fitted=ConsumeTrauma.chest(actor,partial);
             if(fitted!=null)return fitted.subtract(victim.getPosition(partial).add(placement));
@@ -41,7 +50,18 @@ public final class ConsumeAbsorptionFx {
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
         var camera=event.getCamera().getPosition();var stack=event.getPoseStack();var buffers=mc.renderBuffers().bufferSource();
         var type=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
+        RenderType segmentType=null;
         for(var entity:mc.level.entitiesForRendering()){
+            if(entity instanceof LivingEntity small&&!small.isRemoved()&&small.distanceToSqr(camera)<=96*96){
+                var v=small.getData(ModAttachments.CONSUME_VISUAL);
+                var bridges=ChestConsumeTendrils.bridges(v);
+                if(bridges!=null&&!bridges.tracks().isEmpty()&&ConsumeSystem.smallDirectReceiver(small)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity owner){
+                    if(segmentType==null)segmentType=RenderType.entityCutoutNoCull(ConsumeTendrilSegmentMesh.TEXTURE);
+                    ChestConsumeTendrils.draw(stack,buffers.getBuffer(segmentType),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
+                            camera,small,owner,v,bridges,partial);
+                    continue;
+                }
+            }
             if(!(entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon mob)||mob.distanceToSqr(camera)>96*96)continue;
             var visual=mob.getData(ModAttachments.CONSUME_VISUAL);if(!visual.consuming()||mc.level.getEntity(visual.consumerId())==null)continue;
             var phase=ConsumeFracture.phase(mob,partial);if(phase.opening()<=0)continue;
@@ -53,6 +73,7 @@ public final class ConsumeAbsorptionFx {
             stack.popPose();
         }
         buffers.endBatch(type);
+        if(segmentType!=null)buffers.endBatch(segmentType);
     }
     private static void draw(LivingEntity mob,float partial,PoseStack stack,VertexConsumer out,int light,Vec3 to,ConsumeFracture.Phase phase) {
         Vec3 center=ConsumeSequence.contact(mob).subtract(mob.getPosition(partial));
@@ -65,7 +86,13 @@ public final class ConsumeAbsorptionFx {
     }
     public static void drawPosed(PoseStack stack,VertexConsumer out,int light,java.util.List<ConsumeTendrils.Attachment> roots,Vec3 to,ConsumeFracture.Phase phase,int seed,boolean grounded){
         if(roots.isEmpty())return;
-        ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
+        var level=Minecraft.getInstance().level;
+        boolean sourced=false;
+        if(level!=null&&level.getEntity(seed) instanceof LivingEntity small){
+            var visual=small.getData(ModAttachments.CONSUME_VISUAL);
+            sourced=visual.form()==phase.form().ordinal()&&ChestConsumeTendrils.bridges(visual)!=null&&ConsumeSystem.smallDirectReceiver(small);
+        }
+        if(!sourced)ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
         // Brief moving flecks at the actual wound. They cannot remain in a frozen
         // radial halo for the rest of the consume animation.
         float age=(phase.progress()-phase.contact())/.14F;
