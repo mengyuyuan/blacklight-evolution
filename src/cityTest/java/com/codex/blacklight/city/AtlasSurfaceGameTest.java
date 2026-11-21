@@ -46,8 +46,8 @@ public final class AtlasSurfaceGameTest {
             }
         }
         // The other city's projected detail core meets its western approach at a different elevation.
-        var losAngeles=WorldTerrain.column(seed,13129400,-1280513);
-        var approach=WorldTerrain.column(seed,13129399,-1280513);
+        var losAngeles=WorldTerrain.column(seed,13129400,-1280514);
+        var approach=WorldTerrain.column(seed,13129399,-1280514);
         h.assertTrue(losAngeles.scenery&&losAngeles.state(losAngeles.ground+1).isAir()&&approach.atGrade
                 &&Math.abs(losAngeles.ground-approach.ground)<=1,"the Los Angeles core road joins its surveyed approach");
         h.succeed();

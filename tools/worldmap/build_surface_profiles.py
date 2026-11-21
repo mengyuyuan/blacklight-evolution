@@ -3,6 +3,7 @@ from array import array
 from base64 import b64encode
 from collections import deque
 import gzip
+import heapq
 import json
 import math
 import struct
@@ -82,7 +83,8 @@ def build(region):
     elevation = array("h", [MISSING]) * count
     shore = {}
     junctions = {}
-    ends = {}
+    owners = {}
+    ends = set()
     for tx, tz in cells:
         with gzip.open(directory / f"{tx}_{tz}.json.gz") as stream:
             tile = json.load(stream)
@@ -100,13 +102,14 @@ def build(region):
                         if not (tx*TILE <= x < (tx+1)*TILE and tz*TILE <= z < (tz+1)*TILE):
                             continue
                         key = (feature["k"], feature["l"], x, z)
+                        owners.setdefault(key,set()).add(feature["id"])
                         adjacent = junctions.setdefault(key, set())
                         if i:
                             adjacent.add(points[i-1])
                         if i+1 < len(points):
                             adjacent.add(points[i+1])
                         if i == 0 or i+1 == len(points):
-                            ends.setdefault(feature["id"], set()).add(key)
+                            ends.add(key)
             if feature["k"] != 4:
                 continue
             ident = feature["id"]
@@ -174,15 +177,35 @@ def build(region):
             if cuts:
                 profile["cuts"] = cuts
             profiles[f"{tx}_{tz}"] = profile
-    ramps = {}
-    for ident, nodes in ends.items():
-        terminals = sorted((x,z) for kind,layer,x,z in nodes if len(junctions[kind,layer,x,z]) == 1)
-        if terminals:
-            ramps[str(ident)] = [v for point in terminals for v in point]
-    if region == "shenzhen":
-        # This mapped footbridge ends four metres inside the flat detailed raster.
-        # Its geographic ramp must meet the pavement at the data boundary itself.
-        ramps.setdefault("128870307",[]).extend([0.0,505.1])
+    # Ramp length belongs to the connected structure. OSM can split it into short ways,
+    # or join one way to an internal vertex of another before the ramp has levelled out.
+    by_way = {}
+    for node in ends:
+        if len(junctions[node]) != 1:
+            continue
+        kind,layer,x,z = node
+        terminal = (x,z)
+        offset = 0.0
+        if region == "shenzhen" and 128870307 in owners[node] and terminal == (4.1,505.0):
+            # The last four metres are inside the at-grade Futian detail raster.
+            terminal = (0.0,505.1)
+            offset = -math.dist((x,z),terminal)
+        reach = min(60,layer*20)
+        pending = [(offset,node)]
+        visited = set()
+        while pending:
+            dist,at = heapq.heappop(pending)
+            if at in visited:
+                continue
+            visited.add(at)
+            for ident in owners[at]:
+                by_way.setdefault(ident,set()).add(terminal)
+            for neighbour in junctions[at]:
+                key = (kind,layer,*neighbour)
+                cost = dist + math.dist(at[2:],neighbour)
+                if cost<=reach and key in owners and key not in visited:
+                    heapq.heappush(pending,(cost,key))
+    ramps = {str(ident):[v for point in sorted(points) for v in point] for ident,points in by_way.items()}
     links = {}
     for ident,width_blocks,points in APPROACHES.get(region, []):
         xs,zs = points[::2],points[1::2]
