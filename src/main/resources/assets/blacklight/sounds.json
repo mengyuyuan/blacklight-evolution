@@ -3011,5 +3011,59 @@
         "type": "event"
       }
     ]
+  },
+  "greene.molt.summons": {
+    "subtitle": "subtitles.blacklight.greene.summons",
+    "sounds": [
+      {
+        "name": "blacklight:greene/summons",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "greene.molt.pierce": {
+    "subtitle": "subtitles.blacklight.greene.pierce",
+    "sounds": [
+      {
+        "name": "blacklight:greene/pierce",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "greene.molt.drain": {
+    "subtitle": "subtitles.blacklight.greene.drain",
+    "sounds": [
+      {
+        "name": "blacklight:greene/drain",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "greene.molt.weave": {
+    "subtitle": "subtitles.blacklight.greene.weave",
+    "sounds": [
+      {
+        "name": "blacklight:greene/weave",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "greene.molt.split": {
+    "subtitle": "subtitles.blacklight.greene.split",
+    "sounds": [
+      {
+        "name": "blacklight:greene/split",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "greene.molt.ascend": {
+    "subtitle": "subtitles.blacklight.greene.ascend",
+    "sounds": [
+      {
+        "name": "blacklight:greene/ascend",
+        "attenuation_distance": 40
+      }
+    ]
   }
 }

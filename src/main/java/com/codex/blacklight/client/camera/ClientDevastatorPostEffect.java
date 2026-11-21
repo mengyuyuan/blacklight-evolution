@@ -52,7 +52,7 @@ public final class ClientDevastatorPostEffect {
     public static final class ReloadEvents {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event){
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)manager->
-                Minecraft.getInstance().execute(()->{close();failed=false;}));
+                Minecraft.getInstance().execute(()->{close();failed=false;com.codex.blacklight.client.renderer.GreeneMoltRenderer.invalidate();}));
     }
     }
     @SubscribeEvent public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;

@@ -4,10 +4,10 @@
       "item": "blacklight:mother_intel"
     },
     "title": {
-      "translate": "survival.blacklight.greene_pursuit"
+      "translate": "survival.blacklight.greene_outbreak"
     },
     "description": {
-      "translate": "survival.blacklight.greene_pursuit.desc"
+      "translate": "survival.blacklight.greene_outbreak.desc"
     },
     "frame": "challenge",
     "show_toast": true,

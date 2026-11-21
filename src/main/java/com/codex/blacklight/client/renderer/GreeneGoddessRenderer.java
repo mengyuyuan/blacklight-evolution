@@ -15,12 +15,17 @@ import org.joml.Quaternionf;
 /** Rigid groups and sampled world-space joint transforms exported from Greene-second-form.blend. */
 public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     private static final ResourceLocation MESH = new ResourceLocation("blacklight","models/greene_fullbody.mesh.gz");
+    private static final ResourceLocation COLONY = new ResourceLocation("blacklight","models/greene_outbreak_fullbody.mesh.gz");
+    private final ResourceLocation mesh;
     private static final ResourceLocation SKIN = new ResourceLocation("blacklight","textures/entity/greene_goddess.png");
     private record Group(float[] transforms, float[] vertices, int[] colors) {}
     private Group[] groups;
     private int frames, fps;
 
-    public GreeneGoddessRenderer(EntityRendererProvider.Context context) { super(context); }
+    public GreeneGoddessRenderer(EntityRendererProvider.Context context) { this(context,false); }
+    GreeneGoddessRenderer(EntityRendererProvider.Context context,boolean outbreak) {
+        super(context);mesh=outbreak?COLONY:MESH;
+    }
     @Override public ResourceLocation getTextureLocation(GreeneGoddess entity) { return SKIN; }
     @Override public void render(GreeneGoddess entity,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light) {
         stack.pushPose();
@@ -32,7 +37,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
 
     private void load() {
         var manager=Minecraft.getInstance().getResourceManager();
-        try (var in=new DataInputStream(new BufferedInputStream(new GZIPInputStream(manager.open(MESH))))) {
+        try (var in=new DataInputStream(new BufferedInputStream(new GZIPInputStream(manager.open(mesh))))) {
             if(in.readInt()!=0x47464d31) throw new IOException("Unknown Greene mesh version");
             var parts=new Group[in.readInt()];
             frames=in.readInt();
