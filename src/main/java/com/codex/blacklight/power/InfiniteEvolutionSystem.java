@@ -42,7 +42,7 @@ public final class InfiniteEvolutionSystem {
         if(CrossModCombat.administrative(source) || source.is(com.codex.blacklight.combat.QuillHarvest.DRAIN))return amount;
         double value=amount;
         if(source.getEntity() instanceof Player owner&&PrototypeMetabolism.active(owner)&&CrossModCombat.nativeAttack(source)){
-            boolean skill=DevastatorDamage.isTrueDamage(source)||source.typeHolder().unwrapKey().map(k->k.location().getNamespace().equals("blacklight")).orElse(false);
+            boolean skill=DevastatorDamage.isTrueDamage(source)||!source.is(com.codex.blacklight.combat.QuillHarvest.VOLLEY_DAMAGE) && source.typeHolder().unwrapKey().map(k->k.location().getNamespace().equals("blacklight")).orElse(false);
             value*=skill?EvolutionAttribute.skillMultiplier(effectiveRank(owner,EvolutionAttribute.SKILL_POWER)):
                     EvolutionAttribute.attackMultiplier(effectiveRank(owner,EvolutionAttribute.STRENGTH));
         }
