@@ -122,7 +122,6 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
                             (float)com.codex.blacklight.client.tuning.ClawTransformSettings.talonLength(side),hammer.maximumScale());
                     if(endpoints!=null){
                         settleWrist=new net.minecraft.world.phys.Vec3(endpoints[0]);settleForearm=new net.minecraft.world.phys.Vec3(endpoints[1]);
-                        if(settleWrist.distanceToSqr(settleForearm)<.018)settleForearm=settleWrist.add(forearm.subtract(wrist).normalize().scale(.19));
                     }
                     // During the residue tail lift the actual arm and all its layers together if only a sliver remains on screen.
                     var projection=com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix();

@@ -12,9 +12,13 @@ final class ConsumeTendrilSegmentMesh {
     private ConsumeTendrilSegmentMesh() {}
 
     static void draw(PoseStack stack,VertexConsumer out,int light,Vec3[] path,double[] widths,Vec3 side,int color){
+        draw(stack,out,light,path,widths,side,color,true);
+    }
+
+    static void draw(PoseStack stack,VertexConsumer out,int light,Vec3[] path,double[] widths,Vec3 side,int color,boolean jointed){
         if((color>>>24)==0)return;
         var pose=stack.last();
-        ConsumeFiberShape.draw(path,widths,side,(span,fork,face,a,b,c,d,v0,v1)->{
+        ConsumeFiberShape.draw(path,widths,side,jointed,(span,fork,face,a,b,c,d,v0,v1)->{
             emitFace(pose,out,light,color,span,fork,face,a,b,c,d,v0,v1);
         });
     }

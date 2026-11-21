@@ -88,6 +88,21 @@ public final class ConsumeSkinGrowth {
             return weights;
         }
 
+        /** ForwardBackward changes direction in place. In particular, saturated central bones
+         * only start to retreat once a neighbouring, partly covered bone reaches them. */
+        public Weights[] forwardBackward(int seed, float rate, float threshold, float reverse, float end) {
+            int last = (int)Math.ceil(end * STEPS_PER_SECOND);
+            Weights[] frames = new Weights[last + 1];
+            Weights weights = new Weights(parents.length);
+            weights.proximal[seed] = weights.distal[seed] = SEED;
+            frames[0] = new Weights(weights);
+            for (int i = 1; i <= last; i++) {
+                step(weights, 4F * rate / STEPS_PER_SECOND, threshold, (i - 1) >= Math.round(reverse * STEPS_PER_SECOND));
+                frames[i] = new Weights(weights);
+            }
+            return frames;
+        }
+
         public Playback playback(ConsumeReceiverEffect.Cue cue, int seed) { return new Playback(this, cue, seed); }
         public Weights sample(ConsumeReceiverEffect.Cue cue, float ageSeconds, int seed) {
             return playback(cue, seed).sample(ageSeconds);

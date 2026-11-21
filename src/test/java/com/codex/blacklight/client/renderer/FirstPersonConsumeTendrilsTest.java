@@ -1,4 +1,8 @@
 package com.codex.blacklight.client.renderer;
+import com.codex.blacklight.combat.ConsumeGiverEffect;
+import com.codex.blacklight.combat.ConsumeSequence;
+import com.codex.blacklight.combat.ConsumeVisual;
+import com.codex.blacklight.power.PowerForm;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.junit.jupiter.api.Test;
@@ -31,17 +35,57 @@ class FirstPersonConsumeTendrilsTest {
         assertEquals(r,path[0]);assertEquals(f,path[12]);
         assertTrue(path[6].distanceTo(r.lerp(f,.5))>.05);
     }
-    @Test void retainedKnotHasVolumeAtPeakAndSinksInsideTheForearm(){
-        var centre=new Vec3(.3,-.4,-.58);
-        var axis=new Vec3(0,1,0);var out=new Vec3(0,0,1);var across=new Vec3(1,0,0);
-        for(int i=0;i<3;i++){
-            var peak=FirstPersonConsumeTendrils.residue(centre,axis,out,across,.27,1,i);
-            var end=FirstPersonConsumeTendrils.residue(centre,axis,out,across,.27,.015,i);
-            assertTrue(peak[4].z>centre.z+.05);
-            assertTrue(FirstPersonConsumeTendrils.residue(centre,axis,out,across,.27,.17,i)[4].z>centre.z);
-            assertTrue(java.util.Arrays.stream(end).allMatch(p->p.z<centre.z));
-            assertTrue(peak[0].distanceTo(peak[8])>.17);
+    @Test void knotsTravelDownTheActualSurfaceFromHandTowardsElbow(){
+        var elbow=new Vec3(.3,-.40,-.58);
+        var wrist=elbow.add(0,.27,0);
+        var out=new Vec3(0,0,1);
+        for(boolean left:new boolean[]{false,true})for(int strand=0;strand<3;strand++){
+            var across=new Vec3(left?-1:1,0,0);
+            var peak=FirstPersonConsumeTendrils.residue(elbow,wrist,out,across,1,
+                    FirstPersonConsumeTendrils.armGrowth(left,ConsumeGiverEffect.REVERSE_SECONDS),strand);
+            var falling=FirstPersonConsumeTendrils.residue(elbow,wrist,out,across,1,
+                    FirstPersonConsumeTendrils.armGrowth(left,3.06F),strand);
+            var end=FirstPersonConsumeTendrils.residue(elbow,wrist,out,across,1,
+                    FirstPersonConsumeTendrils.armGrowth(left,4.60F),strand);
+            assertTrue(peak.points()[4].z>elbow.z+.05);
+            assertTrue(peak.points()[8].distanceTo(peak.points()[0])>.16);
+            assertTrue(peak.radii()[8]>.002,"the back of the hand must initially be covered");
+            assertEquals(0,falling.radii()[8],.0001,"the far end has already cleared");
+            assertTrue(falling.radii()[0]>.004,"a proximal fold survives after the hand clears");
+            assertTrue(centreOfVolume(peak)-centreOfVolume(falling)>.045,"visible tissue should actually travel towards the elbow");
+            for(var point:falling.points())assertTrue(point.y>=elbow.y&&point.y<=wrist.y);
+            assertTrue(java.util.Arrays.stream(end.radii()).allMatch(r->r==0));
+            assertTrue(java.util.Arrays.stream(end.points()).allMatch(point->point.z<elbow.z));
         }
+    }
+    private static double centreOfVolume(FirstPersonConsumeTendrils.Fold fold){
+        double moment=0,total=0;
+        for(int i=0;i<fold.radii().length;i++){
+            double area=fold.radii()[i]*fold.radii()[i];
+            total+=area;
+            moment+=area*fold.points()[i].y;
+        }
+        return moment/total;
+    }
+    @Test void gatheringLiftsTissueBeforeAnyPullTowardsTheElbow(){
+        assertEquals(0,FirstPersonConsumeTendrils.armGrowth(true,1.9F).pull());
+        assertEquals(0,FirstPersonConsumeTendrils.armGrowth(false,ConsumeGiverEffect.REVERSE_SECONDS).pull());
+        assertTrue(FirstPersonConsumeTendrils.armGrowth(false,2.75F).pull()>.4);
+    }
+    @Test void newCaptureRetainsTheCompletedVictimsWithdrawalClock(){
+        int owner=17;
+        var prior=new ConsumeVisual(owner,100,60,PowerForm.NONE.ordinal(),ConsumeVisual.MOBILE_CONSUME);
+        int complete=ConsumeSequence.completionTick(PowerForm.NONE,false,prior.variant());
+        long now=100+complete+36;
+        var next=new ConsumeVisual(owner,now-1,60,PowerForm.NONE.ordinal(),ConsumeVisual.CONSUME);
+        var scene=FirstPersonConsumeTendrils.scene(owner,next,prior,now,.5F);
+        assertNotNull(scene);
+        assertEquals(prior,scene.residueSource());
+        assertEquals(next,scene.visual());
+        assertEquals(0,scene.envelope());
+        assertEquals(ConsumeGiverEffect.residueAge(prior,prior.elapsed(now,.5F)/20F),scene.residueAge());
+        assertTrue(scene.residueAge()>ConsumeGiverEffect.REVERSE_SECONDS);
+        assertNull(FirstPersonConsumeTendrils.scene(owner+1,next,prior,now,.5F));
     }
     @Test void crosshairClippingChecksTheWholeSegment(){
         assertEquals(0,FirstPersonConsumeTendrils.gap(new Vec3(-.7,0,0),new Vec3(.7,0,0)),1e-8);
