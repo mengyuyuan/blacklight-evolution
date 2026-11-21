@@ -39,6 +39,7 @@ public final class ConsumeFracture implements MultiBufferSource {
     private final boolean sourcedReceiver;
     private final boolean physicalPull;
     private final float materialFront;
+    private final boolean smallChest;
     private final Vector3f cutNormal;
     private final Vector3f cutCenter=new Vector3f();
     private final Vector3f up,side,spinAxis,ground;
@@ -114,6 +115,8 @@ public final class ConsumeFracture implements MultiBufferSource {
         this.target=target;phase=phase(mob,partial);seed=mob.getId();
         headOnly=mob.getData(ModAttachments.CONSUME_VISUAL).stage()==ConsumeVisual.HUNTER_CONSUME;
         sourcedReceiver=phase.nativeEvents();
+        smallChest=ChestConsumeTendrils.matches(mob.getData(ModAttachments.CONSUME_VISUAL))
+                &&com.codex.blacklight.combat.ConsumeSystem.smallDirectReceiver(mob);
         physicalPull=com.codex.blacklight.client.animation.ImpactRagdoll.absorbing(mob);
         var materialScene=com.codex.blacklight.combat.ConsumeReceiverScene.profile(phase.form(),ConsumeSequence.mountedStage(mob.getData(ModAttachments.CONSUME_VISUAL).stage()),mob.getData(ModAttachments.CONSUME_VISUAL).variant());
         float seconds=(mob.level().getGameTime()-mob.getData(ModAttachments.CONSUME_VISUAL).started()+partial)/20F;
@@ -286,6 +289,7 @@ public final class ConsumeFracture implements MultiBufferSource {
         int start=(phase.style()==Style.HEAD_CRUSH||phase.style()==Style.HEAD_IMPACT)?ConsumeAnatomy.HEAD:ConsumeAnatomy.BODY;
         float distance=v.p.distance(centers[start]);
         float dark=headOnly&&piece/divisions!=ConsumeAnatomy.HEAD?0:Math.max(phase.returnFlow(),smooth((materialFront-distance/Math.max(.2F,radii[start]+.9F))/.22F)*.8F);
+        if(smallChest)dark*=.15F+.65F*smooth((phase.returnFlow()-.86F)/.14F);
         out.addVertex(p.x,p.y,p.z).setColor((int)(v.r*(1-dark)+66*dark),(int)(v.g*(1-dark)+12*dark),(int)(v.b*(1-dark)+19*dark),v.a).setUv(v.u,v.v).setOverlay(v.overlay).setLight(v.light).setNormal(v.nx,v.ny,v.nz);
     }
     private void tissueBridges(){

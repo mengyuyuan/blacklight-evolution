@@ -17,7 +17,7 @@ import java.util.List;
  * are in bind space, so a sleeve's weave follows the elbow when the grip opens. */
 public final class ConsumeBodySurface {
     record Point(float x,float y,float z,float nx,float ny,float nz,int a,int b,float weight,
-                         float u,float v,float distance) {}
+                         float u,float v,float distance,float coat) {}
     private record Panel(int region,Point[] points,int columns,boolean cord,float[] posed) {
         Panel(int region,Point[] points,int columns){this(region,points,columns,false,new float[points.length*7]);}
     }
@@ -50,14 +50,40 @@ public final class ConsumeBodySurface {
         int x=(int)Math.floor(u*SIZE)&(SIZE-1), y=(int)Math.floor(v*SIZE)&(SIZE-1);
         return HEIGHT[y*SIZE+x];
     }
-    private static Point point(int region,Vector3f p,Vector3f n,int a,int b,float weight,float u,float v){
+    private static Point point(int region,Vector3f p,Vector3f n,int a,int b,float weight,float u,float v,boolean mercer){
         float arm=region==ConsumeAnatomy.BODY?0:1;
         // Travel over the shoulder to the wrist. Opposing fronts meet first on the upper back.
         float distance=arm==0
                 ?.66F*Math.abs(p.y-1.27F)+.26F*Math.abs(p.x)+.025F*(1-n.z)
                 :.16F+.41F*Math.max(0,1.51F-p.y)+.035F*(1-n.z);
         distance+=.023F*(float)Math.sin(12*u+5*v);
-        return new Point(p.x,p.y,p.z,n.x,n.y,n.z,a,b,weight,2.5F*u,2.5F*v,distance);
+        return new Point(p.x,p.y,p.z,n.x,n.y,n.z,a,b,weight,2.5F*u,2.5F*v,distance,coat(region,p,mercer));
+    }
+
+    private static float unit(float n){return Math.max(0F,Math.min(1F,n));}
+
+    /** Sparse attachment marks in bind space. The carrying strands and the receiver sit outside these. */
+    private static float coat(int region,Vector3f p,boolean mercer){
+        boolean torso=region==ConsumeAnatomy.BODY;
+        float top=mercer?(torso?1.659F:1.542F):1.521F;
+        float height=mercer?(torso?.750F:.716F):.79F;
+        float t=unit((top-p.y)/height);
+        if(torso){
+            float x=p.x/(mercer?.217F:.27F);
+            float z=p.z/(mercer?.129F:.145F);
+            float first=-.61F+1.19F*t+.14F*(float)Math.sin(8*t+.45F*z);
+            float second=.71F-.91F*t+.15F*(float)Math.sin(7.5F*t+1.8F+z);
+            float a=unit((.267F+.035F*(float)Math.cos(9*t+z)-Math.abs(x-first))/.105F);
+            float b=unit((.213F+.025F*(float)Math.sin(8*t-z)-Math.abs(x-second))/.105F);
+            return .27F*Math.max(a,b*unit((.87F-t)/.18F))*unit((1.05F-t)/.18F);
+        }
+        float sign=region==ConsumeAnatomy.RIGHT_ARM?1F:-1F;
+        float cx=mercer?.241F:.375F;
+        float localX=(sign*p.x-cx)/(mercer?.074F:.145F);
+        float localZ=p.z/(mercer?.075F:.145F);
+        double theta=Math.atan2(localZ,localX);
+        float side=(float)Math.cos(theta-1.32+3.6*t+.35*Math.sin(8*t));
+        return .24F*unit((side-.31F)/.27F)*unit((.95F-t)/.19F);
     }
 
     /** The independent Mercer mesh supplies its actual posed weights and clothing surfaces. */
@@ -65,7 +91,7 @@ public final class ConsumeBodySurface {
         Point[] corners=new Point[4];
         for(int i=0;i<4;i++){
             float[] uv=ConsumeAtlasUv.sample(region,p[i],n[0],true);
-            corners[i]=point(region,p[i],n[i],a[i],b[i],w[i],uv[0],uv[1]);
+            corners[i]=point(region,p[i],n[i],a[i],b[i],w[i],uv[0],uv[1],true);
         }
         panels.add(new Panel(region,new Point[]{corners[0],corners[1],corners[3],corners[2]},2));
     }
@@ -100,7 +126,7 @@ public final class ConsumeBodySurface {
                 var weights=BlacklightSkinWeights.sample(region,modelY,false);
                 float[] tex=ConsumeAtlasUv.sample(region,pos,axis,false);
                 points[j*(cols+1)+i]=point(region,pos,normal,bones.searchJointByName(weights.first()).getId(),
-                        bones.searchJointByName(weights.second()).getId(),weights.secondWeight(),tex[0],tex[1]);
+                        bones.searchJointByName(weights.second()).getId(),weights.secondWeight(),tex[0],tex[1],false);
             }
             panels.add(new Panel(region,points,cols+1));
         }
@@ -118,10 +144,10 @@ public final class ConsumeBodySurface {
             for(int i=0;i<grid.length;i++){
                 Point v=grid[i];
                 float local=Math.max(0,Math.min(1,(reach-v.distance)/.11F));
-                if(local<=0){posed[7*i+6]=0;continue;}
-                local=local*local*(3-2*local);
+                if(local<=0||v.coat<=0){posed[7*i+6]=0;continue;}
+                local=local*local*(3-2*local)*v.coat;
                 float pulse=1+.14F*(float)Math.sin(seconds*8-18*v.distance);
-                float lift=panel.cord?0:(.004F+relief(v.u+du,v.v+dv)*pulse)*local;
+                float lift=panel.cord?0:(.003F+relief(v.u+du,v.v+dv)*pulse)*local;
                 base.set(v.x+v.nx*lift,v.y+v.ny*lift,v.z+v.nz*lift);
                 skin[v.a].transformPosition(base,p);skin[v.b].transformPosition(base,other);p.lerp(other,v.weight);
                 base.set(v.nx,v.ny,v.nz);

@@ -8,20 +8,13 @@ import org.joml.Vector3f;
  * material and its travelling surface pattern come from the original character shader. */
 final class ConsumeBodyCords {
     private ConsumeBodyCords(){}
-    // Cross the shoulder and turn down the outside of the raised forearm. Secondary
-    // folds share an origin or reconnect, leaving visible negative space under the arches.
+    // Short growths at the exterior strands' attachment points leave the skin between them open.
     private record Route(float radius,float[] path){}
     private static final Route[] ROUTES={
-        new Route(.78F,new float[]{-2,6,2.4F, 0,3,2.9F, 3.3F,.2F,3.1F, 5.7F,-1.1F,1.4F, 8.5F,1.3F,-.4F, 8.1F,4.3F,-2.2F, 6.7F,7,-2.6F, 4.1F,9.2F,-1.3F}),
-        new Route(.61F,new float[]{2,8,2.5F, -.4F,6,3.1F, -3.6F,2.8F,3, -5.3F,-.8F,2.3F, -7.9F,-.5F,1, -8.8F,2.8F,-.2F, -8,6,-2.5F, -5.8F,8.8F,-2.2F}),
-        new Route(.59F,new float[]{-3,1.4F,-2.2F, -.5F,3.9F,-3, 2.9F,6.1F,-2.9F, 4.4F,7.8F,-1, 4.4F,9.5F,1.1F, 1.8F,11.5F,2.7F, -2.3F,12.2F,1.9F}),
-        new Route(.47F,new float[]{4.1F,1.1F,1.8F, 3.1F,2.8F,3.2F, -.5F,4.6F,3.5F, -3.9F,6.9F,2.9F, -4.5F,9,.5F, -2.3F,10.4F,-2.3F}),
-        new Route(.44F,new float[]{1.9F,4.6F,2.7F, 3.9F,2.2F,3.5F, 5.9F,1.7F,3.6F, 8.1F,3.3F,2.7F, 8.8F,5.2F,.4F, 7.8F,6.3F,-1.8F}),
-        new Route(.36F,new float[]{-2.5F,3,2.7F, -4.1F,1.3F,3.7F, -5.7F,.2F,3.5F, -7,2.3F,2.9F, -7.9F,4.3F,1.7F}),
-        new Route(.38F,new float[]{8.1F,4.1F,-1.8F, 8.8F,6.1F,.3F, 7.9F,8.2F,2.6F, 5.8F,9.2F,2.7F, 4.2F,11.4F,.5F}),
-        new Route(.30F,new float[]{-8.1F,4,-1.6F, -8.5F,5.8F,.6F, -7.4F,7.3F,2.6F, -5.3F,9.4F,2.5F, -4.2F,10.9F,.2F}),
-        new Route(.30F,new float[]{-2.5F,9,2.7F, -.6F,7.8F,3.4F, 2,5,3.3F, 3.4F,3.8F,2.7F}),
-        new Route(.24F,new float[]{-3.3F,4.4F,-2.5F, -4.6F,2,-3.3F, -6.1F,.4F,-3.1F, -8.3F,1.1F,-1.4F})
+        new Route(.36F,new float[]{-1.9F,6,2.25F, .1F,3.5F,2.55F, 3.1F,.65F,2.6F, 5.7F,-.65F,1.55F, 7.1F,1.05F,.7F}),
+        new Route(.31F,new float[]{1.8F,7.3F,2.2F, -.6F,5.4F,2.65F, -3.3F,2.9F,2.5F, -5.6F,-.50F,1.70F, -6.9F,.85F,.88F}),
+        new Route(.21F,new float[]{4.7F,.20F,2.05F, 6.12F,1.0F,2.4F, 7.55F,2.3F,.85F, 7.8F,4F,-.4F}),
+        new Route(.18F,new float[]{-4.95F,1.1F,1.9F, -6.3F,1.7F,2.36F, -7.7F,2.9F,.92F, -7.85F,4.2F,.05F})
     };
     private static Vector3f point(float[] p,int i){
         int k=3*Math.max(0,Math.min(p.length/3-1,i));return new Vector3f(p[k],p[k+1],p[k+2]);
@@ -79,7 +72,7 @@ final class ConsumeBodyCords {
                     float texU=.23F+.097F*routeId+.09F*s/sides;
                     float texV=.14F+u*.68F;
                     ring[s]=new ConsumeBodySurface.Point(x,y,z,normal.x,-normal.y,normal.z,a,b,blend.secondWeight(),
-                            texU,texV,.025F+.31F*u+.014F*(routeId%3));
+                            texU,texV,.025F+.26F*u+.014F*(routeId%3),.46F);
                 }
                 if(prev!=null)mesh.addCordStrip(region,prev,ring);
                 prev=ring;

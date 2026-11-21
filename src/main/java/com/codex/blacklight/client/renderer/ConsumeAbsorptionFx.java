@@ -24,6 +24,8 @@ public final class ConsumeAbsorptionFx {
         var data=victim.getData(ModAttachments.CONSUME_VISUAL);
         var owner=victim.level().getEntity(data.consumerId());if(owner==null)return Vec3.ZERO;
         if(data.stage()==ConsumeVisual.MOBILE_CONSUME && owner instanceof LivingEntity actor){
+            var carried=MobileConsumeCarry.center(victim,actor,data,partial);
+            if(carried!=null)return carried.subtract(victim.getPosition(partial).add(placement));
             var chest=ConsumeTrauma.chest(actor,partial);
             if(chest==null)chest=actor.getPosition(partial).add(0,actor.getBbHeight()*.63,0);
             return chest.subtract(victim.getPosition(partial).add(placement));
@@ -46,10 +48,16 @@ public final class ConsumeAbsorptionFx {
         float partial=event.getPartialTick().getGameTimeDeltaPartialTick(false);
         var camera=event.getCamera().getPosition();var stack=event.getPoseStack();var buffers=mc.renderBuffers().bufferSource();
         var type=RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE);
+        RenderType slingType=null;
         for(var entity:mc.level.entitiesForRendering()){
             if(entity instanceof LivingEntity small&&!small.isRemoved()&&small.distanceToSqr(camera)<=96*96){
                 var v=small.getData(ModAttachments.CONSUME_VISUAL);
-                if(ChestConsumeTendrils.matches(v)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity owner){
+                if(v.active()&&SmallMobConsumeSling.applies(small,v)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity carrier){
+                    if(slingType==null)slingType=ConsumeWeaveMaterial.sling();
+                    SmallMobConsumeSling.draw(stack,buffers.getBuffer(slingType),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
+                            camera,small,carrier,v,partial);
+                }
+                if(ChestConsumeTendrils.matches(v)&&ConsumeSystem.smallDirectReceiver(small)&&mc.level.getEntity(v.consumerId()) instanceof LivingEntity owner){
                     ChestConsumeTendrils.draw(stack,buffers.getBuffer(type),mc.getEntityRenderDispatcher().getPackedLightCoords(small,partial),
                             camera,small,owner,v,partial);
                     continue;
@@ -66,6 +74,7 @@ public final class ConsumeAbsorptionFx {
             stack.popPose();
         }
         buffers.endBatch(type);
+        if(slingType!=null)buffers.endBatch(slingType);
     }
     private static void draw(LivingEntity mob,float partial,PoseStack stack,VertexConsumer out,int light,Vec3 to,ConsumeFracture.Phase phase) {
         Vec3 center=ConsumeSequence.contact(mob).subtract(mob.getPosition(partial));
@@ -80,7 +89,7 @@ public final class ConsumeAbsorptionFx {
         if(roots.isEmpty())return;
         var level=Minecraft.getInstance().level;
         boolean chest=phase.form()==PowerForm.NONE&&level!=null&&level.getEntity(seed) instanceof LivingEntity small
-                &&ChestConsumeTendrils.matches(small.getData(ModAttachments.CONSUME_VISUAL));
+                &&ConsumeSystem.smallDirectReceiver(small)&&ChestConsumeTendrils.matches(small.getData(ModAttachments.CONSUME_VISUAL));
         if(!chest)ConsumeTendrils.draw(stack,out,light,roots,to,phase,seed,grounded);
         // Brief moving flecks at the actual wound. They cannot remain in a frozen
         // radial halo for the rest of the consume animation.

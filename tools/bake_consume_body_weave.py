@@ -100,6 +100,8 @@ def main():
     if args.shader_textures:
         reflection = cube_atlas(dds_bytes(nodes, bound["consume_refl"], b"DXT1"))
         args.shader_textures.mkdir(parents=True, exist_ok=True)
+        cord,_=dds(nodes,"tendril_color.dds")
+        cord.convert("RGB").save(args.shader_textures/"consume_body_cord.png",compress_level=9)
         for name, texture in (("diffuse", albedo), ("normal", normal), ("reflection", reflection)):
             texture.save(args.shader_textures / f"consume_body_{name}.png", compress_level=9)
     print(json.dumps({"size":atlas.size, "diffuseDDS":diffuse_hash, "normalDDS":normal_hash,

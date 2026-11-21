@@ -46,7 +46,7 @@ final class ChestConsumeTendrils {
     private static Vec3 joint(PoseStack stack,Matrix4f[] bones,int index){
         return BlacklightBoneRendering.worldPoint(stack,bones[index].getTranslation(new Vector3f()));
     }
-    private static Vec3[] actorPoints(LivingEntity owner,float partial){
+    static Vec3[] actorPoints(LivingEntity owner,float partial){
         var pose=ACTORS.get(owner);
         if(pose!=null&&pose.level().get()==owner.level()&&Math.abs(owner.level().getGameTime()+partial-pose.clock())<1.2)return pose.points();
         // The camera can suppress the local player model in first person.
@@ -56,7 +56,7 @@ final class ChestConsumeTendrils {
                 feet.add(0,h*.48,0),feet.add(0,h*.60,0)};
     }
     private static Vec3 left(float yaw){return Vec3.directionFromRotation(0,yaw-90);}
-    private static Vec3[] receiverPoints(LivingEntity mob,float partial){
+    static Vec3[] receiverPoints(LivingEntity mob,float partial){
         Vec3[] physical=AdaptiveRagdoll.chestConsumeJoints(mob,partial);
         if(physical!=null)return physical;
         Vec3 base=mob.getPosition(partial).add(ClientCarryPlacement.consumeOffset(mob,partial));

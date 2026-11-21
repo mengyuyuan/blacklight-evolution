@@ -156,6 +156,10 @@ public final class ModAttachments {
             "consume_body_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
                     .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
 
+    public static final Supplier<AttachmentType<com.codex.blacklight.combat.MobileConsumeCarry>> MOBILE_CONSUME_CARRY = ATTACHMENTS.register(
+            "mobile_consume_carry", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.MobileConsumeCarry.EMPTY)
+                    .sync(com.codex.blacklight.combat.MobileConsumeCarry.CODEC).build());
+
     public static final Supplier<AttachmentType<com.codex.blacklight.combat.ConsumeVisual>> CONSUME_VISUAL = ATTACHMENTS.register(
             "consume_visual", () -> AttachmentType.builder(() -> com.codex.blacklight.combat.ConsumeVisual.EMPTY)
                     .sync(com.codex.blacklight.combat.ConsumeVisual.CODEC).build());
