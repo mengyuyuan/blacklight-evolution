@@ -71,15 +71,16 @@ public final class MovingCombatGameTest {
         h.assertTrue(CombatTargeting.visible(p,mob),"rear escape must test steering, not occlusion");
         for(int t=0;t<WeaponMove.BLADE_CUT.duration+1;t++){p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));}
         var displacement=p.position().subtract(origin);
-        var clip=com.codex.blacklight.animation.MotionLibrary.clip(WeaponMove.BLADE_CUT.id);
-        double authoredPath=0;
-        for(int frame=1;frame<=80;frame++)authoredPath+=com.codex.blacklight.animation.NativeRootMotion
-                .clipStep(clip,clip.duration()*(frame-1)/80,clip.duration()*frame/80,0).length();
-        authoredPath*=com.codex.blacklight.animation.NativeRootMotion.travelScale(WeaponMove.BLADE_CUT);
-        h.assertTrue(mob.getHealth()==hp&&displacement.z>.25&&displacement.z<=authoredPath+.02
-                &&Math.abs(displacement.x)<.05&&Math.abs(p.getYRot())<.1,
-                "escaping behind cannot redirect the bounded authored forward lunge or guarantee damage: movement="+displacement+" authoredPath="+authoredPath);
+        h.assertTrue(mob.getHealth()==hp,"departed target must not be struck");
         WeaponCombatSystem.cancel(p);mob.discard();
+        // Play the identical tap on the empty lane: this includes both its authored Coord and release callback.
+        var control=player(h,PowerForm.BLADE);control.setPos(origin);control.setOnGround(true);
+        WeaponCombatSystem.request(control,false);
+        for(int t=0;t<=WeaponMove.BLADE_CUT.duration;t++){control.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(control));}
+        var free=control.position().subtract(origin);
+        h.assertTrue(displacement.z>.25 && displacement.distanceTo(free)<.03 && Math.abs(displacement.x)<.05
+                && Math.abs(p.getYRot())<.1,"escaping rear target redirected a committed step: "+displacement+" / "+free);
+        WeaponCombatSystem.cancel(control);
         for(int x=0;x<10;x++)for(int z=0;z<10;z++)h.setBlock(x,259,z,Blocks.AIR);
         h.succeed();
     }

@@ -10,7 +10,9 @@ public record DevastatorVisual(int kind,long session,long released,int phase,int
                                double x,double y,double z,float dx,float dy,float dz,
                                float radius,float effectStart,float effectEnd,double fallHeight,double downSpeed,
                                java.util.List<Contact> contacts,Vec3 diveAim) {
-    public record Contact(int targetId,float at) { }
+    public record Contact(int targetId,float at,Vec3 groundAnchor) {
+        public Contact(int targetId,float at) { this(targetId,at,null); }
+    }
     public DevastatorVisual(int kind,long session,long released,int phase,int targetId,
                             double x,double y,double z,float dx,float dy,float dz,
                             float radius,float effectStart,float effectEnd,double fallHeight,double downSpeed,
@@ -34,10 +36,19 @@ public record DevastatorVisual(int kind,long session,long released,int phase,int
             double height=b.readDouble(),speed=b.readDouble();int count=b.readVarInt();
             if(count<0||count>64)throw new IllegalArgumentException("Invalid skill contact count");
             var contacts=new java.util.ArrayList<Contact>(count);
-            for(int i=0;i<count;i++)contacts.add(new Contact(b.readVarInt(),b.readFloat()));
+            for(int i=0;i<count;i++){
+                int id=b.readVarInt();float at=b.readFloat();
+                Vec3 anchor=kind==0&&b.readBoolean()?new Vec3(b.readDouble(),b.readDouble(),b.readDouble()):null;
+                contacts.add(new Contact(id,at,anchor));
+            }
             Vec3 aim=b.readBoolean()?new Vec3(b.readDouble(),b.readDouble(),b.readDouble()):null;
             return new DevastatorVisual(kind,session,released,phase,target,x,y,z,dx,dy,dz,radius,start,end,height,speed,contacts,aim);
         }
-        public void encode(RegistryFriendlyByteBuf b,DevastatorVisual v){b.writeVarInt(v.kind);b.writeVarLong(v.session);b.writeVarLong(v.released);b.writeVarInt(v.phase);b.writeVarInt(v.targetId);b.writeDouble(v.x);b.writeDouble(v.y);b.writeDouble(v.z);b.writeFloat(v.dx);b.writeFloat(v.dy);b.writeFloat(v.dz);b.writeFloat(v.radius);b.writeFloat(v.effectStart);b.writeFloat(v.effectEnd);b.writeDouble(v.fallHeight);b.writeDouble(v.downSpeed);b.writeVarInt(v.contacts.size());for(var contact:v.contacts){b.writeVarInt(contact.targetId());b.writeFloat(contact.at());}b.writeBoolean(v.diveAim!=null);if(v.diveAim!=null){b.writeDouble(v.diveAim.x);b.writeDouble(v.diveAim.y);b.writeDouble(v.diveAim.z);}}
+        public void encode(RegistryFriendlyByteBuf b,DevastatorVisual v){b.writeVarInt(v.kind);b.writeVarLong(v.session);b.writeVarLong(v.released);b.writeVarInt(v.phase);b.writeVarInt(v.targetId);b.writeDouble(v.x);b.writeDouble(v.y);b.writeDouble(v.z);b.writeFloat(v.dx);b.writeFloat(v.dy);b.writeFloat(v.dz);b.writeFloat(v.radius);b.writeFloat(v.effectStart);b.writeFloat(v.effectEnd);b.writeDouble(v.fallHeight);b.writeDouble(v.downSpeed);b.writeVarInt(v.contacts.size());for(var contact:v.contacts){b.writeVarInt(contact.targetId());b.writeFloat(contact.at());
+                if(v.kind==0){
+                    Vec3 anchor=contact.groundAnchor();b.writeBoolean(anchor!=null);
+                    if(anchor!=null){b.writeDouble(anchor.x);b.writeDouble(anchor.y);b.writeDouble(anchor.z);}
+                }
+            }b.writeBoolean(v.diveAim!=null);if(v.diveAim!=null){b.writeDouble(v.diveAim.x);b.writeDouble(v.diveAim.y);b.writeDouble(v.diveAim.z);}}
     };
 }

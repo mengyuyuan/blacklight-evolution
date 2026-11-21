@@ -283,8 +283,11 @@ public final class ClientMovementEvents {
             // Travel belongs to the grapple, but its escape edge must still
             // reach the server before this input-ownership return.
             boolean detachHeld=minecraft.screen==null&&mappingDown(minecraft,minecraft.options.keyShift);
-            if(detachHeld&&!lastDetach&&minecraft.getConnection()!=null)
-                PacketDistributor.sendToServer(new MovementInputPayload(false,false,0,0,false,true,cameraYaw(minecraft)));
+            int forward=minecraft.screen==null?(mappingDown(minecraft,minecraft.options.keyUp)?1:0)-(mappingDown(minecraft,minecraft.options.keyDown)?1:0):0;
+            int side=minecraft.screen==null?(mappingDown(minecraft,minecraft.options.keyRight)?1:0)-(mappingDown(minecraft,minecraft.options.keyLeft)?1:0):0;
+            if(minecraft.getConnection()!=null && (detachHeld&&!lastDetach||forward!=lastForwardInput||side!=lastSidewaysInput||minecraft.player.tickCount%6==0))
+                PacketDistributor.sendToServer(new MovementInputPayload(false,false,forward,side,false,detachHeld&&!lastDetach,cameraYaw(minecraft)));
+            lastForwardInput=forward;lastSidewaysInput=side;
             lastDetach=detachHeld;
             if(com.codex.blacklight.combat.ConsumeVisual.blocksTravel(minecraft.player.getData(ModAttachments.GRAB_STAGE)))
                 minecraft.player.setDeltaMovement(0, minecraft.player.getDeltaMovement().y, 0);
@@ -302,7 +305,10 @@ public final class ClientMovementEvents {
         boolean dodgeEligible=prototype&&minecraft.screen==null&&minecraft.player.onGround()&&!CLIENT_WALL.attached()
                 &&!dodging&&!jumpHeld&&(!weaponOwnsMovement(minecraft)||weaponRecovery(minecraft))&&minecraft.player.getData(ModAttachments.GRAB_STAGE)==0;
         boolean sprintDodge=DODGE_TAP.update(sprintKey,dodgeEligible);
-        boolean dodgePressed=dodgeEligible&&(directDodge||sprintDodge);
+        boolean airEvade=directDodge && prototype && minecraft.screen==null && !minecraft.player.onGround()
+                && !dodging && (!weaponOwnsMovement(minecraft)||weaponRecovery(minecraft))
+                && minecraft.player.getData(ModAttachments.GRAB_STAGE)==0;
+        boolean dodgePressed=airEvade||dodgeEligible&&(directDodge||sprintDodge);
         boolean detach=minecraft.screen==null && mappingDown(minecraft,minecraft.options.keyShift);
         // Double-tap momentum can enter the wall. Releasing W stops it; releasing
         // an explicitly held sprint key returns to the slower climbing mode.
@@ -383,7 +389,7 @@ public final class ClientMovementEvents {
         inputChanged|=Math.abs(net.minecraft.util.Mth.wrapDegrees(viewYaw-lastCameraYaw))>.1F||minecraft.player.tickCount%10==0;
         if (!wasPrototype || inputChanged || dodgePressed) {
             PacketDistributor.sendToServer(new MovementInputPayload(
-                    jumpHeld, dodgePressed, forwardInput, sidewaysInput, sprinting, detach,viewYaw));
+                    jumpHeld, dodgePressed, forwardInput, sidewaysInput, sprinting, detach,viewYaw,airEvade));
             if(keysChanged||!wasPrototype)BlacklightNeoMod.LOGGER.debug(
                     "Movement input sent jump={} forward={} sprint={}",
                     jumpHeld, forwardHeld, sprinting);
@@ -528,8 +534,10 @@ public final class ClientMovementEvents {
     static boolean weaponRecovery(Minecraft minecraft) {
         if(minecraft.player==null||minecraft.level==null)return false;
         var visual=minecraft.player.getData(ModAttachments.WEAPON_VISUAL);var move=visual.spec();
-        if(move==null||visual.charging()||visual.traveling()||move.landingAttack()||move.aerial()&&!move.airCombo())return false;
-        return minecraft.level.getGameTime()-visual.started()>=move.end;
+        if(move==null||visual.charging()||visual.traveling()||!move.supportsEvadeRecovery())return false;
+        if (visual.attackPose()>=0 || move==com.codex.blacklight.combat.WeaponMove.CLAW_POUNCE && visual.clipOffset()<.5F) return false;
+        if (com.codex.blacklight.combat.CombatMotion.freeFlight(move) && visual.targetId()<0 && visual.clipOffset()+.001F<move.end/20F) return false;
+        return minecraft.level.getGameTime()-visual.started()>=move.evadeRecoveryTick();
     }
 
     static boolean weaponOwnsMovement(Minecraft minecraft) {

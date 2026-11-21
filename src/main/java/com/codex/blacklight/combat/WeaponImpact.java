@@ -26,13 +26,13 @@ public final class WeaponImpact {
     static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect,WeaponMove action,Vec3 origin){
         if (v.level().isClientSide) return;
         var report = p == null ? WeaponCutContact.Report.NONE : WeaponCutContact.impact(p, v, HitStop.launchVelocity(v));
-        if(tier.atLeast(ImpactTier.HEAVY)){
+        if(!GroundSpikePin.held(v)&&tier.atLeast(ImpactTier.HEAVY)){
             var state=v.getData(ModAttachments.HIT_REACTION);
             if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
                 RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
                         report);
         }
-        if(v.isAlive())HitStop.victim(v,tier.hitstop);
+        if(v.isAlive()&&!GroundSpikePin.held(v))HitStop.victim(v,tier.hitstop);
         float pitch=switch(tier){case LIGHT->1.1F;case MEDIUM->1F;case HEAVY->.88F;case FINISHER->.78F;};
         var at = report.contacts().isEmpty() ? v.getBoundingBox().getCenter() : report.contacts().get(0).point();
         if (p != null && first) com.codex.blacklight.registry.ModWeaponSounds.play(p,

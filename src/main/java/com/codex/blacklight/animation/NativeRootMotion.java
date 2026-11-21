@@ -3,6 +3,7 @@ package com.codex.blacklight.animation;
 import com.codex.blacklight.combat.ClawAttackMotion;
 import com.codex.blacklight.combat.ClawCombatState;
 import com.codex.blacklight.combat.CombatTargeting;
+import com.codex.blacklight.combat.CombatMotion;
 import com.codex.blacklight.combat.LocalWeaponMotion;
 import com.codex.blacklight.combat.WeaponMove;
 import com.codex.blacklight.network.NativeRootMotionPayload;
@@ -66,6 +67,10 @@ public final class NativeRootMotion {
             apply(player,clipStep(MotionLibrary.clip(current.key()),previous.seconds(),current.seconds(),yaw));
     }
     public static void weapon(ServerPlayer player, WeaponMove move, int elapsedTick, float offset, float yaw) {
+        weapon(player,move,elapsedTick,offset,yaw,0);
+    }
+
+    public static void weapon(ServerPlayer player, WeaponMove move, int elapsedTick, float offset, float yaw, float charge) {
         var visual = player.getData(ModAttachments.WEAPON_VISUAL);
         // These actions already have authoritative flight/approach/ballistic velocity.
         if (move.aerial() || move == WeaponMove.BLADE_RUSH || visual.charging() || visual.traveling()) return;
@@ -82,9 +87,23 @@ public final class NativeRootMotion {
                     MotionLibrary.hammerReleaseSeconds(current),yaw);
             step=com.codex.blacklight.combat.HammerQuakeContact.limitWallAdvance(player,move,step,yaw);
         } else {
-            step=clipStep(MotionLibrary.clip(move.id),previous,current,yaw).scale(travelScale(move));
+            var motion = MotionLibrary.clip(move.id);
+            step = clipStep(motion,previous,current,yaw).scale(travelScale(move));
+            var travel = CombatMotion.GroundStep.forMove(move);
+            if (travel != null) {
+                // Held attacks seek to the actual release. Direct/tap callers start at clip time zero.
+                float release = offset>0 ? offset : definition.charge().map(LocalWeaponMotion.Charge::releaseTime).orElse(0F);
+                float begin = Math.max(previous,release+travel.begin);
+                float end = Math.min(current,release+travel.end);
+                if (end > begin) {
+                    var forward = Vec3.directionFromRotation(0,yaw);
+                    double baked = clipStep(motion,begin,end,yaw).dot(forward)*travelScale(move);
+                    double advance = travel.advance(charge,end-begin);
+                    step = step.add(forward.scale(advance-baked));
+                }
+            }
         }
-        if (!move.rush() && !move.quake()) {
+        if ((!move.rush() || move==WeaponMove.MUSCLE_RUSH) && !move.quake()) {
             var target = player.level().getEntity(visual.targetId());
             if (target instanceof LivingEntity living && living.isAlive()) {
                 step = targetStandOff(player, living, step);
@@ -101,7 +120,14 @@ public final class NativeRootMotion {
         var destination=multipart?CombatTargeting.aimPoint(player,player.getEyePosition(),target):target.position();
         var delta=destination.subtract(player.position());
         double spacing=Math.max(.8,(player.getBbWidth()+(multipart?0:target.getBbWidth()))*.5+.15);
-        return standOff(step,delta,Math.max(0,delta.horizontalDistance()-spacing));
+        var limited=standOff(step,delta,Math.max(0,delta.horizontalDistance()-spacing));
+        if(multipart || limited.horizontalDistanceSqr()<1e-10)return limited;
+        // Radial spacing alone can overlap the corners of two axis-aligned bodies on a diagonal dash.
+        var body=player.getBoundingBox();
+        var obstacle=target.getBoundingBox().inflate(body.getXsize()*.5+.01,body.getYsize()*.5,body.getZsize()*.5+.01);
+        var center=body.getCenter();
+        if(obstacle.contains(center))return limited;
+        return obstacle.clip(center,center.add(limited)).map(hit->hit.subtract(center)).orElse(limited);
     }
 
     public static float weaponClock(int elapsedTick,float offset,float transition) {
@@ -119,6 +145,10 @@ public final class NativeRootMotion {
     /** A committed rush closes the gap to its own receiver and stops at blade spacing;
      * it never phases the actor through a living body it is about to cut. */
     public static void bladeRush(ServerPlayer player,Vec3 direction,double distance,LivingEntity target) {
+        groundAdvance(player,direction,distance,target);
+    }
+
+    public static void groundAdvance(ServerPlayer player,Vec3 direction,double distance,LivingEntity target) {
         player.setDeltaMovement(0,player.getDeltaMovement().y,0);
         player.hurtMarked=true;
         var step=direction.scale(distance);

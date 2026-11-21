@@ -59,7 +59,7 @@ public final class NativeConsumePose {
         if(recovery(entity,pose,partial,false))return true;
         int stage=entity.getData(ModAttachments.GRAB_STAGE);
         if(stage!=ConsumeVisual.CONSUME&&stage!=ConsumeVisual.CAPTURE&&stage!=ConsumeVisual.HOLD&&stage!=ConsumeVisual.AIR_HOLD&&stage!=ConsumeVisual.AIR_THROW&&stage!=ConsumeVisual.GRAB_ATTACK&&!ConsumeSequence.mountedStage(stage))return false;
-        var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==entity.getId());
+        var victims=entity.level().getEntitiesOfClass(LivingEntity.class,entity.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).drivesActor(entity.getId()));
         // The victim scene may clear one packet before CONSUMING/GRAB_STAGE; keep sampling the recovery copy.
         if(victims.isEmpty())return recovery(entity,pose,partial,true);
         var visual=victims.getFirst().getData(ModAttachments.CONSUME_VISUAL);
@@ -140,7 +140,7 @@ public final class NativeConsumePose {
         if(ConsumeVisual.holding(actor.getData(ModAttachments.GRAB_STAGE)))
             return net.minecraft.util.Mth.rotLerp(partial,actor.yRotO,actor.getYRot());
         if(actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.CONSUME&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.AIR_THROW&&actor.getData(ModAttachments.GRAB_STAGE)!=ConsumeVisual.GRAB_ATTACK)return fallback;
-        var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).consumerId()==actor.getId());
+        var victims=actor.level().getEntitiesOfClass(LivingEntity.class,actor.getBoundingBox().inflate(18),e->e.getData(ModAttachments.CONSUME_VISUAL).drivesActor(actor.getId()));
         return victims.isEmpty()?fallback:victims.getFirst().getData(ModAttachments.CONSUME_VISUAL).facing();
     }
 }

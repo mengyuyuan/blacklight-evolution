@@ -93,6 +93,133 @@ public final class WallTraversalGameTest {
         helper.succeed();
     }
 
+    @GameTest(template="wall_test",timeoutTicks=100)
+    public static void continuousMountainStepsKeepGroundTraversal(GameTestHelper helper) {
+        for (int z = 2; z <= 9; z++) {
+            int top = Math.min(6, z - 1);
+            for (int x = 3; x <= 6; x++) for (int y = 0; y <= 9; y++) {
+                helper.setBlock(x,y,z,y <= top ? Blocks.STONE : Blocks.AIR);
+            }
+        }
+        Player player = FakePlayerFactory.get(helper.getLevel(),new GameProfile(UUID.randomUUID(),"slope-test"));
+        player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(1.0);
+        player.setYRot(0);
+        player.setPos(helper.absoluteVec(new Vec3(5,2,2.69)));
+        player.setOnGround(true);
+        WallTraversal wall = new WallTraversal();
+        for (int tick = 0; tick < 12 && player.getZ() < helper.absoluteVec(new Vec3(0,0,7.3)).z; tick++) {
+            player.setDeltaMovement(0,-.08,1.45);
+            var frame = wall.tick(RUN,WallContacts.sample(player,wall),player.getY(),1.45,.36,1);
+            helper.assertTrue(!frame.handled(),"one-block slope became " + frame.mode() + " at tick " + tick);
+            player.move(MoverType.SELF,player.getDeltaMovement());
+        }
+        helper.assertTrue(player.getY() >= helper.absoluteVec(new Vec3(0,7,0)).y - .01,
+                "sprint must reach the mountain plateau");
+        helper.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=100)
+    public static void leafGapRespectsBodyAndDeliberateWallRun(GameTestHelper helper) {
+        for (int x = 3; x <= 7; x++) for (int y = 1; y <= 7; y++) for (int z = 3; z <= 7; z++) {
+            helper.setBlock(x,y,z,y == 1 ? Blocks.STONE : Blocks.AIR);
+        }
+        for (int y = 2; y <= 6; y++) {
+            helper.setBlock(4,y,5,Blocks.OAK_LEAVES);
+            helper.setBlock(6,y,5,Blocks.OAK_LOG);
+        }
+        Player player = FakePlayerFactory.get(helper.getLevel(),new GameProfile(UUID.randomUUID(),"tree-gap"));
+        player.setYRot(0);
+        player.setPos(helper.absoluteVec(new Vec3(5.5,2,4.69)));
+        player.setOnGround(true);
+        WallTraversal wall = new WallTraversal();
+        var gap = wall.tick(RUN,WallContacts.sample(player,wall),player.getY(),.9,.36,1);
+        helper.assertTrue(!gap.handled(),"open tree gap must leave steering to the player");
+        player.move(MoverType.SELF,new Vec3(0,-.08,1.3));
+        helper.assertTrue(player.getZ() > helper.absoluteVec(new Vec3(0,0,5.9)).z,"standing player fits the gap");
+        helper.setBlock(5,3,4,Blocks.OAK_LEAVES);
+        player.move(MoverType.SELF,new Vec3(0,0,-1.3));
+        helper.assertTrue(player.getZ() >= helper.absoluteVec(new Vec3(0,0,5.29)).z,
+                "one vertical air block must not fit a standing player");
+        player.setPos(helper.absoluteVec(new Vec3(6.5,2,4.69)));
+        player.setOnGround(true);
+        var trunk = wall.tick(RUN,WallContacts.sample(player,wall),player.getY(),.9,.36,1);
+        helper.assertTrue(trunk.mode()==WallTraversal.Mode.RUN && Math.abs(trunk.x())<1.e-8,
+                "holding forward into the trunk must wall-run even with an open path beside it");
+        helper.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=100)
+    public static void broadCeilingCannotLoopVaultButOpenBalconyCanBeClimbed(GameTestHelper helper) {
+        // A one-block balcony in front of a taller facade, initially extended into a broad ceiling.
+        for (int x = 3; x <= 7; x++) {
+            for (int z = 2; z <= 5; z++) for (int y = 1; y <= 8; y++) {
+                boolean solid = z == 5 || y == 4;
+                helper.setBlock(x,y,z,solid ? Blocks.STONE : Blocks.AIR);
+            }
+        }
+        Player player=FakePlayerFactory.get(helper.getLevel(),new GameProfile(UUID.randomUUID(),"overhang-test"));
+        player.setYRot(0);
+        player.setPos(helper.absoluteVec(new Vec3(5.5,2.19,4.69)));
+        player.setOnGround(false);
+        WallTraversal wall=new WallTraversal();
+        for (int tick = 0; tick < 160; tick++) {
+            var frame=step(helper,player,wall,RUN);
+            helper.assertTrue(!WallTraversal.crossingTop(frame.mode()),"unreachable ceiling triggered " + frame.mode());
+        }
+        for (int x = 3; x <= 7; x++) for (int z = 2; z <= 3; z++) helper.setBlock(x,4,z,Blocks.AIR);
+        int vaults=0;
+        for (int tick = 0; tick < 30 && !wall.finishedOnTop(); tick++) {
+            var previous=wall.mode();
+            var frame=step(helper,player,wall,RUN);
+            if (frame.mode()==WallTraversal.Mode.VAULT && previous!=frame.mode()) vaults++;
+        }
+        helper.assertTrue(vaults==1 && wall.finishedOnTop(),"open balcony must finish exactly one vault, starts=" + vaults);
+        helper.assertTrue(Math.abs(player.getY()-helper.absoluteVec(new Vec3(0,5,0)).y)<.05,
+                "feet must settle on the balcony");
+        helper.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=100)
+    public static void diagonalRunIntoCliffKeepsWallDespiteAdjacentStep(GameTestHelper helper) {
+        for (int x=3; x<=7; x++) for (int z=3; z<=6; z++) for (int y=1; y<=7; y++) {
+            boolean solid=y==1 || z==5 || (x==4 && y==2 && z<5);
+            helper.setBlock(x,y,z,solid ? Blocks.STONE : Blocks.AIR);
+        }
+        Player player=FakePlayerFactory.get(helper.getLevel(),new GameProfile(UUID.randomUUID(),"cliff-corner"));
+        player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(1.0);
+        player.setYRot(40);
+        player.setPos(helper.absoluteVec(new Vec3(5.39,2,4.69)));
+        player.setOnGround(true);
+        player.setDeltaMovement(-.93,-.08,1.11);
+        WallTraversal wall=new WallTraversal();
+        var surface=WallContacts.sample(player,wall);
+        var frame=wall.tick(RUN,surface,player.getY(),1.45,.36,1);
+        helper.assertTrue(surface.torso() && surface.normalZ()==-1 && frame.mode()==WallTraversal.Mode.RUN,
+                "lateral progress over a step must not suppress the cliff ahead");
+        helper.succeed();
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=100)
+    public static void halfStepFitsUnderLowLeaves(GameTestHelper helper) {
+        for (int x=4; x<=6; x++) for (int z=3; z<=7; z++) {
+            helper.setBlock(x,1,z,Blocks.STONE);
+            helper.setBlock(x,2,z,z < 5 ? Blocks.STONE_SLAB : Blocks.STONE);
+            helper.setBlock(x,3,z,Blocks.AIR);
+            helper.setBlock(x,4,z,Blocks.AIR);
+            helper.setBlock(x,5,z,Blocks.OAK_LEAVES);
+        }
+        Player player=FakePlayerFactory.get(helper.getLevel(),new GameProfile(UUID.randomUUID(),"canopy-step"));
+        player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(1.0);
+        player.setPos(helper.absoluteVec(new Vec3(5.5,2.5,4.69)));
+        player.setOnGround(true);
+        helper.assertTrue(com.codex.blacklight.movement.TerrainTraversal.canStepPast(player,new Vec3(0,0,1),.9),
+                "half-block rise has enough headroom under the leaves");
+        player.move(MoverType.SELF,new Vec3(0,-.08,.9));
+        helper.assertTrue(Math.abs(player.getY()-helper.absoluteVec(new Vec3(0,3,0)).y)<.01
+                && player.getZ()>helper.absoluteVec(new Vec3(0,0,5.3)).z,"body must step onto the higher block");
+        helper.succeed();
+    }
+
     private static WallTraversal.Frame step(GameTestHelper helper,Player player,WallTraversal wall,WallTraversal.Input input) {
         var frame=wall.tick(input,WallContacts.sample(player,wall),player.getY(),
                 player.getDeltaMovement().horizontalDistance(),.36,1);

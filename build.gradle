@@ -964,3 +964,5 @@ if (['nativeFrameworkTest', 'nativeFrameworkLiveTest'].any { project.hasProperty
     sourceSets.main.java.srcDir('src/nativeFrameworkSharedTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
+
+apply from: 'gradle/local-p1-effects.gradle'

@@ -417,7 +417,7 @@
   "tutorial.blacklight.disguise.steps": "先吸收普通生物，再轻按变形键切换本体；长按打开独立轮盘，进入「身份收藏」选择旧身份。收藏页会显示已适配的物种能力和当前能力按键。",
   "tutorial.blacklight.jump.controls": "按住 [%1$s] 蓄力 → 松开起跳",
   "tutorial.blacklight.jump.steps": "站在地面按住跳跃键，蹲身蓄力后松开。蓄力期间保持原地；奔跑中可衔接蓄力跳。升级提高起跳力度。",
-  "key.blacklight.dodge": "轻跳闪避",
+  "key.blacklight.dodge": "地面闪避 / 空中闪避",
   "tutorial.blacklight.sprint.controls": "前进 [%1$s] + 疾跑 [%2$s] · 闪避 [%3$s]",
   "tutorial.blacklight.sprint.steps": "持续前进并按住疾跑键提升速度。地面按住方向并按 [%3$s] 立即闪避，不按方向则向后闪避。也可短按疾跑键 [%2$s] 后松开（半秒内）；跳跃键仍用于跳跃和蓄力跳。升级提高极速，水面和低矮障碍可触发对应移动动作。",
   "tutorial.blacklight.wall.controls": "朝墙前进 [%1$s] + 疾跑 [%2$s] · 脱离 [%3$s]",

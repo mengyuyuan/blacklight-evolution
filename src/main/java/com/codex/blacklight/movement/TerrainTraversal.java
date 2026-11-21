@@ -3,6 +3,7 @@ package com.codex.blacklight.movement;
 import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /** Collision probes shared by terrain animation and wall entry; never moves the player. */
@@ -54,14 +55,24 @@ public final class TerrainTraversal {
     }
 
     public static boolean canStepPast(Player player, Vec3 direction, double distance) {
-        if (!player.onGround()) return false;
+        return canStepPast(player, direction, distance, direction);
+    }
+
+    static boolean canStepPast(Player player, Vec3 direction, double distance, Vec3 intoFace) {
+        if (!player.onGround()) {
+            double vertical = player.getDeltaMovement().y;
+            if (vertical > 0 || vertical < -.5 || !supportBelow(player, .08)) return false;
+        }
         double height = player.maxUpStep();
         var box = player.getBoundingBox();
         Vec3 up = Entity.collideBoundingBox(player, new Vec3(0, height, 0), box, player.level(), List.of());
-        if (up.y < height - 1.0e-5) return false;
         Vec3 across = direction.scale(distance).multiply(1, 0, 1);
-        Vec3 resolved = Entity.collideBoundingBox(player, across, box.move(0, height, 0), player.level(), List.of());
-        return resolved.subtract(across).lengthSqr() < 1.0e-8;
+        Vec3 raised = Entity.collideBoundingBox(player, across, box.move(0, up.y, 0), player.level(), List.of());
+        if (raised.subtract(across).lengthSqr() < 1.0e-8) return true;
+        // At sprint speed the next riser can clip even a successful first step.
+        Vec3 flat = Entity.collideBoundingBox(player, across, box, player.level(), List.of());
+        // Stepping sideways along a tall face must not cancel an intended wall run.
+        return raised.subtract(flat).dot(intoFace) > 1.0e-5;
     }
 
     public static boolean centerSupported(Player player) {
@@ -72,16 +83,32 @@ public final class TerrainTraversal {
 
     /** Find a reachable top in front of the body; no teleport or collision bypass. */
     public static double ledgeHeight(Player player, Vec3 into, double distance, double rise, double drop) {
-        var box = player.getBoundingBox();
+        return ledgeHeight(player, player.getBoundingBox(), into, distance, rise, drop);
+    }
+
+    /** Check the same outward arc the controller will attempt before committing to a vault. */
+    public static double vaultLanding(Player player, Vec3 into) {
+        AABB start = player.getBoundingBox(), box = start;
+        Vec3 impulse = into.scale(-WallTraversal.VAULT_OUT).add(0, WallTraversal.VAULT_UP, 0);
+        for (int tick = 0; tick < WallTraversal.VAULT_OUT_TICKS; tick++) {
+            box = box.move(Entity.collideBoundingBox(player, impulse, box, player.level(), List.of()));
+        }
+        double outward = start.getCenter().subtract(box.getCenter()).dot(into);
+        double clearance = player.getBbHeight() + 1.05;
+        double rise = Math.max(0, start.minY + clearance - box.minY);
+        double top = ledgeHeight(player, box, into, outward, rise, clearance);
+        return top > start.minY + .1 ? top : Double.NaN;
+    }
+
+    private static double ledgeHeight(Player player, AABB box, Vec3 into, double distance, double rise, double drop) {
         Vec3 up = Entity.collideBoundingBox(player, new Vec3(0, rise, 0), box, player.level(), List.of());
-        if (up.y < rise - 1.0e-5) return Double.NaN;
         Vec3 across = into.scale(distance).multiply(1, 0, 1);
-        var raised = box.move(0, rise, 0);
+        var raised = box.move(0, up.y, 0);
         Vec3 resolved = Entity.collideBoundingBox(player, across, raised, player.level(), List.of());
         if (resolved.subtract(across).lengthSqr() > 1.0e-8) return Double.NaN;
         var landing = raised.move(across).deflate(player.getBbWidth() * .3, 0, player.getBbWidth() * .3);
         double down = Entity.collideBoundingBox(player, new Vec3(0, -drop, 0), landing,
                 player.level(), List.of()).y;
-        return down > -drop + 1.0e-5 ? player.getY() + rise + down : Double.NaN;
+        return down > -drop + 1.0e-5 ? raised.minY + down : Double.NaN;
     }
 }
