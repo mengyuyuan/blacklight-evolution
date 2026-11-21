@@ -83,7 +83,11 @@ public final class DisguiseRenderer {
             float progress=transition?morph.progress(p.level().getGameTime(),e.getPartialTick()):0;
             float weight=transition?(float)Math.sin(progress*Math.PI):0;
             stack.scale(1-.08F*weight,1-.04F*weight,1-.08F*weight);
-            if(disguised)renderAvatar(avatar,e);
+            if(disguised){
+                renderAvatar(avatar,e);
+                if(p instanceof net.minecraft.client.player.AbstractClientPlayer owner)
+                    ConsumeExteriorWrap.captureDisguise(owner,avatar,stack,e.getPartialTick());
+            }
             else if(p instanceof net.minecraft.client.player.AbstractClientPlayer cp)
                 e.getRenderer().render(cp,p.getYRot(),e.getPartialTick(),stack,e.getMultiBufferSource(),e.getPackedLight());
             if(weight>.02F)cover(p,avatar,stack,e.getMultiBufferSource(),e.getPackedLight(),progress,weight);
