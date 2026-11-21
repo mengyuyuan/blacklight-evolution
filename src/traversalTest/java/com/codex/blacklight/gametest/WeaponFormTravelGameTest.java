@@ -145,6 +145,7 @@ public final class WeaponFormTravelGameTest {
     public static void brokenWhipLineReleasesWithoutPassingWall(GameTestHelper h){
         CombatMovementGameTest.loaded(h,()->{
             floor(h);var p=player(h,PowerForm.WHIPFIST,true);
+            for(int x=3;x<=5;x++)for(int y=75;y<=79;y++)for(int z=3;z<=10;z++)h.setBlock(x,y,z,Blocks.AIR);
             var mob=h.spawn(net.minecraft.world.entity.EntityType.IRON_GOLEM,4,75,10);
             mob.setNoAi(true);mob.setHealth(1);CombatTargeting.requestLock(p,mob.getId());ConsumeSystem.request(p);
             h.assertTrue(ModAttachments.getData(p,ModAttachments.GRAB_STAGE)==ConsumeVisual.WHIP_PULL,"grab starts in the open lane");

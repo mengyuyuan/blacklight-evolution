@@ -64,7 +64,7 @@ public final class OutbreakEvolutionGameTest {
             p.setHealth(p.getMaxHealth()*.25F);float before=p.getHealth();var reward=AssimilationSystem.quote(p,common);
             int balance=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints();
             h.assertTrue(!AssimilationSystem.settle(p,common,reward,true),"living unconsumed enemies never pay healing or EP");
-            common.hurt(common.damageSources().playerAttack(p),1000);
+            h.assertTrue(ConsumeSystem.executeConsumption(p,common,common.getMaxHealth()*20),"the completed absorption executes the living victim");
             h.assertTrue(!common.isAlive()&&AssimilationSystem.settle(p,common,reward,true),"actual finished kill can settle one consume reward");
             h.assertTrue(p.getHealth()-before>=p.getMaxHealth()*.10F,"one blood pack remains useful after health upgrades");
             float after=p.getHealth();int ep=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE).getEvolutionPoints();

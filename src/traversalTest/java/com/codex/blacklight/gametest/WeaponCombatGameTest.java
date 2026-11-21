@@ -82,7 +82,10 @@ public final class WeaponCombatGameTest {
         h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
-    public static void comboHistoryExpiresAndCannotSurviveCancellationOrFormChange(GameTestHelper h){
+    public static void comboHistoryExpiresAndCannotSurviveCancellationOrFormChange(GameTestHelper h) throws Exception {
+        withoutActorHitstop(()->checkComboReset(h));
+    }
+    private static void checkComboReset(GameTestHelper h){
         MovingCombatGameTest.supportFloor(h,1);
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"combo-reset"));
         p.setPos(h.absoluteVec(new Vec3(4,2,3)));p.setYRot(0);p.setOnGround(true);p.tickCount=100;
@@ -97,8 +100,13 @@ public final class WeaponCombatGameTest {
         h.assertTrue(!WeaponCombatSystem.busy(p),"cancelled queue cannot trigger a later attack");
         p.tickCount+=10;WeaponCombatSystem.request(p,false);
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.BLADE_CUT,"idle grace expiration restarts first strike");
-        advance(p,WeaponMove.BLADE_CUT.duration);state.activate(PowerForm.HAMMERFISTS);WeaponCombatSystem.request(p,false);
-        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.HAMMER_JAB,"weapon change cannot inherit blade second-strike history");
+        advance(p,WeaponMove.BLADE_CUT.duration);
+        h.assertTrue(!WeaponCombatSystem.busy(p),"blade recovery completes before the switch");
+        // The blade's actual forward travel can take the fixture off its short support floor.
+        p.setPos(h.absoluteVec(new Vec3(4,2,3)));p.setDeltaMovement(Vec3.ZERO);p.setOnGround(true);
+        h.assertTrue(state.activate(PowerForm.HAMMERFISTS),"the owned hammer form activates");
+        WeaponCombatSystem.request(p,false);
+        h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.HAMMER_JAB,"grounded form change starts hammer jab; actual="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.WEAPON_VISUAL).spec()+" grounded="+p.onGround()+" form="+com.codex.blacklight.registry.ModAttachments.getData(p,ModAttachments.PLAYER_STATE).getActivePower());
         WeaponCombatSystem.cancel(p);h.succeed();
     }
     private static void advance(net.minecraft.server.level.ServerPlayer p,int ticks){
