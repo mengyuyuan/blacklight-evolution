@@ -30,6 +30,21 @@ final class GoliathInjuryPose {
     private static final Track HEAD_LOWERED = new Track("TAUNT", 0,77, 9,94, 49,162, 60,198);
     private static final Track LEG_STUN = new Track("exposed", 0,25, 57,213);
 
+    private static final int CLAW = java.util.Arrays.asList(GoliathMotion.table().bones).indexOf("left_hand");
+    // The authored closed hand is bound at 48% length for the opposite fist's slam.
+    // Its extended bind, expressed in the current wrist axes, plants the fingers
+    // while leaving the original animated wrist pivot in place.
+    private static void extendClaw(float[][] pose, float weight) {
+        if (weight <= 0) return;
+        float[] closed = pose[CLAW];
+        float[] open = java.util.Arrays.copyOf(closed, 9);
+        open[0] = -.85177636F;
+        open[1] = -.70712663F;
+        open[2] = -1.14009089F;
+        for (int axis = 6; axis < 9; axis++) open[axis] = (axis < closed.length ? closed[axis] : 1F) / .48F;
+        pose[CLAW] = weight >= 1 ? open : SourceBossMotion.blend(closed, open, weight);
+    }
+
     private static float[][] frame(String clip, float frame) {
         return GoliathMotion.sample(clip, frame * 20F / GoliathMotion.table().clip(clip).fps(), false);
     }
@@ -50,6 +65,7 @@ final class GoliathInjuryPose {
             }
             case ARM -> {
                 var pose = ARM_EMBEDDED.pose(age);
+                extendClaw(pose, 1);
                 if (age > duration-8) pose = GoliathMotion.blendPose(pose, GoliathMotion.sample("crawl_idle", idleAge, true), 1-(duration-age)/8);
                 yield pose;
             }
@@ -77,6 +93,7 @@ final class GoliathInjuryPose {
 
     static float[][] attack(boolean armMissing, float age, float idleAge) {
         var pose = (armMissing ? LEAP : ARM_STRIKE).pose(age);
+        if (!armMissing) extendClaw(pose, (age - 27) / 8);
         if (age < 5) {
             var idle = armMissing ? frame("crippled_walk", 0) : GoliathMotion.sample("crawl_idle", idleAge, true);
             pose = GoliathMotion.blendPose(idle, pose, age/5);
