@@ -34,7 +34,25 @@ public final class DisguiseSystem {
                 &&p.getData(ModAttachments.DISGUISE_IDENTITY).valid();
     }
     private static boolean enabled(Player p){var s=p.getData(ModAttachments.PLAYER_STATE);return p.isAlive()&&s.isInfected()&&s.isPrototypeMode();}
-    public static boolean morphing(Player p){return p.getData(ModAttachments.DISGUISE_MORPH).active(p.level().getGameTime());}
+    public static boolean morphing(Player p) {
+        return enabled(p) && p.getData(ModAttachments.DISGUISE_MORPH).active(p.level().getGameTime());
+    }
+
+    /** Cancel pending contact before another mode request can reuse it. Keep the collected identity. */
+    public static void endForModeExit(ServerPlayer p) {
+        if (p.getData(ModAttachments.DISGUISE_MORPH).started() >= 0) {
+            p.setData(ModAttachments.DISGUISE_MORPH, DisguiseMorph.EMPTY);
+            p.syncData(ModAttachments.DISGUISE_MORPH);
+        }
+        var state = p.getData(ModAttachments.PLAYER_STATE);
+        var persistent = p.getPersistentData();
+        if (state.isDisguised() || persistent.contains(DisguiseAwareness.KEY)
+                && persistent.getCompound(DisguiseAwareness.KEY).getBoolean("LastForm")) {
+            state.setDisguised(false);
+            DisguiseAwareness.advanceEpoch(p);
+            syncAlert(p);
+        }
+    }
     public static void captured(ServerPlayer p,DisguiseIdentity identity){
         if(!identity.valid())return;
         identity=identity.compact();
@@ -241,11 +259,7 @@ public final class DisguiseSystem {
         var s=p.getData(ModAttachments.PLAYER_STATE);var m=p.getData(ModAttachments.DISGUISE_MORPH);
         long now=p.level().getGameTime();
         if(!enabled(p)){
-            if(s.isDisguised()){
-                s.setDisguised(false);DisguiseAwareness.advanceEpoch(p);
-                p.setData(ModAttachments.PLAYER_STATE,s);p.syncData(ModAttachments.PLAYER_STATE);
-            }
-            if(m.started()>=0){p.setData(ModAttachments.DISGUISE_MORPH,DisguiseMorph.EMPTY);p.syncData(ModAttachments.DISGUISE_MORPH);}
+            endForModeExit(p);
             if(!s.isInfected()){
                 p.getPersistentData().remove(DisguiseAwareness.KEY);
                 if(p.getData(ModAttachments.DISGUISE_IDENTITY).valid()){
