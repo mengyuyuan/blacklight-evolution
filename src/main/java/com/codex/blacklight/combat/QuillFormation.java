@@ -6,20 +6,17 @@ public final class QuillFormation {
     public static final int VISIBLE_SLOTS = 48;
     private QuillFormation() {}
 
-    public static long harvestCount(long rank) {
-        return rank == Long.MAX_VALUE ? rank : Math.max(0, rank) + 1;
+    public static long capacity(long rank) {
+        return 6 + Math.min(Math.max(0, rank), Long.MAX_VALUE - 6);
     }
 
-    /** Carry hundredths between bundles so rounding happens once per player's wave. */
-    public static final class Wave {
-        private final int percent;
-        private int remainder = 99;
-        public Wave(int percent) { this.percent = Math.max(1, Math.min(100, percent)); }
-        public long take(long ready) {
-            int fractional = (int)(ready % 100) * percent + remainder;
-            remainder = fractional % 100;
-            return ready / 100 * percent + fractional / 100;
-        }
+    public static long extendLife(long ticks, long extraRanks) {
+        long room = Long.MAX_VALUE - ticks;
+        return extraRanks > room / 20 ? Long.MAX_VALUE : ticks + 20 * extraRanks;
+    }
+
+    public static int volleySize(int ready, int percent) {
+        return (int)(((long)ready * Math.max(1, Math.min(100, percent)) + 99) / 100);
     }
 
     public static Vec3 offset(int slot, int total, double time, double radius, float yaw) {

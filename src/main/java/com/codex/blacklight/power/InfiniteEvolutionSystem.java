@@ -31,6 +31,8 @@ public final class InfiniteEvolutionSystem {
         long count=bulkCount(requested,state.getEvolutionPoints(),cost,progress.rank(a));
         state.addEvolutionPoints((int)-(count*cost));p.setData(ModAttachments.INFINITE_EVOLUTION,progress.buy(a,count));
         p.syncData(ModAttachments.INFINITE_EVOLUTION);p.syncData(ModAttachments.PLAYER_STATE);EvolutionProgression.refresh(p);GrowthSystem.updateHealth(p);updateMobility(p);
+        if(a==EvolutionAttribute.QUILL_DURATION)
+            com.codex.blacklight.entity.QuillOrgan.extendHeld(p,rank(p,a));
         return count;
     }
     public static final int MAX_BULK=1000;

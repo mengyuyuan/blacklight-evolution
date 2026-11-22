@@ -152,21 +152,20 @@ public final class QuillOrganRenderer extends EntityRenderer<QuillOrgan> {
         double radius=com.codex.blacklight.config.GameplayBalanceConfig.QUILL_ORBIT_RADIUS.get();
         double time=q.level().getGameTime()+partial;
         float yaw=Mth.rotLerp(partial,owner.yBodyRotO,owner.yBodyRot);
-        for(int i=0;i<q.slots();i++){
-            int slot=q.firstSlot()+i;
-            var offset=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time,radius,yaw);
-            var ahead=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time+.25,radius,yaw);
-            var goal=center.add(offset);
-            var wall=q.level().clip(new net.minecraft.world.level.ClipContext(center,goal,
-                    net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,q));
-            if(wall.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)goal=wall.getLocation().subtract(offset.normalize().scale(.18));
-            var delta=goal.subtract(q.getPosition(partial));
-            pose.pushPose();
-            pose.translate(delta.x,delta.y,delta.z);
-            pose.mulPose(new Quaternionf().rotationTo(new org.joml.Vector3f(0,1,-.2F).normalize(),ahead.subtract(offset).normalize().toVector3f()));
-            RoofPerformance.detachedQuill((q.socket()+i)%6,pose,buffers,light);
-            pose.popPose();
-        }
+        int slot=q.firstSlot();
+        if(slot<0)return;
+        var offset=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time,radius,yaw);
+        var ahead=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time+.25,radius,yaw);
+        var goal=center.add(offset);
+        var wall=q.level().clip(new net.minecraft.world.level.ClipContext(center,goal,
+                net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,q));
+        if(wall.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)goal=wall.getLocation().subtract(offset.normalize().scale(.18));
+        var delta=goal.subtract(q.getPosition(partial));
+        pose.pushPose();
+        pose.translate(delta.x,delta.y,delta.z);
+        pose.mulPose(new Quaternionf().rotationTo(new org.joml.Vector3f(0,1,-.2F).normalize(),ahead.subtract(offset).normalize().toVector3f()));
+        RoofPerformance.detachedQuill(q.socket(),pose,buffers,light);
+        pose.popPose();
     }
     @Override public void render(QuillOrgan q,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         if(q.phase()==QuillOrgan.ORBIT && q.level().getEntity(q.actor()) instanceof net.minecraft.world.entity.LivingEntity owner){
@@ -230,27 +229,6 @@ public final class QuillOrganRenderer extends EntityRenderer<QuillOrgan> {
             var rotation=new Quaternionf().rotationTo(new org.joml.Vector3f(0,1,-.2F).normalize(),dir.toVector3f());
             pose.mulPose(rotation);
             RoofPerformance.detachedQuill(q.socket(),pose,buffers,light);
-            if(q.phase()==QuillOrgan.STRIKE || q.phase()==QuillOrgan.REJOIN){
-                int visible=(int)Math.min(12,q.count());
-                for(int i=1;i<visible;i++){
-                    double angle=i*2.4+age*.16, radius=.11*Math.sqrt(i);
-                    double spread=q.phase()==QuillOrgan.STRIKE?Math.min(1,.2+age*.19):.68;
-                    pose.pushPose();
-                    var translation=new org.joml.Vector3f((float)(Math.cos(angle)*radius*spread),-.12F*i,(float)(Math.sin(angle)*radius*spread));
-                    if(q.phase()==QuillOrgan.STRIKE && age<5 && i<q.slots()
-                            && q.level().getEntity(q.actor()) instanceof net.minecraft.world.entity.LivingEntity owner){
-                        double radiusAtLaunch=com.codex.blacklight.config.GameplayBalanceConfig.QUILL_ORBIT_RADIUS.get();
-                        double startTime=q.level().getGameTime()+partial-age;
-                        var first=com.codex.blacklight.combat.QuillFormation.offset(q.firstSlot(),q.formation(),startTime,radiusAtLaunch,owner.yBodyRot);
-                        var start=com.codex.blacklight.combat.QuillFormation.offset(q.firstSlot()+i,q.formation(),startTime,radiusAtLaunch,owner.yBodyRot);
-                        var spreadOffset=start.subtract(first).scale(1-age/5).toVector3f();
-                        translation.add(rotation.transformInverse(spreadOffset));
-                    }
-                    pose.translate(translation.x,translation.y,translation.z);
-                    RoofPerformance.detachedQuill((q.socket()+i)%6,pose,buffers,light);
-                    pose.popPose();
-                }
-            }
         }
         pose.popPose();
     }
