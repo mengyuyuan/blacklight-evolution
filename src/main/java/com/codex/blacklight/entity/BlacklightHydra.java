@@ -197,8 +197,9 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
     public int feedTarget(){return entityData.get(FEED_TARGET);}
     public int feeds(){return feeds;}
     public int growthAge(){return age;}
+    public static final float MAX_BODY_SIZE=2.4F;
     public float bodySize(){return entityData.get(BODY_SIZE);}
-    public void setBodySize(float size){entityData.set(BODY_SIZE,Float.isFinite(size)?Math.clamp(size,1.6F,2.4F):1.6F);}
+    public void setBodySize(float size){entityData.set(BODY_SIZE,Float.isFinite(size)?Math.clamp(size,1.6F,MAX_BODY_SIZE):1.6F);}
     public float visualScale(){return bodySize()*(planted()?.18F+.82F*growth():1F);}
     @Override public EntityDimensions getDefaultDimensions(Pose pose){return super.getDefaultDimensions(pose).scale(visualScale());}
     @Override public void onSyncedDataUpdated(EntityDataAccessor<?> key){super.onSyncedDataUpdated(key);if(key.equals(GROWTH)||key.equals(PLANTED)||key.equals(BODY_SIZE))refreshDimensions();}

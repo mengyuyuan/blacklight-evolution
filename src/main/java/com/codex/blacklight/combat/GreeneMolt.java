@@ -42,43 +42,19 @@ public final class GreeneMolt {
         }
     }
     private static final class Source {static final Tracks TABLE=new Tracks();}
-    private static final int HYDRA=12, SURFACED=60;
-    private Vec3 hydraOffset=Vec3.ZERO;
-
-    void prepare(EncounterMob boss){
-        hydraOffset=Vec3.ZERO;
-        var level=(ServerLevel)boss.level();
-        var authored=position(boss,HYDRA,SURFACED);
-        var reach=authored.subtract(boss.position()).multiply(1,0,1);
-        for(int angle:new int[]{0,35,-35,75,-75,140,180}){
-            for(double radius:new double[]{1,.78,.58}){
-                var candidate=boss.position().add(reach.yRot((float)Math.toRadians(angle)).scale(radius));
-                var floor=level.clip(new net.minecraft.world.level.ClipContext(candidate.add(0,10,0),candidate.add(0,-8,0),
-                        net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,boss));
-                if(floor.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP)continue;
-                var base=floor.getLocation();
-                var space=new net.minecraft.world.phys.AABB(base.add(-2.4,1,-2.4),base.add(2.4,15,2.4));
-                if(level.getBlockCollisions(boss,space).iterator().hasNext())continue;
-                var line=level.clip(new net.minecraft.world.level.ClipContext(boss.position().add(0,9,0),base.add(0,8,0),
-                        net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,boss));
-                if(line.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)continue;
-                hydraOffset=base.subtract(authored).yRot((float)Math.toRadians(boss.greeneBattle().collapseYaw()-180)).scale(1/GreeneForm.OUTBREAK_SCALE);
-                return;
-            }
-        }
-    }
-    void writeOffset(CompoundTag tag){
-        tag.putFloat("HydraX",(float)hydraOffset.x);tag.putFloat("HydraY",(float)hydraOffset.y);tag.putFloat("HydraZ",(float)hydraOffset.z);
-    }
-    public static Vec3 readOffset(CompoundTag tag){
-        return new Vec3(tag.getFloat("HydraX"),tag.getFloat("HydraY"),tag.getFloat("HydraZ"));
-    }
+    private final GreeneHydraVents vents=new GreeneHydraVents();
+    void prepare(EncounterMob boss){vents.prepare(boss,true);}
+    void writeVents(CompoundTag tag){vents.write(tag);}
     private Vec3 position(EncounterMob boss,int slot,int tick){
+        if(vents.owns(slot) && vents.ground(slot)!=null){
+            var ground=vents.ground(slot);
+            return ground.add(0,-GreeneHydraVents.BURIAL_DEPTH*(1-GreeneHydraVents.emergence(slot,tick)),0);
+        }
         int a=Math.min(230,tick/2),b=Math.min(230,a+1);
         int k=(a*SLOTS+slot)*3,j=(b*SLOTS+slot)*3;float mix=(tick%2)*.5F;
         var p=Source.TABLE.pos;
         return boss.position().add(new Vec3(p[k]+(p[j]-p[k])*mix,p[k+1]+(p[j+1]-p[k+1])*mix,p[k+2]+(p[j+2]-p[k+2])*mix)
-                .add(slot==HYDRA?hydraOffset:Vec3.ZERO).scale(GreeneForm.OUTBREAK_SCALE).yRot((float)Math.toRadians(180-boss.greeneBattle().collapseYaw())));
+                .scale(GreeneForm.OUTBREAK_SCALE).yRot((float)Math.toRadians(180-boss.greeneBattle().collapseYaw())));
     }
     public boolean tick(EncounterMob boss, int age){
         if(!(boss.level() instanceof ServerLevel level))return false;
@@ -86,16 +62,26 @@ public final class GreeneMolt {
         shockwave.tick(boss, level, age);
         boss.spider.actions.moltBrood(level,age);
         int prior=absent;
+        boolean relocated=!vents.prepared;
+        if(relocated)vents.prepare(boss,(spawned&(1<<GreeneHydraVents.SECOND))==0);
+
         for(int i=0;i<SLOTS;i++){
             if(age<Source.TABLE.spawn[i] || (absent&(1<<i))!=0)continue;
             Entity actor=captives[i]==null?null:level.getEntity(captives[i]);
+            if(vents.owns(i) && age<Source.TABLE.end[i]){
+                if(age%5==0 && vents.validate(boss,i))relocated=true;
+                if(vents.ground(i)==null){
+                    if(actor!=null)actor.discard();
+                    captives[i]=null;absent|=1<<i;continue;
+                }
+            }
             if(age>=Source.TABLE.end[i]){
                 if(actor!=null)actor.discard();
                 captives[i]=null;continue;
             }
             Vec3 p=position(boss,i,age);
             if((spawned&(1<<i))==0){
-                var type=i<12?ModEntities.COMMON_INFECTED.get():i==12?ModEntities.BLACKLIGHT_HYDRA.get():ModEntities.BLACKLIGHT_HUNTER.get();
+                var type=i<12?ModEntities.COMMON_INFECTED.get():vents.owns(i)?ModEntities.BLACKLIGHT_HYDRA.get():ModEntities.BLACKLIGHT_HUNTER.get();
                 var nearby=level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(52),m->m.getType()==type && m.isAlive()
                     && !m.getPersistentData().hasUUID(OWNER) && !ConsumeControl.protectedEntity(m)
                     && m.getPersistentData().hasUUID("EncounterOwner") && boss.getUUID().equals(m.getPersistentData().getUUID("EncounterOwner")));
@@ -103,6 +89,7 @@ public final class GreeneMolt {
                 boolean fresh=mob==null;
                 if(fresh)mob=type.create(level);
                 if(mob==null)continue;
+                if(mob instanceof com.codex.blacklight.entity.BlacklightHydra hydra)hydra.setBodySize(com.codex.blacklight.entity.BlacklightHydra.MAX_BODY_SIZE);
                 ((Captive)mob).setMoltCaptive(true);
                 mob.moveTo(p.x,p.y,p.z,0,0);mob.setNoAi(true);mob.setNoGravity(true);mob.noPhysics=true;
                 mob.setSilent(true);mob.setInvisible(true);mob.setPersistenceRequired();
@@ -116,15 +103,16 @@ public final class GreeneMolt {
             if(!actor.isAlive()){absent|=1<<i;captives[i]=null;continue;}
             actor.noPhysics=true;actor.setPos(p.x,p.y,p.z);actor.setDeltaMovement(Vec3.ZERO);actor.fallDistance=0;
         }
-        if(captives[HYDRA]!=null && (age==9 || age==38)){
-            var vent=position(boss,HYDRA,SURFACED);
-            SpiderFoley.ground(boss,vent,age==9?1.7F:2.45F,age==9?SpiderFoley.Cue.STRAIN:SpiderFoley.Cue.RUPTURE);
+        for(int slot=GreeneHydraVents.FIRST;slot<=GreeneHydraVents.SECOND;slot++){
+            int beat=age-(slot==GreeneHydraVents.SECOND?14:0);
+            if(vents.owns(slot) && captives[slot]!=null && (beat==9 || beat==38))
+                SpiderFoley.ground(boss,vents.ground(slot),beat==9?1.7F:2.45F,beat==9?SpiderFoley.Cue.STRAIN:SpiderFoley.Cue.RUPTURE);
         }
         for(int i=0;i<CUES.length;i++)if(age==CUES[i]){
             Vec3 p=i==1?position(boss,13,age):i==2?position(boss,12,age):boss.position().add(0,i>=4?22:10,0);
             level.playSound(null,p.x,p.y,p.z,ModInfectedSounds.molt(i),SoundSource.HOSTILE,5F,1F);
         }
-        return prior!=absent;
+        return relocated || prior!=absent;
     }
     public static void orphanCheck(Mob mob){
         if(mob.tickCount%40!=0 || !(mob.level() instanceof ServerLevel level))return;
@@ -146,11 +134,11 @@ public final class GreeneMolt {
     public CompoundTag save(){
         var t=new CompoundTag();t.putInt("Spawned",spawned);t.putInt("Absent",absent);
         for(int i=0;i<SLOTS;i++)if(captives[i]!=null)t.putUUID("Actor"+i,captives[i]);
-        writeOffset(t);shockwave.save(t);
+        writeVents(t);shockwave.save(t);
         return t;
     }
     public void load(CompoundTag t){
-        hydraOffset=readOffset(t);shockwave.load(t);
+        vents.load(t);shockwave.load(t);
         spawned=t.getInt("Spawned");absent=t.getInt("Absent");
         for(int i=0;i<SLOTS;i++)captives[i]=t.hasUUID("Actor"+i)?t.getUUID("Actor"+i):null;
     }
