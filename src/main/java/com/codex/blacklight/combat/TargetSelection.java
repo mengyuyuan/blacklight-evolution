@@ -174,7 +174,8 @@ public record TargetSelection(Entity target,int region) {
         if(target instanceof EncounterMob boss && boss.spider.first() && region>=0 && region<SpiderAnatomy.NAMES.size())return net.minecraft.network.chat.Component.translatable(SpiderAnatomy.label(region)).getString()
             +(SpiderAnatomy.tendon(region)?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider."+
               (boss.spider.exposedTendon(SpiderAnatomy.legForRegion(region))?"exposed_tendon":"covered_tendon")).getString():"")
-            +(region==SpiderAnatomy.MOUTH?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider."+(boss.spider.sealed()?"sealed":boss.spider.feeding()?"open":"closed")).getString():"");
+            +(region==SpiderAnatomy.RIM && boss.spider.feeding()?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider.aim_inside").getString():"")
+              +(region==SpiderAnatomy.MOUTH?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider."+(boss.spider.sealed()?"sealed":boss.spider.healingSpent()?"spent":boss.spider.feeding()?"open":"closed")).getString():"");
         var part=goliathPart();
         if(part!=null)return target.getDisplayName().getString()+" · "+net.minecraft.network.chat.Component.translatable(part.labelKey).getString();
         return target.getDisplayName().getString()+(target instanceof EncounterMob mob&&mob.kind()==EncounterKind.ELIZABETH_GREENE?(region<0?" · 母体核心":" · 防御节段 "+(region+1)):"");}

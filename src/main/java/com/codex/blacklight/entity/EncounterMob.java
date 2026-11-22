@@ -253,8 +253,9 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         int spiderSlot=kind==EncounterKind.ELIZABETH_GREENE && spider.first()?SpiderAnatomy.NAMES.indexOf(c.bone()):-1;
         int leg=SpiderAnatomy.legForRegion(spiderSlot);
         if(leg>=0){
-            if(!spider.broken(leg)){
-                var response=SpiderAnatomy.tendon(spiderSlot) && spider.exposedTendon(leg)?BossImpactFeedback.Contact.WEAK:BossImpactFeedback.Contact.FLESH;
+            if(spiderData().getLong("Break"+leg)!=level().getGameTime() || !spider.broken(leg)){
+                var response=SpiderAnatomy.tendon(spiderSlot) && spider.exposedTendon(leg)?BossImpactFeedback.Contact.WEAK:
+                        spider.broken(leg)?BossImpactFeedback.Contact.FLESH:BossImpactFeedback.Contact.ARMOR;
                 BossImpactFeedback.contact(this,source,c.point(),response,amount);
             }
         }else if(kind==EncounterKind.ELIZABETH_GREENE){

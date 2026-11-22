@@ -75,8 +75,9 @@ public final class SpiderAnatomy {
         for(int id=0;id<PATCHES.size();id++){
             var boxes=new ArrayList<HydraContact.Box>();
             int leg=legForRegion(id);
-            if(boss.greeneBattle().targetable() && (leg<0 || !boss.spider.broken(leg))){
+            if(boss.greeneBattle().targetable() && (!tendon(id) || !boss.spider.broken(leg))){
                 for(var p:PATCHES.get(id)){
+                    if(leg>=0 && boss.spider.severed(leg) && p.joint().equals(shin(leg)))continue;
                     var m=matrices.computeIfAbsent(p.joint(),joint->boss.spider.jointMatrix(root,joint,partial));
                     Vec3 center=origin.add(new Vec3(m.transformPosition(p.center().toVector3f())));
                     boxes.add(HydraContact.affine(center,p.half(),axis(m,1,0,0),axis(m,0,1,0),axis(m,0,0,1)));

@@ -778,7 +778,11 @@ public final class WeaponCombatSystem {
             if(close?s.closeSweepHits.getOrDefault(v.getUUID(),-1)==pulse:s.hit.contains(v.getUUID()))continue;
             // Previous-tick sweeps never authorize a hit after the actor has escaped
             // the victim's actual current reach (teleports, dash or stale movement).
-            if(!CombatTargeting.inReach(p,v,whip==null?moveReach+1.0:30.0*AttackReach.scale(p)))continue;
+            double contactReach=whip==null?moveReach+1.0:30.0*AttackReach.scale(p);
+            if(v instanceof com.codex.blacklight.entity.EncounterMob spider && spider.spider.live()){
+                // A retained mouth lock must not discard real weapon contact with a nearer leg.
+                if(CombatTargeting.distanceSquared(p.getEyePosition(),v)>contactReach*contactReach)continue;
+            }else if(!CombatTargeting.inReach(p,v,contactReach))continue;
             var body=AnimatedHurtBody.of(v);
             boolean meshStrike=cutting.sharp() && !bodyFlight && (body!=null || RagdollImpact.supportedBody(v)&&!CombatTargeting.multipart(v)
                     &&(s.move.form==PowerForm.CLAWS || s.move.form==PowerForm.BLADE));

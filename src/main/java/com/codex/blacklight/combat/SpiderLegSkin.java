@@ -49,18 +49,19 @@ public final class SpiderLegSkin {
                 var center=centers[i].lerp(centers[i+1],(lo+hi)*.5);
                 // The needle tapers to a few pixels. Keep its ground-level strike surface about
                 // three quarters of a block wide, without filling space between different legs.
-                double x=shin && i>=2?.195:.06,y=x,z=0;
+                double x=shin && i>=2?.30:.10,y=x,z=0;
                 for(int k=0;k<6;k++)for(double u:new double[]{lo,hi}){
                     var d=points[i][k].lerp(points[i+1][k],u).subtract(center);
                     x=Math.max(x,Math.abs(d.dot(cross)));y=Math.max(y,Math.abs(d.dot(up)));z=Math.max(z,Math.abs(d.dot(along)));
                 }
-                spans.add(new Span(center,cross,up,along,new Vec3(x+.012,y+.012,z+.008)));
+                spans.add(new Span(center,cross,up,along,new Vec3(x+.075,y+.075,z+.07)));
             }
         }
     }
     public static String joint(int leg,boolean upper){String shin=SpiderAnatomy.shin(leg);return upper?"coxa"+shin.substring(5):shin;}
     static void add(EncounterMob b,int leg,float partial,Matrix4f root,Vec3 origin,Map<String,Matrix4f> matrices,List<HydraContact.Box> boxes){
         for(boolean upper:new boolean[]{false,true}){
+            if(!upper && b.spider.severed(leg))continue;
             String name=joint(leg,upper);
             var m=matrices.computeIfAbsent(name,k->b.spider.jointMatrix(root,k,partial));
             for(var span:of(name).spans){

@@ -41,9 +41,10 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
                 pose.popPose();
             }
         }
-        if(data.contains("BlastAt")){
+        float blast=boss.spider.woundOpenness("BlastClosed",partial);
+        if(data.contains("BlastAt") && blast>0){
             pose.pushPose();pose.translate(data.getDouble("WoundX"),data.getDouble("WoundY"),data.getDouble("WoundZ"));
-            QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,17,4.1,.8);
+            QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,17,4.1*blast,.8*blast);
             pose.popPose();
         }
         float age=boss.level().getGameTime()-data.getLong("LastTumor")+partial;
@@ -61,13 +62,17 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             pose.popPose();
         }
         for(int i=0;i<8;i++)if(boss.spider.broken(i)){
+            float open=boss.spider.woundOpenness("Closed"+i,partial);
+            if(open<=0)continue;
             String joint="tibia_"+(i<4?"L":"R")+(i%4+1);
             var pivot=com.codex.blacklight.combat.SpiderAnatomy.PIVOTS.get(joint);
             pose.pushPose();pose.mulPoseMatrix(boss.spider.jointMatrix(new org.joml.Matrix4f(),joint,partial));
             pose.translate(pivot.x,pivot.y,pivot.z);
             pose.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(i<4?63:-63));
-            QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,i,3.8,.2);
-            SpiderTissue.stump(boss,i,pose,buffers,light,partial);
+            pose.scale(open,open,open);
+            boolean severed=boss.spider.severed(i);
+            QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,i,severed?3.0:1.35,severed?.2:.08);
+            if(severed)SpiderTissue.stump(boss,i,pose,buffers,light,partial);
             pose.popPose();
         }
     }

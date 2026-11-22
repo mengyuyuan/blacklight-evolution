@@ -1,4 +1,8 @@
 package com.codex.blacklight.gametest;
+import com.codex.blacklight.registry.ModEntities;
+import com.codex.blacklight.registry.EncounterEntities;
+import com.codex.blacklight.entity.EncounterKind;
+import com.codex.blacklight.world.GreeneHiveCave;
 
 import com.codex.blacklight.combat.*;
 import com.codex.blacklight.item.GreeneTissueItem;
@@ -22,6 +26,113 @@ import java.util.UUID;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class GrabInteractionGameTest {
+    private static com.codex.blacklight.entity.BlacklightInfectedHost evolvedBody(net.minecraft.server.level.ServerLevel level,Vec3 pos){
+        var mob=ModEntities.INFECTED_HOST.get().create(level);
+        var tag=new net.minecraft.nbt.CompoundTag();mob.saveWithoutId(tag);
+        var host=new net.minecraft.nbt.CompoundTag();
+        host.putString("Type","minecraft:zombie");host.putString("Family","ground");host.putBoolean("Evolved",true);
+        host.putBoolean("Humanoid",true);host.putFloat("Width",1.064F);host.putFloat("Height",2.4192F);
+        tag.put("BlacklightHost",host);mob.load(tag);mob.setPos(pos);mob.setNoAi(true);mob.setNoGravity(true);
+        level.addFreshEntity(mob);return mob;
+    }
+    private static void face(ServerPlayer p,Vec3 point){
+        var v=point.subtract(p.getEyePosition());
+        p.setYRot((float)Math.toDegrees(Math.atan2(-v.x,v.z)));
+        p.setXRot((float)-Math.toDegrees(Math.atan2(v.y,v.horizontalDistance())));
+    }
+    @GameTest(template="wall_test",batch="cave_throw",timeoutTicks=150)
+    public static void feedsFromNaturalCaveFloor(GameTestHelper h){
+        var l=h.getLevel().getServer().getLevel(com.codex.blacklight.city.CityTravel.WORLD);
+        var den=GreeneHiveCave.site(l.getSeed(),0);
+        for(int dx=-3;dx<=3;dx++)for(int dz=-3;dz<=3;dz++)l.getChunk((den.getX()>>4)+dx,(den.getZ()>>4)+dz);
+        var b=EncounterEntities.CREATURES.get(EncounterKind.ELIZABETH_GREENE).get().create(l);
+        int ground=GreeneHiveCave.column(den,den.getX(),den.getZ()).floor();
+        b.moveTo(den.getX()+.5,ground,den.getZ()+.5,0,0);b.setNoGravity(true);b.startGreeneOutbreak();l.addFreshEntity(b);
+        var p=FakePlayerFactory.get(l,new GameProfile(UUID.randomUUID(),"cave-throw"));p.tickCount=100;
+        var powers=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);powers.infect();powers.setPrototypeMode(true);powers.activate(PowerForm.CLAWS);
+        var bodies=new java.util.ArrayList<net.minecraft.world.entity.Mob>();
+        try{
+            b.setHealth(b.getMaxHealth()*.50F);float hp=b.getHealth();
+            for(int shot=0;shot<3;shot++){
+                boolean blocked=shot==0, jump=shot==2;
+                var state=b.spiderData().copy();state.putLong("NextMeal",0);state.putLong("NextMove",l.getGameTime()+500);
+                b.spiderData(state);b.tickCount=100;
+                var mouth=b.spider.mouth(1);var stand=mouth.add(0,0,shot==1?29:17);
+                var col=net.minecraft.core.BlockPos.containing(stand);
+                int y=GreeneHiveCave.column(den,col.getX(),col.getZ()).floor();
+                var feet=new net.minecraft.core.BlockPos(col.getX(),y,col.getZ());
+                h.assertTrue(!l.getBlockState(feet.below()).getCollisionShape(l,feet.below()).isEmpty(),"natural floor supports the shooter");
+                p.setPos(stand.x,y,stand.z);p.setDeltaMovement(Vec3.ZERO);p.setOnGround(true);face(p,mouth);
+                var cargo=evolvedBody(l,p.position().add(0,0,-1.85));bodies.add(cargo);
+                b.spider.tick();
+                h.assertTrue(!b.spider.feeding(),"full-health evolved survives natural selection");
+                cargo.setHealth(cargo.getMaxHealth()*.32F);
+                var food=ModEntities.COMMON_INFECTED.get().create(l);food.setPos(mouth.add(4,0,1));food.setNoGravity(true);food.setNoAi(true);l.addFreshEntity(food);bodies.add(food);
+                b.spider.tick();
+                h.assertTrue(b.spider.feeding() && b.spiderData().getUUID("Prey").equals(food.getUUID()),"meal selects ordinary food while the evolved is wounded");
+                CombatTargeting.requestLock(p,b.getId(),SpiderAnatomy.MOUTH);
+                h.assertTrue(CombatTargeting.locked(p)==b,"can prelock the mouth from the cave floor");
+                ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+                h.assertTrue(ConsumeSystem.holding(p) && CombatTargeting.locked(p)==b,"prelocked mouth does not block grabbing wounded host");
+                ClawCombatSystem.handle(p,Action.IMPLANT_HELD);h.assertTrue(cargo.getPersistentData().getBoolean(SpiderPhase.TUMOR),"X implants held host");
+                if(jump){CombatTargeting.requestLock(p,-1);p.setOnGround(false);p.move(net.minecraft.world.entity.MoverType.SELF,new Vec3(0,1.05,0));tick(p,1);}
+                if(shot==1){
+                    CombatTargeting.requestLock(p,b.getId(),SpiderAnatomy.RIM);
+                    h.assertTrue(CombatTargeting.lockedSelection(p).region()==SpiderAnatomy.RIM,"outer ring is preselected before aiming into the open gap");
+                }
+                face(p,mouth);
+                var wall=net.minecraft.core.BlockPos.containing(p.getEyePosition().lerp(mouth,.28));
+                ClawCombatSystem.handle(p,Action.GRAB_THROW_START);ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);
+                if(blocked)for(int x=-2;x<=2;x++)for(int j=-2;j<=3;j++)l.setBlockAndUpdate(wall.offset(x,j,0),Blocks.STONE.defaultBlockState());
+                tick(p,6);
+                h.assertTrue(ConsumeSystem.inFlight(cargo),"release launches cargo on "+shot);
+                int flight=0;var start=cargo.position();
+                while(ConsumeSystem.inFlight(cargo) && flight++<41){ConsumeSystem.thrown(new com.codex.blacklight.combat.ForgeEntityTickEvent.Pre(cargo));SpiderPhase.settle(l);}
+                if(blocked){
+                    h.assertTrue(b.spiderData().getInt("Oral")==0 && b.getHealth()==hp && food.isAlive(),"solid wall prevents feeding");
+                    for(int x=-2;x<=2;x++)for(int j=-2;j<=3;j++)l.setBlockAndUpdate(wall.offset(x,j,0),Blocks.CAVE_AIR.defaultBlockState());
+                    var reset=b.spiderData().copy();reset.remove("Prey");reset.remove("PreyId");b.spiderData(reset);
+                }else{
+                    h.assertTrue(b.spiderData().getInt("Oral")==shot && food.isAlive() && b.getHealth()==hp,
+                            "mouth outcome "+shot+" ticks="+flight+" launch="+start+" impact="+cargo.position()+" mouth="+mouth+" blast="+b.spiderData().getInt("BlastPart"));
+                    System.out.println("CAVE_OFFER distance="+p.getEyePosition().distanceTo(mouth)+" jump="+jump+" flightTicks="+flight+" oral="+shot);
+                }
+                cargo.discard();food.discard();
+            }
+            h.assertTrue(b.spider.sealed(),"two physical mouth hits permanently seal healing");
+            // After sealing the mouth, throw an ordinary body at a visible leg from the same cave floor.
+            var at=p.position();int floorY=GreeneHiveCave.column(den,(int)Math.floor(at.x),(int)Math.floor(at.z)).floor();
+            p.setPos(at.x,floorY,at.z);p.setOnGround(true);
+            var leg=TargetSelection.choices(p,b).stream().filter(s->s.region()>=SpiderAnatomy.FIRST_LEG && !SpiderAnatomy.tendon(s.region()) && s.visibleWithinRange(p,48))
+                    .min(java.util.Comparator.comparingDouble(s->s.distanceSquared(p))).orElseThrow();
+            var aim=leg.point(p);face(p,aim);
+            CombatTargeting.requestLock(p,b.getId(),leg.region());
+            var ordinary=EntityType.COW.create(l);var forward=aim.subtract(p.getEyePosition()).multiply(1,0,1).normalize();
+            ordinary.setPos(p.position().add(forward.scale(1.5)));ordinary.setNoAi(true);l.addFreshEntity(ordinary);bodies.add(ordinary);
+            ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+            h.assertTrue(ConsumeSystem.holding(p),"pick cargo with leg preselected");
+            ClawCombatSystem.handle(p,Action.GRAB_THROW_START);ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);tick(p,6);
+            float before=b.getHealth();int flight=0;
+            while(ConsumeSystem.inFlight(ordinary) && flight++<41)ConsumeSystem.thrown(new com.codex.blacklight.combat.ForgeEntityTickEvent.Pre(ordinary));
+            int limb=SpiderAnatomy.legForRegion(leg.region());
+            h.assertTrue(b.getHealth()<before && b.spiderData().getFloat("Wear"+limb)>0,
+                    "quick throw hits preselected leg "+limb+" start="+p.position()+" impact="+ordinary.position()+" target="+aim);
+            System.out.println("CAVE_JOINT_THROW leg="+limb+" distance="+p.getEyePosition().distanceTo(aim)+" flightTicks="+flight);
+        }finally{ConsumeSystem.cancel(p);for(var m:bodies)m.discard();b.discard();}
+        h.succeed();
+    }
+    @GameTest(template="wall_test",batch="crowd_grab",timeoutTicks=30)
+    public static void nearbyAvailableBodyWinsInACrowd(GameTestHelper h){
+        var p=player(h);var far=h.spawn(EntityType.COW,3,2,7);far.setNoAi(true);
+        var resistant=h.spawn(EntityType.IRON_GOLEM,3,2,5);resistant.setNoAi(true);
+        var side=h.spawn(EntityType.COW,5,2,4);side.setNoAi(true);
+        p.setPos(p.position().add(0,15,0));far.setPos(p.position().add(0,0,5.7));side.setPos(p.position().add(1.9,0,.75));resistant.setPos(p.position().add(0,0,2.4));
+        CombatTargeting.requestLock(p,far.getId());h.assertTrue(CombatTargeting.locked(p)==far,"far lock fixture; enabled="+ExplicitTarget.enabled(p)+" sight="+CombatTargeting.visibleWithinRange(p,far,32));
+        ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+        h.assertTrue(ConsumeSystem.holding(p) && ConsumeControl.protectedEntity(side) && CombatTargeting.locked(p)==far,
+                "within reach, prefer a grabbable body even with an unreachable combat lock");
+        ConsumeSystem.cancel(p);side.discard();far.discard();resistant.discard();h.succeed();
+    }
     private static ServerPlayer player(GameTestHelper h) {
         for(int x=1;x<10;x++)for(int z=1;z<10;z++)h.setBlock(x,1,z,Blocks.STONE);
         var p=FakePlayerFactory.get(h.getLevel(),new GameProfile(UUID.randomUUID(),"grab-input"));
