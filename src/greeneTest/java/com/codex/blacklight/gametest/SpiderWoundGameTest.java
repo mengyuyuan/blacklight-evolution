@@ -200,6 +200,73 @@ public final class SpiderWoundGameTest {
             System.out.println("CAVE_PRESSURE 460-tick molt, one goddess, no ground shell");
         }finally{b.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}h.succeed();});
     }
+    @GameTest(template="blackwatch_arena",batch="greene_ribbed_den",timeoutTicks=505)
+    public static void eatsThenPursuesAroundDenPillar(GameTestHelper h){
+        var level=h.getLevel();
+        var center=h.absolutePos(new BlockPos(8,141,8));
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int dx=-3;dx<=3;dx++)for(int dz=-2;dz<=3;dz++){
+            int x=(center.getX()>>4)+dx,z=(center.getZ()>>4)+dz;
+            if(level.setChunkForced(x,z,true))forced.add(new net.minecraft.world.level.ChunkPos(x,z));
+        }
+        // Use the outbreak generator's actual floor heights, including raised ribs under the belly.
+        for(int x=-30;x<=36;x++)for(int z=-14;z<=42;z++){
+            var col=com.codex.blacklight.world.GreeneHiveCave.column(center,center.getX()+x,center.getZ()+z);
+            if(col==null)continue;
+            for(int y=-2;y<col.floor()-center.getY();y++)level.setBlock(center.offset(x,y,z),Blocks.STONE.defaultBlockState(),2);
+        }
+        for(int x=-4;x<=4;x++)for(int z=12;z<=13;z++)for(int y=0;y<8;y++)
+            level.setBlock(center.offset(x,y,z),Blocks.DEEPSLATE.defaultBlockState(),2);
+        var start=Vec3.atBottomCenterOf(center);
+        var b=boss(h,start);b.setNoAi(false);b.setNoGravity(false);state(b,0,0,0);
+        b.setHealth(b.getMaxHealth()*.76F);
+        var meal=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HUNTER.get().create(level);
+        meal.moveTo(start.x-14,start.y+1,start.z+2,0,0);meal.setNoAi(true);level.addFreshEntity(meal);
+        var profile=new GameProfile(UUID.randomUUID(),"DenRunner");
+        var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(1000);p.setHealth(1000);
+        p.setPos(start.add(0,2,39));level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);p.setNoGravity(true);
+        var opening=b.spiderData().copy();opening.putLong("NextMove",level.getGameTime()+12);b.spiderData(opening);
+        var metrics=new double[5];var fed=new boolean[1];var samples=new JsonArray();
+        var previous=new Vec3[]{b.position()};
+        for(int i=1;i<=485;i++){
+            int tick=i;
+            h.runAfterDelay(i,()->{
+                double flank=Math.min(31,Math.max(0,tick-224)*.42);
+                p.setPos(start.add(flank,3,39-flank*.60));
+                if(b.spider.feeding()){
+                    fed[0]=true;
+                    if(RECORD){
+                        var line=b.spider.rootPath(0,0);
+                        var sample=new JsonObject();var points=new JsonArray();
+                        for(var v:line)points.add(point(b,v));
+                        sample.add("path",points);sample.addProperty("time",b.tickCount/20.);
+                        sample.addProperty("contact",level.getGameTime()-b.spiderData().getLong("DragAt"));
+                        sample.add("target",point(b,meal.getBoundingBox().getCenter()));
+                        samples.add(sample);
+                    }
+                }
+                metrics[0]=Math.max(metrics[0],b.getZ()-start.z);
+                if(b.getZ()-start.z<19)metrics[1]=Math.max(metrics[1],Math.abs(b.getX()-start.x));
+                if(tick%40==0)System.out.println("CAVE_RIB_TICK "+tick+" rel="+b.position().subtract(start)+" player="+p.position().subtract(start)+" action="+b.spider.actions.move()+" age="+b.spider.actions.age(0));
+                if(tick==224)metrics[2]=b.getX();
+                metrics[3]=Math.max(metrics[3],Math.abs(b.getX()-start.x));
+                metrics[4]=Math.max(metrics[4],previous[0].subtract(b.position()).horizontalDistance());
+                previous[0]=b.position();
+            });
+        }
+        h.runAfterDelay(487,()->{try{
+            double flank=b.getX()-metrics[2];
+            System.out.println("CAVE_RIB_PURSUIT ate="+(!meal.isAlive())+" advance="+metrics[0]+" detour="+metrics[1]+" flank="+flank+" maxStep="+metrics[4]+" pos="+b.position()+" health="+b.getHealth());
+            write("spider-meal-strand.json",samples);
+            h.assertTrue(fed[0] && !meal.isAlive() && b.getHealth()>b.getMaxHealth()*.76F,"must finish real natural meal before chasing");
+            h.assertTrue(metrics[0]>24 && metrics[1]>7 && flank>6,"must get around the stone pillar and follow a runner changing flank");
+            h.assertTrue(metrics[4]<2 && !level.getBlockCollisions(b,b.getBoundingBox().deflate(.02)).iterator().hasNext(),"bounded strides end in free space");
+        }finally{b.discard();meal.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}
+        h.succeed();});
+    }
     @GameTest(template="blackwatch_arena",batch="greene_new_pressure",timeoutTicks=200)
     public static void standingStrikeAndCounterWindow(GameTestHelper h){
         var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));floor(level,center,25,25);

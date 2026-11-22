@@ -55,6 +55,8 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     private final int[] preyVao=new int[4],preyVbo=new int[4],preyCounts=new int[4],preySkins=new int[4];
     private FloatBuffer staging=org.lwjgl.BufferUtils.createFloatBuffer(65536);
     private final int[] dynamic=new int[3];
+    private final int combatTiming;
+    private final float[] combatPaths=new float[3*16*3],combatProfiles=new float[3*4];
     private final int fissures,fissureCount;
     private final int model,strand,shell,wrap,mist,people,lines,frames,schedule,actorSize,pathSize,frameSize;
     private final float[] pivots=new float[36],hydra=new float[9],hunter=new float[9],matrix=new float[16];
@@ -142,6 +144,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
                 if(data.remaining()%48!=0)throw new IOException("Invalid Greene fissure mesh");
                 fissureCount=data.remaining()/48;fissures=mesh(values(data,fissureCount*12),3,3,3,2,1);
             }
+            combatTiming=dataTexture(1,3,4,null);
             grid(0,40,4);grid(1,170,80);grid(2,57,6);
             grids[3]=mesh(new float[]{-1,-1,1,-1,1,1,-1,-1,1,1,-1,1},2);gridCounts[3]=6;
         }catch(IOException|RuntimeException ex){close();throw ex;}
@@ -252,7 +255,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             System.arraycopy(animalMatrices,k,matrix,0,16);glUniformMatrix4fv(u(model,"root"),false,matrix);
             glBindVertexArray(preyVao[i]);glDrawArrays(GL_TRIANGLES,0,preyCounts[i]);
         }
-        if(t<14.3F){glUseProgram(strand);integer(strand,"absent",absent);integer(strand,"paths",4);integer(strand,"timing",5);
+        if(t<14.3F){glUseProgram(strand);integer(strand,"combat",0);integer(strand,"absent",absent);integer(strand,"paths",4);integer(strand,"timing",5);
             gridPass(strand,0,lines*3,camera,eye,t,light);}
         if(t>7.9F&&t<19.5F){gridPass(shell,1,1,camera,eye,t,light);gridPass(wrap,2,94,camera,eye,t,light);}
         if(t>2.35F&&t<20.5F){
@@ -291,6 +294,66 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             renderer.drawModel(1,1);
         }
         return true;
+    }
+    static void drawCombatTendrils(EncounterMob boss,float partial,PoseStack stack,
+                                  net.minecraft.client.renderer.MultiBufferSource buffers,int light){
+        var spider=boss.spider;
+        var move=spider.actions.move();
+        boolean lash=move==com.codex.blacklight.combat.SpiderActions.Move.ORAL_SCISSORS;
+        boolean needle=move==com.codex.blacklight.combat.SpiderActions.Move.CATALYZE;
+        if(!spider.feeding() && !lash && !needle)return;
+        var origin=boss.getPosition(partial);
+        int rows=0;
+        for(int slot=needle?-1:0;slot<=(needle?-1:2);slot++){
+            var path=spider.rootPath(slot,partial);
+            if(path.size()<2 || path.get(0).distanceToSqr(path.get(path.size()-1))<.0004)continue;
+            float width=needle?.24F:lash?.43F:slot==0?.40F:.31F;
+            if(scene==null){
+                var points=new net.minecraft.world.phys.Vec3[path.size()];
+                var widths=new double[path.size()];
+                for(int i=0;i<points.length;i++){
+                    points[i]=path.get(i).subtract(origin);
+                    widths[i]=width*(1-.91*i/(points.length-1.));
+                }
+                var out=buffers.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(ConsumeTendrilSegmentMesh.TEXTURE));
+                ConsumeTendrilSegmentMesh.draw(stack,out,light,points,widths,new net.minecraft.world.phys.Vec3(1,0,0),0xffffffff);
+                continue;
+            }
+            for(int i=0;i<16;i++){
+                double t=i*(path.size()-1)/15.;
+                int j=(int)t;
+                var point=path.get(j).lerp(path.get(Math.min(j+1,path.size()-1)),t-j).subtract(origin);
+                int at=(16*rows+i)*3;
+                scene.combatPaths[at]=(float)point.x;
+                scene.combatPaths[at+1]=(float)point.y;
+                scene.combatPaths[at+2]=(float)point.z;
+            }
+            int at=rows++*4;
+            scene.combatProfiles[at]=width;
+            float contactAge=needle?spider.actions.age(partial)-23:lash?spider.actions.age(partial)-12:
+                    boss.level().getGameTime()-boss.spiderData().getLong("DragAt")+partial;
+            scene.combatProfiles[at+1]=net.minecraft.util.Mth.clamp((contactAge+3)/6,0,1);
+            scene.combatProfiles[at+2]=.28F+.19F*(slot+1);
+            scene.combatProfiles[at+3]=needle?-1F:1F;
+        }
+        if(rows==0)return;
+        var renderer=scene;
+        var view=new Matrix4f(RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
+        var eye=view.invert(new Matrix4f()).transformPosition(new org.joml.Vector3f());
+        var camera=new Matrix4f(RenderSystem.getProjectionMatrix()).mul(view);
+        int atlas=Minecraft.getInstance().getTextureManager().getTexture(ConsumeTendrilSegmentMesh.TEXTURE).getId();
+        try(var state=new State()){
+            upload(4,renderer.dynamic[2],16,rows,GL_RGB,renderer.combatPaths);
+            upload(5,renderer.combatTiming,1,rows,GL_RGBA,renderer.combatProfiles);
+            bind(12,atlas);
+            glDisable(GL_CULL_FACE);glEnable(GL_DEPTH_TEST);glDepthMask(true);glDisable(GL_BLEND);
+            int shader=renderer.strand;
+            glUseProgram(shader);renderer.integer(shader,"absent",0);renderer.integer(shader,"combat",1);
+            renderer.integer(shader,"paths",4);renderer.integer(shader,"timing",5);
+            float brightness=.38F+.62F*Math.max((light>>20)&15,(light>>4)&15)/15F;
+            float seconds=(boss.tickCount+partial)/20F;
+            renderer.gridPass(shader,0,rows*3,camera,new float[]{eye.x,eye.y,eye.z},seconds,brightness);
+        }
     }
     public static void draw(EncounterMob boss,float partial,PoseStack stack,int light){
         int[] skins=new int[8];skins[0]=skin("textures/entity/greene_goddess_tissue.png");

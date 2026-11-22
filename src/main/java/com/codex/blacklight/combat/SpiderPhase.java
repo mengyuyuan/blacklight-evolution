@@ -350,6 +350,10 @@ public final class SpiderPhase {
         var b=prey.getPosition(partial).add(0,prey.getBbHeight()*.52,0);
         double side=slot==1?1:slot==2?-1:0;
         var cross=new Vec3(b.z-a.z,0,a.x-b.x).normalize();
+        // Embed each hydra cable in its own shoulder or breast contact instead of converging inside its core.
+        var approach=a.subtract(b).multiply(1,0,1).normalize();
+        b=b.add(approach.scale(prey.getBbWidth()*.23)).add(cross.scale(side*prey.getBbWidth()*.32))
+                .add(0,Math.abs(side)*prey.getBbHeight()*.13,0);
         float age=now()-data().getLong("MealStart")+partial;
         float drag=data().getLong("DragAt")-data().getLong("MealStart");
         double extension=SpiderGesture.ease(age+1,0,drag*.69F);
@@ -371,7 +375,7 @@ public final class SpiderPhase {
             var a=path.get(i-1);var b=path.get(i);var delta=b.subtract(a);
             if(delta.lengthSqr()<.0001)continue;
             var z=delta.normalize();var x=z.cross(Math.abs(z.y)>.94?new Vec3(1,0,0):new Vec3(0,1,0)).normalize();
-            double width=actions.move()==SpiderActions.Move.ORAL_SCISSORS?jawCordRadius(i):.24;
+            double width=actions.move()==SpiderActions.Move.ORAL_SCISSORS?jawCordRadius(i):slot<0?.24:slot==0?.40:.31;
             boxes.add(HydraContact.oriented(a.lerp(b,.5),new Vec3(width,width,delta.length()*.5+.06),x,z.cross(x),z));
         }
     }
