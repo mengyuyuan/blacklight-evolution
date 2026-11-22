@@ -78,6 +78,10 @@ public final class QuillHarvest {
         }
     }
 
+    static void plantHeld(ServerPlayer player,Mob held){
+        if(active(player) && !protectedPet(held) && mark(held).getInt("layers")==0)
+            attach(player,held,held.getBoundingBox().getCenter(),0);
+    }
     private static QuillOrgan attach(ServerPlayer p,Mob mob,Vec3 entry,int socket){
         CompoundTag mark = mob.getPersistentData().getCompound(MARK);
         if (mark.hasUUID("owner") && !p.getUUID().equals(mark.getUUID("owner"))) return null;
@@ -95,6 +99,14 @@ public final class QuillHarvest {
     public static Vec3 anchor(Mob mob, CompoundTag mark) {
         return mob.position().add(new Vec3(mark.getDouble("x"),mark.getDouble("y"),mark.getDouble("z"))
                 .yRot((float)Math.toRadians(-mob.yBodyRot)));
+    }
+    public static void transferTumor(Mob previous,Mob next,ServerLevel level){
+        if(!previous.getPersistentData().getBoolean(SpiderPhase.TUMOR))return;
+        next.getPersistentData().putBoolean(SpiderPhase.TUMOR,true);next.addTag(SpiderPhase.TUMOR);
+        var tissue=mark(previous).copy();if(!tissue.hasUUID("owner"))return;
+        next.getPersistentData().put(MARK,tissue);
+        if(tissue.hasUUID("organ") && level.getEntity(tissue.getUUID("organ")) instanceof QuillOrgan organ && organ.transferRoot(previous,next))return;
+        tissue.remove("organ");organ(level,next,tissue);
     }
     public static CompoundTag mark(Mob mob) { return mob.getPersistentData().getCompound(MARK); }
     public static boolean protectedPet(Entity entity) {

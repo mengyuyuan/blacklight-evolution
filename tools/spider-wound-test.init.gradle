@@ -1,0 +1,5 @@
+allprojects { afterEvaluate {
+    sourceSets.main.java.srcDir("src/greeneTest/java")
+    sourceSets.main.java.exclude { f -> f.file.path.replace("\\","/").contains("/src/greeneTest/") && f.file.name.endsWith(".java") && f.file.name != "SpiderWoundGameTest.java" }
+    sourceSets.main.resources.srcDir("src/blackwatchTest/resources")
+} }

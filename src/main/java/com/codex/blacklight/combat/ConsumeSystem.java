@@ -6,6 +6,7 @@ import com.codex.blacklight.animation.PlayerActions;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.*;
 import net.minecraft.world.phys.Vec3;
 import com.codex.blacklight.power.PowerForm;
@@ -32,11 +33,23 @@ public final class ConsumeSystem {
     public static final TagKey<EntityType<?>> UNCONSUMABLE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("blacklight", "unconsumable"));
     public static final TagKey<EntityType<?>> PASSIVE = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("blacklight", "consumable_without_weakening"));
     private static final Map<Mob, Thrown> THROWN = new HashMap<>();
+    @SubscribeEvent public static void settleSpiderMouths(net.neoforged.neoforge.event.tick.LevelTickEvent.Post event){
+        if(event.getLevel() instanceof ServerLevel level)SpiderPhase.settle(level);
+    }
+    public static boolean inFlight(Mob mob){return THROWN.containsKey(mob);}
     private record Thrown(ServerPlayer owner, int remaining, Vec3 velocity,float damage,float charge) {}
     /** Same scale as block throws so the two charge bars feel alike. */
     public static final int THROW_CHARGE_TICKS=BlockThrowTuning.MAX_CHARGE_TICKS;
     static float chargeFraction(int ticks){return Math.max(0,Math.min(1,ticks/(float)THROW_CHARGE_TICKS));}
     /** Left button down while holding a body: start or renew the wind-up. */
+    public static void implantHeld(ServerPlayer player){
+        var s=ACTIVE.get(player);
+        if(s==null || s.large || !ConsumeVisual.carrying(s.stage) || !valid(player,s) || !SpiderPhase.edible(s.victim))return;
+        if(SpiderPhase.implant(s.victim)){
+            QuillHarvest.plantHeld(player,s.victim);
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.greene_implanted"),true);
+        }
+    }
     public static void startThrowCharge(ServerPlayer player){
         var s=ACTIVE.get(player);if (s == null || s.large || s.consumeQueued || s.throwAim != null
                 || !(s.stage == ConsumeVisual.CAPTURE || ConsumeVisual.carrying(s.stage)) || !valid(player,s)) return;
@@ -308,6 +321,24 @@ public final class ConsumeSystem {
         return player.level()==target.level()&&(ConsumeSequence.large(target)?player.getEyePosition().distanceToSqr(ConsumeSequence.contact(target)):
                 CombatTargeting.distanceSquared(player.getEyePosition(),target.getBoundingBox()))<=range*range+1e-6;
     }
+    private static boolean grabCandidate(ServerPlayer p,Mob mob,double range){
+        return !(mob instanceof com.codex.blacklight.entity.EncounterMob boss && boss.spider.live())
+                && eligible(mob) && CombatTargeting.selectable(p,mob) && grabInReach(p,mob,range) && hasGrabSight(p,mob);
+    }
+    private static boolean withinGrabArc(ServerPlayer p,Mob mob){
+        double alignment=grabAim(p,mob);
+        if(alignment>.65)return true;
+        double gap=CombatTargeting.distanceSquared(p.getEyePosition(),mob.getBoundingBox());
+        return gap<=1.25*1.25 || (alignment>.17 && gap<=3*3);
+    }
+    private static boolean inSpiderFight(ServerPlayer p){
+        return !p.serverLevel().getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,
+                p.getBoundingBox().inflate(60),b->b.spider.live()).isEmpty();
+    }
+    private static boolean readyToGrab(ServerPlayer p,Mob mob){
+        return healthReady(p,mob) || (mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host
+                && host.isEvolved() && !host.giantBoss() && host.getHealth()<=host.getMaxHealth()*.35F && inSpiderFight(p));
+    }
     /** Arrow knockback can briefly clear onGround without being an aerial move. */
     private static boolean canStartGroundGrab(ServerPlayer player) {
         if(player.onGround())return true;
@@ -318,16 +349,25 @@ public final class ConsumeSystem {
                 feet.maxX-.05,feet.minY+.01,feet.maxZ-.05);
         return player.level().getBlockCollisions(player,support).iterator().hasNext();
     }
-    private record ThrowAim(Vec3 look, LivingEntity target) {}
+    private record ThrowAim(Vec3 look, LivingEntity target, TargetSelection selected) {}
 
     /** Take one sight picture on button release, before the hand starts moving. */
     private static ThrowAim selectThrowAim(ServerPlayer player, Mob body) {
         Vec3 eye = player.getEyePosition(), look = player.getLookAngle();
         LivingEntity locked = CombatTargeting.locked(player);
-        if (locked != null && locked != body && CombatTargeting.selectable(player,locked)
-                && CombatTargeting.visibleWithinRange(player,locked,48)) return new ThrowAim(look,locked);
-
         Vec3 end = eye.add(look.scale(48));
+        if (locked != null && locked != body && CombatTargeting.selectable(player,locked)
+                && CombatTargeting.visibleWithinRange(player,locked,48)){
+            var part=CombatTargeting.selectionFor(player,locked);
+            if(locked instanceof com.codex.blacklight.entity.EncounterMob boss && boss.spider.feeding()
+                    && part!=null && part.region()==SpiderAnatomy.RIM && SpiderPhase.evolved(body)
+                    && body.getPersistentData().getBoolean(SpiderPhase.TUMOR)){
+                var sight=TargetSelection.aimedBoss(player,List.of(boss),eye,end,1,48);
+                if(sight!=null && sight.region()==SpiderAnatomy.MOUTH)part=sight;
+            }
+            return new ThrowAim(look,locked,part);
+        }
+
         LivingEntity aimed = null;
         double best = Double.POSITIVE_INFINITY;
         for (LivingEntity candidate : CombatTargeting.candidates(player, player.getBoundingBox().inflate(48),
@@ -351,7 +391,12 @@ public final class ConsumeSystem {
                 aimed = candidate;
             }
         }
-        return new ThrowAim(look,aimed);
+        if(aimed instanceof com.codex.blacklight.entity.EncounterMob boss && boss.spider.live()){
+            var part=TargetSelection.aimedBoss(player,List.of(boss),eye,end,1,48);
+            // An aimed offer must go to the sighted skin, including when the player has no lock.
+            return new ThrowAim(look,part==null?null:boss,part);
+        }
+        return new ThrowAim(look,aimed,null);
     }
 
     /** The body starts at the moving hand, with gravity and drag applied once per game tick. */
@@ -362,7 +407,13 @@ public final class ConsumeSystem {
         LivingEntity target=intent.target();
         if(target!=null && (!CombatTargeting.selectable(p,target)||!CombatTargeting.visibleWithinRange(p,target,48)))target=null;
         if(target==null)return free;
-        Vec3 aim=CombatTargeting.lockPoint(p,target);
+        Vec3 aim=intent.selected()!=null && intent.selected().selectable(p)?intent.selected().point(p):CombatTargeting.lockPoint(p,target);
+        if(target instanceof com.codex.blacklight.entity.EncounterMob boss && boss.spider.live()
+                && intent.selected()!=null && intent.selected().regional()){
+            if(intent.selected().region()==SpiderAnatomy.MOUTH)aim=boss.spider.mouth(1);
+            // Reach the selected surface of the giant with a low arc while still sweeping all intervening obstacles.
+            speed=Math.max(speed,Math.min(3.0,from.distanceTo(aim)/9.0));
+        }
         Vec3 motion=target.onGround()?target.getDeltaMovement().multiply(1,0,1):Vec3.ZERO;
         double sum=0,drop=0,pow=1,fall=0;
         for(int n=1;n<=40;n++){
@@ -464,17 +515,19 @@ public final class ConsumeSystem {
         var locked=CombatTargeting.locked(player);
         var previous=ABSORBING.get(locked);
         if(previous!=null&&previous.owner()==player)locked=null;
-        Mob target;
-        if(locked!=null) {
-            target=locked instanceof Mob mob && eligible(mob) && grabInReach(player,mob,range)
-                    && hasGrabSight(player,mob)?mob:null;
-        } else {
-            target=CombatTargeting.candidates(player,player.getBoundingBox().inflate(range),
-                    h->h instanceof Mob mob&&eligible(mob)&&CombatTargeting.selectable(player,mob)&&grabInReach(player,mob,range)
-                            &&hasGrabSight(player,mob)&&grabAim(player,mob)>.65).stream().map(Mob.class::cast)
-                    .min(Comparator.<Mob>comparingDouble(h->-grabAim(player,h))
-                            .thenComparingDouble(h->CombatTargeting.distanceSquared(player.getEyePosition(),h))
-                            .thenComparingInt(Mob::getId)).orElse(null);
+        // A boss part can remain the throw destination while the hand picks up nearby cargo.
+        Mob target = locked instanceof Mob mob && grabCandidate(player,mob,range) ? mob : null;
+        if(target==null){
+            var nearby=CombatTargeting.candidates(player,player.getBoundingBox().inflate(range),
+                    e->e instanceof Mob mob && grabCandidate(player,mob,range) && withinGrabArc(player,mob))
+                    .stream().map(Mob.class::cast)
+                    .sorted(Comparator.<Mob>comparingDouble(m->-grabAim(player,m))
+                            .thenComparingDouble(m->CombatTargeting.distanceSquared(player.getEyePosition(),m))
+                            .thenComparingInt(Mob::getId)).toList();
+            for(var candidate:nearby){
+                if(target==null)target=candidate; // Still explain the health threshold if none can be held.
+                if(readyToGrab(player,candidate)){target=candidate;break;}
+            }
         }
         if (target == null) {
             if(queuedGrab)return;
@@ -484,7 +537,10 @@ public final class ConsumeSystem {
             }else message(player,"consume_no_target");
             return;
         }
-        if (!healthReady(player,target)) { message(player, "consume_weaken"); return; }
+        if (!readyToGrab(player,target)) {
+            message(player,SpiderPhase.evolved(target) && inSpiderFight(player) ? "greene_grab_weaken" : "consume_weaken");
+            return;
+        }
         if(!canStartGroundGrab(player)&&!ConsumeSequence.large(target)) {
             message(player,"grab_ground");return;
         }
@@ -628,7 +684,9 @@ public final class ConsumeSystem {
             }
             if(elapsed>=ConsumeVisual.captureDuration(session.form)) {
                 if(target.position().distanceToSqr(anchor(player,target))>.36){cancel(player);return;}
-                phase(player,session,ConsumeVisual.HOLD);message(player,"grab_held");
+                phase(player,session,ConsumeVisual.HOLD);
+                if(SpiderPhase.edible(target))player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.greene_grip_hint",net.minecraft.network.chat.Component.keybind("key.blacklight.disguise")),true);
+                else message(player,"grab_held");
                 if(session.consumeQueued)consume(player);
                 else if(session.throwAim != null)throwTarget(player);
             }
@@ -1027,6 +1085,10 @@ public final class ConsumeSystem {
         if(stoppedBeforeContact){hit=null;mechanical=null;}
         if(stoppedBeforeContact||hit!=null||mechanical!=null||wall!=null||mob.horizontalCollision||mob.verticalCollision) {
             THROWN.remove(mob);release(mob);mob.setDeltaMovement(Vec3.ZERO);
+            if(hit instanceof BlockThrowCollision.AnimatedHit posed && hit.getEntity() instanceof com.codex.blacklight.entity.EncounterMob boss && boss.spider.live()){
+                int part=SpiderAnatomy.NAMES.indexOf(posed.contact().bone());
+                if(part>=0 && boss.spider.receiveThrown(mob,part,mob.damageSources().thrown(mob,shot.owner()),from.distanceTo(contact)/Math.max(1e-6,shot.velocity().length())))return;
+            }
             boolean full=shot.charge()>=.9F;var tier=full?ImpactTier.FINISHER:ImpactTier.HEAVY;
             if(hit!=null&&BlockThrowCollision.hurt(hit,mob.damageSources().thrown(mob,shot.owner()),shot.damage())&&hit.getEntity() instanceof LivingEntity struck){
                 boolean physical=RagdollImpact.supportedBody(struck)&&ImpactControl.begin(struck,

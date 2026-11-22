@@ -1,0 +1,15 @@
+allprojects { afterEvaluate {
+    for (suite in ["feedbackTest","greeneTest","traversalTest"]) {
+        sourceSets.main.java.srcDir("src/"+suite+"/java")
+    }
+    sourceSets.main.java.exclude { f ->
+        if (!f.file.name.endsWith(".java")) return false
+        def p=f.file.path.replace("\\","/")
+        (p.contains("/feedbackTest/") && f.file.name != "EvolvedTraversalGameTest.java") ||
+        (p.contains("/greeneTest/") && f.file.name != "SpiderWoundGameTest.java") ||
+        (p.contains("/traversalTest/") && f.file.name != "OrdinaryConsumeGameTest.java")
+    }
+    sourceSets.main.resources.srcDir("src/blackwatchTest/resources")
+    sourceSets.main.resources.srcDir("src/traversalTest/resources")
+    tasks.named("processResources").configure { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+} }

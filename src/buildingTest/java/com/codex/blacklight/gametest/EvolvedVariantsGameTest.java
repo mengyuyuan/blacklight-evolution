@@ -58,8 +58,13 @@ public final class EvolvedVariantsGameTest {
         var body=host(h,EvolvedArchetype.SENSORY);
         // Keep the actual projectile lane above the shared melee and ecology arenas.
         var lane=h.absolutePos(new BlockPos(5,80,5));
+        var casterChunk=new net.minecraft.world.level.ChunkPos(lane);
+        boolean forcedCaster=h.getLevel().setChunkForced(casterChunk.x,casterChunk.z,true);
+        h.getLevel().getChunk(casterChunk.x,casterChunk.z);
         for(var pos:BlockPos.betweenClosed(lane.offset(-3,-1,-3),lane.offset(3,-1,15)))
             h.getLevel().setBlock(pos,Blocks.STONE.defaultBlockState(),2);
+        for(var pos:BlockPos.betweenClosed(lane.offset(-2,0,-2),lane.offset(2,4,14)))
+            h.getLevel().setBlock(pos,Blocks.AIR.defaultBlockState(),2);
         body.setPos(lane.getX()+.5,lane.getY(),lane.getZ()+.5);
         body.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
         var target=enemy(h,body,12);
@@ -87,10 +92,12 @@ public final class EvolvedVariantsGameTest {
             try{
                 h.assertTrue(volley.get(),"the sensory AI committed a volley against the assigned target");
                 h.assertTrue(emitted.get(),"the caster emitted a physical quill");
-                h.assertTrue(hit.get(),"a quill fired by this caster damaged the assigned target");
+                h.assertTrue(hit.get(),"a quill fired by this caster damaged the assigned target; caster="+body.position()
+                    +" target="+target.position()+" health="+target.getHealth()+" last damage="+target.getLastDamageSource());
             }finally{
                 body.discard();
                 target.discard();
+                if(forcedCaster)h.getLevel().setChunkForced(casterChunk.x,casterChunk.z,false);
             }
             h.succeed();
         });
