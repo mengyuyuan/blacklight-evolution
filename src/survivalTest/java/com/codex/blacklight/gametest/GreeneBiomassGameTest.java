@@ -130,8 +130,8 @@ public final class GreeneBiomassGameTest {
             var host=escaping[0];
             h.assertTrue(done(slime,"plaza_cleared") && done(operator,"plaza_cleared"),"finisher and operator both receive the plaza reward");
             var cores=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,host.getBoundingBox().inflate(6),
-                    item -> item.getItem().is(com.codex.blacklight.registry.ModItems.MOTHER_CORE.get()));
-            h.assertTrue(cores.size()==1 && cores.get(0).getItem().getCount()==1,"biomass receives a single Mother Core");
+                    item -> item.getItem().is(com.codex.blacklight.registry.ModItems.GREENE_TISSUE.get()));
+            h.assertTrue(cores.size()==1 && cores.get(0).getItem().getCount()==1,"escape leaves a single living tissue sample");
             var reformed=BiomassSystem.state(slime).reform(level.getGameTime()-BiomassState.REFORM_TICKS-1);
             ModAttachments.setData(slime,ModAttachments.BIOMASS_FORM,reformed);
             tick(slime);

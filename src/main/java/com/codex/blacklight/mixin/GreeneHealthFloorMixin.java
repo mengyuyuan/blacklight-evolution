@@ -14,7 +14,7 @@ public abstract class GreeneHealthFloorMixin {
     private float blacklight$greeneHealthFloor(float nextHealth){
         nextHealth = com.codex.blacklight.combat.ConsumeContactDamage.healthFloor((LivingEntity)(Object)this, nextHealth);
         if((Object)this instanceof EncounterMob owner&&owner.greeneOwnDamageActive()&&owner.isAlive()&&Float.isFinite(nextHealth))
-            return Math.max(nextHealth,owner.greeneMinimumHealth());
+            return owner.spiderHealthWrite(nextHealth);
         return nextHealth;
     }
 }

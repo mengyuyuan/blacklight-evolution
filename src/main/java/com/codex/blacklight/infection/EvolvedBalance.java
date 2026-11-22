@@ -22,6 +22,7 @@ public final class EvolvedBalance {
         HIT_FRACTION=b.comment("Per-contact damage ceiling as a fraction of an infected player's maximum health, before defenses. Does not force damage upward.").defineInRange("maximumPlayerHealthFractionPerHit",.30D,.05,1);
         SPEC=b.build();
     }
+    public static final double PLAYER_DETECTION=96, PURSUIT_RANGE=128;
     private EvolvedBalance(){}
     public static Rules rules(){return new Rules(HEALTH.get(),ATTACK.get(),ARMOR.get(),TOUGHNESS.get(),SPEED.get(),KNOCKBACK.get(),HIT_FRACTION.get());}
     private static ResourceLocation id(String suffix){return new ResourceLocation("blacklight","evolved_"+suffix);}
@@ -34,7 +35,7 @@ public final class EvolvedBalance {
         CombatScale.modifier(host.getAttribute(Attributes.ARMOR_TOUGHNESS),id("toughness"),active?r.toughness:0,AttributeModifier.Operation.ADDITION);
         CombatScale.modifier(host.getAttribute(Attributes.MOVEMENT_SPEED),id("speed"),active?r.speed*kind.speed-1:0,AttributeModifier.Operation.MULTIPLY_TOTAL);
         CombatScale.modifier(host.getAttribute(Attributes.KNOCKBACK_RESISTANCE),id("knockback"),active?r.knockback:0,AttributeModifier.Operation.ADDITION);
-        if(active)host.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(64,host.getAttributeValue(Attributes.FOLLOW_RANGE)));
+        if(active)host.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(PURSUIT_RANGE,host.getAttribute(Attributes.FOLLOW_RANGE).getBaseValue()));
     }
     public static float playerDamage(float incoming,float maximumHealth,float units,float difficulty,Rules rules){
         if(!Float.isFinite(incoming)||incoming<=0||maximumHealth<=0)return 0;

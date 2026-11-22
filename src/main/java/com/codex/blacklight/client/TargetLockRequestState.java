@@ -24,7 +24,7 @@ public final class TargetLockRequestState {
     public boolean pending(){return pending;}
     public int request(int id){return request(id,-1);}
     public int request(int id,int region) {
-        if(region< -1||region>2||id<0&&region!=-1)throw new IllegalArgumentException("Invalid target region");
+        if(region< -1||region>=com.codex.blacklight.combat.SpiderAnatomy.NAMES.size()||id<0&&region!=-1)throw new IllegalArgumentException("Invalid target region");
         if(id< -1)throw new IllegalArgumentException("Invalid target ID");
         requestId=requestId==Integer.MAX_VALUE?1:requestId+1;
         firstOccludedTick = -1;
@@ -32,7 +32,7 @@ public final class TargetLockRequestState {
     }
     public boolean acknowledge(int sequence,int acceptedId){return acknowledge(sequence,acceptedId,-1);}
     public boolean acknowledge(int sequence,int acceptedId,int acceptedRegion) {
-        if(!pending||sequence!=requestId||acceptedId< -1||acceptedRegion< -1||acceptedRegion>2||acceptedId<0&&acceptedRegion!=-1)return false;
+        if(!pending||sequence!=requestId||acceptedId< -1||acceptedRegion< -1||acceptedRegion>=com.codex.blacklight.combat.SpiderAnatomy.NAMES.size()||acceptedId<0&&acceptedRegion!=-1)return false;
         acknowledgedId=desiredId=acceptedId;acknowledgedRegion=desiredRegion=acceptedRegion;pending=false;attachmentObserved=false;return true;
     }
     /** Synced attachments still deliver later server cleanup to the owner and observers. */

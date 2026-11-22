@@ -2,10 +2,10 @@
   "parent": "blacklight:plaza_cleared",
   "display": {
     "icon": {
-      "item": "blacklight:mother_core"
+      "item": "blacklight:greene_tissue"
     },
     "title": {
-      "translate": "item.blacklight.mother_core"
+      "translate": "item.blacklight.greene_tissue"
     },
     "description": {
       "translate": "survival.blacklight.journal.mother_core"
@@ -21,7 +21,8 @@
         "items": [
           {
             "items": [
-              "blacklight:mother_core"
+              "blacklight:mother_core",
+              "blacklight:greene_tissue"
             ]
           }
         ]

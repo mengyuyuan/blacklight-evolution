@@ -23,7 +23,23 @@ public final class SurvivalGuide {
             player.displayClientMessage(introduction(), false);
         }
     }
-    private static boolean done(ServerPlayer player, String name) {
+    @SubscribeEvent public static void outbreak(net.minecraftforge.event.TickEvent.PlayerTickEvent event){
+        if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
+        if(event.player instanceof ServerPlayer player && player.tickCount%20==0
+                && player.level().dimension()==com.codex.blacklight.city.CityTravel.WORLD
+                && !player.isSpectator()
+                && done(player,"plaza_cleared") && !done(player,"greene_outbreak"))GreeneOutbreak.arrive(player);
+    }
+    @SubscribeEvent public static void captive(net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent event){
+        if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide){
+            com.codex.blacklight.combat.GreeneMolt.orphanCheck(mob);
+            if(mob.getPersistentData().getBoolean("GreeneBroodFall")){
+                mob.fallDistance=0;
+                if(mob.onGround())mob.getPersistentData().remove("GreeneBroodFall");
+            }
+        }
+    }
+    public static boolean done(ServerPlayer player, String name) {
         var advancement = player.server.getAdvancements().getAdvancement(new ResourceLocation("blacklight", name));
         return advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
@@ -62,7 +78,8 @@ public final class SurvivalGuide {
             if (!com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
                 next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
                         : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-            } else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
+            } else if (done(player,"greene_outbreak")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
+            else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
             else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
             else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
             else if (done(player,"containment_decoder")) next=Component.translatable("survival.blacklight.journal.containment_decoder");

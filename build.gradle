@@ -773,6 +773,40 @@ tasks.register('verifyBundledMotionResources',JavaExec) {
 }
 tasks.named('assemble') { dependsOn tasks.named('verifyBundledMotionResources') }
 
+tasks.register('verifyPackageSizeBudget') {
+    group='verification'
+    dependsOn tasks.named('reobfJarJar')
+    def budget=providers.gradleProperty('packageSizeBudgetBytes').orElse('227000000')
+    inputs.property('packageSizeBudgetBytes',budget)
+    inputs.file(tasks.named('jarJar',Jar).flatMap {it.archiveFile})
+    outputs.file(layout.buildDirectory.file('reports/package-size.json'))
+    doLast {
+        long maximum=Long.parseLong(budget.get())
+        if(maximum<1)throw new GradleException('Package byte budget must be positive')
+        def artifact=tasks.named('jarJar',Jar).get().archiveFile.get().asFile
+        def categories=[:].withDefault {0L};def largest=[]
+        new java.util.zip.ZipFile(artifact).withCloseable { archive ->
+            archive.entries().each { entry ->
+                if(!entry.directory) {
+                    def category=entry.name.startsWith('data/blacklight/worldmap/')?'geography':
+                            entry.name.startsWith('data/blacklight/city/')?'city-scenes':
+                            entry.name.startsWith('blacklight/bundled_motions/')?'motions':'runtime'
+                    categories[category]+=entry.compressedSize
+                    largest.add([resource:entry.name,compressedBytes:entry.compressedSize])
+                }
+            }
+        }
+        def report=[version:project.version.toString(),jarBytes:artifact.length(),budgetBytes:maximum,
+                    withinBudget:artifact.length()<=maximum,categories:categories,
+                    largestResources:largest.sort {-it.compressedBytes}.take(20)]
+        def target=layout.buildDirectory.file('reports/package-size.json').get().asFile
+        target.parentFile.mkdirs();target.text=groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(report))
+        if(!report.withinBudget)throw new GradleException("Package exceeds its ${maximum}-byte budget: ${artifact.length()} bytes; inspect build/reports/package-size.json before publishing.")
+        logger.lifecycle("Package budget passed: ${artifact.length()} / ${maximum} bytes")
+    }
+}
+tasks.named('assemble') {dependsOn tasks.named('verifyPackageSizeBudget')}
+
 // Website-feedback regressions run only in disposable GameTest worlds.
 if (project.hasProperty('feedbackTest')) {
     sourceSets.main.java.srcDir('src/feedbackTest/java')
