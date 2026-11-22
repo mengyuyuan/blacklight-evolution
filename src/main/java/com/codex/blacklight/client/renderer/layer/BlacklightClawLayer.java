@@ -136,6 +136,8 @@ public final class BlacklightClawLayer extends net.minecraft.client.renderer.ent
             if(side!=0&&WeaponMorphTiming.arm(form,true))renderHand(player,InteractionHand.OFF_HAND,poses,true,stack,buffer,light,mesh,form,part.surface(),partial,materialTime,
                     form==morph.target()?hammer[1]:null,fit);
         }
+        if (!player.isInvisible())
+            com.codex.blacklight.client.renderer.WeaponMorphTendrils.arms(morph,poses,stack,buffer,light,side,fit);
     }
 
     private void renderHand(AbstractClientPlayer player,

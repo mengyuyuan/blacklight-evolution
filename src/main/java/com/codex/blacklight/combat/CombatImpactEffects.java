@@ -21,12 +21,12 @@ public final class CombatImpactEffects {
         com.codex.blacklight.registry.ModWeaponSounds.play(p,com.codex.blacklight.registry.ModWeaponSounds.equipped(p),"swing",p.position(),.75F,WeaponImpact.finisher(move)?.86F:1F);
 
     }
-    public static void ground(ServerPlayer p,WeaponMove move,Vec3 forward){
-        if(!p.onGround())return;
-        if(move==WeaponMove.BLADE_DIVE){BladeEffects.ground(p);return;}
+    public static boolean ground(ServerPlayer p,WeaponMove move,Vec3 forward){
+        if(!p.onGround())return false;
+        if(move==WeaponMove.BLADE_DIVE)return BladeEffects.ground(p);
         var level=p.serverLevel();var center=p.position().add(forward.scale(move.quake()?0:1.05));
         var hit=level.clip(new ClipContext(center.add(0,.9,0),center.add(0,-1.2,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,p));
-        ground(p,move,hit);
+        return ground(p,move,hit);
     }
     /** The physical fist sweep supplies its actual block surface, including slabs and slopes. */
     public static boolean ground(ServerPlayer p,WeaponMove move,BlockHitResult hit){
@@ -96,8 +96,8 @@ public final class CombatImpactEffects {
             default -> .5F;
         };
         var kind=contact.kind();
-        if(contact.contacts().isEmpty()&&(strike==FleshStrike.EDGE||strike==FleshStrike.CLAW||strike==FleshStrike.LASH))
-            kind=WeaponCutContact.contactKind(move);
+        if((contact.contacts().isEmpty() || kind==WeaponCutContact.Kind.NONE && move.aerial())&&(strike==FleshStrike.EDGE||strike==FleshStrike.CLAW||strike==FleshStrike.LASH))
+            kind=move==WeaponMove.BLADE_DIVE?WeaponCutContact.Kind.PUNCTURE:WeaponCutContact.contactKind(move);
         PlayerHitEffects.emit(p,v,strike.style(kind),size*ImpactTier.of(move).effectScale,contact,strike,fullyCharged,move);
     }
 }

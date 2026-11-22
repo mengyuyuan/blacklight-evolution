@@ -112,6 +112,7 @@ public final class WeaponCutContact {
         var alphas=new TreeSet<Double>();for(int i=0;i<=8;i++)alphas.add(i/8.0);
         if(whip!=null&&to>from)for(var sample:whip.samples())if(sample.time()>from&&sample.time()<to)alphas.add((sample.time()-from)/(to-from));
         float pitch=whip==null?0:WhipCurveContact.aimPitch(player);
+        Vec3 tipTarget=whip==null?null:WhipCurveContact.straightTarget(player);
         var frames=new ArrayList<Frame>();
         for(double alpha:alphas){
             double time=from+(to-from)*alpha;
@@ -119,7 +120,7 @@ public final class WeaponCutContact {
             var triangles=new ArrayList<Triangle>();
             List<Vec3> lash=List.of();
             if(whip!=null){
-                var points=WhipCurveContact.worldPoints(whip,time,feet,facing,player,pitch);
+                var points=WhipCurveContact.worldPoints(whip,time,feet,facing,player,pitch,tipTarget);
                 var visible=WhipCurveContact.visiblePoints(points,player.level(),player);
                 lash=visible;
                 // A wall truncating the curve must not manufacture a cutting tip at the wall.
