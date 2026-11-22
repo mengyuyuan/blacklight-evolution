@@ -299,7 +299,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             gridPass(mist,3,580,camera,eye,t,light);
         }
     }
-    static boolean drawColony(GreeneGoddessRenderer colony,float ticks,PoseStack stack,int light,int overlay){
+    static boolean drawColony(GreeneGoddessRenderer colony,float ticks,PoseStack stack,int light,int overlay,org.joml.Matrix4f[] offsets){
         var renderer=scene;
         if(renderer==null)return false;
         // The mesh is already resident after the transformation. Only joint poses change each frame.
@@ -312,6 +312,16 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         try(var state=new State()){
             colony.writeJointMatrices(ticks,renderer.boneUpload);
             GreeneColonies.pose(renderer.boneUpload);
+            if(offsets!=null){
+                var scratch=new org.joml.Matrix4f();
+                for(int group=0;group<GreeneColonies.JOINTS;group++){
+                    int carrier=group<GreeneColonies.NATIVE?com.codex.blacklight.combat.GoddessRig.carrier(group)
+                            :GreeneColonies.GROUPS.get((group-GreeneColonies.NATIVE)/12).owner();
+                    var offset=offsets[carrier];
+                    if(offset.m33()==0)scratch.identity().scale(0).get(renderer.boneUpload,group*16);
+                    else scratch.set(renderer.boneUpload,group*16).mulLocal(offset).get(renderer.boneUpload,group*16);
+                }
+            }
             upload(0,renderer.dynamic[0],16,GreeneColonies.ROWS,GL_RGBA,renderer.boneUpload);
             bind(2,body);bind(14,lightmap);
             int shader=renderer.model;

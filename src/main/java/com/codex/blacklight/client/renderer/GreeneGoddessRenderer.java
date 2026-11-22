@@ -4,6 +4,8 @@ import com.codex.blacklight.entity.GreeneGoddess;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import com.codex.blacklight.combat.GoddessRig;
+import org.joml.Matrix4f;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 import net.minecraft.client.Minecraft;
@@ -21,7 +23,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     private final ResourceLocation bodySkin;
     private static final ResourceLocation OUTBREAK_SKIN = new ResourceLocation("blacklight","textures/entity/greene_goddess_tissue.png");
     private static final ResourceLocation SKIN = new ResourceLocation("blacklight","textures/entity/greene_goddess.png");
-    private record Group(float[] transforms, float[] vertices, int[] colors, int skin) {}
+    private record Group(float[] transforms, float[] vertices, int[] colors, int skin, int carrier) {}
     private volatile Group[] groups;
     private Group[] jointOrder;
     private final Quaternionf from=new Quaternionf(), to=new Quaternionf();
@@ -67,7 +69,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
                     int col=(int)(2*u/count),row=(int)(4*vv/count);skinIndex=col+2*row;
                     for(int i=0;i<count;i++){vertices[i*8+3]=vertices[i*8+3]*2-col;vertices[i*8+4]=vertices[i*8+4]*4-row;}
                 }
-                parts[p]=new Group(transforms,vertices,colors,skinIndex);
+                parts[p]=new Group(transforms,vertices,colors,skinIndex,mesh.equals(COLONY)?GoddessRig.carrier(p):0);
             }
             jointOrder=parts.clone();
             if(mesh.equals(COLONY))parts=expandedColony(parts);
@@ -91,7 +93,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
             for(int j=0;j<12;j++){
                 var src=original[a.source()+j];var t=src.transforms().clone();
                 for(int f=0;f<frames;f++)for(int d=0;d<3;d++)t[f*7+d]+=delta[f*3+d];
-                expanded[index++]=new Group(t,src.vertices(),src.colors(),src.skin());
+                expanded[index++]=new Group(t,src.vertices(),src.colors(),src.skin(),a.owner());
             }
         }
         return expanded;
@@ -108,20 +110,25 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
         }
     }
     void draw(float ticks,PoseStack stack,MultiBufferSource buffers,int light,int overlay) {
+        draw(ticks,stack,buffers,light,overlay,null);
+    }
+    void draw(float ticks,PoseStack stack,MultiBufferSource buffers,int light,int overlay,Matrix4f[] offsets) {
         if(groups==null){warm();loading.join();}
         if(mesh.equals(COLONY) && !com.codex.blacklight.client.ShaderPackCompat.active()
-                && GreeneMoltRenderer.drawColony(this,ticks,stack,light,overlay))return;
+                && GreeneMoltRenderer.drawColony(this,ticks,stack,light,overlay,offsets))return;
         float sample=(ticks*fps/20F)%frames;
         int frame=(int)sample, a=frame*7, b=((frame+1)%frames)*7;
         float mix=sample-frame;
         VertexConsumer out=null;int skinIndex=-2;
         var q=new Quaternionf(); var next=new Quaternionf();
         for(var group:groups) {
+            if(offsets!=null && offsets[group.carrier()].m33()==0)continue;
             if(skinIndex!=group.skin()){
                 skinIndex=group.skin();out=buffers.getBuffer(RenderType.entityCutoutNoCull(skinIndex<0?bodySkin:CommonInfectedRenderer.skin(skinIndex)));
             }
             var t=group.transforms();
             stack.pushPose();
+            if(offsets!=null)com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,offsets[group.carrier()]);
             stack.translate(t[a]+mix*(t[b]-t[a]), t[a+1]+mix*(t[b+1]-t[a+1]), t[a+2]+mix*(t[b+2]-t[a+2]));
             q.set(t[a+3],t[a+4],t[a+5],t[a+6]);
             next.set(t[b+3],t[b+4],t[b+5],t[b+6]);

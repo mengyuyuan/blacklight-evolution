@@ -16,6 +16,7 @@
     "PotentiaDamageTagsMixin",
     "ShulkerReflectionAccess",
     "LivingDeathAccess",
+    "GoddessPlayerDamageMixin",
     "GreeneHealthFloorMixin",
     "HydraDeathGuardMixin",
     "ServerEntityTickMixin",

@@ -13,7 +13,7 @@ public final class EvolvedQuillRenderer extends EntityRenderer<EvolvedQuill> {
     public EvolvedQuillRenderer(EntityRendererProvider.Context context){super(context);}
     @Override public ResourceLocation getTextureLocation(EvolvedQuill quill){return ConsumedMobVisuals.WHITE;}
     @Override public void render(EvolvedQuill quill,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
-        pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partial,quill.yRotO,quill.getYRot())));pose.mulPose(Axis.XP.rotationDegrees(-Mth.lerp(partial,quill.xRotO,quill.getXRot())));
+        pose.pushPose();if(quill.bloodSpear())pose.scale(5F,5F,5F);pose.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partial,quill.yRotO,quill.getYRot())));pose.mulPose(Axis.XP.rotationDegrees(-Mth.lerp(partial,quill.xRotO,quill.getXRot())));
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
         for(int i=0;i<4;i++){
             double a=i*Math.PI/2,b=(i+1)*Math.PI/2;

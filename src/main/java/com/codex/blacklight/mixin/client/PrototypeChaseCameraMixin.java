@@ -21,5 +21,6 @@ public abstract class PrototypeChaseCameraMixin {
         PrototypeChaseCamera.apply((Camera)(Object)this,partial);
         com.codex.blacklight.client.ClientBiomass.camera((Camera)(Object)this,partial);
         com.codex.blacklight.client.BlockThrowCamera.apply((Camera)(Object)this,partial);
+        com.codex.blacklight.client.animation.GoddessPressurePose.eyes((Camera)(Object)this,partial);
     }
 }

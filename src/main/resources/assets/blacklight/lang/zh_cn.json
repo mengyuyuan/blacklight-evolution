@@ -1429,5 +1429,22 @@
   "subtitle.blacklight.greene.spider.needle": "头须刺入宿主",
   "subtitle.blacklight.greene.spider.rupture": "寄生瘤爆裂",
   "subtitle.blacklight.greene.spider.brace": "口齿扣紧",
-  "subtitle.blacklight.greene.spider.shed": "巢膜裂开"
+  "subtitle.blacklight.greene.spider.shed": "巢膜裂开",
+  "part.blacklight.goddess_head": "头部",
+  "part.blacklight.goddess_chest": "胸核",
+  "part.blacklight.goddess_base": "下身",
+  "part.blacklight.goddess_left_shoulder": "左肩",
+  "part.blacklight.goddess_left_elbow": "左肘",
+  "part.blacklight.goddess_left_wrist": "左腕",
+  "part.blacklight.goddess_left_hand": "左手",
+  "part.blacklight.goddess_right_shoulder": "右肩",
+  "part.blacklight.goddess_right_elbow": "右肘",
+  "part.blacklight.goddess_right_wrist": "右腕",
+  "part.blacklight.goddess_right_hand": "右手",
+  "part.blacklight.goddess_hair": "发冠",
+  "message.blacklight.goddess_grab": "按 %s 扣住暴露的部位",
+  "message.blacklight.goddess_confirm": "按 %s 拔离并吸收",
+  "subtitle.blacklight.greene.pressure.strain": "空泡筋膜绷紧",
+  "subtitle.blacklight.greene.pressure.burst": "黑光空泡爆裂",
+  "subtitle.blacklight.greene.pressure.echo": "岩壁传回闷响"
 }

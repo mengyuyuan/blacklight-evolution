@@ -33,6 +33,7 @@ public final class SurvivalGuide {
     @SubscribeEvent public static void captive(net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent event){
         if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide){
             com.codex.blacklight.combat.GreeneMolt.orphanCheck(mob);
+            com.codex.blacklight.combat.GoddessAttacks.releaseBrood(mob);
             if(mob.getPersistentData().getBoolean("GreeneBroodFall")){
                 mob.fallDistance=0;
                 if(mob.onGround())mob.getPersistentData().remove("GreeneBroodFall");

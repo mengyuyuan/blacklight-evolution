@@ -14,6 +14,12 @@ public final class BlacklightRenderPose {
         return action.clipId().startsWith("greene_mouth_") && action.active(PlayerMotionController.actionTime(entity,partial));
     }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var compression=GoddessPressurePose.owner(player);
+            if(compression!=null)return GoddessPressurePose.sample(compression.goddess.attacks,partial);
+            var paired=com.codex.blacklight.combat.GoddessEncounter.paired(player);
+            if(paired!=null)return com.codex.blacklight.combat.GoddessActor.pose(paired,partial);
+        }
         if(mouthStruggle(entity,partial)){
             var action=ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
             return MotionLibrary.pose(action.clipId(),action.seconds(PlayerMotionController.actionTime(entity,partial)),false);
@@ -103,6 +109,10 @@ public final class BlacklightRenderPose {
         }
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var pressure=GoddessPressurePose.owner(player);
+            if(pressure!=null)return pressure.goddess.attacks.captureYaw();
+        }
         if(mouthStruggle(entity,partial))return ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION).yaw();
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
@@ -111,6 +121,10 @@ public final class BlacklightRenderPose {
         return PlayerMotionController.facing(entity,partial);
     }
     public static float rawFacing(LivingEntity entity,float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var pressure=GoddessPressurePose.owner(player);
+            if(pressure!=null)return pressure.goddess.attacks.captureYaw();
+        }
         var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
         if(dodge.clipId().startsWith("spines_")&&!dodge.clipId().startsWith("spines_scapula")
                 &&dodge.active(PlayerMotionController.actionTime(entity,partial)))
