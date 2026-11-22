@@ -6,6 +6,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class QuillHarvestTest {
+    @org.junit.jupiter.api.BeforeAll static void bootstrapMinecraft(){
+        net.minecraft.SharedConstants.tryDetectVersion();
+        net.minecraft.server.Bootstrap.bootStrap();
+    }
+
     @Test void capacityLifetimeAndVolleyRoundIndependently(){
         assertEquals(6,QuillFormation.capacity(0));
         assertEquals(70,QuillFormation.capacity(64));
