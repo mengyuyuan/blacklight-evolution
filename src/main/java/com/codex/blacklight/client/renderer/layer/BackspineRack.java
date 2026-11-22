@@ -17,7 +17,7 @@ public final class BackspineRack {
             stack.mulPose(new org.joml.Quaternionf().rotationY((float)Math.PI));
             stack.scale(.48F,.48F,.48F);
             stack.translate(0,-1.48,0);
-            RoofPerformance.rack(clock,stack,buffers,light,null,morph.shoulder(),side);
+            RoofPerformance.rack(clock,stack,buffers,light,null,morph,side);
             stack.popPose();
         }
     }
@@ -33,7 +33,7 @@ public final class BackspineRack {
             var socket=new Matrix4f(chest).translate(right?.28F:-.28F,.90F,0)
                     .rotateZ((right?1:-1)*receive*.16F).rotateX(-receive*.12F)
                     .translate(right?-.28F:.28F,-.90F,0);
-            RoofPerformance.rack(c,stack,buffers,light,socket,morph.shoulder(),side);
+            RoofPerformance.rack(c,stack,buffers,light,socket,morph,side);
         }
     }
 }
