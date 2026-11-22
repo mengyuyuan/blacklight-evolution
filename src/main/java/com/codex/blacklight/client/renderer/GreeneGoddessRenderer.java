@@ -69,8 +69,32 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
                 }
                 parts[p]=new Group(transforms,vertices,colors,skinIndex);
             }
-            jointOrder=parts.clone();java.util.Arrays.sort(parts,java.util.Comparator.comparingInt(Group::skin));groups=parts;
+            jointOrder=parts.clone();
+            if(mesh.equals(COLONY))parts=expandedColony(parts);
+            java.util.Arrays.sort(parts,java.util.Comparator.comparingInt(Group::skin));groups=parts;
         } catch(IOException e) { throw new IllegalStateException("Cannot load the Greene full-body mesh",e); }
+    }
+    private Group[] expandedColony(Group[] original){
+        var expanded=java.util.Arrays.copyOf(original,GreeneColonies.JOINTS);
+        int index=original.length;var q=new Quaternionf();var anchor=new org.joml.Vector3f();
+        for(var a:GreeneColonies.GROUPS){
+            var owner=original[a.owner()].transforms();var donor=original[a.source()].transforms();
+            var delta=new float[3*frames];
+            for(int f=0;f<frames;f++){
+                int i=f*7;
+                q.set(owner[i+3],owner[i+4],owner[i+5],owner[i+6]);
+                anchor.set(a.x(),a.y(),a.z()).rotate(q);
+                delta[f*3]=anchor.x+owner[i]-donor[i];
+                delta[f*3+1]=anchor.y+owner[i+1]-donor[i+1];
+                delta[f*3+2]=anchor.z+owner[i+2]-donor[i+2];
+            }
+            for(int j=0;j<12;j++){
+                var src=original[a.source()+j];var t=src.transforms().clone();
+                for(int f=0;f<frames;f++)for(int d=0;d<3;d++)t[f*7+d]+=delta[f*3+d];
+                expanded[index++]=new Group(t,src.vertices(),src.colors(),src.skin());
+            }
+        }
+        return expanded;
     }
     void writeJointMatrices(float ticks,float[] matrices) {
         float sample=ticks*fps/20F%frames;

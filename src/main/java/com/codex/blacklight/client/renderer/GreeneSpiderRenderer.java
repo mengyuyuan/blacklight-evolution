@@ -42,7 +42,6 @@ public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> 
     @Override public void renderCubesOfBone(PoseStack stack,software.bernie.geckolib.cache.object.GeoBone bone,com.mojang.blaze3d.vertex.VertexConsumer out,int light,int overlay,float red,float green,float blue,float alpha){
         var shell=getAnimatable();String name=bone.getName();
         if(shell.fragment()>=0 && !name.equals(com.codex.blacklight.combat.SpiderAnatomy.shin(shell.fragment())))return;
-        if(shell.husk && !(name.startsWith("fang_") || name.equals("carapace") || com.codex.blacklight.combat.SpiderAnatomy.leg(name)>=0))return;
         super.renderCubesOfBone(stack,bone,out,light,overlay,red,green,blue,alpha);
     }
     @Override protected void applyRotations(GreeneSpider entity, PoseStack stack, float age, float yaw, float partial) {

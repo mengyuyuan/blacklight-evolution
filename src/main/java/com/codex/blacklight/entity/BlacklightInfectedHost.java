@@ -162,7 +162,7 @@ public final class BlacklightInfectedHost extends Monster {
         data.putFloat("Width",.95F*1.12F);data.putFloat("Height",2.16F*1.12F);data.putFloat("ModelScale",1);data.put("Visual",new CompoundTag());
         entityData.set(HOST,data);entityData.set(TISSUE_BODY_SCALE,com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance()));
         if(!hasCustomName())setCustomName(Component.translatable(evolvedArchetype().translation()));
-        navigationReady=false;setupNavigation();getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));updateTissueCombat();refreshDimensions();
+        navigationReady=false;setupNavigation();updateTissueCombat();refreshDimensions();
     }
     private static final ResourceLocation TISSUE_HEALTH=new ResourceLocation("blacklight","tissue_evolution_health");
     private static final ResourceLocation TISSUE_DAMAGE=new ResourceLocation("blacklight","tissue_evolution_damage");
@@ -825,7 +825,14 @@ public final class BlacklightInfectedHost extends Monster {
         return TissueCompetition.contender(this,target)||!BlacklightInfectionSystem.isInfected(target);
     }
     @Override protected void registerGoals() {
-        targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this,Player.class,5,true,false,target->isEvolved()&&validTarget(target)){{setUnseenMemoryTicks(200);}});
+        targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this,Player.class,5,true,false,target->isEvolved()&&validTarget(target)){
+            {setUnseenMemoryTicks(240);}
+            @Override public boolean canUse(){
+                if(!isEvolved())return false;
+                targetConditions.range(com.codex.blacklight.infection.EvolvedBalance.PLAYER_DETECTION);
+                return super.canUse();
+            }
+        });
         targetSelector.addGoal(1,new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this){
             @Override public boolean canUse(){return getLastHurtByMob()!=null&&validTarget(getLastHurtByMob())&&super.canUse();}
             @Override public boolean canContinueToUse(){return getTarget()!=null&&validTarget(getTarget())&&super.canContinueToUse();}
@@ -1317,7 +1324,7 @@ public final class BlacklightInfectedHost extends Monster {
         float savedScale=tag.getFloat("BlacklightTissueScale");
         entityData.set(TISSUE_BODY_SCALE,hasMultipartBody()||!Float.isFinite(savedScale)?1F
                 :com.codex.blacklight.forge.WingMath.clamp(savedScale,1F,desiredTissueScale()));
-        if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
+
         digestion=TissueDigestion.read(tag.getCompound("BlacklightTissueDigestion"));publishDigestion();nextTissueForage=level().getGameTime()+Math.floorMod(getId(),40);
         vitals=TissueVitals.read(tag.getCompound("BlacklightTissueVitals"));vitalsProfile=null;publishVitals();
         defense=TissueDefense.read(tag.getCompound("BlacklightTissueDefense"));publishDefense();

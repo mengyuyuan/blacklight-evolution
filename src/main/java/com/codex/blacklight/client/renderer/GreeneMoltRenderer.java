@@ -58,7 +58,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     private final int fissures,fissureCount;
     private final int model,strand,shell,wrap,mist,people,lines,frames,schedule,actorSize,pathSize,frameSize;
     private final float[] pivots=new float[36],hydra=new float[9],hunter=new float[9],matrix=new float[16];
-    private final float[] timeline,bones=new float[BONES],boneUpload=new float[(JOINTS+1)*16],actors,paths;
+    private final float[] timeline,bones=new float[BONES],boneUpload=new float[GreeneColonies.ROWS*64],actors,paths;
     private final float[] animalMatrices=new float[68];
 
     private static ResourceLocation id(String path){return new ResourceLocation("blacklight",path);}
@@ -124,7 +124,11 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             for(int i=0;i<pivots.length;i++)pivots[i]=b.getFloat();
             glActiveTexture(GL_TEXTURE0);schedule=dataTexture(1,lines,4,values(b,lines*4));
             for(var contact:List.of(hydra,hunter))for(int i=0;i<9;i++)contact[i]=b.getFloat();
-            for(int i=0;i<2;i++){counts[i]=b.getInt();models[i]=mesh(values(b,counts[i]*12),3,3,3,2,1);}
+            for(int i=0;i<2;i++){
+                var vertices=values(b,b.getInt()*12);
+                if(i==1)vertices=GreeneColonies.mesh(vertices);
+                counts[i]=vertices.length/12;models[i]=mesh(vertices,3,3,3,2,1);
+            }
             var peopleMesh=brood.civilian();models[2]=mesh(peopleMesh,3,3,3,2,1);counts[2]=peopleMesh.length/12;
             for(int i=0;i<4;i++){
                 preyVao[i]=mesh(new float[12],3,3,3,2,1);preyVbo[i]=buffers.get(buffers.size()-1);
@@ -132,7 +136,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             actorSize=people*12;pathSize=lines*16*3;frameSize=BONES+actorSize+pathSize+68;
             if(b.remaining()!=4L*frames*frameSize)throw new IOException("Truncated Greene timeline");
             timeline=values(b,frames*frameSize);actors=new float[actorSize];paths=new float[pathSize];
-            dynamic[0]=dataTexture(16,(JOINTS+3)/4,4,null);dynamic[1]=dataTexture(3,people,4,null);dynamic[2]=dataTexture(16,lines,3,null);
+            dynamic[0]=dataTexture(16,GreeneColonies.ROWS,4,null);dynamic[1]=dataTexture(3,people,4,null);dynamic[2]=dataTexture(16,lines,3,null);
             try(var in=open("fissures.bin")){
                 var data=ByteBuffer.wrap(in.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
                 if(data.remaining()%48!=0)throw new IOException("Invalid Greene fissure mesh");
@@ -212,7 +216,8 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         posePrey(boss,t,partial,packedLight);
         if(t<1.5F)blendLastSpiderPose(boss,t);
         System.arraycopy(bones,0,boneUpload,0,BONES);
-        upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
+        if(t>=13.2F)GreeneColonies.pose(boneUpload);
+        upload(0,dynamic[0],16,t>=13.2F?GreeneColonies.ROWS:(JOINTS+3)/4,GL_RGBA,boneUpload);upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
         bind(2,skins[0]);bind(3,skins[7]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
         if(t<14.5F)upload(11,clamberTexture,30,people,GL_RGBA,climbPose);
         bind(12,skins[5]);bind(13,skins[6]);
@@ -238,12 +243,6 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             bends[2*i+1]=ease*boss.spider.fold("tibia_"+suffix,partial);
         }
         integer(model,"severed",severed);glUniform2fv(u(model,"legBends"),bends);
-        if(second){
-            System.arraycopy(timeline,131*frameSize,boneUpload,0,BONES);
-            upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);
-            integer(model,"kind",0);drawModel(0,1);
-            System.arraycopy(bones,0,boneUpload,0,BONES);upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);
-        }
         integer(model,"kind",second?1:0);drawModel(second?1:0,1);if(t<14.5F){integer(model,"kind",2);drawModel(2,people);}
         integer(model,"kind",6);
         for(int i=0;i<4;i++){
@@ -273,7 +272,8 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         int lightmap=RenderSystem.getShaderTexture(2);
         try(var state=new State()){
             colony.writeJointMatrices(ticks,renderer.boneUpload);
-            upload(0,renderer.dynamic[0],16,(JOINTS+3)/4,GL_RGBA,renderer.boneUpload);
+            GreeneColonies.pose(renderer.boneUpload);
+            upload(0,renderer.dynamic[0],16,GreeneColonies.ROWS,GL_RGBA,renderer.boneUpload);
             bind(2,body);bind(14,lightmap);
             int shader=renderer.model;
             glUseProgram(shader);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);glEnable(GL_DEPTH_TEST);glDepthMask(true);
