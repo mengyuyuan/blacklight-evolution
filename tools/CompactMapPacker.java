@@ -22,14 +22,30 @@ public final class CompactMapPacker {
         var bytes=new ByteArrayOutputStream();var deflater=new Deflater(6,true);
         try(var out=new DeflaterOutputStream(bytes,deflater)){out.write(raw);}finally{deflater.end();}return bytes.size();
     }
+    private static byte[] compress(byte[] raw) throws IOException {
+        int dictionary=65536;while(dictionary<raw.length&&dictionary<2*1024*1024)dictionary*=2;
+        var options=new LZMA2Options(6);options.setDictSize(dictionary);var bytes=new ByteArrayOutputStream();
+        try(var stream=new XZOutputStream(bytes,options,XZ.CHECK_CRC64)){stream.write(raw);}
+        return bytes.toByteArray();
+    }
     private static Result encode(Path root,Path file)throws Exception{
         String name=root.relativize(file).toString().replace('\\','/');byte[] original=Files.readAllBytes(file);
         byte[] raw=MapResources.decode(new ByteArrayInputStream(original),false);
-        int dictionary=65536;while(dictionary<raw.length&&dictionary<2*1024*1024)dictionary*=2;
-        var options=new LZMA2Options(6);options.setDictSize(dictionary);var bytes=new ByteArrayOutputStream();
-        try(var stream=new XZOutputStream(bytes,options,XZ.CHECK_CRC64)){stream.write(raw);}byte[] packed=bytes.toByteArray();
-        if(!Arrays.equals(raw,MapResources.decode(new ByteArrayInputStream(packed),true)))throw new IOException("Map restoration differs: "+name);
-        return new Result(name,deflated(packed)<deflated(original)?packed:null,original.length,raw.length);
+        byte[] packed = compress(raw);
+        int best = deflated(packed);
+        if (MapResources.isAtlasTile(name)) {
+            byte[] filtered = AtlasTileFilter.encode(raw);
+            if (filtered != raw) {
+                byte[] candidate = compress(filtered);
+                int size = deflated(candidate);
+                if (size < best) { best = size; packed = candidate; }
+            }
+        }
+        byte[] selected = best < deflated(original) ? packed : null;
+        byte[] check = MapResources.read(name, path -> path.equals(name) ? new ByteArrayInputStream(original)
+                : selected == null ? null : new ByteArrayInputStream(selected));
+        if(!Arrays.equals(raw,check))throw new IOException("Map restoration differs: "+name);
+        return new Result(name,selected,original.length,raw.length);
     }
     public static void main(String[] args)throws Exception{
         if(args.length==3&&args[0].equals("--verify")){verify(Path.of(args[1]),Path.of(args[2]));return;}

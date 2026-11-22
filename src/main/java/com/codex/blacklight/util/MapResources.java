@@ -20,10 +20,17 @@ public final class MapResources {
     public static InputStream open(Class<?> owner,String name)throws IOException{
         return new ByteArrayInputStream(read(name,owner::getResourceAsStream));
     }
+    public static boolean isAtlasTile(String name) {
+        String path = name.startsWith("/") ? name.substring(1) : name;
+        return path.startsWith("data/blacklight/worldmap/") && path.endsWith(".json.gz");
+    }
     public static byte[] read(String name,Opener resources)throws IOException{
         if(!supported(name))throw new IOException("Invalid logical map resource: "+name);
         var compact=resources.open(compactName(name));
-        if(compact!=null)return decode(compact,true);
+        if (compact != null) {
+            byte[] raw = decode(compact, true);
+            return isAtlasTile(name) ? AtlasTileCodec.restore(raw, MAXIMUM_BYTES) : raw;
+        }
         var original=resources.open(name);if(original==null)throw new FileNotFoundException("Missing map resource: "+name);
         return decode(original,false);
     }
