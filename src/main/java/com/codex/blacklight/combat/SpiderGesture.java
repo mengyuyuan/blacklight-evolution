@@ -36,11 +36,17 @@ public final class SpiderGesture {
                 lateral+=toward*(-.7F*rise+.88F*land);forward+=1.05F*land-.55F*pry;
             }
             case FLESH_VOLLEY -> {
+                float gulp=phrase(t,33,42,43,47),burst=phrase(t,43,46,50,58);
+                pitch+=.17F*gulp-.21F*burst;forward+=.65F*burst-.35F*gulp;
                 float load=phrase(t,0,11,29,36);
                 float kick=phrase(t,13,16,17,21)+phrase(t,20,23,24,28)+phrase(t,27,30,31,36);
                 pitch+=.16F*load-.15F*kick;forward+=.48F*load-.72F*kick;sink-=.21F*load;
             }
             case STAB -> {
+                if(b.spiderData().getBoolean("SecondStab")){
+                    float wind=phrase(t,20,32,40,46),slam=phrase(t,40,46,48,61);
+                    roll+=toward*(.16F*wind-.27F*slam);sink+=.45F*wind-.71F*slam;
+                }
                 float draw=phrase(t,1,10,12,17),thrust=phrase(t,12,18,21,29);
                 float pry=phrase(t,22,26,28,36);
                 lateral=toward*(-.55F*draw+.64F*thrust);
@@ -86,7 +92,13 @@ public final class SpiderGesture {
                 pitch+=.16F*open-.27F*lunge-.21F*bite;
             }
             case SWALLOW -> {
-                float arch=phrase(t,0,16,43,52);
+                var state=b.spiderData();
+                float end=state.contains("PryAt")?state.getInt("PryAt")+SpiderMouthStruggle.CLEAR:SpiderMouthStruggle.SWALLOWED;
+                float arch=phrase(t,0,16,state.getBoolean("Gripped")?end-7:36,state.getBoolean("Gripped")?end:46);
+                if(state.contains("PryAt")){
+                    float effort=t-state.getInt("PryAt");
+                    roll-=.09F*phrase(effort,2,12,16,25);forward-=.48F*phrase(effort,5,16,18,25);
+                }
                 sink+=.55F*arch;pitch+=.23F*arch;
                 lateral=toward*.25F*phrase(t,15,24,30,43);
             }

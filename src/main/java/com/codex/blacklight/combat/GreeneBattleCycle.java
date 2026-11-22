@@ -158,7 +158,9 @@ public final class GreeneBattleCycle {
         if(!live())dispose();
     }
     private void finishAirborneWave(){
-        boolean born=stage==MOLTING;armourWave=waveCount;owner.greeneRestoreAppendages(armourWave);
+        boolean born=stage==MOLTING;armourWave=waveCount;
+        if(born)owner.spider.synchronizeShellHealth();
+        owner.greeneRestoreAppendages(armourWave);
         if(born){owner.setHealth(owner.getMaxHealth());coreDamageable=false;}
         minimumHealth=GreeneBattleHealth.releaseFloorOnEmergence(owner.getHealth(),owner.getMaxHealth())?0:owner.getHealth();
         releaseRoot();enter(GUARDED);
@@ -183,7 +185,8 @@ public final class GreeneBattleCycle {
         refreshHealthScale();
         // MC maps the missing Times Square camera/dialogue completion to this
         // transition, retaining the normal branch order and source raise delays.
-        armourWave=waveCount;owner.greeneRestoreAppendages(armourWave);
+        armourWave=waveCount;
+        owner.greeneRestoreAppendages(armourWave);
         if(armourWave<=3)minimumHealth=owner.getHealth();
         if(GreeneBattleHealth.releaseFloorOnEmergence(owner.getHealth(),owner.getMaxHealth()))minimumHealth=0;
         surfaceY=surface();goalY=surfaceY;

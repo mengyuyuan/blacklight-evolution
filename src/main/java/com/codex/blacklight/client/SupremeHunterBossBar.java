@@ -17,7 +17,7 @@ public final class SupremeHunterBossBar {
     private static final class Trail {float shown=-1,trail=-1;long tick,seen;}
     private SupremeHunterBossBar(){}
     private static String key(Component name){return name.getContents() instanceof TranslatableContents t?t.getKey():"";}
-    static boolean ours(Component name){return java.util.Set.of(KEY,"boss.blacklight.phase","boss.blacklight.weakpoints","boss.blacklight.exposed","boss.blacklight.collapsing").contains(key(name));}
+    static boolean ours(Component name){return java.util.Set.of(KEY,"boss.blacklight.phase","boss.blacklight.greene_spider.name","boss.blacklight.greene_goddess.name","boss.blacklight.weakpoints","boss.blacklight.exposed","boss.blacklight.collapsing").contains(key(name));}
     @SubscribeEvent public static void bar(CustomizeGuiOverlayEvent.BossEventProgress event){
         var boss=event.getBossEvent();if(!ours(boss.getName()))return;
         var mc=Minecraft.getInstance();if(world!=mc.level){world=mc.level;TRAILS.clear();}

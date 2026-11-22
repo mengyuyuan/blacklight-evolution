@@ -30,6 +30,28 @@ public final class StandalonePlayerRendering {
     public static boolean allowFirstPersonHands(boolean mountedVehicle){return !mountedVehicle;}
     @SubscribeEvent public static void hand(RenderHandEvent event) {
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
+        if(player!=null){
+            var action=ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
+            double clock=com.codex.blacklight.animation.PlayerMotionController.actionTime(player,event.getPartialTick());
+            if(action.clipId().startsWith("greene_mouth_") && action.active(clock)){
+                event.setCanceled(true);
+                if(event.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND){
+                    var renderer=RENDERERS.get(player.getModelName());
+                    var access=(com.codex.blacklight.mixin.client.NativeHandRendererAccess)mc.gameRenderer.itemInHandRenderer;
+                    hands=renderer==null?null:new HandContext(player,renderer,event.getPartialTick(),player.getMainArm(),null,false);
+                    try{
+                        for(var side:HumanoidArm.values()){
+                            var stack=event.getPoseStack();stack.pushPose();
+                            try{
+                                mouthHand(stack,side,action.clipId(),action.seconds(clock)*20);
+                                access.blacklight$renderPlayerArm(stack,event.getMultiBufferSource(),event.getPackedLight(),0,0,side);
+                            }finally{stack.popPose();}
+                        }
+                    }finally{hands=null;}
+                }
+                return;
+            }
+        }
         if(player==null||!allowFirstPersonHands(player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle)||player.isScoping()||!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE).isPrototypeMode())return;
         if(com.codex.blacklight.power.BiomassSystem.active(player)){event.setCanceled(true);return;}
         if (com.codex.blacklight.item.GreeneTissueItem.isTissue(player.getItemInHand(event.getHand()))) return;
@@ -67,6 +89,30 @@ public final class StandalonePlayerRendering {
                 drawVanillaArm(access,event,HumanoidArm.LEFT);
             if(shielded)drawVanillaShield(access,event,renderer);
         }finally{hands=null;}
+    }
+    /** Advance one palm while the other bears weight, also for an unarmed first-person player. */
+    private static void mouthHand(com.mojang.blaze3d.vertex.PoseStack stack,HumanoidArm arm,String clip,float t){
+        boolean right=arm==HumanoidArm.RIGHT;
+        float sign=right?1:-1;
+        float lift,reach,roll;
+        if(clip.equals("greene_mouth_kick")){
+            float plant=beat(t,right?0:4,right?5:9),push=beat(t,9,17),clear=beat(t,18,26);
+            lift=(.32F+.18F*plant-.13F*push)*(1-clear);reach=(.16F+.15F*plant-.22F*push)*(1-clear);
+            roll=(sign*18+24*push)*(1-clear);
+        }else if(clip.equals("greene_mouth_slip")){
+            float claw=beat(t,right?0:3,right?4:8),drop=beat(t,right?6:10,18);
+            lift=.28F+claw*.15F-.62F*drop;reach=.18F+.19F*claw-.32F*drop;roll=sign*(15+18*claw-43*drop);
+        }else{
+            float grip=beat(t,right?2:6,right?12:16);
+            float tug=(float)Math.sin((t+(right?0:4))*.50);
+            lift=grip*(.28F+.105F*tug);reach=grip*(.15F+.09F*tug);roll=sign*grip*(15+9*tug);
+        }
+        stack.translate(-sign*.10F,lift,-reach);
+        stack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(roll));
+    }
+    private static float beat(float t,float start,float end){
+        float u=net.minecraft.util.Mth.clamp((t-start)/(end-start),0,1);
+        return u*u*(3-2*u);
     }
     private static void drawVanillaArm(com.codex.blacklight.mixin.client.NativeHandRendererAccess access,RenderHandEvent event,HumanoidArm side) {
         var stack=event.getPoseStack();stack.pushPose();
@@ -134,7 +180,8 @@ public final class StandalonePlayerRendering {
             return;
         }
         var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
-        boolean active=com.codex.blacklight.client.animation.HydraPlayerPose.visible(player)||state.isPrototypeMode()
+        boolean active=com.codex.blacklight.client.animation.BlacklightRenderPose.mouthStruggle(player,partial)
+                ||com.codex.blacklight.client.animation.HydraPlayerPose.visible(player)||state.isPrototypeMode()
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial)>0
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,partial)>0
                 ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_VISUAL).active();
