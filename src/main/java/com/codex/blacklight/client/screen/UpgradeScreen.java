@@ -342,8 +342,8 @@ public final class UpgradeScreen extends Screen {
             long rank=evolutionRank(evolution);
             y=paragraph(g,Component.translatable("screen.blacklight.infinite_stats",rank,rank==Long.MAX_VALUE?rank:rank+1,cost(e)),y,TEXT)+8;
             y=paragraph(g,Component.translatable("screen.blacklight.infinite_effect",
-                    Component.translatable("upgrade.blacklight."+e.id+".value",String.format(java.util.Locale.ROOT,"%.2f",evolution.effect(rank))),
-                    Component.translatable("upgrade.blacklight."+e.id+".value",String.format(java.util.Locale.ROOT,"%.2f",evolution.effect(rank==Long.MAX_VALUE?rank:rank+1)))),y,TEXT)+8;
+                    Component.translatable("upgrade.blacklight."+e.id+".value",evolution.displayEffect(rank)),
+                    Component.translatable("upgrade.blacklight."+e.id+".value",evolution.displayEffect(rank==Long.MAX_VALUE?rank:rank+1))),y,TEXT)+8;
         }
         var core=com.codex.blacklight.infection.TissueCore.byId(e.id);
         if(core!=null){
