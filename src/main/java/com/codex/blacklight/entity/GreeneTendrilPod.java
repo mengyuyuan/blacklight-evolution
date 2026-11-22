@@ -47,7 +47,13 @@ public final class GreeneTendrilPod extends Mob {
     }
     private void cut(){
         SpiderFoley.play(this,position(),SpiderFoley.Cue.TEAR,1.25F);
-        SpiderFoley.strands(this,position().add(0,.4,0),new Vec3(0,1,0),7);discard();
+        if(level() instanceof ServerLevel l)splinters(l,8);
+        discard();
+    }
+    private void splinters(ServerLevel l,int amount){
+        var shards=new net.minecraft.core.particles.BlockParticleOption(net.minecraft.core.particles.ParticleTypes.BLOCK,
+                net.minecraft.world.level.block.Blocks.POLISHED_BLACKSTONE.defaultBlockState());
+        l.sendParticles(shards,getX(),getY()+.45,getZ(),amount,.31,.17,.31,.11);
     }
     @Override public void tick(){
         super.tick();
@@ -55,7 +61,7 @@ public final class GreeneTendrilPod extends Mob {
         var owner=mother==null?null:l.getEntity(mother);
         if(!(owner instanceof EncounterMob boss) || !boss.spider.live()){discard();return;}
         float age=age(0);
-        if(spent){if(age>=WINDUP+6)discard();return;}
+        if(spent){if(age>=WINDUP+12)discard();return;}
         var floor=l.clip(new ClipContext(position().add(0,.10,0),position().add(0,-.20,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
         if(floor.getType()!=HitResult.Type.BLOCK){cut();return;}
         if(age==12 || age==22)SpiderFoley.play(this,position(),SpiderFoley.Cue.STRAIN,age==12?.95F:1.25F);
@@ -72,9 +78,6 @@ public final class GreeneTendrilPod extends Mob {
             }
         }
         SpiderFoley.ground(boss,position(),1.65F,SpiderFoley.Cue.RUPTURE);
-        for(int i=0;i<6;i++){
-            double a=i*Math.PI/3;
-            SpiderFoley.strands(this,center,new Vec3(Math.cos(a),.38,Math.sin(a)),2);
-        }
+        splinters(l,14);
     }
 }

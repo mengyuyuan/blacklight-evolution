@@ -23,6 +23,12 @@ public final class SpiderPhase {
     private List<HydraContact.Region> cachedSkin;
     public final SpiderActions actions;
     public final SpiderFooting footing;
+    private SpiderBellySupport belly;
+    Matrix4f seatShell(Matrix4f root,float partial){
+        if(!live() || (brokenMask()==0 && actions.move()!=SpiderActions.Move.SLAM))return root;
+        if(belly==null)belly=new SpiderBellySupport(boss);
+        return belly.seat(root,partial);
+    }
     public SpiderPhase(EncounterMob boss){this.boss=boss;actions=new SpiderActions(boss);footing=new SpiderFooting(boss);}
     private CompoundTag data(){return boss.spiderData();}
     public boolean first(){return boss.greeneOutbreak() && boss.greeneBattle().armourWave()==1;}
@@ -98,7 +104,19 @@ public final class SpiderPhase {
             case QUILL -> .55F;
             default -> .68F;
         };
-        return direction*(angle*swing+.24F*recoil)*(joint.startsWith("tibia")?1F:.38F);
+        float bend=direction*(angle*swing+.24F*recoil);
+        // Inward folds on the inner rows can push the intact shin through the rear shell.
+        // Limits are in bind space, fitted to each baked shin against the carapace hull.
+        float limit=switch(limb){
+            case 1 -> bend<0?.90F:1.24F;
+            case 2 -> bend<0?.62F:1.24F;
+            case 5 -> bend>0?1.06F:1.24F;
+            case 6 -> bend>0?.60F:1.24F;
+            default -> 1.24F;
+        };
+        float start=limit*.78F,magnitude=Math.abs(bend);
+        if(magnitude>start)bend=Math.copySign(start+(limit-start)*(float)Math.tanh((magnitude-start)/(limit-start)),bend);
+        return bend*(joint.startsWith("tibia")?1F:.38F);
     }
     private final SpiderLegPose.Pair[] legPose=new SpiderLegPose.Pair[8];
     private final boolean[] sampled=new boolean[8];
@@ -168,6 +186,9 @@ public final class SpiderPhase {
         return m;
     }
     public void contact(int id,DamageSource source,float amount,HydraHurtContact.Contact hit){
+        if(id>SpiderAnatomy.FIRST_ROOT && id<SpiderAnatomy.FIRST_LEG && actions.move()==SpiderActions.Move.ORAL_SCISSORS){
+            SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.35F);actions.cancel();return;
+        }
         if(id==SpiderAnatomy.CROWN && actions.move()==SpiderActions.Move.CATALYZE){SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.1F);actions.cancel();return;}
         if(id>=SpiderAnatomy.FIRST_ROOT && id<SpiderAnatomy.FIRST_LEG && feeding()){SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.1F);SpiderFoley.strands(boss,hit.point(),hit.normal(),5);interruptMeal();return;}
         int leg=SpiderAnatomy.legForRegion(id);
@@ -281,6 +302,11 @@ public final class SpiderPhase {
             }
             return points;
         }
+        if(actions.move()==SpiderActions.Move.ORAL_SCISSORS){
+            if(slot==0)return List.of();
+            var mandible=SpiderAnatomy.point(boss,partial,new Vec3(1.04+(slot==1?1.25:-1.25),3.82,-2.98));
+            return SpiderWoundedActions.lash(boss,slot-1,partial,mandible);
+        }
         if(!feeding())return List.of();
         var mob=boss.level().getEntity(data().getInt("PreyId"));
         if(!(mob instanceof Mob prey) || slot>=(prey instanceof BlacklightHydra?3:1))return List.of();
@@ -302,13 +328,15 @@ public final class SpiderPhase {
         }
         return points;
     }
+    public static double jawCordRadius(int segment){return .45-.19*segment/12.;}
     public void addRootBoxes(int slot,float partial,List<HydraContact.Box> boxes){
         var path=rootPath(slot,partial);
         for(int i=1;i<path.size();i++){
             var a=path.get(i-1);var b=path.get(i);var delta=b.subtract(a);
             if(delta.lengthSqr()<.0001)continue;
             var z=delta.normalize();var x=z.cross(Math.abs(z.y)>.94?new Vec3(1,0,0):new Vec3(0,1,0)).normalize();
-            boxes.add(HydraContact.oriented(a.lerp(b,.5),new Vec3(.24,.24,delta.length()*.5+.06),x,z.cross(x),z));
+            double width=actions.move()==SpiderActions.Move.ORAL_SCISSORS?jawCordRadius(i):.24;
+            boxes.add(HydraContact.oriented(a.lerp(b,.5),new Vec3(width,width,delta.length()*.5+.06),x,z.cross(x),z));
         }
     }
     private void interruptMeal(){

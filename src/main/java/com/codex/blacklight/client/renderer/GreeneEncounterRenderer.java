@@ -111,6 +111,16 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         if(boss.spider.first()){
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             var origin=boss.getPosition(partial);
+            var seed=boss.spider.actions.flyingSeed(partial);
+            if(seed!=null){
+                var local=seed.subtract(origin);
+                stack.pushPose();stack.translate(local.x,local.y-.26,local.z);
+                stack.mulPose(com.mojang.math.Axis.YP.rotation((boss.spider.actions.age(partial)-17)*.37F));
+                stack.scale(.64F,.72F,.64F);
+                BlackTendrilMesh.shell(GreeneTendrilPodRenderer.surface(stack,out,light),12,1.4,28,0);
+                stack.popPose();
+            }
+            boolean lashing=boss.spider.actions.move()==com.codex.blacklight.combat.SpiderActions.Move.ORAL_SCISSORS;
             for(int slot=-1;slot<3;slot++){
                 var path=boss.spider.rootPath(slot,partial);
                 for(int k=1;k<path.size();k++){
@@ -119,9 +129,9 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
                     double phase=slot<0?boss.spider.actions.age(partial):boss.level().getGameTime()-boss.spiderData().getLong("MealStart")+partial;
                     double pulse=slot<0?Math.exp(-Math.pow((u-(phase-8)/21)*5,2)):Math.pow(.5+.5*Math.cos(u*12+phase*.38),4);
                     double width=slot<0?.25*(1-.72*u):.24*(1-.31*u);
-                    ConsumedMobVisuals.tube(stack,out,light,a,b,width*(1+.53*pulse),pulse>.61?0xff9e514c:0xff512932);
+                    ConsumedMobVisuals.tube(stack,out,light,a,b,lashing?com.codex.blacklight.combat.SpiderPhase.jawCordRadius(k):width*(1+.53*pulse),lashing?0xff272832:pulse>.61?0xff9e514c:0xff512932);
                     var rib=b.subtract(a).cross(new Vec3(0,1,0)).normalize().scale(width*.69);
-                    ConsumedMobVisuals.tube(stack,out,light,a.add(rib),b.add(rib),width*.24,0xffa16b59);
+                    ConsumedMobVisuals.tube(stack,out,light,a.add(rib),b.add(rib),width*.24,lashing?0xff727485:0xffa16b59);
                 }
             }
             return;

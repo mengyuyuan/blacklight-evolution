@@ -37,6 +37,16 @@ public final class SpiderGesture {
                 roll+=toward*(.12F*draw-.13F*thrust);pitch+=.10F*draw-.18F*thrust+.09F*pry;
                 sink-=.24F*draw+.42F*thrust;twist=toward*(.13F*draw-.095F*thrust);
             }
+            case ORAL_SCISSORS -> {
+                float plant=phrase(t,0,14,17,28),cross=phrase(t,16,26,28,42);
+                pitch+=.17F*plant-.19F*cross;twist+=.27F*plant-.42F*cross;
+                sink-=.36F*plant;forward+=.86F*cross;
+            }
+            case POD_CAST -> {
+                float load=phrase(t,0,13,16,20),recoil=phrase(t,16,19,22,33);
+                pitch+=.20F*load-.22F*recoil;forward+=.45F*load-.86F*recoil;
+                sink-=.30F*load;roll+=.075F*recoil;
+            }
             case SWEEP -> {
                 float wind=phrase(t,0,12,13,23),carry=phrase(t,14,27,29,42);
                 float stop=phrase(t,27,32,33,43);
@@ -173,6 +183,19 @@ public final class SpiderGesture {
                 x+=.44F*(float)Math.sin(clock);z+=(raised?1:-1)*.18F*(float)Math.cos(clock);
             }
         }else return null;
+        boolean torso=bone.equals("thorax"),arm=bone.startsWith("arm_")||bone.startsWith("elbow_")||bone.startsWith("wrist_");
+        if(move==SpiderActions.Move.ORAL_SCISSORS){
+            float wind=phrase(t,0,12,16,25),cross=phrase(t,16,26,30,43);
+            if(torso){x-=.40F*wind;y+=.42F*wind-.64F*cross;}
+            else if(arm){z+=(raised?-.57F:.44F)*wind;x+=(raised?-.52F:.36F)*cross;}
+            else y+=.29F*wind-.37F*cross;
+        }
+        if(move==SpiderActions.Move.POD_CAST){
+            float inhale=phrase(t,1,13,16,21),kick=phrase(t,16,19,21,33);
+            if(torso){x+=.46F*inhale-.72F*kick;}
+            else if(arm){z+=(raised?1:-1)*(.48F*inhale-.32F*kick);x-=.38F*kick;}
+            else x+=.30F*inhale-.48F*kick;
+        }
         return new Quaternionf().rotateZYX(z,y,x);
     }
 }
