@@ -115,7 +115,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             var origin=boss.getPosition(partial);
             attackEffects.draw(boss,partial,stack,out,light);
-            SpiderPainEffect.draw(boss,partial,stack,buffers,light);
+            SpiderPainEffect.collect(boss,partial);
             var seed=boss.spider.actions.flyingSeed(partial);
             if(seed!=null){
                 var local=seed.subtract(origin);

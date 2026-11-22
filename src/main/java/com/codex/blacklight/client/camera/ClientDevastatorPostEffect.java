@@ -8,6 +8,7 @@ import com.codex.blacklight.client.renderer.DevastatorEffectRenderer;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.Minecraft;
+import com.codex.blacklight.client.renderer.SpiderPainEffect;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,6 +33,8 @@ public final class ClientDevastatorPostEffect {
     private static int width,height;
     private static boolean failed;
     private static long passes;
+    private static final org.joml.Matrix4f entityView=new org.joml.Matrix4f();
+    private static final org.joml.Matrix4f entityProjection=new org.joml.Matrix4f();
     private static float lastBurst,lastRetract,lastFlight;
     private static float lastFlowX,lastFlowY,lastFlightAxis;
     private ClientDevastatorPostEffect() { }
@@ -52,19 +55,25 @@ public final class ClientDevastatorPostEffect {
     public static final class ReloadEvents {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event){
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)manager->
-                Minecraft.getInstance().execute(()->{close();failed=false;com.codex.blacklight.client.renderer.GreeneMoltRenderer.invalidate();}));
+                Minecraft.getInstance().execute(()->{close();SpiderPainEffect.reset();failed=false;com.codex.blacklight.client.renderer.GreeneMoltRenderer.invalidate();}));
     }
     }
     @SubscribeEvent public static void tick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         var current=Minecraft.getInstance().level;
-        if(current!=level){close();failed=false;level=current;}
+        if(current!=level){close();SpiderPainEffect.reset();failed=false;level=current;}
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent event){
+        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_ENTITIES){
+            // Forge's later AFTER_LEVEL event supplies the projection stack in place of the entity view.
+            entityView.set(event.getPoseStack().last().pose());entityProjection.set(event.getProjectionMatrix());
+            return;
+        }
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         // Snapshot the frame matrices; with a shader pack the pass runs later in the frame.
         var view=new org.joml.Matrix4f(event.getPoseStack().last().pose());
         var projection=new org.joml.Matrix4f(event.getProjectionMatrix());
+        SpiderPainEffect.finishFrame(entityView,entityProjection,event.getCamera().getPosition(),event.getPartialTick());
         com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event,view,projection));
     }
     private static void apply(RenderLevelStageEvent event,org.joml.Matrix4f view,org.joml.Matrix4f projection){

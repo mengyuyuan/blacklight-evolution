@@ -67,9 +67,10 @@ public final class GrabInteractionGameTest {
                 b.spider.tick();
                 h.assertTrue(!b.spider.feeding(),"full-health evolved survives natural selection");
                 cargo.setHealth(cargo.getMaxHealth()*.32F);
-                var food=ModEntities.COMMON_INFECTED.get().create(l);food.setPos(mouth.add(4,0,1));food.setNoGravity(true);food.setNoAi(true);l.addFreshEntity(food);bodies.add(food);
+                var food=ModEntities.COMMON_INFECTED.get().create(l);food.moveTo(mouth.x+4,mouth.y,mouth.z+5,0,0);food.setNoGravity(true);food.setNoAi(true);l.addFreshEntity(food);bodies.add(food);
                 b.spider.tick();
                 h.assertTrue(b.spider.feeding() && b.spiderData().getUUID("Prey").equals(food.getUUID()),"meal selects ordinary food while the evolved is wounded");
+                var feeding=b.spiderData().copy();feeding.putBoolean("PreyLeft",shot!=1);b.spiderData(feeding);
                 CombatTargeting.requestLock(p,b.getId(),SpiderAnatomy.MOUTH);
                 h.assertTrue(CombatTargeting.locked(p)==b,"can prelock the mouth from the cave floor");
                 ClawCombatSystem.handle(p,Action.GRAB);tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
