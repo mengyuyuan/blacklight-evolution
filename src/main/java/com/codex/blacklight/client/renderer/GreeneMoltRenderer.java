@@ -103,7 +103,19 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         grids[slot]=mesh(uv,2);gridCounts[slot]=idx.length;
         gridIndex[slot]=glGenBuffers();buffers.add(gridIndex[slot]);glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,gridIndex[slot]);glBufferData(GL_ELEMENT_ARRAY_BUFFER,idx,GL_STATIC_DRAW);
     }
+    // NativeImage can leave an atlas stride and subregion active. Our CPU float arrays
+    // start at pixel zero and contain tightly packed rows, including one-row timing data.
+    private static void tightPixels(){
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER,0);
+        glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH,0);
+        glPixelStorei(GL_UNPACK_SKIP_ROWS,0);
+        glPixelStorei(GL_UNPACK_SKIP_PIXELS,0);
+        glPixelStorei(GL_UNPACK_SWAP_BYTES,0);
+    }
     private int dataTexture(int width,int rows,int channels,float[] data){
+        if(data!=null && data.length<(long)width*rows*channels)throw new IllegalArgumentException("Short Greene texture");
+        tightPixels();
         int id=glGenTextures();textures.add(id);glBindTexture(GL_TEXTURE_2D,id);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
         int format=channels==4?GL_RGBA:GL_RGB,internal=channels==4?GL_RGBA32F:GL_RGB32F;
@@ -158,6 +170,8 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     }
     private static void bind(int unit,int texture){glActiveTexture(GL_TEXTURE0+unit);glBindTexture(GL_TEXTURE_2D,texture);}
     private static void upload(int unit,int texture,int w,int h,int format,float[] data){
+        if(data.length<(long)w*h*(format==GL_RGBA?4:3))throw new IllegalArgumentException("Short Greene texture upload");
+        tightPixels();
         bind(unit,texture);glTexSubImage2D(GL_TEXTURE_2D,0,0,0,w,h,format,GL_FLOAT,data);
     }
     private void posePrey(EncounterMob boss,float t,float partial,int light){
@@ -375,10 +389,17 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         final int program=glGetInteger(GL_CURRENT_PROGRAM),vao=glGetInteger(GL_VERTEX_ARRAY_BINDING),buffer=glGetInteger(GL_ARRAY_BUFFER_BINDING);
         final int active=glGetInteger(GL_ACTIVE_TEXTURE),src=glGetInteger(GL_BLEND_SRC_RGB),dst=glGetInteger(GL_BLEND_DST_RGB),srcA=glGetInteger(GL_BLEND_SRC_ALPHA),dstA=glGetInteger(GL_BLEND_DST_ALPHA);
         final boolean blend=glIsEnabled(GL_BLEND),cull=glIsEnabled(GL_CULL_FACE),depth=glIsEnabled(GL_DEPTH_TEST),write=glGetBoolean(GL_DEPTH_WRITEMASK);
+        final int unpackBuffer=glGetInteger(GL_PIXEL_UNPACK_BUFFER_BINDING),alignment=glGetInteger(GL_UNPACK_ALIGNMENT);
+        final int rowLength=glGetInteger(GL_UNPACK_ROW_LENGTH),skipRows=glGetInteger(GL_UNPACK_SKIP_ROWS);
+        final int skipPixels=glGetInteger(GL_UNPACK_SKIP_PIXELS),swapBytes=glGetInteger(GL_UNPACK_SWAP_BYTES);
         final int[] texture=new int[15];
         State(){for(int i=0;i<texture.length;i++){glActiveTexture(GL_TEXTURE0+i);texture[i]=glGetInteger(GL_TEXTURE_BINDING_2D);}}
         private void toggle(int f,boolean on){if(on)glEnable(f);else glDisable(f);}
         public void close(){
+            glBindBuffer(GL_PIXEL_UNPACK_BUFFER,unpackBuffer);
+            glPixelStorei(GL_UNPACK_ALIGNMENT,alignment);glPixelStorei(GL_UNPACK_ROW_LENGTH,rowLength);
+            glPixelStorei(GL_UNPACK_SKIP_ROWS,skipRows);glPixelStorei(GL_UNPACK_SKIP_PIXELS,skipPixels);
+            glPixelStorei(GL_UNPACK_SWAP_BYTES,swapBytes);
             for(int i=0;i<texture.length;i++)bind(i,texture[i]);glActiveTexture(active);
             glUseProgram(program);glBindVertexArray(vao);glBindBuffer(GL_ARRAY_BUFFER,buffer);
             toggle(GL_BLEND,blend);toggle(GL_CULL_FACE,cull);toggle(GL_DEPTH_TEST,depth);

@@ -22,6 +22,9 @@ public final class SpiderActions {
     private int detourSide;
     private long detourUntil;
     private double closingDistance;
+    private UUID observedTarget;
+    private long observedTick;
+    private Vec3 observedPosition=Vec3.ZERO, walkingVelocity=Vec3.ZERO;
 
     private final EncounterMob boss;
     public SpiderActions(EncounterMob boss){this.boss=boss;}
@@ -53,6 +56,27 @@ public final class SpiderActions {
     public Vec3 aim(){return new Vec3(data().getDouble("Ax"),data().getDouble("Ay"),data().getDouble("Az"));}
     private boolean clear(Vec3 from,Vec3 to){return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()==HitResult.Type.MISS;}
     private Entity actor(){return data().hasUUID("ActionTarget") && boss.level() instanceof ServerLevel l?l.getEntity(data().getUUID("ActionTarget")):null;}
+    private void observe(ServerPlayer player){
+        long tick=now();
+        if(player.getUUID().equals(observedTarget) && observedTick==tick)return;
+        var delta=player.position().subtract(observedPosition).multiply(1,0,1);
+        if(player.getUUID().equals(observedTarget) && observedTick==tick-1 && delta.lengthSqr()<1.5*1.5){
+            walkingVelocity=walkingVelocity.lerp(delta,.55);
+        }else walkingVelocity=Vec3.ZERO;
+        observedPosition=player.position();observedTarget=player.getUUID();observedTick=tick;
+    }
+    private void commitAim(ServerPlayer player,double leadTicks,double maxLead,boolean ground){
+        var lead=walkingVelocity.scale(leadTicks);
+        if(lead.lengthSqr()>maxLead*maxLead)lead=lead.normalize().scale(maxLead);
+        var point=player.position().add(lead);
+        if(ground){
+            var floor=SpiderRupture.floor(boss,player.position(),point);
+            if(floor==null)return;
+            point=floor;
+        }
+        var next=data().copy();next.putDouble("Ax",point.x);next.putDouble("Ay",point.y);next.putDouble("Az",point.z);
+        boss.spiderData(next);
+    }
     private void rest(int delay){
         closingDistance=0;
         releaseGrip();set(Move.REST,null,boss.position(),-1);
@@ -198,6 +222,7 @@ public final class SpiderActions {
         if(boss.spider.feeding() || boss.spider.tilt(0)!=0)return;
         var p=level.getNearestPlayer(boss.getX(),boss.getY(),boss.getZ(),112,who->who instanceof ServerPlayer survivor && survivor.isAlive() && !survivor.isCreative() && !survivor.isSpectator());
         if(!(p instanceof ServerPlayer player) || player.isSpectator() || player.isCreative())return;
+        observe(player);
         Vec3 diff=player.position().subtract(boss.position());
         float facing=(float)Math.toDegrees(Math.atan2(-diff.x,diff.z));
         float speed=4.8F-.27F*Integer.bitCount(boss.spider.brokenMask());
@@ -398,10 +423,22 @@ public final class SpiderActions {
             return;
         }
         if(!(actor() instanceof ServerPlayer p) || !p.isAlive() || p.isSpectator()){rest(18);return;}
+        observe(p);
+        // Commit early enough for the raised limb or opening fissures to advertise one fixed lane.
+        if(t==6 && (m==Move.STAB || m==Move.SWEEP || m==Move.PINCER))
+            commitAim(p,m==Move.SWEEP?16:12,4.5,true);
+        if(t==6 && m==Move.SPIKES)commitAim(p,28,8,true);
         if(m==Move.HEAVY_STAMP){
             heavyStamp(level,t);return;
         }
         if(m==Move.FLESH_VOLLEY){
+            // Each fan has its own six-tick tell. Once released the seven projectiles keep their headings.
+            if(t==9 || t==16 || t==23){
+                var mouth=boss.spider.mouth(1);
+                double flightTicks=20*mouth.distanceTo(p.getBoundingBox().getCenter())/GreeneMissileFlight.Ammo.SHOTGUN.initialSpeed;
+                commitAim(p,6+Math.min(26,flightTicks),7,false);
+                SpiderFoley.strands(boss,mouth,aim().add(0,.95,0).subtract(mouth),5);
+            }
             if(t==3)SpiderFoley.play(boss,boss.spider.mouth(1),SpiderFoley.Cue.INHALE,1.65F);
             if(t==15 || t==22 || t==29){
                 int wave=(t-15)/7,bit=1<<wave;
