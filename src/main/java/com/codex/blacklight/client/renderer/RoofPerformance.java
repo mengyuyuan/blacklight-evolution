@@ -164,7 +164,8 @@ public final class RoofPerformance {
                 .slerp(b.getUnnormalizedRotation(new org.joml.Quaternionf()).normalize(),weight);
         a.translationRotateScale(position,rotation,a.getScale(new Vector3f()).lerp(b.getScale(new Vector3f()),weight));
     }
-    public static void rack(Clock c,PoseStack stack,MultiBufferSource buf,int light,Matrix4f nativeChest,float growth,int side){
+    public static void rack(Clock c,PoseStack stack,MultiBufferSource buf,int light,Matrix4f nativeChest,WeaponMorphTracker.Sample morph,int side){
+        float growth=morph.shoulder();
         var frames=new Matrix4f[R.parent.length];
         var wetness=new float[frames.length];
         java.util.Arrays.fill(wetness,1-growth);
@@ -187,6 +188,16 @@ public final class RoofPerformance {
                 stack.scale(growth,growth,growth);
                 if(circulation)drawVessels(R.geometry[R.mesh[n]],stack,out,pulse);
                 else part(R.mesh[n],stack,out,light,veins,liquid?wetness[n]:0);
+                stack.popPose();
+            }
+        }
+        if(morph.transitioning() && morph.flow()>.01F && growth<.999F){
+            for(int joint:R.quill){
+                var frame=frames[joint];
+                if(frame==null || Math.abs(frame.determinant3x3())<.000015F)continue;
+                stack.pushPose();
+                BlacklightBoneRendering.apply(stack,frame);
+                WeaponMorphTendrils.socket(stack,buf,light,growth,morph.flow());
                 stack.popPose();
             }
         }

@@ -233,6 +233,9 @@ public enum WeaponMove {
             default -> uncharged();
         };
     }
+    public boolean straightWhip(){
+        return switch(uncharged()){case WHIP_AIR,WHIP_LONGSHOT,WHIP_LUNGE -> true; default -> false;};
+    }
     public boolean rush(){return this==BLADE_RUSH||this==HAMMER_RAM||this==WHIP_LUNGE||this==MUSCLE_RUSH;}
     public boolean quake(){return this==GROUND_STOMP||uncharged()==HAMMER_QUAKE||uncharged()==HAMMER_COMBO_SPECIAL||this==HAMMER_DROP||this==HAMMER_RAM||this==COMBO_GROUND_POUND||this==AIR_GROUND_POUND;}
     public boolean frenzy(){return this==BLADE_CLEAVE;}

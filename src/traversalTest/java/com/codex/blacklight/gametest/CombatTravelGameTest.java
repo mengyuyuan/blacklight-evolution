@@ -76,22 +76,31 @@ public final class CombatTravelGameTest {
     private static void check_groundAttacksNeverRunToDistantTargets(GameTestHelper h){
         for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.CLAWS,PowerForm.BLADE,PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.MUSCLE_MASS})
             for(var input:WeaponMove.Input.values())for(boolean locked:new boolean[]{false,true}){
-                var p=MovingCombatGameTest.player(h,form);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(true);p.setNoGravity(true);
-                var origin=p.position();var mob=victim(h,origin.add(0,0,24));float hp=mob.getHealth();
-                if(locked)CombatTargeting.requestLock(p,mob.getId());
-                WeaponCombatSystem.request(p,input);var move=p.getData(ModAttachments.WEAPON_VISUAL).spec();
-                h.assertTrue(move!=null&&!CombatMotion.canApproach(move),"fixture is a grounded opener "+form+" "+input);
-                h.assertTrue(p.getData(ModAttachments.WEAPON_VISUAL).targetId()<0,"distant ground target cannot activate assist, locked="+locked);
-                for(int t=0;t<150&&WeaponCombatSystem.busy(p);t++){
-                    h.assertTrue(!p.getData(ModAttachments.WEAPON_VISUAL).traveling(),"no automatic run-up "+move);
-                    p.move(MoverType.SELF,p.getDeltaMovement());p.setOnGround(true);p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
-                }
-                h.assertTrue(mob.getHealth()==hp,"ground swing cannot damage distant target "+move);
-                h.assertTrue(p.distanceToSqr(origin)<144,"only the move's own bounded displacement remains "+move);
-                h.assertTrue(!WeaponCombatSystem.busy(p),"empty ground attack finishes normally "+move);
-                WeaponCombatSystem.cancel(p);CombatTargeting.requestLock(p,-1);mob.discard();
+                checkGroundAttack(h,form,input,locked,24);
             }
+        // Beyond the base cable, but still inside the minimum server lock range (32).
+        checkGroundAttack(h,PowerForm.WHIPFIST,WeaponMove.Input.SPECIAL,true,31);
         h.succeed();
+    }
+    private static void checkGroundAttack(GameTestHelper h,PowerForm form,WeaponMove.Input input,boolean locked,int distance){
+        boolean longshot=locked && form==PowerForm.WHIPFIST && input==WeaponMove.Input.SPECIAL;
+        var p=MovingCombatGameTest.player(h,form);p.setPos(h.absoluteVec(new Vec3(3,180,3)));p.setOnGround(true);p.setNoGravity(true);
+        var origin=p.position();var mob=victim(h,origin.add(0,0,distance));float hp=mob.getHealth();
+        if(locked)CombatTargeting.requestLock(p,mob.getId());
+        WeaponCombatSystem.request(p,input);var move=p.getData(ModAttachments.WEAPON_VISUAL).spec();
+        h.assertTrue(move!=null&&!CombatMotion.canApproach(move),"fixture is a grounded opener "+form+" "+input);
+        int focus=p.getData(ModAttachments.WEAPON_VISUAL).targetId();
+        h.assertTrue(longshot?focus==mob.getId():focus<0,"ground focus for "+move+" at "+distance+" blocks, locked="+locked+", focus="+focus+", expected="+(longshot?mob.getId():-1));
+        for(int t=0;t<150&&WeaponCombatSystem.busy(p);t++){
+            h.assertTrue(!p.getData(ModAttachments.WEAPON_VISUAL).traveling(),"no automatic run-up "+move);
+            p.move(MoverType.SELF,p.getDeltaMovement());p.setOnGround(true);p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
+        }
+        boolean withinCable=longshot && distance==24;
+        h.assertTrue(withinCable?mob.getHealth()<hp:mob.getHealth()==hp,"physical ground contact at "+distance+" blocks: "+move+", locked="+locked);
+        if(longshot)h.assertTrue(p.position().distanceTo(origin)<1.65,"the cable reaches out while the operator stays in place");
+        h.assertTrue(p.distanceToSqr(origin)<144,"only the move's own bounded displacement remains "+move);
+        h.assertTrue(!WeaponCombatSystem.busy(p),"empty ground attack finishes normally "+move);
+        WeaponCombatSystem.cancel(p);CombatTargeting.requestLock(p,-1);mob.discard();
     }
     @GameTest(template="wall_test",timeoutTicks=600,batch="isolated_nearestVisibleTargetAndExplicitLockAreSeparate")
     public static void nearestVisibleTargetAndExplicitLockAreSeparate(GameTestHelper h){

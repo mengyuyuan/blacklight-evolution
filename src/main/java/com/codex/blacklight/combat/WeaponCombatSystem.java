@@ -251,6 +251,9 @@ public final class WeaponCombatSystem {
                 &&CombatTargeting.inReach(p,v,range)&&CombatTargeting.visible(p,v);
         var locked=CombatTargeting.locked(p);
         if(locked!=null) {
+            // The HUD may retain a visible limb beyond striking distance. Aim the distant
+            // stab at that limb; the cable length, block clip and skin still bound damage.
+            if(move.straightWhip() && CombatTargeting.visibleWithinRange(p,locked,CombatTargeting.viewRange(p)))return locked;
             // An explicitly aimed dash can select the body it is about to reach. Contacts still use local hitboxes.
             if(move==WeaponMove.MUSCLE_RUSH || move==WeaponMove.BLADE_RUSH) {
                 double advance=move==WeaponMove.MUSCLE_RUSH?12*.87:(p.isSprinting()?17.5:10)*.87;
@@ -476,7 +479,7 @@ public final class WeaponCombatSystem {
                 }
             }
         }else if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
-            s.groundEffect=true;CombatImpactEffects.ground(p,s.move,s.direction);
+            s.groundEffect=CombatImpactEffects.ground(p,s.move,s.direction);
         }
         com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw, s.groundTravelCharge);
         if(physicalQuake&&!s.groundEffect&&t<s.move.end){
@@ -789,10 +792,14 @@ public final class WeaponCombatSystem {
             boolean meshStrike=cutting.sharp() && !bodyFlight && (body!=null || RagdollImpact.supportedBody(v)&&!CombatTargeting.multipart(v)
                     &&(s.move.form==PowerForm.CLAWS || s.move.form==PowerForm.BLADE));
             boolean lightLash=whip!=null && s.move.lightLash() && body==null && !CombatTargeting.multipart(v);
-            if(body==null&&!lightLash&&!meshStrike&&!preciseOnly&&!close&&!contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc))continue;
+            boolean missedVolume=body==null&&!lightLash&&!meshStrike&&!preciseOnly&&!close
+                    && !contact(p,s,v,bounds,whip,fromTime,toTime,bodyFlight,moveReach,direction,arc);
+            // During a dive the blade can reach the locked body before the player's capsule.
+            if(missedVolume && !(diving && s.move==WeaponMove.BLADE_DIVE && v==s.target && CombatTargeting.visible(p,v)))continue;
             var boxes=CombatTargeting.hitboxes(v);
             Vec3 oldVictim=v.position().add(previousBox(s,v,boxes,0).getCenter().subtract(boxes.getFirst().getCenter()));
             var cut=cutting.trace(p,v,oldVictim);
+            if(missedVolume && cut.contacts().isEmpty())continue;
             if(lightLash && (cut.contacts().isEmpty() || s.move==WeaponMove.WHIP_LASH)){
                 var cable=cutting.lashStroke(p,v,oldVictim,whip.collisionRadius());
                 if(!cable.contacts().isEmpty())cut=cable;
@@ -807,7 +814,13 @@ public final class WeaponCombatSystem {
                 // there can launch a corpse before the visible weapon reaches it.
                 // A real blade-back contact still gives ordinary hit feedback.
                 impact=cutting.bluntContact(p,v,oldVictim).stroke(s.cutStroke);
-                if(impact.contacts().isEmpty())continue;
+                if(impact.contacts().isEmpty()){
+                    // The flat raking mesh can pass over a low body approached from above.
+                    // Only the selected body within the extended claw's physical reach can take this contact.
+                    if(preciseOnly || s.move!=WeaponMove.CLAW_POUNCE || !s.pounceCommitted || v!=s.target
+                            || body!=null || CombatTargeting.multipart(v) || !pounceContact(p,s,v))continue;
+                    impact=WeaponCutContact.impact(p,v,v.getBoundingBox().getCenter().subtract(p.getEyePosition()));
+                }
             }
             HydraHurtContact.Contact hydraHit=null;
             if(body!=null){
@@ -847,6 +860,15 @@ public final class WeaponCombatSystem {
                     if(!s.lifted){s.lifted=true;p.setOnGround(false);p.setDeltaMovement(s.direction.scale(.12).add(0,.72,0));p.hurtMarked=true;}
                 }else if(!resistsControl&&!CombatTargeting.anchoredBody(v)&&(s.move.quake()||s.move.airCombo())){v.setDeltaMovement(v.getDeltaMovement().add(0,s.move==WeaponMove.AIR_AUTO4?-.6:.3,0));v.hurtMarked=true;}
                 var push=s.move.quake()?v.position().subtract(p.position()).multiply(1,0,1).normalize():s.direction;
+                if(s.move==WeaponMove.HAMMER_DROP && !s.groundEffect){
+                    var foot=v.position();
+                    var floor=p.level().clip(new net.minecraft.world.level.ClipContext(foot.add(0,.16,0),foot.add(0,-.26,0),
+                            net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,p));
+                    if(CombatImpactEffects.ground(p,s.move,floor)){
+                        s.groundEffect=true;
+                        s.hammerFloor=floor.getLocation();
+                    }
+                }
                 if(s.hammerFloor!=null && impact.contacts().isEmpty())
                     impact=WeaponCutContact.hammerPress(v,s.hammerFloor,AttackReach.scale(p));
                 WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,impact,s.fullyCharged);
@@ -935,17 +957,19 @@ public final class WeaponCombatSystem {
         if(!airTargetAvailable(p,s)||p.tickCount-s.travelStarted>s.travelBudget||p.isInWater()||p.isInLava()){
             p.setDeltaMovement(0,Math.min(0,p.getDeltaMovement().y),0);p.hurtMarked=true;cancel(p);return;
         }
-        var delta=s.aimPoint(p).subtract(p.position());
+        boolean pounce=s.move==WeaponMove.CLAW_POUNCE;
+        var delta=pounce?pounceDelta(p,s):s.aimPoint(p).subtract(p.position());
         boolean airborne=s.move.aerial();
         double height=s.move.landingAttack()?2.2:0;
         double standOff=CombatMotion.standOff(s.move);
         float desired=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));
         s.yaw=CombatPursuit.turn(s.yaw,s.yaw,desired,(float)Math.max(CombatMotion.turn(s.move,true),12),180);
         s.direction=Vec3.directionFromRotation(0,s.yaw);p.setYRot(s.yaw);p.setYHeadRot(s.yaw);p.yBodyRot=s.yaw;
-        if(delta.horizontalDistance()<=standOff+.3&&(!airborne||Math.abs(delta.y+height)<.75)){
+        boolean arrived=pounce?delta.lengthSqr()<=3.2*3.2:delta.horizontalDistance()<=standOff+.3&&(!airborne||Math.abs(delta.y+height)<.75);
+        if(arrived){
             s.traveling=false;s.clipOffset=LocalWeaponMotion.find(s.move.id).flatMap(LocalWeaponMotion.Definition::charge)
                     .map(LocalWeaponMotion.Charge::releaseTime).orElse(0F);
-            if(s.move==WeaponMove.CLAW_POUNCE)s.clipOffset=.4F;
+            if(pounce)s.clipOffset=.4F;
             s.started=p.tickCount-Math.round(s.clipOffset*20);s.previousFeet=p.position();s.previousYaw=s.yaw;
             p.setDeltaMovement(0,0,0);p.hurtMarked=true;
             p.setData(ModAttachments.WEAPON_VISUAL,new WeaponVisual(s.move.ordinal(),p.level().getGameTime()-Math.round(s.clipOffset*20),s.yaw,false,s.clipOffset,s.targetId()));p.syncData(ModAttachments.WEAPON_VISUAL);
@@ -965,19 +989,27 @@ public final class WeaponCombatSystem {
             p.setData(ModAttachments.WEAPON_VISUAL,new WeaponVisual(old.move(),old.started(),s.yaw,false,old.clipOffset(),old.targetId(),old.travelPose()));p.syncData(ModAttachments.WEAPON_VISUAL);
         }
     }
+    private static Vec3 pounceDelta(ServerPlayer p,Session s){
+        var shoulder=p.position().add(0,p.getBbHeight()*.62,0);
+        var point=s.target!=null && !CombatTargeting.multipart(s.target)?s.target.getBoundingBox().getCenter():s.aimPoint(p);
+        return point.subtract(shoulder);
+    }
     private static void tickPounce(ServerPlayer p,Session s,int tick){
         if(s.pounceCommitted){
-            var v=p.getDeltaMovement();p.setDeltaMovement(v.x*.55,Math.max(v.y,-.12),v.z*.55);p.hurtMarked=true;return;
+            var v=p.getDeltaMovement();
+            p.setDeltaMovement(v.x*.55,Math.max(v.y,-.12),v.z*.55);p.hurtMarked=true;return;
         }
         if(s.flight<0)s.flight=p.tickCount;
         int elapsed=p.tickCount-s.flight;
         boolean available=airTargetAvailable(p,s);
-        var delta=available?s.aimPoint(p).subtract(p.position()):s.direction.scale(3);
+        var delta=available?pounceDelta(p,s):s.direction.scale(3);
         double distance=delta.horizontalDistance();
-        boolean reached=available&&distance<1.55&&Math.abs(delta.y)<1.15;
+        boolean reached=available && delta.lengthSqr()<=1.48*1.48;
+        // The flight budget is set from the initial 3D distance. Contact still requires local reach.
+        int budget=available?s.travelBudget:18;
         // The travel pose lasts until physical contact range, a wall, or the
         // bounded flight budget. A failed pursuit still rakes empty air.
-        if(tick>=9&&(reached||elapsed>=18||p.horizontalCollision||p.onGround())){
+        if(tick>=9&&(reached||elapsed>=budget||p.horizontalCollision||p.onGround())){
             s.pounceCommitted=true;s.clipOffset=.5F;s.started=p.tickCount-10;
             p.setDeltaMovement(0,0,0);p.hurtMarked=true;
             p.setData(ModAttachments.WEAPON_VISUAL,new WeaponVisual(s.move.ordinal(),p.level().getGameTime()-10,s.yaw,false,.5F,s.targetId()));p.syncData(ModAttachments.WEAPON_VISUAL);
@@ -1021,6 +1053,14 @@ public final class WeaponCombatSystem {
         // through an entire old-to-new limb corridor.
         return old.getCenter().distanceToSqr(box.getCenter())<=64?old:box;
     }
+    private static boolean pounceContact(ServerPlayer p,Session s,LivingEntity victim){
+        var shoulder=p.position().add(0,p.getBbHeight()*.62,0);
+        var surface=CombatTargeting.closestPoint(shoulder,victim);
+        var delta=surface.subtract(shoulder);
+        double reach=1.42*AttackReach.scale(p);
+        if(delta.lengthSqr()>reach*reach || delta.multiply(1,0,1).dot(s.direction)<-.12)return false;
+        return CombatTargeting.clearRay(p,shoulder,surface);
+    }
     private static boolean contact(ServerPlayer p,Session s,LivingEntity target,LocalWeaponMotion.ContactBounds bounds,
             WhipCurve whip,double fromTime,double toTime,boolean bodyFlight,double reach,Vec3 direction,double arc){
         var current=CombatTargeting.hitboxes(target);var previousFeet=safeFeet(p,s);var origin=p.getEyePosition();
@@ -1032,7 +1072,9 @@ public final class WeaponCombatSystem {
                 boolean descending=s.move.divingStrike();
                 double halfHeight=p.getBbHeight()*.5;
                 var expanded=descending?box.inflate(p.getBbWidth()*.5,halfHeight,p.getBbWidth()*.5):box.inflate(.45,.25,.45);
-                var from=previousFeet.add(0,halfHeight,0);
+                // Sweep relative to the receiver so lateral motion during one descent tick is included.
+                var boxMotion=box.getCenter().subtract(previousBox(s,target,current,part).getCenter());
+                var from=previousFeet.add(0,halfHeight,0).add(boxMotion);
                 var to=p.position().add(0,halfHeight,0);
                 if(!descending)to=to.add(s.direction);
                 if(!expanded.contains(from)&&!expanded.contains(to)&&expanded.clip(from,to).isEmpty())continue;

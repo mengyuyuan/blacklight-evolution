@@ -117,12 +117,15 @@ public final class WeaponImpact {
             if(style==FatalWeaponImpact.MUSCLE && fullyCharged && PlayerHitEffects.fleshBody(v)
                     && !impact.contacts().isEmpty() && !PlayerHitEffects.metalAt(v,impact.contacts().get(0).point()))
                 style=FatalWeaponImpact.MUSCLE_BURST;
+            if(style==FatalWeaponImpact.HAMMER_BREAK && move==WeaponMove.HAMMER_DROP && PlayerHitEffects.fleshBody(v)
+                    && volume<=4 && !impact.contacts().isEmpty() && !PlayerHitEffects.metalAt(v,impact.contacts().get(0).point()))
+                style=FatalWeaponImpact.HAMMER_PULP;
             if(style==FatalWeaponImpact.HAMMER_BREAK && (HammerQuakeContact.owns(move)||move.hammerComboSlam()))
                 style=impact.contacts().stream().anyMatch(hit->hit.edge().equals("hammer-floor-press"))
                         ?FatalWeaponImpact.HAMMER_PRESS:FatalWeaponImpact.HAMMER;
             if(style!=null){
                 var travel=style==FatalWeaponImpact.WHIP && !impact.contacts().isEmpty()?impact.direction():direction;
-                launch=style.launch(launch,travel,mass*resistance*tier.force,profile.motion()==ImpactProfile.UP,profile.lift()<0||style==FatalWeaponImpact.HAMMER_PRESS);
+                launch=style.launch(launch,travel,mass*resistance*tier.force,profile.motion()==ImpactProfile.UP,profile.lift()<0||style==FatalWeaponImpact.HAMMER_PRESS||style==FatalWeaponImpact.HAMMER_PULP);
             }
             int motion=style==null?profile.motion():style.motion;
             if(v.isAlive() && controlled && canFall && move.form==PowerForm.HAMMERFISTS && !move.quake())
