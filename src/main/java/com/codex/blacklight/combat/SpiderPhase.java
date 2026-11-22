@@ -31,6 +31,19 @@ public final class SpiderPhase {
     }
     public SpiderPhase(EncounterMob boss){this.boss=boss;actions=new SpiderActions(boss);footing=new SpiderFooting(boss);}
     private CompoundTag data(){return boss.spiderData();}
+    public static final int FULL_HEALTH=50_000;
+    private static final net.minecraft.resources.ResourceLocation SHELL_HEALTH=net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("blacklight","greene_spider_health");
+
+    public void synchronizeShellHealth(){
+        var scale=boss.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        float previous=boss.getMaxHealth(),health=boss.getHealth();
+        double bonus=first()?FULL_HEALTH/com.codex.blacklight.power.CombatScale.UNITS-boss.kind().health:0;
+        if(com.codex.blacklight.power.CombatScale.modifier(scale,SHELL_HEALTH,bonus,
+                net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE)){
+            com.codex.blacklight.power.CombatScale.preserveHealthFraction(boss,previous,health);
+            boss.greeneBattle().refreshHealthScale();
+        }
+    }
     public boolean first(){return boss.greeneOutbreak() && boss.greeneBattle().armourWave()==1;}
     public boolean live(){return first() && boss.greeneStage()==GreeneBattleCycle.GUARDED && boss.isAlive();}
     public int brokenMask(){return data().getInt("Lost");}

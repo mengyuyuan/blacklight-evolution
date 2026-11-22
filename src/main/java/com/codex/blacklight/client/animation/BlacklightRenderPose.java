@@ -9,7 +9,15 @@ import net.minecraft.world.entity.LivingEntity;
 /** Applies gameplay-driven pose constraints once, before any skin, armour or limb layer samples it. */
 public final class BlacklightRenderPose {
     private BlacklightRenderPose() { }
+    public static boolean mouthStruggle(LivingEntity entity,float partial){
+        var action=entity.getData(ModAttachments.PLAYER_ACTION);
+        return action.clipId().startsWith("greene_mouth_") && action.active(PlayerMotionController.actionTime(entity,partial));
+    }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(mouthStruggle(entity,partial)){
+            var action=entity.getData(ModAttachments.PLAYER_ACTION);
+            return MotionLibrary.pose(action.clipId(),action.seconds(PlayerMotionController.actionTime(entity,partial)),false);
+        }
         if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return com.codex.blacklight.client.vehicle.HelicopterPose.skeleton(craft,entity,partial);
         if(entity instanceof net.minecraft.world.entity.player.Player&&entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle){
             String seat=vehicle.seatOf(entity.getUUID());
@@ -98,6 +106,7 @@ public final class BlacklightRenderPose {
         }
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(mouthStruggle(entity,partial))return entity.getData(ModAttachments.PLAYER_ACTION).yaw();
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
         if(entity instanceof net.minecraft.world.entity.player.Player p){var h=com.codex.blacklight.city.HydraTransport.carrier(p);if(h!=null)return h.getYRot();}

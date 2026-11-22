@@ -79,7 +79,7 @@ public final class GreeneProjectile extends Projectile {
         Entity target=targetId==null?null:server.getEntity(targetId);
         if(!GreeneWeaponTarget.valid(owner,target)){flight.loseTarget();target=null;}
         Vec3 from=position(),step=flight.step(from,target==null?null:GreeneWeaponTarget.point(target),target==null?Vec3.ZERO:target.getDeltaMovement().scale(20),.05);
-        Vec3 to=from.add(step);double radius=flight.ammo().thickness;
+        Vec3 to=from.add(step);double radius=flesh()?.23:flight.ammo().thickness;
         var sweep=new AABB(from,to).inflate(radius+.001);
         if(flight.expired()||!Double.isFinite(step.lengthSqr())||step.lengthSqr()>64*64||flight.outOfRange(launch,to)
                 ||!VehicleKinematics.loaded(server,sweep)||sweep.minX<server.getWorldBorder().getMinX()||sweep.maxX>server.getWorldBorder().getMaxX()
@@ -89,7 +89,7 @@ public final class GreeneProjectile extends Projectile {
         if(hit!=null){setPos(hit.hit.center());impact(owner,hit);return;}
         setPos(to);
         GreeneProjectileEffects.tick(this);
-        if(target!=null&&flight.proximityTriggered(to,target.position())){
+        if(!flesh() && target!=null&&flight.proximityTriggered(to,target.position())){
             // Native proximity is a trigger against the original target origin,
             // never a radius that damages all nearby actors.
             var contact=proximityContact(server,target,to);
@@ -167,6 +167,7 @@ public final class GreeneProjectile extends Projectile {
             var target=contact.target;var ammo=flight.ammo();
             if(target instanceof LivingEntity living&&owner.enemy(living)&&!com.codex.blacklight.firearms.FirearmsCombat.protectedTarget(owner,living)){
                 float damage=(float)(living instanceof Player?ammo.damageOnPlayer:ammo.damageOnNpc)*LIVING_DAMAGE_ADAPTER;
+                if(flesh())damage*=1.85F;
                 var source=damageSources().thrown(this,owner);var body=AnimatedHurtBody.of(living);
                 if(body!=null&&contact.body!=null)body.hurtAt(source,damage,contact.body);
                 else if(body==null)living.hurt(source,damage);

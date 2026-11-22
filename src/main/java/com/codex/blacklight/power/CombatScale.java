@@ -58,6 +58,7 @@ public final class CombatScale {
         boolean infected=com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob);
         float before=mob.getMaxHealth(),health=mob.getHealth();
         attributes(mob,infected);preserveHealthFraction(mob,before,health);
+        if(mob instanceof com.codex.blacklight.entity.EncounterMob boss && boss.greeneOutbreak())boss.spider.synchronizeShellHealth();
         INFECTION_STATE.put(mob,infected);
     }
     @SubscribeEvent public static void tick(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event){

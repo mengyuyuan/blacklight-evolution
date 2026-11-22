@@ -317,6 +317,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     }
     public void startGreeneOutbreak() {
         entityData.set(GREENE_OUTBREAK,true);
+        spider.synchronizeShellHealth();
         greeneBattle.beginOpeningAtSurface();
     }
 
@@ -960,14 +961,16 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(spider.first()){
             bar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider.name"));
             bar.setProgress(greeneStage()==GreeneBattleCycle.MOLTING?0:Math.max(0,Math.min(1,getHealth()/getMaxHealth())));
-            bar.setVisible(spider.live());defenseBar.setVisible(false);return;
+            bar.setVisible(isAlive() && (spider.live() || greeneStage()==GreeneBattleCycle.MOLTING));defenseBar.setVisible(false);return;
         }
         bar.setProgress(Math.max(0,Math.min(1,getHealth()/getMaxHealth())));bar.setVisible(kind.enabled()&&kind.boss&&isAlive());
         if(!kind.enabled()){defenseBar.setVisible(false);return;}
         bar.setOverlay(BossEvent.BossBarOverlay.NOTCHED_10);
         boolean counterWindow = kind == EncounterKind.ELIZABETH_GREENE ? greeneBattle.coreDamageable() : exposed();
         bar.setColor(counterWindow ? BossEvent.BossBarColor.PURPLE : BossEvent.BossBarColor.RED);
-        bar.setName(net.minecraft.network.chat.Component.translatable("boss.blacklight.phase",getDisplayName(),phase()+1));
+        bar.setName(greeneOutbreak() && greeneBattle.armourWave()>1
+                ?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_goddess.name")
+                :net.minecraft.network.chat.Component.translatable("boss.blacklight.phase",getDisplayName(),phase()+1));
         defenseBar.setVisible(kind.boss&&isAlive()&&(parts.length>0||exposed()));
         if(kind==EncounterKind.GOLIATH){
             var window=goliathFinisherReady()?GoliathWindow.FINISH:goliathWindow();

@@ -117,6 +117,20 @@ public final class SpiderLegPose {
                 dest=dest.add(0,Math.sin(Math.PI*SpiderGesture.ease(time,impact+6,impact+23))*1.15,0);
             }
         }
+        if(move==SpiderActions.Move.STAB && leg==chosen && state.contains("FirstStabPoint") && time>18){
+            var first=state.getCompound("FirstStabPoint");
+            var plant=new Vec3(first.getDouble("X"),first.getDouble("Y"),first.getDouble("Z"));
+            var loaded=plant.lerp(rest,.34).add(0,7.4,0);
+            var raisedTip=plant.lerp(loaded,SpiderGesture.ease(time,20,31));
+            var strike=action.aim().add(0,.20,0);
+            dest=raisedTip.lerp(strike,SpiderGesture.ease(time,40,46)).lerp(rest,SpiderGesture.ease(time,49,62));
+        }
+        if(move==SpiderActions.Move.SWALLOW && leg%4==chosen%4 && state.getBoolean("Gripped") && time>=24 && time<50){
+            // Carry the captured hips between the two tips until the hands reach the rim.
+            var axis=new Vec3(leg<4?-.56:.56,0,0).yRot((float)Math.toRadians(-boss.skinYaw(partial)));
+            var hold=SpiderMouthStruggle.feet(boss,time,partial).add(axis).add(0,.66,0);
+            dest=dest.lerp(hold,SpiderGesture.phrase(time,24,27,39,50));
+        }
         if(move==SpiderActions.Move.MARCH && (leg==chosen || leg==state.getInt("RushSecond"))){
             boolean second=leg!=chosen;
             float clock=state.contains("RushStopped")?Math.min(time,state.getInt("RushStopped")):time;

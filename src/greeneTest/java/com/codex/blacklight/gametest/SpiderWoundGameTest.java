@@ -267,7 +267,7 @@ public final class SpiderWoundGameTest {
         }finally{b.discard();meal.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}
         h.succeed();});
     }
-    @GameTest(template="blackwatch_arena",batch="greene_walking_routes",timeoutTicks=310)
+    @GameTest(template="blackwatch_arena",batch="greene_walking_routes",timeoutTicks=380)
     public static void walkingLinesAndLateDodge(GameTestHelper h){
         var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,104,8));
         var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
@@ -286,7 +286,7 @@ public final class SpiderWoundGameTest {
         for(int route=0;route<4;route++){
             int mode=route;
             var move=switch(mode){case 1->SpiderActions.Move.SPIKES;case 2->SpiderActions.Move.FLESH_VOLLEY;default->SpiderActions.Move.STAB;};
-            int beginning=1+route*68,duration=mode==2?57:mode==1?35:19;
+            int beginning=1+route*82,duration=mode==2?75:mode==1?35:19;
             record Attack(EncounterMob boss,Vec3 from,Vec3 tangent){}
             var encounter=new Attack[1];
             h.runAfterDelay(beginning,()->{
@@ -319,11 +319,57 @@ public final class SpiderWoundGameTest {
                 b.discard();level.getEntitiesOfClass(GreeneProjectile.class,new net.minecraft.world.phys.AABB(center).inflate(65),shot->shot.getOwner()==b).forEach(Entity::discard);
             });
         }
-        h.runAfterDelay(272,()->{try{
+        h.runAfterDelay(328,()->{try{
             h.assertTrue(damage[0]>0 && damage[1]>0 && damage[2]>0,"strafe, retreat, orbit must be punished on unchanged walking lines: "+Arrays.toString(damage));
             h.assertTrue(damage[3]==0,"reversing direction after the stab commits must evade it: "+damage[3]);
         }finally{level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}
         h.succeed();});
+    }
+    @GameTest(template="blackwatch_arena",batch="greene_shell_rhythm",timeoutTicks=100)
+    public static void shellHealthMigrationAndDelayedHit(GameTestHelper h){
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,162,8));floor(level,center,24,24);
+        var type=EncounterEntities.CREATURES.get(EncounterKind.ELIZABETH_GREENE).get();
+        var former=type.create(level);former.moveTo(center.getX()+.5,center.getY(),center.getZ()+.5,0,0);
+        level.addFreshEntity(former);former.setHealth(former.getMaxHealth()*.4F);
+        var save=former.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        h.assertTrue(former.getMaxHealth()==7000,"baseline before spider shell "+former.getMaxHealth());
+        save.putBoolean("GreeneOutbreak",true);former.discard();save.remove("UUID");
+        var b=type.create(level);b.load(save);b.setNoAi(true);b.setNoGravity(true);level.addFreshEntity(b);
+        h.assertTrue(b.getMaxHealth()==50_000 && b.getHealth()==20_000,"old injured shell rescales once "+b.getHealth()+"/"+b.getMaxHealth());
+        b.spider.synchronizeShellHealth();h.assertTrue(b.getHealth()==20_000,"idempotent migration");
+        var profile=new GameProfile(UUID.randomUUID(),"ShellCounter");
+        var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);
+        p.setHealth(500);p.setNoGravity(true);level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);
+        var hunter=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HUNTER.get().create(level);
+        try{
+            state(b,0,0,0);var toe=SpiderLegPose.worldTip(b,0,1);
+            p.setPos(toe.x,center.getY()+.05,toe.z);
+            hunter.moveTo(p.getX()+1,p.getY(),p.getZ(),0,0);level.addFreshEntity(hunter);
+            p.hurt(hunter.damageSources().mobAttack(hunter),(float)hunter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE));
+            float broodDamage=500-p.getHealth();p.invulnerableTime=0;p.setHealth(500);
+            var st=b.spiderData().copy();st.putInt("Action",SpiderActions.Move.STAB.ordinal());st.putBoolean("SecondStab",true);
+            st.putUUID("ActionTarget",p.getUUID());st.putInt("ActionId",p.getId());st.putInt("Foot",0);
+            st.putDouble("Ax",p.getX());st.putDouble("Ay",p.getY());st.putDouble("Az",p.getZ());b.spiderData(st);
+            atAge(b,18);p.setPos(SpiderLegPose.worldTip(b,0,1));b.spider.actions.tick(level);
+            float quick=500-p.getHealth();p.invulnerableTime=0;p.setHealth(500);
+            atAge(b,37);var lifted=SpiderLegPose.worldTip(b,0,1);b.spider.actions.tick(level);
+            atAge(b,46);var impact=SpiderLegPose.worldTip(b,0,1);
+            h.assertTrue(lifted.y>impact.y+3 && p.getHealth()==500,"held windup before second strike");
+            p.setPos(impact);b.spider.actions.tick(level);
+            float heavy=500-p.getHealth();
+            h.assertTrue(broodDamage>0 && heavy>broodDamage && heavy>quick && quick>0,"comparable damage "+broodDamage+" / "+quick+" / "+heavy);
+            System.out.println("SHELL_RHYTHM migration=20000/50000 hunter="+broodDamage+" quick="+quick+" delayed="+heavy);
+        }finally{
+            for(var pod:level.getEntitiesOfClass(GreeneTendrilPod.class,b.getBoundingBox().inflate(40))){
+                var owner=pod.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+                if(owner.hasUUID("Mother") && owner.getUUID("Mother").equals(b.getUUID()))pod.discard();
+            }
+            hunter.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);b.discard();
+        }
+        h.succeed();
     }
     @GameTest(template="blackwatch_arena",batch="greene_new_pressure",timeoutTicks=200)
     public static void standingStrikeAndCounterWindow(GameTestHelper h){
@@ -386,9 +432,9 @@ public final class SpiderWoundGameTest {
             for(int dy=0;dy<4;dy++)for(int dx=-2;dx<=2;dx++)level.setBlockAndUpdate(wallPos.offset(dx,dy,0),Blocks.STONE.defaultBlockState());
             h.assertTrue(SpiderRupture.spikeSites(b,4)[14]==null,"wall stops the side lane in both simulation and rendering");
             var st=b.spiderData().copy();st.putInt("Action",SpiderActions.Move.FLESH_VOLLEY.ordinal());b.spiderData(st);
-            for(int tick:new int[]{15,15,22,29}){atAge(b,tick);b.spider.actions.tick(level);}
+            for(int tick:new int[]{15,15,22,29,46,46,50,50}){atAge(b,tick);b.spider.actions.tick(level);}
             var shots=level.getEntitiesOfClass(GreeneProjectile.class,b.getBoundingBox().inflate(32),v->v.getOwner()==b && v.flesh());
-            h.assertTrue(shots.size()==21,"three distinct seven-shot flesh waves, same tick cannot fire again: "+shots.size());
+            h.assertTrue(shots.size()==32,"three fans, a split curtain and a fast return; repeated ticks must not duplicate shots: "+shots.size());
             shots.forEach(Entity::discard);
             b.greeneBattle().spiderKilled();
             h.assertTrue(b.greeneStage()==GreeneBattleCycle.MOLTING && b.spiderData().getIntArray("LastPose").length==39*16,"molt captures the same injured rig");
@@ -441,7 +487,19 @@ public final class SpiderWoundGameTest {
     }
     @GameTest(template="blackwatch_arena",batch="greene_injury_combat",timeoutTicks=220)
     public static void leglessSpiderSelectsHitsCanBeCutAndPlantsPods(GameTestHelper h){
-        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));floor(level,center,12,36);
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,192,8));
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=3;z++){
+            int cx=(center.getX()>>4)+x,cz=(center.getZ()>>4)+z;
+            if(level.setChunkForced(cx,cz,true))forced.add(new net.minecraft.world.level.ChunkPos(cx,cz));
+        }
+        h.runAfterDelay(8,()->{
+            try{verifyPodCast(h,center);}
+            finally{for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);}
+        });
+    }
+    private static void verifyPodCast(GameTestHelper h,BlockPos center){
+        var level=h.getLevel();floor(level,center,12,36);
         var b=boss(h,Vec3.atBottomCenterOf(center));var profile=new GameProfile(UUID.randomUUID(),"WoundProbe");
         var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
         p.connection=FakePlayerFactory.get(level,profile).connection;
@@ -474,7 +532,7 @@ public final class SpiderWoundGameTest {
             for(int t=18;t<=61 && !b.spiderData().contains("SeedHit");t++){atAge(b,t);b.spider.actions.tick(level);frame(frames,b,t);}
             write("wounded-attacks.json",frames);
             var pods=level.getEntitiesOfClass(GreeneTendrilPod.class,b.getBoundingBox().inflate(40));
-            h.assertTrue(pods.size()==1 && pods.get(0).position().distanceTo(target)<1.5,"seed lands at advertised point");
+            h.assertTrue(pods.size()==1 && pods.get(0).position().distanceTo(target)<1.5,"seed lands at advertised point "+target+" pods="+pods.stream().map(Entity::position).toList());
             var pod=pods.get(0);pod.hurt(p.damageSources().playerAttack(p),2);
             h.assertTrue(pod.isRemoved(),"cut planted pod before the fuse");
             // A wall across the ballistic lane intercepts the seed before the floor.
