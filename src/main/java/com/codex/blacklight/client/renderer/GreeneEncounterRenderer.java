@@ -76,6 +76,12 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             pose.popPose();
         }
     }
+    @Override public boolean shouldRender(EncounterMob boss,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){
+        if(super.shouldRender(boss,frustum,x,y,z))return true;
+        if(!boss.spider.live() || boss.spider.actions.move()!=com.codex.blacklight.combat.SpiderActions.Move.MOUTH_BEAM)return false;
+        var lane=com.codex.blacklight.combat.SpiderPainBeam.lane(boss,1);
+        return frustum.isVisible(new net.minecraft.world.phys.AABB(lane.mouth(),lane.end()).inflate(lane.radius()));
+    }
     @Override public void render(EncounterMob boss,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light) {
         if(!boss.greeneOutbreak()) {
             super.render(boss,yaw,partial,stack,buffers,light);
@@ -109,6 +115,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             var origin=boss.getPosition(partial);
             attackEffects.draw(boss,partial,stack,out,light);
+            SpiderPainEffect.draw(boss,partial,stack,buffers,light);
             var seed=boss.spider.actions.flyingSeed(partial);
             if(seed!=null){
                 var local=seed.subtract(origin);

@@ -18,7 +18,7 @@ import java.util.*;
 
 /** Server action clock. Each swing, contact and release has one owner and one saved target. */
 public final class SpiderActions {
-    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH, ORAL_SCISSORS, POD_CAST, HEAVY_STAMP, FLESH_VOLLEY }
+    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH, ORAL_SCISSORS, POD_CAST, HEAVY_STAMP, FLESH_VOLLEY, MOUTH_BEAM }
     private static final int[] BYPASS={32,62,88,110,134};
     // A quick stab and the counterable stamp use the same unarmoured damage units as brood melee.
     private static final float MELEE_DAMAGE=44F;
@@ -44,6 +44,8 @@ public final class SpiderActions {
         t.putFloat("Facing",facing);t.putFloat("FaceFrom",facing);t.putLong("FaceTick",now());
         if(move!=Move.REST && move!=Move.RECOIL)t.putInt("LastAttack",move.ordinal());
         t.putInt("Action",move.ordinal());t.putLong("Start",now());t.putBoolean("Struck",false);
+        t.remove("BeamTick");t.remove("BeamPitch");t.remove("FromPitch");
+        if(move==Move.MOUTH_BEAM)t.putLong("NextBeam",now()+200);
         t.remove("SecondStab");t.remove("FirstStabPoint");
         if(move==Move.STAB && (t.getInt("Turns")&4)==0)t.putBoolean("SecondStab",true);
         t.remove("PryAt");t.remove("Gripped");t.remove("Missed");t.remove("ActionTarget");t.remove("ActionId");
@@ -282,6 +284,7 @@ public final class SpiderActions {
             Move next;
             Move injured=SpiderWoundedActions.select(boss.spider.brokenMask(),d,count);
             if(stamp)next=Move.HEAVY_STAMP;
+            else if(d>=14 && d<60 && count%4==3 && now()>=data().getLong("NextBeam"))next=Move.MOUTH_BEAM;
             else if(injured!=null)next=injured;
             else if(flank && foot>=0)next=Move.SWEEP;
             else if(d>21){
@@ -440,6 +443,11 @@ public final class SpiderActions {
         if(t==6 && m==Move.SPIKES)commitAim(p,28,8,true);
         if(m==Move.HEAVY_STAMP){
             heavyStamp(level,t);return;
+        }
+        if(m==Move.MOUTH_BEAM){
+            SpiderPainBeam.tick(boss,p,t);
+            if(t>=SpiderPainBeam.RECOVER)rest(15);
+            return;
         }
         if(m==Move.FLESH_VOLLEY){
             if(t==3 || t==35)SpiderFoley.play(boss,boss.spider.mouth(1),SpiderFoley.Cue.INHALE,t==3?1.65F:1.20F);
@@ -773,6 +781,7 @@ public final class SpiderActions {
             int index=Integer.parseInt(bone.substring(5));
             float side=index<5?-1:1;
             float lag=(index%4)*.6F;
+            if(action==Move.MOUTH_BEAM)return side*SpiderPainBeam.opening(t-lag)*(.94F+.09F*(float)Math.sin(t*.46-lag));
             if(action==Move.FLESH_VOLLEY){
                 float open=SpiderGesture.phrase(t-lag,1,12,29,36)+SpiderGesture.phrase(t-lag,36,44,50,57);
                 return side*open*(.75F-.24F*(float)Math.cos((t-15)*Math.PI/3.5));

@@ -35,6 +35,11 @@ public final class SpiderGesture {
                 pitch+=.15F*rise-.21F*land+.14F*pry;sink+=.42F*rise-.9F*land;
                 lateral+=toward*(-.7F*rise+.88F*land);forward+=1.05F*land-.55F*pry;
             }
+            case MOUTH_BEAM -> {
+                float inhale=phrase(t,0,27,29,36),jet=phrase(t,29,34,75,90);
+                pitch+=.20F*inhale-.14F*jet;forward+=.66F*inhale-.98F*jet;
+                sink-=.56F*inhale+.32F*jet;roll+=.031F*(float)Math.sin(t*.52)*jet;
+            }
             case FLESH_VOLLEY -> {
                 float gulp=phrase(t,33,42,43,47),burst=phrase(t,43,46,50,58);
                 pitch+=.17F*gulp-.21F*burst;forward+=.65F*burst-.35F*gulp;

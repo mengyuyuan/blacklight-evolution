@@ -197,7 +197,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public float skinYaw(float partial){
         if(spider.first() && greeneStage()==GreeneBattleCycle.GUARDED){
             var state=spiderData();
-            if(spider.actions.move()!=SpiderActions.Move.REST && state.contains("ActionYaw"))return state.getFloat("ActionYaw");
+            if(spider.actions.move()!=SpiderActions.Move.REST && spider.actions.move()!=SpiderActions.Move.MOUTH_BEAM && state.contains("ActionYaw"))return state.getFloat("ActionYaw");
             if(spider.feeding() && state.contains("MealYaw"))return state.getFloat("MealYaw");
             // Vanilla body control may turn towards a held player. Resume from the visible shell.
             if(state.contains("Facing")){
