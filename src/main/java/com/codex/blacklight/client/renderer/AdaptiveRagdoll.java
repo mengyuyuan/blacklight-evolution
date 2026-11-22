@@ -647,7 +647,7 @@ public final class AdaptiveRagdoll {
             String material = switch(style) {
                 case FIST -> "bruise";
                 case WHIP -> "welt";
-                case HAMMER, HAMMER_BREAK, HAMMER_PRESS -> "crush";
+                case HAMMER, HAMMER_BREAK, HAMMER_PRESS, HAMMER_PULP -> "crush";
                 default -> "rupture";
             };
             double extent = radius*switch(style) { case FIST -> .8; case WHIP -> 1.36; default -> 1.18; };
@@ -742,6 +742,43 @@ public final class AdaptiveRagdoll {
         double thickness=1;
         Vec3 pressedOffset(Vec3 offset){
             return pressAxis==null?offset:offset.add(pressAxis.scale(offset.dot(pressAxis)*(thickness-1)));
+        }
+        void pulp(){
+            // Build a low mound from each crushed part's footprint in the actual floor plane.
+            Vec3 basis=Math.abs(pressAxis.x)<.8?new Vec3(1,0,0):new Vec3(0,0,1);
+            Vec3 right=basis.subtract(pressAxis.scale(basis.dot(pressAxis))).normalize();
+            Vec3 forward=right.cross(pressAxis);
+            double width=.02, length=.02, height=.012;
+            for(var v:mesh){
+                var delta=v.p.subtract(center);
+                width=Math.max(width,Math.abs(delta.dot(right)));
+                length=Math.max(length,Math.abs(delta.dot(forward)));
+                height=Math.max(height,Math.abs(delta.dot(pressAxis)));
+            }
+            double phase=center.x*17+center.y*9+center.z*13;
+            var material=RenderType.entityCutoutNoCull(new net.minecraft.resources.ResourceLocation("blacklight","textures/block/hive_flesh.png"));
+            int light=mesh.get(0).light;
+            int sides=10;
+            var rim=new Vertex[sides];
+            var ridge=new Vertex[sides];
+            var crest=new Vertex(key,material,center.add(pressAxis.scale(height*1.3)),pressAxis,.5F,.5F,0xffcb8273,OverlayTexture.NO_OVERLAY,light);
+            var bottom=new Vertex(key,material,center.subtract(pressAxis.scale(height)),pressAxis.scale(-1),.5F,.5F,0xff854742,OverlayTexture.NO_OVERLAY,light);
+            for(int i=0;i<sides;i++){
+                double angle=i*2*Math.PI/sides;
+                double lobe=1.24+.24*Math.sin(3*angle+phase)+.15*Math.cos(5*angle-phase);
+                double x=Math.cos(angle),z=Math.sin(angle);
+                var flat=right.scale(x*width*lobe).add(forward.scale(z*length*lobe));
+                float u=(float)(.5+.46*x),v=(float)(.5+.46*z);
+                rim[i]=new Vertex(key,material,bottom.p.add(flat),flat.normalize(),u,v,0xff9c5e58,OverlayTexture.NO_OVERLAY,light);
+                var raised=center.add(flat.scale(.58)).add(pressAxis.scale(height*(.62+.32*Math.cos(3*angle-phase))));
+                ridge[i]=new Vertex(key,material,raised,pressAxis,(u+.5F)*.5F,(v+.5F)*.5F,0xffbf746b,OverlayTexture.NO_OVERLAY,light);
+            }
+            mesh.clear();
+            for(int i=0;i<sides;i++){
+                int next=(i+1)%sides;
+                Collections.addAll(mesh,rim[i],ridge[i],ridge[next],rim[next],ridge[i],crest,crest,ridge[next],rim[i],rim[next],bottom,bottom);
+            }
+            refit();
         }
         void press(double depth){
             pressAxis=rotate(new Vec3(0,1,0),new Quaternionf(rotation).conjugate()).normalize();
@@ -2020,12 +2057,14 @@ public final class AdaptiveRagdoll {
                     floorY=Math.max(floorY,floor.getLocation().y);
             }
             if(!Double.isFinite(floorY))return;
-            boolean small=entity.getBbHeight()<=1 && entity.getBbWidth()<=1;
+            boolean pulp=fatalImpact==FatalWeaponImpact.HAMMER_PULP;
+            boolean small=pulp || entity.getBbHeight()<=1 && entity.getBbWidth()<=1;
             for(var p:parts){
                 if(small){
                     // Compress the entire small rig about its real support, including the
                     // interpolated pose shown during hitstop. Its feet stay on the block.
-                    p.press(.23);
+                    p.press(pulp?.12:.23);
+                    if(pulp)p.pulp();
                     p.pos=new Vec3(p.pos.x,floorY+(p.pos.y-floorY)*p.thickness,p.pos.z);
                     p.old=new Vec3(p.old.x,floorY+(p.old.y-floorY)*p.thickness,p.old.z);
                 }else if(p==pendingPress || pendingPress.bind.region!=32 && p.bind.region==pendingPress.bind.region){
@@ -2039,6 +2078,10 @@ public final class AdaptiveRagdoll {
                     lowest=Math.min(lowest,p.pos.y+rotate(v.p.subtract(p.center).scale(p.scale),p.rotation).y);
                 double lift=floorY+.001-lowest;
                 for(var p:parts){p.pos=p.pos.add(0,lift,0);p.old=p.old.add(0,lift,0);}
+            }
+            if(pulp){
+                var at=new Vec3(pendingPress.pos.x,floorY+.06,pendingPress.pos.z);
+                InfectedImpactVisuals.rupture(entity,at,new Vec3(0,-1,0),Math.min(.7,entity.getBbWidth()*.55));
             }
             if(!small && pendingPress.mark!=null)crushedTissue=pendingPress;
             rebuildJoints();
@@ -2099,7 +2142,7 @@ public final class AdaptiveRagdoll {
                 struck.mark=StrikeMark.attach(struck,at,axis,style,radius);
             if(style==FatalWeaponImpact.MUSCLE_BURST && struck.mark!=null && rupture(struck,at,axis)){
                 InfectedImpactVisuals.rupture(entity,contact,direction,radius);
-            }else if(style==FatalWeaponImpact.HAMMER_PRESS){
+            }else if(style==FatalWeaponImpact.HAMMER_PRESS || style==FatalWeaponImpact.HAMMER_PULP){
                 pressAcross=direction.cross(new Vec3(0,1,0)).normalize();
                 if(pressAcross.lengthSqr()<.5)pressAcross=new Vec3(1,0,0).yRot((float)Math.toRadians(-entity.yBodyRot));
                 pendingPress=struck;
@@ -2136,7 +2179,7 @@ public final class AdaptiveRagdoll {
                     }
                     if (Math.abs(side)<.015) side=(entity.getId()%2==0?1:-1);
                     hinge=hinge.scale(.34).add(0,Math.copySign(.94,side),0);
-                } else if (style==FatalWeaponImpact.HAMMER || style==FatalWeaponImpact.HAMMER_BREAK || style==FatalWeaponImpact.HAMMER_PRESS) {
+                } else if (style==FatalWeaponImpact.HAMMER || style==FatalWeaponImpact.HAMMER_BREAK || style==FatalWeaponImpact.HAMMER_PRESS || style==FatalWeaponImpact.HAMMER_PULP) {
                     hinge=hinge.scale(-1);
                 }
                 roll=hinge.scale(style.turn*Math.min(1,velocity.length()));
@@ -2296,6 +2339,12 @@ public final class AdaptiveRagdoll {
             }
             // A hit captured after this tick first simulates at now + 1. Include
             // the deadline so a one-tick hitstop actually holds one physics step.
+            // Once the crushed tissue rests on a real surface, old limb impulses must not re-open its pose.
+            // If the supporting block disappears the ordinary gravity solver takes over again.
+            if(dead && !captured && pressed && fatalImpact==FatalWeaponImpact.HAMMER_PULP && parts.stream().anyMatch(Part::supported)){
+                for(var p:parts){p.velocity=Vec3.ZERO;p.spin.zero();}
+                recordPoses(now);return;
+            }
             if(now<=freezeUntil){for(var p:parts)p.floorContact();recordPoses(now);return;}
             if(dead&&!captured){
                 pressOnSupport();

@@ -129,6 +129,54 @@ public final class AerialSpecialGameTest {
             h.succeed();
         });
     }
+    @GameTest(template="wall_test",timeoutTicks=600,batch="aerial_small_locked")
+    public static void steepLockedAttacksReachAStrafingPigAndHammerMovesGroundDebris(GameTestHelper h) {
+        loadedFlight(h, () -> {
+            var floor = h.absolutePos(new net.minecraft.core.BlockPos(5, 180, 8));
+            for (int x = -6; x <= 7; x++) for (int z = -6; z <= 15; z++)
+                h.getLevel().setBlockAndUpdate(floor.offset(x,-1,z), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+            var failures = new java.util.ArrayList<String>();
+            for (var form : new PowerForm[]{PowerForm.CLAWS, PowerForm.BLADE, PowerForm.HAMMERFISTS, PowerForm.NONE, PowerForm.MUSCLE_MASS}) {
+                for (int hold : new int[]{1, 45}) {
+                    var p = MovingCombatGameTest.player(h, form);
+                    var origin = Vec3.atBottomCenterOf(floor);
+                    p.setPos(origin.add(-.1, 13.6, hold==1?-2.8:0)); p.setOnGround(false);
+                    p.setYRot(125); p.setXRot(78);
+                    var mob = h.spawn(EntityType.PIG, 5, 180, 8);
+                    mob.setNoAi(true); mob.setPos(origin);
+                    var marker = new net.minecraft.world.entity.item.ItemEntity(h.getLevel(), origin.x+.65, origin.y+.15, origin.z,
+                            new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STICK));
+                    marker.setDeltaMovement(Vec3.ZERO); h.getLevel().addFreshEntity(marker);
+                    try {
+                        CombatTargeting.requestLock(p,mob.getId());
+                        h.assertTrue(CombatTargeting.locked(p)==mob,"could not lock the test pig at fourteen blocks");
+                        float hp = mob.getHealth();
+                        boolean hit = false, near = false, hammerImpulse = false;
+                        for (int tick=0; tick<145; tick++) {
+                            if (mob.getHealth()==hp) mob.move(MoverType.SELF, new Vec3(0,0,.045));
+                            WeaponCombatSystem.acceptInput(p,false,tick<hold);
+                            p.setDeltaMovement(p.getDeltaMovement().add(0,-.08,0));
+                            p.move(MoverType.SELF,p.getDeltaMovement());
+                            p.tickCount++;
+                            WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+                            if (!hit && mob.getHealth()<hp) {
+                                hit=true;
+                                near=p.distanceTo(mob)<4;
+                                hammerImpulse=marker.getDeltaMovement().lengthSqr()>.001;
+                            }
+                        }
+                        if (!near || (form==PowerForm.HAMMERFISTS && !hammerImpulse))
+                            failures.add(form+"/"+hold+" hp="+mob.getHealth()+" floorImpulseAtHit="+hammerImpulse);
+                    } finally {
+                        WeaponCombatSystem.cancelHeldInput(p); WeaponCombatSystem.cancel(p); CombatTargeting.requestLock(p,-1);
+                        mob.discard(); marker.discard();
+                    }
+                }
+            }
+            h.assertTrue(failures.isEmpty(),"steep moving lock failures "+failures); h.succeed();
+        });
+    }
+
     @GameTest(template="wall_test",timeoutTicks=600,batch="aerial_dive_obstruction")
     public static void descentAndLandingShareOneHitAndRespectSolidFloors(GameTestHelper h){
         loadedFlight(h,()->{

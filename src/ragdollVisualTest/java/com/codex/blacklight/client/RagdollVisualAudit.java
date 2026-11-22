@@ -99,6 +99,7 @@ public final class RagdollVisualAudit {
             new Case("muscle_charged_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("muscle_zombie_lethal",PowerForm.MUSCLE_MASS,"minecraft:zombie",false,false),
             new Case("hammer_press_zombie",PowerForm.HAMMERFISTS,"minecraft:zombie",false,true),
+            new Case("hammer_drop_plain_pig",PowerForm.HAMMERFISTS,"minecraft:pig",false,true),
             new Case("hammer_press_chicken",PowerForm.HAMMERFISTS,"minecraft:chicken",false,true),
             new Case("hammer_press_iron",PowerForm.HAMMERFISTS,"minecraft:iron_golem",false,true),
             new Case("hammer_leg_zombie_survive",PowerForm.HAMMERFISTS,"minecraft:zombie",false,false),
@@ -174,6 +175,15 @@ public final class RagdollVisualAudit {
         var mc=Minecraft.getInstance();
         if(done){if(writer.isTerminated())mc.stop();return;}
         try{
+            if(!initialized && mc.screen instanceof net.minecraft.client.gui.screens.BackupConfirmScreen
+                    && mc.gameDirectory.toPath().toAbsolutePath().normalize().endsWith("run-ragdoll-qa")){
+                for(var child:mc.screen.children()){
+                    if(child instanceof net.minecraft.client.gui.components.Button button && button.getMessage().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupJoinConfirmButton").getString())){
+                        button.onPress();break;
+                    }
+                }
+                return;
+            }
             if(!initialized&&mc.screen instanceof net.minecraft.client.gui.screens.ConfirmScreen&&mc.screen.getTitle().getString().equals(net.minecraft.network.chat.Component.translatable("selectWorld.backupQuestion.experimental").getString())){
                 mc.screen.children().stream().filter(w->w instanceof net.minecraft.client.gui.components.Button).map(w->(net.minecraft.client.gui.components.Button)w).findFirst().orElseThrow().onPress();return;
             }
@@ -219,9 +229,19 @@ public final class RagdollVisualAudit {
             // Initial aim belongs to this fixture; mounted heading belongs to the production scene.
             if(!ConsumeSequence.mountedStage(ModAttachments.getData(mc.player, ModAttachments.GRAB_STAGE))){
             mc.player.setYRot(0);mc.player.yRotO=0;float pitch=c.name().startsWith("hammer_leg_")?52:c.name().contains("_chest_")?16:c.name().contains("_leg_")?39:c.name().contains("_arm_")?20:0;
+            if(c.name().equals("hammer_drop_plain_pig") && tick>=36 && tick<=50)pitch=78;
             mc.player.setXRot(pitch);mc.player.xRotO=pitch;
             com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.MOVEMENT_STATE).setCameraYaw(0);
             }
+            if(c.name().equals("hammer_drop_plain_pig") && tick==36) server.execute(()->{
+                var actor=server.getPlayerList().getPlayer(mc.player.getUUID());
+                var victim=server.overworld().getEntity(victimId);
+                if(actor!=null && victim instanceof LivingEntity){
+                    actor.connection.teleport(victim.getX(),victim.getY()+13.6,victim.getZ()-2.8,0,78);
+                    actor.setDeltaMovement(Vec3.ZERO);actor.setOnGround(false);
+                    CombatTargeting.requestLock(actor,victimId);
+                }
+            });
             if(tick==40){
                 if(!c.consume()&&c.form()==PowerForm.BLADE&&!c.name().startsWith("blade_tap_"))ClientWeaponCombat.prepareSpecialMovement();
                 if(c.consume()||c.name().startsWith("thrown_"))PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.GRAB));
@@ -360,6 +380,18 @@ public final class RagdollVisualAudit {
         }
         if(c.name().equals("claws_skeleton"))passed&=minimum==0&&components>=2&&bodies.size()==1&&monotonic;
         if(c.name().equals("hammer_zombie"))passed&=minimum==0&&cuts==0&&components==1&&bodies.size()==1&&monotonic;
+        if(c.name().equals("hammer_drop_plain_pig")){
+            boolean floorPulp=false;
+            for(var element:rows){
+                var r=element.getAsJsonObject();
+                if(r.has("pulpSkin") && r.get("pulpSkin").getAsBoolean() && r.has("renderMeshFloorClearance")){
+                    double gap=r.get("renderMeshFloorClearance").getAsDouble();
+                    floorPulp |= gap>=-.025 && gap<.06;
+                }
+            }
+            result.addProperty("allFleshPartsPressedOnFloor",floorPulp);
+            passed &= floorPulp && minimum==0;
+        }
         if(c.name().startsWith("hammer_press_")){
             int compressed=0,parts=0;
             for(var el:rows){var sample=el.getAsJsonObject();if(sample.has("pressedParts")){
@@ -918,6 +950,16 @@ public final class RagdollVisualAudit {
                             try{return field(v,"type").toString().contains("cow.png");}catch(ReflectiveOperationException ex){throw new IllegalStateException(ex);}
                         }));
                     }
+                }
+                if(current().name().equals("hammer_drop_plain_pig")){
+                    var pieces=(List<?>)field(body,"parts");
+                    boolean pulp=field(body,"fatalImpact")==FatalWeaponImpact.HAMMER_PULP && !pieces.isEmpty();
+                    for(var part:pieces){
+                        var mesh=(List<?>)field(part,"mesh");
+                        pulp &= (Double)field(part,"thickness")<=.13 && !mesh.isEmpty()
+                                && field(mesh.get(0),"type").toString().contains("hive_flesh.png");
+                    }
+                    row.addProperty("pulpSkin",pulp);
                 }
                 if(current().name().startsWith("hammer_press_")){
                     int pressed=0;
