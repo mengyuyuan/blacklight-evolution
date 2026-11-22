@@ -251,6 +251,9 @@ public final class WeaponCombatSystem {
                 &&CombatTargeting.inReach(p,v,range)&&CombatTargeting.visible(p,v);
         var locked=CombatTargeting.locked(p);
         if(locked!=null) {
+            // The HUD may retain a visible limb beyond striking distance. Aim the distant
+            // stab at that limb; the cable length, block clip and skin still bound damage.
+            if(move.straightWhip() && CombatTargeting.visibleWithinRange(p,locked,CombatTargeting.viewRange(p)))return locked;
             // An explicitly aimed dash can select the body it is about to reach. Contacts still use local hitboxes.
             if(move==WeaponMove.MUSCLE_RUSH || move==WeaponMove.BLADE_RUSH) {
                 double advance=move==WeaponMove.MUSCLE_RUSH?12*.87:(p.isSprinting()?17.5:10)*.87;

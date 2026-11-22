@@ -5,6 +5,8 @@ import com.codex.blacklight.entity.*;
 import com.codex.blacklight.firearms.*;
 import com.codex.blacklight.infection.InfectedAttackStyle;
 import com.codex.blacklight.registry.EncounterEntities;
+import com.codex.blacklight.registry.ModAttachments;
+import com.codex.blacklight.power.PowerForm;
 import com.mojang.authlib.GameProfile;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +51,47 @@ public final class GoliathTargetLockGameTest {
             h.getLevel().removePlayerImmediately(player, Entity.RemovalReason.DISCARDED);
             mob.discard();
         }
+    }
+
+    @GameTest(template="blackwatch_arena", batch="goliath_whip_reach", timeoutTicks=80)
+    public static void lockedAirWhipReachesTheRightLegAcrossTwentyOneBlocks(GameTestHelper h) {
+        try (var f=Fixture.open(h)) {
+            var p=f.player;
+            var leg=new TargetSelection(f.mob,GoliathLockPart.RIGHT_LEG.ordinal());
+            var state=p.getData(ModAttachments.PLAYER_STATE);
+            state.infect();
+            state.setPrototypeMode(true);
+            state.unlock(PowerForm.WHIPFIST);
+            state.activate(PowerForm.WHIPFIST);
+            p.setItemInHand(InteractionHand.MAIN_HAND,net.minecraft.world.item.ItemStack.EMPTY);
+            p.setPos(leg.point(p).add(0,6,-20));
+            p.setOnGround(false);
+            p.setXRot(70);
+            CombatTargeting.requestLock(p,f.mob.getId(),leg.region());
+            WeaponCombatSystem.requestSpecial(p);
+            try {
+                var visual=p.getData(ModAttachments.WEAPON_VISUAL);
+                h.assertTrue(visual.spec()==WeaponMove.WHIP_AIR && visual.targetId()==f.mob.getId(),"air release retains a distant limb");
+                var curve=LocalWeaponMotion.find(visual.spec().id).orElseThrow().whipCurve().orElseThrow();
+                var path=WhipCurveContact.worldPoints(curve,.70,p.position(),visual.yaw(),p);
+                var end=path.get(path.size()-1);
+                h.assertTrue(end.distanceTo(leg.point(p))<.05,"visible tip seats in the selected right-leg skin at full extension");
+                var middle=BlockPos.containing(path.get(path.size()/2));
+                var old=h.getLevel().getBlockState(middle);
+                try {
+                    h.getLevel().setBlock(middle,Blocks.STONE.defaultBlockState(),3);
+                    var clipped=WhipCurveContact.visiblePoints(path,h.getLevel(),p);
+                    h.assertTrue(clipped.get(clipped.size()-1).distanceTo(end)>2,"a solid wall cuts the whip before the limb");
+                } finally { h.getLevel().setBlock(middle,old,3); }
+                float before=f.mob.getHealth();
+                for(int t=0;t<35 && before==f.mob.getHealth();t++){
+                    p.tickCount++;
+                    WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
+                }
+                h.assertTrue(f.mob.getHealth()<before,"the physical whip contact damages the boss");
+            } finally { WeaponCombatSystem.cancel(p); }
+        }
+        h.succeed();
     }
 
     @GameTest(template="blackwatch_arena", batch="goliath_lock_regions", timeoutTicks=50)

@@ -33,7 +33,27 @@ public final class WhipCurveContact {
         return worldPoints(curve,time,feet,yaw,actor,aimPitch(actor));
     }
     static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor,float pitch){
-        var points=worldPoints(curve,time,feet,yaw,AttackReach.scale(actor));
+        return worldPoints(curve,time,feet,yaw,actor,pitch,straightTarget(actor));
+    }
+    static Vec3 straightTarget(Entity actor){
+        if(!(actor instanceof net.minecraft.world.entity.player.Player player))return null;
+        var visual=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
+        if(visual.charging()||visual.spec()==null||!visual.spec().straightWhip()||visual.targetId()<0)return null;
+        var target=player.level().getEntity(visual.targetId());
+        var selected=CombatTargeting.selectionFor(player,target);
+        return selected==null?null:selected.point(player);
+    }
+    static List<Vec3> worldPoints(WhipCurve curve,double time,Vec3 feet,float yaw,Entity actor,float pitch,Vec3 targetPoint){
+        double scale=AttackReach.scale(actor);
+        var points=worldPoints(curve,time,feet,yaw,scale);
+        if(targetPoint!=null){
+            // The ground and aerial straight strikes use the same sustained extension pose.
+            var pose=curve.sample(.70);
+            double fullDepth=(pose.get(pose.size()-1).forward()-pose.get(0).forward())*scale;
+            double depth=points.get(points.size()-1).subtract(points.get(0)).dot(Vec3.directionFromRotation(0,yaw));
+            var aimed=pitched(points,feet,yaw,pitch,shoulder(actor));
+            return seatStraightTip(aimed,targetPoint,depth/Math.max(.01,fullDepth),straightReach(scale));
+        }
         if(actor instanceof net.minecraft.world.entity.player.Player player && time>.28 && time<.71){
             var visual=player.getData(com.codex.blacklight.registry.ModAttachments.WEAPON_VISUAL);
             if(visual.spec()==WeaponMove.WHIP_RETURN && !visual.charging() && visual.targetId()>=0){
@@ -60,6 +80,24 @@ public final class WhipCurveContact {
         return pitched(points,feet,yaw,pitch,shoulder(actor));
     }
     private static double smooth(double value){double x=Math.max(0,Math.min(1,value));return x*x*(3-2*x);}
+    // MC reach in blocks. P1 air AutoTarget stores 30 with CheckDistance disabled.
+    // Use the project's .87 retarget scale for a finite physical cable at base rank.
+    static double straightReach(double scale){return 30*.87*scale/1.25;}
+    static List<Vec3> seatStraightTip(List<Vec3> points,Vec3 target,double progress,double maxLength){
+        if(progress<=.08 || points.size()<2)return points;
+        Vec3 wrist=points.get(0),tip=points.get(points.size()-1),toward=target.subtract(wrist);
+        double length=toward.length();
+        if(length<1e-5)return points;
+        double fill=Math.min(1,progress);
+        Vec3 end=wrist.add(toward.scale(fill*Math.min(1,maxLength/length)));
+        Vec3 shift=end.subtract(tip).scale(smooth((fill-.08)/.32));
+        var result=new ArrayList<Vec3>(points.size());
+        for(int i=0;i<points.size();i++){
+            double along=i/(double)(points.size()-1);
+            result.add(points.get(i).add(shift.scale(along)));
+        }
+        return result;
+    }
     /** Lash elevation; within the dead zone the authored ground-level strike is kept exactly. */
     public static final float PITCH_DEAD_ZONE=12F,PITCH_LIMIT=80F;
     public static double shoulder(Entity actor){return actor.getBbHeight()*.78;}
@@ -126,11 +164,19 @@ public final class WhipCurveContact {
     }
     public static AABB sweptBounds(WhipCurve curve,double fromTime,double toTime,Vec3 fromFeet,Vec3 toFeet,float yaw,Entity actor){
         var bounds=sweptBoundsScaled(curve,fromTime,toTime,fromFeet,toFeet,yaw,AttackReach.scale(actor));
-        float pitch=aimPitch(actor);if(pitch==0)return bounds;
-        // Conservative: the pitched lash stays inside a sphere of the flat sweep's extent about the shoulder.
-        double extent=Math.max(bounds.getXsize(),Math.max(bounds.getYsize(),bounds.getZsize()));
         Vec3 pivot=toFeet.add(0,shoulder(actor),0);
-        return bounds.minmax(new AABB(pivot,pivot).inflate(extent));
+        if(aimPitch(actor)!=0){
+            double extent=Math.max(bounds.getXsize(),Math.max(bounds.getYsize(),bounds.getZsize()));
+            bounds=bounds.minmax(new AABB(pivot,pivot).inflate(extent));
+        }
+        var target=straightTarget(actor);
+        if(target!=null){
+            double limit=straightReach(AttackReach.scale(actor))+2;
+            var delta=target.subtract(pivot);
+            var end=pivot.add(delta.scale(Math.min(1,limit/Math.max(.001,delta.length()))));
+            bounds=bounds.minmax(new AABB(pivot,end).inflate(2+curve.collisionRadius()));
+        }
+        return bounds;
     }
     private static AABB sweptBoundsScaled(WhipCurve curve,double fromTime,double toTime,Vec3 fromFeet,Vec3 toFeet,float yaw,double scale){
         var start = worldPoints(curve, fromTime, fromFeet, yaw,scale);
@@ -158,6 +204,7 @@ public final class WhipCurveContact {
                                Level level, Entity actor) {
         float pitch=aimPitch(actor);
         var times = new ArrayList<Double>();
+        var tipTarget=straightTarget(actor);
         times.add(fromTime);
         for (var sample : curve.samples())
             if (sample.time() > fromTime && sample.time() < toTime) times.add(sample.time());
@@ -166,8 +213,8 @@ public final class WhipCurveContact {
             double begin = times.get(interval - 1), end = times.get(interval);
             Vec3 beginFeet = feetAt(begin, fromTime, toTime, fromFeet, toFeet);
             Vec3 endFeet = feetAt(end, fromTime, toTime, fromFeet, toFeet);
-            var a = worldPoints(curve, begin, beginFeet, fromYaw,actor,pitch);
-            var b = worldPoints(curve, end, endFeet, yaw,actor,pitch);
+            var a = worldPoints(curve, begin, beginFeet, fromYaw,actor,pitch,tipTarget);
+            var b = worldPoints(curve, end, endFeet, yaw,actor,pitch,tipTarget);
             double travel = Math.min(2,beforeTarget.getCenter().distanceTo(target.getCenter()));
             for (int node = 0; node < a.size(); node++) travel = Math.max(travel, a.get(node).distanceTo(b.get(node)));
             int steps = Math.max(1, (int)Math.ceil(travel / Math.max(.025, curve.collisionRadius() * .4)));
@@ -178,7 +225,7 @@ public final class WhipCurveContact {
                 double frameAlpha=Math.clamp((time-fromTime)/Math.max(1e-9,toTime-fromTime),0,1);
                 float turn=fromYaw+net.minecraft.util.Mth.wrapDegrees(yaw-fromYaw)*(float)frameAlpha;
                 AABB expanded=CombatPursuit.interpolate(beforeTarget,target,frameAlpha).inflate(curve.collisionRadius());
-                var points = worldPoints(curve,time,beginFeet.lerp(endFeet,alpha),turn,actor,pitch);
+                var points = worldPoints(curve,time,beginFeet.lerp(endFeet,alpha),turn,actor,pitch,tipTarget);
                 var visible = visiblePoints(points, level, actor);
                 for (int segment = 1; segment < visible.size(); segment++) {
                     Vec3 first = visible.get(segment - 1), last = visible.get(segment);
