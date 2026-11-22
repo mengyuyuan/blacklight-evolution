@@ -43,7 +43,7 @@ sourceSets {
     resourceTools {
         java {
             srcDirs = ['src/main/java', 'tools']
-            include 'com/codex/blacklight/util/CompactJson.java', 'com/codex/blacklight/util/CompactStreams.java', 'com/codex/blacklight/util/MapResources.java', 'CompactMotionPacker.java', 'CompactMapPacker.java'
+            include 'com/codex/blacklight/util/CompactJson.java', 'com/codex/blacklight/util/CompactStreams.java', 'com/codex/blacklight/util/MapResources.java', 'com/codex/blacklight/util/AtlasTileCodec.java', 'AtlasTileFilter.java', 'CompactMotionPacker.java', 'CompactMapPacker.java'
         }
     }
 }
@@ -848,6 +848,8 @@ if (['nativeFrameworkTest', 'nativeFrameworkLiveTest'].any { project.hasProperty
     sourceSets.main.java.srcDir('src/nativeFrameworkSharedTest/java')
     sourceSets.main.resources.srcDir('src/traversalTest/resources')
 }
+
+apply from: 'gradle/greene-molt-resources.gradle'
 
 // Private reference exports are never release inputs, including stale incremental output.
 tasks.withType(Jar).configureEach {

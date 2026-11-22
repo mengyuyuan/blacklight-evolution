@@ -1,0 +1,21 @@
+// Keep the authoring exports in source control. Publish the reversible encoding
+// under the same two logical paths used by resource packs and Minecraft.
+sourceSets.resourceTools.java.include 'com/codex/blacklight/util/MoltAnimationData.java', 'CompactMoltPacker.java'
+
+def sourceResources = file('src/main/resources')
+def clipNames = ['scene.bin.gz', 'clamber.bin.gz'].collect { "assets/blacklight/greene/molt/${it}".toString() } as Set
+def sourceClips = clipNames.collect { new File(sourceResources, it) } as Set
+def generatedClips = layout.buildDirectory.dir('generated/compactGreeneMolt')
+def encodeClips = tasks.register('encodeGreeneMolt', JavaExec) {
+    classpath = sourceSets.resourceTools.runtimeClasspath
+    mainClass = 'CompactMoltPacker'
+    args sourceResources.absolutePath, generatedClips.get().asFile.absolutePath
+    inputs.files(sourceClips)
+    outputs.dir(generatedClips)
+    maxHeapSize = '384m'
+    javaLauncher = javaToolchains.launcherFor(java.toolchain)
+}
+sourceSets.main.resources {
+    srcDir(encodeClips)
+    exclude { entry -> clipNames.contains(entry.path) && sourceClips.contains(entry.file) }
+}

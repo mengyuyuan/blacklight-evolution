@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
+import com.codex.blacklight.util.MoltAnimationData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
@@ -27,7 +27,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     private final float[] climbPose=new float[202*10*12];
     private final float[] climbFrames;
     private static ByteBuffer inflate(String name)throws IOException{
-        try(var stream=new GZIPInputStream(open(name))){return ByteBuffer.wrap(stream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);}
+        return ByteBuffer.wrap(MoltAnimationData.read(open(name))).order(ByteOrder.LITTLE_ENDIAN);
     }
     private static void beginLoad(){
         if(loading!=null)return;
