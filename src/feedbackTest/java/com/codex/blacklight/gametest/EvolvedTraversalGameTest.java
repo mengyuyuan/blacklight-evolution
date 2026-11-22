@@ -78,6 +78,18 @@ public final class EvolvedTraversalGameTest {
         host.setPos(Vec3.atBottomCenterOf(h.absolutePos(new BlockPos(5,terrain==1?31:terrain==5?32:30,5))));host.setOnGround(true);
         level.addFreshEntity(host);
         if(terrain==7){
+            // The range fixture moves the target along world +X, beyond the small
+            // obstacle course. Give the host a loaded, continuous route to chase on.
+            var lane=host.blockPosition().above(60);
+            for(int cx=(lane.getX()-3)>>4;cx<=(lane.getX()+196)>>4;cx++){
+                for(int cz=(lane.getZ()-4)>>4;cz<=(lane.getZ()+4)>>4;cz++){
+                    if(level.setChunkForced(cx,cz,true))forced.add(new net.minecraft.world.level.ChunkPos(cx,cz));
+                    level.getChunk(cx,cz);
+                }
+            }
+            for(var floor:BlockPos.betweenClosed(lane.offset(-3,-1,-4),lane.offset(196,-1,4)))
+                level.setBlock(floor,Blocks.STONE.defaultBlockState(),2);
+            host.setPos(Vec3.atBottomCenterOf(lane));
             var profile=new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"DistantPrey");
             var player=new net.minecraft.server.level.ServerPlayer(level.getServer(),level,profile,net.minecraft.server.level.ClientInformation.createDefault());
             player.connection=net.neoforged.neoforge.common.util.FakePlayerFactory.get(level,profile).connection;level.addNewPlayer(player);
@@ -87,12 +99,18 @@ public final class EvolvedTraversalGameTest {
                 h.assertTrue(host.getTarget()==player,"natural target acquisition at 83 blocks");
                 player.setPos(host.position().add(115,0,0));
             });
+            int[] chaseTick={0};
             h.runAfterDelay(72,()->{
                 h.assertTrue(host.getTarget()==player,"keeps a visible target beyond detection range");
+                chaseTick[0]=host.tickCount;
                 player.setPos(host.position().add(149,0,0));
             });
             h.runAfterDelay(89,()->{try{
-                h.assertTrue(host.getTarget()!=player,"releases out-of-range prey");
+                String state=" host="+host.position()+" player="+player.position()+" distance="+host.distanceTo(player)
+                    +" elapsedHostTicks="+(host.tickCount-chaseTick[0]);
+                h.assertTrue(host.isAlive()&&host.tickCount>chaseTick[0],"host remains active on pursuit lane"+state);
+                h.assertTrue(host.distanceTo(player)>com.codex.blacklight.infection.EvolvedBalance.PURSUIT_RANGE,"prey beyond pursuit range"+state);
+                h.assertTrue(host.getTarget()!=player,"releases out-of-range prey"+state);
             }finally{host.discard();level.removePlayerImmediately(player,net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);for(var c:forced)level.setChunkForced(c.x,c.z,false);}h.succeed();});
             return;
         }
