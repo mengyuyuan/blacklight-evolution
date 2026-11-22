@@ -86,7 +86,7 @@ public final class SpiderPhase {
         }
         if(t.contains("SavedClock")){
             long delta=now()-t.getLong("SavedClock");t.remove("SavedClock");
-            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","LastTumor","OralAt","Swallowed","BlastAt","BlastClosed","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
+            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","NextBeam","BeamTick","LastTumor","OralAt","Swallowed","BlastAt","BlastClosed","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
                 if(t.contains(key))t.putLong(key,t.getLong(key)+delta);
             for(String leg:t.getCompound("Footing").getAllKeys()){
                 var step=t.getCompound("Footing").getCompound(leg);step.putLong("At",step.getLong("At")+delta);
