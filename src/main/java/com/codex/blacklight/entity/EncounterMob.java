@@ -199,6 +199,11 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
             var state=spiderData();
             if(spider.actions.move()!=SpiderActions.Move.REST && state.contains("ActionYaw"))return state.getFloat("ActionYaw");
             if(spider.feeding() && state.contains("MealYaw"))return state.getFloat("MealYaw");
+            // Vanilla body control may turn towards a held player. Resume from the visible shell.
+            if(state.contains("Facing")){
+                float t=net.minecraft.util.Mth.clamp(level().getGameTime()-state.getLong("FaceTick")+partial,0,1);
+                return net.minecraft.util.Mth.rotLerp(t,state.getFloat("FaceFrom"),state.getFloat("Facing"));
+            }
         }
         if(kind==EncounterKind.ELIZABETH_GREENE && (greeneBattle.exposed() || greeneStage()==GreeneBattleCycle.MOLTING))return greeneBattle.collapseYaw();
         return net.minecraft.util.Mth.rotLerp(skinFraction(partial),yBodyRotO,yBodyRot);

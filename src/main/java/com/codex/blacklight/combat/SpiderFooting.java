@@ -92,6 +92,32 @@ public final class SpiderFooting {
         if(!next.equals(contacts)){var s=boss.spiderData().copy();s.put("Footing",next);boss.spiderData(s);}
     }
 
+    /** Take weight on a different leg before the attacking limb leaves the ground. */
+    void brace(SpiderActions.Move move,int striking,Vec3 aim) {
+        if(striking<0 || !(boss.level() instanceof ServerLevel level))return;
+        var contacts=planted();
+        var forward=aim.subtract(boss.position()).multiply(1,0,1).normalize();
+        if(forward.lengthSqr()<.5)return;
+        int bank=striking<4?4:0;
+        for(int i=0;i<4;i++){
+            int leg=bank+(striking%4+1+i)%4;
+            if(boss.spider.broken(leg) || busy(leg) || !contacts.contains(KEYS[leg]))continue;
+            var old=contacts.getCompound(KEYS[leg]);
+            if(!old.getBoolean("Contact") || level.getGameTime()-old.getLong("At")<STRIDE)continue;
+            var start=position(old,"To");
+            var out=start.subtract(boss.position()).multiply(1,0,1).normalize();
+            double along=move==SpiderActions.Move.SLAM?.95:move==SpiderActions.Move.SWEEP?.35:-.95;
+            var neutral=restPoint(leg,1);
+            var end=surface(level,neutral.add(out.scale(1.55)).add(forward.scale(along)));
+            if(end==null || Math.abs(end.y-start.y)>1.65 || start.distanceToSqr(end)>16)continue;
+            if(start.distanceToSqr(end)<.28)return; // Already braced from the last exchange.
+            var step=new CompoundTag();position(step,"From",start);position(step,"To",end);
+            step.putLong("At",level.getGameTime());step.putBoolean("Contact",true);
+            var next=contacts.copy();next.put(KEYS[leg],step);
+            var state=boss.spiderData().copy();state.put("Footing",next);boss.spiderData(state);return;
+        }
+    }
+
     private boolean busy(int leg) {
         int selected=boss.spiderData().getInt("Foot");
         return switch(boss.spider.actions.move()) {

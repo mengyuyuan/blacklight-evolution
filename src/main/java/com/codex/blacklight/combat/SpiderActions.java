@@ -28,12 +28,17 @@ public final class SpiderActions {
     public float age(float partial){return Math.max(0,now()-data().getLong("Start")+partial);}
     private void set(Move move,Entity target,Vec3 aim,int leg){
         var t=data().copy();
-        t.putFloat("ActionYaw",move==Move.RECOIL?boss.skinYaw(1):boss.yBodyRot);
+        float facing=boss.skinYaw(1);
+        t.putFloat("ActionYaw",facing);
+        t.putFloat("Facing",facing);t.putFloat("FaceFrom",facing);t.putLong("FaceTick",now());
+        if(move!=Move.REST && move!=Move.RECOIL)t.putInt("LastAttack",move.ordinal());
         t.putInt("Action",move.ordinal());t.putLong("Start",now());t.putBoolean("Struck",false);
         t.remove("Gripped");t.remove("Missed");t.remove("ActionTarget");
         if(target!=null){t.putUUID("ActionTarget",target.getUUID());t.putInt("ActionId",target.getId());}
         t.putDouble("Ax",aim.x);t.putDouble("Ay",aim.y);t.putDouble("Az",aim.z);t.putInt("Foot",leg);
         boss.spiderData(t);
+        if(move==Move.STAB || move==Move.SWEEP || move==Move.SLAM || move==Move.PINCER)
+            boss.spider.footing.brace(move,leg,aim);
     }
     private Vec3 aim(){return new Vec3(data().getDouble("Ax"),data().getDouble("Ay"),data().getDouble("Az"));}
     private boolean clear(Vec3 from,Vec3 to){return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()==HitResult.Type.MISS;}
@@ -46,14 +51,16 @@ public final class SpiderActions {
     public float crouch(float partial){
         if(move()!=Move.SLAM)return 0;
         float t=age(partial);
-        return SpiderGesture.phrase(t,0,17,30,41);
+        // Keep the hand on its world-space target while the thorax is lifting the catch.
+        return SpiderGesture.phrase(t,1,17,30,41);
     }
     public Vec3 handTarget(float partial){
         float t=age(partial);
-        double lift=SpiderGesture.phrase(t,19,26,26,30);
+        boolean caught=data().getBoolean("Gripped");
+        double lift=caught?SpiderGesture.phrase(t,19,26,27,30):0;
         double side=1.85*SpiderGesture.phrase(t,1,9,10,17)-.95*lift;
         double loaded=data().getBoolean("Gripped")?.28*SpiderGesture.phrase(t,17,19,20,23):0;
-        var across=new Vec3(side,0,.45*lift).yRot((float)Math.toRadians(-boss.skinYaw(partial)));
+        var across=new Vec3(side,0,1.35*lift).yRot((float)Math.toRadians(-boss.skinYaw(partial)));
         double brace=data().getBoolean("Missed")?.80*SpiderGesture.phrase(t,18,23,28,37):0;
         return aim().add(across).add(0,1.20+3.6*lift-loaded-brace,0);
     }
@@ -148,7 +155,12 @@ public final class SpiderActions {
         Vec3 diff=player.position().subtract(boss.position());
         float facing=(float)Math.toDegrees(Math.atan2(-diff.x,diff.z));
         float speed=2.8F-.15F*Integer.bitCount(boss.spider.brokenMask());
-        float yaw=Mth.approachDegrees(boss.yBodyRot,facing,speed);
+        float previous=boss.skinYaw(1);
+        float yaw=Mth.approachDegrees(previous,facing,speed);
+        if(!data().contains("Facing") || Math.abs(Mth.wrapDegrees(yaw-previous))>.001F){
+            var st=data().copy();st.putFloat("FaceFrom",previous);st.putFloat("Facing",yaw);
+            st.putLong("FaceTick",now());boss.spiderData(st);
+        }
         boss.setYRot(yaw);boss.yBodyRot=yaw;boss.yHeadRot=yaw;
         if(now()<data().getLong("NextMove")){
             // Reposition between commitments; refuse an unsupported ledge or a solid wall.
@@ -159,17 +171,22 @@ public final class SpiderActions {
             }
             return;
         }
-        if(Math.abs(Mth.wrapDegrees(yaw-facing))>27)return;
+        float angle=Math.abs(Mth.wrapDegrees(yaw-facing));
+        // An exposed flank is in reach before the shell has turned to face the intruder.
+        boolean flank=angle>27 && angle<105 && diff.horizontalDistanceSqr()<18*18
+                && data().getInt("LastAttack")!=Move.SWEEP.ordinal();
+        if(angle>27 && !flank)return;
         int count=data().getInt("Turns"),foot=intact(player.position());
         Vec3 point=player.position();
         var prey=level.getEntitiesOfClass(BlacklightCommonInfected.class,boss.getBoundingBox().inflate(31),m->m.isAlive() && !ConsumeControl.protectedEntity(m));
-        if(count%4==2 && !prey.isEmpty()){
+        if(!flank && count%4==2 && !prey.isEmpty()){
             Mob chosen=prey.get(boss.getRandom().nextInt(prey.size()));
             set(Move.CATALYZE,chosen,chosen.getBoundingBox().getCenter(),-1);
         }else{
             double d=diff.horizontalDistance();
             Move next;
-            if(d>21)next=Move.SPIKES;
+            if(flank && foot>=0)next=Move.SWEEP;
+            else if(d>21)next=Move.SPIKES;
             else if(count%6==4 && d<17 && foot>=0)next=Move.SWALLOW;
             else if(d<12 && count%3==1)next=Move.SLAM;
             else if(foot<0)next=Move.SPIKES;
@@ -212,7 +229,7 @@ public final class SpiderActions {
         }
         if(best==null)return false;
         var state=data().copy();state.putLong("Brace",best.getBlockPos().asLong());
-        var point=best.getLocation();state.putDouble("WallX",point.x);state.putDouble("WallY",point.y);state.putDouble("WallZ",point.z);state.remove("Slip");
+        var point=best.getLocation();state.putDouble("WallX",point.x);state.putDouble("WallY",point.y);state.putDouble("WallZ",point.z);state.remove("Slip");state.putInt("WallLeg",intact(point));
         boss.spiderData(state);return true;
     }
     public Vec3 leapOffset(float partial){
@@ -222,8 +239,11 @@ public final class SpiderActions {
         var perch=toward.normalize().scale(reach).add(0,7,0);
         float time=age(partial);
         if(data().contains("Slip"))time=data().getInt("Slip");
-        float climb=SpiderGesture.ease(time,0,16),spring=SpiderGesture.ease(time,17,29);
-        var offset=perch.scale(climb*(1-spring)).add(0,Math.sin(Math.PI*spring)*4,0);
+        float climb=SpiderGesture.ease(time,4,15);
+        float flight=Mth.clamp((time-18)/11F,0,1);
+        double outward=flight*(2-flight);
+        double height=perch.y*climb*(1-flight)+17*flight*(1-flight);
+        var offset=perch.multiply(1,0,1).scale(climb*(1-outward)).add(0,height,0);
         if(data().contains("Slip"))offset=offset.scale(1-SpiderGesture.ease(age(partial)-time,0,8));
         return offset;
     }
@@ -236,6 +256,11 @@ public final class SpiderActions {
             if(data().contains("Slip")){
                 if(t>=data().getInt("Slip")+8){debris(level,boss.position());rest(46);}
                 return;
+            }
+            if(t>=19 && t<=29){
+                // Keep the horizontal gain on landing. Entity.move clips the stride against the arena.
+                var forward=aim().subtract(boss.position()).multiply(1,0,1);
+                if(forward.lengthSqr()>8*8)takeStep(forward.normalize().scale(.32));
             }
             if(t==12)debris(level,Vec3.atCenterOf(BlockPos.of(data().getLong("Brace"))));
         }
@@ -278,10 +303,23 @@ public final class SpiderActions {
         }
         if(t==impact && m!=Move.SWEEP){
             Vec3 at=SpiderLegPose.worldTip(boss,leg,1);double radius=m==Move.POUNCE?3.8:m==Move.PINCER?2.4:1.85;
-            if(p.position().distanceToSqr(at)<radius*radius && clear(at.add(0,2,0),p.getEyePosition()))hit(p,m==Move.POUNCE?1F:.73F,.4);
+            boolean touched=p.position().distanceToSqr(at)<radius*radius && clear(at.add(0,2,0),p.getEyePosition());
+            if(!touched && m==Move.PINCER && !boss.spider.broken((leg+4)%8)){
+                var other=SpiderLegPose.worldTip(boss,(leg+4)%8,1);
+                touched=p.position().distanceToSqr(other)<radius*radius && clear(other.add(0,2,0),p.getEyePosition());
+            }
+            if(touched)hit(p,m==Move.POUNCE?1F:.73F,.4);
             SpiderFoley.ground(boss,at,m==Move.POUNCE?2.3F:1.75F,SpiderFoley.Cue.STRIKE);
         }
-        if(t>=impact+23)rest(22);
+        if(t>=impact+23){
+            int recovery=switch(m){
+                case SWEEP -> data().getBoolean("Struck")?16:29;
+                case STAB -> data().getBoolean("Struck")?23:30;
+                case POUNCE -> 33;
+                default -> 22;
+            };
+            rest(recovery);
+        }
     }
     private void grapple(ServerPlayer p,Move m,int t){
         int grip=m==Move.SWALLOW?24:18;
@@ -339,7 +377,7 @@ public final class SpiderActions {
         if(p.hurt(boss.damageSources().mobAttack(boss),(float)boss.kind().damage*scale)){
             var dir=p.position().subtract(boss.position()).multiply(1,0,1).normalize();
             p.push(dir.x*.55,lift,dir.z*.55);p.hurtMarked=true;
-            var t=data().copy();t.putBoolean("Struck",true);boss.spiderData(t);
+            var t=data().copy();t.putBoolean("Struck",true);t.putInt("ContactAge",(int)age(0));boss.spiderData(t);
         }
     }
     private void spike(ServerLevel l,ServerPlayer p,int step){
