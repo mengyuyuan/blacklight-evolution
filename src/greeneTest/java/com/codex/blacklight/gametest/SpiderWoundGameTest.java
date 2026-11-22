@@ -21,6 +21,91 @@ import java.util.*;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class SpiderWoundGameTest {
+    @GameTest(template="blackwatch_arena",batch="spider_meal_limits",timeoutTicks=50)
+    public static void limitsFoodAndClosesWoundsWithoutRestoringLegs(GameTestHelper h){
+        var l=h.getLevel();var b=boss(h,h.absoluteVec(new Vec3(8,36,8)));b.setNoAi(false);
+        state(b,1,0,0);b.setHealth(b.getMaxHealth()*.25F);
+        var mouth=b.spider.mouth(1);float start=b.getHealth();
+        for(int meal=0;meal<4;meal++){
+            var food=com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HUNTER.get().create(l);
+            food.setPos(mouth.x,mouth.y-food.getBbHeight()*.5,mouth.z);food.setNoGravity(true);food.setNoAi(true);l.addFreshEntity(food);
+            var t=b.spiderData().copy();t.putLong("NextMove",l.getGameTime()+500);
+            t.putLong("NextMeal",0);b.spiderData(t);b.tickCount=100;b.spider.tick();
+            if(meal<3){
+                h.assertTrue(b.spider.feeding(),"eligible natural hunter "+meal);
+                t=b.spiderData().copy();t.putLong("SwallowAt",l.getGameTime());t.putLong("DragAt",l.getGameTime()-10);b.spiderData(t);
+                for(int i=0;i<12 && !food.isRemoved();i++){b.spider.tick();SpiderPhase.settle(l);}
+                h.assertTrue(food.isRemoved() && b.spiderData().getLong("NextMeal")>=l.getGameTime()+320,"elite meal cooldown food="+food.position()+" mouth="+b.spider.mouth(1)+" data="+b.spiderData());
+                h.assertTrue(b.spider.severed(0) && b.spiderData().contains("Closed0") && b.spider.woundOpenness("Closed0",16)==0,"repair closes cut but missing shin stays missing");
+            }else h.assertTrue(!b.spider.feeding() && food.isAlive(),"budget exhausted");
+            food.discard();
+        }
+        float healed=(b.getHealth()-start)/b.getMaxHealth();h.assertTrue(Math.abs(healed-.24)<.0001,"actual healing limit "+healed);
+        b.spider.load(b.spider.save());h.assertTrue(b.spider.healingSpent() && b.spider.severed(0),"save retains spent healing and severance");
+        var legacy=b.spider.save();legacy.remove("Closed0");legacy.remove("HealedShare");
+        legacy.putLong("Swallowed",l.getGameTime()-25);legacy.putLong("Break0",l.getGameTime()-50);b.spider.load(legacy);
+        h.assertTrue(b.spider.severed(0) && b.spider.woundOpenness("Closed0",0)==0,"older save with a successful later meal closes a stale wound");
+        b.discard();h.succeed();
+    }
+    @GameTest(template="blackwatch_arena",batch="spider_claim_race",timeoutTicks=50)
+    public static void metamorphosisCancelsAnOldTetherAndQueuedBite(GameTestHelper h){
+        var l=h.getLevel();var b=boss(h,h.absoluteVec(new Vec3(8,36,8)));b.setNoAi(false);state(b,0,0,0);
+        b.setHealth(b.getMaxHealth()*.5F);var mouth=b.spider.mouth(1);
+        var mob=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(l);
+        mob.setNoAi(true);mob.setNoGravity(true);mob.setPos(mouth.x,mouth.y-mob.getBbHeight()*.5,mouth.z);l.addFreshEntity(mob);
+        var t=b.spiderData().copy();t.putLong("NextMove",l.getGameTime()+500);b.spiderData(t);b.tickCount=100;b.spider.tick();
+        h.assertTrue(b.spider.feeding(),"ordinary unclaimed host chosen");
+        t=b.spiderData().copy();t.putLong("SwallowAt",l.getGameTime());t.putLong("DragAt",l.getGameTime()-10);b.spiderData(t);
+        var old=b.spider.save();float hp=b.getHealth();b.spider.tick();
+        h.assertTrue(mob.beginGreeneEvolution(),"host begins metamorphosing before end-of-tick settlement");
+        SpiderPhase.settle(l);
+        h.assertTrue(mob.isAlive() && !b.spider.feeding() && b.getHealth()==hp,"queued bite releases metamorphosing host without reward");
+        b.spider.load(old);b.spider.tick();h.assertTrue(!b.spider.feeding() && mob.isAlive(),"stale saved tether released");
+        mob.discard();b.discard();h.succeed();
+    }
+    @GameTest(template="blackwatch_arena",batch="spider_limb_hits",timeoutTicks=70)
+    public static void eightLegsReceiveMeleeAndSweptCargo(GameTestHelper h){
+        var l=h.getLevel();var b=boss(h,h.absoluteVec(new Vec3(8,41,8)));state(b,0,0,0);
+        var p=FakePlayerFactory.get(l,new GameProfile(UUID.randomUUID(),"joint-test"));
+        var powers=p.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);powers.infect();powers.setPrototypeMode(true);
+        var cargo=net.minecraft.world.entity.EntityType.COW.create(l);cargo.setPos(b.position().add(0,20,0));l.addFreshEntity(cargo);
+        try{
+            for(int leg=0;leg<8;leg++){
+                int slot=SpiderAnatomy.FIRST_LEG+leg*2;
+                var region=b.hurtRegions(0).get(slot);
+                // The last span is on the upper segment. Test the visible knee from its outward side.
+                var nearKnee=region.boxes().get(region.boxes().size()-1).center;
+                var out=nearKnee.subtract(b.position()).multiply(1,0,1).normalize();
+                var eye=nearKnee.add(out.scale(2.5));p.setPos(eye.add(0,-p.getEyeHeight(),0));
+                var dir=nearKnee.subtract(p.getEyePosition()).normalize();
+                p.setYRot((float)Math.toDegrees(Math.atan2(-dir.x,dir.z)));p.setXRot((float)-Math.toDegrees(Math.asin(dir.y)));
+                CombatTargeting.requestLock(p,b.getId(),slot);
+                h.assertTrue(CombatTargeting.lockedSelection(p)!=null && CombatTargeting.lockedSelection(p).region()==slot,"visible knee can be locked "+leg);
+                // Prototype mode owns left-click via its weapon packet. Native attacks use vanilla mode.
+                powers.setPrototypeMode(false);
+                b.invulnerableTime=0;float prior=b.getHealth();p.attack(b.getParts()[slot]);
+                powers.setPrototypeMode(true);
+                h.assertTrue(b.getHealth()<prior && b.spiderData().getFloat("Wear"+leg)>0,"native melee contacts the locked leg "+leg);
+                var hit=BlockThrowCollision.entity(l,cargo,eye,nearKnee.subtract(out),new Vec3(.35,.55,.35),e->e==b);
+                h.assertTrue(hit instanceof BlockThrowCollision.AnimatedHit posed && SpiderAnatomy.legForRegion(SpiderAnatomy.NAMES.indexOf(posed.contact().bone()))==leg,"cargo hits the same knee "+leg);
+                b.invulnerableTime=0;prior=b.getHealth();BlockThrowCollision.hurt(hit,p.damageSources().thrown(cargo,p),.5F);
+                h.assertTrue(b.getHealth()<prior,"cargo contact deals joint damage "+leg);
+                if(leg==0){
+                    var form=com.codex.blacklight.power.PowerForm.HAMMERFISTS;powers.unlock(form);powers.activate(form);
+                    p.setOnGround(true);p.tickCount=100;b.invulnerableTime=0;prior=b.getHealth();
+                    CombatTargeting.requestLock(p,b.getId(),slot);
+                    ClawCombatSystem.handle(p,com.codex.blacklight.network.ClawActionPayload.Action.ATTACK);
+                    for(int i=0;i<45;i++){p.tickCount++;WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));}
+                    h.assertTrue(b.getHealth()<prior,"prototype primary attack hits the reachable joint");
+                }
+            }
+            state(b,1,0,0);var closed=b.hurtRegions(0).get(SpiderAnatomy.FIRST_LEG);
+            h.assertTrue(!closed.boxes().isEmpty() && b.hurtRegions(0).get(SpiderAnatomy.FIRST_LEG+1).boxes().isEmpty(),"amputated leg retains upper segment, loses tendon");
+            var tag=b.spiderData().copy();tag.putInt("Strike0",FleshStrike.HAMMER.id);b.spiderData(tag);
+            h.assertTrue(b.hurtRegions(0).get(SpiderAnatomy.FIRST_LEG).boxes().size()>closed.boxes().size(),"folded lower leg retains its visible strike surface");
+        }finally{cargo.discard();b.discard();}
+        h.succeed();
+    }
     private static final boolean RECORD="1".equals(System.getenv("BLACKLIGHT_WOUND_CAPTURE"));
     private static void frame(JsonArray frames,EncounterMob b,int age){
         if(!RECORD)return;

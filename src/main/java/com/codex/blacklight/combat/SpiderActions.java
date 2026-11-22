@@ -142,12 +142,15 @@ public final class SpiderActions {
             return;
         }
         if(!choose || !allowed)return;
-        if(level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(54),SpiderPhase::edible).size()>=(molting?25:13))return;
+        var brood=level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(54),SpiderPhase::edible);
+        // A brood made up entirely of evolved hosts still needs one source of natural food.
+        boolean needsHunter=!molting && brood.size()>=13 && brood.stream().allMatch(SpiderPhase::reservedForThrow);
+        if(brood.size()>=(molting?25:13) && !needsHunter)return;
         int start=boss.getRandom().nextInt(6);
         for(int i=0;i<6;i++){
             int socket=(start+i)%6;var anchor=BlockPos.of(anchors[socket]);
             if(!nestExists(level,anchor))continue;
-            var next=state.copy();next.putInt("HatchSlot",socket);next.putInt("HatchBreed",boss.getRandom().nextInt(molting?5:12));
+            var next=state.copy();next.putInt("HatchSlot",socket);next.putInt("HatchBreed",needsHunter?2:boss.getRandom().nextInt(molting?5:12));
             var child=broodType(next.getInt("HatchBreed")).create(level);
             if(child==null)return;
             var occupant=new CompoundTag();child.saveWithoutId(occupant);next.put("HatchChild",occupant);
