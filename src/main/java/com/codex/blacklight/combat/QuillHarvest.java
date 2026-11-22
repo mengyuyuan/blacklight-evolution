@@ -245,7 +245,7 @@ public final class QuillHarvest {
     }
     static TargetSelection focus(ServerPlayer p, double range) {
         var lock=CombatTargeting.lockedSelection(p);
-        if(lock!=null && !protectedPet(lock.target()) && !ConsumeLastChance.awaitingFinisher(lock.target())
+        if(lock!=null && !protectedPet(lock.target())
                 && lock.visibleWithinRange(p,range))return lock;
         var eye=p.getEyePosition();
         var wall=p.pick(range,1,false).getLocation();

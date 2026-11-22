@@ -90,6 +90,80 @@ public final class AerialSpecialGameTest {
             WeaponCombatSystem.cancel(p);mob.discard();
         }h.succeed();
     }
+    @GameTest(template="wall_test",timeoutTicks=600,batch="aerial_use_impact")
+    public static void aerialUseContactsAcrossAllSevenForms(GameTestHelper h){
+        loadedFlight(h,()->{
+            clearFlightLane(h);
+            var misses=new java.util.ArrayList<String>();
+            for(var form:new PowerForm[]{PowerForm.NONE,PowerForm.MUSCLE_MASS,PowerForm.CLAWS,PowerForm.BLADE,
+                    PowerForm.HAMMERFISTS,PowerForm.WHIPFIST,PowerForm.BACKSPINES}){
+                for(int held:new int[]{1,45}){
+                    var p=MovingCombatGameTest.player(h,form);
+                    var origin=h.absoluteVec(new Vec3(5,183,3));
+                    p.setPos(origin);p.setOnGround(false);p.setNoGravity(true);
+                    QuillHarvest.state(p).addBiomass(1000);
+                    var target=h.spawn(EntityType.HUSK,5,180,6);
+                    target.setNoAi(true);target.setNoGravity(true);
+                    boolean dive=form==PowerForm.BLADE||form==PowerForm.HAMMERFISTS;
+                    target.setPos(origin.add(0,dive?-3.5:-.65,form==PowerForm.WHIPFIST?5:dive?2.4:2.2));
+                    var look=target.getBoundingBox().getCenter().subtract(p.getEyePosition());
+                    p.setXRot((float)Math.toDegrees(Math.atan2(-look.y,look.horizontalDistance())));
+                    p.xRotO=p.getXRot();p.setYRot(0);p.yRotO=0;
+                    float hp=target.getHealth();
+                    try{
+                        for(int t=0;t<125 && target.getHealth()==hp;t++){
+                            WeaponCombatSystem.acceptInput(p,false,t<held);
+                            p.move(MoverType.SELF,p.getDeltaMovement());p.setOnGround(false);p.tickCount++;
+                            WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
+                            for(var shot:p.serverLevel().getEntitiesOfClass(com.codex.blacklight.entity.BackspineQuill.class,
+                                    p.getBoundingBox().inflate(48),q->q.getOwner()==p))shot.tick();
+                        }
+                        if(target.getHealth()>=hp)misses.add(form+" held="+held);
+                    }finally{
+                        for(var shot:p.serverLevel().getEntitiesOfClass(com.codex.blacklight.entity.BackspineQuill.class,
+                                p.getBoundingBox().inflate(64),q->q.getOwner()==p))shot.discard();
+                        WeaponCombatSystem.cancelHeldInput(p);WeaponCombatSystem.cancel(p);target.discard();
+                    }
+                }
+            }
+            h.assertTrue(misses.isEmpty(),"airborne right-click did not damage an unobstructed body: "+misses);
+            h.succeed();
+        });
+    }
+    @GameTest(template="wall_test",timeoutTicks=600,batch="aerial_dive_obstruction")
+    public static void descentAndLandingShareOneHitAndRespectSolidFloors(GameTestHelper h){
+        loadedFlight(h,()->{
+            for(var form:new PowerForm[]{PowerForm.BLADE,PowerForm.HAMMERFISTS}){
+                for(boolean covered:new boolean[]{false,true}){
+                    clearFlightLane(h);
+                    for(int x=1;x<=9;x++)for(int z=0;z<=10;z++){
+                        h.setBlock(x,178,z,net.minecraft.world.level.block.Blocks.STONE);
+                        if(covered)h.setBlock(x,182,z,net.minecraft.world.level.block.Blocks.STONE);
+                    }
+                    var p=MovingCombatGameTest.player(h,form);
+                    var origin=h.absoluteVec(new Vec3(5,185,3));p.setPos(origin);
+                    p.setNoGravity(true);p.setOnGround(false);p.setXRot(75);p.xRotO=75;
+                    var target=h.spawn(EntityType.IRON_GOLEM,5,179,4);
+                    target.setNoAi(true);target.setNoGravity(true);
+                    target.setPos(origin.add(0,-6,.7));
+                    int hits=0;boolean landed=false;
+                    try{
+                        for(int t=0;t<125;t++){
+                            float hp=target.getHealth();target.invulnerableTime=0;
+                            WeaponCombatSystem.acceptInput(p,false,t==0);
+                            p.move(MoverType.SELF,p.getDeltaMovement());
+                            if(p.getY()<=origin.y-(covered?2:6)+.001){p.setOnGround(true);landed=true;}
+                            p.tickCount++;WeaponCombatSystem.tick(new PlayerTickEvent.Post(p));
+                            if(target.getHealth()<hp)hits++;
+                        }
+                        h.assertTrue(landed && hits==(covered?0:1),"actual floor: form="+form+" covered="+covered+" landed="+landed+" hits="+hits);
+                    }finally{WeaponCombatSystem.cancelHeldInput(p);WeaponCombatSystem.cancel(p);target.discard();}
+                }
+            }
+            h.succeed();
+        });
+    }
+
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void airborneKickChargesWithoutDamageAndReleasesAsKick(GameTestHelper h){
         var d=LocalWeaponMotion.find("air_kick");if(d.isEmpty()){h.succeed();return;}
