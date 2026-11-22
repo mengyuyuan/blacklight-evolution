@@ -565,4 +565,43 @@ public final class SpiderWoundGameTest {
             h.succeed();
         }finally{b.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}
     }
+
+    @GameTest(template="blackwatch_arena",batch="greene_mouth_beam",timeoutTicks=100)
+    public static void turningMouthBeam(GameTestHelper h){
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,100,8));
+        floor(level,center,25,42);
+        var b=boss(h,Vec3.atBottomCenterOf(center));
+        var profile=new GameProfile(UUID.randomUUID(),"BeamRunner");
+        var p=new ServerPlayer(level.getServer(),level,profile);
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);
+        p.setHealth(500);p.setNoGravity(true);level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);
+        try{
+            state(b,0,0,3);p.setPos(b.position().add(0,0,35));b.spider.actions.tick(level);
+            h.assertTrue(b.spider.actions.move()==SpiderActions.Move.MOUTH_BEAM,"beam enters normal attack rotation: "+b.spider.actions.move());
+            float startYaw=b.skinYaw(1),initialHp=p.getHealth();
+            for(int t=1;t<32;t++){atAge(b,t);b.spider.actions.tick(level);}
+            h.assertTrue(p.getHealth()==initialHp,"charge is safe");
+            float before=b.skinYaw(1);p.setPos(b.position().add(21,7,27));
+            for(int t=32;t<=65;t++){
+                atAge(b,t);b.spider.actions.tick(level);
+                float yaw=b.skinYaw(1),step=Math.abs(net.minecraft.util.Mth.wrapDegrees(yaw-before));
+                h.assertTrue(step<=2.351F,"uncapped firing turn "+step);before=yaw;
+            }
+            var lane=SpiderPainBeam.lane(b,1);var victim=p.getBoundingBox().getCenter();
+            h.assertTrue(Math.abs(net.minecraft.util.Mth.wrapDegrees(before-startYaw))>20 && lane.axis().dot(victim.subtract(lane.mouth()).normalize())>.99,"beam followed the survivor");
+            h.assertTrue(p.getHealth()<initialHp,"swept lane must deal damage");
+            float exposed=initialHp-p.getHealth();
+            var wall=BlockPos.containing(lane.mouth().lerp(victim,.5));
+            for(int x=-3;x<=3;x++)for(int y=-3;y<=3;y++)level.setBlockAndUpdate(wall.offset(x,y,0),Blocks.STONE.defaultBlockState());
+            atAge(b,66);p.invulnerableTime=0;float sheltered=p.getHealth();b.spider.actions.tick(level);
+            var clipped=SpiderPainBeam.lane(b,1);
+            h.assertTrue(clipped.blocked() && clipped.end().distanceTo(clipped.mouth())<victim.distanceTo(clipped.mouth())-2 && p.getHealth()==sheltered,"solid cover stops visible and damaging beam");
+            atAge(b,93);b.spider.actions.tick(level);
+            h.assertTrue(b.spider.actions.move()==SpiderActions.Move.REST && b.spiderData().getLong("NextBeam")>level.getGameTime(),"recovery and cooldown");
+            System.out.println("MOUTH_BEAM_QA turn="+(before-startYaw)+" damage="+exposed+" wall=true recovered=true");
+            h.succeed();
+        }finally{b.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}
+    }
 }
