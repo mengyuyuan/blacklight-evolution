@@ -1,0 +1,27 @@
+package com.codex.blacklight.client;
+
+import com.codex.blacklight.item.GreeneTissueItem;
+import com.codex.blacklight.registry.ModItems;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+@Mod.EventBusSubscriber(modid="blacklight", value=Dist.CLIENT, bus=Mod.EventBusSubscriber.Bus.MOD)
+public final class GreeneTissueModels {
+    private GreeneTissueModels() {}
+
+    @SubscribeEvent public static void register(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> {
+            var open = new ResourceLocation("blacklight", "tissue_open");
+            for (var item : java.util.List.of(ModItems.GREENE_TISSUE.get(), ModItems.MOTHER_CORE.get())) {
+                ItemProperties.register(item, open, (stack, level, holder, seed) -> {
+                    if (holder == null || !holder.isUsingItem() || holder.getUseItem() != stack) return 0;
+                    return GreeneTissueItem.opening(holder.getTicksUsingItem()) * .5F;
+                });
+            }
+        });
+    }
+}

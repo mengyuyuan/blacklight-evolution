@@ -1,6 +1,12 @@
 package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.combat.*;
+import com.codex.blacklight.item.GreeneTissueItem;
+import com.codex.blacklight.registry.ModItems;
+import com.codex.blacklight.mode.PrototypeSurvivalLock;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import com.codex.blacklight.network.ClawActionPayload.Action;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.registry.ModAttachments;
@@ -28,6 +34,48 @@ public final class GrabInteractionGameTest {
         var v=com.codex.blacklight.registry.ModAttachments.getData(victim, ModAttachments.CONSUME_VISUAL);
         return ConsumePlacementTrack.carryAnchor(p.position(),p.getYRot(),victim,GrappleMotion.key(p,v),GrappleMotion.progress(p,v,0)).orElseThrow();
     }
+    @GameTest(template="wall_test",timeoutTicks=35)
+    public static void livingTissueAcceptsEitherHandAndYieldsToGrab(GameTestHelper h) {
+        var p = player(h);
+        long seed = h.getLevel().getSeed();
+        var den = com.codex.blacklight.world.GreeneHiveCave.site(seed,1);
+        var above = den.above(30);
+        h.assertTrue(com.codex.blacklight.world.GreeneHiveCave.nearest(seed,above).equals(den)
+                && com.codex.blacklight.world.GreeneHiveCave.guidance(den,Vec3.atCenterOf(above)).y < -.99, "a player above the nearest hive is directed down");
+        var tracker = ModItems.GREENE_TISSUE.get();
+        h.assertTrue(tracker != ModItems.MOTHER_CORE.get(), "new loot has its own registry ID");
+        for (var hand : InteractionHand.values()) {
+            var stack = new ItemStack(hand == InteractionHand.MAIN_HAND ? tracker : ModItems.MOTHER_CORE.get());
+            p.setItemInHand(hand, stack);
+            var use = new PlayerInteractEvent.RightClickItem(p, hand);
+            PrototypeSurvivalLock.onRightClickItem(use);
+            h.assertTrue(!use.isCanceled(), "Prototype input permits both fresh and old tissue");
+            h.assertTrue(p.gameMode.useItem(p, p.level(), stack, hand).consumesAction() && p.isUsingItem()
+                    && p.getUsedItemHand() == hand, "normal item entry starts sensing");
+            h.assertTrue(GreeneTissueItem.opening(0) == 0 && GreeneTissueItem.opening(8) == 1
+                    && GreeneTissueItem.opening(21) == 2 && GreeneTissueItem.opening(32) == 0, "valves open and close");
+            p.releaseUsingItem();
+            h.assertTrue(!p.isUsingItem() && stack.getCount() == 1, "interrupted listening preserves tissue");
+            var echo = stack.getItem().finishUsingItem(stack, p.level(), p);
+            h.assertTrue(echo == stack && echo.getCount() == 1 && p.getCooldowns().isOnCooldown(stack.getItem()), "complete scan is reusable");
+            p.setItemInHand(hand, ItemStack.EMPTY);
+        }
+        p.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(tracker));
+        var cow = h.spawn(EntityType.COW,3,2,5);
+        cow.setNoAi(true);
+        ClawCombatSystem.handle(p,Action.GRAB);
+        tick(p,ConsumeVisual.captureDuration(PowerForm.CLAWS));
+        var duringHold = new PlayerInteractEvent.RightClickItem(p,InteractionHand.OFF_HAND);
+        PrototypeSurvivalLock.onRightClickItem(duringHold);
+        h.assertTrue(duringHold.isCanceled(), "a captive keeps ownership of the use input");
+        ClawCombatSystem.handle(p,Action.GRAB_THROW_START);
+        ClawCombatSystem.handle(p,Action.GRAB_THROW_RELEASE);
+        tick(p,6);
+        h.assertTrue(cow.isAlive() && !ConsumeSystem.holding(p) && cow.getDeltaMovement().length() > 1, "tissue in the other hand permits a primary throw");
+        cow.discard();
+        h.succeed();
+    }
+
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void bladeImpalesWithRightArmThenConsumesWithoutDroppingVictim(GameTestHelper h) {
         for(var type:new EntityType<?>[]{EntityType.CHICKEN,EntityType.COW}) {

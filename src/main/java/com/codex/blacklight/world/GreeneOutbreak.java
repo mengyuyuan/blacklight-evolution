@@ -1,6 +1,7 @@
 package com.codex.blacklight.world;
 
 import com.codex.blacklight.entity.EncounterKind;
+import com.codex.blacklight.item.GreeneTissueItem;
 import com.codex.blacklight.registry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,10 +15,17 @@ import net.minecraft.world.phys.Vec3;
 final class GreeneOutbreak {
     private GreeneOutbreak(){}
     static void arrive(ServerPlayer player){
-        var level=player.serverLevel();var den=GreeneHiveCave.nearest(level.getSeed(),player.blockPosition());
-        if(!player.getInventory().contains(new net.minecraft.world.item.ItemStack(ModItems.MOTHER_CORE.get())))return;
-        boolean held=player.getMainHandItem().is(ModItems.MOTHER_CORE.get()) || player.getOffhandItem().is(ModItems.MOTHER_CORE.get());
-        if(held){
+        boolean carries = false;
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            if (GreeneTissueItem.isTissue(player.getInventory().getItem(slot))) {
+                carries = true;
+                break;
+            }
+        }
+        if (!carries) return;
+        var level = player.serverLevel();
+        var den = GreeneHiveCave.nearest(level.getSeed(), player.blockPosition());
+        if (GreeneTissueItem.held(player) && !GreeneTissueItem.isTissue(player.getUseItem())) {
             var from=player.getEyePosition().add(player.getLookAngle().scale(.6)).add(0,-.24,0);
             var direction=GreeneHiveCave.guidance(den,from);
             for(int i=1;i<=7;i++){

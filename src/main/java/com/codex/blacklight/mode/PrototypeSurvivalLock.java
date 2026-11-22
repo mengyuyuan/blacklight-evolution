@@ -1,5 +1,6 @@
 package com.codex.blacklight.mode;
 
+import com.codex.blacklight.item.GreeneTissueItem;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.world.BossSiteBlock;
 import net.minecraft.core.BlockPos;
@@ -31,6 +32,10 @@ public final class PrototypeSurvivalLock {
         return player!=null&&(placementItem(player,player.getMainHandItem())||placementItem(player,player.getOffhandItem()));
     }
 
+    private static boolean usingTissue(Player player) {
+        return !player.isPassenger() && GreeneTissueItem.held(player) && !ModAttachments.getData(player, ModAttachments.CONSUMING);
+    }
+
     /** Allow the encounter console while prototype combat owns ordinary empty-hand use. */
     public static boolean canOperateConsole(Player player, BlockPos pos) {
         if(player==null || player.isSpectator() || player.isPassenger()) return false;
@@ -60,6 +65,11 @@ public final class PrototypeSurvivalLock {
     @SubscribeEvent
     public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         if (!isLocked(event.getEntity()) || canOperateConsole(event.getEntity(),event.getPos())) return;
+        if (usingTissue(event.getEntity())) {
+            event.setCancellationResult(InteractionResult.PASS);
+            event.setCanceled(true);
+            return;
+        }
         if(!event.getEntity().isSpectator()&&holdingPlacementItem(event.getEntity())){
             if(!placementItem(event.getEntity(),event.getItemStack())){
                 // Vanilla tries the main hand first. Yield without using it so the offhand tool can run.
@@ -79,6 +89,13 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (isLocked(event.getEntity()) && usingTissue(event.getEntity())) {
+            if (!GreeneTissueItem.isTissue(event.getItemStack())) {
+                event.setCancellationResult(InteractionResult.PASS);
+                event.setCanceled(true);
+            }
+            return;
+        }
         if(isLocked(event.getEntity())&&!event.getEntity().isSpectator()&&holdingPlacementItem(event.getEntity())){
             if(!placementItem(event.getEntity(),event.getItemStack())){
                 event.setCancellationResult(InteractionResult.PASS);event.setCanceled(true);
@@ -104,6 +121,11 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if (isLocked(event.getEntity()) && usingTissue(event.getEntity())) {
+            event.setCancellationResult(InteractionResult.PASS);
+            event.setCanceled(true);
+            return;
+        }
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null||event.getTarget() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)return;
         if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;
@@ -114,6 +136,11 @@ public final class PrototypeSurvivalLock {
 
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
+        if (isLocked(event.getEntity()) && usingTissue(event.getEntity())) {
+            event.setCancellationResult(InteractionResult.PASS);
+            event.setCanceled(true);
+            return;
+        }
         if(com.codex.blacklight.military.vehicle.VehicleDamageBridge.vehicle(event.getTarget())!=null||event.getTarget() instanceof com.codex.blacklight.entity.BlackwatchHelicopter)return;
         if(event.getItemStack().getItem() instanceof com.codex.blacklight.item.ParasiteSyringeItem)return;
         if (!isLocked(event.getEntity())) return;

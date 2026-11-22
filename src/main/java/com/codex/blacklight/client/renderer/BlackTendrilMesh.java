@@ -21,7 +21,7 @@ public final class BlackTendrilMesh {
         double u=Math.min(1,Math.max(0,(t-a)/(b-a)));return u*u*(3-2*u);
     }
     private static P radial(double a,double r,double y){return new P(r*Math.cos(a),y,r*Math.sin(a));}
-    private static int strand(Surface s,Obstacle clip,P[] spine,double[] width,double flat,boolean silver,boolean vein){
+    static int strand(Surface s,Obstacle clip,P[] spine,double[] width,double flat,boolean silver,boolean vein){
         int sides=8;P[] last=null;P lastTangent=null;
         for(int j=0;j<spine.length;j++){
             boolean stop=false;

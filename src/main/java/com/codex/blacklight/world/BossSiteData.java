@@ -92,7 +92,7 @@ public final class BossSiteData extends SavedData {
         data.release(boss);
         if (bit==4) return; // The outbreak advancement pays its XP once per participant.
         boss.spawnAtLocation(bit == 1 ? com.codex.blacklight.registry.ModItems.HEAVY_ARMOR_CORE.get()
-                : com.codex.blacklight.registry.ModItems.MOTHER_CORE.get());
+                : com.codex.blacklight.registry.ModItems.GREENE_TISSUE.get());
     }
     void deliver(ServerPlayer player) {
         var bits = pending.remove(player.getUUID());

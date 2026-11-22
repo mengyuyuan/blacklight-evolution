@@ -140,7 +140,8 @@ public final class SpiderWoundGameTest {
             h.assertTrue(b.getHealth()<hp && b.spiderData().contains("Along0") && b.spiderData().getFloat("Wear0")>0,"a real player attack must injure the selected shaft");
             b.spider.actions.tick(level);
             h.assertTrue(b.spider.actions.move()==SpiderActions.Move.HEAVY_STAMP && b.spiderData().getInt("Foot")==0,"nearest intact foot selected for heavy stamp");
-            p.setPos(p.position().add(7,0,0));float playerHp=p.getHealth();
+            var stampStart=b.spiderData().copy();
+            p.setPos(b.spider.actions.aim().add(7,0,0));float playerHp=p.getHealth();
             var frames=new JsonArray();
             if(RECORD)for(int i=0;i<18;i++){atAge(b,i);frame(frames,b,i);}
             atAge(b,18);b.spider.actions.tick(level);
@@ -152,10 +153,32 @@ public final class SpiderWoundGameTest {
             if(RECORD)for(int i=58;i<=70;i++){atAge(b,i);frame(frames,b,i);}
             write("heavy-stamp.json",frames);
             atAge(b,58);h.assertTrue(!b.spider.actions.lodged(0),"window ends at 40 ticks");
+            var landed=b.spider.actions.aim();
+            b.spiderData(stampStart.copy());p.setPos(landed.add(4.7,0,0));p.invulnerableTime=0;
+            atAge(b,18);b.spider.actions.tick(level);
+            h.assertTrue(p.getHealth()<playerHp,"grounded survivor 4.7 blocks away takes the widened rupture");
+            float after=p.getHealth();p.invulnerableTime=0;b.spider.actions.tick(level);
+            h.assertTrue(p.getHealth()==after,"duplicate impact cannot hurt twice");
+            b.spiderData(stampStart.copy());p.setPos(landed.add(4.7,1.2,0));
+            atAge(b,18);b.spider.actions.tick(level);
+            h.assertTrue(p.getHealth()==after,"jumping the outside shock frees the counter lane");
+            var spikes=b.spiderData().copy();spikes.putInt("Action",SpiderActions.Move.SPIKES.ordinal());
+            spikes.putDouble("Ax",b.getX());spikes.putDouble("Ay",b.getY());spikes.putDouble("Az",b.getZ()+16);
+            b.spiderData(spikes);
+            var sites=SpiderRupture.spikeSites(b,4);var left=sites[12];var right=sites[14];
+            h.assertTrue(left!=null && right!=null && left.distanceTo(right)>14,"final fork spans both flanks");
+            p.setPos(right);p.invulnerableTime=0;
+            atAge(b,34);b.spider.actions.tick(level);b.spider.actions.tick(level);
+            h.assertTrue(p.getHealth()<after,"outer fork damages at its visible eruption");
+            var shards=level.getEntitiesOfClass(GroundSpikeEntity.class,b.getBoundingBox().inflate(27));
+            h.assertTrue(shards.size()==3,"the same row fires only once");shards.forEach(Entity::discard);
+            var wallPos=BlockPos.containing(b.position().lerp(right,.5));
+            for(int dy=0;dy<4;dy++)for(int dx=-2;dx<=2;dx++)level.setBlockAndUpdate(wallPos.offset(dx,dy,0),Blocks.STONE.defaultBlockState());
+            h.assertTrue(SpiderRupture.spikeSites(b,4)[14]==null,"wall stops the side lane in both simulation and rendering");
             var st=b.spiderData().copy();st.putInt("Action",SpiderActions.Move.FLESH_VOLLEY.ordinal());b.spiderData(st);
-            for(int tick:new int[]{17,17,26,35}){atAge(b,tick);b.spider.actions.tick(level);}
+            for(int tick:new int[]{15,15,22,29}){atAge(b,tick);b.spider.actions.tick(level);}
             var shots=level.getEntitiesOfClass(GreeneProjectile.class,b.getBoundingBox().inflate(32),v->v.getOwner()==b && v.flesh());
-            h.assertTrue(shots.size()==15,"three distinct five-shot flesh waves, same tick cannot fire again: "+shots.size());
+            h.assertTrue(shots.size()==21,"three distinct seven-shot flesh waves, same tick cannot fire again: "+shots.size());
             shots.forEach(Entity::discard);
             b.greeneBattle().spiderKilled();
             h.assertTrue(b.greeneStage()==GreeneBattleCycle.MOLTING && b.spiderData().getIntArray("LastPose").length==39*16,"molt captures the same injured rig");

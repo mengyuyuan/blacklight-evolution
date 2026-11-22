@@ -1,6 +1,17 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "minecraft:item/echo_shard"
-  }
+  "parent": "blacklight:item/greene_tissue",
+  "overrides": [
+    {
+      "predicate": {
+        "blacklight:tissue_open": 0.5
+      },
+      "model": "blacklight:item/greene_tissue_parted"
+    },
+    {
+      "predicate": {
+        "blacklight:tissue_open": 1
+      },
+      "model": "blacklight:item/greene_tissue_listening"
+    }
+  ]
 }

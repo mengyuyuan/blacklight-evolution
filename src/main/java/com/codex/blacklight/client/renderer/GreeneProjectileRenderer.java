@@ -28,7 +28,9 @@ public final class GreeneProjectileRenderer extends EntityRenderer<GreeneProject
             stack.mulPose(new org.joml.Quaternionf().rotationTo(0,1,0,dir.x,dir.y,dir.z));
             stack.mulPose(com.mojang.math.Axis.YP.rotation((projectile.tickCount+partial)*.36F));
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-            BlackTendrilMesh.dart(GreeneTendrilPodRenderer.surface(stack,out,light));
+            var surface=GreeneTendrilPodRenderer.surface(stack,out,light);
+            BlackTendrilMesh.dart(surface);
+            SpiderRuptureMesh.dartWake(surface,projectile.tickCount+partial);
             stack.popPose();return;
         }
         stack.pushPose();
