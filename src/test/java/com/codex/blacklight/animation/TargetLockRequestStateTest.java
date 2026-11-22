@@ -48,9 +48,17 @@ class TargetLockRequestStateTest {
         assertTrue(state.observeAttachment(-1,-1));assertEquals(-1,state.desiredRegion());
     }
     @Test void invalidRegionCannotBecomeAPredictedOrAcknowledgedSelection() {
-        var state=new TargetLockRequestState();assertThrows(IllegalArgumentException.class,()->state.request(17,3));
-        assertThrows(IllegalArgumentException.class,()->state.request(-1,0));int request=state.request(17,1);
-        assertFalse(state.acknowledge(request,17,8));assertTrue(state.pending());
-        assertTrue(state.acknowledge(request,-1,-1));assertEquals(-1,state.desiredId());
+        var state=new TargetLockRequestState();
+        int regionCount=com.codex.blacklight.combat.SpiderAnatomy.NAMES.size();
+        int lastRegion=regionCount-1;
+        int first=state.request(17,lastRegion);
+        assertTrue(state.acknowledge(first,17,lastRegion));
+        assertThrows(IllegalArgumentException.class,()->state.request(17,regionCount));
+        assertThrows(IllegalArgumentException.class,()->state.request(-1,0));
+        int request=state.request(17,1);
+        assertFalse(state.acknowledge(request,17,regionCount));
+        assertTrue(state.pending());
+        assertTrue(state.acknowledge(request,-1,-1));
+        assertEquals(-1,state.desiredId());
     }
 }

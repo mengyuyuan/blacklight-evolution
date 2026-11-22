@@ -22,6 +22,7 @@ public final class DisguiseControls {
     private static net.minecraft.client.player.LocalPlayer owner;
     private static boolean down,pending;
     private static int heldTicks;
+    private static boolean jumpHeld;
     private DisguiseControls(){}
     @SubscribeEvent public static void keys(RegisterKeyMappingsEvent e){e.register(SWITCH);e.register(ABILITY);}
     @SubscribeEvent public static void key(InputEvent.Key e){
@@ -31,6 +32,13 @@ public final class DisguiseControls {
     @SubscribeEvent public static void tick(ClientTickEvent.Post e){
         var mc=Minecraft.getInstance();if(mc.getWindow()==null)return;
         if(owner!=mc.player){owner=mc.player;down=physical();pending=false;heldTicks=0;}
+        boolean jump=mc.player!=null && mc.screen==null && SkillBindings.down(mc.options.keyJump);
+        if(jump && !jumpHeld){
+            var bosses=mc.level.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,mc.player.getBoundingBox().inflate(46),
+                b->b.spider.live() && b.spider.actions.move()==com.codex.blacklight.combat.SpiderActions.Move.SWALLOW && b.spiderData().getInt("ActionId")==mc.player.getId() && b.spiderData().getBoolean("Gripped"));
+            if(!bosses.isEmpty())PacketDistributor.sendToServer(new com.codex.blacklight.network.ClawActionPayload(com.codex.blacklight.network.ClawActionPayload.Action.SPIDER_ESCAPE));
+        }
+        jumpHeld=jump;
         press(physical());
         if(pending){
             if(!valid()){pending=false;heldTicks=0;}
@@ -49,6 +57,13 @@ public final class DisguiseControls {
     }
     private static void press(boolean current){
         boolean pressed=current&&!down,released=!current&&down;down=current;
+        var mc=Minecraft.getInstance();
+        if(pressed && mc.player!=null && mc.getConnection()!=null && mc.screen==null && mc.isWindowActive()
+                && com.codex.blacklight.combat.ConsumeVisual.carrying(mc.player.getData(ModAttachments.GRAB_STAGE))){
+            pending=false;heldTicks=0;
+            PacketDistributor.sendToServer(new com.codex.blacklight.network.ClawActionPayload(com.codex.blacklight.network.ClawActionPayload.Action.IMPLANT_HELD));
+            return;
+        }
         if(pressed&&valid()){pending=true;heldTicks=0;}
         if(released){
             if(pending&&valid())PacketDistributor.sendToServer(new DisguiseTogglePayload());

@@ -3011,5 +3011,241 @@
         "type": "event"
       }
     ]
+  },
+  "greene.molt.summons": {
+    "subtitle": "subtitles.blacklight.greene.summons",
+    "sounds": [
+      {
+        "name": "blacklight:infection.hunter_roar",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.molt.pierce": {
+    "subtitle": "subtitles.blacklight.greene.pierce",
+    "sounds": [
+      {
+        "name": "blacklight:consume.pierce",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.molt.drain": {
+    "subtitle": "subtitles.blacklight.greene.drain",
+    "sounds": [
+      {
+        "name": "blacklight:consume.absorb_hunter",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.molt.weave": {
+    "subtitle": "subtitles.blacklight.greene.weave",
+    "sounds": [
+      {
+        "name": "blacklight:consume.weave",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.molt.split": {
+    "subtitle": "subtitles.blacklight.greene.split",
+    "sounds": [
+      {
+        "name": "blacklight:consume.tear",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.molt.ascend": {
+    "subtitle": "subtitles.blacklight.greene.ascend",
+    "sounds": [
+      {
+        "name": "blacklight:greene.projectile_biomass_loop",
+        "type": "event"
+      }
+    ]
+  },
+  "greene.spider.plant": {
+    "subtitle": "subtitle.blacklight.greene.spider.plant",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/plant_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/plant_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.load": {
+    "subtitle": "subtitle.blacklight.greene.spider.load",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/load_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/load_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.strike": {
+    "subtitle": "subtitle.blacklight.greene.spider.strike",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/strike_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/strike_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.scrape": {
+    "subtitle": "subtitle.blacklight.greene.spider.scrape",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/scrape_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/scrape_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.catch": {
+    "subtitle": "subtitle.blacklight.greene.spider.catch",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/catch_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/catch_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.inhale": {
+    "subtitle": "subtitle.blacklight.greene.spider.inhale",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/inhale_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/inhale_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.strain": {
+    "subtitle": "subtitle.blacklight.greene.spider.strain",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/strain_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/strain_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.gulp": {
+    "subtitle": "subtitle.blacklight.greene.spider.gulp",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/gulp_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/gulp_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.tear": {
+    "subtitle": "subtitle.blacklight.greene.spider.tear",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/tear_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/tear_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.fracture": {
+    "subtitle": "subtitle.blacklight.greene.spider.fracture",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/fracture_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/fracture_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.needle": {
+    "subtitle": "subtitle.blacklight.greene.spider.needle",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/needle_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/needle_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.rupture": {
+    "subtitle": "subtitle.blacklight.greene.spider.rupture",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/rupture_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/rupture_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.brace": {
+    "subtitle": "subtitle.blacklight.greene.spider.brace",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/brace_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/brace_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "greene.spider.shed": {
+    "subtitle": "subtitle.blacklight.greene.spider.shed",
+    "sounds": [
+      {
+        "name": "blacklight:greene/spider/shed_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "blacklight:greene/spider/shed_2",
+        "attenuation_distance": 32
+      }
+    ]
   }
 }

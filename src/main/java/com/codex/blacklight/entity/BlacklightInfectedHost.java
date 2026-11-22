@@ -118,12 +118,24 @@ public final class BlacklightInfectedHost extends Monster {
     public void setEvolvedAction(String action){if(level().isClientSide)return;var tag=new CompoundTag();if(!action.isEmpty()){tag.putString("Move",action);tag.putLong("Started",level().getGameTime());}entityData.set(EVOLVED_ACTION,tag);}
     public void setEvolvedAction(String action,LivingEntity target){setEvolvedAction(action);if(level().isClientSide||action.isEmpty())return;var tag=entityData.get(EVOLVED_ACTION).copy();tag.putInt("Target",target.getId());entityData.set(EVOLVED_ACTION,tag);}
     private void publishEvolvedState(int stage){var tag=new CompoundTag();tag.putInt("Stage",stage);tag.putInt("Elapsed",evolvedMorphTicks);tag.putLong("SampledAt",level().getGameTime());entityData.set(EVOLVED_STATE,tag);}
-    public boolean beginEvolvedMetamorphosis(){
+    public boolean beginEvolvedMetamorphosis(){return beginEvolvedMetamorphosis(false);}
+    public boolean beginGreeneEvolution(){return beginEvolvedMetamorphosis(true);}
+    private boolean beginEvolvedMetamorphosis(boolean catalyzed){
         if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
-                ||!com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
-        if(evolvedChoice().isEmpty()){
+                ||!catalyzed && !com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
+        var server=(net.minecraft.server.level.ServerLevel)level();
+        var den=com.codex.blacklight.combat.SpiderPhase.encounterForEvolution(server,this);
+        if(den!=null && !den.canStartEvolution(server))return false;
+        if(catalyzed){
+            var variants=com.codex.blacklight.infection.EvolvedArchetype.values();
+            var variant=variants[getRandom().nextInt(variants.length)];
+            var base=com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID());
+            var choice=new com.codex.blacklight.infection.EvolvedMapping.Choice(base.form(),variant.id(),variant.bias(),base.table(),base.seed(),base.fallback(),base.scores());
+            var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(choice));entityData.set(HOST,data);
+        }else if(evolvedChoice().isEmpty()){
             var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID())));entityData.set(HOST,data);
         }
+        if(den!=null)den.delayEvolution();
         evolvedMorphTicks=0;publishEvolvedState(1);nativeCombat.interrupt();clearTissueStrike();organAbilities.interrupt();getNavigation().stop();setTarget(null);return true;
     }
     private boolean evolvedSpace(){
@@ -154,7 +166,7 @@ public final class BlacklightInfectedHost extends Monster {
         data.putFloat("Width",.95F*1.12F);data.putFloat("Height",2.16F*1.12F);data.putFloat("ModelScale",1);data.put("Visual",new CompoundTag());
         entityData.set(HOST,data);entityData.set(TISSUE_BODY_SCALE,com.codex.blacklight.infection.EvolvedForm.scale(tissueInheritance()));
         if(!hasCustomName())setCustomName(Component.translatable(evolvedArchetype().translation()));
-        navigationReady=false;setupNavigation();getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));updateTissueCombat();refreshDimensions();
+        navigationReady=false;setupNavigation();updateTissueCombat();refreshDimensions();
     }
     private static final ResourceLocation TISSUE_HEALTH=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_health");
     private static final ResourceLocation TISSUE_DAMAGE=ResourceLocation.fromNamespaceAndPath("blacklight","tissue_evolution_damage");
@@ -807,17 +819,36 @@ public final class BlacklightInfectedHost extends Monster {
         if(devourerIdentity()||DevourerFeedingSystem.isDevourer(this))return Component.translatable("entity.blacklight.devourer");
         return Component.translatable(giantBoss()?"entity.blacklight.infected_boss_name":"entity.blacklight.infected_host_name",sourceType().getDescription());
     }
+    private long yieldPlayerUntil;
+    public void yieldToSpider(boolean yield){
+        yieldPlayerUntil=yield?level().getGameTime()+14:0;
+        if(yield && getTarget() instanceof Player){
+            if(!com.codex.blacklight.combat.ConsumeControl.protectedEntity(this) && !com.codex.blacklight.combat.ConsumeSystem.inFlight(this))evolvedCombat.interrupt();
+            setTarget(null);
+        }
+    }
+    @Override public void setTarget(LivingEntity target){
+        if(target instanceof Player && level().getGameTime()<yieldPlayerUntil)return;
+        super.setTarget(target);
+    }
     private boolean validTarget(LivingEntity target) {
         if(target==this||!target.isAlive()||target instanceof HiveTendril)return false;
         if(DevourerFeedingSystem.isDevourer(this)&&!giantBoss())return false;
         if(DevourerFeedingSystem.isDevourer(this)&&(!(target instanceof Player)
                 ||!DevourerFeedingSystem.withinTerritory(this,target)))return false;
         // Player infection grants powers, not allegiance to hostile infected hosts.
-        if(target instanceof Player player)return !player.isCreative()&&!player.isSpectator();
+        if(target instanceof Player player)return level().getGameTime()>=yieldPlayerUntil && !player.isCreative()&&!player.isSpectator();
         return TissueCompetition.contender(this,target)||!BlacklightInfectionSystem.isInfected(target);
     }
     @Override protected void registerGoals() {
-        targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this,Player.class,5,true,false,target->isEvolved()&&validTarget(target)){{setUnseenMemoryTicks(200);}});
+        targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this,Player.class,5,true,false,target->isEvolved()&&validTarget(target)){
+            {setUnseenMemoryTicks(240);}
+            @Override public boolean canUse(){
+                if(!isEvolved())return false;
+                targetConditions.range(com.codex.blacklight.infection.EvolvedBalance.PLAYER_DETECTION);
+                return super.canUse();
+            }
+        });
         targetSelector.addGoal(1,new net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal(this){
             @Override public boolean canUse(){return getLastHurtByMob()!=null&&validTarget(getLastHurtByMob())&&super.canUse();}
             @Override public boolean canContinueToUse(){return getTarget()!=null&&validTarget(getTarget())&&super.canContinueToUse();}
@@ -1301,7 +1332,7 @@ public final class BlacklightInfectedHost extends Monster {
         float savedScale=tag.getFloat("BlacklightTissueScale");
         entityData.set(TISSUE_BODY_SCALE,hasMultipartBody()||!Float.isFinite(savedScale)?1F
                 :Math.clamp(savedScale,1F,desiredTissueScale()));
-        if(isEvolved())getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(Math.max(48,getAttributeValue(Attributes.FOLLOW_RANGE)));
+
         digestion=TissueDigestion.read(tag.getCompound("BlacklightTissueDigestion"));publishDigestion();nextTissueForage=level().getGameTime()+Math.floorMod(getId(),40);
         vitals=TissueVitals.read(tag.getCompound("BlacklightTissueVitals"));vitalsProfile=null;publishVitals();
         defense=TissueDefense.read(tag.getCompound("BlacklightTissueDefense"));publishDefense();

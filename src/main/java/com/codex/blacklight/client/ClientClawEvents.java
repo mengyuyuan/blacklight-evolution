@@ -89,7 +89,11 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.BLACKWATCH_HELICOPTER.get(),com.codex.blacklight.client.renderer.HelicopterRenderer::new);
-        com.codex.blacklight.registry.EncounterEntities.CREATURES.values().forEach(type->event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.EncounterMob>(context,com.codex.blacklight.entity.EncounterMob::asset)));
+        com.codex.blacklight.registry.EncounterEntities.CREATURES.forEach((kind,type)-> {
+            if(kind==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE)
+                event.registerEntityRenderer(type.get(),com.codex.blacklight.client.renderer.GreeneEncounterRenderer::new);
+            else event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<>(context,com.codex.blacklight.entity.EncounterMob::asset));
+        });
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.UAV.get(),com.codex.blacklight.client.renderer.UavRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
@@ -120,6 +124,7 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.BIOMASS_HUSK.get(),com.codex.blacklight.client.renderer.BiomassHuskRenderer::new);
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
+        event.registerEntityRenderer(ModEntities.GREENE_TENDRIL_POD.get(),com.codex.blacklight.client.renderer.GreeneTendrilPodRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));
@@ -241,6 +246,7 @@ public final class ClientClawEvents {
             event.setCanceled(true);return;
         }
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
+        if (SkillBindings.mouse(minecraft.options.keyUse,event.getButton()) && com.codex.blacklight.item.GreeneTissueItem.held(minecraft.player) && !minecraft.player.getData(ModAttachments.CONSUMING)) return;
         if(ClientWeaponCombat.active()&&(SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))){
             event.setCanceled(true);ClientWeaponCombat.poll();return;
         }
@@ -563,6 +569,7 @@ public final class ClientClawEvents {
         if (minecraft.player == null || minecraft.screen != null) return;
         if (VehicleControls.riding() || event.isUseItem() && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
+        if (event.isUseItem() && com.codex.blacklight.item.GreeneTissueItem.held(minecraft.player) && !minecraft.player.getData(ModAttachments.CONSUMING)) return;
         if(ClientWeaponCombat.active()) {event.setSwingHand(false);event.setCanceled(true);ClientWeaponCombat.poll();return;}
         if(state.isPrototypeMode()&&minecraft.player.getData(ModAttachments.CONSUMING)) {
             event.setSwingHand(false);event.setCanceled(true);tickGrabButtons();return;

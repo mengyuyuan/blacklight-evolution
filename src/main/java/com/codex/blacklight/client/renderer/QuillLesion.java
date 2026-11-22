@@ -18,15 +18,21 @@ final class QuillLesion {
     private final double angle, radius, growth, beat;
 
     private QuillLesion(QuillOrgan q,QuillSkinContact.Surface face,double hostScale,float partial){
-        this.face=face;
-        angle=q.offset();
-        growth=Mth.clamp((q.layers()-1)/9.,0,1);
-        beat=Math.pow(Math.max(0,Math.sin((q.tickCount+partial)*.17+angle)),5);
+        this(face,hostScale,q.offset(),Mth.clamp((q.layers()-1)/9.,0,1),q.tickCount+partial);
+    }
+    private QuillLesion(QuillSkinContact.Surface face,double hostScale,double angle,double growth,double time){
+        this.face=face;this.angle=angle;this.growth=growth;
+        beat=Math.pow(Math.max(0,Math.sin(time*.17+angle)),5);
         radius=(.115+.12*Math.sqrt(growth))*hostScale;
     }
     static void draw(QuillOrgan organ,QuillSkinContact.Surface face,double hostScale,float partial,
                      PoseStack pose,MultiBufferSource buffers,int light,double filling,double plunge){
-        var lesion=new QuillLesion(organ,face,hostScale,partial);
+        paint(new QuillLesion(organ,face,hostScale,partial),pose,buffers,light,filling,plunge);
+    }
+    static void spider(PoseStack pose,MultiBufferSource buffers,int light,float time,int site,double size,double pulse){
+        paint(new QuillLesion(null,size,site*2.4,.8,time),pose,buffers,light,pulse,0);
+    }
+    private static void paint(QuillLesion lesion,PoseStack pose,MultiBufferSource buffers,int light,double filling,double plunge){
         var stain=buffers.getBuffer(RenderType.entityTranslucent(ConsumedMobVisuals.WHITE));
         lesion.bruise(pose,stain,light);
         var mesh=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));

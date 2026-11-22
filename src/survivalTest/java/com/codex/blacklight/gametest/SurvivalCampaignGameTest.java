@@ -127,8 +127,8 @@ public final class SurvivalCampaignGameTest {
                     .thenIdle(24).thenExecute(this::consumeHuman)
                     .thenWaitUntil(this::finishMeal)
                     .thenExecute(()->{
-                        var trophy = drop(player.serverLevel(),human.position(),ModItems.MOTHER_CORE.get());
-                        h.assertTrue(trophy.getCount()==1 && player.isAlive(),"one final core on a living survivor's run");
+                        var trophy = drop(player.serverLevel(),human.position(),ModItems.GREENE_TISSUE.get());
+                        h.assertTrue(trophy.getCount()==1 && player.isAlive(),"one tissue sample after Greene escapes");
                         releaseTickets.forEach(Runnable::run);
                         player.server.getPlayerList().remove(player);
                     }).thenSucceed();

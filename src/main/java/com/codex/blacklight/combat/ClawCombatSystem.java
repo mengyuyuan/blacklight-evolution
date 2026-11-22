@@ -49,6 +49,7 @@ public final class ClawCombatSystem {
     }
 
     public static void handle(ServerPlayer player, ClawActionPayload.Action request) {
+        if(request==ClawActionPayload.Action.SPIDER_ESCAPE){SpiderActions.escape(player);return;}
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         if(request==ClawActionPayload.Action.TERRAIN_GRAB_KEEPALIVE){TerrainGrabSelection.keepAlive(player);return;}
         if(request==ClawActionPayload.Action.TERRAIN_GRAB_RELEASE){TerrainGrabSelection.release(player);return;}
@@ -70,6 +71,7 @@ public final class ClawCombatSystem {
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_START) { ConsumeSystem.startThrowCharge(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_RELEASE) { ConsumeSystem.releaseThrowCharge(player); return; }
+        if (request == ClawActionPayload.Action.IMPLANT_HELD) { ConsumeSystem.implantHeld(player); return; }
         if (request == ClawActionPayload.Action.GRAB_THROW_CANCEL) { ConsumeSystem.cancelThrowCharge(player); return; }
         if (player.getData(ModAttachments.CONSUMING)) return;
         if (request == ClawActionPayload.Action.CYCLE_FORM) { com.codex.blacklight.power.PowerFormSystem.cycle(player); return; }
@@ -307,8 +309,7 @@ public final class ClawCombatSystem {
                      target -> CombatTargeting.damageable(player,target) && CombatTargeting.visibleContact(player,target,sweep)
                              && !alreadyHit.contains(target))) {
                 alreadyHit.add(target);
-                if (target.hurt(player.damageSources().playerAttack(player),
-                        clawDamage(state, 16.0F))) {
+                if (hurtWithClaws(player,target,sweep,clawDamage(state,16F))) {
                     if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
                     WeaponImpact.contact(player, target, ImpactTier.HEAVY, true, null);
                 }
@@ -344,8 +345,7 @@ public final class ClawCombatSystem {
                         target -> CombatTargeting.damageable(player,target) && CombatTargeting.visibleContact(player,target,sweep)).stream()
                         .sorted(CombatTargeting.contactPriority(player))
                         .limit(3).toList()) {
-                    if (target.hurt(player.damageSources().playerAttack(player),
-                            clawDamage(state, 9.0F))) {
+                    if (hurtWithClaws(player,target,sweep,clawDamage(state,9F))) {
                         if(!CombatTargeting.anchoredBody(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
                         hitCount++;
                         if(hitCount==1)com.codex.blacklight.registry.ModWeaponSounds.play(player,
@@ -361,6 +361,24 @@ public final class ClawCombatSystem {
         if (elapsed >= spec.duration()) combat.finish(COMBO_GRACE_TICKS);
     }
 
+    private static boolean hurtWithClaws(ServerPlayer player,LivingEntity target,AABB sweep,float damage){
+        var source=player.damageSources().playerAttack(player);
+        if(!(target instanceof com.codex.blacklight.entity.EncounterMob boss) || !boss.spider.live())return target.hurt(source,damage);
+        var eye=player.getEyePosition();
+        HydraHurtContact.Contact hit=null;
+        double nearest=Double.POSITIVE_INFINITY;
+        for(var region:boss.hurtRegions(0))if(region.bounds().intersects(sweep)){
+            for(var box:region.boxes())if(box.touches(sweep)){
+                var point=box.contact(sweep);double distance=eye.distanceToSqr(point);
+                if(distance<nearest && CombatTargeting.clearRay(player,eye,point)){
+                    hit=new HydraHurtContact.Contact(region.bone(),point,eye.subtract(point).normalize(),
+                            com.codex.blacklight.infection.InfectedAttackStyle.TEAR,FleshStrike.CLAW,false);
+                    nearest=distance;
+                }
+            }
+        }
+        return hit!=null && boss.hurtAt(source,damage,hit);
+    }
     private static void startNextAttack(ServerPlayer player, ClawCombatState combat) {
         ClawCombatState.Action action = combat.beginNextAttack();
         Vec3 forward = horizontalLook(player);
@@ -415,7 +433,7 @@ public final class ClawCombatSystem {
         double knockback = action == ClawCombatState.Action.AUTO_3 ? 0.65D : 0.32D;
         int hitCount = 0;
         for (LivingEntity target : targets) {
-            if (target.hurt(player.damageSources().playerAttack(player), damage)) {
+            if (hurtWithClaws(player,target,sweep,damage)) {
                 if(!CombatTargeting.anchoredBody(target))target.push(forward.x * knockback,
                         action == ClawCombatState.Action.AUTO_3 ? 0.28D : 0.08D,
                         forward.z * knockback);

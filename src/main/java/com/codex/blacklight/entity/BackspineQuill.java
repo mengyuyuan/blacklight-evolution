@@ -116,6 +116,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             if (ownVolley && !accepted) living.invulnerableTime = immunity;
         }
         if (accepted && living != null && owner instanceof net.minecraft.server.level.ServerPlayer player) {
+            if(living instanceof net.minecraft.world.entity.Mob mob)com.codex.blacklight.combat.SpiderPhase.implant(mob);
             com.codex.blacklight.combat.QuillHarvest.impact(player,living,entry,roofIndex(),harvestable);
             if (site != null && (!heavy() || wedge)) QuillWedge.accepted(receiver, owner.getUUID(), site, now, heavy());
             com.codex.blacklight.combat.QuillImpact.hit(player, living, site == null ? entry : site.point(),

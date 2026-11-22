@@ -1,5 +1,7 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GreeneMolt;
+
 import com.codex.blacklight.power.CombatScale;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.nbt.CompoundTag;
@@ -16,7 +18,7 @@ import com.codex.blacklight.infection.CommonInfectedMotion;
 import net.minecraft.world.level.Level;
 
 /** Replenishable food tier; real meals and surplus-cohort development share one safe promotion. */
-public final class BlacklightCommonInfected extends Monster {
+public final class BlacklightCommonInfected extends Monster implements GreeneMolt.Captive {
     private static final EntityDataAccessor<Long> ATTACK_STARTED=SynchedEntityData.defineId(BlacklightCommonInfected.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> ATTACK_HAND=SynchedEntityData.defineId(BlacklightCommonInfected.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> APPEARANCE=SynchedEntityData.defineId(BlacklightCommonInfected.class,EntityDataSerializers.INT);
@@ -27,7 +29,14 @@ public final class BlacklightCommonInfected extends Monster {
     private boolean promoting,leapFlight,leapExitTravel;
     private final com.codex.blacklight.infection.CommonInfectedLeap.RootExit leapExit=new com.codex.blacklight.infection.CommonInfectedLeap.RootExit();
     public BlacklightCommonInfected(EntityType<? extends BlacklightCommonInfected> type, Level level) { super(type, level); xpReward=3; }
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(ATTACK_STARTED,-1L);builder.define(ATTACK_HAND,0);builder.define(APPEARANCE,-1);builder.define(LEAP_PUNCH,-1L);builder.define(LEAP_LANDED,-1L);}
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> MOLT_CAPTIVE=
+            SynchedEntityData.defineId(BlacklightCommonInfected.class,net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    @Override public void setMoltCaptive(boolean value){entityData.set(MOLT_CAPTIVE,value);}
+    private boolean moltCaptive(){return entityData.get(MOLT_CAPTIVE);}
+    @Override public boolean shouldRenderAtSqrDistance(double distance){
+        return !moltCaptive() && super.shouldRenderAtSqrDistance(distance);
+    }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder){super.defineSynchedData(builder);builder.define(MOLT_CAPTIVE,false);builder.define(ATTACK_STARTED,-1L);builder.define(ATTACK_HAND,0);builder.define(APPEARANCE,-1);builder.define(LEAP_PUNCH,-1L);builder.define(LEAP_LANDED,-1L);}
     public long attackStarted(){
         if(isRemoved())return -1;
         return getData(com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL).active()?-1:entityData.get(ATTACK_STARTED);
@@ -289,7 +298,7 @@ public final class BlacklightCommonInfected extends Monster {
         return accepted;
     }
     @Override public void tick() {
-        super.tick();
+        super.tick();if(moltCaptive())return;
         // The final vanilla death tick can remove this body during super.tick().
         if(isRemoved())return;
         // Capture sets NoAI, so the stopped goal cannot clear its own pending pose until release.
@@ -319,9 +328,10 @@ public final class BlacklightCommonInfected extends Monster {
             if(!isAlive()||isRemoved()){host.discard();return null;}
             for(var effect:getActiveEffects())host.addEffect(new net.minecraft.world.effect.MobEffectInstance(effect));
             for(var slot:EquipmentSlot.values())host.setItemSlot(slot,getItemBySlot(slot).copyAndClear());
+            com.codex.blacklight.combat.QuillHarvest.transferTumor(this,host,level);
             discard();return host;
         }finally{promoting=false;}
     }
-    @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag);tag.putInt("BlacklightMeals",meals);tag.putInt("BlacklightCivilianAppearance",appearance()); }
-    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag);cancelAttack();leapExitTravel=false;meals=Math.clamp(tag.getInt("BlacklightMeals"),0,3);entityData.set(APPEARANCE,tag.contains("BlacklightCivilianAppearance")?Math.clamp(tag.getInt("BlacklightCivilianAppearance"),0,3):-1); }
+    @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag);if(moltCaptive())tag.putBoolean("GreeneMoltCaptive",true);tag.putInt("BlacklightMeals",meals);tag.putInt("BlacklightCivilianAppearance",appearance()); }
+    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag);setMoltCaptive(tag.getBoolean("GreeneMoltCaptive"));cancelAttack();leapExitTravel=false;meals=Math.clamp(tag.getInt("BlacklightMeals"),0,3);entityData.set(APPEARANCE,tag.contains("BlacklightCivilianAppearance")?Math.clamp(tag.getInt("BlacklightCivilianAppearance"),0,3):-1); }
 }

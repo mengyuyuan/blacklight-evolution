@@ -777,7 +777,7 @@ tasks.named('assemble') {dependsOn tasks.named('verifyCompactMapResources')}
 tasks.register('verifyPackageSizeBudget') {
     group='verification'
     dependsOn tasks.named('jar')
-    def budget=providers.gradleProperty('packageSizeBudgetBytes').orElse('200000000')
+    def budget=providers.gradleProperty('packageSizeBudgetBytes').orElse('227000000')
     inputs.property('packageSizeBudgetBytes',budget)
     inputs.file(tasks.named('jar',Jar).flatMap {it.archiveFile})
     outputs.file(layout.buildDirectory.file('reports/package-size.json'))

@@ -8,6 +8,7 @@ import com.codex.blacklight.client.renderer.DevastatorEffectRenderer;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import net.minecraft.client.Minecraft;
+import com.codex.blacklight.client.renderer.SpiderPainEffect;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -52,16 +53,21 @@ public final class ClientDevastatorPostEffect {
     public static final class ReloadEvents {
     @SubscribeEvent public static void reload(RegisterClientReloadListenersEvent event){
         event.registerReloadListener((net.minecraft.server.packs.resources.ResourceManagerReloadListener)manager->
-                Minecraft.getInstance().execute(()->{close();failed=false;}));
+                Minecraft.getInstance().execute(()->{close();SpiderPainEffect.reset();failed=false;com.codex.blacklight.client.renderer.GreeneMoltRenderer.invalidate();}));
     }
     }
     @SubscribeEvent public static void tick(ClientTickEvent.Post event){
         var current=Minecraft.getInstance().level;
-        if(current!=level){close();failed=false;level=current;}
+        if(current!=level){close();SpiderPainEffect.reset();failed=false;level=current;}
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent event){
-        if(event.getStage()==RenderLevelStageEvent.Stage.AFTER_LEVEL)com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event));
+        if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
+        com.codex.blacklight.client.renderer.GreeneMoltRenderer.finishFrame(event.getModelViewMatrix(),event.getProjectionMatrix(),event.getCamera().getPosition(),
+                event.getPartialTick().getGameTimeDeltaPartialTick(false));
+        SpiderPainEffect.finishFrame(event.getModelViewMatrix(),event.getProjectionMatrix(),event.getCamera().getPosition(),
+                event.getPartialTick().getGameTimeDeltaPartialTick(false));
+        com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event));
     }
     private static void apply(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
