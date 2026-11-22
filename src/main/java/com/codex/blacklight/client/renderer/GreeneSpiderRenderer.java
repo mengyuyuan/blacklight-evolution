@@ -1,5 +1,7 @@
 package com.codex.blacklight.client.renderer;
 
+import java.util.IdentityHashMap;
+import software.bernie.geckolib.cache.object.GeoBone;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 import com.codex.blacklight.entity.GreeneSpider;
@@ -8,6 +10,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> {
+    private final IdentityHashMap<GeoBone,SpiderBoneMesh> meshes=new IdentityHashMap<>();
+    private GeoBone meshRoot;
     private static final ResourceLocation BROOD_MESH = ResourceLocation.fromNamespaceAndPath("blacklight","geo/entity/greene_spider_brood.geo.json");
     private static final ResourceLocation BROOD = ResourceLocation.fromNamespaceAndPath("blacklight","textures/entity/greene_spider_brood.png");
     @Override public ResourceLocation getTextureLocation(GreeneSpider entity) { return BROOD; }
@@ -40,11 +44,12 @@ public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> 
     }
 
     @Override public void renderCubesOfBone(PoseStack stack,software.bernie.geckolib.cache.object.GeoBone bone,com.mojang.blaze3d.vertex.VertexConsumer out,int light,int overlay,int color){
+        if(bone.getParent()==null && meshRoot!=bone){meshRoot=bone;meshes.clear();}
         var shell=getAnimatable();String name=bone.getName();
         if(shell.encounter!=null && name.startsWith("tibia_")
                 && shell.encounter.spider.severed(com.codex.blacklight.combat.SpiderAnatomy.leg(name)))return;
         if(shell.fragment()>=0 && !name.equals(com.codex.blacklight.combat.SpiderAnatomy.shin(shell.fragment())))return;
-        super.renderCubesOfBone(stack,bone,out,light,overlay,color);
+        if(!bone.getCubes().isEmpty())meshes.computeIfAbsent(bone,SpiderBoneMesh::new).draw(stack.last(),out,light,overlay,color);
     }
     @Override protected void applyRotations(GreeneSpider entity, PoseStack stack, float age, float yaw, float partial, float scale) {
         if(entity.fragment()>=0){
