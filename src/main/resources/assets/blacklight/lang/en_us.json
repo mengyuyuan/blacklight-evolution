@@ -1395,5 +1395,19 @@
   "boss.blacklight.greene_spider.open": " · Throw now",
   "boss.blacklight.greene_spider.closed": " · Closed",
   "boss.blacklight.greene_spider.sealed": " · Feeding disabled",
-  "message.blacklight.greene_grip_hint": "Press %s to implant a tumor"
+  "message.blacklight.greene_grip_hint": "Press %s to implant a tumor",
+  "subtitle.blacklight.greene.spider.plant": "Foot lands",
+  "subtitle.blacklight.greene.spider.load": "Tendon winds up",
+  "subtitle.blacklight.greene.spider.strike": "Talons strike",
+  "subtitle.blacklight.greene.spider.scrape": "Talons scrape",
+  "subtitle.blacklight.greene.spider.catch": "Hand closes",
+  "subtitle.blacklight.greene.spider.inhale": "Feeding maw inhales",
+  "subtitle.blacklight.greene.spider.strain": "Feeding tendril strains",
+  "subtitle.blacklight.greene.spider.gulp": "Maw swallows",
+  "subtitle.blacklight.greene.spider.tear": "Tendon tears",
+  "subtitle.blacklight.greene.spider.fracture": "Carapace fractures",
+  "subtitle.blacklight.greene.spider.needle": "Crown needle pierces",
+  "subtitle.blacklight.greene.spider.rupture": "Tumor ruptures",
+  "subtitle.blacklight.greene.spider.brace": "Teeth clamp",
+  "subtitle.blacklight.greene.spider.shed": "Brood membrane opens"
 }

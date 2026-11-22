@@ -16,6 +16,8 @@ public final class SpiderAnatomy {
     private record Patch(String joint,Vec3 center,Vec3 half) {}
     private static final List<List<Patch>> PATCHES=new ArrayList<>();
     public static final List<String> NAMES=new ArrayList<>();
+    // This order is also the vertex joint index in the player's exported 39-bone spider.
+    public static final List<String> MOLT_JOINTS;
     public static final Map<String,Vec3> TIPS=new HashMap<>();
     public static final Map<String,String> PARENTS=new HashMap<>();
     public static final Map<String,Vec3> PIVOTS=new HashMap<>();
@@ -35,6 +37,8 @@ public final class SpiderAnatomy {
             for(var e:data.getAsJsonObject("tips").entrySet())TIPS.put(e.getKey(),vector(e.getValue().getAsJsonArray(),0));
             for(var e:data.getAsJsonObject("parents").entrySet())PARENTS.put(e.getKey(),e.getValue().getAsString());
             for(var e:data.getAsJsonObject("joints").entrySet())PIVOTS.put(e.getKey(),vector(e.getValue().getAsJsonArray(),0));
+            MOLT_JOINTS=List.copyOf(data.getAsJsonObject("joints").keySet());
+            if(MOLT_JOINTS.size()!=39 || !MOLT_JOINTS.get(13).equals("coxa_L1"))throw new IllegalStateException("Molt rig joint order");
         }catch(Exception ex){throw new IllegalStateException("Cannot read Greene spider rig",ex);}
     }
     private static Vec3 vector(com.google.gson.JsonArray a,int i){
@@ -60,7 +64,7 @@ public final class SpiderAnatomy {
         float crouch=boss.spider.actions.crouch(partial);
         if(crouch>0)result.translate(0,-3.15F*crouch,0).translate(0,3.8F,0).rotateX(-.73F*crouch).translate(0,-3.8F,0);
         float tilt=boss.spider.tilt(partial);
-        return result.translate(0,-1.7F*Math.abs(tilt),0).rotateZ(tilt*.69F);
+        return SpiderGesture.balance(boss,partial,result).translate(0,-1.7F*Math.abs(tilt),0).rotateZ(tilt*.69F);
     }
     public static Vec3 point(EncounterMob boss,float partial,Vec3 local){
         return boss.getPosition(partial).add(new Vec3(root(boss,partial).transformPosition(local.toVector3f())));

@@ -2,6 +2,7 @@ package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.combat.GreeneForm;
 import com.codex.blacklight.combat.GreeneMotion;
+import net.minecraft.world.phys.Vec3;
 import com.codex.blacklight.combat.GreeneFeedingRoots;
 import com.codex.blacklight.entity.EncounterMob;
 import com.mojang.blaze3d.vertex.*;
@@ -23,6 +24,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
     }
     private static void drawWounds(EncounterMob boss,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         var data=boss.spiderData();int meals=data.getInt("Meals");
+        SpiderTissue.mouth(boss,pose,buffers,light,partial);
         if(data.contains("BlastAt")){
             pose.pushPose();pose.translate(data.getDouble("WoundX"),data.getDouble("WoundY"),data.getDouble("WoundZ"));
             QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,17,4.1,.8);
@@ -30,11 +32,14 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         }
         float age=boss.level().getGameTime()-data.getLong("LastTumor")+partial;
         for(int i=0;i<meals;i++){
-            float fade=meals<3?1:net.minecraft.util.Mth.clamp((21+i*2-age)/8F,0,1);
+            float fade=meals<3?1:net.minecraft.util.Mth.clamp((17+i*5-age)/5F,0,1);
             if(fade==0)continue;
             float growth=i==meals-1?net.minecraft.util.Mth.clamp((age+1)/6F,0,1):1;
             pose.pushPose();
-            pose.translate(i==0?1.64:i==1?.32:1.04,i==2?3.72:4.56,i==2?-1.25:-2.21);
+            var target=com.codex.blacklight.combat.SpiderPhase.tumorSite(i);
+            var travel=i==meals-1?Math.max(0,1-Math.min(1,age/7)):0;
+            var at=target.lerp(new Vec3(1.04,4.12,-2.82),travel*travel);
+            pose.translate(at.x,at.y,at.z);
             pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-80));
             QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,i,2.9*growth*fade,meals==3?.8:0);
             pose.popPose();
@@ -46,6 +51,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             pose.translate(pivot.x,pivot.y,pivot.z);
             pose.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(i<4?63:-63));
             QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,i,3.8,.2);
+            SpiderTissue.stump(boss,i,pose,buffers,light,partial);
             pose.popPose();
         }
     }
@@ -94,8 +100,12 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
                 for(int k=1;k<path.size();k++){
                     double u=(double)k/(path.size()-1);
                     var a=path.get(k-1).subtract(origin);var b=path.get(k).subtract(origin);
-                    double width=slot<0?.26*(1-.82*u):.23*(1-.32*u);
-                    ConsumedMobVisuals.tube(stack,out,light,a,b,width,k%4==1?0xffb35b54:0xff61343c);
+                    double phase=slot<0?boss.spider.actions.age(partial):boss.level().getGameTime()-boss.spiderData().getLong("MealStart")+partial;
+                    double pulse=slot<0?Math.exp(-Math.pow((u-(phase-8)/21)*5,2)):Math.pow(.5+.5*Math.cos(u*12+phase*.38),4);
+                    double width=slot<0?.25*(1-.72*u):.24*(1-.31*u);
+                    ConsumedMobVisuals.tube(stack,out,light,a,b,width*(1+.53*pulse),pulse>.61?0xff9e514c:0xff512932);
+                    var rib=b.subtract(a).cross(new Vec3(0,1,0)).normalize().scale(width*.69);
+                    ConsumedMobVisuals.tube(stack,out,light,a.add(rib),b.add(rib),width*.24,0xffa16b59);
                 }
             }
             return;

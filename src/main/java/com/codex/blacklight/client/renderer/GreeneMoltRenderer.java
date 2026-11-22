@@ -179,6 +179,26 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         scalar(effect,"time",t);scalar(effect,"sceneLight",light);
         glBindVertexArray(grids[slot]);if(slot<3)glDrawElementsInstanced(GL_TRIANGLES,gridCounts[slot],GL_UNSIGNED_INT,0L,instances);else glDrawArraysInstanced(GL_TRIANGLES,0,gridCounts[slot],instances);
     }
+    private static float settle(float seconds,int joint){
+        float delay=joint>=13 && joint<=28?(((joint-13)/2)%4)*.09F:joint>=29?.19F:.10F;
+        float f=Math.max(0,Math.min(1,(seconds-delay)/.95F));
+        return f*f*(3-2*f);
+    }
+    private void blendLastSpiderPose(EncounterMob boss,float seconds){
+        int[] saved=boss.spiderData().getIntArray("LastPose");
+        if(saved.length!=39*16)return;
+        var from=new Matrix4f();var to=new Matrix4f();float[] a=new float[16];
+        var translation=new org.joml.Vector3f();var scale=new org.joml.Vector3f();
+        var rotation=new org.joml.Quaternionf();var targetRotation=new org.joml.Quaternionf();var tmp=new org.joml.Vector3f();
+        for(int joint=0;joint<39;joint++){
+            float f=settle(seconds,joint);if(f>=1)continue;
+            int at=joint*16;for(int n=0;n<16;n++)a[n]=Float.intBitsToFloat(saved[at+n]);
+            from.set(a);to.set(bones,at);from.getTranslation(translation).lerp(to.getTranslation(tmp),f);
+            from.getUnnormalizedRotation(rotation).normalize().slerp(to.getUnnormalizedRotation(targetRotation).normalize(),f);
+            from.getScale(scale).lerp(to.getScale(tmp),f);
+            from.translationRotateScale(translation,rotation,scale).get(bones,at);
+        }
+    }
     private void render(EncounterMob boss,float partial,PoseStack stack,int packedLight,int[] skins){
         float t=Math.min(23,boss.greeneBattle().age(partial)/20F),frame=t*SAMPLE_RATE;
         int ai=(int)frame,bi=Math.min(frames-1,ai+1),a=ai*frameSize,b=bi*frameSize;
@@ -190,6 +210,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             for(int i=0;i<climbPose.length;i++){float v=climbFrames[lo+i];climbPose[i]=v+(climbFrames[hi+i]-v)*mix;}
         }
         posePrey(boss,t,partial,packedLight);
+        if(t<1.5F)blendLastSpiderPose(boss,t);
         System.arraycopy(bones,0,boneUpload,0,BONES);
         upload(0,dynamic[0],16,(JOINTS+3)/4,GL_RGBA,boneUpload);upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
         bind(2,skins[0]);bind(3,skins[7]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
@@ -212,8 +233,9 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         for(int i=0;i<8;i++){
             if(boss.spider.severed(i))severed|=1<<i;
             String suffix=(i<4?"L":"R")+(i%4+1);
-            bends[2*i]=boss.spider.fold("coxa_"+suffix,partial);
-            bends[2*i+1]=boss.spider.fold("tibia_"+suffix,partial);
+            float ease=boss.spiderData().contains("LastPose")?settle(t,13+2*i):1;
+            bends[2*i]=ease*boss.spider.fold("coxa_"+suffix,partial);
+            bends[2*i+1]=ease*boss.spider.fold("tibia_"+suffix,partial);
         }
         integer(model,"severed",severed);glUniform2fv(u(model,"legBends"),bends);
         if(second){

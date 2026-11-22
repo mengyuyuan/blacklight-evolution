@@ -25,6 +25,15 @@ public final class ModInfectedSounds {
         String id="greene.molt."+suffix;MOLT.add(SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("blacklight",id))));
     }}
     public static SoundEvent molt(int cue){return MOLT.get(cue).get();}
+    private static final Map<com.codex.blacklight.combat.SpiderFoley.Cue,Supplier<SoundEvent>> SPIDER =
+            new EnumMap<>(com.codex.blacklight.combat.SpiderFoley.Cue.class);
+    static {
+        for(var cue:com.codex.blacklight.combat.SpiderFoley.Cue.values()){
+            String id="greene.spider."+cue.name().toLowerCase(Locale.ROOT);
+            SPIDER.put(cue,SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath("blacklight",id))));
+        }
+    }
+    public static SoundEvent spider(com.codex.blacklight.combat.SpiderFoley.Cue cue){return SPIDER.get(cue).get();}
     private ModInfectedSounds(){}
     public static void register(IEventBus bus){SOUNDS.register(bus);}
     /** Vanilla owns accepted hurt/death playback and its immunity/death deduplication. */

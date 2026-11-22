@@ -142,7 +142,7 @@ public final class GreeneBattleCycle {
     private void rise(){previousDown=age;enter(RISING);}
     public void spiderKilled(){
         if(!owner.spider.live())return;
-        owner.spider.actions.leaveShell();owner.cancelAttack();waveCount=2;collapseYaw=owner.yBodyRot;takeRoot();
+        owner.spider.actions.leaveShell();owner.cancelAttack();waveCount=2;collapseYaw=owner.spiderData().getFloat("HuskYaw");takeRoot();
         enter(MOLTING);molt.tick(owner,0);
     }
     private void beginSubmerge(){

@@ -21,7 +21,8 @@ public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> 
                     var bone=getAnimationProcessor().getBone(joint);if(bone==null)continue;
                     int limb=com.codex.blacklight.combat.SpiderAnatomy.leg(joint);
                     bone.setHidden(owner!=null && limb>=0 && joint.startsWith("tibia_") && owner.spider.severed(limb));
-                    if(owner!=null){
+                    if(entity.fragment()>=0){bone.setRotX(0);bone.setRotY(0);bone.setRotZ(0);}
+                    else if(owner!=null){
                         var rotation=owner.spider.legRotation(joint,state.getPartialTick());
                         if(rotation!=null){
                             var euler=rotation.getEulerAnglesZYX(new org.joml.Vector3f());
@@ -46,9 +47,7 @@ public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> 
     }
     @Override protected void applyRotations(GreeneSpider entity, PoseStack stack, float age, float yaw, float partial, float scale) {
         if(entity.fragment()>=0){
-            stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-entity.getYRot()));
-            float falling=net.minecraft.util.Mth.clamp((entity.tickCount+partial)/16F,0,1);
-            stack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((entity.fragment()<4?1:-1)*falling*70));
+            stack.mulPose(entity.fragmentPose(partial));
             stack.scale(1.9824204F,1.9824204F,1.9824204F);
             var center=com.codex.blacklight.combat.SpiderAnatomy.shinCenter(entity.fragment());stack.translate(-center.x,-center.y,-center.z);
         }else super.applyRotations(entity, stack, age, entity.getYRot(), partial, scale);
