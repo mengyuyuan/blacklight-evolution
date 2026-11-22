@@ -28,7 +28,12 @@ public final class QuillOrgan extends Entity {
     private static final java.util.Map<LivingEntity,java.lang.ref.WeakReference<QuillOrgan>> EXTRACTIONS=new java.util.WeakHashMap<>();
     private static final EntityDataAccessor<Integer> SIDE=SynchedEntityData.defineId(QuillOrgan.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SOCKET=SynchedEntityData.defineId(QuillOrgan.class,EntityDataSerializers.INT);
-    private double orbitPhase=Double.NaN;
+    private static final EntityDataAccessor<Long> COUNT = SynchedEntityData.defineId(QuillOrgan.class, EntityDataSerializers.LONG);
+    private static final EntityDataAccessor<Integer> FIRST_SLOT = SynchedEntityData.defineId(QuillOrgan.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SLOTS = SynchedEntityData.defineId(QuillOrgan.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> FORMATION = SynchedEntityData.defineId(QuillOrgan.class, EntityDataSerializers.INT);
+    private UUID parent;
+    private long capacity = 1;
     private boolean leadSound=true;
     private UUID owner,host,target;
     private int targetRegion=-1;
@@ -48,8 +53,21 @@ public final class QuillOrgan extends Entity {
     }
     @Override protected void defineSynchedData() {
         entityData.define(PHASE,ROOT);entityData.define(LAYERS,1);entityData.define(START,0L);entityData.define(ENERGY,1F);entityData.define(ACTOR,-1);entityData.define(HOST,-1);entityData.define(SIDE,0);entityData.define(SOCKET,0);
+        entityData.define(COUNT,1L); entityData.define(FIRST_SLOT,0); entityData.define(SLOTS,1); entityData.define(FORMATION,1);
     }
     public int phase(){return entityData.get(PHASE);}
+    public long count(){ return entityData.get(COUNT); }
+    public int firstSlot(){ return entityData.get(FIRST_SLOT); }
+    public int slots(){ return entityData.get(SLOTS); }
+    public int formation(){ return entityData.get(FORMATION); }
+    public void arrange(int first, int slots, int total){
+        entityData.set(FIRST_SLOT, first);
+        entityData.set(SLOTS, slots);
+        entityData.set(FORMATION, total);
+    }
+    @Override public net.minecraft.world.phys.AABB getBoundingBoxForCulling(){
+        return phase()==ORBIT ? super.getBoundingBoxForCulling().inflate(2*QUILL_ORBIT_RADIUS.get()+1) : super.getBoundingBoxForCulling().inflate(1);
+    }
     public int socket(){return entityData.get(SOCKET);}
     public Vec3 heading(float partial){
         return oldFlight.lerp(flight,partial).normalize();
@@ -92,6 +110,8 @@ public final class QuillOrgan extends Entity {
         initial=(int)Math.floor(reward.biomass()*QUILL_SPLIT.get());supply=initial;
         deposit=reward.biomass()-initial;heal=(float)(reward.healing()*QUILL_HEAL.get());
         totalLife=QuillHarvest.state(p).hasCombatSkill(CombatSkill.QUILL_ORBIT)?QUILL_LIFE_UP.get():QUILL_LIFE.get();
+        capacity=QuillFormation.harvestCount(InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.QUILL_SWARM));
+        entityData.set(COUNT,capacity);
         life=totalLife;collected=true;
         com.codex.blacklight.city.MilitaryCampaignSystem.consumed(p,victim);
         com.codex.blacklight.disguise.DisguiseSystem.consumed(p,victim);
@@ -207,6 +227,15 @@ public final class QuillOrgan extends Entity {
             end=end.add(new Vec3(Math.cos(offset())*curve,curve*.9,Math.sin(offset())*curve));
         }
         if(!toward(end,Math.min(1.65,.48+age()*.12)))return;
+        if(parent!=null){
+            if(((ServerLevel)level()).getEntity(parent) instanceof QuillOrgan home && !home.isRemoved()
+                    && home.phase()==ORBIT && owner.equals(home.owner)){
+                home.entityData.set(COUNT,home.count()+Math.min(count(),home.capacity-home.count()));
+                if(home.supply==0 && home.count()==home.capacity)home.discard();
+            }
+            discard();
+            return;
+        }
         if(phase()==RETURN){
             if(deposit>0){
                 QuillHarvest.state(p).addBiomass(deposit);
@@ -223,37 +252,45 @@ public final class QuillOrgan extends Entity {
         }
         if(phase()==RETURN)ConsumeSounds.phase(p,"quill_merge",end,leadSound?.9F:.38F,1.06F);
         if(supply<=0){discard();return;}
-        if(Double.isNaN(orbitPhase))orbitPhase=freeAngle(p);
         if(phase()==REJOIN)sound(InfectedSoundCue.RETRACT,.28F,1.38F);
         phase(ORBIT);
     }
-    private double freeAngle(ServerPlayer p){
-        var others=level().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(QUILL_ORBIT_RADIUS.get()+2),
-                q->q!=this && q.phase()==ORBIT && owner.equals(q.owner) && Double.isFinite(q.orbitPhase));
-        if(others.isEmpty())return offset();
-        var angles=others.stream().mapToDouble(q->q.orbitPhase).sorted().toArray();
-        double gap=-1,mid=0,turn=2*Math.PI;
-        for(int i=0;i<angles.length;i++){
-            double next=i+1<angles.length?angles[i+1]:angles[0]+turn;
-            if(next-angles[i]>gap){gap=next-angles[i];mid=(angles[i]+gap*.5)%turn;}
-        }
-        return mid;
-    }
     private void orbit(ServerPlayer p){
-        double angle=level().getGameTime()*.096+orbitPhase;
         double r=QUILL_ORBIT_RADIUS.get();
         Vec3 center=p.position().add(0,p.getBbHeight()*.80,0);
-        Vec3 goal=center.add(Math.cos(angle)*r,.42*Math.sin(angle+.42),Math.sin(angle)*r);
+        Vec3 goal=center.add(QuillFormation.offset(firstSlot(),formation(),level().getGameTime(),r,p.yBodyRot));
         var wall=level().clip(new net.minecraft.world.level.ClipContext(center,goal,net.minecraft.world.level.ClipContext.Block.COLLIDER,
                 net.minecraft.world.level.ClipContext.Fluid.NONE,this));
         if(wall.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)
             goal=wall.getLocation().subtract(goal.subtract(center).normalize().scale(.22));
         setPos(position().lerp(goal,.45));
-        if(supply<QUILL_AUTO_COST.get() || tickCount%2!=0)return;
-        var prey=QuillHarvest.sortie(p);
-        if(prey==null)return;
-        supply-=QUILL_AUTO_COST.get();target=prey.target().getUUID();targetRegion=prey.region();phase(STRIKE);
-        sound(InfectedSoundCue.LAUNCH,.49F,1.32F);
+        if(tickCount%2==0)QuillHarvest.dispatch(p);
+    }
+    public void launch(ServerPlayer p,TargetSelection prey,long number,boolean audible){
+        if(phase()!=ORBIT || number<=0 || number>count() || supply<QUILL_AUTO_COST.get())return;
+        QuillOrgan shot=this;
+        if(capacity>1){
+            shot=new QuillOrgan(ModEntities.QUILL_ORGAN.get(),level());
+            shot.owner=owner;
+            shot.parent=getUUID();
+            shot.life=life;
+            shot.totalLife=totalLife;
+            shot.capacity=number;
+            shot.entityData.set(COUNT,number);
+            shot.entityData.set(SOCKET,socket());
+            shot.arrange(firstSlot(),(int)Math.min(number,slots()),formation());
+            shot.entityData.set(ACTOR,p.getId());
+            shot.setPos(position());
+        }
+        shot.target=prey.target().getUUID();
+        shot.targetRegion=prey.region();
+        shot.phase(STRIKE);
+        if(shot!=this){
+            if(!level().addFreshEntity(shot))return;
+            entityData.set(COUNT,count()-number);
+        }
+        supply-=QUILL_AUTO_COST.get();
+        if(audible)sound(InfectedSoundCue.LAUNCH,.49F,1.32F);
     }
     private static final double STRIKE_SPEED=1.65;
     private void strike(ServerLevel level,ServerPlayer p){
@@ -267,8 +304,9 @@ public final class QuillOrgan extends Entity {
                 Vec3 from=position();
                 if(!toward(point,STRIKE_SPEED))return;
                 var receiver=prey.target();
-                var source=damageSources().thrown(this,p);
-                float damage=QUILL_AUTO_DAMAGE.get().floatValue();
+                var type=level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE).getHolderOrThrow(QuillHarvest.VOLLEY_DAMAGE);
+                var source=new net.minecraft.world.damagesource.DamageSource(type,this,p);
+                float damage=(float)Math.min(Float.MAX_VALUE,QUILL_AUTO_DAMAGE.get()*count());
                 var body=AnimatedHurtBody.of(receiver);
                 boolean harvestable=receiver instanceof LivingEntity living && QuillHarvest.canHarvestImpact(p,living);
                 boolean hit;
@@ -288,7 +326,7 @@ public final class QuillOrgan extends Entity {
                 }
             }
         }
-        target=null;if(supply>0)phase(REJOIN);else discard();
+        target=null;if(parent!=null || supply>0)phase(REJOIN);else discard();
     }
     private void absorb(ServerPlayer p){
         long elapsed=age();
@@ -306,18 +344,23 @@ public final class QuillOrgan extends Entity {
         discard();
     }
     @Override protected void addAdditionalSaveData(CompoundTag n){
+        n.putLong("count",count());n.putLong("capacity",capacity);
+        if(parent!=null)n.putUUID("swarmParent",parent);
         if(owner!=null)n.putUUID("owner",owner);if(host!=null)n.putUUID("host",host);if(target!=null)n.putUUID("target",target);
         if(target!=null)n.putInt("targetRegion",targetRegion);
         n.putInt("phase",phase());n.putLong("age",age());n.putInt("layers",layers());n.putInt("supply",supply);
         n.putInt("initial",initial);n.putInt("deposit",deposit);n.putInt("life",life);n.putInt("totalLife",totalLife);
-        n.putFloat("heal",heal);n.putBoolean("collected",collected);n.putInt("side",entityData.get(SIDE));n.putInt("socket",socket());n.putDouble("orbitPhase",orbitPhase);n.putBoolean("secondaryFoley",!leadSound);
+        n.putFloat("heal",heal);n.putBoolean("collected",collected);n.putInt("side",entityData.get(SIDE));n.putInt("socket",socket());n.putBoolean("secondaryFoley",!leadSound);
     }
     @Override protected void readAdditionalSaveData(CompoundTag n){
+        capacity=Math.max(1,n.getLong("capacity"));
+        entityData.set(COUNT,n.contains("count")?Math.max(0,Math.min(capacity,n.getLong("count"))):1L);
+        parent=n.hasUUID("swarmParent")?n.getUUID("swarmParent"):null;
         owner=n.hasUUID("owner")?n.getUUID("owner"):null;host=n.hasUUID("host")?n.getUUID("host"):null;
         target=n.hasUUID("target")?n.getUUID("target"):null;targetRegion=n.contains("targetRegion")?n.getInt("targetRegion"):-1;
         entityData.set(PHASE,n.getInt("phase"));
         entityData.set(START,level().getGameTime()-n.getLong("age"));entityData.set(LAYERS,n.getInt("layers"));
         supply=n.getInt("supply");initial=n.getInt("initial");deposit=n.getInt("deposit");life=n.getInt("life");
-        totalLife=n.getInt("totalLife");heal=n.getFloat("heal");collected=n.getBoolean("collected");entityData.set(SIDE,n.getInt("side"));entityData.set(SOCKET,Mth.clamp(n.getInt("socket"),0,5));orbitPhase=n.contains("orbitPhase")?n.getDouble("orbitPhase"):offset();leadSound=!n.getBoolean("secondaryFoley");
+        totalLife=n.getInt("totalLife");heal=n.getFloat("heal");collected=n.getBoolean("collected");entityData.set(SIDE,n.getInt("side"));entityData.set(SOCKET,Mth.clamp(n.getInt("socket"),0,5));leadSound=!n.getBoolean("secondaryFoley");
     }
 }
