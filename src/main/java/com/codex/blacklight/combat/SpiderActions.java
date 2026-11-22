@@ -18,9 +18,11 @@ import java.util.*;
 /** Server action clock. Each swing, contact and release has one owner and one saved target. */
 public final class SpiderActions {
     public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH, ORAL_SCISSORS, POD_CAST, HEAVY_STAMP, FLESH_VOLLEY }
-    private static final int[] STRIDE_HEADINGS={0,32,-32};
-    private static final int[] STRAIGHT={0};
-    private static final double[] STEP_HEIGHTS={0,.5,1.01};
+    private static final int[] BYPASS={32,62,88,110,134};
+    private int detourSide;
+    private long detourUntil;
+    private double closingDistance;
+
     private final EncounterMob boss;
     public SpiderActions(EncounterMob boss){this.boss=boss;}
     private CompoundTag data(){return boss.spiderData();}
@@ -52,6 +54,7 @@ public final class SpiderActions {
     private boolean clear(Vec3 from,Vec3 to){return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()==HitResult.Type.MISS;}
     private Entity actor(){return data().hasUUID("ActionTarget") && boss.level() instanceof ServerLevel l?l.getEntity(data().getUUID("ActionTarget")):null;}
     private void rest(int delay){
+        closingDistance=0;
         releaseGrip();set(Move.REST,null,boss.position(),-1);
         var t=data().copy();t.putLong("NextMove",now()+delay);boss.spiderData(t);
     }
@@ -208,18 +211,23 @@ public final class SpiderActions {
         {
             // Reposition between commitments; refuse an unsupported ledge or a solid wall.
             double range=diff.horizontalDistance();
-            if(range>16 && Math.abs(Mth.wrapDegrees(yaw-facing))<65){
+            if(range>10){
                 int lost=boss.spider.brokenMask(),limbs=8-Integer.bitCount(lost);
-                double pace=(range>25?.38:.26)-.025*Integer.bitCount(lost);
+                double pace=(range>24?.54:.37)-.032*Integer.bitCount(lost);
+                if(Math.abs(Mth.wrapDegrees(yaw-facing))>75)pace*=.55;
                 if(limbs<=2){
                     // On the belly the forearms drag the shell only during the planted half-stroke.
                     double stroke=Math.sin(((now()%36)-6)*Math.PI/18);
                     pace=(.035+.012*limbs)*Math.max(0,stroke);
                 }else if((lost&15)==15 || (lost&240)==240)pace*=.52;
                 var stride=diff.multiply(1,0,1).normalize().scale(pace);
+                var before=boss.position();
                 takeStep(stride);
+                closingDistance+=boss.position().subtract(before).horizontalDistance();
             }
             if(now()<data().getLong("NextMove"))return;
+            // Between commitments follow the live target, even if the previous rush struck a wall.
+            if(range>24 && data().getInt("Turns")>0 && closingDistance<9 && age(0)<36)return;
         }
         float angle=Math.abs(Mth.wrapDegrees(yaw-facing));
         // An exposed flank is in reach before the shell has turned to face the intruder.
@@ -267,27 +275,61 @@ public final class SpiderActions {
         }
         var t=data().copy();t.putInt("Turns",count+1);boss.spiderData(t);
     }
-    private void takeStep(Vec3 stride){if(stride.lengthSqr()>1e-7)step(stride,STRIDE_HEADINGS);}
-    private boolean step(Vec3 stride,int[] headings){
-        var level=boss.level();
-        for(int angle:headings){
-            var step=stride.yRot((float)Math.toRadians(angle));
-            var ahead=boss.position().add(step).add(step.normalize().scale(1.5));
-            var floor=level.clip(new ClipContext(ahead.add(0,1.25,0),ahead.add(0,-1.2,0),
-                    ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
-            if(floor.getType()!=HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP)continue;
-            var bounds=boss.getBoundingBox().deflate(.008);
-            // Entity.move performs the final collision. Test the shell against actual blocks;
-            // her own multipart contacts and the locked target do not serve as walls.
-            for(double rise:STEP_HEIGHTS){
-                var raised=bounds.move(0,rise,0);
-                if(level.getBlockCollisions(boss,raised.expandTowards(step)).iterator().hasNext())continue;
-                if(rise>0 && level.getBlockCollisions(boss,bounds.expandTowards(0,rise,0)).iterator().hasNext())continue;
-                if(rise>0)boss.move(MoverType.SELF,new Vec3(0,rise,0));
-                boss.move(MoverType.SELF,step);return true;
+    private void takeStep(Vec3 stride){
+        if(stride.lengthSqr()<1e-7)return;
+        // Keep the chosen shoulder around a pillar until the forward lane opens again.
+        boolean bypass=detourSide!=0 && now()<detourUntil;
+        if((!bypass || clearance(stride.normalize().scale(2.6))>=0) && advanceShell(stride)){
+            detourSide=0;
+            return;
+        }
+        int side=bypass?detourSide:(boss.getId()%2==0?1:-1);
+        for(int pass=0;pass<2;pass++,side=-side){
+            for(int heading:BYPASS){
+                if(advanceShell(stride.yRot((float)Math.toRadians(side*heading)))){
+                    detourSide=side;
+                    detourUntil=now()+48;
+                    return;
+                }
             }
         }
-        return false;
+    }
+    // Highest tread swept by the whole belly, including ridges outside the center ray.
+    // A ceiling or a tall wall cannot supply a tread within the allowed rise.
+    private double clearance(Vec3 stride){
+        var bounds=boss.getBoundingBox().deflate(.008);
+        var lane=bounds.expandTowards(stride);
+        double rise=0;
+        for(var shape:boss.level().getBlockCollisions(boss,lane)){
+            rise=Math.max(rise,shape.max(net.minecraft.core.Direction.Axis.Y)-boss.getY());
+            if(rise>(Integer.bitCount(boss.spider.brokenMask())<=3?2.01:1.01))return -1;
+        }
+        if(rise<=0)return 0;
+        var crown=new AABB(bounds.minX,bounds.maxY,bounds.minZ,bounds.maxX,bounds.maxY+rise+.01,bounds.maxZ);
+        if(boss.level().getBlockCollisions(boss,crown.expandTowards(stride)).iterator().hasNext())return -1;
+        return rise;
+    }
+    private boolean advanceShell(Vec3 stride){
+        double rise=clearance(stride);
+        if(rise<0)return false;
+        var bounds=boss.getBoundingBox();
+        var forward=stride.normalize();
+        double half=(bounds.maxX-bounds.minX)*.5;
+        var front=boss.position().add(stride).add(forward.scale(half*.82));
+        var across=new Vec3(forward.z,0,-forward.x).scale(half*.62);
+        int supported=0;
+        for(int sample=-1;sample<=1;sample++){
+            var at=front.add(across.scale(sample));
+            var ray=boss.level().clip(new ClipContext(at.add(0,rise+1.51,0),at.add(0,-(half+1.85),0),
+                    ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
+            if(ray.getType()==HitResult.Type.BLOCK && ray.getDirection()==net.minecraft.core.Direction.UP)supported++;
+        }
+        if(supported<2)return false;
+        var before=boss.position();
+        if(rise>0)boss.move(MoverType.SELF,new Vec3(0,rise,0));
+        boss.move(MoverType.SELF,stride);
+        boss.move(MoverType.SELF,new Vec3(0,-.52,0));
+        return boss.position().subtract(before).dot(forward)>=stride.length()*.6;
     }
     private boolean wall(){
         if(!boss.spider.footing.pairedSupport())return false;
@@ -469,7 +511,7 @@ public final class SpiderActions {
         if(t>=10 && t<=39){
             var lane=aim().subtract(new Vec3(data().getDouble("RushX"),boss.getY(),data().getDouble("RushZ"))).multiply(1,0,1).normalize();
             double v=(t<=23?.56:.66)*(1-.065*Integer.bitCount(boss.spider.brokenMask()));
-            if(!step(lane.scale(v),STRAIGHT)){
+            if(!advanceShell(lane.scale(v))){
                 var st=data().copy();st.putInt("RushStopped",t);boss.spiderData(st);
                 SpiderFoley.ground(boss,boss.position().add(lane.scale(1.5)),1.45F,SpiderFoley.Cue.SCRAPE);
                 return;

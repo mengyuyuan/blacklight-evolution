@@ -1,6 +1,6 @@
 #version 150
-in vec3 wpos,nn;in float pulse,minor,axis,travel,wound; uniform vec3 eye;uniform float sceneLight;uniform sampler2D fiberMap;out vec4 color;
-void main(){if(wpos.y<.025)discard;
+in vec3 wpos,nn;in float pulse,minor,axis,travel,wound; uniform int combat;uniform vec3 eye;uniform float sceneLight;uniform sampler2D fiberMap;out vec4 color;
+void main(){if(combat==0 && wpos.y<.025)discard;
  vec3 n=normalize(nn),v=normalize(eye-wpos),l=normalize(vec3(-.55,.84,-.38));
  float spec=pow(max(0.,dot(n,normalize(v+l))),18.);
  float ridge=.5+.5*cos(6.283*(axis*5.+travel*2.));
