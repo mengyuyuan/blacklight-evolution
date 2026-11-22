@@ -283,54 +283,37 @@ public final class QuillHarvest {
         boolean cooling=now<clock.getLong(VOLLEY);
         if(cooling && now<NEXT_FORMATION.getOrDefault(p,0L))return;
         NEXT_FORMATION.put(p,now+4);
-        var organs=p.level().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(QUILL_ORBIT_RADIUS.get()+3),
-                q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner()));
+        var organs=QuillOrgan.orbiting(p);
         organs.sort(Comparator.comparingInt(Entity::getId));
         arrange(organs);
         if(cooling)return;
         clock.putLong(VOLLEY,now+4);
+        if(!active(p) || state(p).getActivePower()!=PowerForm.BACKSPINES)return;
         if(organs.isEmpty())return;
-        if(!active(p) || state(p).getActivePower()!=PowerForm.BACKSPINES
-                || organs.stream().noneMatch(q->q.count()>0 && q.supply()>=QUILL_AUTO_COST.get()))return;
         var focused=focus(p,QUILL_AUTO_RANGE.get());
         var target=focused!=null?focused:attackTarget(p,QUILL_AUTO_RANGE.get(),true);
         if(target==null)return;
         clock.putLong(VOLLEY,now+QUILL_AUTO_INTERVAL.get());
         int first=Math.floorMod(clock.getInt("BlacklightQuillFirst"),organs.size());
-        clock.putInt("BlacklightQuillFirst",(first+1)%organs.size());
-        var wave=new QuillFormation.Wave(focused!=null?100:QUILL_AUTO_PERCENT.get());
-        boolean audible=true;
-        for(int i=0;i<organs.size();i++){
-            var organ=organs.get((first+i)%organs.size());
-            if(organ.supply()<QUILL_AUTO_COST.get())continue;
-            long number=wave.take(organ.count());
-            if(number==0)continue;
-            organ.launch(p,target,number,audible);
-            audible=false;
-        }
+        int shots=QuillFormation.volleySize(organs.size(),focused!=null?100:QUILL_AUTO_PERCENT.get());
+        for(int i=0;i<shots;i++)
+            organs.get((int)(((long)first+i)%organs.size())).launch(target,i==0);
+        clock.putInt("BlacklightQuillFirst",(int)(((long)first+shots)%organs.size()));
         arrange(organs);
     }
     private static void arrange(List<QuillOrgan> organs){
-        int[] visible=new int[organs.size()];
-        int total=0;
-        for(int pass=0;total<QuillFormation.VISIBLE_SLOTS;pass++){
-            int before=total;
-            for(int i=0;i<organs.size() && total<QuillFormation.VISIBLE_SLOTS;i++){
-                var organ=organs.get(i);
-                if(organ.phase()==QuillOrgan.ORBIT && pass<organ.count()){visible[i]++;total++;}
-            }
-            if(total==before)break;
-        }
+        int total=(int)Math.min(QuillFormation.VISIBLE_SLOTS,organs.stream().filter(q->q.phase()==QuillOrgan.ORBIT).count());
         int slot=0;
-        for(int i=0;i<organs.size();i++){
-            organs.get(i).arrange(slot,visible[i],total);
-            slot+=visible[i];
+        for(var q:organs){
+            if(q.phase()!=QuillOrgan.ORBIT)continue;
+            q.arrange(slot<total?slot:-1,total);
+            slot++;
         }
     }
     @SubscribeEvent public static void wounded(ForgeDamageEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer p) || event.getNewDamage()<=0 || !active(p) || p.getHealth()>=p.getMaxHealth()) return;
         var shards=p.serverLevel().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(Math.max(5,QUILL_ORBIT_RADIUS.get()+1.5)),
-                q->q.phase()==QuillOrgan.ORBIT && q.count()>0 && q.supply()>0 && p.getUUID().equals(q.owner()));
+                q->q.phase()==QuillOrgan.ORBIT && q.supply()>0 && p.getUUID().equals(q.owner()));
         if (!shards.isEmpty()) shards.get(p.getRandom().nextInt(shards.size())).liquefy();
     }
 }

@@ -367,74 +367,180 @@ public final class QuillPriorityGameTest {
     }
 
     @GameTest(template="wall_test",timeoutTicks=80,batch="quill_swarm_wave")
-    public static void swarmSplitsFocusesAndReturns(GameTestHelper h){
-        var p=join(h,"SwarmWaves");
+    public static void capacityAndLongevityAreIndependent(GameTestHelper h){
+        var p=join(h,"QuillCapacity");
         var level=h.getLevel();
         var mobs=new ArrayList<Mob>();
         var point=h.absolutePos(new BlockPos(5,45,5)).getCenter();
         p.connection.teleport(point.x,point.y,point.z,0,0);
         var state=QuillHarvest.state(p);
         state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
+        state.addEvolutionPoints(10000);
+        ModAttachments.setData(p,ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
+        var search=p.getBoundingBox().inflate(24);
+        var capacity=com.codex.blacklight.power.EvolutionAttribute.QUILL_SWARM;
+        var longevity=com.codex.blacklight.power.EvolutionAttribute.QUILL_DURATION;
         try{
-            var carrier=com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get().create(level);
-            carrier.setPos(p.getEyePosition());
-            var save=carrier.saveWithoutId(new net.minecraft.nbt.CompoundTag());
-            save.putUUID("owner",p.getUUID());save.putInt("phase",QuillOrgan.ORBIT);
-            save.putLong("capacity",11);save.putLong("count",11);
-            save.putInt("life",240);save.putInt("totalLife",240);save.putInt("supply",12);save.putInt("initial",12);
-            carrier.load(save);level.addFreshEntity(carrier);
+            var first=harvestAtShoulder(h,p,mobs);
+            long base=com.codex.blacklight.config.GameplayBalanceConfig.QUILL_LIFE.get();
+            h.assertTrue(first.phase()==QuillOrgan.ORBIT && remainingLife(first)==base,"one ordinary harvest, base lifetime");
+            for(int i=1;i<6;i++)harvestAtShoulder(h,p,mobs);
+            h.assertTrue(level.getEntitiesOfClass(QuillOrgan.class,search,q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner())).size()==6,"six distinct targets fill six slots");
+            state.addBiomass(-state.getBiomass());
+            h.assertTrue(harvestAtShoulder(h,p,mobs).isRemoved() && state.getBiomass()==40,"seventh donor pays full biomass once");
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,capacity,5)==5,"buy capacity only");
+            h.assertTrue(remainingLife(first)==base,"capacity leaves lifetime alone");
+            for(int i=6;i<11;i++)harvestAtShoulder(h,p,mobs);
+            h.assertTrue(level.getEntitiesOfClass(QuillOrgan.class,search,q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner())).size()==11,"five more targets fill the upgraded cap");
             var enemy=spawn(p,mobs,EntityType.HUSK,4,0,400,400);
             var sight=spawn(p,mobs,EntityType.COW,0,4,400,400);
             p.setYRot(180);p.yRotO=180;p.setYHeadRot(180);p.yHeadRotO=180;
-            h.assertTrue(QuillHarvest.focus(p,64)==null,"looking away from both test mobs");
             QuillHarvest.dispatch(p);
-            var search=p.getBoundingBox().inflate(20);
             var auto=level.getEntitiesOfClass(QuillOrgan.class,search,q->enemy.getUUID().equals(q.strikeTarget()));
-            h.assertTrue(carrier.count()==6 && carrier.slots()==6 && auto.size()==1 && auto.get(0).count()==5,"11 ready: 5 automatic, 6 remain. ready="+carrier.count()+", groups="+auto.size());
-            QuillHarvest.dispatch(p);
-            h.assertTrue(carrier.count()==6,"another carrier tick cannot fire the wave twice");
+            h.assertTrue(auto.size()==5,"11 actual spines send 5 automatically");
             p.setYRot(0);p.yRotO=0;p.setYHeadRot(0);p.yHeadRotO=0;p.setXRot(10);p.xRotO=10;
-            p.getPersistentData().remove("BlacklightNextQuillSortie");
-            QuillHarvest.dispatch(p);
-            var focused=level.getEntitiesOfClass(QuillOrgan.class,search,q->sight.getUUID().equals(q.strikeTarget()));
-            h.assertTrue(carrier.count()==0 && carrier.slots()==0 && focused.size()==1 && focused.get(0).count()==6,"six aimed at the cow without an explicit lock");
-            var shot=focused.get(0);
-            shot.load(shot.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
-            for(int i=0;i<40 && !shot.isRemoved();i++)shot.tick();
-            h.assertTrue(shot.isRemoved() && carrier.count()==6 && sight.getHealth()<sight.getMaxHealth(),"focused hit and return after save/load");
-            var patrol=auto.get(0);
-            for(int i=0;i<40 && !patrol.isRemoved();i++)patrol.tick();
-            h.assertTrue(patrol.isRemoved() && carrier.count()==11 && enemy.getHealth()<enemy.getMaxHealth(),"both targets hit, all eleven accounted for");
-            h.assertTrue(carrier.supply()==12-2*com.codex.blacklight.config.GameplayBalanceConfig.QUILL_AUTO_COST.get(),"each wave spends its carrier fuel once");
-            // Produce a second bundle through a purchased rank and the normal harvest ledger.
-            state.addEvolutionPoints(10000);
-            ModAttachments.setData(p,ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
-            var attribute=com.codex.blacklight.power.EvolutionAttribute.QUILL_SWARM;
-            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,attribute,3)==3,"buy three proliferation ranks");
-            var host=spawn(p,mobs,EntityType.COW,2,0,20,20);
-            QuillHarvest.plant(p,host,host.getBoundingBox().getCenter(),0);
-            var other=(QuillOrgan)level.getEntity(QuillHarvest.mark(host).getUUID("organ"));
-            host.discard();
-            var reward=new com.codex.blacklight.power.AssimilationSystem.Yield(2,40,0,null,0);
-            h.assertTrue(other.collect(p,host,reward) && other.count()==4,"new harvest grows four spines");
-            var returning=other.saveWithoutId(new net.minecraft.nbt.CompoundTag());
-            returning.putInt("phase",QuillOrgan.RETURN);other.load(returning);
-            other.setPos(other.shoulder(p));p.setHealth(p.getMaxHealth());other.tick();
-            h.assertTrue(other.phase()==QuillOrgan.ORBIT,"harvest reaches orbit");
             p.getPersistentData().remove("BlacklightNextQuillSortie");QuillHarvest.dispatch(p);
-            var combined=level.getEntitiesOfClass(QuillOrgan.class,search,q->sight.getUUID().equals(q.strikeTarget()));
-            h.assertTrue(combined.size()==2 && combined.stream().mapToLong(QuillOrgan::count).sum()==15,"both carriers commit to one aimed target");
-            for(var bundle:combined){
-                float previous=sight.getHealth();
-                for(int i=0;i<15 && bundle.phase()==QuillOrgan.STRIKE;i++)bundle.tick();
-                h.assertTrue(sight.getHealth()<previous,"each bundle deals damage during the same game tick");
+            var aimed=level.getEntitiesOfClass(QuillOrgan.class,search,q->sight.getUUID().equals(q.strikeTarget()));
+            h.assertTrue(aimed.size()==6,"remaining six focus the same target");
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,longevity,3)==3,"buy longevity only");
+            h.assertTrue(remainingLife(first)==base+60,"time ranks extend an existing in-flight spine");
+            h.assertTrue(harvestAtShoulder(h,p,mobs).isRemoved(),"time ranks and outgoing flight create no free slots");
+            var shot=aimed.get(0);
+            var saved=shot.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            saved.putLong("capacity",200);saved.putLong("count",200);shot.load(saved);
+            for(var q:aimed){
+                float hp=sight.getHealth();
+                for(int i=0;i<20 && q.phase()==QuillOrgan.STRIKE;i++)q.tick();
+                h.assertTrue(sight.getHealth()<hp && sight.isAlive(),"each spine hits once, including the migrated organ");
             }
+            for(int i=0;i<15 && shot.phase()==QuillOrgan.REJOIN;i++)shot.tick();
+            h.assertTrue(shot.phase()==QuillOrgan.ORBIT && remainingLife(shot)<=base+60,"one returns without extending again");
+            var child=com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get().create(level);
+            child.setPos(p.getEyePosition());
+            var legacy=child.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            legacy.putUUID("owner",p.getUUID());legacy.putUUID("swarmParent",shot.getUUID());legacy.putLong("life",100);
+            legacy.putInt("phase",QuillOrgan.STRIKE);legacy.putUUID("target",sight.getUUID());
+            child.load(legacy);level.addFreshEntity(child);float hp=sight.getHealth();child.tick();
+            h.assertTrue(child.isRemoved() && sight.getHealth()==hp,"legacy extra projectile retires without a hit");
+            var expiring=shot.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            expiring.putLong("life",2);shot.load(expiring);shot.tick();
+            h.assertTrue(!shot.isRemoved() && remainingLife(shot)==1,"remaining time survives reload");
+            shot.tick();h.assertTrue(shot.isRemoved(),"expiry releases its slot");
+            var fresh=harvestAtShoulder(h,p,mobs);
+            h.assertTrue(fresh.phase()==QuillOrgan.ORBIT && remainingLife(fresh)==base+60,"one new donor fills exactly the released slot");
+            h.assertTrue(harvestAtShoulder(h,p,mobs).isRemoved(),"refilled cap remains eleven");
             h.succeed();
         }finally{
-            for(var q:level.getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(32),q->p.getUUID().equals(q.owner())))q.discard();
+            for(var q:level.getEntitiesOfClass(QuillOrgan.class,search,q->p.getUUID().equals(q.owner())))q.discard();
             for(var mob:mobs)mob.discard();
             level.getServer().getPlayerList().remove(p);
         }
+    }
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_strafe_endurance")
+    public static void spentSpineStillHitsThroughItsPurchasedLifetime(GameTestHelper h){
+        var p=join(h,"QuillEndurance");
+        var mobs=new ArrayList<Mob>();
+        var start=h.absolutePos(new BlockPos(5,65,5)).getCenter();
+        p.connection.teleport(start.x,start.y,start.z,180,0);
+        var state=QuillHarvest.state(p);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
+        state.addEvolutionPoints(10000);
+        ModAttachments.setData(p,ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
+        var organ=harvestAtShoulder(h,p,mobs);
+        try{
+            var duration=com.codex.blacklight.power.EvolutionAttribute.QUILL_DURATION;
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,duration,8)==8,"buy eight seconds for the held spine");
+            // Reproduce an existing save with one point left and only the purchased time remaining.
+            var saved=organ.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            saved.putInt("supply",1);saved.putLong("life",160);organ.load(saved);
+            p.getPersistentData().putLong("BlacklightNextQuillSortie",Long.MAX_VALUE);
+            organ.tick();
+            var enemy=spawn(p,mobs,EntityType.HUSK,4,1,400,400);
+            for(int wave=0;wave<4;wave++){
+                p.setPos(start.add(wave%2==0?7:-7,0,0));
+                p.yBodyRot=wave%2==0?70:-70;
+                if(wave%2==1)CombatTargeting.requestLock(p,enemy.getId());
+                else CombatTargeting.requestLock(p,-1);
+                enemy.invulnerableTime=0;
+                p.getPersistentData().remove("BlacklightNextQuillSortie");
+                QuillHarvest.dispatch(p);
+                h.assertTrue(enemy.getUUID().equals(organ.strikeTarget()) && organ.supply()==0,"spent spine launches after strafing, wave "+wave);
+                float before=enemy.getHealth();
+                for(int i=0;i<20 && organ.phase()==QuillOrgan.STRIKE;i++)organ.tick();
+                h.assertTrue(enemy.getHealth()<before && organ.phase()==QuillOrgan.REJOIN,"hit and return, wave "+wave);
+                for(int i=0;i<30 && organ.phase()==QuillOrgan.REJOIN;i++)organ.tick();
+                h.assertTrue(organ.phase()==QuillOrgan.ORBIT && !organ.isRemoved(),"rejoin with empty reserve, wave "+wave);
+            }
+            p.getPersistentData().putLong("BlacklightNextQuillSortie",Long.MAX_VALUE);
+            long remaining=remainingLife(organ);
+            h.assertTrue(remaining>0 && remaining<160,"sorties consume lifetime at the usual rate");
+            for(long i=0;i<remaining;i++)organ.tick();
+            h.assertTrue(organ.isRemoved() && QuillOrgan.orbiting(p).isEmpty(),"retire at actual expiry");
+            h.succeed();
+        }finally{
+            CombatTargeting.requestLock(p,-1);
+            organ.discard();
+            for(var mob:mobs){
+                var mark=QuillHarvest.mark(mob);
+                if(mark.hasUUID("organ") && p.serverLevel().getEntity(mark.getUUID("organ")) instanceof QuillOrgan q)q.discard();
+                mob.discard();
+            }
+            p.serverLevel().getServer().getPlayerList().remove(p);
+        }
+    }
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_expiry")
+    public static void expiryWinsInEveryHeldPhaseAndAcrossReload(GameTestHelper h){
+        var p=join(h,"QuillExpiry");
+        var mobs=new ArrayList<Mob>();
+        var level=h.getLevel();
+        var start=h.absolutePos(new BlockPos(5,125,5)).getCenter();
+        p.connection.teleport(start.x,start.y,start.z,0,0);
+        var state=QuillHarvest.state(p);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
+        p.getPersistentData().putLong("BlacklightNextQuillSortie",Long.MAX_VALUE);
+        var prey=spawn(p,mobs,EntityType.HUSK,0,3,400,400);
+        for(int phase:List.of(QuillOrgan.ORBIT,QuillOrgan.STRIKE,QuillOrgan.REJOIN)){
+            var q=harvestAtShoulder(h,p,mobs);
+            var last=q.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            last.putInt("phase",phase);last.putLong("life",1);last.putUUID("target",prey.getUUID());
+            q.load(last);q.setPos(prey.getBoundingBox().getCenter());
+            float hp=prey.getHealth();
+            q.tick();
+            h.assertTrue(q.isRemoved() && QuillOrgan.orbiting(p).isEmpty() && prey.getHealth()==hp,
+                    "expiry removes the entity before any hit or rejoin in phase "+phase);
+        }
+        var unloaded=harvestAtShoulder(h,p,mobs);
+        var saved=unloaded.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+        h.assertTrue(saved.getLong("expiresAt")>level.getGameTime(),"admission saves a world-time deadline");
+        saved.putLong("expiresAt",level.getGameTime()+2);
+        unloaded.discard();
+        h.runAfterDelay(4,()->{
+            try{
+                var reloaded=com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get().create(level);
+                reloaded.load(saved);level.addFreshEntity(reloaded);reloaded.tick();
+                h.assertTrue(reloaded.isRemoved(),"time spent unloaded counts before the first attack");
+                for(int i=0;i<6;i++)h.assertTrue(harvestAtShoulder(h,p,mobs).phase()==QuillOrgan.ORBIT,"all six slots available again");
+                h.succeed();
+            }finally{
+                for(var q:QuillOrgan.orbiting(p))q.discard();
+                for(var mob:mobs)mob.discard();
+                level.getServer().getPlayerList().remove(p);
+            }
+        });
+    }
+    private static long remainingLife(QuillOrgan q){
+        return q.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getLong("life");
+    }
+    private static QuillOrgan harvestAtShoulder(GameTestHelper h,ServerPlayer p,List<Mob> mobs){
+        var host=spawn(p,mobs,EntityType.COW,2,0,20,20);
+        QuillHarvest.plant(p,host,host.getBoundingBox().getCenter(),0);
+        var organ=(QuillOrgan)p.serverLevel().getEntity(QuillHarvest.mark(host).getUUID("organ"));
+        host.discard();
+        var reward=new com.codex.blacklight.power.AssimilationSystem.Yield(2,40,0,null,0);
+        h.assertTrue(organ.collect(p,host,reward) && !organ.collect(p,host,reward),"one settlement per target");
+        organ.harvest(true);releaseHarvest(organ);
+        p.setHealth(p.getMaxHealth());organ.setPos(organ.shoulder(p));organ.tick();
+        return organ;
     }
 
     private static Mob spawn(ServerPlayer p, List<Mob> spawned, EntityType<? extends Mob> type,
