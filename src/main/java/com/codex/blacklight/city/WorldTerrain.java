@@ -142,9 +142,7 @@ final class WorldTerrain {
         final long seed;final int x,z;int ground,water,cover,road,bridge,top,treeBase,treeDistance,treeHeight;
         private List<Deck> decks;
         boolean line,atGrade,urban,sidewalk,lamp,scenery;FullLosAngelesMap.Column arnis;FutianLayout.Column core;Part landmark;final List<Part> parts=new ArrayList<>();
-        private final com.codex.blacklight.world.GreeneHiveCave.Column den;
         Column(long seed,int x,int z,int ground){
-            den=com.codex.blacklight.world.GreeneHiveCave.at(seed,x,z);
             this.seed=seed;this.x=x;this.z=z;
             // The legacy core is at sea-level numerically, but its border is dry ground.
             int distance=Math.max(Math.max(-x,x-FutianMap.WIDTH),Math.max(-z,z-FutianMap.DEPTH));
@@ -175,9 +173,6 @@ final class WorldTerrain {
             top=Math.min(HEIGHT-1,top);
         }
         BlockState state(int y){
-            var block=terrain(y);return den==null?block:den.replace(y,block);
-        }
-        private BlockState terrain(int y){
             if(y<0||y>=HEIGHT)return b(Blocks.VOID_AIR);
             if(arnis!=null)return arnis.state(y);
             if(scenery)return LosAngelesMap.state(x,y,z);

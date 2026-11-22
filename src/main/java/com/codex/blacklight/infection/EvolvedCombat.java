@@ -36,7 +36,8 @@ public final class EvolvedCombat {
     public void interrupt(){detour=null;lastChasePosition=null;stalledChaseTicks=0;specials.interrupt();host.setEvolvedAction("");host.setEvolvedEngaged(false);host.setSprinting(false);host.getNavigation().stop();host.setDeltaMovement(0,host.getDeltaMovement().y,0);contacts.clear();anchor=null;pathCooldown=0;comboLength=0;connected=false;cooldown=Math.max(cooldown,12);}
     public boolean evading(){float t=host.evolvedActionElapsed(0);return host.isEvolved()&&host.evolvedAction().startsWith("dodge_")&&t>=3&&t<10;}
     private boolean valid(LivingEntity target){return target!=null&&target.isAlive()&&target!=host&&target.level()==host.level()&&!host.isAlliedTo(target)
-            &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()));}
+            &&!(target instanceof Player p&&(p.isCreative()||p.isSpectator()
+                ||host.distanceToSqr(p)>EvolvedBalance.PURSUIT_RANGE*EvolvedBalance.PURSUIT_RANGE));}
     private double gap(LivingEntity target){return Math.max(0,host.distanceTo(target)-(host.getBbWidth()+target.getBbWidth())*.5);}
     public boolean tick(){
         if(!host.isEvolved()||host.level().isClientSide||host.isNoAi())return false;

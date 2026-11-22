@@ -1,5 +1,6 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.world.GreeneHiveCave;
 import com.google.gson.JsonParser;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +33,9 @@ public final class FutianLayout {
     public static BlockState state(long seed,int x,int y,int z){return overlay(seed,x,y,z,FutianMap.state(x,y,z));}
     public static BlockState overlay(long seed,int x,int y,int z,BlockState base){
         base=FutianCivicCentre.state(x,y,z,base);
-        return finishOverlay(seed,x,y,z,base);
+        base=finishOverlay(seed,x,y,z,base);
+        var den=y>=0 && y<=63 ? GreeneHiveCave.at(seed,x,z) : null;
+        return den==null?base:den.replace(y,base);
     }
     private static BlockState finishOverlay(long seed,int x,int y,int z,BlockState base){
         base=FutianPublicSpace.state(x,y,z,base);
@@ -60,9 +63,9 @@ public final class FutianLayout {
         private final FutianMap.Tile tile;
         private final FutianCivicCentre.Geometry geometry;
         final int top;
-        private final com.codex.blacklight.world.GreeneHiveCave.Column den;
+        private final GreeneHiveCave.Column den;
         Column(long seed,int x,int z,FutianMap.Tile tile){
-            den=com.codex.blacklight.world.GreeneHiveCave.at(seed,x,z);
+            den=GreeneHiveCave.at(seed,x,z);
             this.seed=seed;this.x=x;this.z=z;this.tile=tile;
             geometry=FutianCivicCentre.geometry(x,z);
             top=Math.max(72,Math.max(tile==null?63:tile.top(x&15,z&15),
@@ -72,8 +75,8 @@ public final class FutianLayout {
             if(y<0||y>=FutianMap.HEIGHT)return Blocks.VOID_AIR.defaultBlockState();
             if(y>top)return Blocks.AIR.defaultBlockState();
             var base=y<63||tile==null?FutianMap.state(x,y,z):tile.state(x&15,y,z&15);
-            if(y<63)return den==null?base:den.replace(y,base);
-            return finishOverlay(seed,x,y,z,FutianCivicCentre.state(x,y,z,base,geometry));
+            if(y>=63)base=finishOverlay(seed,x,y,z,FutianCivicCentre.state(x,y,z,base,geometry));
+            return den==null?base:den.replace(y,base);
         }
     }
     static Column column(long seed,int x,int z){
