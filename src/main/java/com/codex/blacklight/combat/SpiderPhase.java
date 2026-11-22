@@ -119,7 +119,7 @@ public final class SpiderPhase {
             return joint.equals(ARM)?pose.hip():pose.knee();
         }
         int limb=SpiderAnatomy.leg(joint);
-        if(limb<0)return SpiderGesture.upper(boss,joint,partial);
+        if(limb<0)return SpiderIdle.mix(boss,joint,partial,SpiderGesture.upper(boss,joint,partial));
         var origin=boss.position();float yaw=boss.skinYaw(partial);
         if(now()!=poseTick || data()!=poseState || posePartial!=partial || poseYaw!=yaw || !origin.equals(poseOrigin)){
             Arrays.fill(sampled,false);poseState=data();poseTick=now();posePartial=partial;poseYaw=yaw;poseOrigin=origin;
