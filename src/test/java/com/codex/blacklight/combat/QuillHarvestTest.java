@@ -24,16 +24,16 @@ class QuillHarvestTest {
     }
 
     @Test void highRanksAddUprightAndCrossedOrbits(){
-        var flat=QuillFormation.offset(0,5,0,2,0);
+        var flat=QuillFormation.offset(0,5,0,2);
         assertEquals(2,flat.x,1e-8);
-        var upright=QuillFormation.offset(2,24,0,2,0);
+        var upright=QuillFormation.offset(2,24,0,2);
         assertTrue(Math.abs(upright.y)>.8);
-        var crossed=QuillFormation.offset(3,24,0,2,0);
+        var crossed=QuillFormation.offset(3,24,0,2);
         assertTrue(Math.abs(crossed.x)>.8 && Math.abs(crossed.z)>.7);
         for(int i=0;i<48;i++){
-            var offset=QuillFormation.offset(i,48,50,2,35);
+            var offset=QuillFormation.offset(i,48,50,2);
             assertTrue(offset.y>=-1 && offset.y<=1);
-            for(int j=0;j<i;j++)assertTrue(offset.distanceToSqr(QuillFormation.offset(j,48,50,2,35))>1e-8);
+            for(int j=0;j<i;j++)assertTrue(offset.distanceToSqr(QuillFormation.offset(j,48,50,2))>1e-8);
         }
     }
     @Test void eachMarkDrainsOneHundredthOfOnePercentPerSecond() {

@@ -34,6 +34,7 @@ public final class QuillOrgan extends Entity {
     private static final java.util.Map<ServerPlayer, java.util.Set<QuillOrgan>> HELD = new java.util.WeakHashMap<>();
     private ServerPlayer holder;
     private long life, totalLife, durationRank;
+    private long expiresAt=-1;
     private boolean leadSound=true;
     private UUID owner,host,target;
     private int targetRegion=-1;
@@ -75,7 +76,19 @@ public final class QuillOrgan extends Entity {
         held.add(this);
         holder=p;
         extendUntilRank(InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.QUILL_DURATION));
+        if(expiresAt<0){
+            long now=p.level().getGameTime();
+            expiresAt=now+Math.min(life,Long.MAX_VALUE-now);
+        }
         return true;
+    }
+    public static java.util.List<QuillOrgan> orbiting(ServerPlayer p){
+        var organs=new java.util.ArrayList<QuillOrgan>();
+        var held=HELD.get(p);
+        if(held!=null)for(var q:held){
+            if(q.phase()==ORBIT && !q.isRemoved() && q.level()==p.level())organs.add(q);
+        }
+        return organs;
     }
     private void releaseSlot(){
         if(holder==null)return;
@@ -84,7 +97,8 @@ public final class QuillOrgan extends Entity {
         holder=null;
     }
     private void extendUntilRank(long rank){
-        if(rank<=durationRank)return;
+        if(rank<=durationRank || (expiresAt>=0 && level().getGameTime()>=expiresAt))return;
+        if(expiresAt>=0)expiresAt=QuillFormation.extendLife(expiresAt,rank-durationRank);
         life=QuillFormation.extendLife(life,rank-durationRank);
         totalLife=QuillFormation.extendLife(totalLife,rank-durationRank);
         durationRank=rank;
@@ -192,8 +206,11 @@ public final class QuillOrgan extends Entity {
         if(!QuillHarvest.active(p) || p.level()!=level){discard();return;}
         entityData.set(ACTOR,p.getId());
         if(phase()==ORBIT || phase()==STRIKE || phase()==REJOIN){
-            if(life<=0 || !retain(p) || --life<=0){discard();return;}
-            if(tickCount%5==0) entityData.set(ENERGY,Math.min((float)life/Math.max(1,totalLife),supply/(float)Math.max(1,initial)));
+            long now=level.getGameTime();
+            if(life<=0 || (expiresAt>=0 && now>=expiresAt) || !retain(p)){discard();return;}
+            life=Math.min(life-1,expiresAt-now);
+            if(life<=0){discard();return;}
+            if(tickCount%5==0) entityData.set(ENERGY,(float)life/Math.max(1,totalLife));
         }
         switch(phase()){
             case RETURN,REJOIN -> flyHome(p);
@@ -278,26 +295,26 @@ public final class QuillOrgan extends Entity {
             supply=0;
         }
         if(phase()==RETURN)ConsumeSounds.phase(p,"quill_merge",end,leadSound?.9F:.38F,1.06F);
-        if(supply<=0){discard();return;}
+        if(phase()==RETURN && supply<=0){discard();return;}
         if(phase()==REJOIN)sound(InfectedSoundCue.RETRACT,.28F,1.38F);
         phase(ORBIT);
     }
     private void orbit(ServerPlayer p){
         double r=QUILL_ORBIT_RADIUS.get();
         Vec3 center=p.position().add(0,p.getBbHeight()*.80,0);
-        Vec3 goal=center.add(QuillFormation.offset(Math.max(0,firstSlot()),formation(),level().getGameTime(),r,p.yBodyRot));
+        Vec3 goal=center.add(QuillFormation.offset(Math.max(0,firstSlot()),formation(),level().getGameTime(),r));
         var wall=level().clip(new net.minecraft.world.level.ClipContext(center,goal,net.minecraft.world.level.ClipContext.Block.COLLIDER,
                 net.minecraft.world.level.ClipContext.Fluid.NONE,this));
         if(wall.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)
             goal=wall.getLocation().subtract(goal.subtract(center).normalize().scale(.22));
-        setPos(position().lerp(goal,.45));
+        setPos(goal);
         if(tickCount%2==0)QuillHarvest.dispatch(p);
     }
     public void launch(TargetSelection prey,boolean audible){
-        if(phase()!=ORBIT || holder==null || supply<QUILL_AUTO_COST.get())return;
+        if(phase()!=ORBIT || holder==null)return;
         target=prey.target().getUUID();
         targetRegion=prey.region();
-        supply-=QUILL_AUTO_COST.get();
+        supply=Math.max(0,supply-QUILL_AUTO_COST.get());
         phase(STRIKE);
         if(audible)sound(InfectedSoundCue.LAUNCH,.49F,1.32F);
     }
@@ -335,7 +352,8 @@ public final class QuillOrgan extends Entity {
                 }
             }
         }
-        target=null;if(supply>0)phase(REJOIN);else discard();
+        target=null;
+        phase(REJOIN);
     }
     private void absorb(ServerPlayer p){
         long elapsed=age();
@@ -354,6 +372,7 @@ public final class QuillOrgan extends Entity {
     }
     @Override protected void addAdditionalSaveData(CompoundTag n){
         n.putLong("durationRank",durationRank);
+        if(expiresAt>=0)n.putLong("expiresAt",expiresAt);
         if(owner!=null)n.putUUID("owner",owner);if(host!=null)n.putUUID("host",host);if(target!=null)n.putUUID("target",target);
         if(target!=null)n.putInt("targetRegion",targetRegion);
         n.putInt("phase",phase());n.putLong("age",age());n.putInt("layers",layers());n.putInt("supply",supply);
@@ -363,6 +382,7 @@ public final class QuillOrgan extends Entity {
     @Override protected void readAdditionalSaveData(CompoundTag n){
         releaseSlot();
         durationRank=Math.max(0,n.getLong("durationRank"));
+        expiresAt=n.contains("expiresAt")?n.getLong("expiresAt"):-1;
         owner=n.hasUUID("owner")?n.getUUID("owner"):null;host=n.hasUUID("host")?n.getUUID("host"):null;
         target=n.hasUUID("target")?n.getUUID("target"):null;targetRegion=n.contains("targetRegion")?n.getInt("targetRegion"):-1;
         entityData.set(PHASE,n.getInt("phase"));

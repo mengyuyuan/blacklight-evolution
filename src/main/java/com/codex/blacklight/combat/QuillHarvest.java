@@ -271,25 +271,22 @@ public final class QuillHarvest {
         boolean cooling=now<clock.getLong(VOLLEY);
         if(cooling && now<NEXT_FORMATION.getOrDefault(p,0L))return;
         NEXT_FORMATION.put(p,now+4);
-        var organs=p.level().getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(QUILL_ORBIT_RADIUS.get()+3),
-                q->q.phase()==QuillOrgan.ORBIT && p.getUUID().equals(q.owner()));
+        var organs=QuillOrgan.orbiting(p);
         organs.sort(Comparator.comparingInt(Entity::getId));
-        organs.removeIf(q->!q.retain(p));
         arrange(organs);
         if(cooling)return;
         clock.putLong(VOLLEY,now+4);
         if(!active(p) || state(p).getActivePower()!=PowerForm.BACKSPINES)return;
-        var ready=organs.stream().filter(q->q.supply()>=QUILL_AUTO_COST.get()).toList();
-        if(ready.isEmpty())return;
+        if(organs.isEmpty())return;
         var focused=focus(p,QUILL_AUTO_RANGE.get());
         var target=focused!=null?focused:attackTarget(p,QUILL_AUTO_RANGE.get(),true);
         if(target==null)return;
         clock.putLong(VOLLEY,now+QUILL_AUTO_INTERVAL.get());
-        int first=Math.floorMod(clock.getInt("BlacklightQuillFirst"),ready.size());
-        int shots=QuillFormation.volleySize(ready.size(),focused!=null?100:QUILL_AUTO_PERCENT.get());
+        int first=Math.floorMod(clock.getInt("BlacklightQuillFirst"),organs.size());
+        int shots=QuillFormation.volleySize(organs.size(),focused!=null?100:QUILL_AUTO_PERCENT.get());
         for(int i=0;i<shots;i++)
-            ready.get((int)(((long)first+i)%ready.size())).launch(target,i==0);
-        clock.putInt("BlacklightQuillFirst",(int)(((long)first+shots)%ready.size()));
+            organs.get((int)(((long)first+i)%organs.size())).launch(target,i==0);
+        clock.putInt("BlacklightQuillFirst",(int)(((long)first+shots)%organs.size()));
         arrange(organs);
     }
     private static void arrange(List<QuillOrgan> organs){

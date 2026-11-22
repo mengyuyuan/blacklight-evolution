@@ -146,21 +146,33 @@ public final class QuillOrganRenderer extends EntityRenderer<QuillOrgan> {
             pose.popPose();
         }
     }
+    // Match the origin LevelRenderer supplies to EntityRenderDispatcher, including position corrections.
+    private static Vec3 renderPosition(net.minecraft.world.entity.Entity entity,float partial){
+        return new Vec3(Mth.lerp(partial,entity.xOld,entity.getX()),
+                Mth.lerp(partial,entity.yOld,entity.getY()),Mth.lerp(partial,entity.zOld,entity.getZ()));
+    }
+    @Override public boolean shouldRender(QuillOrgan q,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){
+        if(q.phase()==QuillOrgan.ORBIT && q.level().getEntity(q.actor()) instanceof net.minecraft.world.entity.LivingEntity owner){
+            var bounds=owner.getBoundingBox().expandTowards(owner.xOld-owner.getX(),owner.yOld-owner.getY(),owner.zOld-owner.getZ());
+            double radius=com.codex.blacklight.config.GameplayBalanceConfig.QUILL_ORBIT_RADIUS.get();
+            return q.firstSlot()>=0 && owner.shouldRender(x,y,z) && frustum.isVisible(bounds.inflate(radius+1));
+        }
+        return super.shouldRender(q,frustum,x,y,z);
+    }
     private void orbit(QuillOrgan q, net.minecraft.world.entity.LivingEntity owner, float partial,
                        PoseStack pose, MultiBufferSource buffers, int light){
-        var center=owner.getPosition(partial).add(0,owner.getBbHeight()*.80,0);
+        var center=renderPosition(owner,partial).add(0,owner.getBbHeight()*.80,0);
         double radius=com.codex.blacklight.config.GameplayBalanceConfig.QUILL_ORBIT_RADIUS.get();
         double time=q.level().getGameTime()+partial;
-        float yaw=Mth.rotLerp(partial,owner.yBodyRotO,owner.yBodyRot);
         int slot=q.firstSlot();
         if(slot<0)return;
-        var offset=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time,radius,yaw);
-        var ahead=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time+.25,radius,yaw);
+        var offset=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time,radius);
+        var ahead=com.codex.blacklight.combat.QuillFormation.offset(slot,q.formation(),time+.25,radius);
         var goal=center.add(offset);
         var wall=q.level().clip(new net.minecraft.world.level.ClipContext(center,goal,
                 net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,q));
         if(wall.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)goal=wall.getLocation().subtract(offset.normalize().scale(.18));
-        var delta=goal.subtract(q.getPosition(partial));
+        var delta=goal.subtract(renderPosition(q,partial));
         pose.pushPose();
         pose.translate(delta.x,delta.y,delta.z);
         pose.mulPose(new Quaternionf().rotationTo(new org.joml.Vector3f(0,1,-.2F).normalize(),ahead.subtract(offset).normalize().toVector3f()));
