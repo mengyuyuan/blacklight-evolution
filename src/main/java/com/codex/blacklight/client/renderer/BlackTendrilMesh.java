@@ -47,6 +47,27 @@ public final class BlackTendrilMesh {
         }
         return spine.length;
     }
+    /** Serrated blood seed with a pale bone point, three keratin hooks and three trailing fibres. */
+    static void dart(Surface s){
+        double[] y={-.52,-.41,-.21,.03,.24,.41,.71};
+        double[] radius={.046,.13,.205,.23,.16,.085,.003};
+        int[] meat={0xff611d32,0xff862e44,0xff782638,0xff511a2a,0xff913246,0xff6c2238,0xff471827,0xff702436};
+        int[] bone={0xffb99d79,0xffddc8a0,0xffc4af8d,0xffa58b70};
+        for(int j=0;j<y.length-1;j++)for(int i=0;i<8;i++){
+            double a=i*TAU/8,b=(i+1)*TAU/8;
+            s.quad(radial(a,radius[j],y[j]),radial(b,radius[j],y[j]),radial(b,radius[j+1],y[j+1]),
+                    radial(a,radius[j+1],y[j+1]),j==5?bone[i%4]:meat[(i+j/2)%8]);
+        }
+        for(int i=0;i<3;i++){
+            double a=i*TAU/3;
+            strand(s,null,new P[]{radial(a,.065,.44),radial(a,.19,.21),radial(a+.09,.30,-.01),
+                    radial(a+.16,.39,-.18),radial(a+.20,.39,-.32),radial(a+.21,.34,-.41)},
+                    new double[]{.017,.075,.097,.078,.041,.006},.54,true,false);
+            strand(s,null,new P[]{radial(a,.038,-.47),radial(a+.16,.054,-.59),
+                    radial(a+.50,.099,-.70),radial(a+.88,.092,-.82)},
+                    new double[]{.036,.031,.022,.005},.83,false,true);
+        }
+    }
     public static void shell(Surface s,double t,double seed,double fuse,double pop){
         double charge=ease(t,2,fuse-3);
         double beat=Math.pow(.5+.5*Math.cos((t-12)*TAU/10),5);

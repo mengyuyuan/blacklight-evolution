@@ -74,6 +74,95 @@ public final class SpiderWoundGameTest {
         for(int x=-width;x<=width;x++)for(int z=-width;z<=depth;z++)
             l.setBlock(center.offset(x,-1,z),Blocks.STONE.defaultBlockState(),2);
     }
+    @GameTest(template="blackwatch_arena",batch="greene_pursuit_handoff",timeoutTicks=735)
+    public static void pursuesAcrossCaveAndHandsOffOneBoss(GameTestHelper h){
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=-2;x<=2;x++)for(int z=-2;z<=6;z++){
+            int cx=(center.getX()>>4)+x,cz=(center.getZ()>>4)+z;
+            if(level.setChunkForced(cx,cz,true))forced.add(new net.minecraft.world.level.ChunkPos(cx,cz));
+        }
+        floor(level,center,13,91);
+        var b=boss(h,Vec3.atBottomCenterOf(center));var profile=new GameProfile(UUID.randomUUID(),"CaveSurvivor");
+        var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);p.setHealth(500);
+        level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);p.setNoGravity(true);p.setPos(b.position().add(0,0,12));
+        b.setNoAi(false);var start=b.position();p.setPos(start.add(0,0,85));state(b,0,0,0);
+        var saw=java.util.EnumSet.noneOf(SpiderActions.Move.class);
+        for(int i=1;i<=192;i++)h.runAfterDelay(i,()->saw.add(b.spider.actions.move()));
+        h.runAfterDelay(193,()->{
+            h.assertTrue(b.getZ()-start.z>22,"spider closes a real distance against a player 85 blocks away, travel="+(b.getZ()-start.z)+" moves="+saw+" tick="+b.tickCount+" stage="+b.greeneStage());
+            h.assertTrue(saw.contains(SpiderActions.Move.MARCH) && saw.contains(SpiderActions.Move.FLESH_VOLLEY),"pursuit must alternate chase and ranged pressure: "+saw);
+            System.out.println("CAVE_PRESSURE travel="+(b.getZ()-start.z)+" moves="+saw);
+            var skin=b.hurtRegions(0);var region=skin.get(SpiderAnatomy.FIRST_LEG);var pt=region.boxes().get(0).center;
+            var c=new HydraHurtContact.Contact(region.bone(),pt,new Vec3(1,0,0),com.codex.blacklight.infection.InfectedAttackStyle.TEAR);
+            b.hurtAt(p.damageSources().playerAttack(p),b.getMaxHealth()*4,c);
+            h.assertTrue(b.greeneStage()==GreeneBattleCycle.MOLTING,"lethal strike enters molt");
+            p.setGameMode(GameType.CREATIVE);
+        });
+        h.runAfterDelay(390,()->{
+            var st=b.spider.save();st.putDouble("HuskX",b.getX());st.putFloat("HuskYaw",23);b.spider.load(st);
+            h.assertTrue(!b.spiderData().contains("HuskYaw") && b.spiderData().getIntArray("LastPose").length==39*16,"old shell stamp is removed while preserving the actual collapse pose");
+        });
+        h.runAfterDelay(661,()->{try{
+            h.assertTrue(b.greeneStage()==GreeneBattleCycle.GUARDED && GreeneForm.of(b)==GreeneForm.GODDESS && !b.spider.first(),"full transition returns to the airborne combat form");
+            h.assertTrue(b.getHealth()==b.getMaxHealth(),"goddess starts with her own full bar");
+            var nearby=b.getBoundingBox().inflate(100);
+            h.assertTrue(level.getEntitiesOfClass(EncounterMob.class,nearby,m->m.kind()==EncounterKind.ELIZABETH_GREENE).size()==1 &&
+                    level.getEntitiesOfClass(GreeneSpider.class,nearby).isEmpty(),"only one boss and no persistent first-form entity");
+            System.out.println("CAVE_PRESSURE 460-tick molt, one goddess, no ground shell");
+        }finally{b.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}h.succeed();});
+    }
+    @GameTest(template="blackwatch_arena",batch="greene_new_pressure",timeoutTicks=200)
+    public static void standingStrikeAndCounterWindow(GameTestHelper h){
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));floor(level,center,25,25);
+        var b=boss(h,Vec3.atBottomCenterOf(center));var profile=new GameProfile(UUID.randomUUID(),"LimbProbe");
+        var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);p.setHealth(500);
+        level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);p.setNoGravity(true);p.setPos(b.position().add(0,0,12));
+        try{
+            state(b,0,0,0);
+            var joint=SpiderAnatomy.shin(0);
+            var midpoint=new Vec3(9.2065,.8195,-6.3235);
+            var mat=b.spider.jointMatrix(SpiderAnatomy.root(b,0),joint,0);
+            var pos=b.position().add(new Vec3(mat.transformPosition(midpoint.toVector3f())));
+            var outside=pos.subtract(b.position()).multiply(1,0,1).normalize();
+            var eye=pos.add(outside.scale(2));p.setPos(eye.add(0,-p.getEyeHeight(),0));
+            p.setYRot((float)Math.toDegrees(Math.atan2(outside.x,-outside.z)));p.setXRot(0);
+            var choice=TargetSelection.aimedBoss(p,List.of(b),p.getEyePosition(),pos.subtract(outside),0,4);
+            h.assertTrue(choice!=null && choice.region()==SpiderAnatomy.FIRST_LEG,"ground-level aim must select left front shaft "+choice);
+            float hp=b.getHealth();
+            p.attack(b.getParts()[SpiderAnatomy.FIRST_LEG]);
+            h.assertTrue(b.getHealth()<hp && b.spiderData().contains("Along0") && b.spiderData().getFloat("Wear0")>0,"a real player attack must injure the selected shaft");
+            b.spider.actions.tick(level);
+            h.assertTrue(b.spider.actions.move()==SpiderActions.Move.HEAVY_STAMP && b.spiderData().getInt("Foot")==0,"nearest intact foot selected for heavy stamp");
+            p.setPos(p.position().add(7,0,0));float playerHp=p.getHealth();
+            var frames=new JsonArray();
+            if(RECORD)for(int i=0;i<18;i++){atAge(b,i);frame(frames,b,i);}
+            atAge(b,18);b.spider.actions.tick(level);
+            h.assertTrue(b.spider.actions.lodged(0) && p.getHealth()==playerHp,"evaded impact leaves foot lodged");
+            var planted=SpiderLegPose.worldTip(b,0,0);double drift=0;
+            for(int tick=18;tick<58;tick++){atAge(b,tick);frame(frames,b,tick);drift=Math.max(drift,planted.distanceTo(SpiderLegPose.worldTip(b,0,0)));h.assertTrue(b.spider.exposedTendon(0) && b.spider.actions.lodged(0),"counter window at "+tick);}
+            h.assertTrue(drift<.40,"lodged foot stays in its actual floor contact during the counter: "+drift);
+            System.out.println("CAVE_PRESSURE planted tip drift="+drift);
+            if(RECORD)for(int i=58;i<=70;i++){atAge(b,i);frame(frames,b,i);}
+            write("heavy-stamp.json",frames);
+            atAge(b,58);h.assertTrue(!b.spider.actions.lodged(0),"window ends at 40 ticks");
+            var st=b.spiderData().copy();st.putInt("Action",SpiderActions.Move.FLESH_VOLLEY.ordinal());b.spiderData(st);
+            for(int tick:new int[]{17,17,26,35}){atAge(b,tick);b.spider.actions.tick(level);}
+            var shots=level.getEntitiesOfClass(GreeneProjectile.class,b.getBoundingBox().inflate(32),v->v.getOwner()==b && v.flesh());
+            h.assertTrue(shots.size()==15,"three distinct five-shot flesh waves, same tick cannot fire again: "+shots.size());
+            shots.forEach(Entity::discard);
+            b.greeneBattle().spiderKilled();
+            h.assertTrue(b.greeneStage()==GreeneBattleCycle.MOLTING && b.spiderData().getIntArray("LastPose").length==39*16,"molt captures the same injured rig");
+            h.assertTrue(!b.spiderData().contains("HuskX"),"old shell is not placed on the floor");
+            h.succeed();
+        }finally{b.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);}
+    }
     @GameTest(template="blackwatch_arena",batch="greene_abdomen",timeoutTicks=180)
     public static void bellyClearsFloorAcrossEveryDamageMask(GameTestHelper h){
         var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));floor(level,center,13,13);

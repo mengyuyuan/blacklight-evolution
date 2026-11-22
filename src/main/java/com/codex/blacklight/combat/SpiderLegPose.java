@@ -11,6 +11,9 @@ public final class SpiderLegPose {
     private SpiderLegPose(){}
     public record Pair(Quaternionf hip,Quaternionf knee){}
     public static Pair solve(Vec3 hip,Vec3 knee,Vec3 tip,Vec3 target){
+        return solve(hip,knee,tip,target,0);
+    }
+    private static Pair solve(Vec3 hip,Vec3 knee,Vec3 tip,Vec3 target,double twist){
         Vec3 first=knee.subtract(hip),last=tip.subtract(knee),line=target.subtract(hip);
         double a=first.length(),b=last.length();
         if(line.lengthSqr()<1e-7 || a<.01 || b<.01)return new Pair(new Quaternionf(),new Quaternionf());
@@ -21,6 +24,10 @@ public final class SpiderLegPose {
         if(plane.lengthSqr()<1e-6)plane=new Vec3(1,0,0);
         double along=(a*a-b*b+distance*distance)/(2*distance);
         Vec3 bend=direction.scale(along).add(plane.normalize().scale(Math.sqrt(Math.max(0,a*a-along*along))));
+        if(twist!=0){
+            var radial=bend.subtract(direction.scale(along));
+            bend=direction.scale(along).add(radial.scale(Math.cos(twist))).add(direction.cross(radial).scale(Math.sin(twist)));
+        }
         var hipRot=rotation(first,bend);
         var lower=rotation(last,direction.scale(distance).subtract(bend));
         return new Pair(hipRot,new Quaternionf(hipRot).conjugate().mul(lower));
@@ -52,7 +59,8 @@ public final class SpiderLegPose {
             }
         }
         boolean paired=move==SpiderActions.Move.PINCER || move==SpiderActions.Move.SWALLOW;
-        boolean attacking=move==SpiderActions.Move.STAB||move==SpiderActions.Move.SWEEP||move==SpiderActions.Move.POUNCE||paired;
+        boolean heavy=move==SpiderActions.Move.HEAVY_STAMP;
+        boolean attacking=heavy||move==SpiderActions.Move.STAB||move==SpiderActions.Move.SWEEP||move==SpiderActions.Move.POUNCE||paired;
         if(attacking && chosen>=0 && (leg==chosen || paired && leg%4==chosen%4)){
             var aim=new Vec3(state.getDouble("Ax"),state.getDouble("Ay")+.34,state.getDouble("Az"));
             float impact=move==SpiderActions.Move.POUNCE?29:move==SpiderActions.Move.SWEEP?22:move==SpiderActions.Move.SWALLOW?24:18;
@@ -90,12 +98,13 @@ public final class SpiderLegPose {
                 }
                 float gather=SpiderGesture.phrase(time,0,10,32,45);
                 dest=rest.lerp(arc,gather).add(0,1.1*SpiderGesture.phrase(time,1,6,7,12),0);
-            }else if(move==SpiderActions.Move.STAB){
+            }else if(heavy || move==SpiderActions.Move.STAB){
+                if(heavy)aim=aim.add(0,-.56,0);
                 var away=rest.subtract(aim).multiply(1,0,1).normalize();
-                var cocked=rest.lerp(aim,.26).add(away.scale(1.8)).add(0,6.4,0);
+                var cocked=rest.lerp(aim,.26).add(away.scale(heavy?2.45:1.8)).add(0,heavy?8.4:6.4,0);
                 var raised=rest.lerp(cocked,SpiderGesture.ease(time,2,12));
                 var driven=raised.lerp(aim,SpiderGesture.ease(time,12,18));
-                float pull=SpiderGesture.ease(time,23,41);
+                float pull=heavy?SpiderGesture.ease(time,58,70):SpiderGesture.ease(time,23,41);
                 dest=driven.lerp(rest,pull).add(away.scale(-1.3*Math.sin(Math.PI*pull)))
                         .add(0,3.1*Math.sin(Math.PI*pull),0);
             }else{
@@ -122,16 +131,25 @@ public final class SpiderLegPose {
             var catchAt=action.pincerCarry(partial).add(side).add(0,.38,0);
             dest=catchAt.lerp(rest,SpiderGesture.ease(time,28,44));
         }
-        if(state.contains("Flinch"+leg) && (!attacking || leg!=chosen)){
+        boolean pinned=heavy && chosen==leg && time>=18 && time<58;
+        double kneeTwist=pinned?(leg<4?1:-1)*(.084*SpiderGesture.phrase(time,26,31,32,38)+.13*SpiderGesture.phrase(time,44,50,51,57)):0;
+        if(state.contains("Flinch"+leg)){
             float since=boss.level().getGameTime()-state.getLong("Flinch"+leg)+partial;
             float recoil=SpiderGesture.phrase(since,0,3,4,13)*state.getFloat("Recoil"+leg);
             if(recoil>0){
                 Vec3 inward=boss.getPosition(partial).subtract(dest).multiply(1,0,1).normalize();
-                dest=dest.add(inward.scale(.85*recoil)).add(0,1.45*recoil,0);
+                var push=new Vec3(state.getFloat("PushX"+leg),0,state.getFloat("PushZ"+leg));
+                if(push.lengthSqr()<.04)push=inward;
+                if(pinned){
+                    // A strike bends the knee around the hip-to-tip axis while the foot stays caught.
+                    kneeTwist+=(push.dot(inward)>=0?1:-1)*.23*recoil;
+                    recoil=0;
+                }else if(attacking && leg==chosen)recoil*=.36F;
+                dest=dest.add(push.normalize().scale(1.7*recoil)).add(inward.scale(.35*recoil)).add(0,2.15*recoil,0);
             }
         }
         var local=new Vec3(SpiderAnatomy.root(boss,partial).invert().transformPosition(dest.subtract(boss.getPosition(partial)).toVector3f()));
-        return solve(hip,knee,tip,local);
+        return solve(hip,knee,tip,local,kneeTwist);
     }
 
     public static Vec3 worldTip(EncounterMob boss,int leg,float partial){

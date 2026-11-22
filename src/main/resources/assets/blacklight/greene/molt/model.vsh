@@ -46,7 +46,12 @@ void main(){
    }
    if(kind==0)surface=8;else if(j<35)surface=7;
    mat4 bone=mat4(texelFetch(bones,ivec2((j%4)*4+0,j/4),0),texelFetch(bones,ivec2((j%4)*4+1,j/4),0),texelFetch(bones,ivec2((j%4)*4+2,j/4),0),texelFetch(bones,ivec2((j%4)*4+3,j/4),0));
-   p=(root*bone*vec4(p,1)).xyz;if(kind==0)p*=.9912102;n=mat3(root)*mat3(bone)*n;
+   p=(root*bone*vec4(p,1)).xyz;if(kind==0){
+     p*=.9912102;
+     // The enclosing tissue draws the old limbs inward before the new body rises.
+     float close=smoothstep(11.65,13.15,time);
+     p=mix(p,vec3(.6,3.15,-.65),close);
+   }n=mat3(root)*mat3(bone)*n;
  }else if(kind==2){
    int i=gl_InstanceID;if(i<12 && (absent & (1<<i))!=0){gl_Position=vec4(2.,2.,2.,1.);return;}vec4 a=texelFetch(actors,ivec2(0,i),0), b=texelFetch(actors,ivec2(1,i),0),d=texelFetch(actors,ivec2(2,i),0);
    vec4 x=texelFetch(clamber,ivec2(j*3,i),0),y=texelFetch(clamber,ivec2(j*3+1,i),0),z=texelFetch(clamber,ivec2(j*3+2,i),0);

@@ -81,6 +81,7 @@ public final class SpiderAnatomy {
                     Vec3 center=origin.add(new Vec3(m.transformPosition(p.center().toVector3f())));
                     boxes.add(HydraContact.affine(center,p.half(),axis(m,1,0,0),axis(m,0,1,0),axis(m,0,0,1)));
                 }
+                if(leg>=0 && !tendon(id))SpiderLegSkin.add(boss,leg,partial,root,origin,matrices,boxes);
                 if(id==CROWN)boss.spider.addRootBoxes(-1,partial,boxes);
                 if(id>=FIRST_ROOT && id<FIRST_LEG)boss.spider.addRootBoxes(id-FIRST_ROOT,partial,boxes);
             }

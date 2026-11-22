@@ -42,6 +42,7 @@ public final class SpiderPhase {
         if(Math.abs(tilt(0))>.22F)return true;
         int foot=data().getInt("Foot");float t=actions.age(0);
         return switch(actions.move()){
+            case HEAVY_STAMP -> actions.lodged(leg);
             case STAB,SWEEP,POUNCE -> leg==foot && t>=18 && t<=40;
             case PINCER,SWALLOW -> leg%4==foot%4 && t>=16 && t<=40;
             case MARCH -> leg==foot && t>=21 && t<=32 || leg==data().getInt("RushSecond") && t>=38 && t<=50;
@@ -54,6 +55,8 @@ public final class SpiderPhase {
         var t=data().copy();t.putLong("SavedClock",now());return t;
     }
     public void load(CompoundTag t){
+        // Old encounters saved a floor prop independently of the collapse pose.
+        for(String key:List.of("HuskX","HuskY","HuskZ","HuskYaw"))t.remove(key);
         if(t.contains("SavedClock")){
             long delta=now()-t.getLong("SavedClock");t.remove("SavedClock");
             for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","LastTumor","OralAt","Swallowed","BlastAt","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
@@ -195,11 +198,32 @@ public final class SpiderPhase {
         if(leg<0 || broken(leg))return;
         var t=data().copy();
         float damage=amount*com.codex.blacklight.power.CombatScale.units(boss);
-        float progress=t.getFloat("Wear"+leg)+damage/boss.getMaxHealth()*(SpiderAnatomy.tendon(id) && exposedTendon(leg)?2.6F:1F);
+        float leverage=SpiderAnatomy.tendon(id) && exposedTendon(leg)?2.6F:actions.lodged(leg)?2F:1F;
+        float progress=t.getFloat("Wear"+leg)+damage/boss.getMaxHealth()*leverage;
         t.putFloat("Wear"+leg,progress);
-        if(progress<.075F && amount>0 && (!t.contains("Flinch"+leg) || now()-t.getLong("Flinch"+leg)>7)){
-            t.putLong("Flinch"+leg,now());
-            t.putFloat("Recoil"+leg,Math.min(1F,.24F+damage/boss.getMaxHealth()*18F));
+        var kind=hit.strike();
+        if(kind==FleshStrike.GENERIC){
+            kind=source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)?FleshStrike.QUILL:switch(hit.style()){
+                case CRUSH,BURST -> FleshStrike.HAMMER;
+                case PIERCE -> FleshStrike.QUILL;
+                case WHIP -> FleshStrike.LASH;
+                default -> source.getEntity() instanceof Player p && p.getMainHandItem().getItem() instanceof net.minecraft.world.item.SwordItem?FleshStrike.EDGE:FleshStrike.FIST;
+            };
+        }
+        if(progress<.075F && amount>0 && (!t.contains("Flinch"+leg) || now()-t.getLong("Flinch"+leg)>=5)){
+            var site=SpiderLegSkin.closest(boss,leg,hit.point());
+            var push=hit.normal().scale(kind==FleshStrike.LASH?1:-1);
+            t.putFloat("PushX"+leg,(float)push.x);t.putFloat("PushZ"+leg,(float)push.z);
+            t.putLong("Flinch"+leg,now());t.putInt("Impact"+leg,kind.id);
+            t.putBoolean("Upper"+leg,site.joint().startsWith("coxa"));
+            t.putFloat("Along"+leg,(float)site.along());t.putFloat("Around"+leg,(float)site.around());
+            t.putFloat("Recoil"+leg,Math.min(1F,(kind==FleshStrike.HAMMER?.83F:.53F)+damage/boss.getMaxHealth()*15F));
+            SpiderFoley.play(boss,hit.point(),switch(kind){
+                case EDGE,CLAW,LASH -> SpiderFoley.Cue.TEAR;
+                case QUILL -> SpiderFoley.Cue.NEEDLE;
+                default -> SpiderFoley.Cue.STRIKE;
+            },.85F);
+            SpiderFoley.strands(boss,hit.point(),hit.normal(),4);
         }
         if(progress<.075F && amount>0 && SpiderAnatomy.tendon(id) && exposedTendon(leg)
                 && actions.move()==SpiderActions.Move.PINCER && data().getBoolean("Gripped") && actions.age(0)<28){
@@ -208,15 +232,6 @@ public final class SpiderPhase {
         }
         if(progress>=.075F){
 
-            var kind=hit.strike();
-            if(kind==FleshStrike.GENERIC){
-                kind=source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)?FleshStrike.QUILL:switch(hit.style()){
-                    case CRUSH,BURST -> FleshStrike.HAMMER;
-                    case PIERCE -> FleshStrike.QUILL;
-                    case WHIP -> FleshStrike.LASH;
-                    default -> source.getEntity() instanceof Player p && p.getMainHandItem().getItem() instanceof net.minecraft.world.item.SwordItem?FleshStrike.EDGE:FleshStrike.FIST;
-                };
-            }
             if(kind==FleshStrike.EDGE || kind==FleshStrike.CLAW)GreeneSpider.detach(boss,leg,hit.normal().scale(-1));
             if(actions.move()!=SpiderActions.Move.REST)actions.cancel();
             if(feeding())interruptMeal();

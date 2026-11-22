@@ -16,7 +16,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 /** Spider form from the Greene pursuit. Spawned independently for model review. */
 public final class GreeneSpider extends Entity implements GeoEntity {
     public EncounterMob encounter;
-    public boolean husk;
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> LIMB=SynchedEntityData.defineId(GreeneSpider.class,net.minecraft.network.syncher.EntityDataSerializers.INT);
     private static final net.minecraft.network.syncher.EntityDataAccessor<CompoundTag> RELEASE =
             SynchedEntityData.defineId(GreeneSpider.class,net.minecraft.network.syncher.EntityDataSerializers.COMPOUND_TAG);

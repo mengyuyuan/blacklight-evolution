@@ -25,6 +25,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
     }
     private static void drawWounds(EncounterMob boss,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         var data=boss.spiderData();int meals=data.getInt("Meals");
+        SpiderLegInjury.draw(boss,partial,pose,buffers,light);
         SpiderTissue.mouth(boss,pose,buffers,light,partial);
         if(boss.spider.live() && data.contains("Swallowed")){
             float t=boss.level().getGameTime()-data.getLong("Swallowed")+partial;
@@ -98,16 +99,6 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             goddess.draw(boss.tickCount+partial,stack,buffers,light,overlay);
         }
         stack.popPose();
-        if(!boss.spider.first() && boss.spiderData().contains("HuskYaw")){
-            var s=boss.spiderData();var origin=boss.getPosition(partial);var shell=boss.greeneSpiderShell();
-            stack.pushPose();stack.translate(s.getDouble("HuskX")-origin.x,s.getDouble("HuskY")-origin.y,s.getDouble("HuskZ")-origin.z);
-            stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-s.getFloat("HuskYaw")));stack.scale(1.84F,.52F,1.84F);
-            shell.husk=true;
-            try{
-                spider.render(shell,180,partial,stack,buffers,light);
-                drawWounds(boss,partial,stack,buffers,light);
-            }finally{shell.husk=false;stack.popPose();}
-        }
         if(boss.spider.first()){
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             var origin=boss.getPosition(partial);

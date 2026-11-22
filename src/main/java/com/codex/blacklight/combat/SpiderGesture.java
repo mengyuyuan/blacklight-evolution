@@ -29,6 +29,17 @@ public final class SpiderGesture {
         float toward=foot<4?1F:-1F;
         float lateral=0, forward=0, twist=0;
         switch(a.move()){
+            case HEAVY_STAMP -> {
+                float rise=phrase(t,0,12,13,18),land=phrase(t,13,18,20,27),pry=phrase(t,47,56,58,68);
+                roll+=toward*(.18F*rise-.21F*land+.12F*pry);
+                pitch+=.15F*rise-.21F*land+.14F*pry;sink+=.42F*rise-.9F*land;
+                lateral+=toward*(-.7F*rise+.88F*land);forward+=1.05F*land-.55F*pry;
+            }
+            case FLESH_VOLLEY -> {
+                float load=phrase(t,0,12,32,42);
+                float kick=phrase(t,15,18,19,24)+phrase(t,24,27,28,33)+phrase(t,33,36,37,42);
+                pitch+=.16F*load-.15F*kick;forward+=.48F*load-.72F*kick;sink-=.21F*load;
+            }
             case STAB -> {
                 float draw=phrase(t,1,10,12,17),thrust=phrase(t,12,18,21,29);
                 float pry=phrase(t,22,26,28,36);

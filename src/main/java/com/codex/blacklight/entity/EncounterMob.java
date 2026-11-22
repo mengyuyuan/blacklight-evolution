@@ -250,7 +250,14 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         var n=c.normal();var attacker=source.getEntity();
         var tissue=new com.codex.blacklight.network.InfectedImpactPayload(attacker==null?getId():attacker.getId(),getId(),c.appearance(),c.point().x,c.point().y,c.point().z,(float)n.x,(float)n.y,(float)n.z,kind==EncounterKind.ELIZABETH_GREENE?1.25F:.5F,level().getGameTime()*31+getId());
         var sound=ModInfectedSounds.prepare(this,com.codex.blacklight.infection.InfectedSoundCue.contact(c.style()),c.point());
-        if(kind==EncounterKind.ELIZABETH_GREENE){
+        int spiderSlot=kind==EncounterKind.ELIZABETH_GREENE && spider.first()?SpiderAnatomy.NAMES.indexOf(c.bone()):-1;
+        int leg=SpiderAnatomy.legForRegion(spiderSlot);
+        if(leg>=0){
+            if(!spider.broken(leg)){
+                var response=SpiderAnatomy.tendon(spiderSlot) && spider.exposedTendon(leg)?BossImpactFeedback.Contact.WEAK:BossImpactFeedback.Contact.FLESH;
+                BossImpactFeedback.contact(this,source,c.point(),response,amount);
+            }
+        }else if(kind==EncounterKind.ELIZABETH_GREENE){
             int slot=c.bone()!=null&&c.bone().startsWith("weak_")?Integer.parseInt(c.bone().substring(5,6)):3;
             if (slot == 3 || armor[slot] > 0)
                 BossImpactFeedback.contact(this, source, c.point(), slot < 3 || exposed() ? BossImpactFeedback.Contact.WEAK : BossImpactFeedback.Contact.ARMOR, amount);

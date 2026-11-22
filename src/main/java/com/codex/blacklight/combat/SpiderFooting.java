@@ -165,7 +165,7 @@ public final class SpiderFooting {
     private boolean busy(int leg) {
         int selected=boss.spiderData().getInt("Foot");
         return switch(boss.spider.actions.move()) {
-            case STAB,SWEEP,POUNCE -> selected==leg;
+            case HEAVY_STAMP,STAB,SWEEP,POUNCE -> selected==leg;
             case MARCH -> selected==leg || boss.spiderData().getInt("RushSecond")==leg;
             case PINCER,SWALLOW -> selected>=0 && selected%4==leg%4;
             default -> false;
