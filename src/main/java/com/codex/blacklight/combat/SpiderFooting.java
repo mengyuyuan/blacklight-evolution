@@ -1,0 +1,103 @@
+package com.codex.blacklight.combat;
+
+import com.codex.blacklight.entity.EncounterMob;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.*;
+
+/** Feet stay in world space while the heavy shell turns. Only a change of support is sent to observers. */
+public final class SpiderFooting {
+    private static final int STRIDE = 9;
+    private static final int[] ORDER = {0, 6, 2, 4, 1, 7, 3, 5};
+    private static final String[] KEYS = {"L1","L2","L3","L4","R1","R2","R3","R4"};
+    private final EncounterMob boss;
+    private int cursor;
+
+    SpiderFooting(EncounterMob boss) { this.boss = boss; }
+
+    private Vec3 restPoint(int leg, float partial) {
+        var tip = SpiderAnatomy.TIPS.get(SpiderAnatomy.shin(leg));
+        return boss.getPosition(partial).add(tip.scale(1.9824204).yRot((float)Math.toRadians(180 - boss.skinYaw(partial))));
+    }
+
+    private Vec3 surface(ServerLevel level, Vec3 desired) {
+        if (!level.hasChunkAt(BlockPos.containing(desired))) return null;
+        var ray = level.clip(new ClipContext(desired.add(0, 3.4, 0), desired.add(0, -3.5, 0),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+        return ray.getType() == HitResult.Type.BLOCK && ray.getDirection() == net.minecraft.core.Direction.UP
+                ? ray.getLocation().add(0,.022,0) : null;
+    }
+
+    private static Vec3 position(CompoundTag foot, String prefix) {
+        return new Vec3(foot.getDouble(prefix+"X"),foot.getDouble(prefix+"Y"),foot.getDouble(prefix+"Z"));
+    }
+
+    private static void position(CompoundTag foot, String prefix, Vec3 p) {
+        foot.putDouble(prefix+"X",p.x);foot.putDouble(prefix+"Y",p.y);foot.putDouble(prefix+"Z",p.z);
+    }
+
+    private CompoundTag planted() { return boss.spiderData().getCompound("Footing"); }
+
+    public Vec3 foot(int leg, float partial) {
+        var contacts = planted();
+        if (!contacts.contains(KEYS[leg])) return restPoint(leg,partial);
+        var step = contacts.getCompound(KEYS[leg]);
+        Vec3 end = position(step,"To");
+        float phase = Mth.clamp((boss.level().getGameTime()-step.getLong("At")+partial)/STRIDE,0,1);
+        if (phase>=1) return end;
+        var start = position(step,"From");
+        double lift = Math.min(2.3,.48 + .19*start.distanceTo(end));
+        return start.lerp(end,phase*phase*(3-2*phase)).add(0,lift*Math.sin(Math.PI*phase),0);
+    }
+
+    public void tick(ServerLevel level) {
+        var contacts = planted();
+        long now = level.getGameTime();
+        boolean empty = contacts.isEmpty();
+        if (!empty) {
+            for (int i=0;i<8;i++) {
+                if (!contacts.contains(KEYS[i]) || boss.spider.broken(i)) continue;
+                var step = contacts.getCompound(KEYS[i]);
+                if (step.getLong("At")+STRIDE==now && step.getBoolean("Contact") && !busy(i)) {
+                    var at=position(step,"To");SpiderFoley.step(boss,at);
+                }
+            }
+            if ((now&1)!=0 || boss.spider.actions.move()==SpiderActions.Move.POUNCE) return;
+        }
+        int lifting=0;for(int i=0;i<8;i++)if(!boss.spider.broken(i) && contacts.contains(KEYS[i]) &&
+                now-contacts.getCompound(KEYS[i]).getLong("At")<STRIDE)lifting++;
+        if(lifting>=Math.max(1,Math.min(3,(8-Integer.bitCount(boss.spider.brokenMask()))/2)))return;
+        var next=contacts.copy();
+        for (int test=0;test<(empty?8:2);test++) {
+            int leg=ORDER[cursor++ & 7];
+            if(boss.spider.broken(leg)||busy(leg))continue;
+            Vec3 neutral=restPoint(leg,1);
+            Vec3 ground=surface(level,neutral);
+            Vec3 end=ground==null?neutral.add(0,-1.7,0):ground;
+            var old=contacts.getCompound(KEYS[leg]);
+            if(!old.isEmpty() && now-old.getLong("At")<STRIDE)continue;
+            var prev=old.isEmpty()?end:position(old,"To");
+            // Turning may leave the old foot on a different block height. Never plant on removed support.
+            var support=old.isEmpty()?null:surface(level,prev);
+            boolean valid=support!=null && Math.abs(support.y-prev.y)<.16;
+            if(!old.isEmpty() && prev.distanceToSqr(end)<2.3*2.3 && (valid || ground==null && !old.getBoolean("Contact")))continue;
+            var step=new CompoundTag();
+            position(step,"From",prev);position(step,"To",end);step.putLong("At",old.isEmpty()?now-STRIDE-1:now);
+            step.putBoolean("Contact",ground!=null);next.put(KEYS[leg],step);
+            if(!empty)break;
+        }
+        if(!next.equals(contacts)){var s=boss.spiderData().copy();s.put("Footing",next);boss.spiderData(s);}
+    }
+
+    private boolean busy(int leg) {
+        int selected=boss.spiderData().getInt("Foot");
+        return switch(boss.spider.actions.move()) {
+            case STAB,SWEEP,POUNCE -> selected==leg;
+            case PINCER,SWALLOW -> selected>=0 && selected%4==leg%4;
+            default -> false;
+        };
+    }
+}

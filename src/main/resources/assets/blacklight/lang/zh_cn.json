@@ -1395,5 +1395,19 @@
   "boss.blacklight.greene_spider.open": " · 可投喂",
   "boss.blacklight.greene_spider.closed": " · 闭口",
   "boss.blacklight.greene_spider.sealed": " · 回血已破坏",
-  "message.blacklight.greene_grip_hint": "按 %s 植入寄生瘤"
+  "message.blacklight.greene_grip_hint": "按 %s 植入寄生瘤",
+  "subtitle.blacklight.greene.spider.plant": "压足着地",
+  "subtitle.blacklight.greene.spider.load": "足筋绷紧",
+  "subtitle.blacklight.greene.spider.strike": "甲足钉入地面",
+  "subtitle.blacklight.greene.spider.scrape": "甲足刮过岩面",
+  "subtitle.blacklight.greene.spider.catch": "肉掌合拢",
+  "subtitle.blacklight.greene.spider.inhale": "口齿分开吸气",
+  "subtitle.blacklight.greene.spider.strain": "触手绷紧拖拽",
+  "subtitle.blacklight.greene.spider.gulp": "猎物滑入口内",
+  "subtitle.blacklight.greene.spider.tear": "筋束撕裂",
+  "subtitle.blacklight.greene.spider.fracture": "骨甲折断",
+  "subtitle.blacklight.greene.spider.needle": "头须刺入宿主",
+  "subtitle.blacklight.greene.spider.rupture": "寄生瘤爆裂",
+  "subtitle.blacklight.greene.spider.brace": "口齿扣紧",
+  "subtitle.blacklight.greene.spider.shed": "巢膜裂开"
 }

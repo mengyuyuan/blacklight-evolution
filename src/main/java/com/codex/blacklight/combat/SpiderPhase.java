@@ -22,7 +22,8 @@ public final class SpiderPhase {
     private CompoundTag cachedState;
     private List<HydraContact.Region> cachedSkin;
     public final SpiderActions actions;
-    public SpiderPhase(EncounterMob boss){this.boss=boss;actions=new SpiderActions(boss);}
+    public final SpiderFooting footing;
+    public SpiderPhase(EncounterMob boss){this.boss=boss;actions=new SpiderActions(boss);footing=new SpiderFooting(boss);}
     private CompoundTag data(){return boss.spiderData();}
     public boolean first(){return boss.greeneOutbreak() && boss.greeneBattle().armourWave()==1;}
     public boolean live(){return first() && boss.greeneStage()==GreeneBattleCycle.GUARDED && boss.isAlive();}
@@ -48,9 +49,14 @@ public final class SpiderPhase {
     public void load(CompoundTag t){
         if(t.contains("SavedClock")){
             long delta=now()-t.getLong("SavedClock");t.remove("SavedClock");
-            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","LastTumor","OralAt"))
+            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","LastTumor","OralAt","Swallowed","BlastAt"))
                 if(t.contains(key))t.putLong(key,t.getLong(key)+delta);
-            for(int i=0;i<8;i++)if(t.contains("Break"+i))t.putLong("Break"+i,t.getLong("Break"+i)+delta);
+            for(String leg:t.getCompound("Footing").getAllKeys()){
+                var step=t.getCompound("Footing").getCompound(leg);step.putLong("At",step.getLong("At")+delta);
+            }
+            for(int i=0;i<8;i++)for(String prefix:List.of("Break","Flinch")){
+                String key=prefix+i;if(t.contains(key))t.putLong(key,t.getLong(key)+delta);
+            }
         }
         boss.spiderData(t);
     }
@@ -74,7 +80,13 @@ public final class SpiderPhase {
         int limb=SpiderAnatomy.leg(joint);
         if(limb<0 || !broken(limb))return 0;
         float age=Math.max(0,now()-data().getLong("Break"+limb)+partial);
-        float swing=Mth.clamp(age/8F,0,1);
+        var kind=FleshStrike.byId(strike(limb));
+        float swing=switch(kind){
+            case LASH -> SpiderGesture.ease(age,2,9)-.34F*SpiderGesture.phrase(age,0,2,2,6);
+            case HAMMER -> SpiderGesture.ease(age,-.4F,3);
+            case MUSCLE -> SpiderGesture.ease(age,0,6);
+            default -> SpiderGesture.ease(age,0,5);
+        };
         float recoil=(float)Math.sin(age*.52)*Math.max(0,1-age/18);
         float direction=(limb<4?1F:-1F)*data().getFloat("Side"+limb);
         float angle=switch(FleshStrike.byId(strike(limb))){
@@ -107,7 +119,7 @@ public final class SpiderPhase {
             return joint.equals(ARM)?pose.hip():pose.knee();
         }
         int limb=SpiderAnatomy.leg(joint);
-        if(limb<0)return null;
+        if(limb<0)return SpiderGesture.upper(boss,joint,partial);
         var origin=boss.position();float yaw=boss.skinYaw(partial);
         if(now()!=poseTick || data()!=poseState || posePartial!=partial || poseYaw!=yaw || !origin.equals(poseOrigin)){
             Arrays.fill(sampled,false);poseState=data();poseTick=now();posePartial=partial;poseYaw=yaw;poseOrigin=origin;
@@ -136,7 +148,14 @@ public final class SpiderPhase {
         }
         if(joint.startsWith("fang_") && feeding()){
             int index=Integer.parseInt(joint.substring(5));
-            return (index<5?-.49F:.40F)*Mth.clamp((now()-data().getLong("MealStart")+partial)/5F,0,1);
+            float age=now()-data().getLong("MealStart")+partial;
+            float until=data().getLong("SwallowAt")-now()-partial;
+            return (index<5?-.63F:.54F)*SpiderGesture.ease(age,index*.27F,index*.27F+5F)
+                    *(.73F+.27F*SpiderGesture.ease(until,0,4));
+        }
+        if(live() && joint.startsWith("fang_") && data().contains("Swallowed")){
+            float t=now()-data().getLong("Swallowed")+partial;
+            if(t<10)return (joint.charAt(5)=='1'?-.14F:.16F)*SpiderGesture.phrase(t,-.5F,2,3,10);
         }
         return actions.flex(joint,partial);
     }
@@ -148,20 +167,20 @@ public final class SpiderPhase {
         return m;
     }
     public void contact(int id,DamageSource source,float amount,HydraHurtContact.Contact hit){
-        if(id==SpiderAnatomy.CROWN && actions.move()==SpiderActions.Move.CATALYZE){actions.cancel();return;}
-        if(id>=SpiderAnatomy.FIRST_ROOT && id<SpiderAnatomy.FIRST_LEG && feeding()){interruptMeal();return;}
+        if(id==SpiderAnatomy.CROWN && actions.move()==SpiderActions.Move.CATALYZE){SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.1F);actions.cancel();return;}
+        if(id>=SpiderAnatomy.FIRST_ROOT && id<SpiderAnatomy.FIRST_LEG && feeding()){SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.1F);SpiderFoley.strands(boss,hit.point(),hit.normal(),5);interruptMeal();return;}
         int leg=SpiderAnatomy.legForRegion(id);
         if(leg<0 || broken(leg))return;
         var t=data().copy();
         float damage=amount*com.codex.blacklight.power.CombatScale.units(boss);
         float progress=t.getFloat("Wear"+leg)+damage/boss.getMaxHealth()*(SpiderAnatomy.tendon(id) && exposedTendon(leg)?2.6F:1F);
         t.putFloat("Wear"+leg,progress);
+        if(progress<.075F && amount>0 && (!t.contains("Flinch"+leg) || now()-t.getLong("Flinch"+leg)>7)){
+            t.putLong("Flinch"+leg,now());
+            t.putFloat("Recoil"+leg,Math.min(1F,.24F+damage/boss.getMaxHealth()*18F));
+        }
         if(progress>=.075F){
-            if(actions.move()!=SpiderActions.Move.REST)actions.cancel();
-            if(feeding())interruptMeal();
-            t=data().copy();
-            t.putFloat("Wear"+leg,progress);
-            t.putInt("Lost",brokenMask()|(1<<leg));
+
             var kind=hit.strike();
             if(kind==FleshStrike.GENERIC){
                 kind=source.is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)?FleshStrike.QUILL:switch(hit.style()){
@@ -172,19 +191,20 @@ public final class SpiderPhase {
                 };
             }
             if(kind==FleshStrike.EDGE || kind==FleshStrike.CLAW)GreeneSpider.detach(boss,leg,hit.normal().scale(-1));
+            if(actions.move()!=SpiderActions.Move.REST)actions.cancel();
+            if(feeding())interruptMeal();
+            t=data().copy();t.putFloat("Wear"+leg,progress);t.putInt("Lost",brokenMask()|(1<<leg));
             t.putInt("Strike"+leg,kind.id);t.putLong("Break"+leg,now());
             var normal=hit.normal().yRot((float)Math.toRadians(boss.skinYaw(0)-180));
             t.putFloat("Side"+leg,normal.x<0?-1:1);
             t.putInt("DownSide",leg<4?-1:1);t.putLong("DownUntil",now()+80);
             GreeneFeedback.broken(boss,hit.point());
-            var sound=switch(kind){
-                case EDGE,CLAW -> net.minecraft.sounds.SoundEvents.PLAYER_ATTACK_SWEEP;
-                case HAMMER -> net.minecraft.sounds.SoundEvents.IRON_GOLEM_HURT;
-                case LASH -> net.minecraft.sounds.SoundEvents.LEASH_KNOT_BREAK;
-                case QUILL -> net.minecraft.sounds.SoundEvents.TRIDENT_HIT;
-                default -> net.minecraft.sounds.SoundEvents.PLAYER_ATTACK_KNOCKBACK;
-            };
-            boss.level().playSound(null,hit.point().x,hit.point().y,hit.point().z,sound,net.minecraft.sounds.SoundSource.HOSTILE,2F,.72F);
+            SpiderFoley.play(boss,hit.point(),switch(kind){
+                case EDGE,CLAW,LASH -> SpiderFoley.Cue.TEAR;
+                case QUILL -> SpiderFoley.Cue.NEEDLE;
+                default -> SpiderFoley.Cue.FRACTURE;
+            },1.65F);
+            SpiderFoley.strands(boss,hit.point(),hit.normal().scale(-1),8);
             BossImpactFeedback.contact(boss,source,hit.point(),BossImpactFeedback.Contact.BREAK,amount);
         }
         boss.spiderData(t);
@@ -249,7 +269,9 @@ public final class SpiderPhase {
             var points=new ArrayList<Vec3>(13);
             for(int i=0;i<=12;i++){
                 double u=i/12D*extension;
-                points.add(base.lerp(end,u).add(0,Math.sin(u*Math.PI)*2.8,0));
+                var lateral=new Vec3(end.z-base.z,0,base.x-end.x).normalize();
+                double crest=Math.sin(Math.PI*u);
+                points.add(base.lerp(end,u).add(lateral.scale(crest*(.62*Math.sin(5*u-t*.14)))).add(0,crest*(2.8+.35*Math.cos(9*u-t*.23)),0));
             }
             return points;
         }
@@ -260,10 +282,17 @@ public final class SpiderPhase {
         var b=prey.getPosition(partial).add(0,prey.getBbHeight()*.52,0);
         double side=slot==1?1:slot==2?-1:0;
         var cross=new Vec3(b.z-a.z,0,a.x-b.x).normalize();
-        var points=new ArrayList<Vec3>(9);
-        for(int i=0;i<=8;i++){
-            double u=i/8D,arch=Math.sin(u*Math.PI);
-            points.add(a.lerp(b,u).add(cross.scale(arch*(side*1.8+.23*Math.sin(now()*.22+i*.9)))).add(0,arch*.65,0));
+        float age=now()-data().getLong("MealStart")+partial;
+        float drag=data().getLong("DragAt")-data().getLong("MealStart");
+        double extension=SpiderGesture.ease(age+1,0,drag*.69F);
+        double taut=SpiderGesture.ease(age,drag*.65F,drag+4);
+        var points=new ArrayList<Vec3>(13);
+        for(int i=0;i<=12;i++){
+            double u=i/12D*extension,arch=Math.sin(u*Math.PI);
+            double wave=Math.sin(u*8-age*.34+slot)*(.22+.59*(1-taut));
+            var curl=cross.scale(arch*(side*1.5+wave));
+            double sag=arch*(1.8*(1-taut)-Math.min(1.2,.08*a.distanceTo(b))*taut);
+            points.add(a.lerp(b,u).add(curl).add(0,sag,0));
         }
         return points;
     }
@@ -301,14 +330,18 @@ public final class SpiderPhase {
                 spider.swallow(food);
         });
     }
+    public static Vec3 tumorSite(int i){
+        return new Vec3(i==0?1.64:i==1?.32:1.04,i==2?3.72:4.56,i==2?-1.25:-2.21);
+    }
     private void swallow(Mob mob){
         var t=data().copy();boolean marked=mob.getPersistentData().getBoolean(TUMOR);
         float fraction=mealSize(mob);mob.discard();t.remove("Prey");t.remove("PreyId");
+        t.putLong("Swallowed",now());
         if(marked){t.putInt("Meals",Math.min(3,t.getInt("Meals")+1));t.putLong("LastTumor",now());}
         boolean again=fraction==.02F && !t.getBoolean("QuickMeal");
         t.putBoolean("QuickMeal",again);t.putLong("NextMeal",now()+(again?6:100));boss.spiderData(t);
-        boss.heal(fraction*boss.getMaxHealth()/(float)com.codex.blacklight.power.CombatScale.units(boss));boss.playSound(net.minecraft.sounds.SoundEvents.GENERIC_EAT,2,.59F);
-        if(sealed())GreeneFeedback.broken(boss,mouth(1));
+        boss.heal(fraction*boss.getMaxHealth()/(float)com.codex.blacklight.power.CombatScale.units(boss));SpiderFoley.play(boss,mouth(1),SpiderFoley.Cue.GULP,1.6F);
+
     }
     public boolean receiveThrown(Mob prey,int part,DamageSource source,double time){
         if(!live() || !evolved(prey) || !prey.isAlive() || !prey.getPersistentData().getBoolean(TUMOR))return false;
@@ -320,6 +353,7 @@ public final class SpiderPhase {
     private boolean thrownContact(Mob prey,int part,DamageSource source){
         if(!live() || !evolved(prey) || !prey.isAlive() || !prey.getPersistentData().getBoolean(TUMOR))return false;
         var at=prey.position();prey.discard();
+        SpiderFoley.play(boss,at,SpiderFoley.Cue.RUPTURE,1.6F);
         if(part==SpiderAnatomy.MOUTH && feeding()){
             interruptMeal();var t=data().copy();t.putInt("Oral",Math.min(2,t.getInt("Oral")+1));t.putLong("OralAt",now());boss.spiderData(t);
             GreeneFeedback.broken(boss,mouth(1));
@@ -337,10 +371,20 @@ public final class SpiderPhase {
     }
     public void tick(){
         if(!live() || !(boss.level() instanceof ServerLevel level) || boss.isNoAi())return;
+        if(data().getInt("Meals")==3 && data().contains("LastTumor")){
+            long since=now()-data().getLong("LastTumor");
+            if(since>=12 && since<=22 && (since-12)%5==0){
+                int slot=(int)(since-12)/5;var at=SpiderAnatomy.point(boss,1,tumorSite(slot));
+                SpiderFoley.play(boss,at,SpiderFoley.Cue.RUPTURE,.98F+slot*.23F);
+                SpiderFoley.strands(boss,at,mouth(1).subtract(at),6);
+                if(slot==2)GreeneFeedback.broken(boss,at);
+            }
+        }
+        footing.tick(level);
         actions.tick(level);
         if(actions.move()!=SpiderActions.Move.REST || sealed())return;
         if(feeding()){
-            if(now()==data().getLong("MealStart")+3)boss.playSound(net.minecraft.sounds.SoundEvents.SPIDER_AMBIENT,1.8F,.48F);
+
             var entity=level.getEntity(data().getUUID("Prey"));
             if(entity!=null && entity.getId()!=data().getInt("PreyId")){var sync=data().copy();sync.putInt("PreyId",entity.getId());boss.spiderData(sync);}
             if(!(entity instanceof Mob mob) || !mob.isAlive() || ConsumeControl.protectedEntity(mob)){interruptMeal();return;}
@@ -351,12 +395,23 @@ public final class SpiderPhase {
             var delta=target.subtract(mob.getBoundingBox().getCenter());
             var barrier=level.clip(new ClipContext(mob.getBoundingBox().getCenter(),mouth,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,mob));
             if(barrier.getType()!=HitResult.Type.MISS || now()-data().getLong("MealStart")>130){interruptMeal();return;}
-            if(now()<data().getLong("DragAt"))return;
+            long dragAge=now()-data().getLong("DragAt");
+            if(dragAge<0)return;
+            if(dragAge==0){
+                SpiderFoley.play(boss,mob.getBoundingBox().getCenter(),SpiderFoley.Cue.STRAIN,mob instanceof BlacklightHydra?1.65F:1F);
+                SpiderFoley.strands(boss,mob.getBoundingBox().getCenter(),delta,4);
+            }
             mob.getNavigation().stop();
             mob.setDeltaMovement(Vec3.ZERO);mob.fallDistance=0;mob.hurtMarked=true;
             if(delta.length()>.52){
                 var before=mob.position();
-                var movement=delta.normalize().scale(Math.min(1.45,delta.length()));
+                double ramp=.53+.47*SpiderGesture.ease(dragAge,0,5);
+                double resistance=mob instanceof BlacklightHydra?.87+.13*Math.cos(dragAge*.63):1;
+                var movement=delta.normalize().scale(Math.min(1.45*ramp*resistance,delta.length()));
+                if(delta.horizontalDistanceSqr()>.15){
+                    float face=(float)Math.toDegrees(Math.atan2(-delta.x,delta.z));
+                    mob.yBodyRot=Mth.approachDegrees(mob.yBodyRot,face,6);
+                }
                 mob.move(net.minecraft.world.entity.MoverType.SELF,movement);
                 if(mob.position().distanceToSqr(before)<.008){interruptMeal();return;}
                 return;
@@ -374,9 +429,9 @@ public final class SpiderPhase {
             boolean quick=mealSize(mob)==.02F && mob.distanceToSqr(mouth)<12*12;
             var t=data().copy();t.putUUID("Prey",mob.getUUID());t.putInt("PreyId",mob.getId());
             var local=new Vec3(SpiderAnatomy.root(boss,1).invert().transformPosition(mob.getBoundingBox().getCenter().subtract(boss.position()).toVector3f()));
-            t.putBoolean("PreyLeft",local.x<1.04);t.putFloat("MealYaw",boss.skinYaw(1));
+            t.putBoolean("HeavyPrey",mob instanceof BlacklightHydra);t.putBoolean("PreyLeft",local.x<1.04);t.putFloat("MealYaw",boss.skinYaw(1));
             t.putLong("MealStart",now());t.putLong("DragAt",now()+(quick?7:29));t.putLong("SwallowAt",now()+(quick?24:50));boss.spiderData(t);
-            boss.playSound(net.minecraft.sounds.SoundEvents.SPIDER_AMBIENT,2,.63F);break;
+            SpiderFoley.play(boss,mouth,SpiderFoley.Cue.INHALE,1.7F);break;
         }
     }
     private static float mealSize(Mob mob){
