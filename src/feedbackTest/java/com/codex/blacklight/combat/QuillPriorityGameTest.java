@@ -529,7 +529,7 @@ public final class QuillPriorityGameTest {
             }
         });
     }
-    @GameTest(template="wall_test",timeoutTicks=220,batch="quill_air_lock_range")
+    @GameTest(template="wall_test",timeoutTicks=600,batch="quill_air_lock_range")
     public static void airborneShoulderAndOrbitHitRearLockAt42Blocks(GameTestHelper h){
         var level=h.getLevel();
         var p=join(h,"RearAirHeavy");
@@ -545,6 +545,18 @@ public final class QuillPriorityGameTest {
                 if(level.setChunkForced(x,z,true))forced.add(chunk);
                 level.getChunk(x,z);
             }
+        // Entity-section loading is asynchronous on NeoForge's accelerated GameTest server.
+        h.startSequence().thenWaitUntil(()->{
+            java.util.concurrent.locks.LockSupport.parkNanos(20_000_000L);
+            for(int z=net.minecraft.util.Mth.floor(start.z)>>4;z<=far.getZ()>>4;z++)
+                h.assertTrue(level.isPositionEntityTicking(new BlockPos(far.getX(),far.getY(),z<<4)),
+                        "waiting for the entire projectile lane to tick");
+        }).thenExecute(()->runRearAirHeavy(h,p,start,forced,view));
+    }
+    private static void runRearAirHeavy(GameTestHelper h,ServerPlayer p,net.minecraft.world.phys.Vec3 start,
+                                        List<net.minecraft.world.level.ChunkPos> forced,int view){
+        var level=h.getLevel();
+        var players=level.getServer().getPlayerList();
         p.connection.teleport(start.x,start.y,start.z,180,0);
         var state=QuillHarvest.state(p);
         state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);state.addBiomass(1000);
@@ -565,12 +577,15 @@ public final class QuillPriorityGameTest {
         float[] hpAtLaunch={0};
         h.onEachTick(()->{
             if(started[0]<0){
-                if(!level.isPositionEntityTicking(far)||level.getEntity(enemy.getId())!=enemy)return;
+                if(level.getEntity(enemy.getId())!=enemy){
+                    java.util.concurrent.locks.LockSupport.parkNanos(10_000_000L);
+                    return;
+                }
                 CombatTargeting.requestLock(p,enemy.getId());
                 h.assertTrue(CombatTargeting.locked(p)==enemy,"rear target locked at 42 blocks");
-                started[0]=level.getGameTime();
+                started[0]=h.getTick();
             }
-            int t=(int)(level.getGameTime()-started[0]);
+            int t=(int)(h.getTick()-started[0]);
             p.setOnGround(false);p.setNoGravity(true);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             WeaponCombatSystem.acceptInput(p,false,t==2 || t>=60 && t<97);
             p.tickCount++;WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
