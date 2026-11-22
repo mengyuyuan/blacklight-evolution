@@ -16,6 +16,7 @@ vec3 at(int row,float u){
  return mix(texelFetch(paths,ivec2(i,row),0).xyz,texelFetch(paths,ivec2(min(15,i+1),row),0).xyz,fract(x));
 }
 
+uniform float hydraHeight;
 uniform sampler2D clamber;uniform int absent; uniform int row0;uniform vec3 hit[3];uniform float drain,radius;out float digested;
 vec3 siphon(vec3 p,vec3 local,int row,float progress,float d){
  float delay=.43*clamp(d,0.,1.);
@@ -59,11 +60,20 @@ void main(){
    p=vec3(dot(x,v),dot(y,v),dot(z,v));n=vec3(dot(x.xyz,n),dot(y.xyz,n),dot(z.xyz,n));
    p=siphon(p,pos,i,d.z,length(pos-vec3(0,1.14,0))/1.4);
    texuv=vec2((uv.x+mod(d.y,2.))*.5,(uv.y+floor(d.y*.5))*.5);
- }else if(kind==6){
+ }else if(kind==6 || kind==9){
    p=(root*vec4(p,1)).xyz;n=mat3(root)*n;
    vec3 ds=vec3(length(pos-hit[0]),length(pos-hit[1]),length(pos-hit[2]));
    int k=clamp(j,0,2);
+   vec3 planted=p;
+   float h=clamp(pos.y/max(.01,hydraHeight),0.,1.);
+   if(kind==9)p.xz+=vec2(sin(time*2.7+float(row0)),cos(time*3.1))*.22*h*h*(1.+drain);
    p=siphon(p,pos,row0+k,drain,ds[k]/radius);
+   if(kind==9){
+     float root=1.-smoothstep(.06,.24,h);
+     float retract=smoothstep(.83,.997,drain);
+     p=mix(p,planted-vec3(0.,1.8*retract,0.),root);
+     digested=mix(digested,retract,root);
+   }
  }else{surface=3+j;p=(root*vec4(p,1)).xyz;}
  wp=p;norm=n;gl_Position=camera*vec4(p,1);
 }

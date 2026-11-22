@@ -3,6 +3,7 @@ package com.codex.blacklight.client.renderer;
 import com.codex.blacklight.entity.EncounterMob;
 import com.codex.blacklight.client.ShaderPackCompat;
 import com.codex.blacklight.combat.GreeneBattleCycle;
+import com.codex.blacklight.combat.GreeneHydraVents;
 import net.minecraft.world.phys.Vec3;
 import com.codex.blacklight.combat.GreeneForm;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -177,10 +178,26 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         tightPixels();
         bind(unit,texture);glTexSubImage2D(GL_TEXTURE_2D,0,0,0,w,h,format,GL_FLOAT,data);
     }
+    private final float[] ventFloor=new float[4];
+    private boolean plantHydra(EncounterMob boss,int slot,float t,float partial){
+        int captive=12+slot;
+        var foot=GreeneHydraVents.read(boss.greeneBattleData(),captive);
+        if(foot==null)return false;
+        float rotation=(float)Math.toRadians(180-boss.greeneBattle().collapseYaw());
+        var at=foot.subtract(boss.getPosition(partial)).yRot(-rotation).scale(1/GreeneForm.OUTBREAK_SCALE);
+        ventFloor[slot]=(float)at.y;
+        float rise=GreeneHydraVents.emergence(captive,t*20);
+        float y=(float)at.y-(.20F+GreeneHydraVents.BURIAL_DEPTH*(1-rise))/GreeneForm.OUTBREAK_SCALE;
+        // The captured native rig is already maximum size in blocks. Cancel the cinematic scene scale.
+        new Matrix4f().translation((float)at.x,y,(float)at.z)
+                .rotateY((float)Math.atan2(-at.x,-at.z)).scale(1/GreeneForm.OUTBREAK_SCALE).get(animalMatrices,slot*17);
+        return true;
+    }
     private void posePrey(EncounterMob boss,float t,float partial,int light){
         for(int i=0;i<4;i++){
             preyCounts[i]=0;int k=i*17;
             if(animalMatrices[k+16]>=1 || (boss.greeneBattle().missingMoltActors()&(1<<(12+i)))!=0)continue;
+            if(GreeneHydraVents.isHydra(boss.greeneBattleData(),12+i) && !plantHydra(boss,i,t,partial))continue;
             brood.pose(boss,i,t,partial,light);int count=brood.vertexCount();if(count==0)continue;
             if(staging.capacity()<count*12)staging=org.lwjgl.BufferUtils.createFloatBuffer(count*12);
             brood.upload(staging);glBindBuffer(GL_ARRAY_BUFFER,preyVbo[i]);glBufferData(GL_ARRAY_BUFFER,staging,GL_STREAM_DRAW);
@@ -233,11 +250,6 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             int lo=Math.min(144,ai)*climbPose.length,hi=Math.min(144,bi)*climbPose.length;float mix=frame-ai;
             for(int i=0;i<climbPose.length;i++){float v=climbFrames[lo+i];climbPose[i]=v+(climbFrames[hi+i]-v)*mix;}
         }
-        // Translate the animated hydra and its three attachment tracks together to the server's clear vent.
-        var hydraOffset=com.codex.blacklight.combat.GreeneMolt.readOffset(boss.greeneBattleData());
-        animalMatrices[12]+=(float)hydraOffset.x;
-        animalMatrices[13]+=(float)hydraOffset.y;
-        animalMatrices[14]+=(float)hydraOffset.z;
         posePrey(boss,t,partial,packedLight);
         if(t<1.5F)blendLastSpiderPose(boss,t);
         System.arraycopy(bones,0,boneUpload,0,BONES);
@@ -272,7 +284,9 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         integer(model,"kind",6);
         for(int i=0;i<4;i++){
             int k=i*17;float drain=animalMatrices[k+16];if(drain>=1 || (absent&(1<<(12+i)))!=0)continue;
-            boolean h=i==0;if(preyCounts[i]==0)continue;bind(6,preySkins[i]);glUniform3fv(u(model,"hit"),brood.hitPoints[i]);
+            boolean h=GreeneHydraVents.isHydra(boss.greeneBattleData(),12+i);if(preyCounts[i]==0)continue;
+            integer(model,"kind",h?9:6);
+            scalar(model,"ventFloor",ventFloor[i]);scalar(model,"hydraHeight",brood.height[i]);bind(6,preySkins[i]);glUniform3fv(u(model,"hit"),brood.hitPoints[i]);
             scalar(model,"drain",drain);scalar(model,"radius",h?2.6F:1.8F);integer(model,"row0",people+i*3);
             System.arraycopy(animalMatrices,k,matrix,0,16);glUniformMatrix4fv(u(model,"root"),false,matrix);
             glBindVertexArray(preyVao[i]);glDrawArrays(GL_TRIANGLES,0,preyCounts[i]);
