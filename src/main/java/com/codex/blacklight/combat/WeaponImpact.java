@@ -139,6 +139,15 @@ public final class WeaponImpact {
         float pitch = switch (tier) { case LIGHT -> 1.1F; case MEDIUM -> 1F; case HEAVY -> .88F; case FINISHER -> .78F; };
         if (chargedCrush) pitch = Math.min(pitch, .78F);
         contactSound(p,v,soundPoint,form,solidHit,first,solidHit?.88F:.74F,pitch);
+        if(first && (move==WeaponMove.AIR_KICK || move==WeaponMove.CLAW_POUNCE || move.divingStrike() || move.uncharged()==WeaponMove.WHIP_AIR)
+                && PlayerHitEffects.hardContactSound(v,soundPoint)==null){
+            var cue=switch(form){
+                case BLADE -> com.codex.blacklight.infection.InfectedSoundCue.PIERCE;
+                case CLAWS,WHIPFIST -> com.codex.blacklight.infection.InfectedSoundCue.TEAR;
+                default -> com.codex.blacklight.infection.InfectedSoundCue.CRUSH;
+            };
+            com.codex.blacklight.registry.ModInfectedSounds.play(v,cue,soundPoint);
+        }
         if(first&&blade){
             var effect=BladeEffects.heavy(move)?PhysicalFeedbackPayload.Effect.BLADE_HEAVY
                 :move==WeaponMove.BLADE_RETURN||move==WeaponMove.BLADE_COMBO_C2?PhysicalFeedbackPayload.Effect.BLADE_RETURN:PhysicalFeedbackPayload.Effect.BLADE_CUT;

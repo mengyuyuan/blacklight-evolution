@@ -438,6 +438,11 @@ public final class WeaponCombatSystem {
                     // Keep approaching in the air until the authored downward strike starts.
                     p.setDeltaMovement(horizontal.x,Math.max(p.getDeltaMovement().y,-.06),horizontal.z);p.hurtMarked=true;
                 }
+                // Check the path actually travelled since the last tick, including the last step onto a floor.
+                if(s.move.divingStrike() && t>=descent && p.getY()<s.previousFeet.y){
+                    strike(p,s,s.move.start);
+                    if(!currentSession(p,s) || s.hitstop>0)return;
+                }
                 if(!posedHop&&t>=descent&&!p.onGround()){
                     double down=Math.min(1.6,.35+(t-descent)*CombatMotion.gravity(s.move));var horizontal=Vec3.ZERO;
                     if(CombatMotion.directionalDive(s.move)){
@@ -461,7 +466,10 @@ public final class WeaponCombatSystem {
                     com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.WEAPON_VISUAL,new WeaponVisual(s.move.ordinal(),p.level().getGameTime()-Math.round(impact*20),s.yaw,false,impact,s.targetId()));com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.WEAPON_VISUAL);
                     PlayerActions.get().playWeapon(p,s.move,false,impact);
                     PacketDistributor.sendToPlayer(p,new WeaponAnimationPayload(s.move.ordinal(),false,impact));
-                }else return;
+                }else{
+                    s.previousFeet=p.position();s.previousYaw=s.yaw;
+                    return;
+                }
             }
             t=p.tickCount-s.started;
         }
@@ -494,7 +502,8 @@ public final class WeaponCombatSystem {
         int contact=physicalQuake?-1:s.move.contactIndex(t);
         if(contact>=0){
             if(s.contact!=contact){
-                s.contact=contact;s.hit.clear();
+                s.contact=contact;
+                if(!s.move.divingStrike())s.hit.clear();
                 // Later authored swings can cut a receiver killed by the preceding
                 // swing. Dead receivers no longer appear among damage candidates.
                 // Give the new swing its own finite ribbon; never connect two arcs
@@ -690,9 +699,10 @@ public final class WeaponCombatSystem {
         strike(p,s,tick,false);
     }
     private static void strike(ServerPlayer p,Session s,int tick,boolean preciseOnly){
-        if(!preciseOnly)CombatEnvironmentEffects.contact(p,s.move,tick,s.yaw,s.clipOffset,s.terrainContacts);
+        boolean diving=s.move.divingStrike() && s.landed<0;
+        if(!preciseOnly && !diving)CombatEnvironmentEffects.contact(p,s.move,tick,s.yaw,s.clipOffset,s.terrainContacts);
         if(!currentSession(p,s))return;
-        boolean bodyFlight=s.mobilityStarted>=0&&!p.onGround()&&(CombatMotion.freeFlight(s.move)||s.move==WeaponMove.HAMMER_RAM);
+        boolean bodyFlight=diving || s.mobilityStarted>=0&&!p.onGround()&&(CombatMotion.freeFlight(s.move)||s.move==WeaponMove.HAMMER_RAM);
         // Movement packets can briefly clear onGround after the finisher's fist hits a block.
         boolean groundContact=s.move.hammerComboSlam()?s.groundEffect:p.onGround();
         if(s.move.quake()&&!groundContact&&!bodyFlight)return;
@@ -1027,8 +1037,12 @@ public final class WeaponCombatSystem {
             var box=current.get(part);
             if(CombatTargeting.distanceSquared(origin,box)>maxReach*maxReach)continue;
             if(bodyFlight){
-                var expanded=box.inflate(.45,.25,.45);
-                var from=previousFeet.add(0,.9,0);var to=p.position().add(s.direction.scale(1)).add(0,.9,0);
+                boolean descending=s.move.divingStrike();
+                double halfHeight=p.getBbHeight()*.5;
+                var expanded=descending?box.inflate(p.getBbWidth()*.5,halfHeight,p.getBbWidth()*.5):box.inflate(.45,.25,.45);
+                var from=previousFeet.add(0,halfHeight,0);
+                var to=p.position().add(0,halfHeight,0);
+                if(!descending)to=to.add(s.direction);
                 if(!expanded.contains(from)&&!expanded.contains(to)&&expanded.clip(from,to).isEmpty())continue;
             }else if(whip!=null){
                 if(!WhipCurveContact.hits(whip,fromTime,toTime,previousFeet,p.position(),s.previousYaw,s.yaw,
