@@ -14,6 +14,7 @@ import software.bernie.geckolib.cache.object.GeoBone;
 public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<EncounterMob> {
     private final GreeneSpiderRenderer spider;
     private final GreeneGoddessRenderer goddess;
+    private final GreeneNursery nursery=new GreeneNursery();
     public GreeneEncounterRenderer(EntityRendererProvider.Context context) {
         super(context,EncounterMob::asset);
         spider=new GreeneSpiderRenderer(context);
@@ -25,6 +26,19 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
     private static void drawWounds(EncounterMob boss,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         var data=boss.spiderData();int meals=data.getInt("Meals");
         SpiderTissue.mouth(boss,pose,buffers,light,partial);
+        if(boss.spider.live() && data.contains("Swallowed")){
+            float t=boss.level().getGameTime()-data.getLong("Swallowed")+partial;
+            if(t>=0 && t<18){
+                float u=net.minecraft.util.Mth.clamp(t/17,0,1);
+                // A single swallowed bolus passes from the aperture into the abdominal wall.
+                var at=new Vec3(1.04,4.12,-2.62).lerp(new Vec3(.82,4.75,-.60),u);
+                float pulse=(float)Math.sin(Math.PI*u);
+                pose.pushPose();pose.translate(at.x,at.y,at.z);
+                pose.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-68));
+                QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,8,2.1*pulse,.68*pulse);
+                pose.popPose();
+            }
+        }
         if(data.contains("BlastAt")){
             pose.pushPose();pose.translate(data.getDouble("WoundX"),data.getDouble("WoundY"),data.getDouble("WoundZ"));
             QuillLesion.spider(pose,buffers,light,boss.tickCount+partial,17,4.1,.8);
@@ -62,6 +76,8 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         }
         light=LightTexture.pack(Math.max(11,LightTexture.block(light)),LightTexture.sky(light));
         GreeneMoltRenderer.warm();goddess.warm();
+        if(boss.spider.first() || boss.greeneStage()==com.codex.blacklight.combat.GreeneBattleCycle.MOLTING)
+            nursery.draw(boss,partial,stack,buffers,light);
         if(boss.greeneStage()==com.codex.blacklight.combat.GreeneBattleCycle.MOLTING){
             GreeneMoltRenderer.draw(boss,partial,stack,light);
             return;
