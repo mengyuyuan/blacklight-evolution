@@ -1,6 +1,9 @@
 package com.codex.blacklight.client.renderer;
 
 import com.codex.blacklight.entity.EncounterMob;
+import com.codex.blacklight.client.ShaderPackCompat;
+import com.codex.blacklight.combat.GreeneBattleCycle;
+import net.minecraft.world.phys.Vec3;
 import com.codex.blacklight.combat.GreeneForm;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -220,7 +223,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             from.translationRotateScale(translation,rotation,scale).get(bones,at);
         }
     }
-    private void render(EncounterMob boss,float partial,PoseStack stack,int packedLight,int[] skins){
+    private void render(EncounterMob boss,float partial,Matrix4f camera,int packedLight,int[] skins){
         float t=Math.min(23,boss.greeneBattle().age(partial)/20F),frame=t*SAMPLE_RATE;
         int ai=(int)frame,bi=Math.min(frames-1,ai+1),a=ai*frameSize,b=bi*frameSize;
         // Hard rig handoff inside the sealed volume; never interpolate bones of different models.
@@ -230,6 +233,11 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             int lo=Math.min(144,ai)*climbPose.length,hi=Math.min(144,bi)*climbPose.length;float mix=frame-ai;
             for(int i=0;i<climbPose.length;i++){float v=climbFrames[lo+i];climbPose[i]=v+(climbFrames[hi+i]-v)*mix;}
         }
+        // Translate the animated hydra and its three attachment tracks together to the server's clear vent.
+        var hydraOffset=com.codex.blacklight.combat.GreeneMolt.readOffset(boss.greeneBattleData());
+        animalMatrices[12]+=(float)hydraOffset.x;
+        animalMatrices[13]+=(float)hydraOffset.y;
+        animalMatrices[14]+=(float)hydraOffset.z;
         posePrey(boss,t,partial,packedLight);
         if(t<1.5F)blendLastSpiderPose(boss,t);
         System.arraycopy(bones,0,boneUpload,0,BONES);
@@ -239,7 +247,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         if(t<14.5F)upload(11,clamberTexture,30,people,GL_RGBA,climbPose);
         bind(12,skins[5]);bind(13,skins[6]);
         float rotation=(float)Math.toRadians(180-boss.greeneBattle().collapseYaw());
-        var camera=new Matrix4f(RenderSystem.getProjectionMatrix()).mul(RenderSystem.getModelViewMatrix()).mul(stack.last().pose()).rotateY(rotation).scale(GreeneForm.OUTBREAK_SCALE);
+        camera.rotateY(rotation).scale(GreeneForm.OUTBREAK_SCALE);
         var e=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().subtract(boss.getPosition(partial)).yRot(-rotation).scale(1/GreeneForm.OUTBREAK_SCALE);
         float[] eye={(float)e.x,(float)e.y,(float)e.z};
         float light=.38F+.62F*Math.min(1,Math.max((packedLight>>20)&15,(packedLight>>4)&15)/15F);
@@ -369,7 +377,38 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             renderer.gridPass(shader,0,rows*3,camera,new float[]{eye.x,eye.y,eye.z},seconds,brightness);
         }
     }
-    public static void draw(EncounterMob boss,float partial,PoseStack stack,int light){
+    // The entity pass may run more than once for a shader pack (including its shadow map).
+    // Only draw the raw GLSL scene into the final world colour target, with its terrain depth.
+    private static final Map<EncounterMob,Integer> packedScenes=new LinkedHashMap<>();
+
+    static void draw(EncounterMob boss,float partial,PoseStack stack,int light){
+        if(ShaderPackCompat.active()){
+            packedScenes.put(boss,light);
+            return;
+        }
+        var camera=new Matrix4f(RenderSystem.getProjectionMatrix()).mul(RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
+        drawScene(boss,partial,camera,light);
+    }
+
+    public static void finishFrame(Matrix4f view,Matrix4f projection,Vec3 eye,float partial){
+        if(packedScenes.isEmpty())return;
+        var mc=Minecraft.getInstance();
+        try{
+            if(!ShaderPackCompat.active())return;
+            mc.getMainRenderTarget().bindWrite(true);
+            for(var entry:packedScenes.entrySet()){
+                var boss=entry.getKey();
+                if(boss.isRemoved() || boss.level()!=mc.level || boss.greeneStage()!=GreeneBattleCycle.MOLTING)continue;
+                var offset=boss.getPosition(partial).subtract(eye);
+                var camera=new Matrix4f(projection).mul(view).translate((float)offset.x,(float)offset.y,(float)offset.z);
+                drawScene(boss,partial,camera,entry.getValue());
+            }
+        }finally{
+            packedScenes.clear();
+        }
+    }
+
+    private static void drawScene(EncounterMob boss,float partial,Matrix4f camera,int light){
         int[] skins=new int[8];skins[0]=skin("textures/entity/greene_goddess_tissue.png");
         skins[7]=skin("textures/entity/greene_spider_brood.png");
         for(int i=0;i<4;i++)skins[i+1]=Minecraft.getInstance().getTextureManager().getTexture(CommonInfectedRenderer.skin(i)).getId();
@@ -377,10 +416,10 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         skins[6]=skin("textures/entity/consume_charcoal_skin.png");
         try(var state=new State()){
             if(scene==null){beginLoad();scene=new GreeneMoltRenderer(loading.join());loading=null;}
-            scene.render(boss,partial,stack,light,skins);
+            scene.render(boss,partial,camera,light,skins);
         }catch(IOException ex){throw new IllegalStateException("Cannot load Greene molt",ex);}
     }
-    public static void invalidate(){loading=null;if(scene!=null){scene.close();scene=null;}}
+    public static void invalidate(){packedScenes.clear();loading=null;if(scene!=null){scene.close();scene=null;}}
     @Override public void close(){
         for(int v:vaos)glDeleteVertexArrays(v);for(int v:buffers)glDeleteBuffers(v);
         for(int v:textures)glDeleteTextures(v);for(int v:programs)glDeleteProgram(v);

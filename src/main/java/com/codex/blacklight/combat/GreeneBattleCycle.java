@@ -230,6 +230,7 @@ public final class GreeneBattleCycle {
     }
     private void enter(int next){
         emergence.clear();stage=next;age=0;lastTick=owner.level().getGameTime();
+        if(next==MOLTING)molt.prepare(owner);
         if(next==EMERGING)emergence.begin();publish();
     }
     private boolean live(){return !disposed&&!owner.isRemoved()&&owner.isAlive();}
@@ -295,6 +296,7 @@ public final class GreeneBattleCycle {
     private void publish(){
         if(owner.level().isClientSide)return;
         long now=owner.level().getGameTime();var data=new CompoundTag();
+        if(stage==MOLTING)molt.writeOffset(data);
         data.putInt("MoltAbsent",molt.absent());data.putFloat("CollapseYaw",collapseYaw);data.putInt("Stage",stage);data.putInt("Age",age);data.putLong("Started",now-age);
         data.putInt("ExposureAge",exposureAge);data.putLong("CollapseStarted",now-exposureAge);data.putInt("ExposureTotal",exposureDuration());
         data.putInt("PreviousDown",previousDown);data.putInt("ArmourWave",armourWave);data.putBoolean("CoreDamageable",coreDamageable);

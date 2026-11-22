@@ -63,6 +63,8 @@ public final class ClientDevastatorPostEffect {
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void render(RenderLevelStageEvent event){
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
+        com.codex.blacklight.client.renderer.GreeneMoltRenderer.finishFrame(event.getModelViewMatrix(),event.getProjectionMatrix(),event.getCamera().getPosition(),
+                event.getPartialTick().getGameTimeDeltaPartialTick(false));
         SpiderPainEffect.finishFrame(event.getModelViewMatrix(),event.getProjectionMatrix(),event.getCamera().getPosition(),
                 event.getPartialTick().getGameTimeDeltaPartialTick(false));
         com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event));

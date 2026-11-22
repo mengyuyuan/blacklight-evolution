@@ -276,7 +276,7 @@ public final class SpiderActions {
         boolean stamp=nearFoot && data().getInt("LastAttack")!=Move.HEAVY_STAMP.ordinal();
         if(angle>27 && !flank && !stamp)return;
         var prey=level.getEntitiesOfClass(BlacklightCommonInfected.class,boss.getBoundingBox().inflate(31),m->m.isAlive() && !ConsumeControl.protectedEntity(m));
-        if(!stamp && !flank && count%4==2 && !prey.isEmpty()){
+        if(!stamp && !flank && count%4==2 && !prey.isEmpty() && boss.spider.canStartEvolution(level)){
             Mob chosen=prey.get(boss.getRandom().nextInt(prey.size()));
             set(Move.CATALYZE,chosen,chosen.getBoundingBox().getCenter(),-1);
         }else{
@@ -422,7 +422,7 @@ public final class SpiderActions {
             if(t>=28 && !(actor() instanceof BlacklightCommonInfected)){if(t>=38)rest(24);return;}
             if(!(actor() instanceof BlacklightCommonInfected host) || !host.isAlive()){rest(15);return;}
             var needle=boss.spider.rootPath(-1,1);
-            if(t==28 && !needle.isEmpty() && clear(needle.get(0),host.getBoundingBox().getCenter())){
+            if(t==28 && boss.spider.canStartEvolution(level) && !needle.isEmpty() && clear(needle.get(0),host.getBoundingBox().getCenter())){
                 var evolved=host.promote();
                 if(evolved!=null){
                     if(evolved.beginGreeneEvolution()){

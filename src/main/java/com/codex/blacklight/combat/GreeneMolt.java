@@ -42,12 +42,43 @@ public final class GreeneMolt {
         }
     }
     private static final class Source {static final Tracks TABLE=new Tracks();}
+    private static final int HYDRA=12, SURFACED=60;
+    private Vec3 hydraOffset=Vec3.ZERO;
+
+    void prepare(EncounterMob boss){
+        hydraOffset=Vec3.ZERO;
+        var level=(ServerLevel)boss.level();
+        var authored=position(boss,HYDRA,SURFACED);
+        var reach=authored.subtract(boss.position()).multiply(1,0,1);
+        for(int angle:new int[]{0,35,-35,75,-75,140,180}){
+            for(double radius:new double[]{1,.78,.58}){
+                var candidate=boss.position().add(reach.yRot((float)Math.toRadians(angle)).scale(radius));
+                var floor=level.clip(new net.minecraft.world.level.ClipContext(candidate.add(0,10,0),candidate.add(0,-8,0),
+                        net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,boss));
+                if(floor.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP)continue;
+                var base=floor.getLocation();
+                var space=new net.minecraft.world.phys.AABB(base.add(-2.4,1,-2.4),base.add(2.4,15,2.4));
+                if(level.getBlockCollisions(boss,space).iterator().hasNext())continue;
+                var line=level.clip(new net.minecraft.world.level.ClipContext(boss.position().add(0,9,0),base.add(0,8,0),
+                        net.minecraft.world.level.ClipContext.Block.COLLIDER,net.minecraft.world.level.ClipContext.Fluid.NONE,boss));
+                if(line.getType()!=net.minecraft.world.phys.HitResult.Type.MISS)continue;
+                hydraOffset=base.subtract(authored).yRot((float)Math.toRadians(boss.greeneBattle().collapseYaw()-180)).scale(1/GreeneForm.OUTBREAK_SCALE);
+                return;
+            }
+        }
+    }
+    void writeOffset(CompoundTag tag){
+        tag.putFloat("HydraX",(float)hydraOffset.x);tag.putFloat("HydraY",(float)hydraOffset.y);tag.putFloat("HydraZ",(float)hydraOffset.z);
+    }
+    public static Vec3 readOffset(CompoundTag tag){
+        return new Vec3(tag.getFloat("HydraX"),tag.getFloat("HydraY"),tag.getFloat("HydraZ"));
+    }
     private Vec3 position(EncounterMob boss,int slot,int tick){
         int a=Math.min(230,tick/2),b=Math.min(230,a+1);
         int k=(a*SLOTS+slot)*3,j=(b*SLOTS+slot)*3;float mix=(tick%2)*.5F;
         var p=Source.TABLE.pos;
         return boss.position().add(new Vec3(p[k]+(p[j]-p[k])*mix,p[k+1]+(p[j+1]-p[k+1])*mix,p[k+2]+(p[j+2]-p[k+2])*mix)
-                .scale(GreeneForm.OUTBREAK_SCALE).yRot((float)Math.toRadians(180-boss.greeneBattle().collapseYaw())));
+                .add(slot==HYDRA?hydraOffset:Vec3.ZERO).scale(GreeneForm.OUTBREAK_SCALE).yRot((float)Math.toRadians(180-boss.greeneBattle().collapseYaw())));
     }
     public boolean tick(EncounterMob boss, int age){
         if(!(boss.level() instanceof ServerLevel level))return false;
@@ -85,6 +116,10 @@ public final class GreeneMolt {
             if(!actor.isAlive()){absent|=1<<i;captives[i]=null;continue;}
             actor.noPhysics=true;actor.setPos(p.x,p.y,p.z);actor.setDeltaMovement(Vec3.ZERO);actor.fallDistance=0;
         }
+        if(captives[HYDRA]!=null && (age==9 || age==38)){
+            var vent=position(boss,HYDRA,SURFACED);
+            SpiderFoley.ground(boss,vent,age==9?1.7F:2.45F,age==9?SpiderFoley.Cue.STRAIN:SpiderFoley.Cue.RUPTURE);
+        }
         for(int i=0;i<CUES.length;i++)if(age==CUES[i]){
             Vec3 p=i==1?position(boss,13,age):i==2?position(boss,12,age):boss.position().add(0,i>=4?22:10,0);
             level.playSound(null,p.x,p.y,p.z,ModInfectedSounds.molt(i),SoundSource.HOSTILE,5F,1F);
@@ -111,11 +146,11 @@ public final class GreeneMolt {
     public CompoundTag save(){
         var t=new CompoundTag();t.putInt("Spawned",spawned);t.putInt("Absent",absent);
         for(int i=0;i<SLOTS;i++)if(captives[i]!=null)t.putUUID("Actor"+i,captives[i]);
-        shockwave.save(t);
+        writeOffset(t);shockwave.save(t);
         return t;
     }
     public void load(CompoundTag t){
-        shockwave.load(t);
+        hydraOffset=readOffset(t);shockwave.load(t);
         spawned=t.getInt("Spawned");absent=t.getInt("Absent");
         for(int i=0;i<SLOTS;i++)captives[i]=t.hasUUID("Actor"+i)?t.getUUID("Actor"+i):null;
     }

@@ -123,6 +123,9 @@ public final class BlacklightInfectedHost extends Monster {
     private boolean beginEvolvedMetamorphosis(boolean catalyzed){
         if(level().isClientSide||!isAlive()||isEvolved()||isMetamorphosing()||hasMultipartBody()||devourerIdentity()
                 ||!catalyzed && !com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
+        var server=(net.minecraft.server.level.ServerLevel)level();
+        var den=com.codex.blacklight.combat.SpiderPhase.encounterForEvolution(server,this);
+        if(den!=null && !den.canStartEvolution(server))return false;
         if(catalyzed){
             var variants=com.codex.blacklight.infection.EvolvedArchetype.values();
             var variant=variants[getRandom().nextInt(variants.length)];
@@ -132,6 +135,7 @@ public final class BlacklightInfectedHost extends Monster {
         }else if(evolvedChoice().isEmpty()){
             var data=hostData().copy();data.put("EvolvedChoice",com.codex.blacklight.infection.EvolvedChoiceCodec.write(com.codex.blacklight.infection.EvolvedMappingReload.choose(tissueInheritance(),getUUID())));entityData.set(HOST,data);
         }
+        if(den!=null)den.delayEvolution();
         evolvedMorphTicks=0;publishEvolvedState(1);nativeCombat.interrupt();clearTissueStrike();organAbilities.interrupt();getNavigation().stop();setTarget(null);return true;
     }
     private boolean evolvedSpace(){
@@ -815,13 +819,25 @@ public final class BlacklightInfectedHost extends Monster {
         if(devourerIdentity()||DevourerFeedingSystem.isDevourer(this))return Component.translatable("entity.blacklight.devourer");
         return Component.translatable(giantBoss()?"entity.blacklight.infected_boss_name":"entity.blacklight.infected_host_name",sourceType().getDescription());
     }
+    private long yieldPlayerUntil;
+    public void yieldToSpider(boolean yield){
+        yieldPlayerUntil=yield?level().getGameTime()+14:0;
+        if(yield && getTarget() instanceof Player){
+            if(!com.codex.blacklight.combat.ConsumeControl.protectedEntity(this) && !com.codex.blacklight.combat.ConsumeSystem.inFlight(this))evolvedCombat.interrupt();
+            setTarget(null);
+        }
+    }
+    @Override public void setTarget(LivingEntity target){
+        if(target instanceof Player && level().getGameTime()<yieldPlayerUntil)return;
+        super.setTarget(target);
+    }
     private boolean validTarget(LivingEntity target) {
         if(target==this||!target.isAlive()||target instanceof HiveTendril)return false;
         if(DevourerFeedingSystem.isDevourer(this)&&!giantBoss())return false;
         if(DevourerFeedingSystem.isDevourer(this)&&(!(target instanceof Player)
                 ||!DevourerFeedingSystem.withinTerritory(this,target)))return false;
         // Player infection grants powers, not allegiance to hostile infected hosts.
-        if(target instanceof Player player)return !player.isCreative()&&!player.isSpectator();
+        if(target instanceof Player player)return level().getGameTime()>=yieldPlayerUntil && !player.isCreative()&&!player.isSpectator();
         return TissueCompetition.contender(this,target)||!BlacklightInfectionSystem.isInfected(target);
     }
     @Override protected void registerGoals() {
