@@ -30,6 +30,7 @@ public enum ImpactTier {
         if (move.id.startsWith("dev_") || move == WeaponMove.BULLETDIVE_DROP) return FINISHER;
         if (WeaponImpact.finisher(move)) return FINISHER;
         var m = move.uncharged();
+        if (m == WeaponMove.WHIP_AIR) return HEAVY;
         if (m.airCombo() || m == WeaponMove.AIR_LAUNCH_FOLLOW) return MEDIUM;
         var profile = ImpactProfile.of(move);
         if (profile.knockdown() || profile.kind() == HitReaction.SLAM || profile.kind() == HitReaction.LAUNCH

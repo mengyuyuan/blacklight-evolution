@@ -40,7 +40,7 @@ public final class QuillOrgan extends Entity {
     private int targetRegion=-1;
     private int supply,initial,deposit;
     private float heal;
-    private boolean collected;
+    private boolean collected, finishOrder;
     private Vec3 interpolation;
     private Vec3 oldFlight=Vec3.ZERO,flight=Vec3.ZERO;
     private int steps;
@@ -76,10 +76,7 @@ public final class QuillOrgan extends Entity {
         held.add(this);
         holder=p;
         extendUntilRank(InfiniteEvolutionSystem.effectiveRank(p,EvolutionAttribute.QUILL_DURATION));
-        if(expiresAt<0){
-            long now=p.level().getGameTime();
-            expiresAt=now+Math.min(life,Long.MAX_VALUE-now);
-        }
+        startLifetimeClock(p.level().getGameTime());
         return true;
     }
     public static java.util.List<QuillOrgan> orbiting(ServerPlayer p){
@@ -89,6 +86,9 @@ public final class QuillOrgan extends Entity {
             if(q.phase()==ORBIT && !q.isRemoved() && q.level()==p.level())organs.add(q);
         }
         return organs;
+    }
+    private void startLifetimeClock(long now){
+        if(expiresAt<0)expiresAt=now+Math.min(life,Long.MAX_VALUE-now);
     }
     private void releaseSlot(){
         if(holder==null)return;
@@ -203,9 +203,17 @@ public final class QuillOrgan extends Entity {
             if(phase()==EXTRACT)extract(p,mob);
             return;
         }
+        boolean held=phase()==ORBIT || phase()==STRIKE || phase()==REJOIN;
+        if(held && p==null){
+            // Forced chunks may tick before the saved player has joined the world.
+            releaseSlot();
+            startLifetimeClock(level.getGameTime());
+            if(life<=0 || level.getGameTime()>=expiresAt)discard();
+            return;
+        }
         if(!QuillHarvest.active(p) || p.level()!=level){discard();return;}
         entityData.set(ACTOR,p.getId());
-        if(phase()==ORBIT || phase()==STRIKE || phase()==REJOIN){
+        if(held){
             long now=level.getGameTime();
             if(life<=0 || (expiresAt>=0 && now>=expiresAt) || !retain(p)){discard();return;}
             life=Math.min(life-1,expiresAt-now);
@@ -314,6 +322,8 @@ public final class QuillOrgan extends Entity {
         if(phase()!=ORBIT || holder==null)return;
         target=prey.target().getUUID();
         targetRegion=prey.region();
+        // A volley already in flight cannot consume a newly opened finisher window.
+        finishOrder=ConsumeLastChance.awaitingFinisher(prey.target()) && CombatTargeting.lockedEntity(holder)==prey.target();
         supply=Math.max(0,supply-QUILL_AUTO_COST.get());
         phase(STRIKE);
         if(audible)sound(InfectedSoundCue.LAUNCH,.49F,1.32F);
@@ -322,7 +332,7 @@ public final class QuillOrgan extends Entity {
     private void strike(ServerLevel level,ServerPlayer p){
         var prey=target==null?null:new TargetSelection(level.getEntity(target),targetRegion);
         int pursuitTicks=12+Mth.ceil((QUILL_AUTO_RANGE.get()+QUILL_ORBIT_RADIUS.get())/STRIKE_SPEED);
-        if(prey!=null && !com.codex.blacklight.combat.ConsumeLastChance.awaitingFinisher(prey.target()) && !QuillHarvest.protectedPet(prey.target()) && prey.selectable(p) && age()<pursuitTicks){
+        if(prey!=null && (!ConsumeLastChance.awaitingFinisher(prey.target()) || finishOrder && CombatTargeting.lockedEntity(p)==prey.target()) && !QuillHarvest.protectedPet(prey.target()) && prey.selectable(p) && age()<pursuitTicks){
             Vec3 point=prey.point(p);
             var contact=level.clip(new net.minecraft.world.level.ClipContext(position(),point,net.minecraft.world.level.ClipContext.Block.COLLIDER,
                     net.minecraft.world.level.ClipContext.Fluid.NONE,this));
@@ -372,6 +382,7 @@ public final class QuillOrgan extends Entity {
     }
     @Override protected void addAdditionalSaveData(CompoundTag n){
         n.putLong("durationRank",durationRank);
+        if(finishOrder && phase()==STRIKE)n.putBoolean("finishOrder",true);
         if(expiresAt>=0)n.putLong("expiresAt",expiresAt);
         if(owner!=null)n.putUUID("owner",owner);if(host!=null)n.putUUID("host",host);if(target!=null)n.putUUID("target",target);
         if(target!=null)n.putInt("targetRegion",targetRegion);
@@ -382,6 +393,7 @@ public final class QuillOrgan extends Entity {
     @Override protected void readAdditionalSaveData(CompoundTag n){
         releaseSlot();
         durationRank=Math.max(0,n.getLong("durationRank"));
+        finishOrder=n.getBoolean("finishOrder");
         expiresAt=n.contains("expiresAt")?n.getLong("expiresAt"):-1;
         owner=n.hasUUID("owner")?n.getUUID("owner"):null;host=n.hasUUID("host")?n.getUUID("host"):null;
         target=n.hasUUID("target")?n.getUUID("target"):null;targetRegion=n.contains("targetRegion")?n.getInt("targetRegion"):-1;
