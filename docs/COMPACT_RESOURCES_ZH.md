@@ -43,7 +43,7 @@ compact.2 的正常构建使用纯 Java `CompactMapPacker`，逐个比较 Gzip �
 悄悄切换到另一份数据。字典内存仍受 4096 KiB 上限约束，每文件输出最多 8 MiB。
 
 `verifyCompactMapResources` 对实际 JAR 中全部地图逐字节复核，并拒绝同一资源的
-两套压缩格式同时混入。默认 `assemble` 同时运行地图、动作和 200,000,000 字节的
+两套压缩格式同时混入。默认 `assemble` 同时运行地图、动作和 227,000,000 字节的
 主 JAR 预算检查；资源分类和最大文件报告位于 `build/reports/package-size.json`。
 如内容规模有经评审的变化，可显式设置 `-PpackageSizeBudgetBytes=<字节数>`。
 此预算不以降低地图精度、裁掉动作帧或缩小贴图为默认解决办法。
