@@ -267,6 +267,64 @@ public final class SpiderWoundGameTest {
         }finally{b.discard();meal.discard();level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}
         h.succeed();});
     }
+    @GameTest(template="blackwatch_arena",batch="greene_walking_routes",timeoutTicks=310)
+    public static void walkingLinesAndLateDodge(GameTestHelper h){
+        var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,104,8));
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=-2;x<=2;x++)for(int z=-2;z<=3;z++){
+            int cx=(center.getX()>>4)+x,cz=(center.getZ()>>4)+z;
+            if(level.setChunkForced(cx,cz,true))forced.add(new net.minecraft.world.level.ChunkPos(cx,cz));
+        }
+        floor(level,center,26,48);
+        var start=Vec3.atBottomCenterOf(center);var profile=new GameProfile(UUID.randomUUID(),"DenWalker");
+        var p=new ServerPlayer(level.getServer(),level,profile,ClientInformation.createDefault());
+        p.connection=FakePlayerFactory.get(level,profile).connection;
+        for(int i=0;i<61;i++)p.tick();
+        p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);
+        p.setPos(start);level.addNewPlayer(p);p.setGameMode(GameType.SURVIVAL);p.setNoGravity(true);
+        var damage=new float[4];
+        for(int route=0;route<4;route++){
+            int mode=route;
+            var move=switch(mode){case 1->SpiderActions.Move.SPIKES;case 2->SpiderActions.Move.FLESH_VOLLEY;default->SpiderActions.Move.STAB;};
+            int beginning=1+route*68,duration=mode==2?57:mode==1?35:19;
+            record Attack(EncounterMob boss,Vec3 from,Vec3 tangent){}
+            var encounter=new Attack[1];
+            h.runAfterDelay(beginning,()->{
+                var b=boss(h,start);state(b,0,0,0);b.setNoAi(false);
+                var leg=SpiderLegPose.worldTip(b,0,1).subtract(start).multiply(.78,0,.78);
+                var tangent=new Vec3(leg.z,0,-leg.x).normalize();
+                var from=mode==1?new Vec3(0,0,25):mode==2?new Vec3(0,0,37):leg;
+                var origin=start.add(from);encounter[0]=new Attack(b,from,tangent);
+                p.setPos(origin);p.invulnerableTime=0;p.setHealth(500);p.setDeltaMovement(Vec3.ZERO);
+                var s=b.spiderData().copy();s.putInt("Action",move.ordinal());s.putLong("Start",level.getGameTime());
+                s.putUUID("ActionTarget",p.getUUID());s.putInt("ActionId",p.getId());s.putInt("Foot",0);
+                s.putDouble("Ax",origin.x);s.putDouble("Ay",origin.y);s.putDouble("Az",origin.z);b.spiderData(s);
+            });
+            for(int i=1;i<=duration;i++){
+                int t=i;h.runAfterDelay(beginning+i,()->{
+                    var e=encounter[0];var origin=start.add(e.from());double walk=.216*t;
+                    Vec3 next=switch(mode){
+                        case 1->origin.add(0,0,walk);
+                        case 2->start.add(e.from().yRot((float)(walk/37)));
+                        case 3->origin.add(e.tangent().scale(.216*(t<=9?t:18-t)));
+                        default->origin.add(e.tangent().scale(walk));
+                    };
+                    p.setPos(next);p.setDeltaMovement(Vec3.ZERO);
+                });
+            }
+            h.runAfterDelay(beginning+duration+1,()->{
+                var b=encounter[0].boss();
+                damage[mode]=500-p.getHealth();
+                System.out.println("WALKING_DEN "+move+" route="+mode+" damage="+damage[mode]);
+                b.discard();level.getEntitiesOfClass(GreeneProjectile.class,new net.minecraft.world.phys.AABB(center).inflate(65),shot->shot.getOwner()==b).forEach(Entity::discard);
+            });
+        }
+        h.runAfterDelay(272,()->{try{
+            h.assertTrue(damage[0]>0 && damage[1]>0 && damage[2]>0,"strafe, retreat, orbit must be punished on unchanged walking lines: "+Arrays.toString(damage));
+            h.assertTrue(damage[3]==0,"reversing direction after the stab commits must evade it: "+damage[3]);
+        }finally{level.removePlayerImmediately(p,Entity.RemovalReason.DISCARDED);for(var q:forced)level.setChunkForced(q.x,q.z,false);}
+        h.succeed();});
+    }
     @GameTest(template="blackwatch_arena",batch="greene_new_pressure",timeoutTicks=200)
     public static void standingStrikeAndCounterWindow(GameTestHelper h){
         var level=h.getLevel();var center=h.absolutePos(new BlockPos(8,36,8));floor(level,center,25,25);
