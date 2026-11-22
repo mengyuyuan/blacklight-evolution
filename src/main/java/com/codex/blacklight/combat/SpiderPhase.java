@@ -86,7 +86,7 @@ public final class SpiderPhase {
         }
         if(t.contains("SavedClock")){
             long delta=now()-t.getLong("SavedClock");t.remove("SavedClock");
-            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","NextBeam","BeamTick","LastTumor","OralAt","Swallowed","BlastAt","BlastClosed","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
+            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","NextBeam","BeamTick","LastTumor","OralAt","Swallowed","BlastAt","BlastClosed","NextEvolution","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
                 if(t.contains(key))t.putLong(key,t.getLong(key)+delta);
             for(String leg:t.getCompound("Footing").getAllKeys()){
                 var step=t.getCompound("Footing").getCompound(leg);step.putLong("At",step.getLong("At")+delta);
@@ -278,6 +278,45 @@ public final class SpiderPhase {
         }
         boss.spiderData(t);
     }
+    private static final int EVOLVED_LIMIT=2, REINFORCEMENT_TICKS=300;
+    private UUID attackingEvolved;
+    private int lastEvolvedCount;
+
+    private AABB evolutionArea(ServerLevel level){
+        var site=com.codex.blacklight.world.GreeneHiveCave.nearest(level.getSeed(),boss.blockPosition());
+        var origin=site.distSqr(boss.blockPosition())<=72*72?Vec3.atBottomCenterOf(site):boss.position();
+        return new AABB(origin.x-68,origin.y-12,origin.z-68,origin.x+68,origin.y+57,origin.z+68);
+    }
+    public static SpiderPhase encounterForEvolution(ServerLevel level, Mob host){
+        return level.getEntitiesOfClass(EncounterMob.class,host.getBoundingBox().inflate(140,76,140),
+                b->b.spider.live() && b.spider.evolutionArea(level).contains(host.position())).stream()
+                .min(Comparator.comparingDouble(b->host.distanceToSqr(b))).map(b->b.spider).orElse(null);
+    }
+    private List<BlacklightInfectedHost> evolvedInDen(ServerLevel level){
+        return level.getEntitiesOfClass(BlacklightInfectedHost.class,evolutionArea(level),
+                m->m.isAlive() && reservedForThrow(m));
+    }
+    public boolean canStartEvolution(ServerLevel level){
+        if(now()<data().getLong("NextEvolution"))return false;
+        int count=evolvedInDen(level).size();
+        if(count<lastEvolvedCount)delayEvolution();
+        lastEvolvedCount=count;
+        return count<EVOLVED_LIMIT && now()>=data().getLong("NextEvolution");
+    }
+    public void delayEvolution(){
+        var state=data().copy();state.putLong("NextEvolution",now()+REINFORCEMENT_TICKS);boss.spiderData(state);
+    }
+    private void limitEvolvedPressure(ServerLevel level){
+        var hosts=evolvedInDen(level);
+        if(hosts.size()<lastEvolvedCount)delayEvolution();
+        lastEvolvedCount=hosts.size();
+        var attacker=hosts.stream().filter(m->m.isEvolved() && !ConsumeControl.protectedEntity(m) && !ConsumeSystem.inFlight(m))
+                .min(Comparator.<BlacklightInfectedHost,Boolean>comparing(m->!m.getUUID().equals(attackingEvolved))
+                        .thenComparing(BlacklightInfectedHost::getUUID)).orElse(null);
+        attackingEvolved=attacker==null?null:attacker.getUUID();
+        for(var host:hosts)host.yieldToSpider(host!=attacker);
+    }
+
     public static boolean evolved(Mob mob){return mob instanceof BlacklightInfectedHost host && host.isEvolved();}
     public static boolean edible(Mob mob){
         return mob instanceof BlacklightCommonInfected || mob instanceof BlacklightInfectedHost || mob instanceof BlacklightHunter
@@ -468,6 +507,7 @@ public final class SpiderPhase {
     }
     public void tick(){
         if(!live() || !(boss.level() instanceof ServerLevel level) || boss.isNoAi())return;
+        if(boss.tickCount%10==0)limitEvolvedPressure(level);
         if(data().getInt("Meals")==3 && data().contains("LastTumor")){
             long since=now()-data().getLong("LastTumor");
             if(since>=12 && since<=22 && (since-12)%5==0){

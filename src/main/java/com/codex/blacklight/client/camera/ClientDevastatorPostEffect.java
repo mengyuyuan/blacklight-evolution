@@ -73,6 +73,7 @@ public final class ClientDevastatorPostEffect {
         // Snapshot the frame matrices; with a shader pack the pass runs later in the frame.
         var view=new org.joml.Matrix4f(event.getPoseStack().last().pose());
         var projection=new org.joml.Matrix4f(event.getProjectionMatrix());
+        com.codex.blacklight.client.renderer.GreeneMoltRenderer.finishFrame(entityView,entityProjection,event.getCamera().getPosition(),event.getPartialTick());
         SpiderPainEffect.finishFrame(entityView,entityProjection,event.getCamera().getPosition(),event.getPartialTick());
         com.codex.blacklight.client.ShaderPackCompat.afterLevel(()->apply(event,view,projection));
     }
