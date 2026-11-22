@@ -377,6 +377,7 @@ public final class BackspineCombat {
             shot.setWedgeSkills(skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_1),
                     heavy && slot == 0 && s.charged && skills.hasCombatSkill(CombatSkill.QUILL_WEDGE_2));
             shot.setRoofIndex(index);shot.setVolleySlot(slot);shot.setHeavy(heavy);
+            if(heavy && s.air && slot==0)shot.armAirImpactFeedback();
             // A quaternion carries the proper rotation. The entity's shoulder bit carries the reflection.
             var proper=socket;
             var orientation=new org.joml.Quaternionf(bodyTurn).mul(proper.getUnnormalizedRotation(new org.joml.Quaternionf()).normalize());

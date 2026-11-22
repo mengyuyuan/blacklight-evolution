@@ -7,6 +7,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InfiniteProgressTest {
+    @Test void existingQuillRanksBuyCapacityAndLongevitySavesSeparately(){
+        var legacy=new com.google.gson.JsonObject();
+        legacy.addProperty("infinite_quill_swarm",12);
+        var progress=InfiniteProgress.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow();
+        assertEquals(12,progress.rank(EvolutionAttribute.QUILL_SWARM));
+        assertEquals(0,progress.rank(EvolutionAttribute.QUILL_DURATION));
+        var bought=progress.buy(EvolutionAttribute.QUILL_DURATION,3);
+        var encoded=InfiniteProgress.CODEC.encodeStart(JsonOps.INSTANCE,bought).getOrThrow();
+        var loaded=InfiniteProgress.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow();
+        assertEquals(12,loaded.rank(EvolutionAttribute.QUILL_SWARM));
+        assertEquals(3,loaded.rank(EvolutionAttribute.QUILL_DURATION));
+    }
     @Test void repeatableRanksPassOldTierBoundariesWithoutAffectingOtherAttributes(){
         var progress=InfiniteProgress.EMPTY;
         for(int i=0;i<1001;i++)progress=progress.buy(EvolutionAttribute.VITALITY);

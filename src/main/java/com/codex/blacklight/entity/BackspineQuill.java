@@ -23,6 +23,8 @@ public final class BackspineQuill extends ThrowableItemProjectile {
     public void setRoofIndex(int index){entityData.set(ROOF_INDEX,Math.max(0,Math.min(5,index)));}
     public int volleySlot(){return entityData.get(VOLLEY_SLOT);}
     public void setVolleySlot(int slot){entityData.set(VOLLEY_SLOT,Math.max(-2,Math.min(2,slot)));}
+    private boolean airImpactFeedback;
+    public void armAirImpactFeedback(){airImpactFeedback=true;}
     public boolean heavy(){return entityData.get(HEAVY);}
     public void setHeavy(boolean value){entityData.set(HEAVY,value);}
     private static final EntityDataAccessor<Integer> SIDE=SynchedEntityData.defineId(BackspineQuill.class,EntityDataSerializers.INT);
@@ -119,6 +121,11 @@ public final class BackspineQuill extends ThrowableItemProjectile {
             if (site != null && (!heavy() || wedge)) QuillWedge.accepted(receiver, owner.getUUID(), site, now, heavy());
             com.codex.blacklight.combat.QuillImpact.hit(player, living, site == null ? entry : site.point(),
                     direction, heavy(), volleySlot());
+            if(airImpactFeedback){
+                airImpactFeedback=false;
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player,new com.codex.blacklight.network.PhysicalFeedbackPayload(
+                        com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY,.62F));
+            }
             if (wedge && canPierceWedge && cutTargets == null) {
                 piercingWedge = true;
                 enableCleaving();
@@ -249,6 +256,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         entityData.set(id,new org.joml.Vector3f(tag.getFloat(key+"X"),tag.getFloat(key+"Y"),tag.getFloat(key+"Z")));
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){
+        if(airImpactFeedback)tag.putBoolean("AirImpactFeedback",true);
         if(volleyId!=null)tag.putUUID("QuillVolley",volleyId);
         super.addAdditionalSaveData(tag);tag.putFloat("QuillDamage",damage);tag.putInt("FalxSide",side());tag.putBoolean("QuillHeavy",heavy());
         if(aimTarget!=null)tag.putUUID("QuillAimTarget",aimTarget);
@@ -268,6 +276,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         saveVector(tag,"Travel",TRAVEL);saveVector(tag,"Bow",BOW);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag){
+        airImpactFeedback=tag.getBoolean("AirImpactFeedback");
         volleyId=tag.hasUUID("QuillVolley")?tag.getUUID("QuillVolley"):null;
         super.readAdditionalSaveData(tag);if(tag.contains("QuillDamage"))damage=tag.getFloat("QuillDamage");
         aimTarget=tag.hasUUID("QuillAimTarget")?tag.getUUID("QuillAimTarget"):null;
