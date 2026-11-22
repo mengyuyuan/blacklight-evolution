@@ -367,6 +367,77 @@ public final class QuillPriorityGameTest {
         root.load(saved);root.tick();
     }
 
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_swarm_wave")
+    public static void swarmSplitsFocusesAndReturns(GameTestHelper h){
+        var p=join(h,"SwarmWaves");
+        var level=h.getLevel();
+        var mobs=new ArrayList<Mob>();
+        var point=h.absolutePos(new BlockPos(5,45,5)).getCenter();
+        p.connection.teleport(point.x,point.y,point.z,0,0);
+        var state=QuillHarvest.state(p);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
+        try{
+            var carrier=com.codex.blacklight.registry.ModEntities.QUILL_ORGAN.get().create(level);
+            carrier.setPos(p.getEyePosition());
+            var save=carrier.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            save.putUUID("owner",p.getUUID());save.putInt("phase",QuillOrgan.ORBIT);
+            save.putLong("capacity",11);save.putLong("count",11);
+            save.putInt("life",240);save.putInt("totalLife",240);save.putInt("supply",12);save.putInt("initial",12);
+            carrier.load(save);level.addFreshEntity(carrier);
+            var enemy=spawn(p,mobs,EntityType.HUSK,4,0,400,400);
+            var sight=spawn(p,mobs,EntityType.COW,0,4,400,400);
+            p.setYRot(180);p.yRotO=180;p.setYHeadRot(180);p.yHeadRotO=180;
+            h.assertTrue(QuillHarvest.focus(p,64)==null,"looking away from both test mobs");
+            QuillHarvest.dispatch(p);
+            var search=p.getBoundingBox().inflate(20);
+            var auto=level.getEntitiesOfClass(QuillOrgan.class,search,q->enemy.getUUID().equals(q.strikeTarget()));
+            h.assertTrue(carrier.count()==6 && carrier.slots()==6 && auto.size()==1 && auto.get(0).count()==5,"11 ready: 5 automatic, 6 remain. ready="+carrier.count()+", groups="+auto.size());
+            QuillHarvest.dispatch(p);
+            h.assertTrue(carrier.count()==6,"another carrier tick cannot fire the wave twice");
+            p.setYRot(0);p.yRotO=0;p.setYHeadRot(0);p.yHeadRotO=0;p.setXRot(10);p.xRotO=10;
+            p.getPersistentData().remove("BlacklightNextQuillSortie");
+            QuillHarvest.dispatch(p);
+            var focused=level.getEntitiesOfClass(QuillOrgan.class,search,q->sight.getUUID().equals(q.strikeTarget()));
+            h.assertTrue(carrier.count()==0 && carrier.slots()==0 && focused.size()==1 && focused.get(0).count()==6,"six aimed at the cow without an explicit lock");
+            var shot=focused.get(0);
+            shot.load(shot.saveWithoutId(new net.minecraft.nbt.CompoundTag()));
+            for(int i=0;i<40 && !shot.isRemoved();i++)shot.tick();
+            h.assertTrue(shot.isRemoved() && carrier.count()==6 && sight.getHealth()<sight.getMaxHealth(),"focused hit and return after save/load");
+            var patrol=auto.get(0);
+            for(int i=0;i<40 && !patrol.isRemoved();i++)patrol.tick();
+            h.assertTrue(patrol.isRemoved() && carrier.count()==11 && enemy.getHealth()<enemy.getMaxHealth(),"both targets hit, all eleven accounted for");
+            h.assertTrue(carrier.supply()==12-2*com.codex.blacklight.config.GameplayBalanceConfig.QUILL_AUTO_COST.get(),"each wave spends its carrier fuel once");
+            // Produce a second bundle through a purchased rank and the normal harvest ledger.
+            state.addEvolutionPoints(10000);
+            p.setData(ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
+            var attribute=com.codex.blacklight.power.EvolutionAttribute.QUILL_SWARM;
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,attribute,3)==3,"buy three proliferation ranks");
+            var host=spawn(p,mobs,EntityType.COW,2,0,20,20);
+            QuillHarvest.plant(p,host,host.getBoundingBox().getCenter(),0);
+            var other=(QuillOrgan)level.getEntity(QuillHarvest.mark(host).getUUID("organ"));
+            host.discard();
+            var reward=new com.codex.blacklight.power.AssimilationSystem.Yield(2,40,0,null,0);
+            h.assertTrue(other.collect(p,host,reward) && other.count()==4,"new harvest grows four spines");
+            var returning=other.saveWithoutId(new net.minecraft.nbt.CompoundTag());
+            returning.putInt("phase",QuillOrgan.RETURN);other.load(returning);
+            other.setPos(other.shoulder(p));p.setHealth(p.getMaxHealth());other.tick();
+            h.assertTrue(other.phase()==QuillOrgan.ORBIT,"harvest reaches orbit");
+            p.getPersistentData().remove("BlacklightNextQuillSortie");QuillHarvest.dispatch(p);
+            var combined=level.getEntitiesOfClass(QuillOrgan.class,search,q->sight.getUUID().equals(q.strikeTarget()));
+            h.assertTrue(combined.size()==2 && combined.stream().mapToLong(QuillOrgan::count).sum()==15,"both carriers commit to one aimed target");
+            for(var bundle:combined){
+                float previous=sight.getHealth();
+                for(int i=0;i<15 && bundle.phase()==QuillOrgan.STRIKE;i++)bundle.tick();
+                h.assertTrue(sight.getHealth()<previous,"each bundle deals damage during the same game tick");
+            }
+            h.succeed();
+        }finally{
+            for(var q:level.getEntitiesOfClass(QuillOrgan.class,p.getBoundingBox().inflate(32),q->p.getUUID().equals(q.owner())))q.discard();
+            for(var mob:mobs)mob.discard();
+            level.getServer().getPlayerList().remove(p);
+        }
+    }
+
     private static Mob spawn(ServerPlayer p, List<Mob> spawned, EntityType<? extends Mob> type,
                              double x, double z, double maximum, float health) {
         var mob=type.create(p.serverLevel());
@@ -623,7 +694,7 @@ public final class QuillPriorityGameTest {
                 h.assertTrue(selection!=null && selection.target()==far,"absolute HP outranks range and percent HP");
             }
             CombatTargeting.requestLock(p,near.getId());
-            h.assertTrue(QuillHarvest.attackTarget(p,64,false).target()==near && QuillHarvest.sortie(p).target()==near,"both attacks honor the explicit lock");
+            h.assertTrue(QuillHarvest.attackTarget(p,64,false).target()==near && QuillHarvest.focus(p,64).target()==near,"both attacks honor the explicit lock");
             CombatTargeting.requestLock(p,-1);
             var tied=spawn(p,mobs,EntityType.HUSK,-3,0,60,5);
             for(boolean orbit:List.of(false,true)){
