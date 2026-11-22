@@ -62,7 +62,8 @@ public final class SpiderAnatomy {
         var offset=boss.spider.actions.leapOffset(partial);
         var result=new Matrix4f().translate((float)offset.x,(float)offset.y,(float)offset.z).rotateY((float)Math.toRadians(180-boss.skinYaw(partial))).scale(1.9824204F);
         float tilt=boss.spider.tilt(partial);
-        return SpiderGesture.balance(boss,partial,result).translate(0,-1.7F*Math.abs(tilt),0).rotateZ(tilt*.69F);
+        SpiderGesture.balance(boss,partial,result).translate(0,-1.15F*Math.abs(tilt),0).rotateZ(tilt*.54F);
+        return boss.spider.seatShell(result,partial);
     }
     public static Vec3 point(EncounterMob boss,float partial,Vec3 local){
         return boss.getPosition(partial).add(new Vec3(root(boss,partial).transformPosition(local.toVector3f())));

@@ -17,7 +17,7 @@ import java.util.*;
 
 /** Server action clock. Each swing, contact and release has one owner and one saved target. */
 public final class SpiderActions {
-    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH }
+    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH, ORAL_SCISSORS, POD_CAST }
     private static final int[] STRIDE_HEADINGS={0,32,-32};
     private static final int[] STRAIGHT={0};
     private static final double[] STEP_HEIGHTS={0,.5,1.01};
@@ -36,6 +36,7 @@ public final class SpiderActions {
         if(move!=Move.REST && move!=Move.RECOIL)t.putInt("LastAttack",move.ordinal());
         t.putInt("Action",move.ordinal());t.putLong("Start",now());t.putBoolean("Struck",false);
         t.remove("Gripped");t.remove("Missed");t.remove("ActionTarget");t.remove("ActionId");
+        t.remove("SeedX");t.remove("SeedY");t.remove("SeedZ");t.remove("SeedFlight");t.remove("SeedHit");
         t.remove("RushStopped");t.remove("RushSecond");
         if(target!=null){t.putUUID("ActionTarget",target.getUUID());t.putInt("ActionId",target.getId());}
         t.putDouble("Ax",aim.x);t.putDouble("Ay",aim.y);t.putDouble("Az",aim.z);t.putInt("Foot",leg);
@@ -232,7 +233,9 @@ public final class SpiderActions {
         }else{
             double d=diff.horizontalDistance();
             Move next;
-            if(flank && foot>=0)next=Move.SWEEP;
+            Move injured=SpiderWoundedActions.select(boss.spider.brokenMask(),d,count);
+            if(injured!=null)next=injured;
+            else if(flank && foot>=0)next=Move.SWEEP;
             else if(d>21){
                 // After denying a distant lane she leaves her old position. A sustained retreat changes the fight.
                 boolean canMarch=boss.spider.footing.pairedSupport() && foot>=0 && intact(point,foot<4?4:0,foot<4?8:4)>=0;
@@ -246,6 +249,8 @@ public final class SpiderActions {
                 else next=boss.spider.footing.pairedSupport() && intact(point,foot<4?4:0,foot<4?8:4)>=0?Move.MARCH:Move.STAB;
             }
             else next=switch(count%4){case 0 -> Move.STAB;case 1 -> Move.PINCER;case 2 -> Move.SWEEP;default -> Move.SPIKES;};
+            if((next==Move.PINCER || next==Move.SWALLOW) && (foot<0 || boss.spider.broken((foot+4)%8)))
+                next=foot<0?Move.ORAL_SCISSORS:Move.STAB;
             set(next,player,point,foot);
             if(foot>=0 && (next==Move.STAB||next==Move.PINCER||next==Move.SWEEP))SpiderFoley.play(boss,SpiderLegPose.worldTip(boss,foot,1),SpiderFoley.Cue.LOAD,1.15F);
         }
@@ -340,6 +345,16 @@ public final class SpiderActions {
             return;
         }
         if(!(actor() instanceof ServerPlayer p) || !p.isAlive() || p.isSpectator()){rest(18);return;}
+        if(m==Move.ORAL_SCISSORS){
+            if(SpiderWoundedActions.scissors(boss,t,p))hit(p,.83F,.28);
+            if(t>=44)rest(27);
+            return;
+        }
+        if(m==Move.POD_CAST){
+            SpiderWoundedActions.cast(boss,t);
+            if(data().contains("SeedHit") && t>=data().getInt("SeedHit")+12 || t>=74)rest(27);
+            return;
+        }
         if(m==Move.SPIKES){
             if(t==12)SpiderFoley.play(boss,boss.spider.palm(1),SpiderFoley.Cue.LOAD,1.2F);
             if(t>=18 && t<=34 && (t-18)%4==0)spike(level,p,(t-18)/4);
@@ -528,6 +543,9 @@ public final class SpiderActions {
     private void debris(ServerLevel level,Vec3 at){
         SpiderFoley.ground(boss,at,1.65F,SpiderFoley.Cue.STRIKE);
     }
+    public Vec3 flyingSeed(float partial){
+        return move()==Move.POD_CAST?SpiderWoundedActions.seed(boss,age(partial)):null;
+    }
     public float flex(String bone,float partial){
         float t=age(partial);Move action=move();
         float stroke=(float)Math.sin(Math.PI*Mth.clamp(t/(action==Move.SPIKES?43:39),0,1));
@@ -536,6 +554,8 @@ public final class SpiderActions {
             int index=Integer.parseInt(bone.substring(5));
             float side=index<5?-1:1;
             float lag=(index%4)*.6F;
+            if(action==Move.POD_CAST)return side*(.80F*SpiderGesture.phrase(t-lag,1,13,17,25)-.17F*SpiderGesture.phrase(t,17,20,22,29));
+            if(action==Move.ORAL_SCISSORS)return side*.68F*SpiderGesture.phrase(t-lag,1,11,30,44);
             if(action==Move.PINCER){
                 float open=SpiderGesture.phrase(t-lag,4,16,25,29);
                 float snap=SpiderGesture.phrase(t-lag*.28F,26,29,30,39);
