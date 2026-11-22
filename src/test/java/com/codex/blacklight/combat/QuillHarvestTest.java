@@ -6,27 +6,29 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class QuillHarvestTest {
-    @Test void waveRoundsAcrossCarriersAndDoesNotOverflowAtMaximumRank(){
-        var wave=new QuillFormation.Wave(40);
-        assertEquals(2,wave.take(3)+wave.take(1)+wave.take(1));
-        assertEquals(3_689_348_814_741_910_323L,new QuillFormation.Wave(40).take(Long.MAX_VALUE));
-        assertEquals(Long.MAX_VALUE,new QuillFormation.Wave(100).take(Long.MAX_VALUE));
-        assertEquals(Long.MAX_VALUE,QuillFormation.harvestCount(Long.MAX_VALUE));
-        assertEquals(1,QuillFormation.harvestCount(0));
-        assertEquals(65,QuillFormation.harvestCount(64));
+    @Test void capacityLifetimeAndVolleyRoundIndependently(){
+        assertEquals(6,QuillFormation.capacity(0));
+        assertEquals(70,QuillFormation.capacity(64));
+        assertEquals(Long.MAX_VALUE,QuillFormation.capacity(Long.MAX_VALUE));
+        assertEquals(240,QuillFormation.extendLife(240,0));
+        assertEquals(300,QuillFormation.extendLife(240,3));
+        assertEquals(Long.MAX_VALUE,QuillFormation.extendLife(240,Long.MAX_VALUE));
+        assertEquals(5,QuillFormation.volleySize(11,40));
+        assertEquals(11,QuillFormation.volleySize(11,100));
+        assertEquals(Integer.MAX_VALUE,QuillFormation.volleySize(Integer.MAX_VALUE,100));
     }
 
     @Test void highRanksAddUprightAndCrossedOrbits(){
-        var flat=QuillFormation.offset(0,5,0,2,0);
+        var flat=QuillFormation.offset(0,5,0,2);
         assertEquals(2,flat.x,1e-8);
-        var upright=QuillFormation.offset(2,24,0,2,0);
+        var upright=QuillFormation.offset(2,24,0,2);
         assertTrue(Math.abs(upright.y)>.8);
-        var crossed=QuillFormation.offset(3,24,0,2,0);
+        var crossed=QuillFormation.offset(3,24,0,2);
         assertTrue(Math.abs(crossed.x)>.8 && Math.abs(crossed.z)>.7);
         for(int i=0;i<48;i++){
-            var offset=QuillFormation.offset(i,48,50,2,35);
+            var offset=QuillFormation.offset(i,48,50,2);
             assertTrue(offset.y>=-1 && offset.y<=1);
-            for(int j=0;j<i;j++)assertTrue(offset.distanceToSqr(QuillFormation.offset(j,48,50,2,35))>1e-8);
+            for(int j=0;j<i;j++)assertTrue(offset.distanceToSqr(QuillFormation.offset(j,48,50,2))>1e-8);
         }
     }
     @Test void eachMarkDrainsOneHundredthOfOnePercentPerSecond() {
