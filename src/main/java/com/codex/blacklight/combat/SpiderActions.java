@@ -28,6 +28,7 @@ public final class SpiderActions {
     public float age(float partial){return Math.max(0,now()-data().getLong("Start")+partial);}
     private void set(Move move,Entity target,Vec3 aim,int leg){
         var t=data().copy();
+        t.putFloat("IdleOnEntry",SpiderIdle.weight(boss,1));
         float facing=boss.skinYaw(1);
         t.putFloat("ActionYaw",facing);
         t.putFloat("Facing",facing);t.putFloat("FaceFrom",facing);t.putLong("FaceTick",now());
