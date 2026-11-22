@@ -12,10 +12,12 @@ import com.codex.blacklight.combat.ImpactTier;
 import com.codex.blacklight.combat.WeaponMove;
 import com.codex.blacklight.entity.BackspineQuill;
 import com.codex.blacklight.power.PowerForm;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -24,23 +26,36 @@ import org.joml.Quaternionf;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class CombatFeedbackContactGameTest {
-    @GameTest(template="wall_test", batch="feedback_quick_focus", timeoutTicks=45)
+    @GameTest(template="wall_test", batch="feedback_quick_focus", timeoutTicks=180)
     public static void threeQuillsShareTwelveDamageOnOneTarget(GameTestHelper h) { fan(h, 1, false); }
 
-    @GameTest(template="wall_test", batch="feedback_full_focus", timeoutTicks=45)
+    @GameTest(template="wall_test", batch="feedback_full_focus", timeoutTicks=180)
     public static void fiveQuillsShareTwentyOneDamageOnOneTarget(GameTestHelper h) { fan(h, 2, false); }
 
-    @GameTest(template="wall_test", batch="feedback_full_spread", timeoutTicks=45)
+    @GameTest(template="wall_test", batch="feedback_full_spread", timeoutTicks=180)
     public static void separatedTargetsTakeOnlyTheQuillThatHitsThem(GameTestHelper h) { fan(h, 2, true); }
 
     private static void fan(GameTestHelper h, int pairs, boolean spread) {
+        var origin = h.absolutePos(new BlockPos(3, 40, 3));
+        var chunk = new ChunkPos(origin);
+        // Keep all five targets and their three-block flight paths inside the ticking test chunk.
+        var first = new BlockPos(chunk.getMinBlockX() + 2, origin.getY(), chunk.getMinBlockZ() + 9);
+        h.startSequence().thenWaitUntil(() -> h.assertTrue(h.getLevel().isPositionEntityTicking(first),
+                "waiting for the volley lane to start ticking")).thenExecute(() -> fireFan(h, pairs, spread, first));
+    }
+
+    private static void fireFan(GameTestHelper h, int pairs, boolean spread, BlockPos first) {
         var shooter = MovingCombatGameTest.player(h, PowerForm.BACKSPINES);
         float total = pairs == 1 ? 12 : 21;
         var victims = new IronGolem[spread ? pairs * 2 + 1 : 1];
         for (int i = 0; i < victims.length; i++) {
-            var victim = h.spawn(EntityType.IRON_GOLEM, 2 + i * 2, 10, 7);
+            var victim = EntityType.IRON_GOLEM.create(h.getLevel());
+            var position = first.east(i * 2);
+            victim.moveTo(position.getX() + .5, position.getY(), position.getZ() + .5, 0, 0);
             victim.setNoAi(true);
             victim.setNoGravity(true);
+            victim.setPersistenceRequired();
+            h.assertTrue(h.getLevel().addFreshEntity(victim), "registered volley target " + i);
             victims[i] = victim;
         }
         for (int slot = -pairs; slot <= pairs; slot++) {

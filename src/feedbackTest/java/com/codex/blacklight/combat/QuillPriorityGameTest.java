@@ -529,6 +529,127 @@ public final class QuillPriorityGameTest {
             }
         });
     }
+    @GameTest(template="wall_test",timeoutTicks=600,batch="quill_air_lock_range")
+    public static void airborneShoulderAndOrbitHitRearLockAt42Blocks(GameTestHelper h){
+        var level=h.getLevel();
+        var p=join(h,"RearAirHeavy");
+        var players=level.getServer().getPlayerList();
+        int view=players.getViewDistance();
+        if(view<4)players.setViewDistance(4);
+        var start=h.absolutePos(new BlockPos(5,110,5)).getCenter();
+        var far=net.minecraft.core.BlockPos.containing(start.add(0,0,42));
+        var forced=new ArrayList<net.minecraft.world.level.ChunkPos>();
+        for(int x=(far.getX()-2)>>4;x<=(far.getX()+2)>>4;x++)
+            for(int z=(net.minecraft.util.Mth.floor(start.z)-2)>>4;z<=(far.getZ()+2)>>4;z++){
+                var chunk=new net.minecraft.world.level.ChunkPos(x,z);
+                if(level.setChunkForced(x,z,true))forced.add(chunk);
+                level.getChunk(x,z);
+            }
+        // Entity-section loading is asynchronous on NeoForge's accelerated GameTest server.
+        h.startSequence().thenWaitUntil(()->{
+            java.util.concurrent.locks.LockSupport.parkNanos(20_000_000L);
+            for(int z=net.minecraft.util.Mth.floor(start.z)>>4;z<=far.getZ()>>4;z++)
+                h.assertTrue(level.isPositionEntityTicking(new BlockPos(far.getX(),far.getY(),z<<4)),
+                        "waiting for the entire projectile lane to tick");
+        }).thenExecute(()->runRearAirHeavy(h,p,start,forced,view));
+    }
+    private static void runRearAirHeavy(GameTestHelper h,ServerPlayer p,net.minecraft.world.phys.Vec3 start,
+                                        List<net.minecraft.world.level.ChunkPos> forced,int view){
+        var level=h.getLevel();
+        var players=level.getServer().getPlayerList();
+        p.connection.teleport(start.x,start.y,start.z,180,0);
+        var state=QuillHarvest.state(p);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);state.addBiomass(1000);
+        state.addEvolutionPoints(50000000);
+        p.setData(ModAttachments.EVOLUTION_MILESTONES,new com.codex.blacklight.state.EvolutionMilestones(1));
+        for(var stat:List.of(com.codex.blacklight.power.EvolutionAttribute.QUILL_DURATION,com.codex.blacklight.power.EvolutionAttribute.QUILL_SWARM)){
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,stat,1000)==1000,"first 1000 ranks");
+            h.assertTrue(com.codex.blacklight.power.InfiniteEvolutionSystem.purchase(p,stat,10)==10,"1010 ranks");
+        }
+        p.setNoGravity(true);p.setOnGround(false);
+        p.getPersistentData().putLong("BlacklightNextQuillSortie",Long.MAX_VALUE);
+        var mobs=new ArrayList<Mob>();
+        var enemy=spawn(p,mobs,EntityType.HUSK,0,42,500,500);enemy.setNoGravity(true);
+        var orbit=harvestAtShoulder(h,p,mobs);
+        boolean[] hit={false,false,false};
+        var started=new long[]{-1};
+        var tapShots=new HashSet<UUID>();
+        float[] hpAtLaunch={0};
+        h.onEachTick(()->{
+            if(started[0]<0){
+                if(level.getEntity(enemy.getId())!=enemy){
+                    java.util.concurrent.locks.LockSupport.parkNanos(10_000_000L);
+                    return;
+                }
+                CombatTargeting.requestLock(p,enemy.getId());
+                h.assertTrue(CombatTargeting.locked(p)==enemy,"rear target locked at 42 blocks");
+                started[0]=h.getTick();
+            }
+            int t=(int)(h.getTick()-started[0]);
+            p.setOnGround(false);p.setNoGravity(true);p.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            WeaponCombatSystem.acceptInput(p,false,t==2 || t>=60 && t<97);
+            p.tickCount++;WeaponCombatSystem.tick(new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));
+            for(var shot:level.getEntitiesOfClass(com.codex.blacklight.entity.BackspineQuill.class,p.getBoundingBox().inflate(65),q->q.getOwner()==p && q.heavy())){
+                if(t<60)tapShots.add(shot.getUUID());
+                else if(!tapShots.contains(shot.getUUID()) && enemy.getUUID().equals(shot.aimTarget()))hit[1]=true;
+            }
+            if(t==58)hit[0]=enemy.getHealth()<500 && !tapShots.isEmpty();
+            if(t==60)hpAtLaunch[0]=enemy.getHealth();
+            if(t==131)hit[1]&=enemy.getHealth()<hpAtLaunch[0];
+            if(t==132){
+                hpAtLaunch[0]=enemy.getHealth();
+                p.getPersistentData().remove("BlacklightNextQuillSortie");
+            }
+            if(t>=132 && enemy.getUUID().equals(orbit.strikeTarget()))hit[2]=true;
+            if(t>=170){
+                try{
+                    h.assertTrue(hit[0] && hit[1] && hit[2] && enemy.getHealth()<hpAtLaunch[0],"42-block locked hits tap="+hit[0]+" hold="+hit[1]+" orbit="+hit[2]+" hp="+enemy.getHealth());
+                    h.succeed();
+                }finally{
+                    WeaponCombatSystem.cancelHeldInput(p);CombatTargeting.requestLock(p,-1);orbit.discard();
+                    for(var mob:mobs)mob.discard();
+                    for(var chunk:forced)level.setChunkForced(chunk.x,chunk.z,false);
+                    players.remove(p);
+                    if(view<4)players.setViewDistance(view);
+                }
+            }
+        });
+    }
+
+    @GameTest(template="wall_test",timeoutTicks=80,batch="quill_finisher_order")
+    public static void onlyAnExplicitFollowUpCanFinishAnOpenTarget(GameTestHelper h){
+        var p=join(h,"QuillOrder");
+        var mobs=new ArrayList<Mob>();
+        var start=h.absolutePos(new BlockPos(5,155,5)).getCenter();
+        p.connection.teleport(start.x,start.y,start.z,180,0);
+        var state=QuillHarvest.state(p);
+        state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.BACKSPINES);state.activate(PowerForm.BACKSPINES);
+        var q=harvestAtShoulder(h,p,mobs);
+        var mob=spawn(p,mobs,EntityType.HUSK,0,4,200,100);
+        try{
+            CombatTargeting.requestLock(p,mob.getId());QuillHarvest.dispatch(p);
+            h.assertTrue(mob.getUUID().equals(q.strikeTarget()),"outbound before the opening");
+            mob.setHealth(1);
+            mob.getPersistentData().putBoolean("BlacklightConsumeLastChanceUsed",true);
+            mob.getPersistentData().putBoolean("BlacklightConsumeAwaitingFinisher",true);
+            q.tick();
+            h.assertTrue(q.phase()==QuillOrgan.REJOIN && mob.getHealth()==1,"old volley cannot spend the new opening");
+            for(int i=0;i<20 && q.phase()==QuillOrgan.REJOIN;i++)q.tick();
+            CombatTargeting.requestLock(p,-1);
+            p.getPersistentData().remove("BlacklightNextQuillSortie");QuillHarvest.dispatch(p);
+            h.assertTrue(q.phase()==QuillOrgan.ORBIT && mob.getHealth()==1,"passive orbit preserves the opportunity to consume");
+            CombatTargeting.requestLock(p,mob.getId());
+            p.getPersistentData().remove("BlacklightNextQuillSortie");QuillHarvest.dispatch(p);
+            for(int i=0;i<20 && q.phase()==QuillOrgan.STRIKE;i++)q.tick();
+            h.assertTrue(!mob.isAlive(),"explicit lock allows a new volley to finish the target");
+            h.succeed();
+        }finally{
+            q.discard();CombatTargeting.requestLock(p,-1);
+            for(var m:mobs)m.discard();
+            p.serverLevel().getServer().getPlayerList().remove(p);
+        }
+    }
+
     private static long remainingLife(QuillOrgan q){
         return q.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getLong("life");
     }
