@@ -246,6 +246,7 @@ public final class ClientClawEvents {
             event.setCanceled(true);return;
         }
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
+        if (SkillBindings.mouse(minecraft.options.keyUse,event.getButton()) && com.codex.blacklight.item.GreeneTissueItem.held(minecraft.player) && !minecraft.player.getData(ModAttachments.CONSUMING)) return;
         if(ClientWeaponCombat.active()&&(SkillBindings.mouse(minecraft.options.keyAttack,event.getButton())||SkillBindings.mouse(minecraft.options.keyUse,event.getButton()))){
             event.setCanceled(true);ClientWeaponCombat.poll();return;
         }
@@ -568,6 +569,7 @@ public final class ClientClawEvents {
         if (minecraft.player == null || minecraft.screen != null) return;
         if (VehicleControls.riding() || event.isUseItem() && (VehicleControls.interacting() || aimsAtConsole(minecraft))) return;
         var state = minecraft.player.getData(ModAttachments.PLAYER_STATE);
+        if (event.isUseItem() && com.codex.blacklight.item.GreeneTissueItem.held(minecraft.player) && !minecraft.player.getData(ModAttachments.CONSUMING)) return;
         if(ClientWeaponCombat.active()) {event.setSwingHand(false);event.setCanceled(true);ClientWeaponCombat.poll();return;}
         if(state.isPrototypeMode()&&minecraft.player.getData(ModAttachments.CONSUMING)) {
             event.setSwingHand(false);event.setCanceled(true);tickGrabButtons();return;

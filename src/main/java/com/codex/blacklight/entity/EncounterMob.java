@@ -1540,7 +1540,13 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){c.add(new AnimationController<>(this,"body",3,s->s.setAndContinue(RawAnimation.begin().thenLoop(kind()==EncounterKind.BRAWLER&&move()==EncounterMove.NONE&&getDeltaMovement().horizontalDistanceSqr()>.0002?"run":"idle"))));}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}
     @Override public void lerpTo(double x,double y,double z,float yaw,float pitch,int steps){super.lerpTo(x,y,z,yaw,pitch,kind==EncounterKind.FLYER||kind==EncounterKind.ELIZABETH_GREENE&&greeneBattle.controlsRoot()?1:steps);}
-    @Override public AABB getBoundingBoxForCulling(){var bounds=super.getBoundingBoxForCulling();if(kind==EncounterKind.ELIZABETH_GREENE && greeneOutbreak())return bounds.inflate(48,64,48);if(kind==EncounterKind.FLYER)return bounds.inflate(3,2,3);if(greeneParts!=null)for(var part:greeneParts)if(part!=null)bounds=bounds.minmax(part.getBoundingBox());return bounds;}
+    @Override public AABB getBoundingBoxForCulling(){var bounds=super.getBoundingBoxForCulling();if(kind==EncounterKind.ELIZABETH_GREENE && greeneOutbreak()){
+            var envelope=bounds.inflate(48,64,48);
+            if(spider.live() && spider.actions.move()==com.codex.blacklight.combat.SpiderActions.Move.SPIKES){
+                var aim=spider.actions.aim();envelope=envelope.minmax(new AABB(aim,aim).inflate(12,5,12));
+            }
+            return envelope;
+        }if(kind==EncounterKind.FLYER)return bounds.inflate(3,2,3);if(greeneParts!=null)for(var part:greeneParts)if(part!=null)bounds=bounds.minmax(part.getBoundingBox());return bounds;}
     private final class FightGoal extends Goal{
         FightGoal(){setFlags(EnumSet.of(Flag.MOVE,Flag.LOOK));}
         @Override public boolean canUse(){return !disabled()&&(waitingForConvoyGate()||move()!=EncounterMove.NONE||enemy(getTarget())

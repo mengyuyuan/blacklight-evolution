@@ -14,6 +14,7 @@ import software.bernie.geckolib.cache.object.GeoBone;
 public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<EncounterMob> {
     private final GreeneSpiderRenderer spider;
     private final GreeneGoddessRenderer goddess;
+    private final SpiderAttackEffects attackEffects=new SpiderAttackEffects();
     private final GreeneNursery nursery=new GreeneNursery();
     public GreeneEncounterRenderer(EntityRendererProvider.Context context) {
         super(context,EncounterMob::asset);
@@ -102,6 +103,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         if(boss.spider.first()){
             var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
             var origin=boss.getPosition(partial);
+            attackEffects.draw(boss,partial,stack,out,light);
             var seed=boss.spider.actions.flyingSeed(partial);
             if(seed!=null){
                 var local=seed.subtract(origin);

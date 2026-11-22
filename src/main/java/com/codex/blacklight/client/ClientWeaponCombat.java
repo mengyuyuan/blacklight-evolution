@@ -46,6 +46,8 @@ public final class ClientWeaponCombat {
         var mc=Minecraft.getInstance();if(mc.getWindow()==null)return;
         long window=mc.getWindow().getWindow();
         boolean l=SkillBindings.down(mc.options.keyAttack),r=SkillBindings.down(mc.options.keyUse);
+        boolean sensing = com.codex.blacklight.item.GreeneTissueItem.held(mc.player);
+        if (sensing) r = false;
         boolean a=ClientClawEvents.physicalGrabDown(),j=mc.options.keyJump.isDown();
         wheelAttack&=l;wheelSpecial&=r;resumeAttack&=l;resumeSpecial&=r;
         if(!mc.isWindowActive()||mc.getCameraEntity()!=mc.player
@@ -82,7 +84,8 @@ public final class ClientWeaponCombat {
                 PacketDistributor.sendToServer(new WeaponInputPayload(l&&!requireLeftRelease,r&&!requireRightRelease,a,j,false));sentAt=mc.player.tickCount;
             }
             controlling=true;
-            mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
+            mc.options.keyAttack.setDown(false);
+            if (!sensing) mc.options.keyUse.setDown(false);
         }
         left=l;right=r;action=a;jump=j;
     }

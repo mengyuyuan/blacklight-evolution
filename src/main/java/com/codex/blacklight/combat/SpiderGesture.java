@@ -36,8 +36,8 @@ public final class SpiderGesture {
                 lateral+=toward*(-.7F*rise+.88F*land);forward+=1.05F*land-.55F*pry;
             }
             case FLESH_VOLLEY -> {
-                float load=phrase(t,0,12,32,42);
-                float kick=phrase(t,15,18,19,24)+phrase(t,24,27,28,33)+phrase(t,33,36,37,42);
+                float load=phrase(t,0,11,29,36);
+                float kick=phrase(t,13,16,17,21)+phrase(t,20,23,24,28)+phrase(t,27,30,31,36);
                 pitch+=.16F*load-.15F*kick;forward+=.48F*load-.72F*kick;sink-=.21F*load;
             }
             case STAB -> {

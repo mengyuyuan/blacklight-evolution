@@ -38,7 +38,7 @@ public final class SurvivalGuide {
             }
         }
     }
-    private static boolean done(ServerPlayer player, String name) {
+    public static boolean done(ServerPlayer player, String name) {
         var advancement = player.server.getAdvancements().get(ResourceLocation.fromNamespaceAndPath("blacklight", name));
         return advancement != null && player.getAdvancements().getOrStartProgress(advancement).isDone();
     }

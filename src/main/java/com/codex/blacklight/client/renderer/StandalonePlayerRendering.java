@@ -32,6 +32,7 @@ public final class StandalonePlayerRendering {
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
         if(player==null||!allowFirstPersonHands(player.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle)||player.isScoping()||!player.getData(ModAttachments.PLAYER_STATE).isPrototypeMode())return;
         if(com.codex.blacklight.power.BiomassSystem.active(player)){event.setCanceled(true);return;}
+        if (com.codex.blacklight.item.GreeneTissueItem.isTissue(player.getItemInHand(event.getHand()))) return;
         var form=player.getData(ModAttachments.PLAYER_STATE).getActivePower();
         var morph=WeaponMorphTracker.sample(player,event.getPartialTick());
         if(morph.shoulder()>.001F&&event.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND)
