@@ -92,6 +92,50 @@ public final class SpiderFooting {
         if(!next.equals(contacts)){var s=boss.spiderData().copy();s.put("Footing",next);boss.spiderData(s);}
     }
 
+    public boolean pairedSupport(){
+        int healthy=(~boss.spider.brokenMask())&255;
+        return Integer.bitCount(healthy)>=4 && (healthy&15)!=0 && (healthy&240)!=0;
+    }
+    public record Balance(float across,float lower,float along,float roll,float pitch){}
+    private static final Balance LEVEL=new Balance(0,0,0,0,0);
+    private CompoundTag balanceState;
+    private long balanceTime;
+    private float balancePartial,balanceYaw;
+    private Vec3 balanceOrigin;
+    private Balance balance=LEVEL;
+
+    /** Resolve the centre of pressure from the eight actual footholds in shell coordinates.
+     * A newly broken leg unloads over ten ticks; the existing knockdown owns the immediate fall. */
+    public Balance balance(float partial){
+        var state=boss.spiderData();int lost=boss.spider.brokenMask();if(lost==0)return LEVEL;
+        var origin=boss.getPosition(partial);var now=boss.level().getGameTime();float yaw=boss.skinYaw(partial);
+        if(balanceState==state && balanceTime==now && balanceYaw==yaw && balancePartial==partial && origin.equals(balanceOrigin))return balance;
+        float total=0,baselineX=0,baselineZ=0;double x=0,z=0;
+        var contacts=planted();float angle=(float)Math.toRadians(yaw-180);
+        for(int leg=0;leg<8;leg++){
+            var bind=SpiderAnatomy.TIPS.get(SpiderAnatomy.shin(leg));
+            baselineX+=bind.x/8;baselineZ+=bind.z/8;
+            var contact=contacts.getCompound(KEYS[leg]);var local=bind;
+            float weight=1;
+            if(!contact.isEmpty()){
+                if(!contact.getBoolean("Contact"))weight=.10F;
+                local=foot(leg,partial).subtract(origin).yRot(angle).scale(1/1.9824204);
+                float progress=Mth.clamp((now-contact.getLong("At")+partial)/STRIDE,0,1);
+                weight*=1-.75F*(float)Math.sin(Math.PI*progress);
+            }
+            if(boss.spider.broken(leg))weight*=1-SpiderGesture.ease(now-state.getLong("Break"+leg)+partial,0,10);
+            x+=local.x*weight;z+=local.z*weight;total+=weight;
+        }
+        // Below one effective support the abdominal shell takes the weight.
+        double blend=Math.min(total,1);
+        float across=(float)Mth.clamp((x/Math.max(total,.001F)-baselineX)*blend/8,-1,1);
+        float along=(float)Mth.clamp((z/Math.max(total,.001F)-baselineZ)*blend/5.7,-1,1);
+        float lower=-.055F*Integer.bitCount(lost)-.34F*(1-Math.min(total/3,1));
+        balance=new Balance(across*.98F,lower,along*.83F,across*.31F,-along*.31F);
+        balanceState=state;balanceTime=now;balanceYaw=yaw;balancePartial=partial;balanceOrigin=origin;
+        return balance;
+    }
+
     /** Take weight on a different leg before the attacking limb leaves the ground. */
     void brace(SpiderActions.Move move,int striking,Vec3 aim) {
         if(striking<0 || !(boss.level() instanceof ServerLevel level))return;
@@ -122,6 +166,7 @@ public final class SpiderFooting {
         int selected=boss.spiderData().getInt("Foot");
         return switch(boss.spider.actions.move()) {
             case STAB,SWEEP,POUNCE -> selected==leg;
+            case MARCH -> selected==leg || boss.spiderData().getInt("RushSecond")==leg;
             case PINCER,SWALLOW -> selected>=0 && selected%4==leg%4;
             default -> false;
         };

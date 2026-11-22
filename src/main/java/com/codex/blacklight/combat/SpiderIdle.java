@@ -66,6 +66,8 @@ public final class SpiderIdle {
         float w=weight(b,partial);
         if(w<=0)return action;
         var idle=track.sample(phase(b,partial),w);
+        if(Integer.bitCount(b.spider.brokenMask())>=6 && b.spider.actions.move()==SpiderActions.Move.REST
+                && action!=null && (joint.startsWith("elbow_") || joint.startsWith("wrist_")))return idle.mul(action);
         if(action!=null)return w>=1?idle:idle.mul(new Quaternionf().slerp(action,1-w));
         // Persistent mouth damage and an actual meal still move the teeth over the idle clip.
         float flex=b.spider.flex(joint,partial);

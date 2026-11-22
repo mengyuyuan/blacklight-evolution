@@ -38,6 +38,7 @@ public final class SpiderPhase {
         return switch(actions.move()){
             case STAB,SWEEP,POUNCE -> leg==foot && t>=18 && t<=40;
             case PINCER,SWALLOW -> leg%4==foot%4 && t>=16 && t<=40;
+            case MARCH -> leg==foot && t>=21 && t<=32 || leg==data().getInt("RushSecond") && t>=38 && t<=50;
             case RECOIL -> true;
             default -> false;
         };
@@ -49,7 +50,7 @@ public final class SpiderPhase {
     public void load(CompoundTag t){
         if(t.contains("SavedClock")){
             long delta=now()-t.getLong("SavedClock");t.remove("SavedClock");
-            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","LastTumor","OralAt","Swallowed","BlastAt"))
+            for(var key:java.util.List.of("NextMeal","MealStart","DragAt","SwallowAt","DownUntil","NextMove","Start","FaceTick","LastTumor","OralAt","Swallowed","BlastAt","HatchDue","HatchStart","HatchedAt","SafeFromMouth"))
                 if(t.contains(key))t.putLong(key,t.getLong(key)+delta);
             for(String leg:t.getCompound("Footing").getAllKeys()){
                 var step=t.getCompound("Footing").getCompound(leg);step.putLong("At",step.getLong("At")+delta);
@@ -178,6 +179,11 @@ public final class SpiderPhase {
         if(progress<.075F && amount>0 && (!t.contains("Flinch"+leg) || now()-t.getLong("Flinch"+leg)>7)){
             t.putLong("Flinch"+leg,now());
             t.putFloat("Recoil"+leg,Math.min(1F,.24F+damage/boss.getMaxHealth()*18F));
+        }
+        if(progress<.075F && amount>0 && SpiderAnatomy.tendon(id) && exposedTendon(leg)
+                && actions.move()==SpiderActions.Move.PINCER && data().getBoolean("Gripped") && actions.age(0)<28){
+            boss.spiderData(t);actions.cancel();SpiderFoley.play(boss,hit.point(),SpiderFoley.Cue.TEAR,1.15F);
+            return;
         }
         if(progress>=.075F){
 

@@ -17,8 +17,9 @@ import java.util.*;
 
 /** Server action clock. Each swing, contact and release has one owner and one saved target. */
 public final class SpiderActions {
-    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL }
+    public enum Move { REST, STAB, SWEEP, PINCER, SPIKES, SLAM, POUNCE, CATALYZE, SWALLOW, RECOIL, MARCH }
     private static final int[] STRIDE_HEADINGS={0,32,-32};
+    private static final int[] STRAIGHT={0};
     private static final double[] STEP_HEIGHTS={0,.5,1.01};
     private final EncounterMob boss;
     public SpiderActions(EncounterMob boss){this.boss=boss;}
@@ -34,9 +35,14 @@ public final class SpiderActions {
         t.putFloat("Facing",facing);t.putFloat("FaceFrom",facing);t.putLong("FaceTick",now());
         if(move!=Move.REST && move!=Move.RECOIL)t.putInt("LastAttack",move.ordinal());
         t.putInt("Action",move.ordinal());t.putLong("Start",now());t.putBoolean("Struck",false);
-        t.remove("Gripped");t.remove("Missed");t.remove("ActionTarget");
+        t.remove("Gripped");t.remove("Missed");t.remove("ActionTarget");t.remove("ActionId");
+        t.remove("RushStopped");t.remove("RushSecond");
         if(target!=null){t.putUUID("ActionTarget",target.getUUID());t.putInt("ActionId",target.getId());}
         t.putDouble("Ax",aim.x);t.putDouble("Ay",aim.y);t.putDouble("Az",aim.z);t.putInt("Foot",leg);
+        if(move==Move.MARCH){
+            t.putInt("RushSecond",intact(aim,leg<4?4:0,leg<4?8:4));
+            t.putDouble("RushX",boss.getX());t.putDouble("RushZ",boss.getZ());
+        }
         boss.spiderData(t);
         if(move==Move.STAB || move==Move.SWEEP || move==Move.SLAM || move==Move.PINCER)
             boss.spider.footing.brace(move,leg,aim);
@@ -99,9 +105,10 @@ public final class SpiderActions {
             }
         }
     }
-    private int intact(Vec3 target){
+    private int intact(Vec3 target){return intact(target,0,8);}
+    private int intact(Vec3 target,int start,int end){
         int best=-1;double score=Double.MAX_VALUE;
-        for(int leg=0;leg<8;leg++)if(!boss.spider.broken(leg)){
+        for(int leg=start;leg<end;leg++)if(!boss.spider.broken(leg)){
             var tip=SpiderAnatomy.point(boss,1,SpiderAnatomy.TIPS.get(SpiderAnatomy.shin(leg)));
             double dist=tip.distanceToSqr(target);
             if(dist<score){score=dist;best=leg;}
@@ -109,42 +116,74 @@ public final class SpiderActions {
         return best;
     }
     public void moltBrood(ServerLevel level,int age){
-        if(age%22!=0 || age>154)return;
-        hatch(level,true);
+        brood(level,true,age%22==0 && age<=154);
     }
     public void spawnBrood(ServerLevel level){
-        if(!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING) || boss.tickCount%75!=1)return;
-        hatch(level,false);
+        brood(level,false,boss.tickCount%75==1);
     }
-    private void hatch(ServerLevel level,boolean molting){
-        var sight=boss.getBoundingBox().inflate(54);
-        if(level.getEntitiesOfClass(Mob.class,sight,SpiderPhase::edible).size()>=(molting?25:13))return;
-        long seed=level.getSeed();var site=com.codex.blacklight.world.GreeneHiveCave.nearest(seed,boss.blockPosition());
-        if(site.distSqr(boss.blockPosition())>50*50)return;
+    private void brood(ServerLevel level,boolean molting,boolean choose){
+        var state=data();var anchors=state.getLongArray("DenNests");
+        if(anchors.length!=6){
+            if(!choose)return;
+            var site=com.codex.blacklight.world.GreeneHiveCave.nearest(level.getSeed(),boss.blockPosition());
+            if(site.distSqr(boss.blockPosition())>52*52)return;
+            anchors=new long[6];
+            for(int i=0;i<6;i++)anchors[i]=com.codex.blacklight.world.GreeneHiveCave.sac(site,i).asLong();
+            state=state.copy();state.putLongArray("DenNests",anchors);boss.spiderData(state);
+        }
+        boolean allowed=molting || level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING);
+        if(state.contains("HatchDue")){
+            long since=now()-state.getLong("HatchDue");
+            if(since<0 && allowed)return;
+            int socket=state.getInt("HatchSlot"),breed=state.getInt("HatchBreed");
+            var occupant=state.getCompound("HatchChild");
+            var next=state.copy();next.remove("HatchDue");next.remove("HatchChild");boss.spiderData(next);
+            if(allowed && since>=0 && since<=20 && socket>=0 && socket<6)hatch(level,socket,BlockPos.of(anchors[socket]),breed,occupant);
+            return;
+        }
+        if(!choose || !allowed)return;
+        if(level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(54),SpiderPhase::edible).size()>=(molting?25:13))return;
         int start=boss.getRandom().nextInt(6);
         for(int i=0;i<6;i++){
-            int socket=(start+i)%6;
-            var anchor=com.codex.blacklight.world.GreeneHiveCave.sac(site,socket);
-            if(!level.hasChunkAt(anchor) || !level.getBlockState(anchor).is(com.codex.blacklight.registry.ModBlocks.TISSUE_ATTACHMENT.get()))continue;
-            int breed=boss.getRandom().nextInt(molting?5:12);
-            Mob child=switch(breed){
-                case 0->ModEntities.BLACKLIGHT_STALKER.get().create(level);
-                case 1->ModEntities.BLACKLIGHT_SPITTER.get().create(level);
-                case 2->ModEntities.BLACKLIGHT_HUNTER.get().create(level);
-                default->ModEntities.COMMON_INFECTED.get().create(level);
-            };
+            int socket=(start+i)%6;var anchor=BlockPos.of(anchors[socket]);
+            if(!nestExists(level,anchor))continue;
+            var next=state.copy();next.putInt("HatchSlot",socket);next.putInt("HatchBreed",boss.getRandom().nextInt(molting?5:12));
+            var child=broodType(next.getInt("HatchBreed")).create(level);
             if(child==null)return;
-            var normal=com.codex.blacklight.world.GreeneHiveCave.support(socket).getOpposite();
-            child.setPos(Vec3.atBottomCenterOf(anchor.relative(normal,3)));
-            if(!level.noCollision(child))continue;
-            child.getPersistentData().putBoolean("GreeneBroodFall",true);
-            child.getPersistentData().putUUID("EncounterOwner",boss.getUUID());
-            if(level.addFreshEntity(child)){
-                level.sendParticles(ParticleTypes.CRIMSON_SPORE,child.getX(),child.getY()+2,child.getZ(),14,.5,.3,.5,.02);
-                SpiderFoley.play(boss,Vec3.atCenterOf(anchor),SpiderFoley.Cue.SHED,1.25F);
-                SpiderFoley.strands(boss,Vec3.atCenterOf(anchor),child.position().subtract(Vec3.atCenterOf(anchor)),6);
-            }
+            var occupant=new CompoundTag();child.saveWithoutId(occupant);next.put("HatchChild",occupant);
+            next.putLong("HatchDue",now()+18);next.putLong("HatchStart",now());boss.spiderData(next);
+            SpiderFoley.play(boss,Vec3.atCenterOf(anchor),SpiderFoley.Cue.STRAIN,.95F);
             return;
+        }
+    }
+    private static boolean nestExists(ServerLevel level,BlockPos p){
+        return level.hasChunkAt(p) && level.getBlockState(p).is(com.codex.blacklight.registry.ModBlocks.TISSUE_ATTACHMENT.get());
+    }
+    public static EntityType<? extends Mob> broodType(int breed){
+        return switch(breed){
+            case 0->ModEntities.BLACKLIGHT_STALKER.get();
+            case 1->ModEntities.BLACKLIGHT_SPITTER.get();
+            case 2->ModEntities.BLACKLIGHT_HUNTER.get();
+            default->ModEntities.COMMON_INFECTED.get();
+        };
+    }
+    private void hatch(ServerLevel level,int socket,BlockPos anchor,int breed,CompoundTag occupant){
+        if(!nestExists(level,anchor))return;
+        Mob child=broodType(breed).create(level);if(child==null)return;
+        if(!occupant.isEmpty())child.load(occupant);
+        var normal=com.codex.blacklight.world.GreeneHiveCave.support(socket).getOpposite();
+        Vec3 spawn=Vec3.atBottomCenterOf(anchor.relative(normal,3));
+        float yaw=normal.getAxis().isVertical()?0:normal.toYRot();
+        child.moveTo(spawn.x,spawn.y,spawn.z,yaw,0);child.yBodyRot=yaw;child.yHeadRot=yaw;
+        if(!level.noCollision(child))return;
+        child.getPersistentData().putBoolean("GreeneBroodFall",true);
+        child.getPersistentData().putUUID("EncounterOwner",boss.getUUID());
+        if(level.addFreshEntity(child)){
+            var out=boss.spiderData().copy();out.putLong("HatchedAt",now());boss.spiderData(out);
+            child.setDeltaMovement(Vec3.atLowerCornerOf(normal.getNormal()).scale(.16));
+            level.sendParticles(ParticleTypes.CRIMSON_SPORE,spawn.x,spawn.y+1.1,spawn.z,10,.4,.28,.4,.045);
+            SpiderFoley.play(boss,Vec3.atCenterOf(anchor),SpiderFoley.Cue.SHED,1.35F);
+            SpiderFoley.strands(boss,Vec3.atCenterOf(anchor),spawn.subtract(Vec3.atCenterOf(anchor)),6);
         }
     }
     public void tick(ServerLevel level){
@@ -167,7 +206,14 @@ public final class SpiderActions {
             // Reposition between commitments; refuse an unsupported ledge or a solid wall.
             double range=diff.horizontalDistance();
             if(range>17 && Math.abs(Mth.wrapDegrees(yaw-facing))<30){
-                var stride=diff.multiply(1,0,1).normalize().scale(.14-.013*Integer.bitCount(boss.spider.brokenMask()));
+                int lost=boss.spider.brokenMask(),limbs=8-Integer.bitCount(lost);
+                double pace=.14-.012*Integer.bitCount(lost);
+                if(limbs<=2){
+                    // On the belly the forearms drag the shell only during the planted half-stroke.
+                    double stroke=Math.sin(((now()%36)-6)*Math.PI/18);
+                    pace=(.035+.012*limbs)*Math.max(0,stroke);
+                }else if((lost&15)==15 || (lost&240)==240)pace*=.52;
+                var stride=diff.multiply(1,0,1).normalize().scale(pace);
                 takeStep(stride);
             }
             return;
@@ -187,20 +233,28 @@ public final class SpiderActions {
             double d=diff.horizontalDistance();
             Move next;
             if(flank && foot>=0)next=Move.SWEEP;
-            else if(d>21)next=Move.SPIKES;
-            else if(count%6==4 && d<17 && foot>=0)next=Move.SWALLOW;
+            else if(d>21){
+                // After denying a distant lane she leaves her old position. A sustained retreat changes the fight.
+                boolean canMarch=boss.spider.footing.pairedSupport() && foot>=0 && intact(point,foot<4?4:0,foot<4?8:4)>=0;
+                next=canMarch && data().getInt("LastAttack")==Move.SPIKES.ordinal()?Move.MARCH:Move.SPIKES;
+            }
+            else if(count%6==4 && d<17 && foot>=0 && now()>=data().getLong("SafeFromMouth"))next=Move.SWALLOW;
             else if(d<12 && count%3==1)next=Move.SLAM;
             else if(foot<0)next=Move.SPIKES;
-            else if(boss.getHealth()<boss.getMaxHealth()*.6F && count%5==3 && wall())next=Move.POUNCE;
+            else if(boss.getHealth()<boss.getMaxHealth()*.6F && count%5==3){
+                if(wall())next=Move.POUNCE;
+                else next=boss.spider.footing.pairedSupport() && intact(point,foot<4?4:0,foot<4?8:4)>=0?Move.MARCH:Move.STAB;
+            }
             else next=switch(count%4){case 0 -> Move.STAB;case 1 -> Move.PINCER;case 2 -> Move.SWEEP;default -> Move.SPIKES;};
             set(next,player,point,foot);
             if(foot>=0 && (next==Move.STAB||next==Move.PINCER||next==Move.SWEEP))SpiderFoley.play(boss,SpiderLegPose.worldTip(boss,foot,1),SpiderFoley.Cue.LOAD,1.15F);
         }
         var t=data().copy();t.putInt("Turns",count+1);boss.spiderData(t);
     }
-    private void takeStep(Vec3 stride){
+    private void takeStep(Vec3 stride){if(stride.lengthSqr()>1e-7)step(stride,STRIDE_HEADINGS);}
+    private boolean step(Vec3 stride,int[] headings){
         var level=boss.level();
-        for(int angle:STRIDE_HEADINGS){
+        for(int angle:headings){
             var step=stride.yRot((float)Math.toRadians(angle));
             var ahead=boss.position().add(step).add(step.normalize().scale(1.5));
             var floor=level.clip(new ClipContext(ahead.add(0,1.25,0),ahead.add(0,-1.2,0),
@@ -214,11 +268,13 @@ public final class SpiderActions {
                 if(level.getBlockCollisions(boss,raised.expandTowards(step)).iterator().hasNext())continue;
                 if(rise>0 && level.getBlockCollisions(boss,bounds.expandTowards(0,rise,0)).iterator().hasNext())continue;
                 if(rise>0)boss.move(MoverType.SELF,new Vec3(0,rise,0));
-                boss.move(MoverType.SELF,step);return;
+                boss.move(MoverType.SELF,step);return true;
             }
         }
+        return false;
     }
     private boolean wall(){
+        if(!boss.spider.footing.pairedSupport())return false;
         var from=boss.position().add(0,7,0);
         BlockHitResult best=null;
         for(int i=0;i<12;i++){
@@ -296,6 +352,8 @@ public final class SpiderActions {
         int leg=data().getInt("Foot");
         if(leg<0 || boss.spider.broken(leg)){rest(18);return;}
         int impact=m==Move.POUNCE?29:m==Move.SWEEP?22:18;
+        if(m==Move.MARCH){march(level,p,t,leg);return;}
+        if(m==Move.PINCER){pincer(p,t,leg);return;}
         if(m==Move.SWEEP && t>=14 && t<=31){
             var before=SpiderLegPose.worldTip(boss,leg,0);var after=SpiderLegPose.worldTip(boss,leg,1);
             if(DevastatorCollision.capsuleDistanceSquared(before,after,p.getBoundingBox())<1.85*1.85 && clear(after.add(0,.35,0),p.getEyePosition()))
@@ -303,13 +361,10 @@ public final class SpiderActions {
             if(t==18 || t==26)SpiderFoley.ground(boss,after,1.15F,SpiderFoley.Cue.SCRAPE);
         }
         if(t==impact && m!=Move.SWEEP){
-            Vec3 at=SpiderLegPose.worldTip(boss,leg,1);double radius=m==Move.POUNCE?3.8:m==Move.PINCER?2.4:1.85;
+            Vec3 at=SpiderLegPose.worldTip(boss,leg,1);double radius=m==Move.POUNCE?3.8:1.85;
             boolean touched=p.position().distanceToSqr(at)<radius*radius && clear(at.add(0,2,0),p.getEyePosition());
-            if(!touched && m==Move.PINCER && !boss.spider.broken((leg+4)%8)){
-                var other=SpiderLegPose.worldTip(boss,(leg+4)%8,1);
-                touched=p.position().distanceToSqr(other)<radius*radius && clear(other.add(0,2,0),p.getEyePosition());
-            }
             if(touched)hit(p,m==Move.POUNCE?1F:.73F,.4);
+            if(m==Move.STAB)GreeneTendrilPod.plant(boss,at);
             SpiderFoley.ground(boss,at,m==Move.POUNCE?2.3F:1.75F,SpiderFoley.Cue.STRIKE);
         }
         if(t>=impact+23){
@@ -321,6 +376,84 @@ public final class SpiderActions {
             };
             rest(recovery);
         }
+    }
+    /** Both footfalls stay in the lane advertised at takeoff, even if the player sidesteps. */
+    public Vec3 marchGoal(boolean second){
+        var origin=new Vec3(data().getDouble("RushX"),boss.getY(),data().getDouble("RushZ"));
+        var dir=aim().subtract(origin).multiply(1,0,1);
+        double distance=Math.min(dir.length(),second?22:15);
+        var across=new Vec3(dir.z,0,-dir.x).normalize().scale((data().getInt("Foot")<4?1:-1)*(second?-1.1:1.1));
+        var at=origin.add(dir.normalize().scale(distance)).add(across);
+        var hit=boss.level().clip(new ClipContext(at.add(0,3,0),at.add(0,-4,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
+        return hit.getType()==HitResult.Type.BLOCK?hit.getLocation().add(0,.08,0):at;
+    }
+    private void march(ServerLevel level,ServerPlayer p,int t,int first){
+        int second=data().getInt("RushSecond");
+        if(second<0 || boss.spider.broken(second)){rest(28);return;}
+        if(data().contains("RushStopped")){
+            if(t-data().getInt("RushStopped")>=14)rest(28);
+            return;
+        }
+        if(t==4 || t==20)SpiderFoley.play(boss,SpiderLegPose.worldTip(boss,t==4?first:second,1),SpiderFoley.Cue.LOAD,1.45F);
+        if(t>=10 && t<=39){
+            var lane=aim().subtract(new Vec3(data().getDouble("RushX"),boss.getY(),data().getDouble("RushZ"))).multiply(1,0,1).normalize();
+            double v=(t<=23?.42:.48)*(1-.065*Integer.bitCount(boss.spider.brokenMask()));
+            if(!step(lane.scale(v),STRAIGHT)){
+                var st=data().copy();st.putInt("RushStopped",t);boss.spiderData(st);
+                SpiderFoley.ground(boss,boss.position().add(lane.scale(1.5)),1.45F,SpiderFoley.Cue.SCRAPE);
+                return;
+            }
+        }
+        if(t==21 || t==38){
+            var at=SpiderLegPose.worldTip(boss,t==21?first:second,1);
+            var floor=level.clip(new ClipContext(at.add(0,.55,0),at.add(0,-1.35,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
+            if(floor.getType()==HitResult.Type.BLOCK){
+                SpiderFoley.ground(boss,at,2.05F,SpiderFoley.Cue.STRIKE);
+                if(p.getBoundingBox().inflate(2.1,.95,2.1).contains(at) && clear(at.add(0,.45,0),p.getEyePosition()))hit(p,.82F,.48);
+            }
+        }
+        if(t>=55)rest(27);
+    }
+    public Vec3 pincerCarry(float partial){
+        float t=age(partial);
+        var from=new Vec3(data().getDouble("Px"),data().getDouble("Py"),data().getDouble("Pz"));
+        var lip=boss.spider.mouth(partial).add(0,-.9,0);
+        return from.lerp(lip,SpiderGesture.ease(t,18,28)).add(0,.48*Math.sin(Math.PI*SpiderGesture.ease(t,18,28)),0);
+    }
+    private void pincer(ServerPlayer p,int t,int leg){
+        int other=(leg+4)%8;
+        if(t==18){
+            var box=p.getBoundingBox().inflate(1.25);
+            boolean contact=false;
+            for(int foot:new int[]{leg,other}){
+                if(boss.spider.broken(foot))continue;
+                var tip=SpiderLegPose.worldTip(boss,foot,1);
+                SpiderFoley.ground(boss,tip,1.45F,SpiderFoley.Cue.PLANT);
+                contact|=box.contains(tip) && clear(tip,p.getEyePosition());
+            }
+            var st=data().copy();
+            if(contact && !boss.spider.broken(other) && !p.getPersistentData().hasUUID("GreeneGrasp")){
+                st.putBoolean("Gripped",true);st.putDouble("Px",p.getX());st.putDouble("Py",p.getY());st.putDouble("Pz",p.getZ());
+                p.getPersistentData().putUUID("GreeneGrasp",boss.getUUID());
+                SpiderFoley.play(boss,p.position(),SpiderFoley.Cue.CATCH,1.1F);
+            }else st.putBoolean("Missed",true);
+            boss.spiderData(st);
+        }
+        if(t>18 && t<=28 && data().getBoolean("Gripped")){
+            if(boss.spider.broken(other)){rest(26);return;}
+            var next=pincerCarry(1);
+            var box=p.getBoundingBox().move(next.subtract(p.position())).deflate(.001);
+            if(!clear(p.getEyePosition(),next.add(0,p.getEyeHeight(),0)) || boss.level().getBlockCollisions(p,box).iterator().hasNext()){
+                rest(26);return;
+            }
+            p.teleportTo(next.x,next.y,next.z);p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
+            if(t==28){
+                hit(p,.73F,.18);releaseGrip();
+                SpiderFoley.play(boss,boss.spider.mouth(1),SpiderFoley.Cue.CATCH,1.55F);
+                SpiderFoley.strands(boss,boss.spider.mouth(1),p.position().subtract(boss.spider.mouth(1)),7);
+            }
+        }
+        if(t>=44)rest(data().getBoolean("Missed")?32:27);
     }
     private void grapple(ServerPlayer p,Move m,int t){
         int grip=m==Move.SWALLOW?24:18;
@@ -378,7 +511,10 @@ public final class SpiderActions {
         if(p.hurt(boss.damageSources().mobAttack(boss),(float)boss.kind().damage*scale)){
             var dir=p.position().subtract(boss.position()).multiply(1,0,1).normalize();
             p.push(dir.x*.55,lift,dir.z*.55);p.hurtMarked=true;
-            var t=data().copy();t.putBoolean("Struck",true);t.putInt("ContactAge",(int)age(0));boss.spiderData(t);
+            var t=data().copy();
+            if(move()==Move.PINCER || move()==Move.MARCH || move()==Move.SLAM || move()==Move.SPIKES || move()==Move.POUNCE)
+                t.putLong("SafeFromMouth",now()+86);
+            t.putBoolean("Struck",true);t.putInt("ContactAge",(int)age(0));boss.spiderData(t);
         }
     }
     private void spike(ServerLevel l,ServerPlayer p,int step){
@@ -396,7 +532,19 @@ public final class SpiderActions {
         float t=age(partial);Move action=move();
         float stroke=(float)Math.sin(Math.PI*Mth.clamp(t/(action==Move.SPIKES?43:39),0,1));
         if(action==Move.REST || action==Move.RECOIL)return 0;
-        if(bone.startsWith("fang_"))return action==Move.SWALLOW?.38F*stroke:0;
+        if(bone.startsWith("fang_")){
+            int index=Integer.parseInt(bone.substring(5));
+            float side=index<5?-1:1;
+            float lag=(index%4)*.6F;
+            if(action==Move.PINCER){
+                float open=SpiderGesture.phrase(t-lag,4,16,25,29);
+                float snap=SpiderGesture.phrase(t-lag*.28F,26,29,30,39);
+                return side*(.60F*open-.23F*snap);
+            }
+            if(action==Move.SWALLOW)return side*(.78F*SpiderGesture.phrase(t-lag,2,18,43,51)
+                    -.12F*SpiderGesture.phrase(t,48,51,52,56));
+            return 0;
+        }
         if(bone.equals("thorax"))return action==Move.SLAM?-1.84F*crouch(partial):(action==Move.SWALLOW?.30F:action==Move.SPIKES?.36F:.15F)*stroke;
         if(bone.startsWith("arm_")||bone.startsWith("elbow_"))return (action==Move.SLAM?-.88F:action==Move.SPIKES?.94F:0)*stroke;
         if(bone.equals("streamer"))return action==Move.CATALYZE?.73F*stroke:0;

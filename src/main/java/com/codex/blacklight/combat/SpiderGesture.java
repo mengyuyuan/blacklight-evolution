@@ -24,8 +24,8 @@ public final class SpiderGesture {
         if(!b.spider.live())return m;
         var a=b.spider.actions;float t=a.age(partial);
         int lost=b.spider.brokenMask(),foot=b.spiderData().getInt("Foot");
-        float favor=(Integer.bitCount(lost&15)-Integer.bitCount(lost>>>4))*.016F;
-        float roll=favor, pitch=0, sink=-.043F*Integer.bitCount(lost)+.062F*breathing(b,partial);
+        var support=b.spider.footing.balance(partial);
+        float roll=support.roll(),pitch=support.pitch(),sink=support.lower()+.062F*breathing(b,partial);
         float toward=foot<4?1F:-1F;
         float lateral=0, forward=0, twist=0;
         switch(a.move()){
@@ -57,12 +57,27 @@ public final class SpiderGesture {
                 lateral=.42F*phrase(t,0,9,10,17)-.26F*lift;
                 twist=.13F*phrase(t,1,10,12,18)-.14F*lift;
             }
-            case PINCER,SWALLOW -> {
-                float hit=a.move()==SpiderActions.Move.SWEEP?22:a.move()==SpiderActions.Move.SWALLOW?24:18;
-                float load=phrase(t,0,hit*.55F,hit*.65F,hit);
-                float drive=phrase(t,hit*.62F,hit+1,hit+5,hit+19);
-                roll+=toward*(.076F*load-.057F*drive);
-                pitch+=.09F*load-.12F*drive;sink-=.19F*load+.24F*drive;
+            case PINCER -> {
+                float open=phrase(t,0,10,12,19),lunge=phrase(t,10,18,21,28);
+                float bite=phrase(t,20,27,29,41),miss=b.spiderData().getBoolean("Missed")?phrase(t,18,24,28,43):0;
+                forward=-.95F*open+2.05F*lunge+1.13F*bite+.43F*miss;
+                sink+=.45F*open-1.0F*lunge-1.18F*bite-.44F*miss;
+                pitch+=.16F*open-.27F*lunge-.21F*bite;
+            }
+            case SWALLOW -> {
+                float arch=phrase(t,0,16,43,52);
+                sink+=.55F*arch;pitch+=.23F*arch;
+                lateral=toward*.25F*phrase(t,15,24,30,43);
+            }
+            case MARCH -> {
+                var state=b.spiderData();boolean blocked=state.contains("RushStopped");
+                float time=blocked?Math.min(t,state.getInt("RushStopped")):t;
+                float one=phrase(time,1,11,13,23),two=phrase(time,18,28,30,40);
+                float down=phrase(time,14,21,22,28)+phrase(time,31,38,39,48);
+                float fade=blocked?1-ease(t-time,0,13):1;
+                lateral+=toward*.94F*(two-one)*fade;roll+=toward*.19F*(one-two)*fade;
+                sink+=(.42F*(one+two)-.90F*down)*fade;
+                pitch+=(.17F*(one+two)-.22F*down)*fade;forward+=.83F*down*fade;
             }
             case SPIKES -> {pitch+=.15F*phrase(t,2,14,17,28)-.09F*phrase(t,15,21,34,48);roll+=.08F*phrase(t,3,17,33,47);}
             case POUNCE -> {
@@ -93,7 +108,7 @@ public final class SpiderGesture {
             float check=phrase(dt,0,2,3,8);
             forward-=.28F*check;twist+=toward*.09F*check;roll+=toward*.05F*check;
         }
-        return m.translate(lateral,sink,-forward).translate(.55F,4,0)
+        return m.translate(lateral+support.across(),sink,-forward+support.along()).translate(.55F,4,0)
                 .rotateY(twist).rotateZ(roll).rotateX(pitch).translate(-.55F,-4,0);
     }
 
@@ -114,7 +129,11 @@ public final class SpiderGesture {
             if(move==SpiderActions.Move.SPIKES){x+=.33F*phrase(t,2,13,16,25)-.21F*phrase(t,16,22,31,48);y-=.37F*phrase(t,2,14,28,47);}
             if(striking){y+=side*(.24F*phrase(t,0,10,12,21)-.27F*phrase(t,14,22,26,41));}
             if(move==SpiderActions.Move.CATALYZE){x+=.22F*phrase(t,2,15,26,37);y+=.25F*phrase(t,1,12,27,38);}
-            if(move==SpiderActions.Move.SWALLOW)x+=.32F*phrase(t,0,16,40,51);
+            if(move==SpiderActions.Move.SWALLOW)x-=.26F*phrase(t,0,16,40,51);
+            if(move==SpiderActions.Move.MARCH){
+                y+=side*(.36F*phrase(t,1,10,14,23)-.40F*phrase(t,18,27,31,42));
+                x-=.20F*phrase(t,11,20,38,52);
+            }
             if(move==SpiderActions.Move.RECOIL)x-=.36F*phrase(t,-2,4,8,30);
         }else if(bone.equals("veiled_head")||bone.equals("crest")||bone.equals("streamer")){
             float lag=bone.equals("veiled_head")?0:bone.equals("crest")?2.4F:5.5F;
@@ -149,6 +168,10 @@ public final class SpiderGesture {
             if(striking)z+=(raised?-.24F:.19F)*side*phrase(phase,0,10,21,37);
             if(move==SpiderActions.Move.CATALYZE)x+=(raised?.24F:-.17F)*phrase(phase,1,13,24,36);
             if(move==SpiderActions.Move.SWALLOW)z+=(raised?.44F:-.38F)*phrase(phase,0,15,39,53);
+            if(move==SpiderActions.Move.REST && Integer.bitCount(b.spider.brokenMask())>=6){
+                float clock=(float)((b.level().getGameTime()%36+partial)*Math.PI/18)+(raised?1.45F:0);
+                x+=.44F*(float)Math.sin(clock);z+=(raised?1:-1)*.18F*(float)Math.cos(clock);
+            }
         }else return null;
         return new Quaternionf().rotateZYX(z,y,x);
     }

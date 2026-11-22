@@ -108,6 +108,20 @@ public final class SpiderLegPose {
                 dest=dest.add(0,Math.sin(Math.PI*SpiderGesture.ease(time,impact+6,impact+23))*1.15,0);
             }
         }
+        if(move==SpiderActions.Move.MARCH && (leg==chosen || leg==state.getInt("RushSecond"))){
+            boolean second=leg!=chosen;
+            float clock=state.contains("RushStopped")?Math.min(time,state.getInt("RushStopped")):time;
+            float t=clock-(second?17:0);
+            var goal=action.marchGoal(second);var from=rest.lerp(goal,SpiderGesture.ease(t,4,21));
+            float release=SpiderGesture.ease(t,24,second?37:39);
+            var stomp=from.lerp(rest,release).add(0,6.2*SpiderGesture.phrase(t,1,12,13,21)+1.4*Math.sin(Math.PI*release),0);
+            dest=state.contains("RushStopped")?stomp.lerp(rest,SpiderGesture.ease(time-clock,0,13)):stomp;
+        }
+        if(move==SpiderActions.Move.PINCER && paired && leg%4==chosen%4 && state.getBoolean("Gripped") && time>=18){
+            var side=new Vec3(leg<4?-.57:.57,0,0).yRot((float)Math.toRadians(-boss.skinYaw(partial)));
+            var catchAt=action.pincerCarry(partial).add(side).add(0,.38,0);
+            dest=catchAt.lerp(rest,SpiderGesture.ease(time,28,44));
+        }
         if(state.contains("Flinch"+leg) && (!attacking || leg!=chosen)){
             float since=boss.level().getGameTime()-state.getLong("Flinch"+leg)+partial;
             float recoil=SpiderGesture.phrase(since,0,3,4,13)*state.getFloat("Recoil"+leg);
