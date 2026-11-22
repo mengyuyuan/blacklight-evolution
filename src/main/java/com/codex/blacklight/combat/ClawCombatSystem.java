@@ -66,6 +66,8 @@ public final class ClawCombatSystem {
         }
         if(request==ClawActionPayload.Action.BLOCK_THROW_START||request==ClawActionPayload.Action.BLOCK_THROW_RELEASE||request==ClawActionPayload.Action.BLOCK_THROW_CANCEL)return;
 
+        if ((request==ClawActionPayload.Action.GRAB || request==ClawActionPayload.Action.CONSUME)
+                && !ConsumeSystem.active(player) && GoddessEncounter.input(player,request==ClawActionPayload.Action.CONSUME)) return;
         if (request == ClawActionPayload.Action.GRAB) { ConsumeSystem.request(player); return; }
         if (request == ClawActionPayload.Action.CONSUME) { ConsumeSystem.consume(player); return; }
         if (request == ClawActionPayload.Action.THROW) { ConsumeSystem.throwTarget(player); return; }

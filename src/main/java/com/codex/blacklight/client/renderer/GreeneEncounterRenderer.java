@@ -95,6 +95,14 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             GreeneMoltRenderer.draw(boss,partial,stack,light);
             return;
         }
+        if(boss.goddess.active()){
+            stack.pushPose();
+            stack.mulPose(com.codex.blacklight.combat.GoddessRig.root(boss,partial));
+            int overlay=net.minecraft.client.renderer.texture.OverlayTexture.pack(0,net.minecraft.client.renderer.texture.OverlayTexture.v(boss.hurtTime>0));
+            goddess.draw(boss.tickCount+partial,stack,buffers,light,overlay,com.codex.blacklight.combat.GoddessRig.renderOffsets(boss,partial));
+            stack.popPose();
+            return;
+        }
         var form=GreeneForm.of(boss);
         var transform=boss.spider.first()?com.codex.blacklight.combat.SpiderAnatomy.root(boss,partial):form.transform(GreeneMotion.table().transforms(GreeneMotion.pose(boss,partial)),boss.skinYaw(partial));
         stack.pushPose();

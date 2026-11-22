@@ -26,6 +26,7 @@ public final class GreenePart extends PartEntity<EncounterMob> {
         if(!owner.isAlive() || owner.isRemoved())return false;
         if(owner.kind()==EncounterKind.GOLIATH)
             return !GoliathLockPart.severed(GoliathContact.regionBones().get(slot),owner.goliathBrokenMask());
+        if(owner.goddess.active())return slot<GoddessRig.PARTS.size() && !owner.hurtRegions(0).get(slot).boxes().isEmpty();
         if(owner.spider.first())return slot<SpiderAnatomy.NAMES.size() && !owner.hurtRegions(0).get(slot).boxes().isEmpty();
         return slot<GreeneContact.regionBones().size() && owner.greeneBattle().targetable() && (slot>=owner.kind().weakParts() || !owner.broken(slot));
     }

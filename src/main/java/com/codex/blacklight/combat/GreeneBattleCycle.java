@@ -90,7 +90,7 @@ public final class GreeneBattleCycle {
         case EMERGING -> age(0)>=EMERGE_TARGET_TICKS;
         default -> true;
     };}
-    public boolean canAttack(){return !openingPending()&&(stage()==GUARDED||stage()==EMERGING&&age(0)>=EMERGE_ATTACK_TICKS&&outside());}
+    public boolean canAttack(){return !owner.goddess.active() && !openingPending()&&(stage()==GUARDED||stage()==EMERGING&&age(0)>=EMERGE_ATTACK_TICKS&&outside());}
     public boolean busy(){return stage()!=GUARDED;}
     public float handoffAge(){return owner.level().isClientSide?client().getFloat("HandoffAge"):handoffAge;}
     public float handoffElapsed(float partial){long at=owner.level().isClientSide?client().getLong("HandoffAt"):handoffAt;return at==Long.MIN_VALUE?100:owner.level().getGameTime()-at+partial;}
@@ -104,7 +104,7 @@ public final class GreeneBattleCycle {
         player=candidate instanceof ServerPlayer p?p.getUUID():null;
     }
     public void collapse(int hold){
-        if(owner.level().isClientSide||openingPending||stage!=GUARDED&&stage!=EMERGING)return;
+        if(owner.level().isClientSide||owner.goddess.active()||openingPending||stage!=GUARDED&&stage!=EMERGING)return;
         initializeNew();refreshHealthScale();choosePlayer();selectedHold=GreeneMotion.hold(hold);
         recoveryRemaining=COLLAPSE_TICKS+selectedHold;exposureAge=0;previousDown=0;
         coreDamageable=false;stunPending=false;recoveryPending=false;floorPending=true;floorDelay=-1;
@@ -159,7 +159,14 @@ public final class GreeneBattleCycle {
     }
     private void finishAirborneWave(){
         boolean born=stage==MOLTING;armourWave=waveCount;
-        if(born)owner.spider.synchronizeShellHealth();
+        if(owner.goddess.active()){
+            minimumHealth=0;
+            coreDamageable=true;
+            releaseRoot();
+            enter(GUARDED);
+            if(born)owner.goddess.born();
+            return;
+        }
         owner.greeneRestoreAppendages(armourWave);
         if(born){owner.setHealth(owner.getMaxHealth());coreDamageable=false;}
         minimumHealth=GreeneBattleHealth.releaseFloorOnEmergence(owner.getHealth(),owner.getMaxHealth())?0:owner.getHealth();
@@ -237,6 +244,11 @@ public final class GreeneBattleCycle {
     public void tick(){
         if(owner.level().isClientSide)return;
         initializeNew();if(!live()){dispose();return;}refreshHealthScale();
+        if(owner.goddess.active()){
+            if(stage!=GUARDED){releaseRoot();openingPending=false;enter(GUARDED);}
+            owner.goddess.tick();
+            return;
+        }
         if(openingPending){beginOpeningAtSurface();return;}
         long now=owner.level().getGameTime();if(lastTick==now)return;lastTick=now;
         age++;if(exposed()){exposureAge++;if(recoveryRemaining>0)recoveryRemaining--;}

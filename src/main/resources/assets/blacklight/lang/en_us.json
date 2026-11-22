@@ -1429,5 +1429,22 @@
   "subtitle.blacklight.greene.spider.needle": "Crown needle pierces",
   "subtitle.blacklight.greene.spider.rupture": "Tumor ruptures",
   "subtitle.blacklight.greene.spider.brace": "Teeth clamp",
-  "subtitle.blacklight.greene.spider.shed": "Brood membrane opens"
+  "subtitle.blacklight.greene.spider.shed": "Brood membrane opens",
+  "part.blacklight.goddess_head": "Head",
+  "part.blacklight.goddess_chest": "Chest core",
+  "part.blacklight.goddess_base": "Lower body",
+  "part.blacklight.goddess_left_shoulder": "Left shoulder",
+  "part.blacklight.goddess_left_elbow": "Left elbow",
+  "part.blacklight.goddess_left_wrist": "Left wrist",
+  "part.blacklight.goddess_left_hand": "Left hand",
+  "part.blacklight.goddess_right_shoulder": "Right shoulder",
+  "part.blacklight.goddess_right_elbow": "Right elbow",
+  "part.blacklight.goddess_right_wrist": "Right wrist",
+  "part.blacklight.goddess_right_hand": "Right hand",
+  "part.blacklight.goddess_hair": "Crown",
+  "message.blacklight.goddess_grab": "Press %s to grip the exposed part",
+  "message.blacklight.goddess_confirm": "Press %s to tear free and consume",
+  "subtitle.blacklight.greene.pressure.strain": "Membrane strains",
+  "subtitle.blacklight.greene.pressure.burst": "Blacklight vacuole bursts",
+  "subtitle.blacklight.greene.pressure.echo": "Rock reverberates"
 }

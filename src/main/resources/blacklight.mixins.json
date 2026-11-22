@@ -47,6 +47,7 @@
     "ConsumeStunMixin",
     "BiomassPlayerMixin",
     "BiomassPreyMixin",
+    "GoddessPlayerDamageMixin",
     "AdaptivePlayerDamageMixin",
     "WingFlightTravelMixin",
     "WingFlightFloatingMixin",

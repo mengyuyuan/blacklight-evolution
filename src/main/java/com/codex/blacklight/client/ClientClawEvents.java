@@ -314,6 +314,15 @@ public final class ClientClawEvents {
     private static void tickGrabButtons(boolean left, boolean right) {
         var mc=Minecraft.getInstance();
         if(ClientBlockThrowInput.poll(left,right)){lastGrabLeft=left;lastGrabRight=right;return;}
+        if (right && !lastGrabRight && mc.player != null && mc.screen == null && mc.isWindowActive()
+                && !mc.level.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,mc.player.getBoundingBox().inflate(70),
+                    mob -> mob.goddess.active() && mob.goddess.action() == com.codex.blacklight.combat.GoddessEncounter.Action.GRIPPED
+                    && mob.goddessData().hasUUID("Actor") && mc.player.getUUID().equals(mob.goddessData().getUUID("Actor"))).isEmpty()) {
+            PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.CONSUME));
+            lastGrabRight=true;
+            lastGrabLeft=left;
+            return;
+        }
         if(mc.player!=null&&mc.screen==null&&mc.isWindowActive()&&mc.player.getData(ModAttachments.CONSUMING)) {
             clearLeftAttackHold();
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);
