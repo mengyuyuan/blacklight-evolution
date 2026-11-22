@@ -1,5 +1,6 @@
 package com.codex.blacklight.infection;
 
+import java.util.ArrayList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -30,15 +31,17 @@ public final class PopulationGuard {
     public static void trim(ServerLevel level){
         if(level.getGameTime()%200!=0||level.players().isEmpty())return;
         int distance=OutbreakConfig.TRIM_DISTANCE.get();if(distance<=0)return;
-        int removed=0;
+        var toRemove = new ArrayList<Mob>(16);
         for(var entity:level.getAllEntities()){
-            if(removed>=16)break;
             if(!(entity instanceof Mob mob)||!infected(mob))continue;
             var nearest=level.getNearestPlayer(mob,-1);
             double sq=nearest==null?Double.MAX_VALUE:nearest.distanceToSqr(mob);
             if(trimmable(mob.getPersistentData().getBoolean(AMBIENT),mob.hasCustomName(),mob.getTarget()!=null,mob.isPassenger()||mob.isVehicle(),sq,distance)){
-                mob.discard();removed++;
+                toRemove.add(mob);
+                if (toRemove.size() == 16) break;
             }
         }
+        // Discard updates the live entity index returned by getAllEntities().
+        for (Mob mob : toRemove) mob.discard();
     }
 }
