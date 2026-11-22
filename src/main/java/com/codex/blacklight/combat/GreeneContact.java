@@ -33,15 +33,23 @@ public final class GreeneContact {
     }
     public static List<String> regionBones(){var result=new ArrayList<>(List.of("weak_0","weak_1","weak_2"));CUBES.stream().map(Cube::bone).filter(n->!n.startsWith("weak_")).distinct().forEach(result::add);return List.copyOf(result);}
     public static List<Surface> surfaces(float[][] pose,Vec3 origin,float yaw,int broken){
+        return surfaces(pose,origin,yaw,broken,null,-1);
+    }
+    private static List<Surface> surfaces(float[][] pose,Vec3 origin,float yaw,int broken,GreeneForm form,int strikingSlot){
         var transforms=GreeneMotion.table().transforms(pose);var base=new Matrix4f().rotateY((float)Math.toRadians(180-yaw));var result=new ArrayList<Surface>();
-        for(var cube:CUBES){String region=region(cube.bone);if(region.startsWith("weak_")&&(broken&(1<<Integer.parseInt(region.substring(5))))!=0)continue;
+        for(var cube:CUBES){String region=region(cube.bone);if(form!=null&&(!region.startsWith("weak_") || region.charAt(5)-'0'!=strikingSlot))continue;if(region.startsWith("weak_")&&(broken&(1<<Integer.parseInt(region.substring(5))))!=0)continue;
             var matrix=new Matrix4f(base).mul(transforms[cube.index]).mul(cube.local);var center=matrix.transformPosition(cube.center.toVector3f());var axes=new Vec3[3];double[] scale=new double[3];
             for(int i=0;i<3;i++){var v=matrix.transformDirection(new Vector3f(i==0?1:0,i==1?1:0,i==2?1:0));scale[i]=v.length();v.normalize();axes[i]=new Vec3(v.x,v.y,v.z);}
             result.add(new Surface(region,HydraContact.affine(origin.add(center.x,center.y+.01,center.z),cube.half.multiply(scale[0],scale[1],scale[2]),axes[0],axes[1],axes[2])));
-        }return result;
+        }
+        if(form!=null)form.addSurfaces(result,transforms,yaw,origin,broken);
+        return result;
     }
     public static List<HydraContact.Region> regions(float[][] pose,Vec3 origin,float yaw,int broken){
-        var surfaces=surfaces(pose,origin,yaw,broken);var result=new ArrayList<HydraContact.Region>();
+        return regions(pose,origin,yaw,broken,null,-1);
+    }
+    public static List<HydraContact.Region> regions(float[][] pose,Vec3 origin,float yaw,int broken,GreeneForm form,int strikingSlot){
+        var surfaces=surfaces(pose,origin,yaw,broken,form,strikingSlot);var result=new ArrayList<HydraContact.Region>();
         for(String bone:regionBones()){var boxes=surfaces.stream().filter(s->s.bone.equals(bone)).map(Surface::box).toList();
             AABB bounds=new AABB(origin,origin);if(!boxes.isEmpty()){bounds=boxes.get(0).bounds;for(var box:boxes)bounds=bounds.minmax(box.bounds);}
             result.add(new HydraContact.Region(bone,boxes,bounds));

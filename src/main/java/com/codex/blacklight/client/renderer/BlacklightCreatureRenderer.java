@@ -12,7 +12,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import java.util.function.Function;
-public final class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity> extends AnatomicalGeoRenderer<T> {
+public class BlacklightCreatureRenderer<T extends LivingEntity & GeoEntity> extends AnatomicalGeoRenderer<T> {
     private GoliathLockPart highlightedPart;
     private float greenePartial;
     private float greeneFlash(software.bernie.geckolib.cache.object.GeoBone bone){

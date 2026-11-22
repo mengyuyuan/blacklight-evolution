@@ -44,9 +44,20 @@ public final class BlockThrowCollision {
   for(var e:CombatTargeting.candidates(owner,query,target->allowed.test(target)||allowedPart(target,allowed))){
    var body=AnimatedHurtBody.of(e);
    if(body!=null){
+    var spider=e instanceof com.codex.blacklight.entity.EncounterMob mother && mother.spider.feeding()?mother:null;
+    var throat=spider!=null && owner instanceof net.minecraft.world.entity.Mob cargo && SpiderPhase.evolved(cargo) && cargo.getPersistentData().getBoolean(SpiderPhase.TUMOR)
+        ?spider.spider.aperture(a,b,half,0):null;
+    if(throat!=null && throat.fraction()<=1 && a.distanceToSqr(throat.center())<distance){
+        distance=a.distanceToSqr(throat.center());
+        best=new AnimatedHit(e,throat.center(),new HydraHurtContact.Contact("mouth",throat.center(),throat.normal(),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));
+    }
     for(var region:body.hurtRegions(0))for(var box:region.boxes()){
      if(!query.intersects(box.bounds.inflate(.000001)))continue;
      var hit=box.sweepBox(a,b,half);if(hit==null)continue;double d=a.distanceToSqr(hit.center());
+     // Feeding cords can cross the entrance as a marked evolved arrives. Let a shot
+     // travelling into the opening part the cords; terrain and hard shell still intercept it.
+     if(throat!=null && region.bone().startsWith("feed_"))continue;
+     if(throat!=null && (region.bone().equals("rim")||region.bone().equals("mouth")||region.bone().equals("shell")) && hit.center().distanceToSqr(throat.center())<3*3)continue;
      if(d<distance-1e-9){best=new AnimatedHit(e,hit.center(),new HydraHurtContact.Contact(region.bone(),hit.point(),hit.normal(),com.codex.blacklight.infection.InfectedAttackStyle.CRUSH));distance=d;}
     }
    }else for(var shape:CombatTargeting.hitboxes(e)){

@@ -1,5 +1,7 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GreeneMolt;
+
 import com.codex.blacklight.infection.BlacklightInfectionSystem;
 import com.codex.blacklight.combat.HunterConsume;
 import com.codex.blacklight.combat.CreatureAttack;
@@ -26,7 +28,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
 
 /** A separate species, with an original full-body rig and server-timed heavy swipe. */
-public final class BlacklightHunter extends Monster implements GeoEntity {
+public final class BlacklightHunter extends Monster implements GeoEntity, GreeneMolt.Captive {
     private static final EntityDataAccessor<Integer> ATTACK = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MOVE = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> STARTED = SynchedEntityData.defineId(BlacklightHunter.class, EntityDataSerializers.LONG);
@@ -58,8 +60,15 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
                 .add(Attributes.ATTACK_DAMAGE, HunterBalance.DAMAGE).add(Attributes.FOLLOW_RANGE, 32)
                 .add(Attributes.KNOCKBACK_RESISTANCE, HunterBalance.KNOCKBACK_RESISTANCE).add(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get(), .4);
     }
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> MOLT_CAPTIVE=
+            SynchedEntityData.defineId(BlacklightHunter.class,net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    @Override public void setMoltCaptive(boolean value){entityData.set(MOLT_CAPTIVE,value);}
+    private boolean moltCaptive(){return entityData.get(MOLT_CAPTIVE);}
+    @Override public boolean shouldRenderAtSqrDistance(double distance){
+        return !moltCaptive() && super.shouldRenderAtSqrDistance(distance);
+    }
     @Override protected void defineSynchedData() {
-        super.defineSynchedData(); entityData.define(ATTACK, 0); entityData.define(CONSUMER, -1); entityData.define(CONSUME_TICKS, 0);
+        super.defineSynchedData();entityData.define(MOLT_CAPTIVE,false); entityData.define(ATTACK, 0); entityData.define(CONSUMER, -1); entityData.define(CONSUME_TICKS, 0);
         entityData.define(REMAINS_STARTED, -1L);
         entityData.define(PARASITE,0);
         entityData.define(MOVE,0);entityData.define(STARTED,0L);entityData.define(COUNTER_RELEASE,false);
@@ -75,7 +84,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         targetSelector.addGoal(4, new HuntPreyGoal());
     }
     @Override public void tick() {
-        super.tick();
+        super.tick();if(moltCaptive())return;
         if (level().isClientSide || isBeingConsumed() || !isAlive()) return;
         if(parasiteLocked()){
             // Endless stagger: refresh the heavy hit pose and pin it in place.
@@ -322,7 +331,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
     @Override public boolean isPushable() { return !isConsumeRemains()&&super.isPushable(); }
     @Override public boolean isPickable() { return !isConsumeRemains()&&super.isPickable(); }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
+        super.addAdditionalSaveData(tag);if(moltCaptive())tag.putBoolean("GreeneMoltCaptive",true);
         tag.putInt("BlacklightHunterBalanceVersion",HunterBalance.VERSION);
         tag.putInt("BlacklightParasite",entityData.get(PARASITE));
         // The transient grab must never persist as a permanently disabled AI after restart.
@@ -333,7 +342,7 @@ public final class BlacklightHunter extends Monster implements GeoEntity {
         // Attack/target/root progress is deliberately transient. Loading into
         // this same object must not resume a stale counter or its release.
         cancelAttack();
-        super.readAdditionalSaveData(tag);
+        super.readAdditionalSaveData(tag);setMoltCaptive(tag.getBoolean("GreeneMoltCaptive"));
         restoreLegacyBrawlerAttributes(tag);
         // Upgrade only the old stock attributes. Preserve custom mobs and the current health fraction.
         double oldHealth=getAttribute(Attributes.MAX_HEALTH).getBaseValue(),oldDamage=getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();

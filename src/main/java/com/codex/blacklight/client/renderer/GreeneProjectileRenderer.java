@@ -22,6 +22,17 @@ public final class GreeneProjectileRenderer extends EntityRenderer<GreeneProject
     @Override public void render(GreeneProjectile projectile,float yaw,float partial,PoseStack stack,MultiBufferSource buffers,int light){
         var profile=GreeneProjectileAppearance.of(projectile.ammo());
         if(!GreeneProjectileAppearance.meshVisible(projectile.ammo(),projectile.finished()))return;
+        if(projectile.flesh()){
+            stack.pushPose();
+            var dir=projectile.renderHeading(partial).normalize().toVector3f();
+            stack.mulPose(new org.joml.Quaternionf().rotationTo(0,1,0,dir.x,dir.y,dir.z));
+            stack.mulPose(com.mojang.math.Axis.YP.rotation((projectile.tickCount+partial)*.36F));
+            var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
+            var surface=GreeneTendrilPodRenderer.surface(stack,out,light);
+            BlackTendrilMesh.dart(surface);
+            SpiderRuptureMesh.dartWake(surface,projectile.tickCount+partial);
+            stack.popPose();return;
+        }
         stack.pushPose();
         stack.mulPose(GreeneProjectileAppearance.orientation(projectile.ammo(),projectile.getUUID(),projectile.renderHeading(partial),projectile.renderFlightSeconds(partial)));
         stack.scale(profile.scale(),profile.scale(),profile.scale());

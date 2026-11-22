@@ -31,7 +31,9 @@ public final class ModItems {
     public static final RegistryObject<Item> BLOODTOX_STARTER = ITEMS.register("bloodtox_starter",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
     public static final RegistryObject<Item> MOTHER_CORE = ITEMS.register("mother_core",
-            () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
+            () -> new com.codex.blacklight.item.GreeneTissueItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final RegistryObject<Item> GREENE_TISSUE = ITEMS.register("greene_tissue",
+            () -> new com.codex.blacklight.item.GreeneTissueItem(new Item.Properties().rarity(Rarity.RARE)));
     public static final RegistryObject<com.codex.blacklight.item.EncounterDossierItem> STATION_RECORD = ITEMS.register("station_record",
             () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "on_research_station_maps"));
     public static final RegistryObject<Item> BLOODTOX_COMMAND_KEY = ITEMS.register("bloodtox_command_key",
@@ -93,7 +95,7 @@ public final class ModItems {
                         output.accept(CONTAINMENT_DECODER.get());
                         output.accept(HEAVY_ARMOR_CORE.get());
                         output.accept(BLOODTOX_STARTER.get());
-                        output.accept(MOTHER_CORE.get());
+                        output.accept(GREENE_TISSUE.get());
                         output.accept(CONVOY_MANIFEST.get()); output.accept(MOTHER_INTEL.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());

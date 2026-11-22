@@ -107,6 +107,7 @@ public final class ConsumeSequence {
     /** Receiver release markers are Minecraft adaptation cues, not recovered original event metadata. */
     public static float release(PowerForm form){return switch(form){case HAMMERFISTS->.32F;case WHIPFIST->.20F;case BLADE->.47F;case MUSCLE_MASS->.49F;case CLAWS->.48F;default->.43F;};}
     public static boolean large(LivingEntity target) {
+        if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host && host.isEvolved() && host.getHealth()<=host.getMaxHealth()*.35F && !host.giantBoss())return false;
         // Evolved retain a human receiver rig even after inherited growth makes
         // their collider taller than the generic large-creature threshold.
         if(target instanceof com.codex.blacklight.entity.BlacklightInfectedHost host&&host.isEvolved())return false;
