@@ -185,10 +185,14 @@ public final class GoddessAttacks {
         var joint=region.bounds().getCenter();
         var edge=region.boxes().get((elapsed/4)%region.boxes().size()).nearest(center);
         SpiderFoley.strands(boss,edge,joint.subtract(edge),4);
+        if(boss.level() instanceof ServerLevel server){
+            var visible=edge.add(center.subtract(edge).normalize().scale(.2));
+            server.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK,visible.x,visible.y,visible.z,6,.36,.32,.36,.018);
+        }
     }
     private void finish(){
         boss.goddess.finishedAttack();
-        groups=move==Move.STRONG_CALL && paid ? 2 : groups+1;
+        groups=Math.min(3,groups+(move==Move.STRONG_CALL && paid ? 2 : 1));
         enter(Move.REST,null);
     }
     private Vec3 eyes(){return GoddessCastPose.face(boss,1);}

@@ -77,7 +77,7 @@ public final class GoddessEncounter {
             default -> 1;
         };
     }
-    private double lift;
+    private double lift, fallEntryLift;
     private Vec3 approach;
     public Vec3 approach(){return approach;}
     float braceTilt(float partial) {
@@ -89,6 +89,10 @@ public final class GoddessEncounter {
     }
     public double lift(float partial){
         double dy=boss.level().isClientSide?boss.goddessData().getDouble("LandingLift"):lift;
+        if(action()==Action.FALLING) {
+            double from=boss.level().isClientSide?boss.goddessData().getDouble("FallEntryLift"):fallEntryLift;
+            return from+(dy-from)*fraction(age(partial)/38F);
+        }
         return dy * lowered(partial);
     }
     private void site(int exposed){
@@ -139,7 +143,7 @@ public final class GoddessEncounter {
         var data = boss.goddessData();
         float start = boss.level().isClientSide ? data.getFloat("EntryYaw") : entryYaw;
         float end = boss.level().isClientSide ? data.getFloat("Facing") : facing;
-        return net.minecraft.util.Mth.rotLerp(lowered(partial), start, end);
+        return net.minecraft.util.Mth.rotLerp(action()==Action.FALLING ? fraction(age(partial)/38F) : lowered(partial), start, end);
     }
     public boolean terminal() { return life.finished(); }
     public boolean zeroOnBar() { return (removed() & 3) == 3 && part() == GoddessVitals.HEAD && action()!=Action.FLYING && action()!=Action.STAGGER && action()!=Action.RISING; }
@@ -189,25 +193,35 @@ public final class GoddessEncounter {
         if (!player.onGround() && (player.getDeltaMovement().y > .01
                 || !player.level().getBlockCollisions(player,player.getBoundingBox().move(0,-.04,0)).iterator().hasNext())) return false;
         int slot = GoddessRig.PARTS.indexOf(hit.bone());
-        if (slot < 0 || (slot != 0 && slot != 1 && slot != supportingWrist())) return false;
+        if (!groundOpening(slot)) return false;
         double reach = player.getAttributeValue(net.minecraftforge.common.ForgeMod.ENTITY_REACH.get()) + 0.5;
         return player.getEyePosition().distanceToSqr(hit.point()) <= reach * reach
                 && HydraHurtContact.clear(boss, player.getEyePosition(), hit.point());
     }
+    boolean groundOpening(int slot) {
+        int wrist=supportingWrist();
+        return slot==0 || slot==1 || wrist>=0 && slot>=wrist-1 && slot<=wrist+1;
+    }
     public void rockImpact(com.codex.blacklight.entity.ThrownBlock rock, HydraHurtContact.Contact hit) {
-        if (hit == null || !(rock.getOwner() instanceof ServerPlayer)) return;
-        int slot = GoddessRig.PARTS.indexOf(hit.bone());
-        if (slot == 0 && (rock.twoHanded() || rock.chargedImpact())
-                || slot >= 0 && slot == supportingWrist() && rock.chargedImpact()) stagger(hit);
+        if (hit==null || !rock.chargedImpact() || !(rock.getOwner() instanceof ServerPlayer thrower)) return;
+        int highlighted=attacks.strainingSlot();
+        if (highlighted>=0 && GoddessRig.PARTS.get(highlighted).equals(hit.bone())) stagger(hit,thrower);
     }
     public void aerialImpact(HydraHurtContact.Contact hit) {
         if (hit != null && attacks.strainingSlot() == GoddessRig.PARTS.indexOf(hit.bone()) && attacks.strainingSlot() >= 0) stagger(hit);
     }
     void finishedAttack() { staggerLocked = false; }
-    void stagger(HydraHurtContact.Contact hit) {
+    void stagger(HydraHurtContact.Contact hit) { stagger(hit,boss.level().getNearestPlayer(boss,112)); }
+    private void stagger(HydraHurtContact.Contact hit, Player opponent) {
         if (action != Action.FLYING || life.waiting() || staggerLocked) return;
-        var landing = GoddessLanding.find(boss, nextPart(), boss.yBodyRot,true);
-        if (landing == null) return;
+        var landing = GoddessLanding.forStagger(boss, boss.yBodyRot,opponent);
+        if (landing == null) {
+            // A player can remove the entire floor. A genuine counter still interrupts the cast.
+            staggerLocked = true;
+            attacks.cancel();
+            SpiderFoley.play(boss, hit.point(), SpiderFoley.Cue.STRAIN, 1.6F);
+            return;
+        }
         entryYaw = boss.yBodyRot;
         facing = landing.yaw();
         lift = landing.lift();
@@ -220,14 +234,14 @@ public final class GoddessEncounter {
     private void fall() {
         boolean continuing = action == Action.STAGGER;
         fallFrom = continuing ? lowered(0) : 0;
+        fallEntryLift = lift(0);
+        entryYaw = facing(0);
         attacks.cancel();
         boss.cancelAttack();
         previousMask = life.removed();
         part = nextPart();
-        if (!continuing) {
-            entryYaw = facing = boss.yBodyRot;
-            site(part);
-        }
+        facing=entryYaw;
+        site(part);
         change(Action.FALLING);
         boss.playSound(SoundEvents.RAVAGER_ROAR, 2F,.65F);
     }
@@ -390,7 +404,7 @@ public final class GoddessEncounter {
         t.putBoolean("Committed",committed);
         t.putBoolean("StaggerLocked",staggerLocked);
         t.putFloat("EntryYaw",entryYaw);
-        t.putFloat("FallFrom",fallFrom);
+        t.putFloat("FallFrom",fallFrom);t.putDouble("FallEntryLift",fallEntryLift);
         t.putFloat("Facing",facing);t.putDouble("LandingLift",lift);
         if(approach!=null){t.putDouble("FloorX",approach.x);t.putDouble("FloorY",approach.y);t.putDouble("FloorZ",approach.z);}
         if (actor!=null){t.putUUID("Actor",actor);t.putDouble("GripX",grabFrom.x);t.putDouble("GripY",grabFrom.y);t.putDouble("GripZ",grabFrom.z);}
@@ -407,7 +421,7 @@ public final class GoddessEncounter {
         gripYaw=t.contains("GripYaw") ? t.getFloat("GripYaw") : t.getFloat("Facing");
         staggerLocked=t.getBoolean("StaggerLocked") || action==Action.STAGGER;
         entryYaw=t.contains("EntryYaw") ? t.getFloat("EntryYaw") : t.getFloat("Facing");
-        fallFrom=fraction(t.getFloat("FallFrom"));
+        fallFrom=fraction(t.getFloat("FallFrom"));fallEntryLift=t.contains("FallEntryLift")?t.getDouble("FallEntryLift"):t.getDouble("LandingLift")*fallFrom;
         facing=t.getFloat("Facing");lift=t.getDouble("LandingLift");
         approach=t.contains("FloorX")?new Vec3(t.getDouble("FloorX"),t.getDouble("FloorY"),t.getDouble("FloorZ")):null;
         committed=t.getBoolean("Committed");
