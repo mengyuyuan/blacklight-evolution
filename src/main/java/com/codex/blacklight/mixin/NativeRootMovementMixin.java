@@ -20,7 +20,8 @@ public abstract class NativeRootMovementMixin {
 
     @Unique private boolean blacklight$ownsRootPosition(){
         if(player.isRemoved()||!player.isAlive())return false;
-        return NativeRootMotion.controlsGroundRoot(player)
+        return com.codex.blacklight.combat.GoddessHeldMovement.controls(player)
+                || NativeRootMotion.controlsGroundRoot(player)
                 ||com.codex.blacklight.city.HydraTransport.active(player)
                 ||com.codex.blacklight.combat.ConsumeSystem.committed(player)
                 ||com.codex.blacklight.power.BiomassSystem.state(player).immobilized()

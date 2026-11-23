@@ -15,10 +15,20 @@ public final class BlacklightRenderPose {
     }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
         if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.actorOwner(player,true);
+            if(paired!=null){
+                float weight=paired.goddess.actorBlend(partial);
+                if(weight<=0)return ordinaryPose(entity,partial);
+                var authored=com.codex.blacklight.combat.GoddessActor.pose(paired,partial);
+                return weight>=1 ? authored : BlacklightPose.interpolatePose(ordinaryPose(entity,partial),authored,weight);
+            }
+        }
+        return ordinaryPose(entity,partial);
+    }
+    private static BlacklightPose ordinaryPose(LivingEntity entity,float partial){
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
             var compression=GoddessPressurePose.owner(player);
             if(compression!=null)return GoddessPressurePose.sample(compression.goddess.attacks,partial);
-            var paired=com.codex.blacklight.combat.GoddessEncounter.paired(player);
-            if(paired!=null)return com.codex.blacklight.combat.GoddessActor.pose(paired,partial);
         }
         if(mouthStruggle(entity,partial)){
             var action=entity.getData(ModAttachments.PLAYER_ACTION);
@@ -113,6 +123,8 @@ public final class BlacklightRenderPose {
     }
     public static float facing(LivingEntity entity,float partial) {
         if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.actorOwner(player,true);
+            if(paired!=null)return paired.goddess.actorFacing(partial, PlayerMotionController.facing(entity,partial));
             var pressure=GoddessPressurePose.owner(player);
             if(pressure!=null)return pressure.goddess.attacks.actorYaw();
         }

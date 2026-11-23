@@ -22,8 +22,14 @@ public abstract class BiomassEntityRenderMixin {
             target="Lnet/minecraft/client/renderer/entity/EntityRenderer;getRenderOffset(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/world/phys/Vec3;"))
     private net.minecraft.world.phys.Vec3 blacklight$carryOffset(net.minecraft.world.phys.Vec3 original,Entity entity,
             double x,double y,double z,float yaw,float partial){
-        return entity instanceof net.minecraft.world.entity.player.Player p
-                ? original.add(com.codex.blacklight.client.animation.GoddessPressurePose.carryOffset(p,partial)):original;
+        if(!(entity instanceof net.minecraft.world.entity.player.Player p))return original;
+        var paired=com.codex.blacklight.combat.GoddessEncounter.paired(p);
+        if(paired!=null){
+            // Match the exact interpolation used by LevelRenderer.renderEntity, also for spectators and shader passes.
+            var anchor=new net.minecraft.world.phys.Vec3(p.xOld,p.yOld,p.zOld).lerp(p.position(),partial);
+            return p.getPosition(partial).add(paired.goddess.drawnActorOffset(p,partial)).subtract(anchor);
+        }
+        return original.add(com.codex.blacklight.client.animation.GoddessPressurePose.carryOffset(p,partial));
     }
     @WrapOperation(method="render",at=@At(value="INVOKE",target="Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/world/entity/Entity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     private void blacklight$coat(EntityRenderer<?> renderer,Entity entity,float yaw,float partial,
