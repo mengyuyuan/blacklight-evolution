@@ -217,6 +217,7 @@ public final class GoddessEncounter {
                     fight.committed = false;
                     fight.grabFrom=player.position();
                     fight.change(Action.EXTRACTING);
+                    player.displayClientMessage(Component.empty(),true);
                 }
                 return true;
             }
@@ -258,17 +259,50 @@ public final class GoddessEncounter {
                 p.displayClientMessage(Component.translatable("message.blacklight.goddess_grab",Component.keybind("key.blacklight.grab")),true);
         }
     }
+    public Vec3 actorPosition(float partial){
+        Vec3 origin=grabFrom;
+        if(boss.level().isClientSide){
+            var data=boss.goddessData();
+            origin=new Vec3(data.getDouble("GripX"),data.getDouble("GripY"),data.getDouble("GripZ"));
+        }
+        float t=fraction(age(partial)/12F);
+        return origin.lerp(GoddessActor.point(boss,0,partial),t*t*(3-2*t));
+    }
+    // Terrain correction for the authored feet. Sweep a short ramp around a ledge so a low
+    // floor crossing cannot freeze the actor for several metres and then teleport them free.
+    private Vec3 supportedActorPosition(Player p,float partial){
+        Vec3 at=actorPosition(partial);
+        var box=p.getBoundingBox().move(at.subtract(p.position()));
+        var feet=new net.minecraft.world.phys.AABB(box.minX-1.6,box.minY-.08,box.minZ-1.6,
+                box.maxX+1.6,box.minY+1.65,box.maxZ+1.6);
+        double y=at.y;
+        for(var shape:p.level().getBlockCollisions(p,feet)){
+            for(var step:shape.toAabbs()){
+                double height=step.maxY-at.y;
+                if(height<=0 || height>1.65 || step.minY>at.y+.55)continue;
+                double dx=Math.max(0,Math.max(box.minX-step.maxX,step.minX-box.maxX));
+                double dz=Math.max(0,Math.max(box.minZ-step.maxZ,step.minZ-box.maxZ));
+                y=Math.max(y,step.maxY-Math.hypot(dx,dz));
+            }
+        }
+        var target=new Vec3(at.x,y,at.z);
+        return p.level().getBlockCollisions(p,box.move(0,y-at.y,0)).iterator().hasNext()?null:target;
+    }
+    public Vec3 drawnActorOffset(Player p,float partial){
+        var to=supportedActorPosition(p,partial);
+        return to==null?Vec3.ZERO:to.subtract(p.getPosition(partial));
+    }
+    public void placeActor(Player p){
+        if(action()!=Action.EXTRACTING || !isActor(p) || !p.isAlive())return;
+        Vec3 next=supportedActorPosition(p,0);
+        if(next!=null)p.setPos(next.x,next.y,next.z);
+        p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
+        float yaw=GoddessActor.yaw(boss,0);
+        p.setYRot(yaw);p.yBodyRot=yaw;p.yHeadRot=yaw;
+    }
     private void tickExecution(Player player) {
         if (!committed && (player == null || !player.isAlive() || player.isSpectator())) { release(); return; }
-        if(player instanceof ServerPlayer p && p.isAlive()){
-            float mix=Math.min(1,age/12F);mix=mix*mix*(3-2*mix);
-            Vec3 next=grabFrom.lerp(GoddessActor.point(boss,0,0),mix);
-            if(!boss.level().getBlockCollisions(p,p.getBoundingBox().move(next.subtract(p.position()))).iterator().hasNext()){
-                p.teleportTo(next.x,next.y,next.z);
-            }
-            p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
-            p.setYRot(GoddessActor.yaw(boss,0));p.yBodyRot=p.getYRot();p.yHeadRot=p.getYRot();
-        }
+        if(player instanceof ServerPlayer p && p.isAlive())placeActor(p);
         int tearTick=previousMask==0?62:49;
         int separationTick=previousMask==0?78:55;
         int braceTick=previousMask==0?34:35;
@@ -286,6 +320,8 @@ public final class GoddessEncounter {
             publish();
         }
         if (age < 139) return;
+        // The paired actor is driven on both sides during the shot. Send one final authoritative position.
+        if(player instanceof ServerPlayer p && p.isAlive())p.connection.teleport(p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot());
         if (life.finished()) {
             var source = player == null ? boss.damageSources().generic() : boss.damageSources().playerAttack(player);
             boss.setHealth(0);
