@@ -65,7 +65,7 @@ public final class GoddessEncounter {
         if(site!=null){facing=site.yaw();lift=site.lift();approach=site.approach();}
         else {lift=0;approach=null;}
     }
-    private record SurfaceSample(long tick,float partial,Vec3 origin,float yaw,int pose,int mask,Action action,
+    private record SurfaceSample(long tick,float partial,Vec3 origin,float yaw,int pose,int mask,Action action,CompoundTag snapshot,
                                  java.util.List<HydraContact.Region> regions) {}
     private final SurfaceSample[] skin = new SurfaceSample[3];
     public java.util.List<HydraContact.Region> regions(Vec3 origin,float partial){
@@ -75,10 +75,11 @@ public final class GoddessEncounter {
         float yaw=facing(partial);
         int frame=(int)age(0),mask=removed();
         var action=action();
-        if(cached!=null && cached.tick==tick && cached.partial==partial && cached.origin.equals(origin)
+        var snapshot=boss.goddessData();
+        if(cached!=null && cached.snapshot==snapshot && cached.tick==tick && cached.partial==partial && cached.origin.equals(origin)
                 && cached.yaw==yaw && cached.pose==frame && cached.mask==mask && cached.action==action)return cached.regions;
         var result=GoddessRig.regions(boss,origin,partial);
-        skin[slot]=new SurfaceSample(tick,partial,origin,yaw,frame,mask,action,result);
+        skin[slot]=new SurfaceSample(tick,partial,origin,yaw,frame,mask,action,snapshot,result);
         return result;
     }
 
@@ -171,7 +172,7 @@ public final class GoddessEncounter {
         if (hit != null && attacks.strainingSlot() == GoddessRig.PARTS.indexOf(hit.bone()) && attacks.strainingSlot() >= 0) stagger(hit);
     }
     void finishedAttack() { staggerLocked = false; }
-    private void stagger(HydraHurtContact.Contact hit) {
+    void stagger(HydraHurtContact.Contact hit) {
         if (action != Action.FLYING || life.waiting() || staggerLocked) return;
         var landing = GoddessLanding.find(boss, nextPart(), boss.yBodyRot,true);
         if (landing == null) return;

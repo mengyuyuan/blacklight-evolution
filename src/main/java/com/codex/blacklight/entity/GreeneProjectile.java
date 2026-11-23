@@ -22,6 +22,9 @@ public final class GreeneProjectile extends Projectile {
     private static final EntityDataAccessor<org.joml.Vector3f> HEADING=SynchedEntityData.defineId(GreeneProjectile.class,EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Float> FLIGHT_SECONDS=SynchedEntityData.defineId(GreeneProjectile.class,EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FLESH=SynchedEntityData.defineId(GreeneProjectile.class,EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CANNON=SynchedEntityData.defineId(GreeneProjectile.class,EntityDataSerializers.BOOLEAN);
+    public boolean cannon(){return entityData.get(CANNON);}
+    public void cannon(boolean value){entityData.set(CANNON,value);}
     public boolean flesh(){return entityData.get(FLESH);}
     public GreeneProjectile asFlesh(){entityData.set(FLESH,true);return this;}
     private static final EntityDataAccessor<Long> FINISH_START=SynchedEntityData.defineId(GreeneProjectile.class,EntityDataSerializers.LONG);
@@ -40,7 +43,7 @@ public final class GreeneProjectile extends Projectile {
         flight=new GreeneMissileFlight(ammo,user,direction,owner.getDeltaMovement().scale(20));entityData.set(AMMO,ammo.ordinal());syncFlight();syncStep(flight.velocity().scale(.05));
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder){
-        builder.define(FLESH,false);builder.define(AMMO,GreeneMissileFlight.Ammo.RIFLE.ordinal());builder.define(FLIGHT_STEP,new org.joml.Vector3f());
+        builder.define(CANNON,false);builder.define(FLESH,false);builder.define(AMMO,GreeneMissileFlight.Ammo.RIFLE.ordinal());builder.define(FLIGHT_STEP,new org.joml.Vector3f());
         builder.define(HEADING,new org.joml.Vector3f(0,0,-1));builder.define(FLIGHT_SECONDS,0F);builder.define(FINISH_START,Long.MIN_VALUE);
     }
     public GreeneMissileFlight.Ammo ammo(){int i=entityData.get(AMMO);return GreeneMissileFlight.Ammo.values()[Math.max(0,Math.min(GreeneMissileFlight.Ammo.values().length-1,i))];}
@@ -75,11 +78,11 @@ public final class GreeneProjectile extends Projectile {
             var step=entityData.get(FLIGHT_STEP);setDeltaMovement(step.x,step.y,step.z);setPos(position().add(getDeltaMovement()));return;
         }
         if(!(level() instanceof ServerLevel server)||flight==null||launch==null||!(getOwner() instanceof EncounterMob owner)||!owner.isAlive()||owner.isRemoved()
-                ||flesh()&&!owner.spider.live()||flight.expired()||flight.outOfRange(launch,position())){discard();return;}
+                ||flesh() && (getPersistentData().getBoolean("GoddessHandShot") ? !owner.goddess.active() || !owner.goddess.damageable() || getPersistentData().getInt("GoddessSequence")!=owner.goddess.attacks.sequence() : !owner.spider.live())||flight.expired()||flight.outOfRange(launch,position())){discard();return;}
         Entity target=targetId==null?null:server.getEntity(targetId);
         if(!GreeneWeaponTarget.valid(owner,target)){flight.loseTarget();target=null;}
         Vec3 from=position(),step=flight.step(from,target==null?null:GreeneWeaponTarget.point(target),target==null?Vec3.ZERO:target.getDeltaMovement().scale(20),.05);
-        Vec3 to=from.add(step);double radius=flesh()?.23:flight.ammo().thickness;
+        Vec3 to=from.add(step);double radius=cannon()?.78:flesh()?.23:flight.ammo().thickness;
         var sweep=new AABB(from,to).inflate(radius+.001);
         if(flight.expired()||!Double.isFinite(step.lengthSqr())||step.lengthSqr()>64*64||flight.outOfRange(launch,to)
                 ||!VehicleKinematics.loaded(server,sweep)||sweep.minX<server.getWorldBorder().getMinX()||sweep.maxX>server.getWorldBorder().getMaxX()
@@ -167,7 +170,7 @@ public final class GreeneProjectile extends Projectile {
             var target=contact.target;var ammo=flight.ammo();
             if(target instanceof LivingEntity living&&owner.enemy(living)&&!com.codex.blacklight.firearms.FirearmsCombat.protectedTarget(owner,living)){
                 float damage=(float)(living instanceof Player?ammo.damageOnPlayer:ammo.damageOnNpc)*LIVING_DAMAGE_ADAPTER;
-                if(flesh())damage*=1.85F;
+                if(flesh())damage*=cannon()?3.7F:1.85F;
                 var source=damageSources().thrown(this,owner);var body=AnimatedHurtBody.of(living);
                 if(body!=null&&contact.body!=null)body.hurtAt(source,damage,contact.body);
                 else if(body==null)living.hurt(source,damage);
@@ -176,18 +179,19 @@ public final class GreeneProjectile extends Projectile {
                 // damage here rather than fabricating a firearm definition.
                 VehicleDamageBridge.hurtPhysical(owner,hull,(float)ammo.damageOnNpc,this,damageContact);
             }else if(target instanceof BlackwatchHelicopter h&&!VehicleDamageBridge.protectedAircraft(owner,h))h.hurt(damageSources().thrown(this,owner),(float)ammo.damageOnNpc);
+            if(cannon() && contact.target==null)GreeneTendrilPod.plant(owner,damageContact);
             GreeneProjectileEffects.impact(this,damageContact);
         }finally{
             damageContact=null;entityData.set(FINISH_START,level().getGameTime());syncStep(Vec3.ZERO);
         }
     }
     @Override protected void addAdditionalSaveData(CompoundTag tag){
-        super.addAdditionalSaveData(tag);if(flesh())tag.putBoolean("FleshVolley",true);if(flight!=null)tag.put("GreeneFlight",flight.save());if(targetId!=null)tag.putUUID("GreeneTarget",targetId);
+        super.addAdditionalSaveData(tag);if(cannon())tag.putBoolean("HandCannon",true);if(flesh())tag.putBoolean("FleshVolley",true);if(flight!=null)tag.put("GreeneFlight",flight.save());if(targetId!=null)tag.putUUID("GreeneTarget",targetId);
         if(launch!=null){tag.putDouble("LaunchX",launch.x);tag.putDouble("LaunchY",launch.y);tag.putDouble("LaunchZ",launch.z);}
         if(finished())tag.putInt("GreeneFinalAge",(int)Math.min(6,finishAge(0)));
     }
     @Override protected void readAdditionalSaveData(CompoundTag tag){
-        super.readAdditionalSaveData(tag);entityData.set(FLESH,tag.getBoolean("FleshVolley"));flight=GreeneMissileFlight.load(tag.getCompound("GreeneFlight"));
+        super.readAdditionalSaveData(tag);cannon(tag.getBoolean("HandCannon"));entityData.set(FLESH,tag.getBoolean("FleshVolley"));flight=GreeneMissileFlight.load(tag.getCompound("GreeneFlight"));
         targetId=tag.hasUUID("GreeneTarget")?tag.getUUID("GreeneTarget"):null;
         launch=tag.contains("LaunchX",6)&&tag.contains("LaunchY",6)&&tag.contains("LaunchZ",6)?new Vec3(tag.getDouble("LaunchX"),tag.getDouble("LaunchY"),tag.getDouble("LaunchZ")):null;
         if(launch!=null&&!Double.isFinite(launch.lengthSqr()))launch=null;

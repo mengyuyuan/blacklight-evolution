@@ -24,6 +24,7 @@ public final class GreeneProjectileRenderer extends EntityRenderer<GreeneProject
         if(!GreeneProjectileAppearance.meshVisible(projectile.ammo(),projectile.finished()))return;
         if(projectile.flesh()){
             stack.pushPose();
+            if(projectile.cannon())stack.scale(3.2F,2.4F,3.2F);
             var dir=projectile.renderHeading(partial).normalize().toVector3f();
             stack.mulPose(new org.joml.Quaternionf().rotationTo(0,1,0,dir.x,dir.y,dir.z));
             stack.mulPose(com.mojang.math.Axis.YP.rotation((projectile.tickCount+partial)*.36F));

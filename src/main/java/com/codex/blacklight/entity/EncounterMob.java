@@ -1313,6 +1313,15 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(source.getEntity() instanceof LivingEntity attacker&&isAlliedTo(attacker))return false;
         if(goddess.active()){
             if(!goddess.damageable())return false;
+            if(incomingContact!=null){
+                int slot=GoddessRig.PARTS.indexOf(incomingContact.bone());
+                if(slot>=GoddessHandPose.WRIST){
+                    if(!goddess.attacks.hand.hit(slot,source,amount,incomingContact.point()))return false;
+                    BossSiteData.participant(this,source.getEntity());
+                    BossImpactFeedback.contact(this,source,incomingContact.point(),BossImpactFeedback.Contact.WEAK,amount);
+                    return true;
+                }
+            }
             if(goddess.groundWeakSpot(source,incomingContact))amount*=1.5F;
             boolean accepted;
             greeneOwnDamageDepth++;
@@ -1321,6 +1330,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                 BossSiteData.participant(this,source.getEntity());
                 if(incomingContact!=null)confirmedIncoming(source,amount);
                 goddess.afterDamage();
+                goddess.attacks.hand.hitController(source,incomingContact);
                 if(source.getDirectEntity() instanceof ThrownBlock rock)goddess.rockImpact(rock,incomingContact);
             }
             return accepted;
