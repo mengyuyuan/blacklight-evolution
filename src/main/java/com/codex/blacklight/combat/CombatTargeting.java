@@ -96,7 +96,7 @@ public final class CombatTargeting {
         return entity instanceof LivingEntity living?living:null;
     }
     public static boolean multipart(LivingEntity target) {
-        return target instanceof BlacklightInfectedHost host&&host.hasMultipartBody()
+        return target instanceof com.codex.blacklight.entity.GoddessEmplacement || target instanceof BlacklightInfectedHost host&&host.hasMultipartBody()
                 || target.isMultipartEntity() && target.getParts()!=null && target.getParts().length>0;
     }
     /** Query proxies alone must not make a light flying body immune to knockback. */

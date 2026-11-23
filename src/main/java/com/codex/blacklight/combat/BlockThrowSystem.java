@@ -67,10 +67,10 @@ public final class BlockThrowSystem {
         if(!selectable(p,pos))return false;
         var selection=new java.util.LinkedHashMap<BlockPos,net.minecraft.world.level.block.state.BlockState>();
         for(var at:TerrainGrabShape.grow(pos,limit,seed,q->selectable(p,q))){
-            var candidate=level.getBlockState(at);var event=new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,at,candidate,p);var previous=OWN_BREAK.get();OWN_BREAK.set(event);
-            try{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);}finally{if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous);}
+            var candidate=level.getBlockState(at);
             // A protected cell cancels the whole extraction, preserving connectivity and all source blocks.
-            if(event.isCanceled())return false;selection.put(at.immutable(),candidate);
+            if(!mayExtract(p,at,candidate))return false;
+            selection.put(at.immutable(),candidate);
         }
         if(!selection.containsKey(pos)||!canUse(p)||p.level()!=level)return false;
         for(var entry:selection.entrySet())if(level.getBlockState(entry.getKey())!=entry.getValue()||!level.mayInteract(p,entry.getKey()))return false;
@@ -111,6 +111,15 @@ public final class BlockThrowSystem {
             if(hit.getType()==HitResult.Type.BLOCK&&hit.getBlockPos().equals(pos))return true;
         }
         return false;
+    }
+    static boolean mayExtract(ServerPlayer player,BlockPos at,net.minecraft.world.level.block.state.BlockState state){
+        var level=player.serverLevel();
+        var event=new net.neoforged.neoforge.event.level.BlockEvent.BreakEvent(level,at,state,player);
+        var previous=OWN_BREAK.get();
+        OWN_BREAK.set(event);
+        try{net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(event);}
+        finally{if(previous==null)OWN_BREAK.remove();else OWN_BREAK.set(previous);}
+        return !event.isCanceled() && level.getBlockState(at)==state && level.mayInteract(player,at);
     }
     public static boolean selectable(ServerPlayer p,BlockPos at){
         var level=p.serverLevel();if(!level.hasChunkAt(at)||!level.mayInteract(p,at)||!level.getWorldBorder().isWithinBounds(at))return false;

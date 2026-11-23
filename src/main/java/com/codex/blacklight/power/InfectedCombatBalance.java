@@ -57,6 +57,7 @@ public final class InfectedCombatBalance {
         // commands and environmental damage do not acquire a creature budget.
         if(!(source.getEntity() instanceof Mob attacker)
                 ||source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))return;
+        if(attacker instanceof com.codex.blacklight.entity.EncounterMob mob && mob.goddess.active())return;
         if(com.codex.blacklight.compat.CultivationCompatibility.lateIncomingBudget(player,source))return;
         if(com.codex.blacklight.infection.InfectionStatScaling.nativeThreat(attacker)){
             event.setAmount(com.codex.blacklight.infection.EvolvedBalance.playerDamage(event.getAmount(),player.getMaxHealth(),CombatScale.units(player),

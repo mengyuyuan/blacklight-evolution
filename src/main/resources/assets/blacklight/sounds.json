@@ -3247,5 +3247,32 @@
         "attenuation_distance": 32
       }
     ]
+  },
+  "greene.pressure.strain": {
+    "subtitle": "subtitle.blacklight.greene.pressure.strain",
+    "sounds": [
+      {
+        "name": "blacklight:greene/pressure/strain",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "greene.pressure.burst": {
+    "subtitle": "subtitle.blacklight.greene.pressure.burst",
+    "sounds": [
+      {
+        "name": "blacklight:greene/pressure/burst",
+        "attenuation_distance": 36
+      }
+    ]
+  },
+  "greene.pressure.echo": {
+    "subtitle": "subtitle.blacklight.greene.pressure.echo",
+    "sounds": [
+      {
+        "name": "blacklight:greene/pressure/echo",
+        "attenuation_distance": 80
+      }
+    ]
   }
 }

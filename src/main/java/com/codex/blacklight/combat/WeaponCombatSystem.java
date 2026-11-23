@@ -724,6 +724,15 @@ public final class WeaponCombatSystem {
             meleePitch=WhipCurveContact.aimPitch(p);
             if(meleePitch!=0)hullSearch=hullSearch.inflate(0,moveReach,0);
         }
+        for(var spear:p.level().getEntitiesOfClass(com.codex.blacklight.entity.EvolvedQuill.class,
+                hullSearch.inflate(2.3),com.codex.blacklight.entity.EvolvedQuill::lodgedSpear)){
+            var shaft=spear.shaft();
+            Vec3 contact=cutting.hullContact(p,List.of(shaft),whip==null?0:whip.collisionRadius());
+            if(contact==null && !preciseOnly && bounds!=null && !cutting.sharp()
+                    && meleeContact(p,s,shaft.bounds,shaft.bounds,bounds))contact=shaft.nearest(p.getEyePosition());
+            if(contact!=null && CombatTargeting.clearRay(p,p.getEyePosition(),contact))
+                spear.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form));
+        }
         for(Entity hull:ExplicitTarget.hullsIn(p,hullSearch)){
             if(!currentSession(p,s))return;
             if(s.hit.contains(hull.getUUID())||s.hit.size()>=(s.move.quake()?48:8))continue;
@@ -842,6 +851,8 @@ public final class WeaponCombatSystem {
                     ?encounter.hurtWeapon(p.damageSources().playerAttack(p),contactDamage,cut,box->!cutting.sharp()&&bounds!=null&&meleeContact(p,s,box,box,bounds))
                     :v.hurt(p.damageSources().playerAttack(p),contactDamage);
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Weapon contact move={} victim={} id={} accepted={} health={} -> {} cuts={} meshContacts={} preciseTail={}",s.move.id,v.getType().getDescriptionId(),v.getId(),accepted,healthBefore,v.getHealth(),cut.contacts().size(),impact.contacts().size(),preciseOnly);
+            if(accepted && hydraHit!=null && v instanceof com.codex.blacklight.entity.EncounterMob boss
+                    && boss.goddess.active() && s.move.aerialHeavy())boss.goddess.aerialImpact(hydraHit);
             // Restore only the timer we temporarily cleared, never overwrite a
             // newer protection installed by another damage callback.
             if(!accepted&&ownPrevious&&v.invulnerableTime==0)v.invulnerableTime=resistance;

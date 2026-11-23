@@ -10,6 +10,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 /** Prototype-specific sprint food rules and particle suppression. */
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {
+    @Inject(method = "aiStep", at = @At("TAIL"))
+    private void blacklight$placeGoddessCaptive(org.spongepowered.asm.mixin.injection.callback.CallbackInfo callback) {
+        com.codex.blacklight.client.animation.GoddessPressurePose.placeCaptive((LocalPlayer)(Object)this);
+    }
+
     @Inject(method = "hasEnoughFoodToStartSprinting", at = @At("HEAD"), cancellable = true)
     private void blacklight$ignoreSprintHunger(CallbackInfoReturnable<Boolean> callback) {
         // Vanilla uses this for both entering sprint and cancelling an existing sprint.

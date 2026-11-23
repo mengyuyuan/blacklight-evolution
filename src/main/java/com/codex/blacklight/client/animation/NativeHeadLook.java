@@ -10,21 +10,26 @@ import net.minecraft.world.entity.player.Player;
 public final class NativeHeadLook {
     private NativeHeadLook() { }
     public static void apply(LivingEntity entity,BlacklightPose pose,float partial) {
-        if(!(entity instanceof Player player)||!player.onGround()
+        if(!(entity instanceof Player player)
                 ||com.codex.blacklight.movement.WallPoseState.get(player)!=null
                 ||player.getData(ModAttachments.WEAPON_VISUAL).spec()!=null
                 ||player.getData(ModAttachments.GRAB_STAGE)!=0
                 ||player.getData(ModAttachments.CONSUME_RECOVERY).active()
                 ||player.getData(ModAttachments.JUMP_CHARGE)>0
-                ||player.getData(ModAttachments.POWER_MORPH).visible(player,partial)
-                ||player.getData(ModAttachments.HIT_REACTION).weight(player.level().getGameTime(),partial)>0)return;
+                ||player.getData(ModAttachments.POWER_MORPH).visible(player,partial))return;
         var action=player.getData(ModAttachments.PLAYER_ACTION);
         if(action.active(com.codex.blacklight.animation.PlayerMotionController.actionTime(player,partial))&&!action.clipId().startsWith("basic_"))return;
+        float contact=com.codex.blacklight.animation.PlayerMotionController.groundLook(player,partial);
+        if(contact<=0)return;
         float headYaw=Mth.rotLerp(partial,player.yHeadRotO,player.yHeadRot);
         float bodyYaw=BlacklightRenderPose.facing(player,partial);
-        float yaw=Mth.clamp(Mth.wrapDegrees(headYaw-bodyYaw),-75,75);
+        float relative=Mth.wrapDegrees(headYaw-bodyYaw);
+        // At exactly the rear the anatomical turn is ambiguous. Return to centre
+        // continuously from either side, avoiding a 150-degree snap across +/-180.
+        float rear=Mth.clamp((180-Math.abs(relative))/65F,0,1);
+        float yaw=Mth.clamp(relative,-75,75)*rear*rear*(3-2*rear);
         float pitch=Mth.clamp(Mth.lerp(partial,player.xRotO,player.getXRot()),-70,70);
         // Native Minecraft's model Y points downward; Blacklight's Y points up.
-        pose.orElseEmpty("Head").rotation().rotateY(-(float)Math.toRadians(yaw)).rotateX(-(float)Math.toRadians(pitch));
+        pose.orElseEmpty("Head").rotation().rotateY(-(float)Math.toRadians(yaw*contact)).rotateX(-(float)Math.toRadians(pitch*contact));
     }
 }

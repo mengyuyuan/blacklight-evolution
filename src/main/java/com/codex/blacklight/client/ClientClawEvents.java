@@ -125,6 +125,8 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
         event.registerEntityRenderer(ModEntities.GREENE_TENDRIL_POD.get(),com.codex.blacklight.client.renderer.GreeneTendrilPodRenderer::new);
+        event.registerEntityRenderer(ModEntities.GREENE_SPINE_CANNON.get(),com.codex.blacklight.client.renderer.GoddessEmplacementRenderer::new);
+        event.registerEntityRenderer(ModEntities.GREENE_GROUND_WRIST.get(),com.codex.blacklight.client.renderer.GoddessEmplacementRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));
@@ -314,6 +316,15 @@ public final class ClientClawEvents {
     private static void tickGrabButtons(boolean left, boolean right) {
         var mc=Minecraft.getInstance();
         if(ClientBlockThrowInput.poll(left,right)){lastGrabLeft=left;lastGrabRight=right;return;}
+        if (right && !lastGrabRight && mc.player != null && mc.screen == null && mc.isWindowActive()
+                && !mc.level.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,mc.player.getBoundingBox().inflate(70),
+                    mob -> mob.goddess.active() && mob.goddess.action() == com.codex.blacklight.combat.GoddessEncounter.Action.GRIPPED
+                    && mob.goddessData().hasUUID("Actor") && mc.player.getUUID().equals(mob.goddessData().getUUID("Actor"))).isEmpty()) {
+            PacketDistributor.sendToServer(new ClawActionPayload(ClawActionPayload.Action.CONSUME));
+            lastGrabRight=true;
+            lastGrabLeft=left;
+            return;
+        }
         if(mc.player!=null&&mc.screen==null&&mc.isWindowActive()&&mc.player.getData(ModAttachments.CONSUMING)) {
             clearLeftAttackHold();
             mc.options.keyAttack.setDown(false);mc.options.keyUse.setDown(false);

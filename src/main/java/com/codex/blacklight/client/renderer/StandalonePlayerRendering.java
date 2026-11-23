@@ -29,6 +29,7 @@ public final class StandalonePlayerRendering {
     public static boolean nativeHandPass(){return hands!=null;}
     public static boolean allowFirstPersonHands(boolean mountedVehicle){return !mountedVehicle;}
     @SubscribeEvent public static void hand(RenderHandEvent event) {
+        if(com.codex.blacklight.client.camera.GoddessExecutionCamera.active()){event.setCanceled(true);return;}
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
         if(player!=null && com.codex.blacklight.world.WeaveCell.channelOf(player)!=null) {
             // The planted arms are rendered in world space with the station.
@@ -38,7 +39,8 @@ public final class StandalonePlayerRendering {
         if(player!=null){
             var action=player.getData(ModAttachments.PLAYER_ACTION);
             double clock=com.codex.blacklight.animation.PlayerMotionController.actionTime(player,event.getPartialTick());
-            if(action.clipId().startsWith("greene_mouth_") && action.active(clock)){
+            var pressure=com.codex.blacklight.client.animation.GoddessPressurePose.owner(player);
+            if(pressure!=null || action.clipId().startsWith("greene_mouth_") && action.active(clock)){
                 event.setCanceled(true);
                 if(event.getHand()==net.minecraft.world.InteractionHand.MAIN_HAND){
                     var renderer=RENDERERS.get(player.getSkin().model());
@@ -48,7 +50,12 @@ public final class StandalonePlayerRendering {
                         for(var side:HumanoidArm.values()){
                             var stack=event.getPoseStack();stack.pushPose();
                             try{
-                                mouthHand(stack,side,action.clipId(),action.seconds(clock)*20);
+                                if(pressure==null)mouthHand(stack,side,action.clipId(),action.seconds(clock)*20);
+                                else if(pressure.goddess.attacks.struggle.holds())
+                                    com.codex.blacklight.client.animation.GoddessFatalActor.hand(stack,side,pressure.goddess.attacks.struggle,event.getPartialTick());
+                                else if(pressure.goddess.attacks.move()==com.codex.blacklight.combat.GoddessAttacks.Move.RUSH)
+                                    com.codex.blacklight.client.animation.GoddessThrowActor.hand(stack,side,pressure.goddess.attacks,event.getPartialTick());
+                                else pressureHand(stack,side,pressure.goddess.attacks.age(event.getPartialTick()),pressure.goddess.attacks.grounded());
                                 access.blacklight$renderPlayerArm(stack,event.getMultiBufferSource(),event.getPackedLight(),0,0,side);
                             }finally{stack.popPose();}
                         }
@@ -114,6 +121,20 @@ public final class StandalonePlayerRendering {
         }
         stack.translate(-sign*.10F,lift,-reach);
         stack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(roll));
+    }
+    private static void pressureHand(com.mojang.blaze3d.vertex.PoseStack stack,HumanoidArm side,float age,boolean grounded){
+        boolean right=side==HumanoidArm.RIGHT;
+        float sign=right?1:-1;
+        float brace=beat(age,right?28:32,right?34:39);
+        float fold=beat(age,38,51);
+        float release=1-beat(age,52,61);
+        float shock=beat(age,28,31)*(1-beat(age,32,39));
+        float effort=.018F*net.minecraft.util.Mth.sin(age*1.65F)*fold;
+        stack.translate(sign*(.08F*brace-.41F*fold)*release,
+                ((right?.37F:.23F)*brace-.13F*fold+effort)*release,
+                (-.26F*brace+.21F*fold)*release);
+        stack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(release*(sign*(24*brace-47*fold)+(grounded?5:16)*shock)));
+        stack.mulPose(com.mojang.math.Axis.XP.rotationDegrees((-13*brace+22*fold)*release));
     }
     private static float beat(float t,float start,float end){
         float u=net.minecraft.util.Mth.clamp((t-start)/(end-start),0,1);

@@ -20,7 +20,7 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-94-consume-contact")
+        event.registrar("standalone-95-goddess")
                 .playToClient(ContactEffectsPayload.TYPE,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
                 .playToServer(ContextActionPayload.TYPE,ContextActionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)com.codex.blacklight.combat.ContextActionSystem.request(player);}))
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
@@ -82,7 +82,7 @@ public final class ModNetwork {
                 .playToServer(WeaponInputPayload.TYPE,WeaponInputPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            if(payload.cancelled())com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
+                            if(payload.cancelled() || com.codex.blacklight.combat.GoddessStruggle.controlling(player))com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
                             else com.codex.blacklight.combat.WeaponCombatSystem.acceptInput(player,payload.attack(),payload.special(),payload.action(),payload.jump());
                         }
                     }))
@@ -144,11 +144,16 @@ public final class ModNetwork {
                 })
                 .playToClient(LandingVisualPayload.TYPE, LandingVisualPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> ClientLandingVisuals.accept(payload));
-                });
+                })
+                .playToServer(GoddessStrugglePayload.TYPE,GoddessStrugglePayload.STREAM_CODEC,(payload,context)->
+                    context.enqueueWork(()->{
+                        if(context.player() instanceof ServerPlayer p)
+                            com.codex.blacklight.combat.GoddessStruggle.input(p,payload.entityId(),payload.sequence(),payload.controls());
+                    }));
     }
 
     private static boolean canAct(ServerPlayer player) {
-        return player != null && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
+        return player != null && !com.codex.blacklight.combat.GoddessStruggle.controlling(player) && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
     }
 
     @SubscribeEvent
