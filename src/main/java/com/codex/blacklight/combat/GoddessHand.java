@@ -32,7 +32,7 @@ public final class GoddessHand {
     private boolean lastWasMelee;
     private BlockPos vein;
     GoddessHand(EncounterMob boss){this.boss=boss;}
-    private long now(){return boss.level().getGameTime();}
+    private long now(){return boss.level().isClientSide?boss.goddess.visualServerTick():boss.level().getGameTime();}
     private CompoundTag remote(){return boss.goddessData().getCompound("Offense").getCompound("Hand");}
     private static Vec3 read(CompoundTag t,String k){return new Vec3(t.getDouble(k+"X"),t.getDouble(k+"Y"),t.getDouble(k+"Z"));}
     private static void put(CompoundTag t,String k,Vec3 v){t.putDouble(k+"X",v.x);t.putDouble(k+"Y",v.y);t.putDouble(k+"Z",v.z);}

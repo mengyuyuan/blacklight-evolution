@@ -299,6 +299,10 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
     public final GoddessEncounter goddess=new GoddessEncounter(this);
     public final SpiderPhase spider=new SpiderPhase(this);
     public CompoundTag goddessData(){return entityData.get(GODDESS);}
+    @Override public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (key == GODDESS && level().isClientSide) goddess.receiveTimeline(goddessData());
+    }
     public void goddessData(CompoundTag tag){if(!level().isClientSide)entityData.set(GODDESS,tag);}
     private boolean spiderLethal;
     public CompoundTag spiderData(){return entityData.get(SPIDER);}

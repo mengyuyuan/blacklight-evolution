@@ -35,11 +35,15 @@ public final class GoddessStruggle {
     private boolean client(){return boss.level().isClientSide;}
     private CompoundTag remote(){return boss.goddessData().getCompound("Offense").getCompound("Struggle");}
     GoddessStruggle(EncounterMob boss){this.boss=boss;}
+    private final GoddessSceneClock scene = new GoddessSceneClock();
     private long now(){return boss.level().getGameTime();}
+    void receiveTimeline(CompoundTag data, long observed) {
+        scene.synchronize(data.getInt("Token"),data.getInt("Step"),data.getLong("At"),observed,boss.tickCount);
+    }
     public boolean active(){return attacks().move()==GoddessAttacks.Move.STRUGGLE;}
     public boolean hair(){return client()?remote().getBoolean("Hair"):hair;}
     public Step step(){return client()?Step.values()[Mth.clamp(remote().getInt("Step"),0,Step.values().length-1)]:step;}
-    public float age(float partial){return now()-(client()?remote().getLong("At"):stepAt)+partial;}
+    public float age(float partial){return client()?scene.age(boss.tickCount,partial):now()-stepAt+partial;}
     public boolean promptDisplayed(){return client()?remote().getBoolean("Displayed"):shown>=0;}
     public boolean prompt(){return switch(step()){case PUSH,JUMP,LEFT,RIGHT,REPRISE->true;default->false;};}
     public boolean holds(){return active() && step()!=Step.WARN && step()!=Step.OPEN;}
@@ -48,7 +52,8 @@ public final class GoddessStruggle {
     public float facing(){return client()?remote().getFloat("Facing"):facing;}
     public double effort(float partial){
         long start=client()?remote().getLong("Pressed"):pressed;
-        return start<0?0:Mth.clamp((now()-start+partial)/12.,0,1);
+        long at=client()?remote().getLong("At"):stepAt;
+        return start<0?0:Mth.clamp((age(partial)-(start-at))/12.,0,1);
     }
     private static double smooth(double x){x=Mth.clamp(x,0,1);return x*x*(3-2*x);}
     public Vec3 mark(){return client()?vec(remote(),"Mark"):mark;}

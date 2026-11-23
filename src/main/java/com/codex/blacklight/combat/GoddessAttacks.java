@@ -24,6 +24,7 @@ public final class GoddessAttacks {
     final GoddessBrood brood;
     private final GoddessVolley volley;
     private final EncounterMob boss;
+    private final GoddessSceneClock scene = new GoddessSceneClock();
     private Move move=Move.REST;
     private int elapsed, sequence, groups, order;
     private UUID target;
@@ -38,7 +39,11 @@ public final class GoddessAttacks {
 
     private CompoundTag client(){return boss.goddessData().getCompound("Offense");}
     public Move move(){return boss.level().isClientSide?decode(client()):move;}
-    public float age(float partial){return boss.level().isClientSide?Math.max(0,boss.level().getGameTime()-client().getLong("Start")+partial):elapsed+partial;}
+    public float age(float partial){return boss.level().isClientSide?scene.age(boss.tickCount,partial):elapsed+partial;}
+    void receiveTimeline(CompoundTag data, long observed) {
+        scene.synchronize(data.getInt("Sequence"),decode(data).ordinal(),data.getLong("Start"),observed,boss.tickCount);
+        struggle.receiveTimeline(data.getCompound("Struggle"),observed);
+    }
     public Vec3 center(){return boss.level().isClientSide?readCenter(client()):center;}
     public boolean caught(){return boss.level().isClientSide?client().getBoolean("Caught"):caught;}
     public boolean grounded(){return boss.level().isClientSide?client().getBoolean("Ground"):grounded;}
@@ -201,7 +206,10 @@ public final class GoddessAttacks {
         SpiderFoley.strands(boss,edge,joint.subtract(edge),4);
         if(boss.level() instanceof ServerLevel server){
             var visible=edge.add(center.subtract(edge).normalize().scale(.2));
-            server.sendParticles(net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK,visible.x,visible.y,visible.z,6,.36,.32,.36,.018);
+            // A player on the floor can be more than 32 blocks from the face of this 46-block boss.
+            for(var observer:server.players())if(observer.distanceToSqr(boss)<=112*112)
+                server.sendParticles(observer,net.minecraft.core.particles.ParticleTypes.ELECTRIC_SPARK,true,
+                        visible.x,visible.y,visible.z,6,.36,.32,.36,.018);
         }
     }
     private void finish(){
