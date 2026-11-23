@@ -27,6 +27,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     private volatile Group[] groups;
     private Group[] jointOrder;
     private final GoddessLimbFlow.Profile[] flows=new GoddessLimbFlow.Profile[3];
+    private final GoddessLimbFlow.WetSurface liquidSheen=new GoddessLimbFlow.WetSurface();
     private final Quaternionf from=new Quaternionf(), to=new Quaternionf();
     private final org.joml.Matrix4f transform=new org.joml.Matrix4f();
     private java.util.concurrent.CompletableFuture<Void> loading;
@@ -119,6 +120,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
     void draw(float ticks,PoseStack stack,MultiBufferSource buffers,int light,int overlay,Matrix4f[] offsets,com.codex.blacklight.entity.EncounterMob boss,float partial) {
         if(groups==null){warm();loading.join();}
         var flow=GoddessLimbFlow.active(boss,partial,flows);
+        if(flow!=null)liquidSheen.reset();
         boolean resident=false;
         if(mesh.equals(COLONY) && !com.codex.blacklight.client.ShaderPackCompat.active()){
             var gpuOffsets=offsets;
@@ -147,7 +149,7 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
                 q.set(t[a+3],t[a+4],t[a+5],t[a+6]);next.set(t[b+3],t[b+4],t[b+5],t[b+6]);
                 var posed=new Matrix4f(offsets[group.carrier()]).translate(t[a]+mix*(t[b]-t[a]),
                         t[a+1]+mix*(t[b+1]-t[a+1]),t[a+2]+mix*(t[b+2]-t[a+2])).rotate(q.slerp(next,mix));
-                flow.draw(group,posed,stack.last(),out,light,overlay);
+                flow.draw(group,posed,stack.last(),out,light,overlay,liquidSheen);
                 continue;
             }
             stack.pushPose();
@@ -165,5 +167,6 @@ public final class GreeneGoddessRenderer extends EntityRenderer<GreeneGoddess> {
             }
             stack.popPose();
         }
+        if(flow!=null)liquidSheen.draw(stack.last(),buffers);
     }
 }
