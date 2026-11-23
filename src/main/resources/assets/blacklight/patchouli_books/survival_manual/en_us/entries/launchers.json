@@ -1,0 +1,37 @@
+{
+  "name": "Heavy Launchers",
+  "category": "blacklight:military",
+  "sortnum": 23,
+  "icon": "blacklight:rocket_launcher",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Each pair shows a launcher and its matching round. Check your stock and clearance before setting out. Military armories are another source of equipment and ammunition."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:grenade_launcher",
+      "recipe2": "blacklight:grenade_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:rocket_launcher",
+      "recipe2": "blacklight:rocket_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:missile_launcher",
+      "recipe2": "blacklight:missile_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:thermobaric_launcher",
+      "recipe2": "blacklight:thermobaric_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:infection_launcher",
+      "recipe2": "blacklight:infection_round"
+    }
+  ]
+}

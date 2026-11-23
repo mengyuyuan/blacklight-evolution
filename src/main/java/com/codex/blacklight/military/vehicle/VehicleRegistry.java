@@ -1,5 +1,6 @@
 package com.codex.blacklight.military.vehicle;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.MilitaryVehicle;
 import com.codex.blacklight.military.MilitaryFaction;
 import com.codex.blacklight.registry.ModEntities;
@@ -103,7 +104,7 @@ public final class VehicleRegistry {
             if(placement!=VehicleKinematics.StopReason.NONE){
                 vehicle.discard();
                 String reason=switch(placement){case WATER->"water";case UNSUPPORTED->"unsupported";case UNKNOWN_CHUNK->"unloaded";default->"blocked";};
-                player.displayClientMessage(Component.translatable("message.blacklight.vehicle_place_"+reason),true);
+                FieldNotes.record(player, Component.translatable("message.blacklight.vehicle_place_"+reason));
                 return InteractionResult.FAIL;
             }
             vehicle.setPlayerOwner(player.getUUID());

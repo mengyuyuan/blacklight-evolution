@@ -1,0 +1,16 @@
+{
+  "name": "Underground Military Lairs",
+  "category": "blacklight:ecology",
+  "sortnum": 28,
+  "icon": "blacklight:hive_vein",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "After the first vial breaks, look for a split fleshy mound with radiating veins in the Overworld or city. The entrance is a shaft: plan your descent and exit. The central hangar connects to stores, armories and laboratories."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Explore the hatcheries beyond the hangar. Swelling hive entities release defenders; destroying a hive removes that threat. Grow your own two-way passage using living hive tissue."
+    }
+  ]
+}

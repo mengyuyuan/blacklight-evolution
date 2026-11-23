@@ -1,0 +1,16 @@
+{
+  "name": "Identity and Infiltration",
+  "category": "blacklight:powers",
+  "sortnum": 13,
+  "icon": "blacklight:military_circuit",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Consume eligible creatures to collect identities. Tap transform (X) to toggle a disguise. Hold it and choose the identity collection to change your selection. Each entry lists its species ability and binding. Collect a military identity before infiltrating dispatch."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Watch for witnesses: attacks or vehicle theft at a checkpoint can raise the alarm. Break sight around corners or on rooftops. Once unlocked, use your defensive and sensory powers to cover an approach or identify infected targets."
+    }
+  ]
+}

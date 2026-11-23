@@ -85,7 +85,7 @@ public final class ConsumeLastChanceGameTest {
                 try{small.getAttribute(Attributes.MAX_HEALTH).setBaseValue(max);small.setHealth(start);
                     if(max<50)h.assertTrue(ConsumeSystem.healthReady(p,small),"low-health class directly consumable");
                     kill(p,small);
-                    h.assertTrue(small.isAlive()==(max>=50),"boundary at "+start+" / "+max);
+                    h.assertTrue(small.isAlive()==(max>50),"boundary at "+start+" / "+max);
                 }finally{small.discard();}
             }
         } finally {p.discard();}h.succeed();
@@ -131,7 +131,7 @@ public final class ConsumeLastChanceGameTest {
     public static void serverCanDisableTheLargePreyOpening(GameTestHelper h){
         var p=player(h,true);var disabled=mob(h);var tuned=mob(h);boolean enabled=GameplayBalanceConfig.CONSUME_LAST_CHANCE.get();
         try{GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(false);disabled.setHealth(10);kill(p,disabled);h.assertTrue(!disabled.isAlive(),"server switch respected");
-            GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(true);tuned.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50);tuned.setHealth(10);kill(p,tuned);h.assertTrue(tuned.isAlive()&&tuned.getHealth()==1,"50 HP target receives the enabled opening");
+            GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(true);tuned.getAttribute(Attributes.MAX_HEALTH).setBaseValue(50);tuned.setHealth(10);kill(p,tuned);h.assertTrue(!tuned.isAlive()&&!ConsumeLastChance.used(tuned),"50 HP is outside the enabled opening");
         }finally{GameplayBalanceConfig.CONSUME_LAST_CHANCE.set(enabled);disabled.discard();tuned.discard();p.discard();}h.succeed();
     }
 }

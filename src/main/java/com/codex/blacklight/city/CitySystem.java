@@ -1,5 +1,6 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.infection.BlacklightInfectionSystem;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.core.BlockPos;
@@ -100,7 +101,7 @@ public final class CitySystem {
             CityEcology.cleared(level,center);
             level.playSound(null,center,SoundEvents.GENERIC_EXPLODE.value(),SoundSource.HOSTILE,3,.65f);
             for(var player:level.players())if(player.distanceToSqr(center.getX(),65,center.getZ())<160*160)
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hive_destroyed"),false);
+                FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("city.blacklight.hive_destroyed"));
         }
     }
     static boolean spawn(ServerLevel level,EntityType<? extends Mob> type,BlockPos pos,boolean infected){

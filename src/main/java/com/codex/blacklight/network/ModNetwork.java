@@ -20,7 +20,7 @@ public final class ModNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         // Configurable ecology, consume variants and military payloads share one negotiated layout.
-        event.registrar("standalone-94-consume-contact")
+        event.registrar("standalone-95-goddess")
                 .playToClient(ContactEffectsPayload.TYPE,ContactEffectsPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.ContactEffectsPresentation.accept(payload)))
                 .playToServer(ContextActionPayload.TYPE,ContextActionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer player)com.codex.blacklight.combat.ContextActionSystem.request(player);}))
                 .playToClient(RagdollImpactPayload.TYPE,RagdollImpactPayload.CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.animation.ImpactRagdoll.accept(payload)))
@@ -28,6 +28,8 @@ public final class ModNetwork {
                 .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
                 .playToClient(VehicleDestructionPayload.TYPE,VehicleDestructionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.VehicleDestructionVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
+                .playToClient(ManualPagesPayload.TYPE,ManualPagesPayload.STREAM_CODEC,(msg,ctx)->ctx.enqueueWork(()->com.codex.blacklight.client.ManualReader.open(msg)))
+                .playToClient(GreeneSignalPayload.TYPE,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(HelicopterControlPayload.TYPE,HelicopterControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleControlPayload.TYPE,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))

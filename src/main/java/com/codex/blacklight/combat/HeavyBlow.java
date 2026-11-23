@@ -44,7 +44,7 @@ public final class HeavyBlow {
     public static boolean apply(ServerPlayer p,LivingEntity v,WeaponMove move,ImpactTier tier,float charge,Vec3 direction,boolean controlled){
         boolean full=charge>=.9F;
         boolean killed=!v.isAlive()||v.getHealth()<=0;
-        float dealt=move.damageFor(move.form)*(1+.5F*charge);
+        float dealt=move.contactDamage(p,QuillHarvest.state(p).getActivePower(),charge);
         // Supported human and pig rigs retain a physical corpse; other rigs keep their previous effects.
         if(killed){
             boolean sharp=move.form==com.codex.blacklight.power.PowerForm.CLAWS||move.form==com.codex.blacklight.power.PowerForm.BLADE||move.form==com.codex.blacklight.power.PowerForm.WHIPFIST;
@@ -118,7 +118,10 @@ public final class HeavyBlow {
                     boolean hurt = f.previousBox != null && v.getHealth()+v.getAbsorptionAmount()<f.vitality;
                     if (f.previousBox != null && !hurt) {
                         float landingDamage = f.damage * Math.min(.65F, (speedDown - .45F) * .55F);
-                        if (v.isAlive()) hurt=v.hurt(level.damageSources().fall(), landingDamage);
+                        if (v.isAlive()) {
+                            if (attacker != null) landingDamage *= com.codex.blacklight.power.InfiniteEvolutionSystem.strengthMultiplier(attacker);
+                            hurt=v.hurt(level.damageSources().fall(), com.codex.blacklight.power.CombatScale.weaponContact(v,landingDamage));
+                        }
                     }
                     if (hurt && attacker!=null)
                         PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
@@ -145,7 +148,7 @@ public final class HeavyBlow {
         level.playSound(null, at.x, at.y, at.z, SoundEvents.PLAYER_ATTACK_KNOCKBACK, SoundSource.PLAYERS, .64F, .68F);
         float damage = (float)(f.damage * Math.min(.9, .35 + .35 * surface.speed()));
         v.invulnerableTime=0;
-        boolean hurt=v.hurt(attacker!=null?attacker.damageSources().playerAttack(attacker):level.damageSources().flyIntoWall(),damage);
+        boolean hurt=v.hurt(attacker!=null?attacker.damageSources().playerAttack(attacker):level.damageSources().flyIntoWall(),com.codex.blacklight.power.CombatScale.weaponContact(v,damage));
         if (hurt && attacker!=null)
             PlayerHitEffects.surface(attacker,v,com.codex.blacklight.infection.InfectedAttackStyle.CRUSH,
                     (float)Math.min(1.55,.54+surface.speed()*.55),FleshStrike.HAMMER,false,at,normal.scale(-1),0);
@@ -175,7 +178,7 @@ public final class HeavyBlow {
             f.bowled.add(other.getUUID());
             int immunity = other.invulnerableTime;
             other.invulnerableTime=0;
-            if (!other.hurt(attacker.damageSources().playerAttack(attacker), f.damage * .35F)) {
+            if (!other.hurt(attacker.damageSources().playerAttack(attacker), com.codex.blacklight.power.CombatScale.weaponContact(other,f.damage * .35F))) {
                 other.invulnerableTime = immunity;
                 continue;
             }

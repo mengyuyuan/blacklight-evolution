@@ -1,0 +1,20 @@
+{
+  "name": "Your First Lead",
+  "category": "blacklight:route",
+  "sortnum": 0,
+  "icon": "minecraft:compass",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)Start here.$()$(br2)Post or snowy village → research station → awakening and first consume → Evolved and convoy → hive and Hydra → Futian pump → underground den.$(br2)Use /blacklightguide for a lead based on your own progress."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Search the plains for an abandoned quarantine post. Take the cold-storage record from the booth barrel. Use it in the Overworld to obtain a station map. Keep the copper."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A snowy apprentice cartographer can sell a station map for a base price of 12 emeralds and a compass. At the red X, find the surface entrance and head downstairs.$(br2)$(l:lab)Next: cold storage$(/l)"
+    }
+  ]
+}

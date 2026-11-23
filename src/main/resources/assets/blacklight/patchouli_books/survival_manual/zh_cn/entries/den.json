@@ -1,0 +1,16 @@
+{
+  "name": "地下母巢与群体升华",
+  "category": "blacklight:route",
+  "sortnum": 8,
+  "icon": "blacklight:greene_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "完成广场战，把格林留下的组织带在身上回到福田。手持组织并按住使用键，朝孢子的方向移动。手持组织时，巢穴方位与距离会标在世界中。超平坦存档隐藏光标。目标在地下；走近水平位置后，还要向下找巢腔。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "带着组织进入巢腔，在非和平难度触发暴动。应对格林在地面与空中的阶段，完成「群体升华」。之后仍可走寄生实验、无限进化和共生装备线。$(br2)$(l:recovery)丢失线索时$(/l)"
+    }
+  ]
+}

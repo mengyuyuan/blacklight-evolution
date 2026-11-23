@@ -1,0 +1,6 @@
+{
+  "name": "生存路线",
+  "description": "从第一张地图到福田地下母巢。按顺序读，手头的实物线索决定下一站。",
+  "icon": "minecraft:compass",
+  "sortnum": 0
+}

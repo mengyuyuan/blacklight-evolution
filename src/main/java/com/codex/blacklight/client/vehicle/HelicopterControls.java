@@ -43,22 +43,10 @@ public final class HelicopterControls {
         lines.add(Component.translatable("hud.blacklight.air_status",Math.round(craft.health()),360,Component.translatable("seat.blacklight."+(slot==0?"pilot":slot==1?"copilot":"passenger"))));
         lines.add(Component.translatable("hud.blacklight.air_ammo",craft.controlData().getInt("Rounds"),craft.controlData().getInt("Rockets")));
         lines.add(Component.translatable("hud.blacklight.air_rapid",craft.controlData().getInt("RapidLeft"),craft.controlData().getInt("RapidRight")));
-        boolean gunner=slot==1||slot==0&&craft.pilot().occupant(1)==null;
         Component weapon=Component.translatable(craft.controlData().getBoolean("RapidSelected")?"hud.blacklight.air_70mm":"hud.blacklight.air_hellfire");
-        lines.add(Component.translatable(gunner?"hud.blacklight.air_weapon":"hud.blacklight.air_weapon_observer",weapon,com.codex.blacklight.client.VehicleControls.ammunitionKey()));
+        lines.add(Component.translatable("hud.blacklight.air_weapon_observer",weapon));
         if(craft.pilot().hijack().active())lines.add(Component.translatable("hud.blacklight.air_hijack",Math.min(100,craft.pilot().hijack().ticks()*100/76)));
-        else {
-            if(slot==0){
-                if(craft.rotor()<.99F)lines.add(Component.translatable("hud.blacklight.air_starting",Math.round(craft.rotor()*100)));
-                lines.add(Component.translatable("hud.blacklight.air_controls",mc.options.keyUp.getTranslatedKeyMessage(),mc.options.keyDown.getTranslatedKeyMessage(),mc.options.keyLeft.getTranslatedKeyMessage(),mc.options.keyRight.getTranslatedKeyMessage(),mc.options.keyJump.getTranslatedKeyMessage(),mc.options.keySprint.getTranslatedKeyMessage()));
-            }
-            if(gunner){
-                lines.add(Component.translatable("hud.blacklight.air_fire_controls",mc.options.keyAttack.getTranslatedKeyMessage(),mc.options.keyUse.getTranslatedKeyMessage()));
-                if(com.codex.blacklight.client.VehicleControls.ammunitionUnbound())lines.add(Component.translatable("hud.blacklight.air_bind_ammo"));
-            }else lines.add(Component.translatable(slot==0?"hud.blacklight.air_copilot_weapons":"hud.blacklight.air_passenger_controls"));
-            lines.add(Component.translatable(com.codex.blacklight.client.VehicleControls.seatUnbound()?"hud.blacklight.air_bind_seat":"hud.blacklight.air_seat_controls",com.codex.blacklight.client.VehicleControls.seatKey()));
-        }
-        lines.add(Component.translatable("hud.blacklight.air_exit",mc.options.keyShift.getTranslatedKeyMessage()));
+        else if(slot==0 && craft.rotor()<.99F)lines.add(Component.translatable("hud.blacklight.air_starting",Math.round(craft.rotor()*100)));
         int width=Math.min(260,graphics.guiWidth()-20),y=28;var rows=new java.util.ArrayList<net.minecraft.util.FormattedCharSequence>();for(var line:lines)rows.addAll(mc.font.split(line,width));
         graphics.fill(4,y-4,12+width,y+rows.size()*10+4,0xCC10181E);for(var row:rows){graphics.drawString(mc.font,row,8,y,0xFFE8EDD9,false);y+=10;}
     }

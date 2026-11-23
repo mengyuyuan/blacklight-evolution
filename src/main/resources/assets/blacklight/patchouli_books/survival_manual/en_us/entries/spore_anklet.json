@@ -1,0 +1,15 @@
+{
+  "name": "Blacklight Anklets",
+  "category": "blacklight:weave",
+  "sortnum": 72,
+  "icon": "blacklight:spore_anklet",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Cost: 80 biomass. Offer 6 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue.$(br2)Equip in the feet slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.$(br2)Narrow black glints skim the ankles and shoes."
+    },
+    {
+      "type": "blacklight:layout_spore_anklet"
+    }
+  ]
+}

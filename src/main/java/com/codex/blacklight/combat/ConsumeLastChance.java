@@ -23,8 +23,12 @@ public final class ConsumeLastChance {
     private static final String USED="BlacklightConsumeLastChanceUsed";
     private static final String WAITING="BlacklightConsumeAwaitingFinisher";
     private static final String LAST_ATTACK="BlacklightConsumeOpeningAttack";
+    private static boolean protectable(Mob mob) {
+        float maximum=mob.getMaxHealth();
+        return Float.isFinite(maximum) && !ConsumeSystem.smallHealthTarget(mob);
+    }
     public static boolean awaitingFinisher(Entity entity) {
-        return entity instanceof Mob mob && mob.getMaxHealth() >= ConsumeSystem.DIRECT_GRAB_MAX_HEALTH && mob.getHealth() <= 1
+        return entity instanceof Mob mob && protectable(mob) && mob.getHealth() <= 1
                 && mob.getPersistentData().getBoolean(WAITING) && GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE);
     }
     private static UUID actionId(DamageSource source) {
@@ -61,8 +65,7 @@ public final class ConsumeLastChance {
         if(event.isCanceled()||event.getAmount()<=0||!GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE)
                 ||used(target)||EXECUTING.get().contains(target)||CrossModCombat.administrative(event.getSource())
                 ||!ownedHit(target,event.getSource()))return;
-        float maximum=target.getMaxHealth();
-        if(Float.isFinite(maximum) && maximum>=ConsumeSystem.DIRECT_GRAB_MAX_HEALTH && target.getHealth()>0
+        if(protectable(target) && target.getHealth()>0
                 &&ConsumeSystem.eligibleBiomass(target))
             HITS.put(target,new Hit(event.getSource(),target.level().getGameTime()));
     }
@@ -78,7 +81,7 @@ public final class ConsumeLastChance {
         if(!(event.getEntity() instanceof Mob target)||target.level().isClientSide)return;
         var hit=HITS.remove(target);
         if(event.isCanceled()||hit==null||hit.source()!=event.getSource()||hit.tick()!=target.level().getGameTime()
-                ||used(target)||EXECUTING.get().contains(target)
+                ||!protectable(target)||used(target)||EXECUTING.get().contains(target)
                 ||!GameplayBalanceConfig.value(GameplayBalanceConfig.CONSUME_LAST_CHANCE))return;
         target.getPersistentData().putBoolean(USED,true);
         target.getPersistentData().putBoolean(WAITING,true);

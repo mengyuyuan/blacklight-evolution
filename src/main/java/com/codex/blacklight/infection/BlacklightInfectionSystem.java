@@ -1,5 +1,6 @@
 package com.codex.blacklight.infection;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModEffects;
 import com.codex.blacklight.state.BlacklightState;
@@ -81,8 +82,8 @@ public final class BlacklightInfectionSystem {
         state.infect();
         player.setData(ModAttachments.PLAYER_STATE, state);
         player.syncData(ModAttachments.PLAYER_STATE);
-        player.displayClientMessage(Component.translatable("message.blacklight.infected"), false);
-        player.displayClientMessage(com.codex.blacklight.world.SurvivalGuide.consumeHint(), false);
+        FieldNotes.record(player, Component.translatable("message.blacklight.infected"));
+        FieldNotes.record(player, com.codex.blacklight.world.SurvivalGuide.consumeHint());
         if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
             com.codex.blacklight.power.GrowthSystem.award(serverPlayer, "awakening");
         }
@@ -103,8 +104,8 @@ public final class BlacklightInfectionSystem {
 
     public static void notifyBurstOwner(Entity owner, int exposedCount) {
         if (owner instanceof Player player) {
-            player.displayClientMessage(Component.translatable(
-                    "message.blacklight.vial_burst", exposedCount), true);
+            FieldNotes.record(player, Component.translatable(
+                    "message.blacklight.vial_burst", exposedCount));
         }
     }
 

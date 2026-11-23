@@ -1,5 +1,6 @@
 package com.codex.blacklight.item;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlacklightHydra;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.world.InteractionResult;
@@ -16,7 +17,7 @@ public final class HiveTissueItem extends Item {
     @Override public InteractionResult useOn(UseOnContext c) {
         var level=c.getLevel();var player=c.getPlayer();
         if(com.codex.blacklight.city.CityTravel.isCity(level.dimension())){
-            if(player!=null&&!level.isClientSide)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("hydra.blacklight.outside"),true);
+            if(player!=null&&!level.isClientSide)FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("hydra.blacklight.outside"));
             return InteractionResult.FAIL;
         }
         if(player==null||!player.mayBuild()||c.getClickedFace()!=Direction.UP)return InteractionResult.FAIL;
@@ -33,7 +34,7 @@ public final class HiveTissueItem extends Item {
             hydra.plant(player.getUUID());
             if(!level.addFreshEntity(hydra))return InteractionResult.FAIL;
             if(!player.getAbilities().instabuild)c.getItemInHand().shrink(1);
-            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("hydra.blacklight.planted"),false);
+            FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("hydra.blacklight.planted"));
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

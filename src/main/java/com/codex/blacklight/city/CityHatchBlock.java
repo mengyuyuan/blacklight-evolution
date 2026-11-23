@@ -1,4 +1,5 @@
 package com.codex.blacklight.city;
+import com.codex.blacklight.world.FieldNotes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,7 +22,7 @@ public final class CityHatchBlock extends HorizontalDirectionalBlock {
     }
     @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,net.minecraft.world.level.Level level,net.minecraft.core.BlockPos pos,net.minecraft.world.entity.player.Player player,net.minecraft.world.phys.BlockHitResult hit){
         if(level instanceof net.minecraft.server.level.ServerLevel server){var data=CityData.get(server);var p=CityHiveSupply.port(server,pos);
-            if(CityHiveSupply.live(server,data,p))player.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hive_supply_status",7-Integer.bitCount(data.brokenPorts[p.hive()]&127),data.hiveSupply[p.hive()].reserve(),data.hiveSupply[p.hive()].queued(),data.hiveBroodTicks[p.hive()]/2),true);
+            if(CityHiveSupply.live(server,data,p))FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("city.blacklight.hive_supply_status",7-Integer.bitCount(data.brokenPorts[p.hive()]&127),data.hiveSupply[p.hive()].reserve(),data.hiveSupply[p.hive()].queued(),data.hiveBroodTicks[p.hive()]/2));
         }return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "培育九头蛇通道",
+  "category": "blacklight:route",
+  "sortnum": 5,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "在黑光维度以外找坚固地面，顶部留两格空气，远离已有九头蛇。从上面对地使用活性蜂巢组织。带五只活物靠近幼体，让它实际进食，保持区块加载，生长至少 2 分钟。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "成熟后靠近根部，通过活体通道进入黑光维度。带上行动情报、重甲核心和补给。返回时找来路对应的九头蛇。$(br2)$(l:dispatch)进入福田后的第一步$(/l)"
+    }
+  ]
+}

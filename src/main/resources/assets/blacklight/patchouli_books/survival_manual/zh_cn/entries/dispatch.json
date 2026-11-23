@@ -1,0 +1,16 @@
+{
+  "name": "福田的三条侦察路线",
+  "category": "blacklight:route",
+  "sortnum": 6,
+  "icon": "blacklight:mother_intel",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "在黑光维度对空使用行动情报，读出福田封锁片区。找到黑黄岗哨后，伪装成军方人员调查调度室登记台，能拿到卸货街口并打开西侧维修门。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "也可从车间屋顶尾随放行的卡车，跟丢就回岗哨等下一班。靠近车尾潜行调查可截获军用电路。第三条路是夺车闯岗，或步行沿双线车辙和软管追到泵车。$(br2)$(l:pump)接通血毒泵$(/l)"
+    }
+  ]
+}

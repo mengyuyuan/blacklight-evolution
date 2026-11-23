@@ -1,0 +1,452 @@
+[
+  {
+    "title": "The Survival Route",
+    "pages": [
+      [
+        "Your First Lead",
+        "Start here.\n\nPost or snowy village → research station → awakening and first consume → Evolved and convoy → hive and Hydra → Futian pump → underground den.\n\nUse /blacklightguide for a lead based on your own progress."
+      ],
+      [
+        "Your First Lead",
+        "Search the plains for an abandoned quarantine post. Take the cold-storage record from the booth barrel. Use it in the Overworld to obtain a station map. Keep the copper."
+      ],
+      [
+        "Your First Lead",
+        "A snowy apprentice cartographer can sell a station map for a base price of 12 emeralds and a compass. At the red X, find the surface entrance and head downstairs.\n\nNext: cold storage"
+      ],
+      [
+        "Cold Storage",
+        "Pass the laboratory and isolation rooms. Open the sample chest beside the ice. Take the virus samples and convoy manifest. The exposed redstone line in the west lab can supply dust for the decoder."
+      ],
+      [
+        "Cold Storage",
+        "Use a sample aimed at the ground beside you, away from your base. When the vial shatters nearby, switch to Prototype mode. The first release also starts the world's outbreak clock.\n\nTry your first consume"
+      ],
+      [
+        "The Escaped Host",
+        "After your first consume and upgrade, investigate the broken quarantine gate. Search the grass and follow fresh tracks onto red soil. Keep its escape route clear. Wild Evolved are another source of ganglia."
+      ],
+      [
+        "The Escaped Host",
+        "Combine the ganglion with copper and redstone dust to make a containment decoder. Read the station's manifest in the Overworld to locate the incident.\n\nNext: the lost convoy"
+      ],
+      [
+        "Containment Decoder",
+        "{blacklight:evolved_ganglion}\n{minecraft:copper_ingot}\n{minecraft:redstone}"
+      ],
+      [
+        "The Lost Convoy",
+        "Follow the skid marks to the carrier. Use the decoder on the lock in normal mode. Leave an escape lane by the barrier. If your field notes report a blocked exit, clear the space behind it and restore the floor. The encounter needs a non-Peaceful difficulty."
+      ],
+      [
+        "The Lost Convoy",
+        "Bait Goliath into charging the barrier, sidestep and strike the exposed right knee. Follow the weak-point openings, or wear it down with sustained damage. Save the heavy armor core for the pump.\n\nNext: the colossal hive"
+      ],
+      [
+        "Break the Hive",
+        "Explore fresh Overworld terrain for the colossal hive. Break through its defenders and attack the living core in Prototype mode. Collect the living hive tissue and operation intel. One grows a passage; the other identifies the sector to search in Futian."
+      ],
+      [
+        "Break the Hive",
+        "Save your first tissue for the Hydra passage. Extra tissue goes into syringe culture, building infection cores or the weave nest. See The Supreme Hunter for the separate boss route."
+      ],
+      [
+        "Grow a Passage",
+        "Outside the Blacklight dimension, choose solid ground with two clear blocks above and space away from other Hydras. Use living hive tissue on the top face. Bring five living prey within feeding reach. Keep the area loaded while it grows. Allow at least two loaded minutes."
+      ],
+      [
+        "Grow a Passage",
+        "Approach the mature root to cross into the Blacklight dimension. Bring your intel, armor core and supplies. Use the linked Hydra for the return trip.\n\nYour first lead in Futian"
+      ],
+      [
+        "Find the Bloodtox Pump",
+        "Read the operation intel in the Blacklight dimension. In the indicated Futian sector, look for the black-and-yellow checkpoint. A military disguise lets you inspect dispatch records for the unloading junction and west service entrance."
+      ],
+      [
+        "Find the Bloodtox Pump",
+        "Alternatively, tail the departing truck from the workshop roof. If you lose it, wait at the post. Investigate its rear while sneaking for circuitry. You can also seize a vehicle or follow the twin tire tracks and hoses on foot.\n\nActivate the pump"
+      ],
+      [
+        "The Pump and Greene",
+        "Craft a Bloodtox starter with the armor core, military circuitry and redstone. A command key offers a second recipe. Use the starter on the truck in normal mode. Keep the emergence area clear with solid ground."
+      ],
+      [
+        "Bloodtox Pump Starter",
+        "{blacklight:heavy_armor_core}\n{blacklight:military_circuit}\n{minecraft:redstone}"
+      ],
+      [
+        "Bloodtox Pump Starter",
+        "{blacklight:heavy_armor_core}\n{blacklight:bloodtox_command_key}"
+      ],
+      [
+        "The Pump and Greene",
+        "Break the shell's attack organs, then close on the fallen body. When Greene's human form emerges, grab and consume in Prototype mode. She escapes. Recover the living tissue she leaves behind.\n\nTrack the underground den"
+      ],
+      [
+        "The Underground Den",
+        "After the plaza fight, bring Greene's tissue back to Futian. Hold it and use it to follow the spore trail. Holding the tissue marks the den and its distance in the world. The marker is hidden in superflat saves. Once you are above the den, descend to the chamber."
+      ],
+      [
+        "The Underground Den",
+        "Enter the chamber carrying the tissue on a non-Peaceful difficulty. Survive Greene's ground and airborne phases to complete the outbreak milestone. Parasite experiments, repeatable evolution and symbiotes remain open.\n\nRecover a lost lead"
+      ],
+      [
+        "Recover a Lost Lead",
+        "Use /blacklightguide to review your current objective and recorded sites. Open the vanilla advancements screen for the Blacklight tree. Read cold-storage and convoy documents in the Overworld; read operation intel in the city dimension."
+      ],
+      [
+        "Recover a Lost Lead",
+        "If a site is already active, return to its existing fight. For an unresponsive lock, check normal mode, the item in your hand, difficulty and the exit space. Search newly generated terrain with structures enabled for natural sites."
+      ],
+      [
+        "Your Field Notes",
+        "Use the manual to read. Sneak-use to open your field notes: your current objective, recorded destinations and recent discoveries or field feedback. You can also open the notes with /blacklightguide."
+      ],
+      [
+        "Your Field Notes",
+        "The next page links to the community wiki. Published defaults can differ from your current release or server settings. Use your own notes and the site itself for active missions."
+      ],
+      [
+        "Your Field Notes",
+        "https://prototype.qibusu.com/wiki"
+      ]
+    ]
+  },
+  {
+    "title": "Living as a Prototype",
+    "pages": [
+      [
+        "Your First Consume",
+        "After awakening, toggle Prototype mode (default B). Approach a cow, sheep or common infected. Face it, grab (E) and use to consume; attack throws a held creature. Open Upgrades (U) and spend your first evolution points."
+      ],
+      [
+        "Your First Consume",
+        "Check reach and line of sight. Ordinary targets with under 50 base max health can usually be grabbed immediately; tougher prey generally need to be at 15% health. Mature hosts and bosses have special rules. Switch back to normal mode for tools, chests and books. A lethal hit kills targets with 50 or fewer base HP outright."
+      ],
+      [
+        "Weapons and Traversal",
+        "Hold the power wheel (Z) to choose a form; change tabs for defenses and senses. Claws pounce, Whipfist reaches out, Hammerfists slam, Muscle Mass improves throwing and Blade pursues a target. Lock on (Tab) and aim for the exposed part."
+      ],
+      [
+        "Weapons and Traversal",
+        "Buy movement skills, then practise charged jumps, wall running and gliding in open ground. Use in midair for a heavy attack. After learning Bulletdive, hold use during a glide. Sovereign Wings offer a separate flight form. Check bindings for takeoff and descent."
+      ],
+      [
+        "Backspines and Critical Mass",
+        "Learn and equip Backspines. Kills accumulate orbiting spines. Lock a target to concentrate a volley; otherwise nearby targets can share it. Invest separately in capacity for a larger stock and duration to retain the stock longer."
+      ],
+      [
+        "Backspines and Critical Mass",
+        "Learn Critical Mass and the desired devastator. Consume at full health to build the blue reserve. Fully charge attack + use for Graveyard Spikes, use + grab for Tendril Barrage, or attack + grab for Critical Pain. A short reserve can cost health."
+      ],
+      [
+        "Identity and Infiltration",
+        "Consume eligible creatures to collect identities. Tap transform (X) to toggle a disguise. Hold it and choose the identity collection to change your selection. Each entry lists its species ability and binding. Collect a military identity before infiltrating dispatch."
+      ],
+      [
+        "Identity and Infiltration",
+        "Watch for witnesses: attacks or vehicle theft at a checkpoint can raise the alarm. Break sight around corners or on rooftops. Once unlocked, use your defensive and sensory powers to cover an approach or identify infected targets."
+      ],
+      [
+        "Biomass and Reconstruction",
+        "Consume to replenish biomass. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
+      ],
+      [
+        "Biomass and Reconstruction",
+        "A qualifying lethal hit spends biomass to enter liquid form. There is no shell to return to after death. Find living, consumable prey quickly and finish feeding. Tamed, mounted or invulnerable targets are poor choices. Find standing room to reform."
+      ],
+      [
+        "Research and Repeatable Growth",
+        "Weaken and consume infected hosts with mature organs to record samples. Check organ research in Upgrades. Sample quality limits the ranks available. Seek older hosts or different organs to advance another line."
+      ],
+      [
+        "Research and Repeatable Growth",
+        "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 50 for the first adaptation and regeneration tiers, then 150 for the second tiers. Consult the panel for your server's settings."
+      ],
+      [
+        "Terrain and Field Survival",
+        "With Muscle Mass and a terrain-throw upgrade, hold grab on connected terrain and release to lift it. Hold attack to charge and release to throw; use sets it down. A grabbable creature in front takes priority."
+      ],
+      [
+        "Terrain and Field Survival",
+        "Normal mode uses ordinary hunger. If the server enables Prototype hunger, consuming replenishes food. Keep prey or provisions nearby before a long sprint. Check your active key bindings after rebinding controls."
+      ]
+    ]
+  },
+  {
+    "title": "Parasites and Bosses",
+    "pages": [
+      [
+        "The Parasite Experiment",
+        "A Supreme Parasite Syringe can appear in a research sample chest. Culture an existing syringe with a virus sample and two living hive tissues to make two. Keep one for the next culture."
+      ],
+      [
+        "Supreme Parasite Syringe",
+        "{blacklight:supreme_parasite_syringe}\n{blacklight:blacklight_sample}\n{blacklight:living_hive_tissue}\n{blacklight:living_hive_tissue}"
+      ],
+      [
+        "The Parasite Experiment",
+        "Inject a living Blacklight Hunter, weaken it, then consume it. This cures parasite suppression and unlocks Blade, Armor and Sovereign Wings. Injecting yourself suppresses powers. Injecting a hive instead starts a different encounter."
+      ],
+      [
+        "The Supreme Hunter",
+        "Bring supplies and clear space around a living hive entity. Inject it with the Supreme Parasite Syringe to release the Supreme Hunter. Back off when the hive bursts. Evade its lunges and punish the recovery after heavy attacks."
+      ],
+      [
+        "The Supreme Hunter",
+        "Defeat earns the first milestone. For the apex-predator consumption milestone, close in during the kneeling window and finish the consume in Prototype mode. Stop allied attacks or lingering damage from killing it first."
+      ]
+    ]
+  },
+  {
+    "title": "Infection and Colonies",
+    "pages": [
+      [
+        "The Outbreak Clock",
+        "The first shattered vial starts the world's outbreak clock; the five stages begin on outbreak days 0, 1, 3, 7 and 14 by default. Servers can change the thresholds. Later stages allow more mature hosts, hunters and airborne infected. Local habitat, loaded chunks and population limits still affect encounters."
+      ],
+      [
+        "The Outbreak Clock",
+        "City districts track local infection and military presence. Destroying a hive can suppress its neighborhood. Scout another district for hosts or supplies and watch the sky. Use a field scanner to check for nearby infected."
+      ],
+      [
+        "Cultivate a Building Hive",
+        "Craft a building infection core with living hive tissue and three rotten flesh. Place it against a supported outer wall. Use an empty hand to inspect growth. Feed the core or leave edible drops where its mouth can reach them. Keep the area loaded."
+      ],
+      [
+        "Blacklight Building Infection Core",
+        "{blacklight:living_hive_tissue}\n{minecraft:rotten_flesh}\n{minecraft:rotten_flesh}\n{minecraft:rotten_flesh}"
+      ],
+      [
+        "Cultivate a Building Hive",
+        "A mature colony produces infected according to stage and stored nutrients. Several mouths can belong to one hive. An empty reserve, blocked exit or full local population can stall production. For a city portal, plant unprocessed tissue as described in Grow a Passage."
+      ],
+      [
+        "Hosts and Evolved",
+        "Observe infected hosts feeding and growing. Digestion and competing tissue change the organs, silhouette and abilities. For research, let a useful organ mature, weaken its host and consume it. A plain kill does not register a consume sample."
+      ],
+      [
+        "Hosts and Evolved",
+        "Hosts can evolve after assimilating multiple distinct mature organs. For the story, follow the escape trail from a quarantine post. Hunt Evolved for a ganglion; raid a hive for living hive tissue. The two materials serve different routes."
+      ],
+      [
+        "Underground Military Lairs",
+        "After the first vial breaks, look for a split fleshy mound with radiating veins in the Overworld or city. The entrance is a shaft: plan your descent and exit. The central hangar connects to stores, armories and laboratories."
+      ],
+      [
+        "Underground Military Lairs",
+        "Explore the hatcheries beyond the hangar. Swelling hive entities release defenders; destroying a hive removes that threat. Grow your own two-way passage using living hive tissue."
+      ],
+      [
+        "Field Identification",
+        "Common infected are good first prey. Stalkers close in, spitters punish open approaches, while armored beasts and hunters need room to evade. Wild Hydras ambush travelers. Plant and feed a Hydra to establish your own gateway."
+      ]
+    ]
+  },
+  {
+    "title": "City Fieldcraft",
+    "pages": [
+      [
+        "Recon and Supplies",
+        "Explore camps, checkpoints and bases for supply, ammo, armory and technology caches. Military circuitry goes into equipment and mission devices. In Futian you can also intercept the dispatch truck for circuitry."
+      ],
+      [
+        "Field Infection Scanner",
+        " I \nCGC\n R \n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nG = {minecraft:glass}\nR = {minecraft:redstone}"
+      ],
+      [
+        "Recon and Supplies",
+        "Use the scanner in normal mode for the name, bearing and distance of the nearest infected within 48 blocks. Move and scan again for other contacts. For story locations use the maps, intel and /blacklightguide."
+      ],
+      [
+        "Field Weapons",
+        "Choose a weapon, then craft its matching ammunition. Use the carbine or machine gun in normal mode. Heavy launchers and their dedicated rounds are in the following entry."
+      ],
+      [
+        "Compact carbine",
+        " II\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:rifle_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Rifle rounds",
+        "{minecraft:iron_ingot}\n{minecraft:gunpowder}"
+      ],
+      [
+        "Squad machine gun",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:machine_gun_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Machine gun rounds",
+        "{minecraft:iron_ingot}\n{minecraft:copper_ingot}\n{minecraft:gunpowder}"
+      ],
+      [
+        "Service rifle",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:rifle_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Heavy Launchers",
+        "Each pair shows a launcher and its matching round. Check your stock and clearance before setting out. Military armories are another source of equipment and ammunition."
+      ],
+      [
+        "Grenade launcher",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:grenade_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Fragmentation grenade",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:gunpowder}"
+      ],
+      [
+        "Rocket launcher",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:rocket_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Rocket",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{minecraft:paper}"
+      ],
+      [
+        "Missile launcher",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:missile_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Missile",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{minecraft:paper}\n{minecraft:redstone}"
+      ],
+      [
+        "Thermobaric launcher",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:thermobaric_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Thermobaric grenade",
+        "{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{minecraft:blaze_powder}"
+      ],
+      [
+        "Infection launcher",
+        "III\n CR\n SI\n\nI = {minecraft:iron_ingot}\nC = {blacklight:military_circuit}\nR = {blacklight:infection_round}\nS = {minecraft:stick}"
+      ],
+      [
+        "Infection grenade",
+        "{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{blacklight:blacklight_sample}"
+      ],
+      [
+        "Vehicles and Garages",
+        "Use a vehicle item on wide solid ground, then use the hull empty-handed to board. Move to drive and steer, jump to brake and sneak to dismount. Stop and dismount to apply repair parts or compatible ammunition to the hull."
+      ],
+      [
+        "Military Transport Truck",
+        "ICI\nIFI\nICI\n\nI = {minecraft:iron_block}\nC = {minecraft:copper_block}\nF = {minecraft:furnace}"
+      ],
+      [
+        "Blackwatch Transport Truck",
+        "{blacklight:military_truck_chassis}\n{minecraft:black_dye}"
+      ],
+      [
+        "Military Armored Fighting Vehicle",
+        "IRI\nITI\nIOI\n\nI = {minecraft:iron_block}\nR = {minecraft:redstone_block}\nT = {blacklight:military_truck_chassis}\nO = {minecraft:observer}"
+      ],
+      [
+        "Blackwatch Armored Fighting Vehicle",
+        "{blacklight:military_apc_chassis}\n{minecraft:black_dye}"
+      ],
+      [
+        "Military Main Battle Tank",
+        "IRI\nIAI\nIDI\n\nI = {minecraft:iron_block}\nR = {minecraft:redstone_block}\nA = {blacklight:military_apc_chassis}\nD = {minecraft:dispenser}"
+      ],
+      [
+        "Blackwatch Main Battle Tank",
+        "{blacklight:military_tank_chassis}\n{minecraft:black_dye}"
+      ],
+      [
+        "Vehicle Repair Parts",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:redstone}"
+      ],
+      [
+        "Autocannon Round",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:copper_ingot}\n{minecraft:gunpowder}"
+      ],
+      [
+        "Tank AP Shell",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{minecraft:copper_ingot}"
+      ],
+      [
+        "Tank HE Shell",
+        "{minecraft:iron_ingot}\n{minecraft:iron_ingot}\n{minecraft:gunpowder}\n{minecraft:gunpowder}\n{minecraft:copper_ingot}"
+      ],
+      [
+        "Hijacking and Air Support",
+        "Approach an enemy cab in Prototype mode, sneak and use it empty-handed to attempt a hijack. Witnesses can raise an alarm. Captured vehicles retain damage and ammo. Search base garages and watch for faction supply movements."
+      ],
+      [
+        "Hijacking and Air Support",
+        "On a boardable helicopter, check the pilot seat and rotor clearance. Move to fly and turn, jump to climb, sprint to descend, sneak to leave. An occupied gunner seat handles weapons. The Bloodtox mission belongs to Futian even when exploring other districts or Los Angeles."
+      ]
+    ]
+  },
+  {
+    "title": "The Weave Nest",
+    "pages": [
+      [
+        "Build the Weave Nest",
+        "Build a single 5×5 layer: one core in the center, four anchors in the corners, twelve channels along the edges and eight beds inside. Leave level ground along one edge for the operator. The next page can project the arrangement into the world."
+      ],
+      [
+        "Build the Weave Nest",
+        "ACCCA\nCBBBC\nCB0BC\nCBBBC\nACCCA\n\n0 = Weave Marrow Core\nA = Osseous Anchor\nB = Offering Bed\nC = Vascular Channel"
+      ],
+      [
+        "Weave Marrow Core",
+        "FVF\nNLN\nFSF\n\nF = {blacklight:tissue_fiber}\nL = {blacklight:living_hive_tissue}\nN = {blacklight:nutrient_node}\nS = {blacklight:hive_carapace}\nV = {blacklight:hive_vein}"
+      ],
+      [
+        "Osseous Anchor",
+        "BFB\nSBS\n\nB = {blacklight:hive_bone}\nF = {blacklight:tissue_fiber}\nS = {blacklight:hive_carapace}"
+      ],
+      [
+        "Vascular Channel",
+        "FVF\nVSV\n\nF = {blacklight:tissue_fiber}\nS = {blacklight:hive_carapace}\nV = {blacklight:hive_vein}"
+      ],
+      [
+        "Offering Bed",
+        "MFM\nSFS\n\nF = {blacklight:tissue_fiber}\nM = {blacklight:hive_membrane}\nS = {blacklight:hive_carapace}"
+      ],
+      [
+        "Load and Infuse",
+        "Use the empty core with an empty hand to cycle recipe ghosts. Use each ingredient on its cell's top face to deposit one; use the cell empty-handed to take it back. Quarter-turn rotations work. Keep unused cells clear. Each of the four equipment entries has a 5×5 layout."
+      ],
+      [
+        "Load and Infuse",
+        "As an infected survivor, stand close to an edge at the base level. Sneak-use the rim empty-handed and stand still for about 4.8 seconds. When infusion finishes, ingredients and biomass are spent. Take the result from the core. Moving away cancels the channel."
+      ],
+      [
+        "Blacklight Sternum Seal",
+        "Cost: 180 biomass. Offer 2 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Hive carapace, 1 Evolved Ganglion.\n\nEquip in the chest slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents pass over the chest, back and upper arms, fading before changing course."
+      ],
+      [
+        "Blacklight Sternum Seal",
+        "A · · · A\n· B · B ·\n· · C · ·\n· D · D ·\n· · E · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Evolved Ganglion\nD = Living Hive Tissue\nE = Hive carapace"
+      ],
+      [
+        "Knee Sinew Knots",
+        "Cost: 120 biomass. Offer 4 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue.\n\nEquip in the legs slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents travel between the knees and thighs."
+      ],
+      [
+        "Knee Sinew Knots",
+        "· A · A ·\n· B · B ·\nC · · · C\n· A · A ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Living Hive Tissue"
+      ],
+      [
+        "Blacklight Anklets",
+        "Cost: 80 biomass. Offer 6 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue.\n\nEquip in the feet slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nNarrow black glints skim the ankles and shoes."
+      ],
+      [
+        "Blacklight Anklets",
+        "· · · · ·\n· A · A ·\n· B · B ·\nC · · · C\nB B · B B\n\nA = Hive Vein\nB = Tissue Fiber\nC = Living Hive Tissue"
+      ],
+      [
+        "Temple Bud",
+        "Cost: 100 biomass. Offer 2 Tissue Fiber, 1 Hive Vein, 2 Living Hive Tissue, 2 Hive carapace.\n\nEquip in the head slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nA moving black glint traces the temples and nape."
+      ],
+      [
+        "Temple Bud",
+        "· A B A ·\nC · · · C\n· D · D ·\n· · · · ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Hive carapace\nD = Living Hive Tissue"
+      ]
+    ]
+  }
+]

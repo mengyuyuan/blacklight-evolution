@@ -31,7 +31,7 @@ public final class FutianDispatch {
     private FutianDispatch() {}
 
     private static void tell(ServerPlayer player, String key, Object... args) {
-        player.displayClientMessage(Component.translatable("survival.blacklight." + key,args),false);
+        FieldNotes.record(player, Component.translatable("survival.blacklight." + key,args));
     }
 
     private static boolean near(Entity entity, BlockPos origin, double radius) {

@@ -1,5 +1,6 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlacklightHunter;
 import com.codex.blacklight.animation.PlayerAction;
 import com.codex.blacklight.animation.PlayerActions;
@@ -26,6 +27,10 @@ public final class ConsumeSystem {
     public static final double WHIP_GRAB_RANGE = 12;
     public static final float HEALTH_LIMIT = .15F;
     public static final float DIRECT_GRAB_MAX_HEALTH = 50F;
+    public static boolean smallHealthTarget(net.minecraft.world.entity.LivingEntity target) {
+        return com.codex.blacklight.power.CombatScale.originalMaximum(target)<=DIRECT_GRAB_MAX_HEALTH;
+    }
+
     private static final Map<ServerPlayer, Session> ACTIVE = new HashMap<>();
     private record Absorbing(ServerPlayer owner,Session scene) {}
     private static final Map<Mob,Absorbing> ABSORBING=new IdentityHashMap<>();
@@ -47,7 +52,7 @@ public final class ConsumeSystem {
         if(s==null || s.large || !ConsumeVisual.carrying(s.stage) || !valid(player,s) || !SpiderPhase.edible(s.victim))return;
         if(SpiderPhase.implant(s.victim)){
             QuillHarvest.plantHeld(player,s.victim);
-            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.greene_implanted"),true);
+            FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("message.blacklight.greene_implanted"));
         }
     }
     public static void startThrowCharge(ServerPlayer player){
@@ -691,7 +696,7 @@ public final class ConsumeSystem {
             if(elapsed>=ConsumeVisual.captureDuration(session.form)) {
                 if(target.position().distanceToSqr(anchor(player,target))>.36){cancel(player);return;}
                 phase(player,session,ConsumeVisual.HOLD);
-                if(SpiderPhase.edible(target))player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.greene_grip_hint",net.minecraft.network.chat.Component.keybind("key.blacklight.disguise")),true);
+                if(SpiderPhase.edible(target))FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("message.blacklight.greene_grip_hint",net.minecraft.network.chat.Component.keybind("key.blacklight.disguise")));
                 else message(player,"grab_held");
                 if(session.consumeQueued)consume(player);
                 else if(session.throwAim != null)throwTarget(player);
@@ -976,7 +981,7 @@ public final class ConsumeSystem {
         com.codex.blacklight.disguise.DisguiseSystem.consumed(player,target);
         com.codex.blacklight.disguise.DisguiseSystem.captured(player,identity);
         ConsumeSounds.phase(player,session.sound("finish"),player.position().add(0,1,0),.96F,1F);
-        player.displayClientMessage(Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()), true);
+        FieldNotes.record(player, Component.translatable("message.blacklight.consume_complete", session.heal()*com.codex.blacklight.power.CombatScale.units(player), session.biomass(), session.ep()));
     }
     /** Run the death callback while the absorber and the type of execution are still known. */
     public static boolean executeConsumption(ServerPlayer player, Mob target, float damage) {
@@ -1124,7 +1129,7 @@ public final class ConsumeSystem {
             mob.level().playSound(null,mob.blockPosition(),SoundEvents.GENERIC_BIG_FALL,SoundSource.PLAYERS,.8F+.5F*shot.charge(),.8F-.2F*shot.charge());
         } else THROWN.put(mob,new Thrown(shot.owner(),shot.remaining()-1,shot.velocity().add(0,-.08,0).scale(.98),shot.damage(),shot.charge()));
     }
-    private static void message(ServerPlayer p, String key) { p.displayClientMessage(Component.translatable("message.blacklight." + key), true); }
+    private static void message(ServerPlayer p, String key) { FieldNotes.record(p, Component.translatable("message.blacklight." + key)); }
     @SubscribeEvent public static void hurt(LivingDamageEvent.Post event) {
         if (event.getNewDamage() <= 0) return;
         // Ordinary damage cannot silently discard capture/hold. Death still ends it.

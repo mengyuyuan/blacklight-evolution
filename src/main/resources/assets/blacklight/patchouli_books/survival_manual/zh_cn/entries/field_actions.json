@@ -1,0 +1,16 @@
+{
+  "name": "地形投掷与野外补给",
+  "category": "blacklight:powers",
+  "sortnum": 30,
+  "icon": "blacklight:hive_bone",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "学会肌肉投掷后切到肌肉强化。面对地形按住抓取键，沿相连方块选取，松开举起；按住攻击蓄力并松开投出，使用键放下。面前有可抓取生物时先抓生物。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "普通模式遵循正常饥饿规则。服主若开启原型体饥饿，吸收会补充饱食度，长途疾跑前备好猎物或食物。控件经过重绑时，以选项里的实际键位为准。"
+    }
+  ]
+}

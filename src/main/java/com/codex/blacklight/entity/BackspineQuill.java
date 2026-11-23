@@ -110,7 +110,7 @@ public final class BackspineQuill extends ThrowableItemProjectile {
         boolean accepted = false;
         wedgedTarget = wedge ? living : null;
         try {
-            accepted = receiver.hurt(source, damage);
+            accepted = receiver.hurt(source, com.codex.blacklight.power.CombatScale.weaponContact(living,damage));
         } finally {
             wedgedTarget = null;
             if (ownVolley && !accepted) living.invulnerableTime = immunity;

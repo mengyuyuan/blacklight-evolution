@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.entity.BlacklightHunter;
 import com.codex.blacklight.registry.ModAttachments;
@@ -34,7 +35,7 @@ public final class ParasiteSystem {
     public static boolean allows(Player p,PowerForm form){return !suppressed(p)||form==PowerForm.NONE||form==PowerForm.CLAWS;}
     public static boolean blocked(ServerPlayer p,PowerForm form){
         if(allows(p,form))return false;
-        p.displayClientMessage(Component.translatable("message.blacklight.parasite_blocked"),true);return true;
+        FieldNotes.record(p, Component.translatable("message.blacklight.parasite_blocked"));return true;
     }
 
     public static boolean inject(ServerPlayer user,LivingEntity target){
@@ -45,17 +46,17 @@ public final class ParasiteSystem {
             return true;
         }
         if(target instanceof BlacklightHunter hunter){
-            if(!hunter.isAlive()||hunter.parasite()){user.displayClientMessage(Component.translatable("message.blacklight.syringe_no_effect"),true);return false;}
+            if(!hunter.isAlive()||hunter.parasite()){FieldNotes.record(user, Component.translatable("message.blacklight.syringe_no_effect"));return false;}
             hunter.infectParasite();
-            user.displayClientMessage(Component.translatable("message.blacklight.hunter_infected"),false);
+            FieldNotes.record(user, Component.translatable("message.blacklight.hunter_infected"));
             level.playSound(null,hunter.blockPosition(),SoundEvents.SCULK_SHRIEKER_SHRIEK,SoundSource.HOSTILE,1.5F,.6F);
             return true;
         }
         if(target instanceof ServerPlayer victim){
             if(!victim.getData(ModAttachments.PLAYER_STATE).isInfected()||suppressed(victim)){
-                user.displayClientMessage(Component.translatable("message.blacklight.syringe_no_effect"),true);return false;}
+                FieldNotes.record(user, Component.translatable("message.blacklight.syringe_no_effect"));return false;}
             suppress(victim);
-            if(victim!=user)user.displayClientMessage(Component.translatable("message.blacklight.syringe_other",victim.getDisplayName()),false);
+            if(victim!=user)FieldNotes.record(user, Component.translatable("message.blacklight.syringe_other",victim.getDisplayName()));
             return true;
         }
         return false;
@@ -63,7 +64,7 @@ public final class ParasiteSystem {
     public static void suppress(ServerPlayer p){
         set(p,bits(p)|SUPPRESSED);
         enforce(p);
-        p.displayClientMessage(Component.translatable("message.blacklight.parasite_suppressed"),false);
+        FieldNotes.record(p, Component.translatable("message.blacklight.parasite_suppressed"));
         p.level().playSound(null,p.blockPosition(),SoundEvents.ELDER_GUARDIAN_CURSE,SoundSource.PLAYERS,1F,.7F);
     }
     /** Consuming an Infected Hunter: lift the suppression and take the three apex forms without EP. */
@@ -74,12 +75,12 @@ public final class ParasiteSystem {
         state.unlock(PowerForm.BLADE);state.unlock(PowerForm.ARMOR);state.unlock(PowerForm.SOVEREIGN_WINGS);
         p.setData(ModAttachments.PLAYER_STATE,state);p.syncData(ModAttachments.PLAYER_STATE);
         GrowthSystem.award(p,"biological_experiment");
-        p.displayClientMessage(Component.translatable("message.blacklight.parasite_cured"),false);
+        FieldNotes.record(p, Component.translatable("message.blacklight.parasite_cured"));
     }
     public static void grantApex(ServerPlayer p){
         if(apex(p))return;
         set(p,bits(p)|APEX);
-        p.displayClientMessage(Component.translatable("message.blacklight.apex_granted"),false);
+        FieldNotes.record(p, Component.translatable("message.blacklight.apex_granted"));
     }
     private static void enforce(ServerPlayer p){
         var state=p.getData(ModAttachments.PLAYER_STATE);

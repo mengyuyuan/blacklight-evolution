@@ -1,5 +1,6 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.BlacklightNeoMod;
 import com.codex.blacklight.entity.GroundSpikeEntity;
 import com.codex.blacklight.animation.PlayerAction;
@@ -96,7 +97,7 @@ public final class ClawCombatSystem {
             return;
         }
         if (!canUseClaws(state)) {
-            player.displayClientMessage(Component.translatable("message.blacklight.claws_required"), true);
+            FieldNotes.record(player, Component.translatable("message.blacklight.claws_required"));
             return;
         }
 
@@ -121,12 +122,12 @@ public final class ClawCombatSystem {
 
     private static void toggleClaws(ServerPlayer player, BlacklightState state, ClawCombatState combat) {
         if (!state.isInfected() || !state.hasUnlocked(PowerForm.CLAWS)) {
-            player.displayClientMessage(Component.translatable("message.blacklight.not_infected"), true);
+            FieldNotes.record(player, Component.translatable("message.blacklight.not_infected"));
             return;
         }
         if (!state.isPrototypeMode()) {
-            player.displayClientMessage(Component.translatable(
-                    "message.blacklight.prototype_mode_required"), true);
+            FieldNotes.record(player, Component.translatable(
+                    "message.blacklight.prototype_mode_required"));
             return;
         }
 
@@ -142,8 +143,8 @@ public final class ClawCombatSystem {
         player.setData(ModAttachments.PLAYER_STATE, state);
         player.syncData(ModAttachments.PLAYER_STATE);
         playPrototypeTransition(player, activate);
-        player.displayClientMessage(Component.translatable(
-                activate ? "message.blacklight.claws_enabled" : "message.blacklight.claws_disabled"), true);
+        FieldNotes.record(player, Component.translatable(
+                activate ? "message.blacklight.claws_enabled" : "message.blacklight.claws_disabled"));
     }
 
     /** Plays the biological arm transition after a server-authoritative mode change. */
@@ -174,7 +175,7 @@ public final class ClawCombatSystem {
     private static void requestGroundSpikeCharge(ServerPlayer player, ClawCombatState combat) {
         if (combat.action() != ClawCombatState.Action.IDLE) return;
         if (!player.onGround()) {
-            player.displayClientMessage(Component.translatable("message.blacklight.groundspike_ground_only"), true);
+            FieldNotes.record(player, Component.translatable("message.blacklight.groundspike_ground_only"));
             return;
         }
         combat.beginGroundSpikeCharge();
@@ -191,7 +192,7 @@ public final class ClawCombatSystem {
         }
         combat.beginGroundSpikeRecovery();
         lockGroundSpikePose(player);
-        eruptGroundSpike(player);
+        eruptGroundSpike(player,0);
         BlacklightNeoMod.LOGGER.debug("Groundspike released for {}",
                 player.getGameProfile().getName());
     }
@@ -202,8 +203,8 @@ public final class ClawCombatSystem {
                 || combat.action() == ClawCombatState.Action.SPRINT_ATTACK;
         if (combat.action() != ClawCombatState.Action.IDLE && !canBlendFromAttack) return;
         if (!state.hasClawUpgrade(ClawUpgrade.DASHING_SLICE)) {
-            player.displayClientMessage(Component.translatable(
-                    "message.blacklight.dashing_slice_locked"), true);
+            FieldNotes.record(player, Component.translatable(
+                    "message.blacklight.dashing_slice_locked"));
             return;
         }
 
@@ -311,12 +312,12 @@ public final class ClawCombatSystem {
                      target -> CombatTargeting.damageable(player,target) && CombatTargeting.visibleContact(player,target,sweep)
                              && !alreadyHit.contains(target))) {
                 alreadyHit.add(target);
-                if (hurtWithClaws(player,target,sweep,clawDamage(state,16F))) {
+                if (hurtWithClaws(player,target,sweep,clawDamage(player,state,16F))) {
                     if(!CombatTargeting.anchoredBody(target))target.push(combat.dashX() * 0.9D, 0.3D, combat.dashZ() * 0.9D);
                     WeaponImpact.contact(player, target, ImpactTier.HEAVY, true, null);
                 }
             }
-            hitHulls(player,sweep,clawDamage(state,16F),alreadyHit,Integer.MAX_VALUE);
+            hitHulls(player,sweep,clawDamage(player,state,16F),alreadyHit,Integer.MAX_VALUE);
             // The slash trail and impact feedback fire on the first sweep tick, in
             // sync with the visible hit, instead of waiting for the dash to end.
             if (firstSweep) {
@@ -347,7 +348,7 @@ public final class ClawCombatSystem {
                         target -> CombatTargeting.damageable(player,target) && CombatTargeting.visibleContact(player,target,sweep)).stream()
                         .sorted(CombatTargeting.contactPriority(player))
                         .limit(3).toList()) {
-                    if (hurtWithClaws(player,target,sweep,clawDamage(state,9F))) {
+                    if (hurtWithClaws(player,target,sweep,clawDamage(player,state,9F))) {
                         if(!CombatTargeting.anchoredBody(target))target.push(forward.x * 0.48D, 0.14D, forward.z * 0.48D);
                         hitCount++;
                         if(hitCount==1)com.codex.blacklight.registry.ModWeaponSounds.play(player,
@@ -355,7 +356,7 @@ public final class ClawCombatSystem {
                         ClawPhysicalEffects.onComboTargetHit(player, target, false);
                     }
                 }
-                hitCount+=hitHulls(player,sweep,clawDamage(state,9F),new HashSet<>(),3-hitCount);
+                hitCount+=hitHulls(player,sweep,clawDamage(player,state,9F),new HashSet<>(),3-hitCount);
                 ClawPhysicalEffects.onComboImpact(player,
                         ClawCombatState.Action.AUTO_2, forward, hitCount);
             }
@@ -364,6 +365,7 @@ public final class ClawCombatSystem {
     }
 
     private static boolean hurtWithClaws(ServerPlayer player,LivingEntity target,AABB sweep,float damage){
+        damage=com.codex.blacklight.power.CombatScale.weaponContact(target,damage);
         var source=player.damageSources().playerAttack(player);
         if(!(target instanceof com.codex.blacklight.entity.EncounterMob boss) || !boss.spider.live())return target.hurt(source,damage);
         var eye=player.getEyePosition();
@@ -414,7 +416,7 @@ public final class ClawCombatSystem {
                 .expandTowards(forward.scale(reach));
         Vec3 attackOrigin = player.position().add(0.0D, player.getBbHeight() * 0.55D, 0.0D);
         Vec3 attackForward = forward;
-        float damage = clawDamage(state, ClawDamageRules.comboBaseDamage(action));
+        float damage = clawDamage(player,state, ClawDamageRules.comboBaseDamage(action));
         int maxTargets = ClawDamageRules.comboMaxTargets(action);
 
         var targets = CombatTargeting.candidates(player, sweep,
@@ -452,7 +454,7 @@ public final class ClawCombatSystem {
         ClawPhysicalEffects.onComboImpact(player, action, forward, hitCount);
     }
 
-    static void eruptGroundSpike(ServerPlayer player) {
+    static void eruptGroundSpike(ServerPlayer player,float heldCharge) {
         if (!canUseClaws(player.getData(ModAttachments.PLAYER_STATE))) return;
         ServerLevel level = player.serverLevel();
         BlacklightState state = player.getData(ModAttachments.PLAYER_STATE);
@@ -481,13 +483,14 @@ public final class ClawCombatSystem {
         var targets=CombatTargeting.candidates(player,hitBox,target->CombatTargeting.damageable(player,target));
         targets.sort(CombatTargeting.contactPriority(player));
         var anchors=ClawSpikeField.spawn(player,center,master,targets);
+        float spikeDamage=clawDamage(player,state,14F)*WeaponMove.chargeMultiplier(heldCharge);
         boolean firstSpike = true;
         for (LivingEntity target : targets) {
             var anchor=anchors.stream().filter(root->GroundSpikePin.touches(target,root))
                     .min(java.util.Comparator.comparingDouble(root->root.distanceToSqr(target.position()))).orElse(null);
             if(anchor==null)continue;
             if (target.hurt(player.damageSources().playerAttack(player),
-                    clawDamage(state, 14.0F))) {
+                    com.codex.blacklight.power.CombatScale.weaponContact(target,spikeDamage))) {
                 if(GroundSpikePin.catchMob(target,anchor,GroundSpikeEntity.ERUPTION_DURATION_TICKS-4,player.getYRot())){
                     WeaponImpact.contact(player,target,ImpactTier.of(WeaponMove.CLAW_GROUNDSPIKE),firstSpike,null,WeaponMove.CLAW_GROUNDSPIKE,anchor);
                     firstSpike=false;
@@ -505,7 +508,7 @@ public final class ClawCombatSystem {
                 WeaponImpact.apply(player,target,WeaponMove.CLAW_GROUNDSPIKE,away.multiply(1,0,1).normalize(),firstSpike);firstSpike=false;
             }
         }
-        hitHulls(player,hitBox,clawDamage(state,14F),new HashSet<>(),Integer.MAX_VALUE);
+        hitHulls(player,hitBox,spikeDamage,new HashSet<>(),Integer.MAX_VALUE);
         for (Entity loose : level.getEntities(player, hitBox,
                 entity -> entity instanceof ItemEntity || entity instanceof ExperienceOrb)) {
             Vec3 away = loose.position().subtract(x, loose.getY(), z)
@@ -572,8 +575,8 @@ public final class ClawCombatSystem {
         };
     }
 
-    private static float clawDamage(BlacklightState state, float baseDamage) {
-        return ClawDamageRules.applyDamageUpgrade(baseDamage,
+    private static float clawDamage(ServerPlayer player, BlacklightState state, float baseDamage) {
+        return ClawDamageRules.applyDamageUpgrade(com.codex.blacklight.item.SymbioteCharm.attackBase(player,baseDamage),
                 state.hasClawUpgrade(ClawUpgrade.DAMAGE));
     }
 

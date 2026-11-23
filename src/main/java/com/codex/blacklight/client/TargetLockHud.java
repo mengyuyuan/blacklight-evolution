@@ -16,6 +16,42 @@ import org.joml.Matrix4f;
 public final class TargetLockHud {
     private record WorldFrame(Object level,long frame,Matrix4f view,Matrix4f projection,Vec3 camera,float partial) { }
     public record Marker(int targetId,float x,float y,boolean inFront,boolean onScreen,String cameraType) { }
+    private static net.minecraft.core.BlockPos den;
+    private static net.minecraft.client.multiplayer.ClientLevel denLevel;
+    private static long denExpires;
+
+    public static void greeneSignal(net.minecraft.core.BlockPos site) {
+        var level = Minecraft.getInstance().level;
+        if (level == null || level.dimension() != com.codex.blacklight.city.CityTravel.WORLD) return;
+        den = site;
+        denLevel = level;
+        denExpires = level.getGameTime() + 30;
+    }
+
+    private static void drawGreeneSignal(GuiGraphics g, Minecraft mc) {
+        if (den == null || denLevel != mc.level || mc.level.getGameTime() >= denExpires) {
+            den = null;
+            denLevel = null;
+            return;
+        }
+        if (mc.player.isSpectator() || !com.codex.blacklight.item.GreeneTissueItem.held(mc.player)) return;
+        var at = Vec3.atCenterOf(den);
+        var clip = handTarget(at);
+        if (clip == null || clip.w <= .001F) return;
+        float nx = clip.x / clip.w, ny = clip.y / clip.w;
+        if (Math.abs(nx) > 1 || Math.abs(ny) > 1) return;
+        int x = Math.round((nx + 1) * g.guiWidth() * .5F);
+        int y = Math.round((1 - ny) * g.guiHeight() * .5F);
+        for (int row = -4; row <= 4; row++) {
+            int edge = 4 - Math.abs(row);
+            g.fill(x-edge, y+row, x+edge+1, y+row+1, 0xD52E1722);
+            g.fill(x-edge, y+row, x-edge+1, y+row+1, 0xFFF39EAD);
+            g.fill(x+edge, y+row, x+edge+1, y+row+1, 0xFFF39EAD);
+        }
+        long distance = Math.round(mc.player.getPosition(world.partial).distanceTo(at));
+        var label = net.minecraft.network.chat.Component.translatable("hud.blacklight.greene_signal",distance);
+        g.drawCenteredString(mc.font,label,x,y+7,0xFFF5D6DA);
+    }
     private static long frame;
     private static WorldFrame world;
     private static Marker marker;
@@ -27,7 +63,7 @@ public final class TargetLockHud {
     private TargetLockHud() { }
     public static Marker lastMarker(){return marker;}
     public static int readyMarkerCount(){return readyCount;}
-    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;if(Minecraft.getInstance().level==null){world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();rootedHosts.clear();quillRadius=-1;}}
+    @SubscribeEvent public static void begin(RenderFrameEvent.Pre event){frame++;marker=null;if(Minecraft.getInstance().level==null){den=null;denLevel=null;world=null;candidateLevel=null;candidateTick=-100;candidates=java.util.List.of();rootedHosts.clear();quillRadius=-1;}}
     @SubscribeEvent public static void captureWorld(RenderLevelStageEvent event) {
         if(event.getStage()!=RenderLevelStageEvent.Stage.AFTER_LEVEL)return;
         var mc=Minecraft.getInstance();
@@ -47,6 +83,7 @@ public final class TargetLockHud {
         var mc=Minecraft.getInstance();var g=event.getGuiGraphics();
         readyCount=0;
         if(mc.player==null||mc.level==null||mc.options.hideGui)return;
+        drawGreeneSignal(g,mc);
         consumeMarkers(g,mc);
         var dive=mc.player.getData(com.codex.blacklight.registry.ModAttachments.DEVASTATOR_VISUAL);
         if(dive.kind()==3&&dive.phase()==com.codex.blacklight.combat.DevastatorSystem.FLIGHT&&dive.diveAim()!=null){
@@ -57,11 +94,7 @@ public final class TargetLockHud {
         }
         if(!ClientTargetLock.active())return;
         var target=ClientTargetLock.entityTarget();
-        if(target==null){
-            String notice=ClientTargetLock.notice();
-            if(!notice.isBlank())panel(g,notice,g.guiWidth()/2,g.guiHeight()-54,0xFFFFCA77);
-            return;
-        }
+        if(target==null)return;
         String name=(ClientTargetLock.pending()?"锁定中 · ":"锁定 · ")+ClientTargetLock.selection(target).label();
         var captured=world;
         if(captured!=null&&captured.level==mc.level&&captured.frame==frame) {
@@ -77,7 +110,6 @@ public final class TargetLockHud {
         }
         String status=name+"  "+Math.round(Math.sqrt(ClientTargetLock.selection(target).distanceSquared(mc.player)))+"m"
                 +(marker==null||!marker.onScreen()?" · 目标在视野外":"");
-        if(target instanceof net.minecraft.world.entity.Mob mob&&ready(mc,mob)&&(quillRadius<0||canRecall(mc,mob)))status+=" · "+net.minecraft.network.chat.Component.translatable("hud.blacklight.consume_ready_short",SkillBindings.label("key.blacklight.grab")).getString();
         var shown=mc.font.plainSubstrByWidth(status,182);int statusY=g.guiHeight()-108;
         BlacklightUi.hud(g,4,statusY-4,12+Math.min(182,mc.font.width(shown)),statusY+12,BlacklightUi.RED);
         g.drawString(mc.font,shown,8,statusY,0xFFE8DDD6,false);
