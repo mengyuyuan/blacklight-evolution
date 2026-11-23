@@ -68,18 +68,23 @@ public final class UtilityPowerControls {
             Component line = s.broken() ? Component.translatable("hud.blacklight.shield_rebuild", String.format(java.util.Locale.ROOT,"%.1f",ticks/20F))
                     : Component.translatable("hud.blacklight.shield",Math.round(s.shield()/UtilityState.SHIELD_CAPACITY*100))
                             .append(" · ").append(Component.translatable("hud.blacklight.shield_stage_"+s.damageStage()));
+            PrototypeHealthHud.reserve(10,y,10+Math.max(100,mc.font.width(line)),y+15);
             g.drawString(mc.font,line,10,y,s.broken()?0xFFFF795A:0xFFDCE7EF,true);
             g.fill(10,y+12,110,y+15,0xA0202630);
             float progress=s.broken()?s.rebuildProgress(mc.level.getGameTime()):s.shield()/UtilityState.SHIELD_CAPACITY;
             g.fill(10,y+12,10+Math.round(100*progress),y+15,s.broken()?0xFFFF795A:0xFFCADBE6);y+=23;
         } else if (UtilityPowerSystem.active(mc.player, PowerForm.ARMOR)) {
             boolean forming=mc.level.getGameTime()-com.codex.blacklight.registry.ModAttachments.getData(mc.player, ModAttachments.UTILITY_STATE).changedAt()<81;
-            g.drawString(mc.font,Component.translatable(forming?"hud.blacklight.armor_forming":"hud.blacklight.armor"),10,y,0xFFDCE7EF,true);y+=14;
+            var label=Component.translatable(forming?"hud.blacklight.armor_forming":"hud.blacklight.armor");
+            PrototypeHealthHud.reserve(10,y,10+mc.font.width(label),y+mc.font.lineHeight);
+            g.drawString(mc.font,label,10,y,0xFFDCE7EF,true);y+=14;
         }
         PowerForm vision = UtilityPowerSystem.active(mc.player, PowerForm.INFECTED_VISION) ? PowerForm.INFECTED_VISION
                 : UtilityPowerSystem.active(mc.player, PowerForm.THERMAL_VISION) ? PowerForm.THERMAL_VISION : PowerForm.NONE;
         if (vision != PowerForm.NONE) {
-            g.drawString(mc.font,Component.translatable("hud.blacklight."+vision.id()),10,y,0xFFFFAA83,true);y+=14;
+            var label=Component.translatable("hud.blacklight."+vision.id());
+            PrototypeHealthHud.reserve(10,y,10+mc.font.width(label),y+mc.font.lineHeight);
+            g.drawString(mc.font,label,10,y,0xFFFFAA83,true);y+=14;
         }
     }
 }

@@ -16,6 +16,18 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 /** Fixed-size biological meter; health growth never adds rows of hearts. */
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class PrototypeHealthHud {
+    private static final java.util.List<HealthHudLayout.Bounds> occupied = new java.util.ArrayList<>();
+    private static boolean collecting;
+    static void reserve(int left,int top,int right,int bottom) {
+        if(collecting)occupied.add(new HealthHudLayout.Bounds(left,top,right,bottom));
+    }
+    @SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.HIGHEST)
+    public static void beginFrame(RenderGuiEvent.Pre event) {
+        occupied.clear();
+        collecting=true;
+        var g=event.getGuiGraphics();
+        reserve(g.guiWidth()/2-98,g.guiHeight()-46,g.guiWidth()/2+98,g.guiHeight());
+    }
     private static LocalPlayer owner;
     private static float lastHealth,lastMaximum,trail;
     private static double lastTime=-1,holdUntil;
@@ -52,7 +64,8 @@ public final class PrototypeHealthHud {
         if(active()&&event.getOverlay().id().equals(VanillaGuiOverlay.PLAYER_HEALTH.id()))event.setCanceled(true);
 
     }
-    @SubscribeEvent public static void render(RenderGuiEvent.Post event){
+    @SubscribeEvent(priority=net.minecraftforge.eventbus.api.EventPriority.LOWEST) public static void render(RenderGuiEvent.Post event){
+        collecting=false;
         var mc=Minecraft.getInstance();
         if(!active()||mc.level==null){owner=null;lastTime=-1;return;}
         if(mc.options.hideGui || mc.screen instanceof com.codex.blacklight.client.screen.PresentationSettingsScreen settings && settings.previewsHealth())return;
@@ -70,6 +83,9 @@ public final class PrototypeHealthHud {
         var placement=HealthHudLayout.position(mc.getWindow().getGuiScaledWidth(),mc.getWindow().getGuiScaledHeight(),
                 Math.min(mc.getWindow().getGuiScaledWidth()-20,w*2),com.codex.blacklight.config.PassiveHudConfig.HEALTH_X.get(),
                 com.codex.blacklight.config.PassiveHudConfig.HEALTH_Y.get());
+        int drawnWidth=ModAttachments.getData(p, ModAttachments.CRITICAL_MASS).reserve()>0 ? Math.min(g.guiWidth()-placement.x()-10,2*w) : w;
+        int drawnHeight=ModAttachments.getData(p, ModAttachments.ADRENALINE).active(mc.level.getGameTime()) ? 24+mc.font.lineHeight : 24;
+        placement=HealthHudLayout.avoid(placement,drawnWidth,drawnHeight,g.guiHeight(),occupied);
         int x=placement.x(),y=placement.y();
         if(SourceBar.VALUE!=null)renderCriticalMassBacking(g,p,x,y,w,true);
         if(NativeHealthHud.render(g,x,y,w,health/maximum,trail/maximum,p.getAbsorptionAmount()/maximum)){

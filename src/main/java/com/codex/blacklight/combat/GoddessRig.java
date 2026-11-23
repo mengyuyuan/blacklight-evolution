@@ -1,0 +1,284 @@
+package com.codex.blacklight.combat;
+
+import com.codex.blacklight.entity.EncounterMob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import java.io.*;
+import java.util.*;
+import java.util.zip.GZIPInputStream;
+
+/** Bind-local receiver patches, GPU skinning and shader-pack rendering use identical joint samples. */
+public final class GoddessRig {
+    public static final List<String> PARTS=List.of("goddess_head","goddess_chest","goddess_base","goddess_left_shoulder",
+            "goddess_left_elbow","goddess_left_wrist","goddess_left_hand","goddess_right_shoulder","goddess_right_elbow",
+            "goddess_right_wrist","goddess_right_hand","goddess_hair","colony_wrist","colony_palm","colony_thumb","colony_index","colony_middle","colony_ring","colony_pinky");
+    public static final int JOINTS=35;
+    private record Bone(int part,float[] idle,Vec3[] centers,Vec3[] half) {}
+    private static final Bone[] bones=new Bone[JOINTS];
+    private static final int frames,rate;
+    private static final byte[] colonies;
+    private static final float[][] falls=new float[3][];
+    private static final int fallFrames;
+    static {
+        try (var in=stream("greene_goddess_receivers.bin.gz"); var clip=stream("greene_execution_first.pose.gz")) {
+            if (in.readInt()!=0x47524731 || in.readInt()!=JOINTS) throw new IOException("Invalid goddess anatomy");
+            frames=in.readInt();rate=in.readInt();
+            for (int i=0;i<JOINTS;i++) {
+                String name=in.readUTF();
+                float[] idle=readFloats(in,frames*7);
+                int count=in.readInt();
+                Vec3[] centers=new Vec3[count], half=new Vec3[count];
+                for(int b=0;b<count;b++){centers[b]=vector(in);half[b]=vector(in);}
+                bones[i]=new Bone(region(name),idle,centers,half);
+            }
+            colonies=in.readNBytes(in.readInt());
+            if(clip.readInt()!=0x47455831) throw new IOException("Invalid execution timeline");
+            fallFrames=clip.readInt();
+            if(clip.readInt()!=JOINTS)throw new IOException("Incompatible execution rig");
+            falls[0]=readFloats(clip,fallFrames*JOINTS*10);
+            for(int i=1;i<=2;i++)try(var action=stream(i==1?"greene_execution_second.pose.gz":"greene_execution_head.pose.gz")){
+                if(action.readInt()!=0x47455831 || action.readInt()!=fallFrames || action.readInt()!=JOINTS)throw new IOException("Mismatched fall rig");
+                falls[i]=readFloats(action,fallFrames*JOINTS*10);
+            }
+        } catch(IOException ex){throw new ExceptionInInitializerError(ex);}
+    }
+    private static DataInputStream stream(String name) throws IOException {
+        var raw=GoddessRig.class.getResourceAsStream("/assets/blacklight/models/"+name);
+        if(raw==null)throw new FileNotFoundException(name);
+        return new DataInputStream(new BufferedInputStream(new GZIPInputStream(raw)));
+    }
+    private static Vec3 vector(DataInputStream in) throws IOException {return new Vec3(in.readFloat(),in.readFloat(),in.readFloat());}
+    private static float[] readFloats(DataInputStream in,int count)throws IOException{
+        var a=new float[count];for(int i=0;i<count;i++)a[i]=in.readFloat();return a;
+    }
+    private static int region(String name){
+        if(name.startsWith("near_")||name.startsWith("far_")){
+            int offset=name.startsWith("near_")?3:7;
+            return offset+(name.endsWith("_forearm")?1:name.endsWith("_arm")?0:name.endsWith("_hand")?2:3);
+        }
+        return switch(name){case "greene_head"->0;case "thorax"->1;case "crown","crown_tip"->11;default->2;};
+    }
+    public static int carrier(int joint){return joint<JOINTS?joint:colonies[(joint-JOINTS)/12];}
+    private static int flag(int part){return part>=3&&part<=6?GoddessVitals.LEFT_ARM:part>=7&&part<=10?GoddessVitals.RIGHT_ARM:part==0||part==11?GoddessVitals.HEAD:0;}
+    static boolean belongsTo(String bone,int part){
+        int slot=PARTS.indexOf(bone);return slot>=0 && flag(slot)==part;
+    }
+    public static boolean visible(EncounterMob boss,int joint){return (boss.goddess.removed()&flag(bones[joint].part))==0;}
+    private static float lerp(float a,float b,float t){return a+(b-a)*t;}
+    private static Matrix4f interpolate(float[] data,int a,int b,float mix,boolean scale){
+        var rotation=new Quaternionf(data[a+3],data[a+4],data[a+5],data[a+6])
+                .slerp(new Quaternionf(data[b+3],data[b+4],data[b+5],data[b+6]),mix);
+        var matrix=new Matrix4f().translationRotate(lerp(data[a],data[b],mix),lerp(data[a+1],data[b+1],mix),lerp(data[a+2],data[b+2],mix),rotation);
+        return scale?matrix.scale(lerp(data[a+7],data[b+7],mix),lerp(data[a+8],data[b+8],mix),lerp(data[a+9],data[b+9],mix)):matrix;
+    }
+    private static Matrix4f idle(int joint,float ticks){
+        float sample=Math.max(0,ticks)*rate/20F%frames;
+        int f=(int)sample;
+        return interpolate(bones[joint].idle,7*f,7*((f+1)%frames),sample-f,false);
+    }
+    static Matrix4f executionOffset(int stage,int joint,float frame){
+        float sample=Math.min(fallFrames-1,Math.max(0,frame-1));
+        int first=(int)sample;
+        int a=(first*JOINTS+joint)*10, b=(Math.min(fallFrames-1,first+1)*JOINTS+joint)*10;
+        return interpolate(falls[stage],a,b,sample-first,true);
+    }
+    /** Let the surviving joints settle from the actual release pose as the rise begins. */
+    static Matrix4f risingOffset(int stage,int joint,float frame,float age){
+        var target=executionOffset(stage,joint,frame);
+        if(age>=12)return target;
+        var released=executionOffset(stage,joint,80+GoddessEncounter.EXTRACTION_TICKS*1.2F);
+        if(age<=0)return released;
+        float t=age/12F;
+        t=t*t*(3-2*t);
+        var position=released.getTranslation(new Vector3f()).lerp(target.getTranslation(new Vector3f()),t);
+        var rotation=released.getUnnormalizedRotation(new Quaternionf()).slerp(target.getUnnormalizedRotation(new Quaternionf()),t);
+        var scale=released.getScale(new Vector3f()).lerp(target.getScale(new Vector3f()),t);
+        return target.translationRotateScale(position,rotation,scale);
+    }
+    private static float executionFrame(EncounterMob boss,float partial) {
+        float age=boss.goddess.age(partial);
+        return switch(boss.goddess.action()){
+            case FLYING -> 0;
+            case STAGGER, FALLING -> 1 + 79 * boss.goddess.lowered(partial);
+            case DOWN,GRIPPED -> 80;
+            case EXTRACTING -> Math.min(fallFrames,80+age*1.2F);
+            case RISING -> Math.max(1,80-age*1.58F);
+        };
+    }
+    public static Matrix4f[] pose(EncounterMob boss,float partial){
+        return pose(boss,partial,executionFrame(boss,partial));
+    }
+    private static Matrix4f[] pose(EncounterMob boss,float partial,float frame){
+        var result=new Matrix4f[JOINTS];
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
+        float riseAge=boss.goddess.age(partial);
+        boolean settling=boss.goddess.action()==GoddessEncounter.Action.RISING && riseAge<12;
+        for(int j=0;j<JOINTS;j++){
+            if(frame==0) result[j]=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
+            else {
+                var offset=settling && visible(boss,j) ? risingOffset(stage,j,frame,riseAge) : executionOffset(stage,j,frame);
+                result[j]=offset.mul(idle(j,0));
+                if(frame < 14){
+                    float blend=(frame-1)/13;
+                    blend=blend*blend*(3-2*blend);
+                    var hover=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
+                    result[j]=hover.lerp(result[j],blend);
+                }
+            }
+        }
+        if(frame==0 && boss.goddess.attacks.struggle.active()){
+            var q=boss.goddess.attacks.struggle;
+            float fold=q.closure(partial);
+            var head=result[0].getTranslation(new Vector3f());
+            var turn=new Matrix4f().translate(head).rotateX(q.hair()?.28F+.28F*fold:-.18F*fold).translate(-head.x,-head.y,-head.z);
+            result[0].mulLocal(turn);result[33].mulLocal(turn);result[34].mulLocal(turn);
+            if(!q.hair()){
+                int first=(boss.goddess.removed()&1)==0?5:19;
+                var joint=result[first].getTranslation(new Vector3f());
+                var direction=result[first+2].getTranslation(new Vector3f()).sub(joint).normalize();
+                var toFace=new Vector3f(head).sub(joint).add(first==5?-.8F:.8F,-.35F,-1.3F).normalize();
+                float raise=GoddessRush.ease(boss.goddess.attacks.age(partial),0,18);
+                var up=new Quaternionf().slerp(new Quaternionf().rotationTo(direction,toFace),raise*.93F);
+                var rotation=new Matrix4f().translate(joint).rotate(up).translate(-joint.x,-joint.y,-joint.z);
+                for(int i=first;i<first+14;i++)result[i].mulLocal(rotation);
+            }
+        }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.RUSH){
+            int wrist=boss.goddess.attacks.rush.arm()==1?7:21;
+            GoddessRushPose.pose(boss,result,partial,bones[wrist].centers[0]);
+        }else if(frame==0 && (boss.goddess.attacks.move()==GoddessAttacks.Move.CALL || boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL)){
+            float age=boss.goddess.attacks.age(partial);
+            boolean strong=boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL;
+            float cue=GoddessRush.ease(age,1,10)*(1-GoddessRush.ease(age,15,23));
+            int end=strong?GoddessAttacks.STRONG_CALL_END:GoddessAttacks.NORMAL_CALL_END;
+            float point=GoddessRush.ease(age,12,GoddessAttacks.CALL_FIRST)*(1-GoddessRush.ease(age,end-11,end));
+            float beat=(age-GoddessAttacks.CALL_FIRST)/GoddessAttacks.CALL_INTERVAL;
+            float pulse=point*(float)Math.cos(beat*2*Math.PI);
+            float shift=strong?GoddessRush.ease(age,34,42):0;
+            var head=result[0].getTranslation(new Vector3f());
+            var call=new Matrix4f().translate(head).rotateX(-.31F*cue+.22F*point+.045F*pulse)
+                    .rotateY((.32F-.76F*shift)*point).translate(-head.x,-head.y,-head.z);
+            result[0].mulLocal(call);result[33].mulLocal(call);result[34].mulLocal(call);
+            for(int arm=0;arm<2;arm++){
+                if((boss.goddess.removed()&(1<<arm))!=0)continue;
+                int first=arm==0?5:19;
+                float share=strong?(arm==0?1-shift:shift):(boss.goddess.removed()==0 && arm==1?.22F:1);
+                var pivot=result[first].getTranslation(new Vector3f());
+                var gesture=new Matrix4f().translate(pivot).rotateZ((arm==0?1:-1)*(.32F*cue+.63F*point*share))
+                        .rotateX(-.88F*cue-(.45F*point+.12F*pulse)*share).translate(-pivot.x,-pivot.y,-pivot.z);
+                for(int j=first;j<first+14;j++)result[j].mulLocal(gesture);
+            }
+        }else if(frame==0 && GoddessCastPose.active(boss.goddess.attacks.move())){
+            GoddessCastPose.apply(boss,result,partial);
+        }else if(frame==0 && boss.goddess.attacks.hand.melee()){
+            int first=(boss.goddess.removed()&1)==0?5:19;
+            GoddessPalmCombo.conduct(result,first,boss.goddess.attacks.hand.controlTime(partial));
+        }else if(frame==0 && boss.goddess.attacks.hand.visible()){
+            int shoulder=(boss.goddess.removed()&1)==0?3:7;
+            int first=-1;
+            for(int j=0;j<JOINTS;j++)if(bones[j].part==shoulder){first=j;break;}
+            if(first>=0 && bones[first].centers.length>0){
+                var pivot=result[first].transformPosition(bones[first].centers[0].toVector3f());
+                float amount=boss.goddess.attacks.hand.gesture(partial);
+                var gesture=new Matrix4f().translate(pivot).rotateX(-.56F*amount).rotateZ((shoulder==3?1:-1)*.38F*amount).translate(-pivot.x,-pivot.y,-pivot.z);
+                for(int j=0;j<JOINTS;j++)if(bones[j].part>=shoulder && bones[j].part<=shoulder+3)result[j].mulLocal(gesture);
+            }
+        }
+        return result;
+    }
+    public static int flowStart(int stage){return stage==0?171:163;}
+    public static int flowEnd(int stage){return stage==0?233:222;}
+    public static int severedPart(int joint){return flag(bones[joint].part);}
+    public static Matrix4f fullLimbOffset(int stage,int joint){
+        int at=((flowStart(stage)-1)*JOINTS+joint)*10;
+        return interpolate(falls[stage],at,at,0,true);
+    }
+    public static Matrix4f[] renderOffsets(EncounterMob boss,float partial){
+        float frame=executionFrame(boss,partial);
+        var output=pose(boss,partial,frame);
+        boolean extracting=boss.goddess.action()==GoddessEncounter.Action.EXTRACTING;
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
+        for(int j=0;j<JOINTS;j++){
+            boolean part=extracting && severedPart(j)==boss.goddess.part();
+            if(!visible(boss,j) && !(part && frame<flowEnd(stage))){output[j].zero();continue;}
+            if(part && frame>=flowStart(stage) && frame<flowEnd(stage))
+                output[j]=fullLimbOffset(stage,j).mul(idle(j,0));
+            output[j].mul(idle(j,boss.tickCount+partial).invert());
+        }
+        return output;
+    }
+    // Floor normals and brace pivots fitted to the head, exposed chest and remaining wrist
+    // of each authored prone mesh. All vectors are in unscaled model coordinates.
+    private static final Vector3f[] BRACE_PIVOTS={
+        new Vector3f(.2092F,.5071F,-3.9365F),new Vector3f(-7.1954F,.7931F,-3.4076F),new Vector3f(2.2989F,1.8205F,-4.5788F)
+    };
+    private static final Quaternionf[] BRACE_ROTATIONS={
+        new Quaternionf().rotationTo(-.395715F,.890889F,-.222994F,0,1,0),
+        new Quaternionf().rotationTo(-.086292F,.990889F,-.103407F,0,1,0),
+        new Quaternionf().rotationTo(-.143025F,.988667F,-.045629F,0,1,0)
+    };
+    private static Matrix4f root(EncounterMob boss,float yaw,float lift,float tilt){
+        var m=new Matrix4f().translation(0,lift,0).rotateY((float)Math.toRadians(180-yaw)).scale(2);
+        if(tilt<=0)return m;
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
+        var pivot=BRACE_PIVOTS[stage];
+        return m.translate(pivot).rotate(new Quaternionf().slerp(BRACE_ROTATIONS[stage],tilt))
+                .translate(-pivot.x,-pivot.y,-pivot.z);
+    }
+    public static Matrix4f root(EncounterMob boss,float partial){
+        return root(boss,boss.goddess.facing(partial),(float)boss.goddess.lift(partial),boss.goddess.braceTilt(partial));
+    }
+    public static List<HydraContact.Region> regions(EncounterMob boss,Vec3 origin,float partial){
+        var regions=build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial));
+        var snare=boss.goddess.attacks.struggle;
+        if(snare.active() && snare.hair() && snare.step()!=GoddessStruggle.Step.OPEN){
+            var region=regions.get(11);
+            var boxes=new ArrayList<>(region.boxes());
+            Vec3 root=snare.supportTip(partial);
+            var support=HydraContact.affine(root,new Vec3(.42,1.15,.42),snare.right(),new Vec3(0,1,0),snare.front());
+            boxes.add(support);
+            regions=new ArrayList<>(regions);
+            regions.set(11,new HydraContact.Region(region.bone(),boxes,region.bounds().minmax(support.bounds)));
+        }
+        return regions;
+    }
+    static List<HydraContact.Region> resting(EncounterMob boss,float yaw,boolean melee){
+        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80),null);
+    }
+    private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed,GoddessHandPose hand){
+        var slots=new ArrayList<List<HydraContact.Box>>(PARTS.size());
+        for(int i=0;i<PARTS.size();i++) slots.add(new ArrayList<>());
+        for(int j=0;j<JOINTS;j++){
+            if(!visible(boss,j))continue;
+            var bone=bones[j];var m=new Matrix4f(root).mul(posed[j]);
+            var x=new Vec3(m.transformDirection(new Vector3f(1,0,0)));
+            var y=new Vec3(m.transformDirection(new Vector3f(0,1,0)));
+            var z=new Vec3(m.transformDirection(new Vector3f(0,0,1)));
+            if(x.lengthSqr()<.00001||y.lengthSqr()<.00001||z.lengthSqr()<.00001)continue;
+            for(int i=0;i<bone.centers.length;i++){
+                Vec3 center=origin.add(new Vec3(m.transformPosition(bone.centers[i].toVector3f())));
+                slots.get(bone.part).add(HydraContact.affine(center,bone.half[i],x,y,z));
+            }
+        }
+        if(hand!=null)for(var link:hand.links())slots.get(link.slot()).add(link.surface());
+        var result=new ArrayList<HydraContact.Region>();
+        for(int i=0;i<slots.size();i++){
+            var boxes=slots.get(i);
+            var bounds=boxes.isEmpty()?new AABB(origin,origin):boxes.get(0).bounds;
+            for(int b=1;b<boxes.size();b++)bounds=bounds.minmax(boxes.get(b).bounds);
+            result.add(new HydraContact.Region(PARTS.get(i),boxes,bounds));
+        }
+        return List.copyOf(result);
+    }
+    public static boolean reachable(EncounterMob boss,Player player,int part){
+        if(player.distanceToSqr(boss)>80*80)return false;
+        var regions=boss.hurtRegions(0);
+        for(int i=0;i<PARTS.size();i++)if(flag(i)==part && !regions.get(i).boxes().isEmpty()
+                && GreeneContact.focus(regions,i,player,4)!=null)return true;
+        return false;
+    }
+    private GoddessRig(){}
+}

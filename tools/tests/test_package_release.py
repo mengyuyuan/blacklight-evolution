@@ -1,3 +1,6 @@
+from zipfile import ZipFile
+import struct
+import gzip
 import shutil
 import os
 import importlib.util
@@ -131,6 +134,57 @@ class ProductionClassBoundaryTest(unittest.TestCase):
         self.assertTrue(release.same_stream_content(io.BytesIO(prefix + b'a'), io.BytesIO(prefix + b'a')))
         self.assertFalse(release.same_stream_content(io.BytesIO(prefix + b'a'), io.BytesIO(prefix + b'b')))
         self.assertFalse(release.same_stream_content(io.BytesIO(prefix), io.BytesIO(prefix + b'a')))
+
+
+class GreeneClipVerificationTest(unittest.TestCase):
+    def test_restores_both_jar_clips_and_rejects_a_stale_frame_or_missing_entry(self):
+        repo = Path(__file__).resolve().parents[2]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            classes = root / 'build/classes/java/resourceTools'
+            classes.mkdir(parents=True)
+            jdk = Path(os.environ['JAVA_HOME']) / 'bin' if os.environ.get('JAVA_HOME') else None
+            javac = str(jdk / 'javac') if jdk else shutil.which('javac')
+            java = str(jdk / 'java') if jdk else shutil.which('java')
+            if not javac or not java:
+                self.skipTest('A JDK is required for compressed animation fixtures')
+            subprocess.run([javac, '-encoding', 'UTF-8', '-d', str(classes), str(repo / 'tools/CompactMoltPacker.java'),
+                            str(repo / 'src/main/java/com/codex/blacklight/util/MoltAnimationData.java')], check=True)
+            prefix = Path('assets/blacklight/greene/molt')
+            source = root / 'src/main/resources'
+            (source / prefix).mkdir(parents=True)
+            # Two empty scene meshes, followed by two one-channel keyframes in both source clips.
+            scene = struct.pack('<4I', 0x474d4c32, 0, 0, 2) + bytes(224) + struct.pack('<2I', 11, 17)
+            climb = struct.pack('<6I', 0x434c4d31, 2, 0, 0, 21, 43)
+            names = [(prefix / name).as_posix() for name in ('scene.bin.gz', 'clamber.bin.gz')]
+            for name, raw in zip(names, (scene, climb)):
+                (source / name).write_bytes(gzip.compress(raw))
+            packed = root / 'packed'
+            subprocess.run([java, '-cp', str(classes), 'CompactMoltPacker', str(source), str(packed)], check=True)
+            jar = root / 'fixture.jar'
+
+            def write_jar(entries, include_decoder=True):
+                with ZipFile(jar, 'w') as archive:
+                    if include_decoder:
+                        decoder = 'com/codex/blacklight/util/MoltAnimationData.class'
+                        archive.write(classes / decoder, decoder)
+                    for name in entries:
+                        archive.write(packed / name, name)
+
+            write_jar(names)
+            self.assertEqual(set(names), release.verify_compact_molt(root, root / 'build', jar))
+            for name, raw in zip(names, (scene, climb)):
+                with self.subTest(name=name):
+                    (source / name).write_bytes(gzip.compress(raw[:-1] + bytes([raw[-1] ^ 1])))
+                    with self.assertRaisesRegex(RuntimeError, 'Packaged Greene animation differs'):
+                        release.verify_compact_molt(root, root / 'build', jar)
+                    (source / name).write_bytes(gzip.compress(raw))
+            write_jar(names, include_decoder=False)
+            with self.assertRaisesRegex(RuntimeError, 'Missing shipped Greene animation decoder'):
+                release.verify_compact_molt(root, root / 'build', jar)
+            write_jar(names[:1])
+            with self.assertRaisesRegex(RuntimeError, 'Missing packaged clamber'):
+                release.verify_compact_molt(root, root / 'build', jar)
 
 
 if __name__ == '__main__':

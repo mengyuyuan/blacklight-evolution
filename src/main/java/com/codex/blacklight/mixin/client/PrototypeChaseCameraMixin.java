@@ -15,11 +15,14 @@ public abstract class PrototypeChaseCameraMixin {
     private void blacklight$finishCamera(BlockGetter level,Entity entity,boolean detached,
             boolean reverse,float partial,Operation<Void> original) {
         boolean cinematic=com.codex.blacklight.client.camera.HydraCinematicCamera.update();
-        original.call(level,entity,cinematic||detached,cinematic?false:reverse,partial);
+        boolean executing=com.codex.blacklight.client.camera.GoddessExecutionCamera.update(entity);
+        original.call(level,entity,cinematic||executing||detached,cinematic||executing?false:reverse,partial);
+        if(executing){com.codex.blacklight.client.camera.GoddessExecutionCamera.apply((Camera)(Object)this,partial);return;}
         if(cinematic){com.codex.blacklight.client.camera.HydraCinematicCamera.apply((Camera)(Object)this);return;}
         if(com.codex.blacklight.client.vehicle.VehicleCamera.apply((Camera)(Object)this,partial))return;
         PrototypeChaseCamera.apply((Camera)(Object)this,partial);
         com.codex.blacklight.client.ClientBiomass.camera((Camera)(Object)this,partial);
         com.codex.blacklight.client.BlockThrowCamera.apply((Camera)(Object)this,partial);
+        com.codex.blacklight.client.animation.GoddessPressurePose.eyes((Camera)(Object)this,partial);
     }
 }

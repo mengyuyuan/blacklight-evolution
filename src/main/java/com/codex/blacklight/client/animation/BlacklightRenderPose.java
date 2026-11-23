@@ -14,6 +14,22 @@ public final class BlacklightRenderPose {
         return action.clipId().startsWith("greene_mouth_") && action.active(PlayerMotionController.actionTime(entity,partial));
     }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.actorOwner(player,true);
+            if(paired!=null){
+                float weight=paired.goddess.actorBlend(partial);
+                if(weight<=0)return ordinaryPose(entity,partial);
+                var authored=com.codex.blacklight.combat.GoddessActor.pose(paired,partial);
+                return weight>=1 ? authored : BlacklightPose.interpolatePose(ordinaryPose(entity,partial),authored,weight);
+            }
+        }
+        return ordinaryPose(entity,partial);
+    }
+    private static BlacklightPose ordinaryPose(LivingEntity entity,float partial){
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var compression=GoddessPressurePose.owner(player);
+            if(compression!=null)return GoddessPressurePose.sample(compression.goddess.attacks,partial);
+        }
         if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
             var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
             if (cell!=null) return WeaveBrace.pose(player,cell,partial);
@@ -107,6 +123,12 @@ public final class BlacklightRenderPose {
         }
     }
     public static float facing(LivingEntity entity,float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.actorOwner(player,true);
+            if(paired!=null)return paired.goddess.actorFacing(partial, PlayerMotionController.facing(entity,partial));
+            var pressure=GoddessPressurePose.owner(player);
+            if(pressure!=null)return pressure.goddess.attacks.actorYaw();
+        }
         if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
             var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
             if (cell!=null) return (float)Math.toDegrees(Math.atan2(-cell.inward().x,cell.inward().z));
@@ -119,6 +141,12 @@ public final class BlacklightRenderPose {
         return PlayerMotionController.facing(entity,partial);
     }
     public static float rawFacing(LivingEntity entity,float partial) {
+        if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.paired(player);
+            if(paired!=null)return paired.goddess.actorFacing(partial,player.yBodyRot);
+            var pressure=GoddessPressurePose.owner(player);
+            if(pressure!=null)return pressure.goddess.attacks.actorYaw();
+        }
         var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
         if(dodge.clipId().startsWith("spines_")&&!dodge.clipId().startsWith("spines_scapula")
                 &&dodge.active(PlayerMotionController.actionTime(entity,partial)))

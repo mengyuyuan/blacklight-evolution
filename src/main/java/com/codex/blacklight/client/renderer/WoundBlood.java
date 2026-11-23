@@ -38,6 +38,8 @@ public final class WoundBlood {
     private static final Map<LivingEntity,Integer> SEVERED=new WeakHashMap<>();
     private record ConsumeMark(long started,int tick) {}
     private static final Map<LivingEntity,ConsumeMark> CONSUME_HITS=new WeakHashMap<>();
+    private static final class PressureMark {int sequence,beat;boolean burst;GoddessBubbleRenderer.Shell shell;}
+    private static final Map<com.codex.blacklight.entity.EncounterMob,PressureMark> PRESSURE=new WeakHashMap<>();
     private static ClientLevel scene;
     public record Anchor(Vec3 point,Vec3 direction,Vec3 velocity) {}
     private WoundBlood() {}
@@ -46,7 +48,7 @@ public final class WoundBlood {
     }
     private static void reset(){
         var level=Minecraft.getInstance().level;
-        if(scene!=level){scene=level;dropTick=Long.MIN_VALUE;contactDrops=0;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();CONSUME_HITS.clear();}
+        if(scene!=level){scene=level;PRESSURE.clear();dropTick=Long.MIN_VALUE;contactDrops=0;EMITTERS.clear();DROPS.clear();SPLATS.clear();FRAMES.clear();SEVERED.clear();CONSUME_HITS.clear();}
     }
     private static long dropTick = Long.MIN_VALUE;
     private static int contactDrops;
@@ -268,6 +270,7 @@ public final class WoundBlood {
         var active=Collections.newSetFromMap(new IdentityHashMap<LivingEntity,Boolean>());
         var player=Minecraft.getInstance().player;if(player==null)return;
         for(var entity:scene.entitiesForRendering()){
+            if(entity instanceof com.codex.blacklight.entity.EncounterMob boss && boss.greeneOutbreak())compression(boss);
             if(!(entity instanceof LivingEntity e)||!com.codex.blacklight.combat.PlayerHitEffects.fleshBody(e)||e.isInvisible()||e.distanceToSqr(player)>64*64)continue;
             var visual=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
             if(!visual.consuming()||com.codex.blacklight.combat.ConsumeSequence.mountedStage(visual.stage()))continue;
@@ -314,13 +317,72 @@ public final class WoundBlood {
         var e=emitter.entity;var visual=com.codex.blacklight.registry.ModAttachments.getData(e, ModAttachments.CONSUME_VISUAL);
         return e.level()==scene&&!e.isInvisible()&&!e.isRemoved()&&visual.consuming()&&visual.started()==emitter.consumeStarted;
     }
+    /** Both near players and observers use the server's cast and damage receipt. No health is changed here. */
+    private static void compression(com.codex.blacklight.entity.EncounterMob boss){
+        var attack=boss.goddess.attacks;
+        if(!boss.goddess.active() || attack.move()!=com.codex.blacklight.combat.GoddessAttacks.Move.VACUOLE || !attack.caught()){
+            PRESSURE.remove(boss);return;
+        }
+        var uuid=attack.victim();
+        var target=uuid==null?null:scene.getPlayerByUUID(uuid);
+        if(target==null || target.isInvisible() || Minecraft.getInstance().player.distanceToSqr(target)>64*64)return;
+        int age=(int)attack.age(0);
+        if(age<39||age>=62)return;
+        var mark=PRESSURE.computeIfAbsent(boss,b->new PressureMark());
+        if(mark.sequence!=attack.sequence()){mark.sequence=attack.sequence();mark.beat=0;mark.burst=false;}
+        mark.shell=GoddessBubbleRenderer.shape(boss,0);
+        int beat=age<42?0:age<46?1:age<49?2:3;
+        boolean burst=attack.bled() && !mark.burst;
+        if(!burst && (beat<=mark.beat || age>=52))return;
+        mark.beat=beat;mark.burst|=burst;
+        var pose=com.codex.blacklight.client.animation.GoddessPressurePose.sample(attack,0);
+        var chest=com.codex.blacklight.client.animation.GoddessPressurePose.contact(target,pose,"Chest",attack.captureYaw(),0);
+        var left=com.codex.blacklight.client.animation.GoddessPressurePose.contact(target,pose,"Arm_L",attack.captureYaw(),0);
+        var right=com.codex.blacklight.client.animation.GoddessPressurePose.contact(target,pose,"Arm_R",attack.captureYaw(),0);
+        var lateral=right.subtract(left).normalize();
+        var front=lateral.cross(new Vec3(0,1,0)).normalize().scale(-1);
+        var random=net.minecraft.util.RandomSource.create(boss.getId()*37L+mark.sequence*73L+beat);
+        int count=burst?22:3;
+        for(int i=0;i<count;i++){
+            boolean shoulder=(i&1)==0;
+            var normal=(shoulder?lateral.scale(-1):lateral).add(front.scale(.45+random.nextDouble()*.6)).normalize();
+            var point=(shoulder?left:chest.add(lateral.scale(.17))).add(normal.scale(.08)).add(0,random.nextDouble()*.13-.065,0);
+            var speed=burst?.24+.21*random.nextDouble():.032+.047*random.nextDouble();
+            var velocity=normal.scale(speed).add((random.nextDouble()-.5)*speed*.85,
+                    burst?(random.nextDouble()-.18)*.32:-.008,(random.nextDouble()-.5)*speed*.85);
+            var drop=new Drop(point,velocity,(burst?.030F:.023F)+.023F*random.nextFloat(),127+random.nextInt(69));
+            drop.pressure=boss;drop.cast=mark.sequence;
+            if(DROPS.size()>=MAX_DROPS)DROPS.remove(0);
+            DROPS.add(drop);
+        }
+    }
     private static final class Drop {
+        com.codex.blacklight.entity.EncounterMob pressure;
+        int cast;boolean sliding;
         Vec3 pos,old,velocity;final float radius;final int red;int age;
         Drop(Vec3 point,Vec3 velocity,float radius,int red){pos=old=point;this.velocity=velocity;this.radius=radius;this.red=red;}
         boolean tick(){
             old=pos;age++;if(age>32||!scene.hasChunkAt(BlockPos.containing(pos)))return false;
             boolean water=!scene.getFluidState(BlockPos.containing(pos)).isEmpty();
             velocity=velocity.scale(water?.65:.97).add(0,water?-.004:-.033,0);
+            if(pressure!=null){
+                var mark=PRESSURE.get(pressure);
+                if(mark==null||mark.sequence!=cast||mark.shell.rupture()>.4F||pressure.isRemoved()){
+                    pressure=null;sliding=false;
+                }else{
+                    var next=pos.add(velocity);
+                    var skin=mark.shell.inside(next);
+                    if(next.distanceToSqr(skin)>.000005 || sliding){
+                        // Stay on the inner film, slip down tangentially, fall free when the film tears.
+                        var radial=skin.subtract(mark.shell.center()).normalize();
+                        var tangent=new Vec3(0,-.051,0).add(radial.scale(.051*radial.y));
+                        Vec3 trial=skin.add(tangent);
+                        if(sliding)trial=trial.add(radial.scale(.075));
+                        var to=mark.shell.inside(trial);
+                        velocity=to.subtract(pos);sliding=true;
+                    }
+                }
+            }
             var hit=scene.clip(new ClipContext(pos,pos.add(velocity),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,(net.minecraft.world.entity.Entity)null));
             if(hit.getType()==HitResult.Type.BLOCK){
                 if(!water&&velocity.lengthSqr()>.0003)splat(hit,radius*(2.8F+(float)Math.min(2,velocity.length()*5)),red,velocity);

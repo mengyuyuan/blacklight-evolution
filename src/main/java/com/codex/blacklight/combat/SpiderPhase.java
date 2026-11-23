@@ -37,7 +37,8 @@ public final class SpiderPhase {
     public void synchronizeShellHealth(){
         var scale=boss.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
         float previous=boss.getMaxHealth(),health=boss.getHealth();
-        double bonus=first()?FULL_HEALTH/com.codex.blacklight.power.CombatScale.UNITS-boss.kind().health:0;
+        float desired=first()?FULL_HEALTH:boss.goddess.active()?GoddessVitals.FULL:0;
+        double bonus=desired==0?0:desired/com.codex.blacklight.power.CombatScale.UNITS-boss.kind().health;
         if(com.codex.blacklight.power.CombatScale.modifier(scale,SHELL_HEALTH,bonus,
                 net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION)){
             com.codex.blacklight.power.CombatScale.preserveHealthFraction(boss,previous,health);

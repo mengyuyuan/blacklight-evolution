@@ -3,6 +3,8 @@
   "values": [
     "blacklight:hive_tendril",
     "blacklight:greene_tendril_pod",
+    "blacklight:greene_spine_cannon",
+    "blacklight:greene_ground_wrist",
     "blacklight:recon_uav",
     "blacklight:biomass_husk"
   ]

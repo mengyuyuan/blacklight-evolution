@@ -24,6 +24,18 @@ public final class ModInfectedSounds {
     static {for(String suffix:java.util.List.of("summons","pierce","drain","weave","split","ascend")){
         String id="greene.molt."+suffix;MOLT.add(SOUNDS.register(id,()->SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id))));
     }}
+    public enum Pressure { STRAIN, BURST, ECHO }
+    private static final Map<Pressure,Supplier<SoundEvent>> PRESSURE=new EnumMap<>(Pressure.class);
+    static {
+        for(var cue:Pressure.values()){
+            String id="greene.pressure."+cue.name().toLowerCase(Locale.ROOT);
+            PRESSURE.put(cue,SOUNDS.register(id,()->{
+                var location=new ResourceLocation("blacklight",id);
+                return cue==Pressure.ECHO?SoundEvent.createFixedRangeEvent(location,80F):SoundEvent.createVariableRangeEvent(location);
+            }));
+        }
+    }
+    public static SoundEvent pressure(Pressure cue){return PRESSURE.get(cue).get();}
     public static SoundEvent molt(int cue){return MOLT.get(cue).get();}
     private static final Map<com.codex.blacklight.combat.SpiderFoley.Cue,Supplier<SoundEvent>> SPIDER =
             new EnumMap<>(com.codex.blacklight.combat.SpiderFoley.Cue.class);

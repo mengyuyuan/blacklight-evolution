@@ -41,6 +41,7 @@ public final class ThrownBlock extends Projectile {
     public int holderId(){return entityData.get(HOLDER);}
     public void arm(){armed=true;}
     public boolean throwing(){return entityData.get(THROWING);}
+    public boolean chargedImpact(){return chargeSnapshot >= BlockThrowTuning.MAX_CHARGE_TICKS * .75F;}
     public int chargeTicks(){return entityData.get(CHARGE);}
     private boolean validHolder(ServerPlayer p){return !level().isClientSide&&holderId()==p.getId()&&getOwner()==p&&p.level()==level()&&BlockThrowSystem.canUse(p);}
     public void setCargo(BlockThrowCargo cargo){entityData.set(CARGO,cargo.save());entityData.set(TWO,cargo.twoHanded());}
@@ -207,7 +208,10 @@ public final class ThrownBlock extends Projectile {
             if(victim!=null&&victim.getEntity() instanceof LivingEntity target&&allowed(target)){
                 if(BlockThrowCollision.hurt(victim,damageSources().thrown(this,getOwner()),impactDamage)){
                     var push=velocity.normalize().scale(impactKnockback);
-                    target.push(push.x,Math.min(.65,.2+impactKnockback*.15),push.z);target.hurtMarked=true;
+                    if(!(target instanceof EncounterMob mother && mother.goddess.active())){
+                        target.push(push.x,Math.min(.65,.2+impactKnockback*.15),push.z);
+                        target.hurtMarked=true;
+                    }
                     com.codex.blacklight.combat.WeaponImpact.contact(getOwner() instanceof net.minecraft.server.level.ServerPlayer owner?owner:null,target,
                             impactDamage>=20?com.codex.blacklight.combat.ImpactTier.FINISHER:com.codex.blacklight.combat.ImpactTier.HEAVY,true,
                             com.codex.blacklight.network.PhysicalFeedbackPayload.Effect.CLAW_HEAVY);
@@ -239,6 +243,6 @@ public final class ThrownBlock extends Projectile {
     @Override protected boolean canHitEntity(Entity e){
         if(e instanceof BlackwatchHelicopter craft)return craft.health()>0&&super.canHitEntity(e)&&getOwner()!=null&&craft!=getOwner().getRootVehicle();
         var living=CombatTargeting.resolveTarget(e);return living!=null&&super.canHitEntity(e)&&living!=getOwner()&&allowed(living);}
-    @Override protected void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.put("Block",NbtUtils.writeBlockState(block()));tag.putBoolean("Armed",armed);tag.putBoolean("Recover",settled||holderId()>=0);tag.putInt("Age",age);tag.putFloat("Damage",impactDamage);tag.putBoolean("TwoHanded",twoHanded());tag.put("Cargo",cargo().save());tag.putInt("Recovered",recoveryIndex);tag.putDouble("Knockback",impactKnockback);}
-    @Override protected void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(BLOCK,NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag.getCompound("Block")));setCargo(BlockThrowCargo.load(level(),tag.getCompound("Cargo"),block()));recoveryIndex=Math.max(0,Math.min(cargo().cells().size(),tag.getInt("Recovered")));armed=tag.getBoolean("Armed");settled=tag.getBoolean("Recover");entityData.set(SETTLED,settled);age=tag.getInt("Age");float savedDamage=tag.getFloat("Damage");impactDamage=Float.isFinite(savedDamage)?Math.max(0,Math.min(100,savedDamage)):0;double savedKnockback=tag.getDouble("Knockback");impactKnockback=Double.isFinite(savedKnockback)?Math.max(0,Math.min(4,savedKnockback)):0;}
+    @Override protected void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.put("Block",NbtUtils.writeBlockState(block()));tag.putBoolean("Armed",armed);tag.putBoolean("Recover",settled||holderId()>=0);tag.putInt("Age",age);tag.putInt("ImpactCharge",chargeSnapshot);tag.putFloat("Damage",impactDamage);tag.putBoolean("TwoHanded",twoHanded());tag.put("Cargo",cargo().save());tag.putInt("Recovered",recoveryIndex);tag.putDouble("Knockback",impactKnockback);}
+    @Override protected void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(BLOCK,NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag.getCompound("Block")));setCargo(BlockThrowCargo.load(level(),tag.getCompound("Cargo"),block()));recoveryIndex=Math.max(0,Math.min(cargo().cells().size(),tag.getInt("Recovered")));armed=tag.getBoolean("Armed");settled=tag.getBoolean("Recover");entityData.set(SETTLED,settled);age=tag.getInt("Age");chargeSnapshot=Math.max(0, Math.min(BlockThrowTuning.MAX_CHARGE_TICKS,tag.getInt("ImpactCharge")));float savedDamage=tag.getFloat("Damage");impactDamage=Float.isFinite(savedDamage)?Math.max(0,Math.min(100,savedDamage)):0;double savedKnockback=tag.getDouble("Knockback");impactKnockback=Double.isFinite(savedKnockback)?Math.max(0,Math.min(4,savedKnockback)):0;}
 }

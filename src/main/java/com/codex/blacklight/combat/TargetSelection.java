@@ -25,7 +25,7 @@ public record TargetSelection(Entity target,int region) {
             return new TargetSelection(part.getParent(),subtarget==null?-1:subtarget.ordinal());
         }
         if(entity instanceof GreenePart part&&part.getParent().kind()==EncounterKind.ELIZABETH_GREENE)
-            return new TargetSelection(part.getParent(),part.getParent().spider.first()||part.slot<3?part.slot:-1);
+            return new TargetSelection(part.getParent(),part.getParent().goddess.active()||part.getParent().spider.first()||part.slot<3?part.slot:-1);
         return new TargetSelection(ExplicitTarget.resolve(entity),-1);
     }
     /** The vanilla crosshair only picks entities within interaction reach.
@@ -48,7 +48,7 @@ public record TargetSelection(Entity target,int region) {
             if(distance>=closest || !CombatTargeting.clearRay(player,from,hit.point()))continue;
             int slot;
             if(mob.kind()==EncounterKind.ELIZABETH_GREENE){
-                slot=mob.spider.first()?SpiderAnatomy.NAMES.indexOf(hit.bone()):hit.bone().startsWith("weak_")?Integer.parseInt(hit.bone().substring(5)):-1;
+                slot=mob.goddess.active()?GoddessRig.PARTS.indexOf(hit.bone()):mob.spider.first()?SpiderAnatomy.NAMES.indexOf(hit.bone()):hit.bone().startsWith("weak_")?Integer.parseInt(hit.bone().substring(5)):-1;
             }else{
                 var part=GoliathLockPart.forSkin(hit.bone());
                 slot=part==null?-1:part.ordinal();
@@ -80,6 +80,7 @@ public record TargetSelection(Entity target,int region) {
             var part=goliathPart();
             return part!=null && part.available(boss);
         }
+        if(boss.goddess.active())return region>=0 && region<GoddessRig.PARTS.size() && !boxes().isEmpty();
         if(boss.spider.first())return boss.spider.live() && region>=0 && region<SpiderAnatomy.NAMES.size() && !boxes().isEmpty();
         return region>=-1&&region<3&&boss.greeneBattle().targetable()
                 &&(region<0?boss.greeneBattle().coreDamageable():!boss.broken(region))
@@ -87,7 +88,7 @@ public record TargetSelection(Entity target,int region) {
     }
     public static List<TargetSelection> choices(Player player,Entity entity){
         var result=new ArrayList<TargetSelection>();var whole=new TargetSelection(entity,-1);
-        int count=entity instanceof EncounterMob boss && boss.spider.first()?SpiderAnatomy.NAMES.size():3;
+        int count=entity instanceof EncounterMob boss && boss.spider.first()?SpiderAnatomy.NAMES.size():entity instanceof EncounterMob goddess && goddess.goddess.active()?GoddessRig.PARTS.size():3;
         if(whole.regional())for(int i=0;i<count;i++){var part=new TargetSelection(entity,i);if(part.selectable(player))result.add(part);}
         if(whole.selectable(player))result.add(whole);
         return List.copyOf(result);
@@ -105,6 +106,7 @@ public record TargetSelection(Entity target,int region) {
             return part==null || !part.available((EncounterMob)target) ? List.of()
                     : GoliathContact.lockSurface((EncounterMob)target,part,0).boxes();
         }
+        if(((EncounterMob)target).goddess.active())return region>=0 && region<GoddessRig.PARTS.size()?((EncounterMob)target).hurtRegions(0).get(region).boxes():List.of();
         if(((EncounterMob)target).spider.first())return region>=0 && region<SpiderAnatomy.NAMES.size()?((EncounterMob)target).hurtRegions(0).get(region).boxes():List.of();
         var result=new ArrayList<HydraContact.Box>();
         for(var surface:((EncounterMob)target).hurtRegions(0)){
@@ -171,6 +173,7 @@ public record TargetSelection(Entity target,int region) {
         return points(player).stream().anyMatch(p->player.getEyePosition().distanceToSqr(p)<=range*range+1e-6);
     }
     public String label(){
+        if(target instanceof EncounterMob m && m.goddess.active() && region>=0 && region<GoddessRig.PARTS.size())return net.minecraft.network.chat.Component.translatable("part.blacklight."+GoddessRig.PARTS.get(region)).getString();
         if(target instanceof EncounterMob boss && boss.spider.first() && region>=0 && region<SpiderAnatomy.NAMES.size())return net.minecraft.network.chat.Component.translatable(SpiderAnatomy.label(region)).getString()
             +(SpiderAnatomy.tendon(region)?net.minecraft.network.chat.Component.translatable("boss.blacklight.greene_spider."+
               (boss.spider.exposedTendon(SpiderAnatomy.legForRegion(region))?"exposed_tendon":"covered_tendon")).getString():"")

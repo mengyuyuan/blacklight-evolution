@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-54-consume-contact";
+    private static final String PROTOCOL = "forge-1.20.1-55-goddess";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -92,7 +92,7 @@ public final class ModNetwork {
                 .playToServer(WeaponInputPayload.class,WeaponInputPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            if(payload.cancelled())com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
+                            if(payload.cancelled() || com.codex.blacklight.combat.GoddessStruggle.controlling(player))com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
                             else com.codex.blacklight.combat.WeaponCombatSystem.acceptInput(player,payload.attack(),payload.special(),payload.action(),payload.jump());
                         }
                     }))
@@ -159,11 +159,16 @@ public final class ModNetwork {
                     context.enqueueWork(() -> com.codex.blacklight.forge.ClientAttachmentSync.accept(payload));
                 })
                 .playToClient(ManualPagesPayload.class,ManualPagesPayload.STREAM_CODEC,(msg,ctx)->ctx.enqueueWork(()->com.codex.blacklight.client.ManualReader.open(msg)))
-                .playToClient(GreeneSignalPayload.class,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())));
+                .playToClient(GreeneSignalPayload.class,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())))
+                .playToServer(GoddessStrugglePayload.class,GoddessStrugglePayload.STREAM_CODEC,(payload,context)->
+                    context.enqueueWork(()->{
+                        if(context.player() instanceof ServerPlayer p)
+                            com.codex.blacklight.combat.GoddessStruggle.input(p,payload.entityId(),payload.sequence(),payload.controls());
+                    }));
     }
 
     private static boolean canAct(ServerPlayer player) {
-        return player != null && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
+        return player != null && !com.codex.blacklight.combat.GoddessStruggle.controlling(player) && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
     }
 
     @SubscribeEvent

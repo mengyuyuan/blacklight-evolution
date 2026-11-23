@@ -33,4 +33,17 @@ class MapResourcesTest {
         assertFalse(MapResources.supported("/assets/secret.gz"));assertFalse(MapResources.supported("/data/blacklight/worldmap/../other.gz"));
         assertThrows(IllegalArgumentException.class,()->MapResources.compactName("/assets/secret.gz"));
     }
+    @Test void FilteredTilePreservesCoordinateSpellingAndHonorsDecodeBudget() throws Exception {
+        byte[] expected = "[1.0,-0.1,1.1,-0.2]".getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+        var bytes = new ByteArrayOutputStream();
+        var out = new DataOutputStream(bytes);
+        out.writeInt(AtlasTileCodec.MAGIC);
+        out.writeInt(expected.length);
+        out.writeInt(1);
+        out.write(new byte[] {AtlasTileCodec.COORDINATES, 4, 20, 1, 2, 1});
+        byte[] tile = bytes.toByteArray(), compact = xz(tile);
+        assertArrayEquals(expected, MapResources.read(NAME, n -> new ByteArrayInputStream(compact)));
+        assertThrows(IOException.class, () -> AtlasTileCodec.restore(tile, expected.length - 1));
+        assertThrows(IOException.class, () -> AtlasTileCodec.restore(Arrays.copyOf(tile, tile.length - 1), expected.length));
+    }
 }

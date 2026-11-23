@@ -72,6 +72,7 @@ public final class BackspineCombat {
     }
     public static void cancel(ServerPlayer p){
         STATES.remove(p);
+        if(!ModAttachments.available(p))return;
         syncAim(p,null);
         if(ModAttachments.getData(p,ModAttachments.PLAYER_ACTION).clipId().startsWith("spines_"))NativePlayerActionBackend.clear(p);
     }

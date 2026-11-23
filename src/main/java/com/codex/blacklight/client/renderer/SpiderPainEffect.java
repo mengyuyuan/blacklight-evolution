@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 
 /** Refract the rendered world inside the visible volume of each mouth blast. */
 public final class SpiderPainEffect {
-    private record Pulse(Vec3 start, Vec3 end, float radius, float strength, float age) {}
+    private record Pulse(Vec3 start, Vec3 end, float radius, float strength, float age, GoddessBubbleRenderer.Shell shell) {}
     private static final LinkedHashMap<Integer,Pulse> pending = new LinkedHashMap<>();
     private static PostChain chain;
     private static RenderTarget depth;
@@ -39,7 +39,17 @@ public final class SpiderPainEffect {
         float radius = charge ? 2.0F * opening : (float)lane.radius() * 1.32F;
         if (radius < .02F) return;
         Vec3 end = charge ? lane.mouth() : lane.end();
-        pending.put(boss.getId(), new Pulse(lane.mouth(), end, radius, opening * (charge ? .78F : 1F), age));
+        pending.put(boss.getId(), new Pulse(lane.mouth(), end, radius, opening * (charge ? .78F : 1F), age,null));
+    }
+
+    static void shell(int id,GoddessBubbleRenderer.Shell shape,float strength,float age){
+        lastVisible=System.nanoTime();
+        float bound=(float)Math.max(shape.axes().x,Math.max(shape.axes().y,shape.axes().z))*1.40F;
+        pending.put(id,new Pulse(shape.center(),shape.eye(),bound,strength,age,shape));
+    }
+
+    private static void vector(String name,Vector3f v){
+        uniform(name+"X",v.x);uniform(name+"Y",v.y);uniform(name+"Z",v.z);
     }
 
     public static void reset() {
@@ -57,6 +67,10 @@ public final class SpiderPainEffect {
     }
 
     public static void finishFrame(Matrix4f view, Matrix4f projection, Vec3 camera, float partial) {
+        // The camera may see the trapped player while Greene herself is outside its frustum.
+        var level=Minecraft.getInstance().level;
+        if(level!=null)for(var entity:level.entitiesForRendering())
+            if(entity instanceof EncounterMob boss && boss.goddess.active())GoddessBubbleRenderer.collect(boss,partial);
         if (pending.isEmpty()) {
             if (lastVisible == 0 || System.nanoTime() - lastVisible > 2_000_000_000L) { release(); return; }
             if (chain != null || failed) return;
@@ -108,6 +122,18 @@ public final class SpiderPainEffect {
             for (var pulse : pulses) {
                 var start = toView(pulse.start(), camera, view);
                 var end = toView(pulse.end(), camera, view);
+                var shell=pulse.shell();
+                uniform("Inward",shell==null?0F:1F);
+                if(shell!=null){
+                    vector("Axis",shell.axes().toVector3f());
+                    vector("Right",view.transformDirection(shell.right().toVector3f()));
+                    vector("Up",view.transformDirection(new Vector3f(0,1,0)));
+                    vector("PalmR",view.transformDirection(shell.palmR().toVector3f()));
+                    vector("PalmL",view.transformDirection(shell.palmL().toVector3f()));
+                    vector("Knee",view.transformDirection(shell.knee().toVector3f()));
+                    vector("Shoulder",view.transformDirection(shell.shoulder().toVector3f()));
+                    uniform("Contact",shell.contact());uniform("Fracture",shell.rupture());
+                }
                 uniform("Ax", start.x); uniform("Ay", start.y); uniform("Az", start.z);
                 uniform("Bx", end.x); uniform("By", end.y); uniform("Bz", end.z);
                 uniform("Radius", pulse.radius()); uniform("Strength", pulse.strength()); uniform("Age", pulse.age());

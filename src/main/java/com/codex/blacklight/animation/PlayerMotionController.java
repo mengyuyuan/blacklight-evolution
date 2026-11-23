@@ -47,6 +47,7 @@ public final class PlayerMotionController {
         long revision = -1, suppressedRevision = -1;
         long anchorRevision = Long.MIN_VALUE, anchorStarted; double anchorBias, anchorLast; long anchorNanos;
         float previousSpineStride, spineStride;
+        float previousGroundLook, groundLook;
         String locomotion;
         LocomotionPhase phase;
         long diagnosticsAt=Long.MIN_VALUE;
@@ -250,6 +251,12 @@ public final class PlayerMotionController {
         if(!available(entity))return new BlacklightPose();
         return locomotion(entity,state(entity),now(entity,partial),partial);
     }
+    /** Fade the neck constraint when feet lift or land, including externally forced hops. */
+    public static float groundLook(LivingEntity entity,float partial) {
+        var runtime=STATES.get(entity);
+        if(runtime==null || runtime.gait.key()==null)return entity.onGround()?1F:0F;
+        return net.minecraft.util.Mth.lerp(partial,runtime.previousGroundLook,runtime.groundLook);
+    }
     public static float facing(LivingEntity entity,float partial) {
         if(!available(entity))return entity==null?0:net.minecraft.util.Mth.rotLerp(partial,entity.yBodyRotO,entity.yBodyRot);
         var facing=state(entity).facing;
@@ -403,6 +410,9 @@ public final class PlayerMotionController {
         if(runtime.gait.key()!=null&&tick<=runtime.gait.tick())return;
         runtime.charge.commit(entity==Minecraft.getInstance().player?ClientMovementEvents.visualJumpCharge()
                 :com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.JUMP_CHARGE),MovementTuningSettings.jumpChargeTicks());
+        float groundLook=entity.onGround()?1F:0F;
+        runtime.previousGroundLook=runtime.gait.key()==null?groundLook:runtime.groundLook;
+        runtime.groundLook=net.minecraft.util.Mth.approach(runtime.previousGroundLook,groundLook,.22F);
         var previous=runtime.last;
         var velocity=entity.getDeltaMovement();
         var travel=runtime.committedPosition==null?net.minecraft.world.phys.Vec3.ZERO:entity.position().subtract(runtime.committedPosition);
