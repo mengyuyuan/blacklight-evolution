@@ -4,6 +4,7 @@ import com.codex.blacklight.animation.ScapulaVolley;
 import com.codex.blacklight.combat.BackspineCombat;
 import com.codex.blacklight.combat.HeavyBlow;
 import com.codex.blacklight.power.CombatSkill;
+import com.codex.blacklight.power.CombatScale;
 import com.codex.blacklight.registry.ModAttachments;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public final class CombatFeedbackContactGameTest {
             var victim = h.spawn(EntityType.IRON_GOLEM, 2 + i * 2, 10, 7);
             victim.setNoAi(true);
             victim.setNoGravity(true);
+            MovingCombatGameTest.prepareDamageTarget(victim);
             victims[i] = victim;
         }
         for (int slot = -pairs; slot <= pairs; slot++) {
@@ -55,7 +57,7 @@ public final class CombatFeedbackContactGameTest {
         h.runAfterDelay(12, () -> {
             for (int i = 0; i < victims.length; i++) {
                 var victim = victims[i];
-                float expected = spread ? ScapulaVolley.damage(total, i - pairs, pairs) : total;
+                float expected = (spread ? ScapulaVolley.damage(total, i - pairs, pairs) : total) * CombatScale.UNITS;
                 float lost = victim.getMaxHealth() - victim.getHealth();
                 h.assertTrue(Math.abs(lost - expected) < .001F, "target " + i + " expected " + expected + " lost " + lost);
                 victim.discard();
@@ -71,7 +73,7 @@ public final class CombatFeedbackContactGameTest {
             for (int y = 9; y < 14; y++) h.setBlock(x, y, 5, Blocks.IRON_BLOCK);
         var body = h.spawn(EntityType.PIG, 3, 10, 3);
         body.setNoGravity(true);
-        float start = body.getHealth();
+        float start = MovingCombatGameTest.prepareDamageTarget(body);
         h.assertTrue(HeavyBlow.apply(attacker, body, WeaponMove.HAMMER_HOOK, ImpactTier.HEAVY, 0,
                 new Vec3(0, 0, 1), true), "the authored hook must put a small body in flight");
         h.runAfterDelay(12, () -> {

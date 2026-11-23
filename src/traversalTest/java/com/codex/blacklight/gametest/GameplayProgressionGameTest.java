@@ -34,13 +34,13 @@ public final class GameplayProgressionGameTest {
         p.setPos(h.absoluteVec(new Vec3(4,8,4)));p.setYRot(0);p.setOnGround(false);p.tickCount=100;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);state.unlock(PowerForm.HAMMERFISTS);state.activate(PowerForm.HAMMERFISTS);
         for(int x=1;x<10;x++)for(int z=1;z<10;z++)h.setBlock(x,1,z,Blocks.STONE);
-        var mob=h.spawn(EntityType.IRON_GOLEM,4,2,6);mob.setNoAi(true);float hp=mob.getHealth();
+        var mob=h.spawn(EntityType.IRON_GOLEM,4,2,6);mob.setNoAi(true);float hp=MovingCombatGameTest.prepareDamageTarget(mob);
         WeaponCombatSystem.request(p,true);
         for(int t=0;t<35;t++){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
         h.assertTrue(WeaponCombatSystem.busy(p)&&mob.getHealth()==hp,"long descent stays committed without early damage");
         p.setPos(h.absoluteVec(new Vec3(4,2,4)));p.setOnGround(true);
         for(int t=0;t<WeaponMove.HAMMER_DROP.duration+2;t++){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
-        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage,"landing contacts exactly once");
+        h.assertTrue(mob.getHealth()==hp-WeaponMove.HAMMER_DROP.damage*com.codex.blacklight.power.CombatScale.UNITS,"landing contacts exactly once");
         h.assertTrue(!WeaponCombatSystem.busy(p),"landing recovery ends");mob.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)
