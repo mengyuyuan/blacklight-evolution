@@ -26,6 +26,7 @@ public final class GoddessAttacks {
     private final EncounterMob boss;
     private final GoddessSceneClock scene = new GoddessSceneClock();
     private Move move=Move.REST;
+    private static final int GAZE_INHALE_TICKS = 12;
     private int elapsed, sequence, groups, order;
     private UUID target;
     private Vec3 center=Vec3.ZERO;
@@ -39,7 +40,13 @@ public final class GoddessAttacks {
 
     private CompoundTag client(){return boss.goddessData().getCompound("Offense");}
     public Move move(){return boss.level().isClientSide?decode(client()):move;}
-    public float age(float partial){return boss.level().isClientSide?scene.age(boss.tickCount,partial):elapsed+partial;}
+    public float age(float partial){
+        float physical = boss.level().isClientSide ? scene.age(boss.tickCount,partial) : elapsed+partial;
+        if(move()!=Move.VACUOLE)return physical;
+        // Stretch just the first half of the look-up. Subsequent camera, grab, impact and
+        // release frames keep their authored spacing, using the same positive server clock.
+        return physical<2*GAZE_INHALE_TICKS ? physical*.5F : physical-GAZE_INHALE_TICKS;
+    }
     void receiveTimeline(CompoundTag data, long observed) {
         scene.synchronize(data.getInt("Sequence"),decode(data).ordinal(),data.getLong("Start"),observed,boss.tickCount);
         struggle.receiveTimeline(data.getCompound("Struggle"),observed);
@@ -190,7 +197,7 @@ public final class GoddessAttacks {
             case RUSH -> elapsed>=12 && elapsed<=26 || rush.grip()<0 && elapsed>=43 && elapsed<60 ? (rush.arm()==1?5:9) : -1;
             case HAND -> elapsed>=5 && elapsed<=34 ? wrist : -1;
             // A fully charged rock needs about 20 ticks to leave the hand and reach her face from the cave floor.
-            case VACUOLE -> elapsed>=1 && elapsed<28 ? 0 : -1;
+            case VACUOLE -> elapsed>=1 && elapsed<GAZE_INHALE_TICKS+28 ? 0 : -1;
             case NEEDLE_RAIN -> elapsed>=4 && elapsed<=35 ? 11 : -1;
             case BLOOD_SURF -> elapsed<=12 || elapsed>=22 && elapsed<=38 ? (wrist>=0?wrist:1) : -1;
             case CALL, STRONG_CALL, WALL_SPEARS -> elapsed>=12 && elapsed<=32 ? (wrist>=0?wrist:1) : -1;
@@ -241,16 +248,17 @@ public final class GoddessAttacks {
         player.fallDistance=0;
     }
     private void bubble(ServerLevel level,ServerPlayer p){
-        if(elapsed<=20){
+        int phase=elapsed-GAZE_INHALE_TICKS;
+        if(phase<=20){
             if(!clear(eyes(),p.getEyePosition())){abandonMove();return;}
             center=p.getBoundingBox().getCenter();
             boss.getLookControl().setLookAt(p,18,12);
-            if(elapsed%3==0 || elapsed==20)send();
-            if(elapsed==20){
+            if(phase%3==0 || phase==20)send();
+            if(phase==20){
                 SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.STRAIN,3.8F);
                 SpiderFoley.play(boss,center,SpiderFoley.Cue.LOAD,1.15F);
             }
-        } else if(elapsed==28){
+        } else if(phase==28){
             Vec3 nearest=new Vec3(Math.max(p.getBoundingBox().minX,Math.min(center.x,p.getBoundingBox().maxX)),
                     Math.max(p.getBoundingBox().minY,Math.min(center.y,p.getBoundingBox().maxY)),
                     Math.max(p.getBoundingBox().minZ,Math.min(center.z,p.getBoundingBox().maxZ)));
@@ -270,13 +278,13 @@ public final class GoddessAttacks {
             }
             send();
         }
-        if(caught && elapsed>=28 && elapsed<52){
+        if(caught && phase>=28 && phase<52){
             moveInsideBubble(p);
             GoddessHeldMovement.commit(p,boss);
             if(grounded)pullDebris(level);
         }
-        if(elapsed==34 && caught)sound(level,center,com.codex.blacklight.registry.ModInfectedSounds.Pressure.STRAIN,.75F);
-        if(elapsed==52 && caught && !paid){
+        if(phase==34 && caught)sound(level,center,com.codex.blacklight.registry.ModInfectedSounds.Pressure.STRAIN,.75F);
+        if(phase==52 && caught && !paid){
             GoddessHeldMovement.release(p,boss);
             paid=true;
             float before=p.getHealth();
@@ -287,11 +295,11 @@ public final class GoddessAttacks {
             if(grounded)burstDust(level);
             send();
         }
-        if(elapsed==55 && caught && paid){
+        if(phase==55 && caught && paid){
             var wall=reflector(level);
             if(wall!=null)sound(level,wall,com.codex.blacklight.registry.ModInfectedSounds.Pressure.ECHO,1.0F);
         }
-        if(elapsed>=(caught?62:34))finish();
+        if(phase>=(caught?62:34))finish();
     }
     private void drawGround(ServerLevel level,ServerPlayer p){
         if(!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
@@ -354,7 +362,7 @@ public final class GoddessAttacks {
         }
     }
     public CompoundTag save(){
-        var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putInt("Age",elapsed);t.putLong("Start",boss.level().getGameTime()-elapsed);
+        var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putInt("Age",elapsed);if(move==Move.VACUOLE)t.putBoolean("GazeInhale",true);t.putLong("Start",boss.level().getGameTime()-elapsed);
         brood.saveCall(t);t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
@@ -372,7 +380,9 @@ public final class GoddessAttacks {
         entry=new Vec3(t.getDouble("EntryX"),t.contains("EntryY")?t.getDouble("EntryY"):-.9,t.getDouble("EntryZ"));
         impulse=new Vec3(t.getDouble("PushX"),0,t.getDouble("PushZ"));
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));
-        move=decode(t);elapsed=Math.max(0,t.getInt("Age"));sequence=t.getInt("Sequence");groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));
+        move=decode(t);elapsed=Math.max(0,t.getInt("Age"));
+        if(move==Move.VACUOLE && elapsed>0 && !t.getBoolean("GazeInhale"))elapsed+=GAZE_INHALE_TICKS;
+        sequence=t.getInt("Sequence");groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));
         caught=t.getBoolean("Caught");grounded=t.getBoolean("Ground");paid=t.getBoolean("Paid");bled=t.getBoolean("Bled");center=readCenter(t);target=t.hasUUID("Target")?t.getUUID("Target"):null;
         if(move==Move.STRUGGLE){move=Move.REST;target=null;elapsed=0;sequence++;hand.cancel();}
     }
