@@ -31,7 +31,7 @@ public final class GoddessExecutionCamera {
         return active();
     }
     private static EncounterMob framed;
-    private static Vec3 focus,axis;
+    private static Vec3 focus,axis,viewEye;
     private static double distance;
     private static float lastAge;
     private static int stage=-1;
@@ -94,6 +94,22 @@ public final class GoddessExecutionCamera {
         var hit=mc.level.clip(new ClipContext(at,at.add(forward.scale(wanted)),ClipContext.Block.VISUAL,ClipContext.Fluid.NONE,mc.player));
         return hit.getType()==HitResult.Type.MISS?wanted:Math.max(.32,at.distanceTo(hit.getLocation())-.24);
     }
+    private static boolean lensClear(Minecraft mc,Vec3 point){
+        var box=new AABB(point.x-.22,point.y-.22,point.z-.22,point.x+.22,point.y+.22,point.z+.22);
+        return !mc.level.getBlockCollisions(mc.player,box).iterator().hasNext();
+    }
+    private static Vec3 clearLens(Minecraft mc,Vec3 at,Vec3 axis,double distance){
+        var eye=at.add(axis.scale(distance));
+        if(lensClear(mc,eye))return eye;
+        // A ledge between subject and camera can cover an ankle; it must never pull a distant lens to the ground.
+        for(double up=.4;up<=2.81;up+=.4){
+            var lifted=eye.add(0,up,0);if(lensClear(mc,lifted))return lifted;
+        }
+        for(double d=distance-.6;d>=2.4;d-=.6){
+            var inside=at.add(axis.scale(d));if(lensClear(mc,inside))return inside;
+        }
+        return viewEye;
+    }
     public static double verticalFov(){return fov;}
     public static void apply(Camera camera,float partial){
         var mc=Minecraft.getInstance();
@@ -109,7 +125,7 @@ public final class GoddessExecutionCamera {
         int start=GoddessRig.flowStart(part);
         double flow=Math.max(0,Math.min(1,(frame-start)/(GoddessRig.flowEnd(part)-start)));
         double close=ease((flow-.25)/.69);
-        boolean entering=actor!=framed || part!=stage || t<lastAge-.75F;
+        boolean entering=actor!=framed || part!=stage;
         if(entering){side=0;fullSize=null;}
         axis=direction(part,root,side,close);
         var origin=actor.getPosition(partial);
@@ -125,13 +141,13 @@ public final class GoddessExecutionCamera {
         var target=shot.focus();double wanted=shot.distance();
         if(entering){
             framed=actor;stage=part;focus=target;
-            double room=clearDistance(mc,focus,axis,wanted);
+            double room=clearDistance(mc,right,axis,wanted);
             if(room<wanted*.65)for(double extra:new double[]{-18,18,-32,32}){
                 var other=direction(part,root,extra,close);
-                double open=clearDistance(mc,focus,other,wanted);
+                double open=clearDistance(mc,right,other,wanted);
                 if(open>room+.4){axis=other;side=extra;room=open;}
             }
-            distance=Math.min(wanted,room);lastAge=t;
+            distance=wanted;lastAge=t;viewEye=null;
         }
         double dt=Math.max(0,t-lastAge);lastAge=Math.max(t,lastAge);
         double follow=1-Math.exp(-.50*dt);
@@ -139,10 +155,26 @@ public final class GoddessExecutionCamera {
         if(shift.length()>1.1*dt && dt>0)shift=shift.normalize().scale(1.1*dt);
         focus=focus.add(shift);
         distance+=Math.max(-.72*dt,Math.min(.72*dt,(wanted-distance)*follow));
-        distance=Math.min(distance,clearDistance(mc,focus,axis,distance));
-        var eye=focus.add(axis.scale(distance));
-        yaw=(float)Math.toDegrees(Math.atan2(axis.x,-axis.z));
-        pitch=(float)Math.toDegrees(Math.asin(axis.y));
+        var safe=clearLens(mc,focus,axis,distance);
+        if(viewEye==null)viewEye=safe==null?mc.player.getEyePosition(partial):safe;
+        else if(safe!=null && dt>0){
+            var travel=safe.subtract(viewEye);
+            double limit=1.5*dt;
+            if(travel.length()>limit)travel=travel.normalize().scale(limit);
+            var next=viewEye.add(travel);
+            if(lensClear(mc,next))viewEye=next;
+            else{
+                var raised=viewEye.add(0,Math.min(limit,.5*dt),0);
+                if(lensClear(mc,raised))viewEye=raised;
+            }
+        }
+        var eye=viewEye;
+        var look=eye.subtract(focus).normalize();
+        float heading=(float)Math.toDegrees(Math.atan2(look.x,-look.z));
+        float tilt=(float)Math.toDegrees(Math.asin(look.y));
+        float turn=(float)(1.8*dt);
+        yaw=entering?heading:net.minecraft.util.Mth.approachDegrees(yaw,heading,turn);
+        pitch=entering?tilt:net.minecraft.util.Mth.approach(pitch,tilt,turn);
         fov=45;
         var access=(PrototypeCameraAccess)camera;
         access.blacklight$setPosition(eye);access.blacklight$setRotation(yaw,pitch,0);
