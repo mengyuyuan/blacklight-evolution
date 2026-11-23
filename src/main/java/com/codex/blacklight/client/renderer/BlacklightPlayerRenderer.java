@@ -22,7 +22,17 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
     @Override public void render(AbstractClientPlayer player,float yaw,float partial,PoseStack stack,
                                  net.minecraft.client.renderer.MultiBufferSource buffers,int light) {
         try(var scope=NativePlayerRenderScope.enter(player)) {
-            super.render(player,yaw,partial,stack,buffers,light);
+            var boss=com.codex.blacklight.combat.GoddessEncounter.paired(player);
+            if(boss==null){super.render(player,yaw,partial,stack,buffers,light);return;}
+            var delta=boss.goddess.drawnActorOffset(player,partial);
+            stack.pushPose();
+            try{
+                stack.translate(delta.x,delta.y,delta.z);
+                float body=net.minecraft.util.Mth.rotLerp(partial,player.yBodyRotO,player.yBodyRot);
+                float aim=com.codex.blacklight.combat.GoddessActor.yaw(boss,partial);
+                stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(net.minecraft.util.Mth.wrapDegrees(body-aim)));
+                super.render(player,yaw,partial,stack,buffers,light);
+            }finally{stack.popPose();}
         }
     }
     public record RenderedView(com.codex.blacklight.client.animation.FirstPersonPose.Result result,double gameTime,String route) {

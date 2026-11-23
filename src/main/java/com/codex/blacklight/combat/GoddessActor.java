@@ -41,6 +41,15 @@ public final class GoddessActor {
         return boss.getPosition(partial).add(new Vec3(GoddessRig.root(boss,partial)
                 .transformPosition(localPoint(boss,joint,partial).toVector3f())));
     }
+    /** The intake meets the skinned MC glove, including the actual collision-limited render position. */
+    public static org.joml.Vector3f gloveLocal(EncounterMob boss,float partial){
+        var state=boss.goddessData();
+        var player=state.hasUUID("Actor")?boss.level().getPlayerByUUID(state.getUUID("Actor")):null;
+        if(player==null)return localPoint(boss,1,partial).toVector3f();
+        var local=BlockThrowMotion.palm(pose(boss,partial),"R");
+        var skin=BlockThrowMotion.world(player,local,yaw(boss,partial),partial).add(boss.goddess.drawnActorOffset(player,partial));
+        return GoddessRig.root(boss,partial).invert().transformPosition(skin.subtract(boss.getPosition(partial)).toVector3f());
+    }
     public static float yaw(EncounterMob boss,float partial){
         var s=sample(boss,partial);
         var d=GoddessRig.root(boss,partial).transformDirection(new org.joml.Vector3f(s.at(21),0,s.at(22)));
