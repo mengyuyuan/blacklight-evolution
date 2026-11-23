@@ -21,7 +21,8 @@ public final class GoddessPressurePose {
         if(cached!=null && cached.tick()==tick)return cached.owner();
         EncounterMob owner=null;
         for(var b:player.level().getEntitiesOfClass(EncounterMob.class,player.getBoundingBox().inflate(120),
-                b->b.goddess.active() && b.goddess.attacks.move()==GoddessAttacks.Move.VACUOLE && b.goddess.attacks.caught())){
+                b->b.goddess.active() && (b.goddess.attacks.move()==GoddessAttacks.Move.VACUOLE && b.goddess.attacks.caught()
+                        || b.goddess.attacks.move()==GoddessAttacks.Move.RUSH && b.goddess.attacks.rush.grip()>=0 && !b.goddess.attacks.rush.landed()))){
             if(player.getUUID().equals(b.goddess.attacks.victim())){ owner=b;break; }
         }
         owners.put(player,new Binding(tick,owner));
@@ -34,6 +35,7 @@ public final class GoddessPressurePose {
     }
 
     public static BlacklightPose sample(GoddessAttacks attack,float partial){
+        if(attack.move()==GoddessAttacks.Move.RUSH)return GoddessThrowActor.sample(attack,partial);
         float age=attack.age(partial);
         boolean ground=attack.grounded();
         float impact=rise(age,28,31)*(1-rise(age,32,39));
@@ -82,6 +84,17 @@ public final class GoddessPressurePose {
                 new Vector3f(0,bone.startsWith("Tool")?.06F:0,0));
         return BlockThrowMotion.world(player,local,yaw,partial);
     }
+    /** Render both actors from the same interpolated palm, including on remote players. */
+    public static Vec3 carryOffset(Player p,float partial){
+        var boss=owner(p);
+        if(boss==null)return Vec3.ZERO;
+        var attack=boss.goddess.attacks;
+        if(attack.move()!=GoddessAttacks.Move.RUSH || !attack.rush.holding())return Vec3.ZERO;
+        var wrist=boss.hurtRegions(partial).get(attack.rush.arm()==1?5:9);
+        if(wrist.boxes().isEmpty())return Vec3.ZERO;
+        var seat=attack.rush.heldPosition(wrist.boxes().get(0),p.getBbHeight(),attack.age(partial)-attack.rush.grip());
+        return seat.subtract(p.getPosition(partial));
+    }
     public static void eyes(net.minecraft.client.Camera camera,float partial){
         var mc=net.minecraft.client.Minecraft.getInstance();
         if(camera.isDetached() || camera.getEntity()!=mc.player || mc.player==null || !mc.options.getCameraType().isFirstPerson()
@@ -92,7 +105,8 @@ public final class GoddessPressurePose {
         var neutral=new Vector3f(0,.21F,-.07F);
         var compressed=rig.getBoundTransformFor(sample(a,partial),rig.head).transformPosition(new Vector3f(neutral));
         rig.getBoundTransformFor(new BlacklightPose(),rig.head).transformPosition(neutral);
-        Vec3 offset=BlockThrowMotion.world(p,compressed,a.captureYaw(),partial).subtract(BlockThrowMotion.world(p,neutral,a.captureYaw(),partial));
+        Vec3 offset=BlockThrowMotion.world(p,compressed,a.actorYaw(),partial).subtract(BlockThrowMotion.world(p,neutral,a.actorYaw(),partial));
+        offset=offset.add(carryOffset(p,partial));
         var from=camera.getPosition();var to=from.add(offset);
         var hit=p.level().clip(new net.minecraft.world.level.ClipContext(from,to,net.minecraft.world.level.ClipContext.Block.COLLIDER,
                 net.minecraft.world.level.ClipContext.Fluid.NONE,p));

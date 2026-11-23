@@ -111,7 +111,7 @@ public final class BlacklightRenderPose {
     public static float facing(LivingEntity entity,float partial) {
         if(entity instanceof net.minecraft.world.entity.player.Player player){
             var pressure=GoddessPressurePose.owner(player);
-            if(pressure!=null)return pressure.goddess.attacks.captureYaw();
+            if(pressure!=null)return pressure.goddess.attacks.actorYaw();
         }
         if(mouthStruggle(entity,partial))return ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION).yaw();
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
@@ -123,7 +123,7 @@ public final class BlacklightRenderPose {
     public static float rawFacing(LivingEntity entity,float partial) {
         if(entity instanceof net.minecraft.world.entity.player.Player player){
             var pressure=GoddessPressurePose.owner(player);
-            if(pressure!=null)return pressure.goddess.attacks.captureYaw();
+            if(pressure!=null)return pressure.goddess.attacks.actorYaw();
         }
         var dodge=com.codex.blacklight.registry.ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
         if(dodge.clipId().startsWith("spines_")&&!dodge.clipId().startsWith("spines_scapula")
