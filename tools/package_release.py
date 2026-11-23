@@ -304,6 +304,25 @@ def geographic_city_selected(repo: Path, archive: ZipFile) -> bool:
     return True
 
 
+def verify_compact_molt(repo: Path, build: Path, jar: Path) -> set[str]:
+    classes = build / 'classes/java/resourceTools'
+    require((classes / 'CompactMoltPacker.class').is_file(), 'Compile resourceTools classes before checking Greene clips')
+    java_home = os.environ.get('JAVA_HOME')
+    java = str(Path(java_home) / 'bin' / ('java.exe' if os.name == 'nt' else 'java')) if java_home else shutil.which('java')
+    require(bool(java), 'A Java runtime is required to verify Greene clips')
+    with ZipFile(jar) as archive:
+        require('com/codex/blacklight/util/MoltAnimationData.class' in archive.namelist(),
+                'Missing shipped Greene animation decoder')
+    # Load the decoder shipped in the mod and the build-only verifier from resourceTools.
+    result = subprocess.run([java, '-Xmx384m', '-XX:ActiveProcessorCount=2', '-cp', os.pathsep.join((str(jar), str(classes))),
+                             'CompactMoltPacker', '--verify', str(repo / 'src/main/resources'), str(jar)],
+                            capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=180)
+    require(result.returncode == 0, f'Exact Greene clip restoration failed: {result.stdout}\n{result.stderr}')
+    clips = set(re.findall(r'^VERIFIED (\S+) decodedBytes=', result.stdout, re.MULTILINE))
+    require(clips == {'scene.bin.gz', 'clamber.bin.gz'}, 'Incomplete Greene clip verification')
+    return {'assets/blacklight/greene/molt/' + name for name in clips}
+
+
 def verify_compact_maps(repo: Path, build: Path, jar: Path) -> None:
     classes = build / 'classes/java/resourceTools'
     require((classes / 'CompactMapPacker.class').is_file(), 'Compile resourceTools classes before checking compact maps')
@@ -426,6 +445,7 @@ def main() -> None:
         require(motions == expected, 'Bundled resources differ from the exact selected input profile/manifest')
         geographic_city = geographic_city_selected(repo, archive)
         compact_city = compact_city_selected(repo, archive)
+        verified_molt = verify_compact_molt(repo, build, jar)
         compact_maps = any(name.endswith('.xz') for name in names)
         if compact_maps:
             verify_compact_maps(repo, build, jar)
@@ -481,6 +501,8 @@ def main() -> None:
                 data = path.read_bytes()
                 require(name not in resources or resources[name] == digest(data), f'Conflicting production resource roots: {name}')
                 resources[name] = digest(data)
+                if name in verified_molt:
+                    continue  # Exact decoded bytes already matched the authored clip.
                 if compact_maps and name.endswith('.gz') and name[:-3]+'.xz' in names:
                     # Every decoded byte and the complete logical inventory were checked above.
                     require(name not in names, f'Both map encodings shipped: {name}')
