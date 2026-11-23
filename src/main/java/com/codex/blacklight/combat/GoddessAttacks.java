@@ -84,6 +84,7 @@ public final class GoddessAttacks {
         }
         var p=player(level);
         if(p==null){cancel();return;}
+        telegraphStrain();
         switch(move){
             case VACUOLE -> bubble(level,p);
             case CALL, STRONG_CALL -> {
@@ -110,7 +111,25 @@ public final class GoddessAttacks {
         }
     }
     public static void releaseBrood(net.minecraft.world.entity.Mob mob){GoddessBrood.release(mob);}
-    private void finish(){groups++;enter(Move.REST,null);}
+    int strainingSlot(){
+        int wrist=boss.goddess.supportingWrist();
+        return switch(move){
+            case VACUOLE -> elapsed>=9 && elapsed<=26 ? 0 : -1;
+            case NEEDLE_RAIN, BLOOD_SURF -> elapsed>=8 && elapsed<=25 ? 1 : -1;
+            case CALL, STRONG_CALL, WALL_SPEARS -> elapsed>=12 && elapsed<=32 ? (wrist>=0?wrist:1) : -1;
+            default -> -1;
+        };
+    }
+    private void telegraphStrain(){
+        int slot=strainingSlot();
+        if(slot<0 || elapsed%4!=0)return;
+        var region=boss.hurtRegions(0).get(slot);
+        if(region.boxes().isEmpty())return;
+        var joint=region.bounds().getCenter();
+        var edge=region.boxes().get((elapsed/4)%region.boxes().size()).nearest(center);
+        SpiderFoley.strands(boss,edge,joint.subtract(edge),4);
+    }
+    private void finish(){boss.goddess.finishedAttack();groups++;enter(Move.REST,null);}
     private Vec3 eyes(){return boss.hurtRegions(1).get(0).bounds().getCenter();}
     private boolean clear(Vec3 from,Vec3 to){
         return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()!=HitResult.Type.BLOCK;

@@ -119,6 +119,10 @@ public enum WeaponMove {
     }
     public boolean airCombo(){return this==AIR_AUTO1||this==AIR_AUTO2||this==AIR_AUTO3||this==AIR_AUTO4;}
     public boolean hammerComboSlam(){return this==HAMMER_COMBO_SPECIAL||this==HAMMER_COMBO_SPECIAL_CHARGED;}
+    public boolean aerialHeavy(){
+        return landingAttack() || this==CLAW_POUNCE || this==WHIP_AIR_CHARGED || this==MUSCLE_AIR
+                || this==AIR_KICK || this==AIR_CLAP || this==AIR_PAIN || this==BULLETDIVE_DROP;
+    }
     public boolean divingStrike(){return this==BLADE_DIVE||this==HAMMER_DROP;}
     public boolean landingAttack(){return this==BLADE_DIVE||this==HAMMER_DROP||this==HAMMER_RAM||this==AIR_GROUND_POUND||uncharged()==HAMMER_COMBO_SPECIAL;}
     public boolean lightLash(){return this==WHIP_LASH || this==WHIP_RETURN;}

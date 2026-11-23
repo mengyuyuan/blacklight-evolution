@@ -849,6 +849,8 @@ public final class WeaponCombatSystem {
                     ?encounter.hurtWeapon(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower),cut,box->!cutting.sharp()&&bounds!=null&&meleeContact(p,s,box,box,bounds))
                     :v.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower));
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Weapon contact move={} victim={} id={} accepted={} health={} -> {} cuts={} meshContacts={} preciseTail={}",s.move.id,v.getType().getDescriptionId(),v.getId(),accepted,healthBefore,v.getHealth(),cut.contacts().size(),impact.contacts().size(),preciseOnly);
+            if(accepted && hydraHit!=null && v instanceof com.codex.blacklight.entity.EncounterMob boss
+                    && boss.goddess.active() && s.move.aerialHeavy())boss.goddess.aerialImpact(hydraHit);
             // Restore only the timer we temporarily cleared, never overwrite a
             // newer protection installed by another damage callback.
             if(!accepted&&ownPrevious&&v.invulnerableTime==0)v.invulnerableTime=resistance;
