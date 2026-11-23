@@ -28,6 +28,12 @@ public final class CombatScale {
         var attribute=entity.getAttribute(Attributes.MAX_HEALTH);
         return attribute!=null&&attribute.hasModifier(HEALTH)?UNITS:1;
     }
+    /** Ordinary creatures have vanilla HP. Authored weapon hits are expressed in Blacklight health units. */
+    public static float weaponContact(LivingEntity victim,float authored) {
+        if (victim instanceof Mob mob && !com.codex.blacklight.infection.BlacklightInfectionSystem.isInfected(mob))
+            return authored * (UNITS / units(mob));
+        return authored;
+    }
     public static float originalMaximum(LivingEntity entity){return entity.getMaxHealth()/units(entity);}
     public static boolean modifier(AttributeInstance attribute,ResourceLocation id,double amount,AttributeModifier.Operation operation){
         if(attribute==null)return false;

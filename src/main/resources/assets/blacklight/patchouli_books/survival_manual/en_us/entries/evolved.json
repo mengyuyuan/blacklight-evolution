@@ -1,0 +1,20 @@
+{
+  "name": "The Escaped Host",
+  "category": "blacklight:route",
+  "sortnum": 2,
+  "icon": "blacklight:evolved_ganglion",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "After your first consume and upgrade, investigate the broken quarantine gate. Search the grass and follow fresh tracks onto red soil. Keep its escape route clear. Wild Evolved are another source of ganglia."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Combine the ganglion with copper and redstone dust to make a containment decoder. Read the station's manifest in the Overworld to locate the incident.$(br2)$(l:convoy)Next: the lost convoy$(/l)"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:containment_decoder"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "至尊猎手",
+  "category": "blacklight:hunts",
+  "sortnum": 17,
+  "icon": "blacklight:hive_carapace",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "准备补给，在活的蜂巢实体旁留出空地。向它注射至尊寄生针会引出至尊猎手。看到蜂巢爆裂就退到有空间闪避的位置，观察起手，利用扑击、重击后的空隙。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "「成为食物链顶端」记录击败；想拿「顶级掠食者」，还要趁猎手跪倒可吞噬时，切原型模式贴近并完成吸收。准备收尾时留住目标，避免同伴或持续伤害抢先击杀。"
+    }
+  ]
+}

@@ -11,7 +11,7 @@
       "translate": "advancement.blacklight.hydra_tissue.desc"
     },
     "frame": "task",
-    "show_toast": true,
+    "show_toast": false,
     "announce_to_chat": false
   },
   "criteria": {

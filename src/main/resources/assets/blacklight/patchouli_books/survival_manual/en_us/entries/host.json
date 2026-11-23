@@ -1,0 +1,16 @@
+{
+  "name": "Hosts and Evolved",
+  "category": "blacklight:ecology",
+  "sortnum": 20,
+  "icon": "blacklight:evolved_ganglion",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Observe infected hosts feeding and growing. Digestion and competing tissue change the organs, silhouette and abilities. For research, let a useful organ mature, weaken its host and consume it. A plain kill does not register a consume sample."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Hosts can evolve after assimilating multiple distinct mature organs. For the story, follow the escape trail from a quarantine post. Hunt Evolved for a ganglion; raid a hive for living hive tissue. The two materials serve different routes."
+    }
+  ]
+}

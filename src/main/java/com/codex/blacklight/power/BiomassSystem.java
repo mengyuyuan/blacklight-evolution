@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.combat.*;
 import com.codex.blacklight.entity.BiomassHusk;
 import com.codex.blacklight.world.GreeneHost;
@@ -97,24 +98,24 @@ public final class BiomassSystem {
         var s=state(p);
         if(!s.active()||!p.isAlive()||p.isSpectator())return false;
         if(!s.recallable()){
-            p.displayClientMessage(Component.translatable(s.fatal()?"message.blacklight.biomass_need_prey":"message.blacklight.biomass_reforming"),true);
+            FieldNotes.record(p, Component.translatable(s.fatal()?"message.blacklight.biomass_need_prey":"message.blacklight.biomass_reforming"));
             return false;
         }
         BiomassHusk husk=null;
         try{var found=p.serverLevel().getEntity(java.util.UUID.fromString(s.shell()));if(found instanceof BiomassHusk h)husk=h;}catch(IllegalArgumentException ignored){}
         if(husk==null||!husk.isAlive()||husk.erupted()||!p.getUUID().equals(husk.owner())){
-            p.displayClientMessage(Component.translatable("message.blacklight.biomass_no_shell"),true);return false;
+            FieldNotes.record(p, Component.translatable("message.blacklight.biomass_no_shell"));return false;
         }
         Vec3 at=husk.position();
         if(!p.level().noCollision(p,new AABB(at.x-.3,at.y,at.z-.3,at.x+.3,at.y+1.8,at.z+.3))){
-            p.displayClientMessage(Component.translatable("message.blacklight.biomass_blocked_shell"),true);return false;
+            FieldNotes.record(p, Component.translatable("message.blacklight.biomass_blocked_shell"));return false;
         }
         // Removing the shell before publishing HUMAN avoids its automatic burst.
         // Clearing the transient claim immediately releases an unfinished victim.
         husk.discard();p.teleportTo(at.x,at.y,at.z);p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
         var power=p.getData(ModAttachments.PLAYER_STATE);power.activate(PowerForm.byId(s.previousPower()));
         publish(p,BiomassState.EMPTY);p.syncData(ModAttachments.PLAYER_STATE);
-        p.displayClientMessage(Component.translatable("message.blacklight.biomass_recalled"),true);
+        FieldNotes.record(p, Component.translatable("message.blacklight.biomass_recalled"));
         return true;
     }
     @SubscribeEvent(priority=net.neoforged.bus.api.EventPriority.LOWEST) public static void death(LivingDeathEvent e){
@@ -184,7 +185,7 @@ public final class BiomassSystem {
             int lifetime=BiomassEvolution.lifetime(p);
             if(lifetime>=0&&s.age()>=lifetime){
                 if(s.recallable()&&cancel(p))return;
-                p.displayClientMessage(Component.translatable("message.blacklight.biomass_expired"),true);
+                FieldNotes.record(p, Component.translatable("message.blacklight.biomass_expired"));
                 // Real damage/death events preserve other mods' resurrection and death vetoes.
                 p.hurt(p.damageSources().genericKill(),Float.MAX_VALUE);return;
             }
@@ -204,7 +205,7 @@ public final class BiomassSystem {
                 boolean claimed=p.server.getPlayerList().getPlayers().stream().anyMatch(other->other!=p&&other.level()==p.level()
                     &&state(other).phase()==BiomassState.ABSORBING&&state(other).victim()==target.getId());
                 if(!claimed&&now-s.changedAt()>=12){publish(p,s.absorb(target.getId(),now));
-                    p.displayClientMessage(Component.translatable("message.blacklight.biomass_contact",target.getDisplayName()),true);}
+                    FieldNotes.record(p, Component.translatable("message.blacklight.biomass_contact",target.getDisplayName()));}
             }
         }else if(s.phase()==BiomassState.ABSORBING){
             Entity entity=p.level().getEntity(s.victim());
@@ -246,7 +247,7 @@ public final class BiomassSystem {
             p.teleportTo(room.x,room.y,room.z);
             var power=p.getData(ModAttachments.PLAYER_STATE);power.activate(PowerForm.byId(s.previousPower()));
             publish(p,BiomassState.EMPTY);p.syncData(ModAttachments.PLAYER_STATE);
-            p.displayClientMessage(Component.translatable("message.blacklight.biomass_restored"),true);
+            FieldNotes.record(p, Component.translatable("message.blacklight.biomass_restored"));
         }
     }
     private static Vec3 standingRoom(ServerPlayer p){

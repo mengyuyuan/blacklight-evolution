@@ -1,5 +1,6 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.*;
 import com.codex.blacklight.registry.ModEntities;
 import com.codex.blacklight.registry.ModAttachments;
@@ -139,7 +140,7 @@ public final class SpiderActions {
                     && age>=SpiderMouthStruggle.PROMPT && age<=SpiderMouthStruggle.LAST_PRESS){
                 var state=action.data().copy();state.putInt("PryAt",age);owner.spiderData(state);
                 com.codex.blacklight.animation.PlayerActions.get().playVisual(p,"greene_mouth_kick",.08F);
-                p.displayClientMessage(Component.translatable("boss.blacklight.greene_spider.pry"),true);
+                FieldNotes.record(p, Component.translatable("boss.blacklight.greene_spider.pry"));
                 SpiderFoley.play(owner,p.position(),SpiderFoley.Cue.STRAIN,1.12F);
             }
         }
@@ -707,11 +708,11 @@ public final class SpiderActions {
                     set(Move.RECOIL,null,boss.position(),-1);
                 }
             }else if(t==SpiderMouthStruggle.PROMPT){
-                p.displayClientMessage(Component.translatable("boss.blacklight.greene_spider.escape",Component.keybind("key.jump")),true);
+                FieldNotes.record(p, Component.translatable("boss.blacklight.greene_spider.escape",Component.keybind("key.jump")));
                 SpiderFoley.play(boss,next,SpiderFoley.Cue.BRACE,1.3F);
             }else if(t==SpiderMouthStruggle.LAST_PRESS+1){
                 com.codex.blacklight.animation.PlayerActions.get().playVisual(p,"greene_mouth_slip",.04F);
-                p.displayClientMessage(Component.translatable("boss.blacklight.greene_spider.slip"),true);
+                FieldNotes.record(p, Component.translatable("boss.blacklight.greene_spider.slip"));
                 SpiderFoley.play(boss,next,SpiderFoley.Cue.SCRAPE,1.06F);
             }else if(t>=SpiderMouthStruggle.SWALLOWED){
                 SpiderFoley.play(boss,boss.spider.mouth(1),SpiderFoley.Cue.GULP,1.7F);

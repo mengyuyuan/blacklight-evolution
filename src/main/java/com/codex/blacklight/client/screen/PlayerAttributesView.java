@@ -31,8 +31,8 @@ final class PlayerAttributesView {
             add(values,"ricochet_damage",Component.literal("×"+number(RicochetRules.multiplier(reflection))));
         }
         if(form==PowerForm.BACKSPINES){
-            int base=com.codex.blacklight.animation.ScapulaVolley.OPENING_SHOT_DAMAGE;
-            add(values,"damage",Component.translatable("screen.blacklight.stats.quill_damage",number(base),number(base*CombatScale.UNITS)));
+            float base=com.codex.blacklight.item.SymbioteCharm.attackBase(p,com.codex.blacklight.animation.ScapulaVolley.OPENING_SHOT_DAMAGE);
+            add(values,"damage",Component.literal(damageValue(p,base*CombatScale.UNITS)));
             int layers=com.codex.blacklight.config.GameplayBalanceConfig.value(com.codex.blacklight.config.GameplayBalanceConfig.QUILL_LAYERS);
             double one=com.codex.blacklight.combat.QuillHarvest.drainPercent(p,1);
             double all=com.codex.blacklight.combat.QuillHarvest.drainPercent(p,layers);
@@ -40,7 +40,7 @@ final class PlayerAttributesView {
             add(values,"quill_drain",Component.translatable("screen.blacklight.stats.quill_rates",fmt.format(one),layers,fmt.format(all)));
         }else{
             var move=WeaponMove.choose(form,WeaponMove.Input.ATTACK,false,false,false);
-            add(values,"damage",move==null?Component.literal("—"):Component.literal(number(move.damageFor(form)*CombatScale.UNITS)));
+            add(values,"damage",move==null?Component.literal("—"):Component.literal(damageValue(p,move.damageFor(p,form)*CombatScale.UNITS)));
         }
         add(values,"attack_speed",Component.translatable("screen.blacklight.stats.per_second",number(p.getAttributeValue(Attributes.ATTACK_SPEED))));
         add(values,"movement",Component.literal(number(p.getAttributeValue(Attributes.MOVEMENT_SPEED))));
@@ -53,6 +53,10 @@ final class PlayerAttributesView {
                 number(MovementTuningSettings.estimatedJumpHeight(1,state.getMovementUpgradeMask()))));
         add(values,"notes",Component.translatable("screen.blacklight.stats.notes_value"));
         return values;
+    }
+    private static String damageValue(net.minecraft.world.entity.player.Player player,double base) {
+        double multiplier=InfiniteEvolutionSystem.strengthMultiplier(player);
+        return multiplier==1 ? number(base) : number(base)+" × "+number(multiplier)+" = "+number(base*multiplier);
     }
     private static void add(List<Entry> values,String key,Component value){values.add(new Entry(Component.translatable("screen.blacklight.stats."+key),value));}
     private static String number(double n){

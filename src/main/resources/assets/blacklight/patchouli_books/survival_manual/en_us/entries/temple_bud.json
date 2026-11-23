@@ -1,0 +1,15 @@
+{
+  "name": "Temple Bud",
+  "category": "blacklight:weave",
+  "sortnum": 73,
+  "icon": "blacklight:temple_bud",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Cost: 100 biomass. Offer 2 Tissue Fiber, 1 Hive Vein, 2 Living Hive Tissue, 2 Hive carapace.$(br2)Equip in the head slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.$(br2)A moving black glint traces the temples and nape."
+    },
+    {
+      "type": "blacklight:layout_temple_bud"
+    }
+  ]
+}

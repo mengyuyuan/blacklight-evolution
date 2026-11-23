@@ -1,0 +1,22 @@
+{
+  "name": "随身行动记录",
+  "category": "blacklight:route",
+  "sortnum": 31,
+  "icon": "minecraft:writable_book",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "手持宝典右键读教程；潜行右键翻开本存档的行动记录。第一页写当前任务和已记录地点，后面是最近收到的战斗、操作和侦察反馈。也可以输入 /blacklightguide 直接查看记录。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "查外部资料可翻到下一页的社区百科。网站对应的发布版本和存档配置可能不同；进行中的事件以随身记录和现场为准。"
+    },
+    {
+      "type": "patchouli:link",
+      "url": "https://prototype.qibusu.com/wiki",
+      "link_text": "黑光社区百科",
+      "text": "查阅感染阶段、母巢和宿主的参考资料，以及服务器可调整的数值。"
+    }
+  ]
+}

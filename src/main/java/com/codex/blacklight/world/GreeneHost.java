@@ -144,7 +144,7 @@ public final class GreeneHost extends PathfinderMob {
             case ESCAPING -> tickEscape(level);
             case SPENT -> {
                 if(tickCount%60==1) for (var p:level.players()) if(p.distanceToSqr(this)<12*12 && !p.isSpectator())
-                    p.displayClientMessage(Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab"),Component.keybind("key.use")),true);
+                    FieldNotes.record(p, Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab"),Component.keybind("key.use")));
             }
         }
     }
@@ -159,7 +159,7 @@ public final class GreeneHost extends PathfinderMob {
             if(stage()!=BLOCKED || tickCount%80==0){
                 enter(BLOCKED,BREAKOUT);
                 for(var observer:level.players()) if(observer.distanceToSqr(this)<48*48)
-                    observer.displayClientMessage(Component.translatable("survival.blacklight.pump_blocked",pad.getX(),pad.getY(),pad.getZ()),true);
+                    FieldNotes.record(observer, Component.translatable("survival.blacklight.pump_blocked",pad.getX(),pad.getY(),pad.getZ()));
             }
             return;
         }
@@ -244,7 +244,7 @@ public final class GreeneHost extends PathfinderMob {
             if(level.hasChunkAt(station) && level.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(level);
             BossSiteData.complete(this,null,2);
             for (var observer:level.players()) if (observer.distanceToSqr(this)<24*24)
-                observer.displayClientMessage(Component.translatable("survival.blacklight.greene_escaped"),true);
+                FieldNotes.record(observer, Component.translatable("survival.blacklight.greene_escaped"));
             discard();
         }
     }

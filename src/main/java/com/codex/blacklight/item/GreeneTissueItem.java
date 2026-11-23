@@ -1,5 +1,6 @@
 package com.codex.blacklight.item;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.city.CityTravel;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.world.GreeneHiveCave;
@@ -28,6 +29,18 @@ public final class GreeneTissueItem extends Item {
     public static boolean isTissue(ItemStack stack) { return stack.getItem() instanceof GreeneTissueItem; }
     public static boolean held(Player player) { return player != null && player.isHolding(GreeneTissueItem::isTissue); }
 
+    @Override public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity,
+                                        int slot, boolean selected) {
+        if (!(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0 || player.isSpectator()
+                || !(selected || player.getOffhandItem() == stack) || level.dimension() != CityTravel.WORLD
+                || SurvivalGuide.done(player, "greene_outbreak")) return;
+        // The city itself uses a custom flat-derived generator. Check the save's overworld preset.
+        if (player.serverLevel().getServer().overworld().getChunkSource().getGenerator().getClass()
+                == net.minecraft.world.level.levelgen.FlatLevelSource.class) return;
+        var site = GreeneHiveCave.nearest(player.serverLevel().getSeed(), player.blockPosition());
+        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new com.codex.blacklight.network.GreeneSignalPayload(site));
+    }
+
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player.getData(ModAttachments.CONSUMING)) return InteractionResultHolder.fail(stack);
@@ -52,8 +65,8 @@ public final class GreeneTissueItem extends Item {
         var world = player.serverLevel();
         world.playSound(null, player.blockPosition(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, .6F, age == 12 ? 1.04F : .82F);
         if (world.dimension() != CityTravel.WORLD || SurvivalGuide.done(player, "greene_outbreak")) {
-            if (age == 12) player.displayClientMessage(Component.translatable(world.dimension() != CityTravel.WORLD
-                    ? "item.blacklight.greene_tissue.distant" : "item.blacklight.greene_tissue.quiet"), true);
+            if (age == 12) FieldNotes.record(player, Component.translatable(world.dimension() != CityTravel.WORLD
+                    ? "item.blacklight.greene_tissue.distant" : "item.blacklight.greene_tissue.quiet"));
             return;
         }
         var den = GreeneHiveCave.nearest(world.getSeed(), player.blockPosition());
@@ -65,8 +78,7 @@ public final class GreeneTissueItem extends Item {
             Vec3 point = palm.add(heading.scale(i * .35));
             world.sendParticles(player, ParticleTypes.CRIMSON_SPORE, true, point.x, point.y, point.z, 2, .035, .035, .035, 0);
         }
-        player.displayClientMessage(Component.translatable("survival.blacklight.greene_tissue_signal",
-                Math.round(Math.sqrt(den.distSqr(player.blockPosition())))), true);
+
     }
 
     @Override public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity holder) {

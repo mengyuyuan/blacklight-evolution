@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.entity.BlacklightMutant;
 import net.minecraft.resources.ResourceLocation;
@@ -50,9 +51,9 @@ public final class GrowthSystem {
         var advancement=p.server.getAdvancements().get(ResourceLocation.fromNamespaceAndPath("blacklight",id));
         if (advancement == null || !p.getAdvancements().award(advancement, "done")) return;
         if (id.equals("first_consume"))
-            p.displayClientMessage(Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades")), false);
+            FieldNotes.record(p, Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades")));
         if (id.equals("first_evolution"))
-            p.displayClientMessage(Component.translatable("survival.blacklight.branch"), false);
+            FieldNotes.record(p, Component.translatable("survival.blacklight.branch"));
     }
     public static void updateHealth(ServerPlayer p){
         AssimilationSystem.updateCrest(p);

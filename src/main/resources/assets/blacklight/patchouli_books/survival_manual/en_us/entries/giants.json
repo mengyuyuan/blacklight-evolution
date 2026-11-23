@@ -1,0 +1,12 @@
+{
+  "name": "Field Identification",
+  "category": "blacklight:ecology",
+  "sortnum": 29,
+  "icon": "blacklight:nutrient_node",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Common infected are good first prey. Stalkers close in, spitters punish open approaches, while armored beasts and hunters need room to evade. Wild Hydras ambush travelers. Plant and feed a Hydra to establish your own gateway."
+    }
+  ]
+}

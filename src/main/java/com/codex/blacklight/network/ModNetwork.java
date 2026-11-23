@@ -28,6 +28,8 @@ public final class ModNetwork {
                 .playToClient(GunplayFeedbackPayload.TYPE,GunplayFeedbackPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.GunplayVisuals.accept(payload)))
                 .playToClient(VehicleDestructionPayload.TYPE,VehicleDestructionPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.VehicleDestructionVisuals.accept(payload)))
                 .playToClient(InfectedImpactPayload.TYPE,InfectedImpactPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.renderer.InfectedImpactVisuals.accept(payload)))
+                .playToClient(ManualPagesPayload.TYPE,ManualPagesPayload.STREAM_CODEC,(msg,ctx)->ctx.enqueueWork(()->com.codex.blacklight.client.ManualReader.open(msg)))
+                .playToClient(GreeneSignalPayload.TYPE,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())))
                 .playToClient(DistrictZonePayload.TYPE,DistrictZonePayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.DistrictZoneHud.accept(payload)))
                 .playToServer(HelicopterControlPayload.TYPE,HelicopterControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))
                 .playToServer(VehicleControlPayload.TYPE,VehicleControlPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->{if(context.player() instanceof ServerPlayer p)payload.handle(p);}))

@@ -88,29 +88,16 @@ public final class BlacklightCommands {
                         .then(Commands.argument("species",StringArgumentType.word())
                                 .suggests((context,builder)->net.minecraft.commands.SharedSuggestionProvider.suggest(
                                         new String[]{"zombie","skeleton","creeper","cow","pig","sheep","wolf","spider","warden","iron_golem","wither","ender_dragon"},builder))
-                                .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),null,false))
+                                .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),null))
                                 .then(Commands.argument("position",net.minecraft.commands.arguments.coordinates.Vec3Argument.vec3())
                                         .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),
-                                                net.minecraft.commands.arguments.coordinates.Vec3Argument.getVec3(context,"position"),false)))))
-                .then(Commands.literal("spawn_colossus").requires(source -> source.hasPermission(2))
-                        .then(Commands.argument("species",StringArgumentType.word())
-                                .suggests((context,builder)->net.minecraft.commands.SharedSuggestionProvider.suggest(
-                                        new String[]{"warden","iron_golem","wither","ender_dragon"},builder))
-                                .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),null,true))
-                                .then(Commands.argument("position",net.minecraft.commands.arguments.coordinates.Vec3Argument.vec3())
-                                        .executes(context->spawnInfected(context.getSource(),StringArgumentType.getString(context,"species"),
-                                                net.minecraft.commands.arguments.coordinates.Vec3Argument.getVec3(context,"position"),true)))))
+                                                net.minecraft.commands.arguments.coordinates.Vec3Argument.getVec3(context,"position"))))))
                 .then(Commands.literal("spawn_supreme_hunter").requires(source -> source.hasPermission(2)).executes(context->{
                     var p=context.getSource().getPlayerOrException();
                     var at=p.position().add(p.getLookAngle().multiply(1,0,1).normalize().scale(12));
                     var boss=com.codex.blacklight.entity.SupremeHunterRewards.summon(p.serverLevel(),at,p);
                     if(boss==null){context.getSource().sendFailure(Component.translatable("command.blacklight.supreme_hunter_no_room"));return 0;}
                     context.getSource().sendSuccess(()->Component.translatable("command.blacklight.supreme_hunter_spawned"),false);return 1;
-                }))
-                .then(Commands.literal("colossus_status").requires(source -> source.hasPermission(2)).executes(context->{
-                    var player=context.getSource().getPlayerOrException();
-                    context.getSource().sendSuccess(()->com.codex.blacklight.infection.ColossusEvolutionSystem.describe(player),false);
-                    return 1;
                 }))
                 .then(Commands.literal("form").then(Commands.argument("id", StringArgumentType.word())
                         .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
@@ -218,14 +205,11 @@ public final class BlacklightCommands {
         source.sendSuccess(()->Component.literal("已生成预置成熟器官的试玩样本，开始十秒蜕变。自然进化仍需满足真实吞噬门槛。"),false);return 1;
     }
 
-    private static int spawnInfected(CommandSourceStack source,String species,net.minecraft.world.phys.Vec3 requested,boolean colossal){
+    private static int spawnInfected(CommandSourceStack source,String species,net.minecraft.world.phys.Vec3 requested){
         var id=net.minecraft.resources.ResourceLocation.tryParse(species);
         var registry=net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE;
         if(id==null||!id.getNamespace().equals("minecraft")||!registry.containsKey(id)){
             source.sendFailure(Component.translatable("command.blacklight.infected_unknown",species));return 0;
-        }
-        if(colossal&&com.codex.blacklight.entity.InfectedBossProfile.forSpecies(id.toString())==null){
-            source.sendFailure(Component.translatable("command.blacklight.colossus_unknown",species));return 0;
         }
         var original=registry.get(id).create(source.getLevel());
         if(!(original instanceof net.minecraft.world.entity.Mob mob)){
@@ -233,7 +217,7 @@ public final class BlacklightCommands {
         }
         var infected=com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(source.getLevel());
         if(infected==null)return 0;
-        infected.inherit(mob,colossal);
+        infected.inherit(mob);
         var facing=net.minecraft.world.phys.Vec3.directionFromRotation(0,source.getRotation().y);
         var pos=requested!=null?requested:source.getPosition().add(facing.scale(infected.giantBoss()?48:4));
         infected.moveTo(pos.x,pos.y,pos.z,source.getRotation().y+180,0);

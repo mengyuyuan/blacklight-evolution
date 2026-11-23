@@ -1,0 +1,16 @@
+{
+  "name": "研究站与觉醒",
+  "category": "blacklight:route",
+  "sortnum": 1,
+  "icon": "blacklight:blacklight_sample",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "穿过实验室和隔离区，在后方冷藏室找冰块旁的样本箱。带走病毒样本和冷库运输单，保留运输单供稍后定位车队。西侧实验室的红石线可回收红石粉。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "找片离基地远的空地，普通模式手持样本，瞄准脚下使用，让安瓿在身边破裂。觉醒后切换原型体模式。第一次摔瓶也会启动这个存档的世界感染进程。$(br2)$(l:consume)练习第一次吸收$(/l)"
+    }
+  ]
+}

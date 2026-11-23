@@ -1,0 +1,21 @@
+{
+  "name": "The Pump and Greene",
+  "category": "blacklight:route",
+  "sortnum": 7,
+  "icon": "blacklight:bloodtox_starter",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Craft a Bloodtox starter with the armor core, military circuitry and redstone. A command key offers a second recipe. Use the starter on the truck in normal mode. Keep the emergence area clear with solid ground."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:bloodtox_starter",
+      "recipe2": "blacklight:bloodtox_starter_from_key"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Break the shell's attack organs, then close on the fallen body. When Greene's human form emerges, grab and consume in Prototype mode. She escapes. Recover the living tissue she leaves behind.$(br2)$(l:den)Track the underground den$(/l)"
+    }
+  ]
+}

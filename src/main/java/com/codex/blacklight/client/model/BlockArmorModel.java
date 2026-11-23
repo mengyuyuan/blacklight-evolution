@@ -167,19 +167,34 @@ public final class BlockArmorModel {
 
     public void renderJoint(String joint, AbstractClientPlayer player, PoseStack stack, MultiBufferSource buffers, int light, float partial, boolean weaponArm) {
         var state = state(player, partial); if (state == null) return;
-        var out = buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE)); var pose = stack.last();
-        for (int i = 0; i < parts.size(); i++) {
-            Part part = parts.get(i); float growth = state.values[i];
-            if (!part.joint.equals(joint) || growth <= .005F || weaponArm && !part.shoulder) continue;
-            for (int f = 0; f < faces.length; f++) {
-                var normal = part.normals[f];
-                for (int v = 0; v < 4; v++) {
-                    var point = part.points[faces[f][v]]; var center = part.center;
-                    float u = (part.material + ((v == 1 || v == 2) ? .969F : .031F)) / materialCount;
-                    float tv = v < 2 ? .031F : .969F;
-                    if (part.uv != null) { u = part.uv[f][v][0]; tv = part.uv[f][v][1]; }
-                    out.addVertex(pose, center.x + (point.x - center.x) * growth, center.y + (point.y - center.y) * growth, center.z + (point.z - center.z) * growth)
-                            .setColor(0xFFFFFFFF).setUv(u, tv).setOverlay(OverlayTexture.pack(0, player.hurtTime > 0)).setLight(light).setNormal(pose, normal.x, normal.y, normal.z);
+        var slot = joint.equals("Head") ? net.minecraft.world.entity.EquipmentSlot.HEAD
+                : joint.startsWith("Leg_") ? net.minecraft.world.entity.EquipmentSlot.LEGS
+                : joint.startsWith("Thigh_") ? net.minecraft.world.entity.EquipmentSlot.LEGS
+                : net.minecraft.world.entity.EquipmentSlot.CHEST;
+        float phase = ArmorFlow.phase(player, partial);
+        boolean ink = ArmorFlow.visible(player, slot);
+        boolean ankleInk = joint.startsWith("Leg_") && ArmorFlow.visible(player, net.minecraft.world.entity.EquipmentSlot.FEET);
+        int passes = ink || ankleInk ? 2 : 1;
+        var pose = stack.last();
+        for (int pass = 0; pass < passes; pass++) {
+            boolean flow = pass == 1;
+            var out = buffers.getBuffer(flow ? RenderType.entityTranslucent(ArmorFlow.TEXTURE) : RenderType.entityCutoutNoCull(TEXTURE));
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i); float growth = state.values[i];
+                if (!part.joint.equals(joint) || growth <= .005F || weaponArm && !part.shoulder) continue;
+                if (flow && !(joint.startsWith("Leg_") && part.center.y > .24F ? ankleInk : ink)) continue;
+                for (int f = 0; f < faces.length; f++) {
+                    var normal = part.normals[f];
+                    for (int v = 0; v < 4; v++) {
+                        var point = part.points[faces[f][v]]; var center = part.center;
+                        float u = (part.material + ((v == 1 || v == 2) ? .969F : .031F)) / materialCount;
+                        float tv = v < 2 ? .031F : .969F;
+                        if (part.uv != null) { u = part.uv[f][v][0]; tv = part.uv[f][v][1]; }
+                        if (flow) { u=ArmorFlow.u(point,phase); tv=ArmorFlow.v(point,phase); }
+                        float lift=flow ? .0015F : 0;
+                        out.addVertex(pose, center.x + (point.x - center.x) * growth + normal.x * lift, center.y + (point.y - center.y) * growth + normal.y * lift, center.z + (point.z - center.z) * growth + normal.z * lift)
+                                .setColor(0xFFFFFFFF).setUv(u, tv).setOverlay(OverlayTexture.pack(0, player.hurtTime > 0)).setLight(light).setNormal(pose, normal.x, normal.y, normal.z);
+                    }
                 }
             }
         }

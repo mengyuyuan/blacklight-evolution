@@ -1,0 +1,16 @@
+{
+  "name": "Grow a Passage",
+  "category": "blacklight:route",
+  "sortnum": 5,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Outside the Blacklight dimension, choose solid ground with two clear blocks above and space away from other Hydras. Use living hive tissue on the top face. Bring five living prey within feeding reach. Keep the area loaded while it grows. Allow at least two loaded minutes."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Approach the mature root to cross into the Blacklight dimension. Bring your intel, armor core and supplies. Use the linked Hydra for the return trip.$(br2)$(l:dispatch)Your first lead in Futian$(/l)"
+    }
+  ]
+}

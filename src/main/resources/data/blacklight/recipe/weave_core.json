@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FVF",
+    "NLN",
+    "FSF"
+  ],
+  "key": {
+    "F": {
+      "item": "blacklight:tissue_fiber"
+    },
+    "L": {
+      "item": "blacklight:living_hive_tissue"
+    },
+    "N": {
+      "item": "blacklight:nutrient_node"
+    },
+    "S": {
+      "item": "blacklight:hive_carapace"
+    },
+    "V": {
+      "item": "blacklight:hive_vein"
+    }
+  },
+  "result": {
+    "id": "blacklight:weave_core",
+    "count": 1
+  }
+}

@@ -32,5 +32,13 @@ public final class ModBlocks {
     // Breaking/removing this block immediately interrupts the structure's physical feed line.
     public static final DeferredBlock<Block> NUTRIENT_NODE=BLOCKS.registerSimpleBlock("nutrient_node",BlockBehaviour.Properties.of().strength(2.5F,5).sound(SoundType.SCULK).lightLevel(s->4));
     public static final DeferredBlock<Block> TISSUE_ATTACHMENT=BLOCKS.register("tissue_attachment",()->new com.codex.blacklight.world.TissueAttachmentBlock(BlockBehaviour.Properties.of().strength(.6F).sound(SoundType.SLIME_BLOCK).noCollission().noOcclusion().randomTicks()));
+    public static final DeferredBlock<Block> WEAVE_CORE = weave("weave_core",7);
+    public static final DeferredBlock<Block> WEAVE_ANCHOR = weave("weave_anchor",1);
+    public static final DeferredBlock<Block> WEAVE_CHANNEL = weave("weave_channel",3);
+    public static final DeferredBlock<Block> WEAVE_BED = weave("weave_bed",2);
+    private static DeferredBlock<Block> weave(String name,int glow){
+        return BLOCKS.register(name,()->new com.codex.blacklight.world.WeaveBlock(BlockBehaviour.Properties.of().strength(3.5F,7F)
+                .sound(SoundType.NETHER_WOOD).dynamicShape().noOcclusion().lightLevel(s->glow).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    }
     public static void register(IEventBus bus){BLOCKS.register(bus);}
 }

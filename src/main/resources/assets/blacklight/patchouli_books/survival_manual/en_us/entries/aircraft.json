@@ -1,0 +1,16 @@
+{
+  "name": "Hijacking and Air Support",
+  "category": "blacklight:military",
+  "sortnum": 25,
+  "icon": "blacklight:military_circuit",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Approach an enemy cab in Prototype mode, sneak and use it empty-handed to attempt a hijack. Witnesses can raise an alarm. Captured vehicles retain damage and ammo. Search base garages and watch for faction supply movements."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "On a boardable helicopter, check the pilot seat and rotor clearance. Move to fly and turn, jump to climb, sprint to descend, sneak to leave. An occupied gunner seat handles weapons. The Bloodtox mission belongs to Futian even when exploring other districts or Los Angeles."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "种植和供养建筑母巢",
+  "category": "blacklight:ecology",
+  "sortnum": 19,
+  "icon": "blacklight:building_infection_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "用一份活性蜂巢组织和三块腐肉做建筑感染核心。贴在有支撑的外墙，空手右键查看生长。拿食物喂核心或放在嘴部可见的位置，给它已加载的时间消化、扩张。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:building_infection_core"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "成熟殖群按阶段和可用养分生产感染体。多个孵化口可属于同一母巢。断供、通道堵塞或当地种群已满都会影响生产。要去福田，请把原始活性组织种在空地养九头蛇，参见$(l:gateway)活体通道$(/l)。"
+    }
+  ]
+}

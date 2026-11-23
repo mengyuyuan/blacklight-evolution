@@ -14,6 +14,10 @@ public final class BlacklightRenderPose {
         return action.clipId().startsWith("greene_mouth_") && action.active(PlayerMotionController.actionTime(entity,partial));
     }
     public static BlacklightPose sample(LivingEntity entity, float partial) {
+        if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
+            var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
+            if (cell!=null) return WeaveBrace.pose(player,cell,partial);
+        }
         if(mouthStruggle(entity,partial)){
             var action=entity.getData(ModAttachments.PLAYER_ACTION);
             return MotionLibrary.pose(action.clipId(),action.seconds(PlayerMotionController.actionTime(entity,partial)),false);
@@ -106,6 +110,10 @@ public final class BlacklightRenderPose {
         }
     }
     public static float facing(LivingEntity entity,float partial) {
+        if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
+            var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
+            if (cell!=null) return (float)Math.toDegrees(Math.atan2(-cell.inward().x,cell.inward().z));
+        }
         if(mouthStruggle(entity,partial))return entity.getData(ModAttachments.PLAYER_ACTION).yaw();
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.MilitaryVehicle vehicle)return -net.minecraft.util.Mth.rotLerp(partial,vehicle.yRotO,vehicle.getYRot());
