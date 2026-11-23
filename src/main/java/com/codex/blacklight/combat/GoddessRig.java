@@ -166,12 +166,24 @@ public final class GoddessRig {
         }
         return result;
     }
+    public static int flowStart(int stage){return stage==0?171:163;}
+    public static int flowEnd(int stage){return stage==0?233:222;}
+    public static int severedPart(int joint){return flag(bones[joint].part);}
+    public static Matrix4f fullLimbOffset(int stage,int joint){
+        int at=((flowStart(stage)-1)*JOINTS+joint)*10;
+        return interpolate(falls[stage],at,at,0,true);
+    }
     public static Matrix4f[] renderOffsets(EncounterMob boss,float partial){
-        var output=pose(boss,partial);
+        float frame=executionFrame(boss,partial);
+        var output=pose(boss,partial,frame);
+        boolean extracting=boss.goddess.action()==GoddessEncounter.Action.EXTRACTING;
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
         for(int j=0;j<JOINTS;j++){
-            boolean inTransfer=boss.goddess.action()==GoddessEncounter.Action.EXTRACTING && flag(bones[j].part)==boss.goddess.part() && executionFrame(boss,partial)<(boss.goddess.poseMask()==0?233:195);
-            if(!visible(boss,j) && !inTransfer)output[j].zero();
-            else output[j].mul(idle(j,boss.tickCount+partial).invert());
+            boolean part=extracting && severedPart(j)==boss.goddess.part();
+            if(!visible(boss,j) && !(part && frame<flowEnd(stage))){output[j].zero();continue;}
+            if(part && frame>=flowStart(stage) && frame<flowEnd(stage))
+                output[j]=fullLimbOffset(stage,j).mul(idle(j,0));
+            output[j].mul(idle(j,boss.tickCount+partial).invert());
         }
         return output;
     }
