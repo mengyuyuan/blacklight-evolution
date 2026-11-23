@@ -1,0 +1,16 @@
+{
+  "name": "Break the Hive",
+  "category": "blacklight:route",
+  "sortnum": 4,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Explore fresh Overworld terrain for the colossal hive. Break through its defenders and attack the living core in Prototype mode. Collect the living hive tissue and operation intel. One grows a passage; the other identifies the sector to search in Futian."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Save your first tissue for the $(l:gateway)Hydra passage$(/l). Extra tissue goes into syringe culture, building infection cores or the weave nest. See $(l:apex)The Supreme Hunter$(/l) for the separate boss route."
+    }
+  ]
+}

@@ -29,6 +29,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
     }
     private static final java.util.Map<AbstractClientPlayer,RenderedView> VIEWS=new java.util.WeakHashMap<>();
     public static RenderedView renderedView(AbstractClientPlayer player){return VIEWS.get(player);}
+    private final com.codex.blacklight.client.renderer.layer.SymbioteLayer symbiote;
     private final BlacklightClawLayer biological;
     private final UtilityPowerLayer utility;
     private final com.codex.blacklight.client.renderer.layer.SovereignWingLayer wings;
@@ -47,6 +48,8 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
                 new com.codex.blacklight.client.model.BlacklightArmorModel(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR),body),context.getModelManager()));
         biological=new BlacklightClawLayer(this);utility=new UtilityPowerLayer(this);
         wings=new com.codex.blacklight.client.renderer.layer.SovereignWingLayer(this);
+        symbiote=new com.codex.blacklight.client.renderer.layer.SymbioteLayer(this);
+        addLayer(symbiote);
         addLayer(biological);addLayer(utility);addLayer(wings);
     }
     /** YSM owns the body pass; only Blacklight's weapon, shield and wing attachments are drawn here. */
@@ -63,6 +66,7 @@ public final class BlacklightPlayerRenderer extends PlayerRenderer {
             stack.translate(0,-1.501F,0);
             model.prepareMobModel(player,0,0,partial);
             model.setupAnim(player,0,0,player.tickCount+partial,0,0);
+            symbiote.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
             biological.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
             utility.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);
             wings.render(stack,buffers,light,player,0,0,partial,player.tickCount+partial,0,0);

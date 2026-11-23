@@ -1,0 +1,16 @@
+{
+  "name": "Recover a Lost Lead",
+  "category": "blacklight:route",
+  "sortnum": 9,
+  "icon": "minecraft:map",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Use $(bold)/blacklightguide$() to review your current objective and recorded sites. Open the vanilla advancements screen for the Blacklight tree. Read cold-storage and convoy documents in the Overworld; read operation intel in the city dimension."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "If a site is already active, return to its existing fight. For an unresponsive lock, check normal mode, the item in your hand, difficulty and the exit space. Search newly generated terrain with structures enabled for natural sites."
+    }
+  ]
+}

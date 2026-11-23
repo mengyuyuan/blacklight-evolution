@@ -1,5 +1,6 @@
 package com.codex.blacklight.military.vehicle;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.MilitaryVehicle;
 import com.codex.blacklight.entity.MilitarySoldier;
 import com.codex.blacklight.registry.ModAttachments;
@@ -90,7 +91,7 @@ public final class VehicleHijackSystem {
             var vehicle=level.getEntity(session.vehicle) instanceof MilitaryVehicle v?v:null;
             if(player==null||vehicle==null||!ready(player)||!contact(player,vehicle)||!session.crew.equals(crew(vehicle))){sessions.remove(session.vehicle);continue;}
             vehicle.setDeltaMovement(Vec3.ZERO);long elapsed=level.getGameTime()-session.started;
-            if(elapsed<30){if(elapsed%5==0)player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hijack",Math.min(100,(int)(elapsed*100/30))),true);continue;}
+            if(elapsed<30){if(elapsed%5==0)FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hijack",Math.min(100,(int)(elapsed*100/30))));continue;}
             var members=List.copyOf(vehicle.getPassengers());var safe=exits(vehicle,members);
             if(safe.isEmpty()){sessions.remove(session.vehicle);continue;}
             // Validate the entire egress before changing any actual passenger. Main-thread commit has no re-spawn path.

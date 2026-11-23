@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MFM",
+    "SFS"
+  ],
+  "key": {
+    "F": {
+      "item": "blacklight:tissue_fiber"
+    },
+    "M": {
+      "item": "blacklight:hive_membrane"
+    },
+    "S": {
+      "item": "blacklight:hive_carapace"
+    }
+  },
+  "result": {
+    "item": "blacklight:weave_bed",
+    "count": 4
+  }
+}

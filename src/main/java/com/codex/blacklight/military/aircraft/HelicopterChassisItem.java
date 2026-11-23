@@ -1,5 +1,6 @@
 package com.codex.blacklight.military.aircraft;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModEntities;
 import java.util.List;
 import net.minecraft.network.chat.Component;
@@ -32,7 +33,7 @@ public final class HelicopterChassisItem extends Item {
         craft.setYRot(yaw);craft.setPos(at);
         if(at.y<context.getLevel().getMinBuildHeight()||at.y+5.8>context.getLevel().getMaxBuildHeight()
                 ||!craft.safeLanding(at)||context.getLevel().containsAnyLiquid(craft.getBoundingBox())){
-            craft.discard();player.displayClientMessage(Component.translatable("message.blacklight.helicopter_place_clear_pad"),true);return InteractionResult.FAIL;
+            craft.discard();FieldNotes.record(player, Component.translatable("message.blacklight.helicopter_place_clear_pad"));return InteractionResult.FAIL;
         }
         craft.pilot().captured(player);craft.setFlightPhase(com.codex.blacklight.entity.BlackwatchHelicopter.Phase.IDLE);
         if(!context.getLevel().addFreshEntity(craft)){craft.discard();return InteractionResult.FAIL;}

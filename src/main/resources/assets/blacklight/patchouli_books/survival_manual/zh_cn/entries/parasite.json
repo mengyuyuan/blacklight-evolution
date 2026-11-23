@@ -1,0 +1,20 @@
+{
+  "name": "寄生针与生物实验",
+  "category": "blacklight:hunts",
+  "sortnum": 16,
+  "icon": "blacklight:supreme_parasite_syringe",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "研究站样本箱有机会出至尊寄生针。已有一支时，可配病毒样本和两份活性蜂巢组织培养成两支。保留一支作下一次培养的种子。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:supreme_parasite_syringe_culture"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "对活着的黑光猎杀者使用寄生针，再削弱并吞噬它，完成生物实验，可解除寄生压制并取得刀锋、装甲和君主之翼。对自己注射会暂时压制能力；给蜂巢注射则引向另一场战斗。"
+    }
+  ]
+}

@@ -51,7 +51,7 @@ public final class BossSiteBlock extends HorizontalDirectionalBlock implements E
             net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
         if (player instanceof ServerPlayer operator && level instanceof ServerLevel server && !player.isSpectator()) {
             String outcome = activate(server, pos, operator);
-            player.displayClientMessage(Component.translatable("survival.blacklight." + outcome), false);
+            FieldNotes.record(player, Component.translatable("survival.blacklight." + outcome));
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }

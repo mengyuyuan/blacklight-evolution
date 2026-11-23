@@ -1,0 +1,16 @@
+{
+  "name": "地下军事基地母巢",
+  "category": "blacklight:ecology",
+  "sortnum": 28,
+  "icon": "blacklight:hive_vein",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "摔碎第一瓶样本后，在主世界或城市寻找地面裂开的血肉脓包和放射状血管。入口是竖井，先准备安全下落和返回的办法。下方中央机库通向仓库、军械库和实验室。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "沿通道检查孵化区，避开成群守卫。实体蜂巢胀大后产怪，击破后可压制这一处威胁。要培养双向通道，仍须使用活性蜂巢组织。"
+    }
+  ]
+}

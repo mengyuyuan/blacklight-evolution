@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.*;
 import com.codex.blacklight.infection.AirPopulation;
 import net.minecraft.nbt.CompoundTag;
@@ -217,14 +218,14 @@ public final class BlacklightHive extends Monster implements GeoEntity {
                 var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
                 if(state.isInfected()){state.addEvolutionPoints(180);state.addBiomass(250);com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.PLAYER_STATE);}
                 com.codex.blacklight.power.GrowthSystem.award(player,"hive_breaker");
-                player.displayClientMessage(Component.translatable("message.blacklight.hive_cleared"),false);
+                FieldNotes.record(player, Component.translatable("message.blacklight.hive_cleared"));
             }
             boss.removeAllPlayers();
         }
     }
     @Override public void remove(RemovalReason reason){boss.removeAllPlayers();super.remove(reason);}
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putBoolean("BlacklightRewarded",rewarded);tag.putFloat("BlacklightGrowth",growth());tag.putInt("BlacklightWaves",waves);tag.putInt("BlacklightWaveCooldown",cooldown);if(broodStage>=0)tag.putInt("BlacklightBroodStage",broodStage);if(brood>=0)tag.putString("BlacklightBrood",BROOD_KEYS[brood]);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);rewarded=tag.getBoolean("BlacklightRewarded");setGrowth(tag.contains("BlacklightGrowth")?tag.getFloat("BlacklightGrowth"):1F);waves=Math.max(0,tag.getInt("BlacklightWaves"));cooldown=net.minecraft.util.Mth.clamp(tag.getInt("BlacklightWaveCooldown"),0,240);broodStage=tag.contains("BlacklightBroodStage")?tag.getInt("BlacklightBroodStage"):-1;brood=java.util.Arrays.asList(BROOD_KEYS).indexOf(tag.getString("BlacklightBrood"));applyBroodName();}
+    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);getPersistentData().remove("BlacklightColossusEvolution");getPersistentData().remove("BlacklightHiveAcceleration");getPersistentData().remove("BlacklightHiveAccelerationHost");rewarded=tag.getBoolean("BlacklightRewarded");setGrowth(tag.contains("BlacklightGrowth")?tag.getFloat("BlacklightGrowth"):1F);waves=Math.max(0,tag.getInt("BlacklightWaves"));cooldown=net.minecraft.util.Mth.clamp(tag.getInt("BlacklightWaveCooldown"),0,240);broodStage=tag.contains("BlacklightBroodStage")?tag.getInt("BlacklightBroodStage"):-1;brood=java.util.Arrays.asList(BROOD_KEYS).indexOf(tag.getString("BlacklightBrood"));applyBroodName();}
     public int waves(){return waves;}
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c){c.add(new AnimationController<>(this,"core",0,s->s.setAndContinue(RawAnimation.begin().thenLoop("idle"))));}
     @Override public AnimatableInstanceCache getAnimatableInstanceCache(){return cache;}

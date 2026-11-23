@@ -1,0 +1,16 @@
+{
+  "name": "The Supreme Hunter",
+  "category": "blacklight:hunts",
+  "sortnum": 17,
+  "icon": "blacklight:hive_carapace",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Bring supplies and clear space around a living hive entity. Inject it with the Supreme Parasite Syringe to release the Supreme Hunter. Back off when the hive bursts. Evade its lunges and punish the recovery after heavy attacks."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Defeat earns the first milestone. For the apex-predator consumption milestone, close in during the kneeling window and finish the consume in Prototype mode. Stop allied attacks or lingering damage from killing it first."
+    }
+  ]
+}

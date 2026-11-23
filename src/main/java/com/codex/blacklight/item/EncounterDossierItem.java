@@ -1,5 +1,6 @@
 package com.codex.blacklight.item;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.world.SurvivalGuide;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -36,13 +37,13 @@ public final class EncounterDossierItem extends Item {
         boolean plaza="mother_plaza".equals(site);
         var dimension=plaza?com.codex.blacklight.city.CityTravel.WORLD:Level.OVERWORLD;
         if (level.dimension()!=dimension || player.isSpectator()) {
-            player.displayClientMessage(Component.translatable(plaza?"survival.blacklight.enter_futian":"survival.blacklight.return_overworld"), false);
+            FieldNotes.record(player, Component.translatable(plaza?"survival.blacklight.enter_futian":"survival.blacklight.return_overworld"));
             return InteractionResultHolder.fail(stack);
         }
         player.getCooldowns().addCooldown(this, 40);
         if(plaza){
             if(!com.codex.blacklight.city.MotherPlazaStructure.chart(server)){
-                player.displayClientMessage(Component.translatable("survival.blacklight.city_site_unavailable"),false);
+                FieldNotes.record(player, Component.translatable("survival.blacklight.city_site_unavailable"));
                 return InteractionResultHolder.fail(stack);
             }
             SurvivalGuide.remember(reader,site,com.codex.blacklight.city.MotherPlazaStructure.console(server));
@@ -50,7 +51,7 @@ public final class EncounterDossierItem extends Item {
         }
         BlockPos dest=server.findNearestMapStructure(destinations,player.blockPosition(),8,false);
         if (dest == null) {
-            player.displayClientMessage(Component.translatable(plaza?"survival.blacklight.city_site_unavailable":"survival.blacklight.no_site"), false);
+            FieldNotes.record(player, Component.translatable(plaza?"survival.blacklight.city_site_unavailable":"survival.blacklight.no_site"));
             return InteractionResultHolder.fail(stack);
         }
         var map = MapItem.create(level, dest.getX(), dest.getZ(), (byte) 2, true, true);

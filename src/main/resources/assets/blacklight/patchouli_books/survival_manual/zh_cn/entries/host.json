@@ -1,0 +1,16 @@
+{
+  "name": "宿主、器官与进化者",
+  "category": "blacklight:ecology",
+  "sortnum": 20,
+  "icon": "blacklight:evolved_ganglion",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "感染动物或其他宿主后，留意它实际捕食和成长的部位。捕食、消化和组织竞争会改变外形与能力。想获得研究样本，应等其成熟，削弱后吸收；仅击杀不能代替取样。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "进化者可能由宿主收集多种成熟器官后形成。追主线时也可按检疫哨踪迹寻找目标。需要神经节就追猎进化者；需要活性蜂巢组织去攻蜂巢。两种材料用途不同。"
+    }
+  ]
+}

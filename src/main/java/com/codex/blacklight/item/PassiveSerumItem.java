@@ -1,5 +1,6 @@
 package com.codex.blacklight.item;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.power.AdaptivePassiveSystem;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -18,11 +19,11 @@ public final class PassiveSerumItem extends Item {
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         var stack = p.getItemInHand(hand);
         if (!com.codex.blacklight.power.IndependentPassives.installed()) {
-            if (!level.isClientSide) p.displayClientMessage(Component.translatable("message.blacklight.passive_moved"), true);
+            if (!level.isClientSide) FieldNotes.record(p, Component.translatable("message.blacklight.passive_moved"));
             return InteractionResultHolder.fail(stack);
         }
         if (com.codex.blacklight.power.IndependentPassives.owns(p, flag)) {
-            if (!level.isClientSide) p.displayClientMessage(Component.translatable("message.blacklight.passive_already_owned"), true);
+            if (!level.isClientSide) FieldNotes.record(p, Component.translatable("message.blacklight.passive_already_owned"));
             return InteractionResultHolder.fail(stack);
         }
         p.startUsingItem(hand); return InteractionResultHolder.consume(stack);

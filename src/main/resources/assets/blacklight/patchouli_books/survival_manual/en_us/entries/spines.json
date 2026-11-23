@@ -1,0 +1,16 @@
+{
+  "name": "Backspines and Critical Mass",
+  "category": "blacklight:powers",
+  "sortnum": 12,
+  "icon": "blacklight:hive_carapace",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Learn and equip Backspines. Kills accumulate orbiting spines. Lock a target to concentrate a volley; otherwise nearby targets can share it. Invest separately in capacity for a larger stock and duration to retain the stock longer."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Learn Critical Mass and the desired devastator. Consume at full health to build the blue reserve. Fully charge attack + use for Graveyard Spikes, use + grab for Tendril Barrage, or attack + grab for Critical Pain. A short reserve can cost health."
+    }
+  ]
+}

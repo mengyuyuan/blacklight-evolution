@@ -1,5 +1,6 @@
 package com.codex.blacklight.mode;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.combat.ClawCombatSystem;
 import com.codex.blacklight.disguise.DisguiseSystem;
 import com.codex.blacklight.animation.PlayerActions;
@@ -22,8 +23,8 @@ public final class PrototypeModeSystem {
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         BlacklightState state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
         if (!state.isInfected()) {
-            player.displayClientMessage(Component.translatable(
-                    "message.blacklight.prototype_mode_requires_infection"), true);
+            FieldNotes.record(player, Component.translatable(
+                    "message.blacklight.prototype_mode_requires_infection"));
             return;
         }
         if (!enabled) DisguiseSystem.endForModeExit(player);
@@ -60,9 +61,9 @@ public final class PrototypeModeSystem {
             ModAttachments.getData(player,ModAttachments.CLAW_COMBAT).reset();
             if(weapon!=PowerForm.NONE)PowerFormSystem.playWeaponMorph(player,weapon,enabled);
         }
-        player.displayClientMessage(Component.translatable(enabled
+        FieldNotes.record(player, Component.translatable(enabled
                 ? "message.blacklight.prototype_mode_enabled"
-                : "message.blacklight.prototype_mode_disabled"), true);
+                : "message.blacklight.prototype_mode_disabled"));
     }
 
     public static boolean isActive(net.minecraft.world.entity.player.Player player) {

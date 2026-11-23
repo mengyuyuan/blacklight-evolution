@@ -20,8 +20,7 @@ public final class FirearmControls {
         var mc=Minecraft.getInstance();while(RELOAD.consumeClick()){
             if(mc.player==null||mc.level==null||mc.screen!=null||mc.isPaused()||!mc.player.isAlive()||mc.player.isSpectator())continue;
             InteractionHand hand=mc.player.getMainHandItem().getItem() instanceof FirearmItem?InteractionHand.MAIN_HAND:InteractionHand.OFF_HAND;
-            if(mc.player.getItemInHand(hand).getItem() instanceof FirearmItem gun){
-                if(gun.reserveAmmo(mc.player)==0)com.codex.blacklight.client.FirearmHud.missing();
+            if(mc.player.getItemInHand(hand).getItem() instanceof FirearmItem){
                 PacketDistributor.sendToServer(new com.codex.blacklight.network.FirearmReloadPayload(hand.ordinal()));
             }
         }

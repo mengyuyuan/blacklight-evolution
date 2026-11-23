@@ -1,0 +1,20 @@
+{
+  "name": "追踪逃逸宿主",
+  "category": "blacklight:route",
+  "sortnum": 2,
+  "icon": "blacklight:evolved_ganglion",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "完成初次吸收和升级后，回检疫哨调查破门。检查沿途草丛和门外的新鲜痕迹，沿红土追到逃逸宿主。痕迹冷了就继续搜查，给逃逸路线留出空间。野外进化者也是神经节的来源。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "取得进化者神经节后，配上铜锭和红石粉制成收容破解器。在主世界阅读研究站的冷库运输单，找到事故区。$(br2)$(l:convoy)下一站：失联车队$(/l)"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:containment_decoder"
+    }
+  ]
+}

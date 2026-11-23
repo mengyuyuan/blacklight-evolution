@@ -1,5 +1,6 @@
 package com.codex.blacklight.infection;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.entity.BlacklightInfectedHost;
 import com.codex.blacklight.registry.ModAttachments;
@@ -23,8 +24,7 @@ import com.codex.blacklight.combat.ForgeEntityTickEvent;
 import java.util.Comparator;
 import java.util.List;
 
-/** Loaded-time outbreak progression. Infection itself never promotes a colossal boss. */
-@EventBusSubscriber(modid = "blacklight")
+/** Archived giant encounter coordinator. Unregistered while the models are under development. */
 public final class ColossusEvolutionSystem {
     public static final int CHECK_INTERVAL = 100;
     public static final int HIVE_MATURITY_TICKS = 12000;
@@ -41,7 +41,6 @@ public final class ColossusEvolutionSystem {
 
     private ColossusEvolutionSystem() {}
 
-    @SubscribeEvent
     public static void onTick(com.codex.blacklight.combat.ForgeEntityTickEvent.Post event) {
         Entity entity = event.getEntity();
         if (!(entity.level() instanceof ServerLevel level)) return;
@@ -304,7 +303,7 @@ public final class ColossusEvolutionSystem {
         };
         for (ServerPlayer player : level.getPlayers(p -> p.isAlive() && !p.isSpectator()
                 && p.distanceToSqr(host) <= PLAYER_RADIUS * PLAYER_RADIUS)) {
-            player.sendSystemMessage(Component.translatable(key, host.getDisplayName()));
+            FieldNotes.record(player, Component.translatable(key, host.getDisplayName()));
         }
         level.playSound(null, host.blockPosition(), SoundEvents.SCULK_CATALYST_BLOOM,
                 SoundSource.HOSTILE, .5F, stage == 4 ? .65F : .85F);

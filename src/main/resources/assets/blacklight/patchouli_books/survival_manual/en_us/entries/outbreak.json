@@ -1,0 +1,16 @@
+{
+  "name": "The Outbreak Clock",
+  "category": "blacklight:ecology",
+  "sortnum": 18,
+  "icon": "blacklight:blacklight_sample",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "The first shattered vial starts the world's outbreak clock; the five stages begin on outbreak days 0, 1, 3, 7 and 14 by default. Servers can change the thresholds. Later stages allow more mature hosts, hunters and airborne infected. Local habitat, loaded chunks and population limits still affect encounters."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "City districts track local infection and military presence. Destroying a hive can suppress its neighborhood. Scout another district for hosts or supplies and watch the sky. Use a field scanner to check for nearby infected."
+    }
+  ]
+}

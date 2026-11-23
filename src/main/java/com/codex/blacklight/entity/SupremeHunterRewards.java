@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.power.GrowthSystem;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModEntities;
@@ -29,7 +30,7 @@ public final class SupremeHunterRewards {
         if(player==null)return;
         keep(player).putBoolean(SUMMONED,true);
         SupremeHunterEmergence.get((ServerLevel)hive.level()).schedule(hive.position(), player.getUUID(), hive.level().getGameTime()+30);
-        player.displayClientMessage(Component.translatable("message.blacklight.parasite_hive"),false);
+        FieldNotes.record(player, Component.translatable("message.blacklight.parasite_hive"));
     }
     /** Milestones live in the persisted sub-tag so death and respawn do not reset them. */
     static net.minecraft.nbt.CompoundTag keep(ServerPlayer player){
@@ -77,6 +78,6 @@ public final class SupremeHunterRewards {
         com.codex.blacklight.power.ParasiteSystem.grantApex(player);
         if(consumed)GrowthSystem.award(player,"supreme_hunter_consumed");
         if(state.isInfected()&&!consumed){state.addEvolutionPoints(400);state.addBiomass(500);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.PLAYER_STATE);}
-        player.displayClientMessage(Component.translatable(consumed?"message.blacklight.supreme_hunter_consumed":"message.blacklight.supreme_hunter_slain"),false);
+        FieldNotes.record(player, Component.translatable(consumed?"message.blacklight.supreme_hunter_consumed":"message.blacklight.supreme_hunter_slain"));
     }
 }

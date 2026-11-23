@@ -1,5 +1,6 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.world.FieldNotes;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -134,14 +135,14 @@ public final class CityTravel {
             yaw=tag.getFloat("yaw");pitch=tag.getFloat("pitch");
         }else{
             target=server.getLevel(destination);
-            if(target==null){player.displayClientMessage(Component.translatable("city.blacklight.unavailable"),false);return 0;}
+            if(target==null){FieldNotes.record(player, Component.translatable("city.blacklight.unavailable"));return 0;}
             origin=requestedOrigin==null?arrivalOrigin(target):requestedOrigin;yaw=CitySystem.futian(target)?180:0;pitch=0;
         }
         // A bounded asynchronous ticket also supports returns to unloaded original worlds.
         if(PENDING.size()>=16)return 0;
         String arrivalMessage=welcome!=null?welcome:destination.equals(WORLD)?"city.blacklight.welcome":"city.blacklight.legacy_welcome";
         PENDING.put(player,new PendingTravel(player,target,origin,yaw,pitch,returning,arrivalMessage));
-        player.displayClientMessage(Component.translatable("hydra.blacklight.wait"),true);
+        FieldNotes.record(player, Component.translatable("hydra.blacklight.wait"));
         tickTravel(player);return 1;
     }
     private static void cancelTravel(ServerPlayer p){var pending=PENDING.remove(p);if(pending!=null)pending.ticket.release();}
@@ -159,13 +160,13 @@ public final class CityTravel {
         }
         if(p.server.getTickCount()>pending.deadline){
             com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("City arrival timed out: dimension={} origin={} readiness={}",pending.target.dimension().location(),pending.origin,pending.ticket.diagnostics());
-            cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.loading_timeout"),false);return;
+            cancelTravel(p);FieldNotes.record(p, Component.translatable("city.blacklight.loading_timeout"));return;
         }
         if(!pending.ticket.prepare(pending.target,pending.origin))return;
         var safe=safePosition(pending.target,pending.origin);
         if(safe==null){
             com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("City arrival has no safe floor: dimension={} origin={} readiness={}",pending.target.dimension().location(),pending.origin,pending.ticket.diagnostics());
-            cancelTravel(p);p.displayClientMessage(Component.translatable("city.blacklight.no_safe_exit"),false);return;
+            cancelTravel(p);FieldNotes.record(p, Component.translatable("city.blacklight.no_safe_exit"));return;
         }
         var back=new CompoundTag();back.putString("dimension",p.level().dimension().location().toString());
         back.putDouble("x",p.getX());back.putDouble("y",p.getY());back.putDouble("z",p.getZ());
@@ -176,7 +177,7 @@ public final class CityTravel {
             if(pending.returning)p.getPersistentData().remove(RETURN);
             else if(!isCity(pending.source.dimension()))p.getPersistentData().put(RETURN,back);
             p.fallDistance=0;p.setDeltaMovement(0,0,0);p.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),40);
-            if(!pending.returning)p.displayClientMessage(Component.translatable(pending.welcome),false);
+            if(!pending.returning)FieldNotes.record(p, Component.translatable(pending.welcome));
         }finally{cancelTravel(p);}
     }
     @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent event){if(event.getEntity() instanceof ServerPlayer p)cancelTravel(p);}
@@ -243,7 +244,7 @@ public final class CityTravel {
             }
             if(sourceHydra!=null&&!sourceHydra.isRemoved())sourceHydra.connect(player.getUUID(),new HydraLink(target.dimension(),carrier.blockPosition(),carrier.getUUID()));
             player.fallDistance=0;player.setDeltaMovement(0,0,0);player.getCooldowns().addCooldown(CityBlocks.TRANSIT.get(),100);
-            player.displayClientMessage(Component.translatable("hydra.blacklight.arrived"),false);
+            FieldNotes.record(player, Component.translatable("hydra.blacklight.arrived"));
             committed=true;return true;
         }finally{
             if(!committed){

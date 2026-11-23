@@ -1,0 +1,15 @@
+{
+  "name": "颞芽",
+  "category": "blacklight:weave",
+  "sortnum": 73,
+  "icon": "blacklight:temple_bud",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "生物质：100。放入组织纤维 ×2、蜂巢血管 ×1、活性蜂巢组织 ×2、蜂巢硬壳 ×2。$(br2)装备在头部槽，攻击伤害 +25。全套基础首击 +100，再乘无限进化的力量倍率。$(br2)一道黑光沿鬓角与后颈游走。"
+    },
+    {
+      "type": "blacklight:layout_temple_bud"
+    }
+  ]
+}

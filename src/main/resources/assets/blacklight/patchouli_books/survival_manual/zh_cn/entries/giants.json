@@ -1,0 +1,12 @@
+{
+  "name": "野外辨认",
+  "category": "blacklight:ecology",
+  "sortnum": 29,
+  "icon": "blacklight:nutrient_node",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "野外先辨认轮廓：普通感染者适合初学吸收；潜行者会贴近，喷吐者要借掩体接近，重甲兽和猎杀者要留出闪避空间。野生九头蛇是伏击者，种植并喂养的九头蛇才是你的通道。"
+    }
+  ]
+}

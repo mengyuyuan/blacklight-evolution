@@ -1,0 +1,20 @@
+{
+  "name": "The Parasite Experiment",
+  "category": "blacklight:hunts",
+  "sortnum": 16,
+  "icon": "blacklight:supreme_parasite_syringe",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "A Supreme Parasite Syringe can appear in a research sample chest. Culture an existing syringe with a virus sample and two living hive tissues to make two. Keep one for the next culture."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:supreme_parasite_syringe_culture"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Inject a living Blacklight Hunter, weaken it, then consume it. This cures parasite suppression and unlocks Blade, Armor and Sovereign Wings. Injecting yourself suppresses powers. Injecting a hive instead starts a different encounter."
+    }
+  ]
+}

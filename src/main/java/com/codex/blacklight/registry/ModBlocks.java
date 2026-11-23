@@ -32,5 +32,13 @@ public final class ModBlocks {
     public static final RegistryObject<Block> BUILDING_BIOMASS=BLOCKS.register("building_biomass",()->new com.codex.blacklight.world.BuildingBiomassBlock(BlockBehaviour.Properties.of().strength(3F,6F).sound(SoundType.SLIME_BLOCK).noOcclusion().noLootTable()));
     public static final RegistryObject<Block> BUILDING_CORE=BLOCKS.register("building_infection_core",()->new com.codex.blacklight.world.BuildingInfectionCoreBlock(BlockBehaviour.Properties.of().strength(5,8).sound(SoundType.SLIME_BLOCK).noOcclusion()));
     public static final RegistryObject<Block> TISSUE_ATTACHMENT=BLOCKS.register("tissue_attachment",()->new com.codex.blacklight.world.TissueAttachmentBlock(BlockBehaviour.Properties.of().strength(.6F).sound(SoundType.SLIME_BLOCK).noCollission().noOcclusion().randomTicks()));
+    public static final RegistryObject<Block> WEAVE_CORE = weave("weave_core",7);
+    public static final RegistryObject<Block> WEAVE_ANCHOR = weave("weave_anchor",1);
+    public static final RegistryObject<Block> WEAVE_CHANNEL = weave("weave_channel",3);
+    public static final RegistryObject<Block> WEAVE_BED = weave("weave_bed",2);
+    private static RegistryObject<Block> weave(String name,int glow){
+        return BLOCKS.register(name,()->new com.codex.blacklight.world.WeaveBlock(BlockBehaviour.Properties.of().strength(3.5F,7F)
+                .sound(SoundType.NETHER_WOOD).dynamicShape().noOcclusion().lightLevel(s->glow).pushReaction(net.minecraft.world.level.material.PushReaction.BLOCK)));
+    }
     public static void register(IEventBus bus){BLOCKS.register(bus);}
 }
