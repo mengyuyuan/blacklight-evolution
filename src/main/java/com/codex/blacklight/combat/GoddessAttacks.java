@@ -136,6 +136,10 @@ public final class GoddessAttacks {
                         if(move!=Move.STRONG_CALL)return;
                     }
                 }
+                if(brood.issued(sequence)){
+                    if(elapsed==39)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,strong || (sequence&1)==0);
+                    if(strong && elapsed==63)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,false);
+                }
                 if(elapsed>=(strong?102:78)){
                     if(brood.issued(sequence))finish();
                     else enter(Move.NEEDLE_RAIN,p);

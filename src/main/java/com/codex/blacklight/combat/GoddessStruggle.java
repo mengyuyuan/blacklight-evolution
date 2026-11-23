@@ -85,6 +85,7 @@ public final class GoddessStruggle {
         return null;
     }
     boolean begin(ServerPlayer p){
+        if(com.codex.blacklight.entity.GoddessEmplacement.releaseGrace(p,boss))return false;
         int arms=Integer.bitCount(boss.goddess.removed()&3),bit=1<<arms;
         if(now()<coolUntil || (spent&bit)!=0 || p.isPassenger() || !p.isAlive() || p.isCreative() || p.isSpectator()
                 || com.codex.blacklight.power.BiomassSystem.active(p))return false;

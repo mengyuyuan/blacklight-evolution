@@ -30,7 +30,8 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
     public void damage(float amount){damage=Float.isFinite(amount)?Math.clamp(amount,0,1000000):0;}
     @Override protected Item getDefaultItem(){return Items.IRON_NUGGET;}
     @Override protected double getDefaultGravity(){return .012;}
-    @Override protected boolean canHitEntity(Entity e){return super.canHitEntity(e)&&e!=getOwner()&&(!(getOwner() instanceof LivingEntity owner)||!owner.isAlliedTo(e));}
+    @Override protected boolean canHitEntity(Entity e){return !(getPersistentData().hasUUID("GoddessSpineCaster") && e.getUUID().equals(getPersistentData().getUUID("GoddessSpineCaster")))
+            && super.canHitEntity(e)&&e!=getOwner()&&(!(getOwner() instanceof LivingEntity owner)||!owner.isAlliedTo(e));}
     @Override protected void onHitEntity(EntityHitResult hit){
         super.onHitEntity(hit);if(level().isClientSide||hit.getEntity()==getOwner())return;
         if(hit.getEntity() instanceof LivingEntity target&&target.hurt(damageSources().thrown(this,getOwner()),damage)){

@@ -125,6 +125,8 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(ModEntities.INFECTED_HOST.get(), com.codex.blacklight.client.renderer.InfectedHostRenderer::new);
         event.registerEntityRenderer(ModEntities.COMMON_INFECTED.get(), com.codex.blacklight.client.renderer.CommonInfectedRenderer::new);
         event.registerEntityRenderer(ModEntities.GREENE_TENDRIL_POD.get(),com.codex.blacklight.client.renderer.GreeneTendrilPodRenderer::new);
+        event.registerEntityRenderer(ModEntities.GREENE_SPINE_CANNON.get(),com.codex.blacklight.client.renderer.GoddessEmplacementRenderer::new);
+        event.registerEntityRenderer(ModEntities.GREENE_GROUND_WRIST.get(),com.codex.blacklight.client.renderer.GoddessEmplacementRenderer::new);
         event.registerEntityRenderer(ModEntities.GROUND_SPIKE.get(), GroundSpikeRenderer::new);
         for(var type:java.util.List.of(ModEntities.BLACKLIGHT_STALKER,ModEntities.BLACKLIGHT_SPITTER,ModEntities.BLACKLIGHT_BRUTE))
             event.registerEntityRenderer(type.get(),context->new com.codex.blacklight.client.renderer.BlacklightCreatureRenderer<com.codex.blacklight.entity.BlacklightMutant>(context,com.codex.blacklight.entity.BlacklightMutant::asset));
