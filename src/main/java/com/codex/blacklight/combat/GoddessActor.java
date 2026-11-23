@@ -29,10 +29,17 @@ public final class GoddessActor {
         int index=(int)frame;
         return new Sample(clips[clip],index*STRIDE,Math.min(248,index+1)*STRIDE,frame-index);
     }
-    public static Vec3 point(EncounterMob boss,int joint,float partial){
+    public static Vec3 localPoint(EncounterMob boss,int joint,float partial){
         var s=sample(boss,partial);
-        var p=new org.joml.Vector3f(s.at(joint*3),s.at(joint*3+1),s.at(joint*3+2));
-        return boss.getPosition(partial).add(new Vec3(GoddessRig.root(boss,partial).transformPosition(p)));
+        return new Vec3(s.at(joint*3),s.at(joint*3+1),s.at(joint*3+2));
+    }
+    public static Vec3 framePoint(int stage,int joint,int frame){
+        int i=(frame-1)*STRIDE+joint*3;
+        return new Vec3(clips[stage][i],clips[stage][i+1],clips[stage][i+2]);
+    }
+    public static Vec3 point(EncounterMob boss,int joint,float partial){
+        return boss.getPosition(partial).add(new Vec3(GoddessRig.root(boss,partial)
+                .transformPosition(localPoint(boss,joint,partial).toVector3f())));
     }
     public static float yaw(EncounterMob boss,float partial){
         var s=sample(boss,partial);

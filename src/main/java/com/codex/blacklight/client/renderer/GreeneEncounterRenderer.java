@@ -120,7 +120,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,com.codex.blacklight.combat.GoddessRig.root(boss,partial));
             GoddessExecutionTracks.draw(boss,partial,stack,buffers,light);
             int overlay=net.minecraft.client.renderer.texture.OverlayTexture.pack(0,net.minecraft.client.renderer.texture.OverlayTexture.v(boss.hurtTime>0));
-            goddess.draw(boss.tickCount+partial,stack,buffers,light,overlay,com.codex.blacklight.combat.GoddessRig.renderOffsets(boss,partial));
+            goddess.draw(boss.tickCount+partial,stack,buffers,light,overlay,com.codex.blacklight.combat.GoddessRig.renderOffsets(boss,partial),boss,partial);
             stack.popPose();
             return;
         }
