@@ -12,6 +12,17 @@ import net.minecraftforge.gametest.*;
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class EntityRemovalGameTest {
     @GameTest(template="wall_test",timeoutTicks=30)
+    public static void stalePlayerWeaponTickCanCancelBackspines(GameTestHelper h) {
+        var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"ReleasedQuills"));
+        h.assertTrue(ModAttachments.available(p),"live player has attachments");
+        p.invalidateCaps();
+        WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(
+                net.minecraftforge.event.TickEvent.Phase.END,p));
+        h.assertTrue(!ModAttachments.available(p),"weapon cleanup must leave the capability invalid");
+        h.succeed();
+    }
+    @GameTest(template="wall_test",timeoutTicks=30)
     public static void stalePlayerEvolutionTickKeepsCapsInvalid(GameTestHelper h) {
         var p=new net.minecraftforge.common.util.FakePlayer(h.getLevel(),
                 new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(),"StaleEvolution"));
