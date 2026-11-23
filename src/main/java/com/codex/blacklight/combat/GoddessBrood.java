@@ -207,6 +207,12 @@ final class GoddessBrood {
         }
         return any;
     }
+    // The offer is bounded even if no walkable surface exists. An uptake already in progress
+    // keeps its normal settlement and release grace.
+    static final int SEARCH_TICKS=30, OFFER_TICKS=48;
+    private static boolean offering(int age,int readyAt) {
+        return readyAt<0 ? age<=SEARCH_TICKS : age-readyAt<OFFER_TICKS && age<SEARCH_TICKS+OFFER_TICKS;
+    }
     private static final class Meal {
         UUID id;
         int readyAt=-1,holdAt=-1,settledAt=-1;
@@ -273,9 +279,17 @@ final class GoddessBrood {
             if(m.claimed)m.spent=true;
             return false;
         }
-        if(m.readyAt<0 || !m.claimed && age-m.readyAt>=180)return false;
+        if(m.readyAt<0 || !m.claimed && !offering(age,m.readyAt))return false;
         m.claimed=true;
-        if(ConsumeVisual.acquiring(stage) || ConsumeVisual.consumeStage(stage))return true;
+        if(ConsumeVisual.acquiring(stage) || ConsumeVisual.consumeStage(stage)){
+            var visual=com.codex.blacklight.registry.ModAttachments.peekData(prey,
+                    com.codex.blacklight.registry.ModAttachments.CONSUME_VISUAL,ConsumeVisual.EMPTY);
+            if(visual.consumerId()==player.getId() && level.getGameTime()-visual.started()
+                    <= visual.duration()+Math.max(0,visual.landingDelay())+15L)return true;
+            // A stalled/disconnected actor cannot keep the entire encounter in recovery.
+            m.spent=true;
+            return false;
+        }
         if(ConsumeVisual.holding(stage)){
             if(m.holdAt<0)m.holdAt=age;
             if(age-m.holdAt<15)return true;
@@ -297,7 +311,8 @@ final class GoddessBrood {
         for(var p:players){
             var m=meals.computeIfAbsent(p.getUUID(),id->new Meal());
             boolean busy=pending(level,p,m,age);
-            if(refresh && !m.claimed && !m.spent && (m.readyAt<0 || age-m.readyAt<180)){
+            boolean wounded=p.getHealth()<p.getMaxHealth();
+            if(refresh && wounded && !m.claimed && !m.spent && offering(age,m.readyAt)){
                 Mob prey=m.id!=null && level.getEntity(m.id) instanceof Mob old && reachableMeal(p,old)?old:null;
                 if(prey==null){
                     if(m.id!=null)assigned.remove(m.id);
@@ -317,11 +332,10 @@ final class GoddessBrood {
                     }
                 }
                 if(prey!=null && m.id!=null)pacify(prey,now);
-                else if(m.readyAt>=0)m.readyAt+=10;
             }
-            if(m.readyAt<0 || age-m.readyAt<180 || busy)finished=false;
+            if(busy || wounded && !m.spent && offering(age,m.readyAt))finished=false;
         }
-        return finished;
+        return finished && age>=16;
     }
     private static void pacify(Mob mob,long now){
         var t=mob.getPersistentData();

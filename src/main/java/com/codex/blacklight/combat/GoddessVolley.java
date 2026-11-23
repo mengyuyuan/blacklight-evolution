@@ -45,7 +45,8 @@ final class GoddessVolley {
         }
         SpiderFoley.play(boss,tufts.get(row*(tufts.size()-1)/4).center,SpiderFoley.Cue.NEEDLE,3.6F);
     }
-    void waves(ServerLevel level,Vec3 aim,boolean high){
+    boolean waves(ServerLevel level,Vec3 aim,boolean high){
+        boolean fired=false;
         Vec3 side=across(aim),forward=new Vec3(-side.z,0,side.x);
         Vec3 first=aim.subtract(forward.scale(14));
         for(int i=-5;i<=5;i++){
@@ -55,11 +56,14 @@ final class GoddessVolley {
             if(ground.getType()!=HitResult.Type.BLOCK)continue;
             var origin=ground.getLocation().add(0,high?2.30:.65,0);
             quill(level,origin,forward,high?1.25:1.55,16,false,high?EvolvedQuill.HIGH_SURF:EvolvedQuill.LOW_SURF);
+            fired=true;
         }
+        if(!fired)return false;
         int wrist=boss.goddess.supportingWrist();
         var joint=boss.hurtRegions(1).get(wrist>=0?wrist:1).bounds().getCenter();
         SpiderFoley.play(boss,joint,high?SpiderFoley.Cue.STRIKE:SpiderFoley.Cue.BRACE,3.7F);
         SpiderFoley.play(boss,first,high?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.STRAIN,1.3F);
+        return true;
     }
     boolean spears(ServerLevel level, Vec3 aim) {
         Vec3 chest = boss.hurtRegions(1).get(1).bounds().getCenter();

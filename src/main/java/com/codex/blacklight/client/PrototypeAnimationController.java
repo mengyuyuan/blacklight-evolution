@@ -151,6 +151,8 @@ public final class PrototypeAnimationController {
         private float facing, previousFacing;
         private int terrainAirTicks;
         private boolean hadGroundSupport;
+        private boolean hitLift;
+        private double hitLiftY;
         private WallTraversal.Mode previousWallMode = WallTraversal.Mode.NONE;
 
         private boolean visualGrounded(AbstractClientPlayer player, Vec3 velocity, boolean moving) {
@@ -182,19 +184,29 @@ public final class PrototypeAnimationController {
                 velocity=new Vec3(step.x,velocity.y,step.z);
             double horizontalSqr = velocity.x * velocity.x + velocity.z * velocity.z;
             visualSpeed=Math.sqrt(horizontalSqr);
-            boolean nowMoving = movingIntent || horizontalSqr >= MOVING_SPEED_SQR;
+            var minecraft = Minecraft.getInstance();
+            boolean local = player == minecraft.player;
+            // Crowds and knockback move the local entity without any requested step.
+            // Remote movement has to be inferred from travel after a hit has settled.
+            boolean nowMoving = movingIntent || !local && player.hurtTime == 0 && horizontalSqr >= MOVING_SPEED_SQR;
             boolean grounded = visualGrounded(player, velocity, nowMoving);
             boolean ontoPlatform = previousWallMode != WallTraversal.Mode.NONE
                     && wallMode == WallTraversal.Mode.NONE && grounded;
             previousWallMode = wallMode;
             var weapon=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL);
-            var minecraft=Minecraft.getInstance();
-            boolean local=player==minecraft.player;
+            if (grounded || charging || wallMode != WallTraversal.Mode.NONE) {
+                hitLift=false;
+            } else if (!hitLift && player.hurtTime >= 7 && velocity.y > 0
+                    && (!local || !minecraft.options.keyJump.isDown())
+                    && !com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_ACTION).clipId().startsWith("basic_jump_")) {
+                hitLift=true;
+                hitLiftY=player.getY();
+            }
             var target=local?ClientTargetLock.entityTarget():player.level().getEntity(com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.TARGET_LOCK_ID));
             boolean locked=target!=null&&target.isAlive()&&!target.isRemoved();
             boolean runningFree=nowMoving&&(sprintIntent||player.isSprinting()||Math.sqrt(horizontalSqr)>=RUN_SPEED);
             targetFacing=locked&&!runningFree&&weapon.spec()==null&&!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING);
-            freeFacing=grounded&&!charging&&wallMode==WallTraversal.Mode.NONE
+            freeFacing=(grounded||player.hurtTime>0)&&!charging&&wallMode==WallTraversal.Mode.NONE
                     &&!player.isPassenger()&&!player.isSleeping()&&!player.isFallFlying()&&!player.getAbilities().flying
                     &&weapon.spec()==null&&!com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)
                     &&(!locked||runningFree);
@@ -210,11 +222,11 @@ public final class PrototypeAnimationController {
                 // Remote players don't reliably expose travel velocity; use their interpolated step.
                 double dx=velocity.x;
                 double dz=velocity.z;
-                if(intent!=null||dx*dx+dz*dz>=MOVING_SPEED_SQR) {
+                if(intent!=null||!local&&nowMoving) {
                     // Face real travel while momentum is still resolving a turn
                     // (especially ice). Input supplies the first near-zero step.
-                    float desired=dx*dx+dz*dz>=.0016?(float)Math.toDegrees(Math.atan2(-dx,dz))
-                            :intent!=null?intent:(float)Math.toDegrees(Math.atan2(-dx,dz));
+                    float desired = (float)Math.toDegrees(Math.atan2(-dx,dz));
+                    if (intent != null && (player.hurtTime > 0 || dx*dx+dz*dz < .0016)) desired = intent;
                     facing+=net.minecraft.util.Mth.clamp(net.minecraft.util.Mth.wrapDegrees(desired-facing),-45F,45F);
                 }
             }
@@ -261,6 +273,12 @@ public final class PrototypeAnimationController {
                 LocomotionPhase resolved = LocomotionPhase.resolve(charging, grounded,
                         velocity.y, nowMoving, running, moving, hardTurn,
                         LandingImpact.Strength.NONE);
+                if(hitLift){
+                    // A shallow knock-up never played the windup for an acrobatic jump.
+                    // Keep the body braced through its apex. A high launch uses the fall pose.
+                    resolved=Math.abs(player.getY()-hitLiftY)<1.25&&velocity.y>-.55
+                            ?LocomotionPhase.IDLE:LocomotionPhase.FALL;
+                }
                 // A fresh direction must leave braking immediately, including while
                 // residual velocity still makes nowMoving true. Do not latch airborne phases.
                 if(charging||!grounded||transitionPhase==LocomotionPhase.BRAKE&&nowMoving)
