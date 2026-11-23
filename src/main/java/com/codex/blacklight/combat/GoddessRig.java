@@ -15,7 +15,7 @@ import java.util.zip.GZIPInputStream;
 public final class GoddessRig {
     public static final List<String> PARTS=List.of("goddess_head","goddess_chest","goddess_base","goddess_left_shoulder",
             "goddess_left_elbow","goddess_left_wrist","goddess_left_hand","goddess_right_shoulder","goddess_right_elbow",
-            "goddess_right_wrist","goddess_right_hand","goddess_hair");
+            "goddess_right_wrist","goddess_right_hand","goddess_hair","colony_wrist","colony_palm","colony_thumb","colony_index","colony_middle","colony_ring","colony_pinky");
     public static final int JOINTS=35;
     private record Bone(int part,float[] idle,Vec3[] centers,Vec3[] half) {}
     private static final Bone[] bones=new Bone[JOINTS];
@@ -110,6 +110,17 @@ public final class GoddessRig {
                 }
             }
         }
+        if(frame==0 && boss.goddess.attacks.hand.visible()){
+            int shoulder=(boss.goddess.removed()&1)==0?3:7;
+            int first=-1;
+            for(int j=0;j<JOINTS;j++)if(bones[j].part==shoulder){first=j;break;}
+            if(first>=0 && bones[first].centers.length>0){
+                var pivot=result[first].transformPosition(bones[first].centers[0].toVector3f());
+                float amount=boss.goddess.attacks.hand.gesture(partial);
+                var gesture=new Matrix4f().translate(pivot).rotateX(-.56F*amount).rotateZ((shoulder==3?1:-1)*.38F*amount).translate(-pivot.x,-pivot.y,-pivot.z);
+                for(int j=0;j<JOINTS;j++)if(bones[j].part>=shoulder && bones[j].part<=shoulder+3)result[j].mulLocal(gesture);
+            }
+        }
         return result;
     }
     public static Matrix4f[] renderOffsets(EncounterMob boss,float partial){
@@ -143,12 +154,12 @@ public final class GoddessRig {
         return root(boss,boss.goddess.facing(partial),(float)boss.goddess.lift(partial),boss.goddess.braceTilt(partial));
     }
     public static List<HydraContact.Region> regions(EncounterMob boss,Vec3 origin,float partial){
-        return build(boss,origin,root(boss,partial),pose(boss,partial));
+        return build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial));
     }
     static List<HydraContact.Region> resting(EncounterMob boss,float yaw,boolean melee){
-        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80));
+        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80),null);
     }
-    private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed){
+    private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed,GoddessHandPose hand){
         var slots=new ArrayList<List<HydraContact.Box>>(PARTS.size());
         for(int i=0;i<PARTS.size();i++) slots.add(new ArrayList<>());
         for(int j=0;j<JOINTS;j++){
@@ -163,6 +174,7 @@ public final class GoddessRig {
                 slots.get(bone.part).add(HydraContact.affine(center,bone.half[i],x,y,z));
             }
         }
+        if(hand!=null)for(var link:hand.links())slots.get(link.slot()).add(link.surface());
         var result=new ArrayList<HydraContact.Region>();
         for(int i=0;i<slots.size();i++){
             var boxes=slots.get(i);

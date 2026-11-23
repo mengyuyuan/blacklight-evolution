@@ -12,6 +12,7 @@ import software.bernie.geckolib.cache.object.GeoBone;
 
 /** Draw the authored shell on the fighting entity, revealing its striking limb during the matching contact animation. */
 public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<EncounterMob> {
+    private final GoddessHandRenderer colonyHand=new GoddessHandRenderer();
     private final GreeneSpiderRenderer spider;
     private final GreeneGoddessRenderer goddess;
     private final SpiderAttackEffects attackEffects=new SpiderAttackEffects();
@@ -96,6 +97,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             return;
         }
         if(boss.goddess.active()){
+            colonyHand.draw(boss,partial,stack,buffers);
             stack.pushPose();
             com.codex.blacklight.client.ClientPoseMatrices.multiply(stack,com.codex.blacklight.combat.GoddessRig.root(boss,partial));
             int overlay=net.minecraft.client.renderer.texture.OverlayTexture.pack(0,net.minecraft.client.renderer.texture.OverlayTexture.v(boss.hurtTime>0));

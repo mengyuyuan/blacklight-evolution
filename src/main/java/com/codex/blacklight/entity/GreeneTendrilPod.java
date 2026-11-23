@@ -38,7 +38,8 @@ public final class GreeneTendrilPod extends Mob {
         var hit=l.clip(new ClipContext(tip.add(0,.65,0),tip.add(0,-1.25,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
         if(hit.getType()!=HitResult.Type.BLOCK || hit.getDirection()!=net.minecraft.core.Direction.UP)return;
         var pod=ModEntities.GREENE_TENDRIL_POD.get().create(l);if(pod==null)return;
-        pod.setPos(hit.getLocation().add(0,.02,0));pod.mother=boss.getUUID();pod.entityData.set(START,l.getGameTime());
+        pod.setPos(hit.getLocation().add(0,.02,0));pod.mother=boss.getUUID();
+        if(boss.goddess.active())pod.getPersistentData().putBoolean("GoddessPod",true);pod.entityData.set(START,l.getGameTime());
         if(!l.getBlockCollisions(pod,pod.getBoundingBox().deflate(.005)).iterator().hasNext() && l.addFreshEntity(pod))SpiderFoley.play(pod,pod.position(),SpiderFoley.Cue.SHED,1.25F);
     }
     @Override public boolean hurt(DamageSource source,float amount){
@@ -59,7 +60,7 @@ public final class GreeneTendrilPod extends Mob {
         super.tick();
         if(!(level() instanceof ServerLevel l))return;
         var owner=mother==null?null:l.getEntity(mother);
-        if(!(owner instanceof EncounterMob boss) || !boss.spider.live()){discard();return;}
+        if(!(owner instanceof EncounterMob boss) || (getPersistentData().getBoolean("GoddessPod") ? !boss.goddess.active()||!boss.goddess.damageable() : !boss.spider.live())){discard();return;}
         float age=age(0);
         if(spent){if(age>=WINDUP+12)discard();return;}
         var floor=l.clip(new ClipContext(position().add(0,.10,0),position().add(0,-.20,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this));
