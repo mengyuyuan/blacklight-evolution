@@ -215,8 +215,6 @@ public final class BlacklightHive extends Monster implements GeoEntity {
             com.codex.blacklight.city.MilitaryCampaignSystem.hiveDefeated(this);
             com.codex.blacklight.city.CityEcology.cleared((ServerLevel)level(),blockPosition());
             if(source.getEntity() instanceof ServerPlayer player){
-                var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
-                if(state.isInfected()){state.addEvolutionPoints(180);state.addBiomass(250);com.codex.blacklight.registry.ModAttachments.setData(player,ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.PLAYER_STATE);}
                 com.codex.blacklight.power.GrowthSystem.award(player,"hive_breaker");
                 FieldNotes.record(player, Component.translatable("message.blacklight.hive_cleared"));
             }

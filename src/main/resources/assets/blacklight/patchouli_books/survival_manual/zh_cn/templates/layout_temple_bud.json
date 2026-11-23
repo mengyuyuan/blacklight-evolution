@@ -53,6 +53,12 @@
       "item": "blacklight:living_hive_tissue"
     },
     {
+      "type": "patchouli:item",
+      "x": 47,
+      "y": 54,
+      "item": "blacklight:wither_core"
+    },
+    {
       "type": "patchouli:text",
       "x": 1,
       "y": 113,

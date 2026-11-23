@@ -2,7 +2,6 @@ package com.codex.blacklight.entity;
 
 import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.power.GrowthSystem;
-import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -72,12 +71,10 @@ public final class SupremeHunterRewards {
     }
     static void defeated(BlacklightSupremeHunter boss,ServerPlayer player,boolean consumed){
         if(player==null)return;
-        var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
         keep(player).putBoolean(DEFEATED,true);
         GrowthSystem.award(player,"supreme_hunter");
         com.codex.blacklight.power.ParasiteSystem.grantApex(player);
         if(consumed)GrowthSystem.award(player,"supreme_hunter_consumed");
-        if(state.isInfected()&&!consumed){state.addEvolutionPoints(400);state.addBiomass(500);com.codex.blacklight.registry.ModAttachments.syncData(player,ModAttachments.PLAYER_STATE);}
         FieldNotes.record(player, Component.translatable(consumed?"message.blacklight.supreme_hunter_consumed":"message.blacklight.supreme_hunter_slain"));
     }
 }

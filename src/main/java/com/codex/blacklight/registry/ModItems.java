@@ -32,6 +32,8 @@ public final class ModItems {
             () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.LEGS));
     public static final RegistryObject<com.codex.blacklight.item.SymbioteCharm> SPORE_ANKLET = ITEMS.register("spore_anklet",
             () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.FEET));
+    public static final RegistryObject<Item> WITHER_CORE = ITEMS.register("wither_core",
+            () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> EVOLVED_GANGLION = ITEMS.register("evolved_ganglion",
             () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final RegistryObject<Item> CONTAINMENT_DECODER = ITEMS.register("containment_decoder",
@@ -110,6 +112,7 @@ public final class ModItems {
                         output.accept(SPORE_ANKLET.get());
                         output.accept(STATION_RECORD.get());
                         output.accept(EVOLVED_GANGLION.get());
+                        output.accept(WITHER_CORE.get());
                         output.accept(CONTAINMENT_DECODER.get());
                         output.accept(HEAVY_ARMOR_CORE.get());
                         output.accept(BLOODTOX_STARTER.get());

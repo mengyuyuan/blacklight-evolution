@@ -33,6 +33,23 @@ public final class CombatRewardsGameTest {
     private static int bio(AssimilationSystem.Yield q){return CombatRewards.fraction(q.biomass(),.5);}
     private static int ep(AssimilationSystem.Yield q){return CombatRewards.fraction(q.ep(),.5);}
     private static void expect(GameTestHelper h,ServerPlayer p,int biomass,int points){h.assertTrue(state(p).getBiomass()==biomass&&state(p).getEvolutionPoints()==points,"bank mismatch: bio="+state(p).getBiomass()+" EP="+state(p).getEvolutionPoints()+" expected="+biomass+"/"+points);}
+    @GameTest(template="wall_test",timeoutTicks=40,batch="hunter_max_health_rewards")
+    public static void actualHunterMaximumDeterminesBothCurrencies(GameTestHelper h) {
+        var p = player(h, true, true);
+        var hunter = h.spawn(com.codex.blacklight.registry.ModEntities.BLACKLIGHT_HUNTER.get(),3,2,5);
+        hunter.setNoAi(true);
+        try {
+            hunter.setHealth(1);
+            var normal = AssimilationSystem.quote(p,hunter);
+            h.assertTrue(hunter.getMaxHealth()==2500 && normal.ep()==625 && normal.biomass()==625,"wounded hunter still pays a quarter of combat maximum");
+            h.assertTrue(CombatRewards.fraction(normal.ep(),.5)==313,"kill rounds half of the consume award");
+            hunter.infectParasite();
+            var parasite = AssimilationSystem.quote(p,hunter);
+            h.assertTrue(hunter.getMaxHealth()==3750 && parasite.ep()==938 && parasite.biomass()==938,"parasite variant uses its own actual health");
+        } finally { hunter.discard();p.discard(); }
+        h.succeed();
+    }
+
     @GameTest(template="wall_test",timeoutTicks=40,batch="rewards_melee")
     public static void normalModeMeleePaysHalfWithoutConsumeProgress(GameTestHelper h){
         var p=player(h,true,false);var m=mob(h);var q=AssimilationSystem.quote(p,m);var growth=ModAttachments.getData(p,ModAttachments.GROWTH);var research=ModAttachments.getData(p,ModAttachments.ORGAN_RESEARCH);

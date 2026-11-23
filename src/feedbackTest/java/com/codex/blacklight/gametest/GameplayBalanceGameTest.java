@@ -27,7 +27,7 @@ import net.minecraftforge.gametest.*;
 public final class GameplayBalanceGameTest {
     private static InfiniteProgress ranks(int rank){var map=new HashMap<String,Long>();for(var a:EvolutionProgression.CORE_ATTRIBUTES)map.put(a.id,(long)rank);return new InfiniteProgress(map);}
     @GameTest(template="wall_test",timeoutTicks=45,batch="configured_passive_gates")
-    public static void legacyLearningWaitsForFiftyAndOneHundredFifty(GameTestHelper h){
+    public static void legacyLearningRespectsBothPassiveThresholds(GameTestHelper h){
         var profile=new GameProfile(UUID.randomUUID(),"ConfigQA");var p=new ServerPlayer(h.getLevel().getServer(),h.getLevel(),profile);
         p.connection=FakePlayerFactory.get(h.getLevel(),profile).connection;p.setGameMode(GameType.SURVIVAL);
         var state=new BlacklightState();state.infect();state.setPrototypeMode(true);state.addEvolutionPoints(10000);
@@ -35,15 +35,15 @@ public final class GameplayBalanceGameTest {
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.EVOLUTION_MILESTONES,new EvolutionMilestones(7));
         com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.ADAPTIVE_PASSIVES,new AdaptivePassiveState(0,90,20,0));
         try{
-            h.assertTrue(PlayerEvolutionConfig.PASSIVE_LEVEL.get()==50&&PlayerEvolutionConfig.PERCENT_LEVEL.get()==150,"real loaded defaults are 50/150");
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(49));EvolutionProgression.refresh(p);
+            h.assertTrue(PlayerEvolutionConfig.PASSIVE_LEVEL.get()==300&&PlayerEvolutionConfig.PERCENT_LEVEL.get()==500,"real loaded defaults are 300/500");
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(299));EvolutionProgression.refresh(p);
             h.assertTrue(!AdaptivePassiveSystem.active(p,1)&&!AdaptivePassiveSystem.active(p,2),"old 20/50 flags cannot bypass the new first tier");
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(50));EvolutionProgression.refresh(p);
-            h.assertTrue(AdaptivePassiveSystem.active(p,1)&&AdaptivePassiveSystem.active(p,2)&&!AdaptivePassiveSystem.percentBased(p)&&!AdaptivePassiveSystem.percentRegeneration(p),"50 opens only both first-tier skills");
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(149));EvolutionProgression.refresh(p);
-            h.assertTrue(!AdaptivePassiveSystem.percentBased(p)&&!AdaptivePassiveSystem.percentRegeneration(p),"149 cannot unlock either second tier");
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(150));EvolutionProgression.refresh(p);
-            h.assertTrue(AdaptivePassiveSystem.percentBased(p)&&AdaptivePassiveSystem.percentRegeneration(p),"150 activates both already-learned second tiers");
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(300));EvolutionProgression.refresh(p);
+            h.assertTrue(AdaptivePassiveSystem.active(p,1)&&AdaptivePassiveSystem.active(p,2)&&!AdaptivePassiveSystem.percentBased(p)&&!AdaptivePassiveSystem.percentRegeneration(p),"300 opens only both first-tier skills");
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(499));EvolutionProgression.refresh(p);
+            h.assertTrue(!AdaptivePassiveSystem.percentBased(p)&&!AdaptivePassiveSystem.percentRegeneration(p),"499 cannot unlock either second tier");
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.INFINITE_EVOLUTION,ranks(500));EvolutionProgression.refresh(p);
+            h.assertTrue(AdaptivePassiveSystem.percentBased(p)&&AdaptivePassiveSystem.percentRegeneration(p),"500 activates both already-learned second tiers");
             h.assertTrue(AdaptivePassiveSystem.state(p).adaptation()==90&&AdaptivePassiveSystem.state(p).regeneration()==20,"migration preserves stack progress");
         }finally{p.discard();}h.succeed();
     }

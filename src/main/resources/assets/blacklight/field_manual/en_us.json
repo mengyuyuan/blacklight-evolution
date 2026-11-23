@@ -149,7 +149,7 @@
       ],
       [
         "Biomass and Reconstruction",
-        "Consume to replenish biomass. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
+        "Consuming grants biomass and EP, each equal to 25% of the target’s maximum health. Ordinary kills pay half the consumption reward by default. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
       ],
       [
         "Biomass and Reconstruction",
@@ -161,7 +161,7 @@
       ],
       [
         "Research and Repeatable Growth",
-        "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 50 for the first adaptation and regeneration tiers, then 150 for the second tiers. Consult the panel for your server's settings."
+        "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 300 for the first adaptation and regeneration tiers, then 500 for the second tiers. Consult the panel for your server's settings."
       ],
       [
         "Terrain and Field Survival",
@@ -417,35 +417,35 @@
       ],
       [
         "Blacklight Sternum Seal",
-        "Cost: 180 biomass. Offer 2 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Hive carapace, 1 Evolved Ganglion.\n\nEquip in the chest slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents pass over the chest, back and upper arms, fading before changing course."
+        "Cost: 180 biomass. Offer 2 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Hive carapace, 1 Evolved Ganglion, 1 Blighted Wither Core. Each infected Wither drops one core.\n\nEquip in the chest slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents pass over the chest, back and upper arms, fading before changing course."
       ],
       [
         "Blacklight Sternum Seal",
-        "A · · · A\n· B · B ·\n· · C · ·\n· D · D ·\n· · E · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Evolved Ganglion\nD = Living Hive Tissue\nE = Hive carapace"
+        "A · C · A\n· B · B ·\n· · F · ·\n· D · D ·\n· · E · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Evolved Ganglion\nD = Living Hive Tissue\nE = Hive carapace\nF = Blighted Wither Core"
       ],
       [
         "Knee Sinew Knots",
-        "Cost: 120 biomass. Offer 4 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue.\n\nEquip in the legs slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents travel between the knees and thighs."
+        "Cost: 120 biomass. Offer 4 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Blighted Wither Core. Each infected Wither drops one core.\n\nEquip in the legs slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nBlack currents travel between the knees and thighs."
       ],
       [
         "Knee Sinew Knots",
-        "· A · A ·\n· B · B ·\nC · · · C\n· A · A ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Living Hive Tissue"
+        "· A · A ·\n· B · B ·\nC · D · C\n· A · A ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Living Hive Tissue\nD = Blighted Wither Core"
       ],
       [
         "Blacklight Anklets",
-        "Cost: 80 biomass. Offer 6 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue.\n\nEquip in the feet slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nNarrow black glints skim the ankles and shoes."
+        "Cost: 80 biomass. Offer 6 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Blighted Wither Core. Each infected Wither drops one core.\n\nEquip in the feet slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nNarrow black glints skim the ankles and shoes."
       ],
       [
         "Blacklight Anklets",
-        "· · · · ·\n· A · A ·\n· B · B ·\nC · · · C\nB B · B B\n\nA = Hive Vein\nB = Tissue Fiber\nC = Living Hive Tissue"
+        "· · · · ·\n· A · A ·\n· B D B ·\nC · · · C\nB B · B B\n\nA = Hive Vein\nB = Tissue Fiber\nC = Living Hive Tissue\nD = Blighted Wither Core"
       ],
       [
         "Temple Bud",
-        "Cost: 100 biomass. Offer 2 Tissue Fiber, 1 Hive Vein, 2 Living Hive Tissue, 2 Hive carapace.\n\nEquip in the head slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nA moving black glint traces the temples and nape."
+        "Cost: 100 biomass. Offer 2 Tissue Fiber, 1 Hive Vein, 2 Living Hive Tissue, 2 Hive carapace, 1 Blighted Wither Core. Each infected Wither drops one core.\n\nEquip in the head slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.\n\nA moving black glint traces the temples and nape."
       ],
       [
         "Temple Bud",
-        "· A B A ·\nC · · · C\n· D · D ·\n· · · · ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Hive carapace\nD = Living Hive Tissue"
+        "· A B A ·\nC · · · C\n· D E D ·\n· · · · ·\n· · · · ·\n\nA = Tissue Fiber\nB = Hive Vein\nC = Hive carapace\nD = Living Hive Tissue\nE = Blighted Wither Core"
       ]
     ]
   }

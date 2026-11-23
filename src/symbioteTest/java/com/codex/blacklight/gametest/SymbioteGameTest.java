@@ -45,6 +45,31 @@ public final class SymbioteGameTest {
     private static com.codex.blacklight.world.WeaveCell cell(GameTestHelper h,BlockPos pos){
         return (com.codex.blacklight.world.WeaveCell)h.getLevel().getBlockEntity(pos);
     }
+    @GameTest(template="wall_test",timeoutTicks=50,batch="wither_core_drop")
+    public static void infectedWitherDropsOneCraftingCore(GameTestHelper h) {
+        var level = h.getLevel();
+        level.getServer().setDifficulty(net.minecraft.world.Difficulty.NORMAL,true);
+        var at = h.absoluteVec(new Vec3(3,15,3));
+        var wither = net.minecraft.world.entity.EntityType.WITHER.create(level);
+        wither.setPos(at);
+        wither.setNoAi(true);
+        level.addFreshEntity(wither);
+        var host = com.codex.blacklight.registry.ModEntities.INFECTED_HOST.get().create(level);
+        host.inherit(wither);
+        host.setPos(at);
+        host.setNoAi(true);
+        level.addFreshEntity(host);
+        var drops = host.getBoundingBox().inflate(4);
+        var core = ModItems.WITHER_CORE.get();
+        wither.hurt(wither.damageSources().genericKill(),Float.MAX_VALUE);
+        h.assertTrue(!wither.isAlive() && level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,drops,
+                item->item.getItem().is(core)).isEmpty(),"ordinary Wither does not drop a core");
+        host.hurt(host.damageSources().genericKill(),Float.MAX_VALUE);
+        var cores = level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,drops,item->item.getItem().is(core));
+        h.assertTrue(!host.isAlive() && cores.size()==1 && cores.get(0).getItem().getCount()==1,"one infected Wither yields exactly one core");
+        h.succeed();
+    }
+
     private static void lay(GameTestHelper h,ServerPlayer p,BlockPos core,com.codex.blacklight.world.WeavePattern pattern) {
         for(int z=0;z<5;z++)for(int x=0;x<5;x++){
             var item=pattern.ingredient(x,z);
@@ -81,9 +106,16 @@ public final class SymbioteGameTest {
         var chest=com.codex.blacklight.world.WeavePattern.CHEST;
         var legs=com.codex.blacklight.world.WeavePattern.KNEES;
         var feet=com.codex.blacklight.world.WeavePattern.FEET;
+        for (var pattern : com.codex.blacklight.world.WeavePattern.values()) {
+            h.assertTrue(pattern.ingredient(2,2)==ModItems.WITHER_CORE.get(),"all four patterns require the Wither Core at the center");
+        }
         lay(h,p,core,chest);tap(p,core,ItemStack.EMPTY,true);
         h.assertTrue(cell(h,core).weaver()==null,"insufficient biomass blocks infusion");
         state.addBiomass(600);
+        tap(p,core,ItemStack.EMPTY,false);
+        tap(p,core,ItemStack.EMPTY,true);
+        h.assertTrue(cell(h,core).weaver()==null && state.getBiomass()==600,"a missing Wither Core prevents infusion");
+        tap(p,core,new ItemStack(ModItems.WITHER_CORE.get()),false);
         p.teleportTo(stand.x,stand.y,stand.z+2.0);
         tap(p,core,ItemStack.EMPTY,true);
         h.assertTrue(cell(h,core).weaver()==null,"out of palm reach");

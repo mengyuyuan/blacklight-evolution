@@ -32,19 +32,18 @@ public final class FeedbackSuggestionsGameTest {
         }finally{target.discard();FeedbackLifecycleGameTest.cleanup(p);}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_metabolism")
-    public static void metabolismPaysForHealingWithoutCreatingCriticalMass(GameTestHelper h){
+    public static void retiredMetabolismCannotRunFromAnOldSave(GameTestHelper h){
         var p=FeedbackLifecycleGameTest.player(h);
         try{
             var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.addBiomass(200);
-            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GROWTH,GrowthProgress.EMPTY.buy(GrowthUpgrade.BIOMASS_METABOLISM));
-            p.setHealth(p.getMaxHealth()/2);float before=p.getHealth();int biomass=state.getBiomass();
-            GrowthSystem.metabolize(p);
-            h.assertTrue(p.getHealth()>before&&state.getBiomass()==biomass-10,"only a delivered healing pulse costs biomass");
-            h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CRITICAL_MASS).reserve()==0,"metabolism cannot farm critical mass");
-            p.setHealth(p.getMaxHealth());biomass=state.getBiomass();GrowthSystem.metabolize(p);
-            h.assertTrue(state.getBiomass()==biomass,"full health consumes no biomass");
-            state.setPrototypeMode(false);p.setHealth(p.getMaxHealth()/2);before=p.getHealth();GrowthSystem.metabolize(p);
-            h.assertTrue(p.getHealth()==before&&state.getBiomass()==biomass,"ordinary mode cannot run the prototype metabolism");
+            com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.GROWTH,new GrowthProgress(524288,0));
+            GrowthSystem.updateHealth(p);
+            p.setHealth(p.getMaxHealth()/2);
+            float before=p.getHealth();
+            int biomass=state.getBiomass();
+            p.tickCount=20;
+            GrowthSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
+            h.assertTrue(p.getHealth()==before && state.getBiomass()==biomass,"retired skill cannot heal or spend biomass");
         }finally{FeedbackLifecycleGameTest.cleanup(p);}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="feedback_claw_grace")

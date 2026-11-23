@@ -16,6 +16,9 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 public final class InfiniteEvolutionSystem {
     private static final ResourceLocation SPEED=new ResourceLocation("blacklight","infinite_mobility");
     private static final Map<ServerPlayer,Integer> LAST_HURT=new WeakHashMap<>();
+    @SubscribeEvent public static void serverStarting(net.minecraftforge.event.server.ServerStartingEvent event) {
+        PlayerEvolutionConfig.migratePassiveThresholds();
+    }
     private InfiniteEvolutionSystem(){}
     public static long rank(Player p,EvolutionAttribute a){return com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.INFINITE_EVOLUTION).rank(a);}
     public static long effectiveRank(Player p,EvolutionAttribute a){return EvolutionProgression.infiniteUnlocked(p)?rank(p,a):0;}

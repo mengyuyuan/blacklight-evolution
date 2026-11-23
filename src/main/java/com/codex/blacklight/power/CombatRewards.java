@@ -2,7 +2,6 @@ package com.codex.blacklight.power;
 
 import com.codex.blacklight.combat.CrossModCombat;
 import com.codex.blacklight.config.GameplayBalanceConfig;
-import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.registry.ModAttachments;
 import java.util.*;
 import net.minecraft.server.MinecraftServer;
@@ -29,16 +28,16 @@ public final class CombatRewards {
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void death(LivingDeathEvent event) {
         if(event.isCanceled()||!(event.getEntity() instanceof Mob victim)||victim.level().isClientSide
-                ||victim instanceof BlacklightHive||CrossModCombat.administrative(event.getSource())
+                ||CrossModCombat.administrative(event.getSource())
                 ||!GameplayBalanceConfig.KILL_REWARDS.get())return;
         // Owned projectiles/TNT keep their causing player; normal delayed kills use vanilla credit.
         var credited=com.codex.blacklight.combat.CombatOwnership.player(event.getSource()) instanceof ServerPlayer owner?owner:victim.getKillCredit();
         if(!(credited instanceof ServerPlayer player)||!player.isAlive()||player.isSpectator()
                 ||player.level()!=victim.level()||!ModAttachments.available(player)
                 ||!ModAttachments.getData(player,ModAttachments.PLAYER_STATE).isInfected())return;
-        var quote=AssimilationSystem.quote(player,victim);
-        int biomass=fraction(quote.biomass(),GameplayBalanceConfig.KILL_BIOMASS.get());
-        int ep=fraction(quote.ep(),GameplayBalanceConfig.KILL_EP.get());
+        int full=AssimilationSystem.fullReward(victim);
+        int biomass=fraction(full,GameplayBalanceConfig.KILL_BIOMASS.get());
+        int ep=fraction(full,GameplayBalanceConfig.KILL_EP.get());
         if(biomass==0&&ep==0)return;
         PENDING.computeIfAbsent(player.server,s->new HashMap<>())
                 .putIfAbsent(victim.getUUID(),new Pending(player,victim,event,biomass,ep));

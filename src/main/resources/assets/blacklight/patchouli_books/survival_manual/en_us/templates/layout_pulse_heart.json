@@ -37,7 +37,7 @@
     {
       "type": "patchouli:item",
       "x": 47,
-      "y": 54,
+      "y": 18,
       "item": "blacklight:evolved_ganglion"
     },
     {
@@ -57,6 +57,12 @@
       "x": 47,
       "y": 90,
       "item": "blacklight:hive_carapace"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 47,
+      "y": 54,
+      "item": "blacklight:wither_core"
     },
     {
       "type": "patchouli:text",

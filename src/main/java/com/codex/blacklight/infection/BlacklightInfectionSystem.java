@@ -49,6 +49,20 @@ public final class BlacklightInfectionSystem {
         return applied || dedicatedBoss;
     }
 
+    @SubscribeEvent
+    public static void dropWitherCore(net.minecraftforge.event.entity.living.LivingDropsEvent event) {
+        LivingEntity victim = event.getEntity();
+        boolean infectedWither = victim instanceof com.codex.blacklight.entity.BlacklightInfectedHost host
+                && host.bossProfile() == com.codex.blacklight.entity.InfectedBossProfile.WITHER
+                || victim instanceof net.minecraft.world.entity.boss.wither.WitherBoss && NativeInfection.active(victim);
+        if (!infectedWither || !(victim.level() instanceof ServerLevel level)
+                || !level.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DOMOBLOOT)) return;
+        var core = new net.minecraft.world.entity.item.ItemEntity(level, victim.getX(), victim.getY(), victim.getZ(),
+                new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.WITHER_CORE.get()));
+        core.setDefaultPickUpDelay();
+        event.getDrops().add(core);
+    }
+
     /** Eligibility is checked before random exposure/cooldown; players awaken voluntarily. */
     public static boolean canInfect(LivingEntity target) {
         return target != null && ModAttachments.available(target) && !target.level().isClientSide && target.isAlive()
