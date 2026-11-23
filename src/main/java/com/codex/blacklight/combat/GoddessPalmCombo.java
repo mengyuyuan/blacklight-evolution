@@ -26,6 +26,7 @@ final class GoddessPalmCombo {
     static float clock(float age,float stopped){
         if(stopped<0 || age<=stopped)return age;
         float dt=age-stopped;
+        if(stopped>=42)return stopped+(END-stopped)*ease((dt-3)/19.);
         return Math.max(0,stopped-1.8F*Math.max(0,dt-3));
     }
     static double pitch(float t){
@@ -82,6 +83,7 @@ final class GoddessPalmCombo {
         return b;
     }
     boolean tick(ServerLevel l,EncounterMob boss,GoddessHand hand,int age){
+        if(stopped>=42)return age>=stopped+22;
         if(stopped>=0)return clock(age,stopped)<=0 && age>stopped+3;
         if(age>=END)return true;
         var before=hand.comboPose(age-1);
