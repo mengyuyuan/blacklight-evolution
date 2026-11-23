@@ -9,6 +9,7 @@ import net.minecraft.world.phys.HitResult;
 
 /** Every visible needle uses the existing physical bone projectile and is obstructed by current terrain. */
 final class GoddessVolley {
+    static final double NEEDLE_SPEED = 2.45;
     private final EncounterMob boss;
     GoddessVolley(EncounterMob boss){this.boss=boss;}
     private Vec3 across(Vec3 aim){
@@ -39,9 +40,11 @@ final class GoddessVolley {
         for(int i=-3;i<=3;i++){
             if(i==opening || i==opening-1 && (boss.goddess.removed()&GoddessVitals.LEFT_ARM)!=0
                     || i==opening+1 && (boss.goddess.removed()&GoddessVitals.RIGHT_ARM)!=0)continue;
-            var endpoint=aim.add(across.scale(i*2.3)).add(forward.scale((row-2)*1.65+.38*i));
+            // The middle spine crosses the led mark. The flanking spines rake front to back.
+            double rake = i == 0 ? 0 : (row - 2) * 1.65 + .38 * i;
+            var endpoint=aim.add(across.scale(i*2.3)).add(forward.scale(rake));
             var origin=tufts.get((i+3)*(tufts.size()-1)/6).nearest(endpoint);
-            quill(level,origin,endpoint.subtract(origin),2.45,12,false,EvolvedQuill.CROWN_NEEDLE);
+            quill(level,origin,endpoint.subtract(origin),NEEDLE_SPEED,12,false,EvolvedQuill.CROWN_NEEDLE);
         }
         SpiderFoley.play(boss,tufts.get(row*(tufts.size()-1)/4).center,SpiderFoley.Cue.NEEDLE,3.6F);
     }

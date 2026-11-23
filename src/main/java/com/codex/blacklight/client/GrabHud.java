@@ -14,6 +14,11 @@ import net.neoforged.neoforge.client.event.RenderGuiEvent;
 @EventBusSubscriber(modid=BlacklightNeoMod.MOD_ID,value=Dist.CLIENT)
 public final class GrabHud {
     private GrabHud() {}
+    private static void drawHint(net.minecraft.client.gui.GuiGraphics g,Minecraft mc,Component label,int x,int y,int color) {
+        int half=(mc.font.width(label)+1)/2;
+        PrototypeHealthHud.reserve(x-half,y,x+half,y+mc.font.lineHeight);
+        g.drawCenteredString(mc.font,label,x,y,color);
+    }
     @SubscribeEvent public static void render(RenderGuiEvent.Post event) {
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.screen!=null||mc.options.hideGui)return;
@@ -22,13 +27,14 @@ public final class GrabHud {
             int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()-110;
             var g=event.getGuiGraphics();float integrity=com.codex.blacklight.power.BiomassEvolution.integrity(mc.player);
             float amount=slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?slime.progress(mc.level.getGameTime(),com.codex.blacklight.power.ConsumeProgression.absorbTicks(mc.player)):integrity;
+            PrototypeHealthHud.reserve(x-50,y+12,x+50,y+16);
             g.fill(x-50,y+12,x+50,y+16,0xDF29252A);g.fill(x-50,y+12,x-50+(int)(100*amount),y+16,0xffa53142);
             int life=com.codex.blacklight.power.BiomassEvolution.lifetime(mc.player);
-            g.drawCenteredString(mc.font,Component.translatable(life<0?"hud.blacklight.slime_stable":"hud.blacklight.slime_decay",Math.max(0,(life-slime.age()+19)/20)),x,y+20,0xffc6b4b8);
+            drawHint(g,mc,Component.translatable(life<0?"hud.blacklight.slime_stable":"hud.blacklight.slime_decay",Math.max(0,(life-slime.age()+19)/20)),x,y+20,0xffc6b4b8);
             return;
         }
         var selected=ClientTerrainGrab.preview();
-        if(!selected.isEmpty()){event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable("hud.blacklight.terrain_select",selected.size()),mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);}
+        if(!selected.isEmpty()){drawHint(event.getGuiGraphics(),mc,Component.translatable("hud.blacklight.terrain_select",selected.size()),mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);}
         int stage=mc.player.getData(ModAttachments.GRAB_STAGE);
         if(!ConsumeVisual.holding(stage))return;
         var block=com.codex.blacklight.combat.BlockThrowSystem.held(mc.player);
@@ -37,11 +43,12 @@ public final class GrabHud {
             int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()/2+42;
             var g=event.getGuiGraphics();
             int cy=mc.getWindow().getGuiScaledHeight()/2;g.fill(x-4,cy,x+5,cy+1,0xffe5ddd7);g.fill(x,cy-4,x+1,cy+5,0xffe5ddd7);
-            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.block_throw",tier,charge*100/com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS),x,y,0xffe5ddd7);
+            drawHint(g,mc,Component.translatable("hud.blacklight.block_throw",tier,charge*100/com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS),x,y,0xffe5ddd7);
+            PrototypeHealthHud.reserve(x-45,y+12,x+45,y+16);
             g.fill(x-45,y+12,x+45,y+16,0xDF29252A);
             g.fill(x-45,y+12,x-45+90*charge/com.codex.blacklight.combat.BlockThrowTuning.MAX_CHARGE_TICKS,y+16,0xffc52c36);
             String mode=com.codex.blacklight.client.SkillBindings.down(mc.options.keyShift)?"manual":block.aimTarget()>=0?"locked":"aim";
-            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.throw_style",Component.translatable("hud.blacklight.throw_"+(block.twoHanded()?"two":"one")),Component.translatable("hud.blacklight.throw_"+mode)),x,y+20,0xffe5ddd7);
+            drawHint(g,mc,Component.translatable("hud.blacklight.throw_style",Component.translatable("hud.blacklight.throw_"+(block.twoHanded()?"two":"one")),Component.translatable("hud.blacklight.throw_"+mode)),x,y+20,0xffe5ddd7);
             return;
         }
         long chargeAt=mc.player.getData(ModAttachments.GRAB_THROW_CHARGE);
@@ -49,7 +56,7 @@ public final class GrabHud {
             int max=com.codex.blacklight.combat.ConsumeSystem.THROW_CHARGE_TICKS;
             int charge=(int)Math.max(0,Math.min(max,mc.level.getGameTime()-chargeAt));
             int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()/2+42;var g=event.getGuiGraphics();
-            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.grab_throw_charge",charge*100/max),x,y,0xffe5ddd7);
+            drawHint(g,mc,Component.translatable("hud.blacklight.grab_throw_charge",charge*100/max),x,y,0xffe5ddd7);
             g.fill(x-45,y+12,x+45,y+16,0xDF29252A);
             g.fill(x-45,y+12,x-45+90*charge/max,y+16,charge>=max?0xffff5a4a:0xffc52c36);
             return;

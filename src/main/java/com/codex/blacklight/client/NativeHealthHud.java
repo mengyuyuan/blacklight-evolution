@@ -40,7 +40,7 @@ final class NativeHealthHud {
         RenderSystem.enableBlend();RenderSystem.defaultBlendFunc();
         try {
             var bar=profile.getAsJsonArray("bar");int bx=bar.get(0).getAsInt(),by=bar.get(1).getAsInt(),bw=bar.get(2).getAsInt(),bh=bar.get(3).getAsInt();
-            g.fill(bx,by,bx+bw,by+bh,0x2DFFEACF);
+            g.fill(bx-1,by-1,bx+bw+1,by+bh+1,0xDF24171B);
             texture(g,"underline","underline",.8984375F);
             texture(g,"junction","junction",.8984375F);
             int end=bx+Math.round(bw*Mth.clamp(health,0,1));

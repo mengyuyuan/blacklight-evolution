@@ -78,7 +78,7 @@ public final class GreeneProjectile extends Projectile {
             var step=entityData.get(FLIGHT_STEP);setDeltaMovement(step.x,step.y,step.z);setPos(position().add(getDeltaMovement()));return;
         }
         if(!(level() instanceof ServerLevel server)||flight==null||launch==null||!(getOwner() instanceof EncounterMob owner)||!owner.isAlive()||owner.isRemoved()
-                ||flesh() && (getPersistentData().getBoolean("GoddessHandShot") ? !owner.goddess.active() || !owner.goddess.damageable() || getPersistentData().getInt("GoddessSequence")!=owner.goddess.attacks.sequence() : !owner.spider.live())||flight.expired()||flight.outOfRange(launch,position())){discard();return;}
+                ||flesh() && (getPersistentData().getBoolean("GoddessHandShot") ? !owner.goddess.attacks.keepsProjectile(getPersistentData().getInt("GoddessSequence")) : !owner.spider.live())||flight.expired()||flight.outOfRange(launch,position())){discard();return;}
         Entity target=targetId==null?null:server.getEntity(targetId);
         if(!GreeneWeaponTarget.valid(owner,target)){flight.loseTarget();target=null;}
         Vec3 from=position(),step=flight.step(from,target==null?null:GreeneWeaponTarget.point(target),target==null?Vec3.ZERO:target.getDeltaMovement().scale(20),.05);

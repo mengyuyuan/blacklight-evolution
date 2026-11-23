@@ -75,7 +75,10 @@ public final class GoddessRush {
                 || p.isSpectator() || p.distanceToSqr(boss)>40*40 || !p.isAlive())return false;
         Vec3 delta=p.position().subtract(boss.position()).multiply(1,0,1);
         if(delta.lengthSqr()<4)return false;
-        grip=-1;origin=boss.position();mark=p.getBoundingBox().getCenter();heading=delta.normalize();
+        grip=-1;origin=boss.position();mark=boss.goddess.attacks.lead(p,34);
+        delta=mark.subtract(origin).multiply(1,0,1);
+        if(delta.lengthSqr()<4)return false;
+        heading=delta.normalize();
         entryYaw=boss.yBodyRot;
         int preferred=p.position().subtract(boss.position()).dot(Vec3.directionFromRotation(0,entryYaw+90))>=0?1:2;
         for(float offset:new float[]{0,.36F,-.36F,.70F,-.70F}){

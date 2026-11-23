@@ -152,11 +152,14 @@ public final class GoddessRig {
         }else if(frame==0 && (boss.goddess.attacks.move()==GoddessAttacks.Move.CALL || boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL)){
             float age=boss.goddess.attacks.age(partial);
             boolean strong=boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL;
-            float cue=GoddessRush.ease(age,1,15)*(1-GoddessRush.ease(age,22,33));
-            float point=GoddessRush.ease(age,19,27)*(1-GoddessRush.ease(age,strong?85:62,strong?100:76));
-            float shift=strong?GoddessRush.ease(age,53,63):0;
+            float cue=GoddessRush.ease(age,1,10)*(1-GoddessRush.ease(age,15,23));
+            int end=strong?GoddessAttacks.STRONG_CALL_END:GoddessAttacks.NORMAL_CALL_END;
+            float point=GoddessRush.ease(age,12,GoddessAttacks.CALL_FIRST)*(1-GoddessRush.ease(age,end-11,end));
+            float beat=(age-GoddessAttacks.CALL_FIRST)/GoddessAttacks.CALL_INTERVAL;
+            float pulse=point*(float)Math.cos(beat*2*Math.PI);
+            float shift=strong?GoddessRush.ease(age,34,42):0;
             var head=result[0].getTranslation(new Vector3f());
-            var call=new Matrix4f().translate(head).rotateX(-.31F*cue+.22F*point)
+            var call=new Matrix4f().translate(head).rotateX(-.31F*cue+.22F*point+.045F*pulse)
                     .rotateY((.32F-.76F*shift)*point).translate(-head.x,-head.y,-head.z);
             result[0].mulLocal(call);result[33].mulLocal(call);result[34].mulLocal(call);
             for(int arm=0;arm<2;arm++){
@@ -165,7 +168,7 @@ public final class GoddessRig {
                 float share=strong?(arm==0?1-shift:shift):(boss.goddess.removed()==0 && arm==1?.22F:1);
                 var pivot=result[first].getTranslation(new Vector3f());
                 var gesture=new Matrix4f().translate(pivot).rotateZ((arm==0?1:-1)*(.32F*cue+.63F*point*share))
-                        .rotateX(-.88F*cue-.45F*point*share).translate(-pivot.x,-pivot.y,-pivot.z);
+                        .rotateX(-.88F*cue-(.45F*point+.12F*pulse)*share).translate(-pivot.x,-pivot.y,-pivot.z);
                 for(int j=first;j<first+14;j++)result[j].mulLocal(gesture);
             }
         }else if(frame==0 && GoddessCastPose.active(boss.goddess.attacks.move())){

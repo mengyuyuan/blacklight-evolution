@@ -28,8 +28,19 @@ public final class GoddessAttacks {
     private Move move=Move.REST;
     private static final int GAZE_INHALE_TICKS = 12;
     private int elapsed, sequence, groups, order;
+    private int lastVolley = -1;
+    static final int CALL_FIRST = 18, CALL_INTERVAL = 8;
+    static final int NORMAL_CALL_END = 52, STRONG_CALL_END = 70;
+    static final int RAIN_END = 44, SURF_END = 49, SPEARS_END = 80;
     private UUID target;
     private Vec3 center=Vec3.ZERO;
+    private final GoddessAim measuredAim = new GoddessAim();
+
+    Vec3 lead(ServerPlayer player, double ticks) {
+        Vec3 center = player.getBoundingBox().getCenter();
+        measuredAim.observe(player.getUUID(), center, player.level().getGameTime());
+        return measuredAim.lead(center, ticks);
+    }
     private boolean caught,grounded,paid,bled;
     private float captureYaw;
     private Vec3 entry=Vec3.ZERO, impulse=Vec3.ZERO;
@@ -61,16 +72,28 @@ public final class GoddessAttacks {
     public boolean ruptured(){return boss.level().isClientSide?client().getBoolean("Paid"):paid;}
     public boolean safe(ServerPlayer p){return move==Move.BREATHER || holds(p) || (move==Move.RUSH && p.getUUID().equals(target) && rush.released() && !rush.landed());}
     public UUID victim(){var t=boss.level().isClientSide?client():null;return t==null?target:t.hasUUID("Target")?t.getUUID("Target"):null;}
-    private ServerPlayer player(ServerLevel level){return target==null?null:level.getEntity(target) instanceof ServerPlayer p&&p.isAlive()&&!p.isSpectator()?p:null;}
+    private ServerPlayer player(ServerLevel level){return target==null?null:level.getEntity(target) instanceof ServerPlayer p&&p.isAlive()&&!p.isSpectator()&&!p.isCreative()?p:null;}
     private ServerPlayer nearest(ServerLevel level){
         return level.players().stream().filter(p->p.isAlive()&&!p.isSpectator()&&!p.isCreative()&&p.distanceToSqr(boss)<112*112)
                 .min(Comparator.comparingDouble(p->p.distanceToSqr(boss))).orElse(null);
     }
+    static boolean recoveryDue(int groups, float health, float maximum) {
+        return health < maximum && (groups >= 4 || groups >= 2 && health <= maximum * .5F);
+    }
+
+    int previousVolley() { return lastVolley; }
+
+    public boolean keepsProjectile(int cast) {
+        return boss.goddess.active() && boss.goddess.action() == GoddessEncounter.Action.FLYING
+                && (cast == sequence || lastVolley != -1 && cast == lastVolley);
+    }
+
     private void send(){boss.goddess.publish();}
     private void enter(Move next,ServerPlayer p){
         if(move==Move.VACUOLE && caught && !paid && boss.level() instanceof ServerLevel level)GoddessHeldMovement.release(player(level),boss);
         debris.clear();
         if(move==Move.BREATHER || next==Move.BREATHER)brood.clearMeals();
+        if (next == Move.BREATHER || next == Move.STRUGGLE || next == Move.RUSH || next == Move.VACUOLE) lastVolley = -1;
         move=next;elapsed=0;caught=false;grounded=false;paid=false;bled=false;
         target=p==null?null:p.getUUID();
         if(p!=null){center=p.getBoundingBox().getCenter();captureYaw=p.yBodyRot;}
@@ -82,6 +105,7 @@ public final class GoddessAttacks {
         abandonMove();
     }
     private void abandonMove(){
+        lastVolley = -1;
         if((caught || move==Move.RUSH) && boss.level() instanceof ServerLevel level){
             var p=player(level);if(p!=null)p.fallDistance=0;
         }
@@ -91,10 +115,13 @@ public final class GoddessAttacks {
         if(!(boss.level() instanceof ServerLevel level))return;
         elapsed++;
         if(move==Move.REST){
-            if(elapsed<(groups>=3?1:order==0?12:3))return;
+            if (elapsed < (order == 0 ? 10 : 2)) return;
             var p=nearest(level);
             if(p==null)return;
-            if(groups>=3){enter(Move.BREATHER,p);}
+            boolean recover = groups >= 2 && level.players().stream().anyMatch(other -> other.isAlive()
+                    && !other.isSpectator() && !other.isCreative() && other.distanceToSqr(boss) <= 100 * 100
+                    && recoveryDue(groups, other.getHealth(), other.getMaxHealth()));
+            if(recover){enter(Move.BREATHER,p);}
             else {
                 Move selected=ORDERS[Math.floorMod(order++,ORDERS.length)];
                 if((selected==Move.CALL || selected==Move.STRONG_CALL) && !brood.ready(selected==Move.STRONG_CALL))selected=Move.NEEDLE_RAIN;
@@ -105,11 +132,13 @@ public final class GoddessAttacks {
                 }
                 else if(selected==Move.RUSH){
                     if(!rush.begin(p))selected=Move.WALL_SPEARS;
-                }else if(order>1 && selected!=Move.HAND && selected!=Move.CALL && selected!=Move.STRONG_CALL && (boss.goddess.removed()&3)!=3
+                }else if(selected==Move.WALL_SPEARS && (boss.goddess.removed()&3)!=3
                         && rush.close(p) && rush.begin(p)){
                     selected=Move.RUSH;
                 }
-                if(selected==Move.HAND && !hand.begin(level,p))selected=Move.NEEDLE_RAIN;
+                if (selected == Move.HAND && !hand.begin(level,p)) {
+                    selected = (order & 2) == 0 ? Move.BLOOD_SURF : Move.NEEDLE_RAIN;
+                }
                 enter(selected,p);
             }
             if(move==Move.VACUOLE)SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.INHALE,3.8F);
@@ -127,6 +156,7 @@ public final class GoddessAttacks {
         var p=player(level);
         if(p==null && struggle.active() && struggle.step()==GoddessStruggle.Step.OPEN && struggle.age(0)<15)return;
         if(p==null){if(struggle.active()){struggle.cancel(null);hand.cancel();}if(move==Move.HAND)hand.cancel();abandonMove();return;}
+        measuredAim.observe(p.getUUID(), p.getBoundingBox().getCenter(), level.getGameTime());
         telegraphStrain();
         switch(move){
             case STRUGGLE -> {
@@ -144,28 +174,39 @@ public final class GoddessAttacks {
                 boolean strong=move==Move.STRONG_CALL;
                 if(brood.orderBroken(level,sequence)){finish();return;}
                 if(elapsed==8)brood.signal(level,p,strong);
-                if(elapsed>=26 && elapsed<26+(strong?6:4)*12 && (elapsed-26)%12==0){
-                    if(brood.reinforce(level,p,strong,(elapsed-26)/12,sequence) && strong && !paid){
+                if(elapsed>=CALL_FIRST && elapsed<CALL_FIRST+(strong?6:4)*CALL_INTERVAL && (elapsed-CALL_FIRST)%CALL_INTERVAL==0){
+                    if(brood.reinforce(level,p,strong,(elapsed-CALL_FIRST)/CALL_INTERVAL,sequence) && strong && !paid){
                         paid=true;send();boss.goddess.paid(4500);
                         if(move!=Move.STRONG_CALL)return;
                     }
                 }
-                if(elapsed==38 && !brood.issued(sequence)){
+                if(elapsed==CALL_FIRST+CALL_INTERVAL && !brood.issued(sequence)){
                     enter(Move.NEEDLE_RAIN,p);
                     return;
                 }
                 if(brood.issued(sequence)){
-                    if(elapsed==39)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,strong || (sequence&1)==0);
-                    if(strong && elapsed==63)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,false);
+                    if(elapsed==CALL_FIRST+CALL_INTERVAL+1)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,strong || (sequence&1)==0);
+                    if(strong && elapsed==CALL_FIRST+3*CALL_INTERVAL+1)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,false);
                 }
-                if(elapsed>=(strong?102:78)){
+                if(elapsed>=(strong?STRONG_CALL_END:NORMAL_CALL_END)){
                     if(brood.issued(sequence))finish();
                     else enter(Move.NEEDLE_RAIN,p);
                 }
             }
             case NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF -> {
-                if(elapsed<=10 || move==Move.BLOOD_SURF && elapsed>=21 && elapsed<=28){
-                    center=p.getBoundingBox().getCenter();boss.getLookControl().setLookAt(p,18,12);
+                if (move == Move.NEEDLE_RAIN && elapsed >= 8 && elapsed <= 32 && (elapsed - 8) % 6 == 0) {
+                    // Each row commits four ticks before release. Both the crown and the needles use this mark.
+                    var crown = boss.hurtRegions(1).get(11);
+                    if (!crown.boxes().isEmpty()) {
+                        double range = crown.bounds().getCenter().distanceTo(p.getBoundingBox().getCenter());
+                        center = lead(p, 4 + GoddessAim.flightTicks(range, GoddessVolley.NEEDLE_SPEED));
+                        boss.getLookControl().setLookAt(center.x, center.y, center.z, 18, 12);
+                        send();
+                    }
+                } else if (move != Move.NEEDLE_RAIN && (elapsed <= 10 || move == Move.BLOOD_SURF && elapsed >= 21 && elapsed <= 28)) {
+                    center = move == Move.BLOOD_SURF ? lead(p, elapsed <= 10 ? 12 - elapsed + 10 : 38 - elapsed + 12)
+                            : p.getBoundingBox().getCenter();
+                    boss.getLookControl().setLookAt(center.x, center.y, center.z, 18, 12);
                     if(elapsed%3==0 || elapsed==10 || elapsed==28)send();
                 }
                 if(move==Move.NEEDLE_RAIN && elapsed>=12&&elapsed<=36&&(elapsed-12)%6==0)volley.rain(level,center,(elapsed-12)/6);
@@ -184,7 +225,7 @@ public final class GoddessAttacks {
                     finish();
                     return;
                 }
-                if(elapsed>=(move==Move.WALL_SPEARS?112:55))finish();
+                if(elapsed>=(move==Move.WALL_SPEARS?SPEARS_END:move==Move.BLOOD_SURF?SURF_END:RAIN_END))finish();
             }
             default -> { }
         }
@@ -222,7 +263,8 @@ public final class GoddessAttacks {
     }
     private void finish(){
         boss.goddess.finishedAttack();
-        groups=Math.min(3,groups+(move==Move.STRONG_CALL && paid ? 2 : 1));
+        lastVolley = sequence;
+        groups=Math.min(4,groups+(move==Move.STRONG_CALL && paid ? 2 : 1));
         enter(Move.REST,null);
     }
     private Vec3 eyes(){return GoddessCastPose.face(boss,1);}
@@ -363,7 +405,7 @@ public final class GoddessAttacks {
     }
     public CompoundTag save(){
         var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putInt("Age",elapsed);if(move==Move.VACUOLE)t.putBoolean("GazeInhale",true);t.putLong("Start",boss.level().getGameTime()-elapsed);
-        brood.saveCall(t);t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
+        brood.saveCall(t);t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("LastVolley",lastVolley);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
         t.putFloat("CaptureYaw",captureYaw);
@@ -382,7 +424,7 @@ public final class GoddessAttacks {
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));
         move=decode(t);elapsed=Math.max(0,t.getInt("Age"));
         if(move==Move.VACUOLE && elapsed>0 && !t.getBoolean("GazeInhale"))elapsed+=GAZE_INHALE_TICKS;
-        sequence=t.getInt("Sequence");groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));
+        sequence=t.getInt("Sequence");lastVolley=t.contains("LastVolley")?t.getInt("LastVolley"):-1;groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));
         caught=t.getBoolean("Caught");grounded=t.getBoolean("Ground");paid=t.getBoolean("Paid");bled=t.getBoolean("Bled");center=readCenter(t);target=t.hasUUID("Target")?t.getUUID("Target"):null;
         if(move==Move.STRUGGLE){move=Move.REST;target=null;elapsed=0;sequence++;hand.cancel();}
     }
