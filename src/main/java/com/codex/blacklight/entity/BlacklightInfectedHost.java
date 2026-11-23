@@ -125,7 +125,7 @@ public final class BlacklightInfectedHost extends Monster {
                 ||!catalyzed && !com.codex.blacklight.infection.EvolvedForm.eligible(tissueInheritance(),tissueAge())||!evolvedSpace())return false;
         var server=(net.minecraft.server.level.ServerLevel)level();
         var den=com.codex.blacklight.combat.SpiderPhase.encounterForEvolution(server,this);
-        if(den!=null && !den.canStartEvolution(server))return false;
+        if(den!=null && !den.canStartEvolution(server) || !com.codex.blacklight.combat.GoddessAttacks.mayEvolve(server,this))return false;
         if(catalyzed){
             var variants=com.codex.blacklight.infection.EvolvedArchetype.values();
             var variant=variants[getRandom().nextInt(variants.length)];

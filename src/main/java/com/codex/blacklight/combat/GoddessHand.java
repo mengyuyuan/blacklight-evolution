@@ -81,7 +81,7 @@ public final class GoddessHand {
                 && (!d.hasUUID("EncounterOwner")||d.getUUID("EncounterOwner").equals(boss.getUUID()));
     }
     boolean begin(ServerLevel l,ServerPlayer p){
-        if(now()<cooldown || (boss.goddess.removed()&3)==3)return false;
+        if(!formed && now()<cooldown || (boss.goddess.removed()&3)==3)return false;
         side=(boss.goddess.removed()&1)==0?-1:1;
         var eye=p.getEyePosition();
         var toward=boss.position().subtract(eye).multiply(1,0,1).normalize();
@@ -135,7 +135,7 @@ public final class GoddessHand {
         stone=null;vein=null;
     }
     void cancel(){
-        if(visible()){cooldown=now()+100;SpiderFoley.play(boss,anchor,SpiderFoley.Cue.SHED,1);}
+        if(visible()){cooldown=Math.max(cooldown,now()+100);SpiderFoley.play(boss,anchor,SpiderFoley.Cue.SHED,1);}
         formed=forming=acting=false;donors.clear();releaseRock(Vec3.ZERO);
     }
     boolean tick(ServerLevel l,ServerPlayer p,GoddessVolley volley){
@@ -156,7 +156,7 @@ public final class GoddessHand {
             if(t<35)return false;
             if(close<3){if(t<49)return false;cancel();return true;}
             for(UUID id:donors)if(l.getEntity(id) instanceof BlacklightCommonInfected m && available(m) && m.getBoundingBox().getCenter().distanceToSqr(anchor)<6.25)m.discard();
-            donors.clear();forming=false;formed=true;started=now();
+            donors.clear();forming=false;formed=true;started=now();cooldown=now()+440;
             SpiderFoley.play(boss,anchor,SpiderFoley.Cue.CATCH,1.6F);
             boss.goddess.publish();boss.goddess.paid(3000);
             return false;

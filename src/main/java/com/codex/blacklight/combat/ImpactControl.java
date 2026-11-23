@@ -103,6 +103,9 @@ public final class ImpactControl {
         if(ModAttachments.peekData(entity, ModAttachments.HIT_REACTION, HitReaction.EMPTY).duration()>0)publish(entity,HitReaction.EMPTY);
     }
     private static int controlLimit(Mob mob,Control control){return control.knockdown()&&mob instanceof com.codex.blacklight.entity.BlacklightMutant brute&&brute.kind()==com.codex.blacklight.entity.BlacklightMutant.Kind.BRUTE?BruteKnockdown.MAX_CONTROL_TICKS:80;}
+    public static boolean knockedDown(Mob mob){
+        return stunned(mob) && ACTIVE.get(mob).knockdown();
+    }
     public static boolean stunned(Mob mob){
         if(mob.level().isClientSide)return false;
         if(NativeBossBodyControl.ownsPose(mob)){cancel(mob);return false;}

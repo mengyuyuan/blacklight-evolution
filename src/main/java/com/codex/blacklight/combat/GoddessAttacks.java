@@ -84,6 +84,7 @@ public final class GoddessAttacks {
             if(groups>=2){enter(Move.BREATHER,p);}
             else {
                 Move selected=ORDERS[Math.floorMod(order++,ORDERS.length)];
+                if((selected==Move.CALL || selected==Move.STRONG_CALL) && !brood.ready(selected==Move.STRONG_CALL))selected=Move.NEEDLE_RAIN;
                 if(selected==Move.STRUGGLE){
                     if(!struggle.begin(p))selected=Move.NEEDLE_RAIN;
                 }else if(selected==Move.RUSH && hand.readyForGrip() && !rush.close(p) && struggle.begin(p)){
@@ -127,13 +128,18 @@ public final class GoddessAttacks {
             case RUSH -> {if(rush.tick(level,p,elapsed))finish();}
             case CALL, STRONG_CALL -> {
                 boolean strong=move==Move.STRONG_CALL;
+                if(brood.orderBroken(level,sequence)){finish();return;}
+                if(elapsed==8)brood.signal(level,p,strong);
                 if(elapsed>=26 && elapsed<26+(strong?6:4)*12 && (elapsed-26)%12==0){
                     if(brood.reinforce(level,p,strong,(elapsed-26)/12,sequence) && strong && !paid){
                         paid=true;send();boss.goddess.paid(4500);
                         if(move!=Move.STRONG_CALL)return;
                     }
                 }
-                if(elapsed>=(strong?102:78))finish();
+                if(elapsed>=(strong?102:78)){
+                    if(brood.issued(sequence))finish();
+                    else enter(Move.NEEDLE_RAIN,p);
+                }
             }
             case NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF -> {
                 if(elapsed<=10){
@@ -148,6 +154,7 @@ public final class GoddessAttacks {
             default -> { }
         }
     }
+    public static boolean mayEvolve(ServerLevel level,com.codex.blacklight.entity.BlacklightInfectedHost host){return GoddessBrood.canEvolve(level,host);}
     public static void releaseBrood(net.minecraft.world.entity.Mob mob){GoddessBrood.release(mob);}
     int strainingSlot(){
         int wrist=boss.goddess.supportingWrist();
@@ -299,7 +306,7 @@ public final class GoddessAttacks {
     }
     public CompoundTag save(){
         var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putInt("Age",elapsed);t.putLong("Start",boss.level().getGameTime()-elapsed);
-        t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
+        brood.saveCall(t);t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
         t.putFloat("CaptureYaw",captureYaw);
@@ -312,7 +319,7 @@ public final class GoddessAttacks {
     private static Move decode(CompoundTag t){try{return Move.valueOf(t.getString("Move"));}catch(IllegalArgumentException e){return Move.REST;}}
     private static Vec3 readCenter(CompoundTag t){return new Vec3(t.getDouble("X"),t.getDouble("Y"),t.getDouble("Z"));}
     public void load(CompoundTag t){
-        struggle.load(t.getCompound("Struggle"));hand.load(t.getCompound("Hand"));rush.load(t.getCompound("Rush"));captureYaw=t.getFloat("CaptureYaw");
+        brood.loadCall(t);struggle.load(t.getCompound("Struggle"));hand.load(t.getCompound("Hand"));rush.load(t.getCompound("Rush"));captureYaw=t.getFloat("CaptureYaw");
         entry=new Vec3(t.getDouble("EntryX"),t.contains("EntryY")?t.getDouble("EntryY"):-.9,t.getDouble("EntryZ"));
         impulse=new Vec3(t.getDouble("PushX"),0,t.getDouble("PushZ"));
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));

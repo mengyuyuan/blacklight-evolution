@@ -102,6 +102,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             return;
         }
         if(boss.goddess.active()){
+            GoddessLeaderRenderer.draw(boss,partial,stack,buffers,light);
             GoddessStruggleRenderer.draw(boss,partial,stack,buffers,light);
             colonyHand.draw(boss,partial,stack,buffers);
             stack.pushPose();
