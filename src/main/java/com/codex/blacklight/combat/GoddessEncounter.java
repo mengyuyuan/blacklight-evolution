@@ -14,6 +14,10 @@ import java.util.UUID;
 public final class GoddessEncounter {
     public enum Action { FLYING, STAGGER, FALLING, DOWN, GRIPPED, EXTRACTING, RISING }
     private final EncounterMob boss;
+    private final GoddessSceneClock scene = new GoddessSceneClock();
+    private int sceneSequence;
+    private long serverTickOffset;
+    private boolean receivedTimeline;
     public final GoddessAttacks attacks;
     private final GoddessVitals life = new GoddessVitals();
     private Action action = Action.FLYING;
@@ -136,7 +140,21 @@ public final class GoddessEncounter {
         return index >= 0 && index < Action.values().length ? Action.values()[index] : Action.FLYING;
     }
     public float age(float partial) {
-        return boss.level().isClientSide ? Math.max(0, boss.level().getGameTime() - boss.goddessData().getLong("Start") + partial) : age + partial;
+        return boss.level().isClientSide ? scene.age(boss.tickCount, partial) : age + partial;
+    }
+    public void receiveTimeline(CompoundTag data) {
+        if (!data.contains("Start")) return;
+        long published = data.getLong("Start") + data.getInt("Age");
+        long observed = Math.max(published, boss.level().getGameTime());
+        if (!receivedTimeline) {
+            serverTickOffset = observed - boss.tickCount;
+            receivedTimeline = true;
+        }
+        scene.synchronize(data.getInt("SceneSequence"), data.getInt("Action"), data.getLong("Start"), observed, boss.tickCount);
+        attacks.receiveTimeline(data.getCompound("Offense"), observed);
+    }
+    long visualServerTick() {
+        return boss.tickCount + serverTickOffset;
     }
     public float facing(float partial) {
         if(action()==Action.FLYING && attacks.move()==GoddessAttacks.Move.RUSH)return attacks.rush.bodyYaw(attacks.age(partial));
@@ -247,6 +265,7 @@ public final class GoddessEncounter {
         boss.playSound(SoundEvents.RAVAGER_ROAR, 2F,.65F);
     }
     private void change(Action next) {
+        sceneSequence++;
         action = next;
         age = 0;
         publish();
@@ -394,6 +413,7 @@ public final class GoddessEncounter {
         t.put("Offense",attacks.save());
         t.putBoolean("Initialized",initialized);
         t.putInt("Action",action.ordinal());
+        t.putInt("SceneSequence",sceneSequence);
         t.putInt("Age",age);
         t.putInt("Part",part);
         t.putInt("Removed",life.removed());
@@ -415,6 +435,7 @@ public final class GoddessEncounter {
         attacks.load(t.getCompound("Offense"));
         initialized=t.getBoolean("Initialized");
         action=readAction(t);
+        sceneSequence=t.getInt("SceneSequence");
         age=Math.max(0,t.getInt("Age"));
         part=t.getInt("Part");
         previousMask=t.getInt("Before") & 7;

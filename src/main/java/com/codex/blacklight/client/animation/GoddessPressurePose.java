@@ -16,7 +16,7 @@ public final class GoddessPressurePose {
     private static final java.util.Map<Player,Binding> owners=new java.util.WeakHashMap<>();
 
     public static EncounterMob owner(Player player){
-        long tick=player.level().getGameTime();
+        long tick=player.tickCount;
         Binding cached=owners.get(player);
         if(cached!=null && cached.tick()==tick)return cached.owner();
         EncounterMob owner=null;
