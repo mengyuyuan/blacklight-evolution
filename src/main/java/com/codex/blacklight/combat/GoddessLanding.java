@@ -43,5 +43,58 @@ final class GoddessLanding {
         }
         return best;
     }
+    /** Use a point on the planted skin facing the thrower. The middle of a multipart
+     * wrist can be hollow or well inside a slope, even when its fingers are reachable. */
+    static Site forStagger(EncounterMob boss, float heading, net.minecraft.world.entity.player.Player player) {
+        Vec3 viewer = player == null ? boss.position() : player.position();
+        Site landing = sampleStagger(boss, heading, viewer, false);
+        return landing == null ? sampleStagger(boss, heading, viewer, true) : landing;
+    }
+
+    private static Site sampleStagger(EncounterMob boss, float heading, Vec3 viewer, boolean searchAllSurfaces) {
+        Site best = null;
+        double bestScore = Double.POSITIVE_INFINITY;
+        var level = boss.level();
+        int wrist = boss.goddess.supportingWrist();
+        for (int turn : new int[]{0, 1, -1, 2, -2, 3, -3, 4}) {
+            float yaw = heading + turn * 45;
+            var skin = GoddessRig.resting(boss, yaw, true);
+            for (int slot : new int[]{wrist, wrist < 0 ? -1 : wrist + 1, 0, 1}) {
+                if (slot < 0) continue;
+                var boxes = skin.get(slot).boxes();
+                if (boxes.isEmpty()) continue;
+                var nearest = boxes.stream().min(java.util.Comparator.comparingDouble(box -> box.center.distanceToSqr(viewer))).orElseThrow();
+                for (var patch : boxes) {
+                    if (!searchAllSurfaces && patch != nearest) continue;
+                    double toward = Math.atan2(viewer.z - patch.center.z, viewer.x - patch.center.x);
+                    for (int side = 0; side < 8; side++) {
+                        double angle = toward + side * Math.PI / 4;
+                        var outward = new Vec3(Math.cos(angle), 0, Math.sin(angle));
+                        var edge = patch.nearest(patch.center.add(outward.scale(12)));
+                        var scan = edge.add(outward.scale(1.65));
+                        var ground = level.clip(new ClipContext(scan.add(0, searchAllSurfaces ? 22 : 7, 0), scan.add(0, -40, 0),
+                                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+                        if (ground.getType() != HitResult.Type.BLOCK || ground.getDirection() != net.minecraft.core.Direction.UP) continue;
+                        var feet = ground.getLocation().add(0, .002, 0);
+                        double lift = feet.y + 1.45 - edge.y;
+                        double score = feet.distanceTo(viewer) + .40 * Math.abs(lift) + .16 * Math.abs(turn);
+                        if (score >= bestScore) continue;
+                        var standing = new AABB(feet.x-.32, feet.y, feet.z-.32, feet.x+.32, feet.y+1.86, feet.z+.32);
+                        if (level.getBlockCollisions(boss, standing).iterator().hasNext() || !level.getFluidState(net.minecraft.core.BlockPos.containing(feet)).isEmpty()) continue;
+                        var eye = feet.add(0, 1.62, 0);
+                        var hit = HydraHurtContact.ray(skin, eye.subtract(0, lift, 0), edge.lerp(patch.center, .12),
+                                com.codex.blacklight.infection.InfectedAttackStyle.CRUSH);
+                        if (hit == null || !boss.goddess.groundOpening(GoddessRig.PARTS.indexOf(hit.bone()))) continue;
+                        var target = hit.point().add(0, lift, 0);
+                        if (eye.distanceToSqr(target) > 2.9*2.9 || !HydraHurtContact.clear(boss, eye, target)) continue;
+                        best = new Site(yaw, lift, feet);
+                        bestScore = score;
+                        if (searchAllSurfaces) return best;
+                    }
+                }
+            }
+        }
+        return best;
+    }
     private GoddessLanding(){}
 }

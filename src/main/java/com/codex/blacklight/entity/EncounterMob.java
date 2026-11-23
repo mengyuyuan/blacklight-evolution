@@ -1337,8 +1337,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                 BossSiteData.participant(this,source.getEntity());
                 if(incomingContact!=null)confirmedIncoming(source,amount);
                 goddess.afterDamage();
-                goddess.attacks.hand.hitController(source,incomingContact);
                 if(source.getDirectEntity() instanceof ThrownBlock rock)goddess.rockImpact(rock,incomingContact);
+                goddess.attacks.hand.hitController(source,incomingContact);
             }
             return accepted;
         }
