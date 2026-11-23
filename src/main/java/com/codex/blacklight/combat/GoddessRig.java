@@ -165,6 +165,9 @@ public final class GoddessRig {
                         .rotateX(-.48F*draw+.27F*spread-.32F*pull).translate(-pivot.x,-pivot.y,-pivot.z);
                 for(int j=first;j<first+14;j++)result[j].mulLocal(sweep);
             }
+        }else if(frame==0 && boss.goddess.attacks.hand.melee()){
+            int first=(boss.goddess.removed()&1)==0?5:19;
+            GoddessPalmCombo.conduct(result,first,boss.goddess.attacks.hand.controlTime(partial));
         }else if(frame==0 && boss.goddess.attacks.hand.visible()){
             int shoulder=(boss.goddess.removed()&1)==0?3:7;
             int first=-1;

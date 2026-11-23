@@ -24,6 +24,33 @@ final class GoddessHandRenderer {
         var shape=hand.pose(partial);if(shape==null)return;
         var origin=boss.getPosition(partial);
         var skin=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumeTendrilSegmentMesh.TEXTURE));
+        if(hand.melee()){
+            var controller=boss.hurtRegions(partial).get((boss.goddess.removed()&1)==0?5:9);
+            if(!controller.boxes().isEmpty()){
+                Vec3 start=controller.bounds().getCenter().subtract(origin);
+                var wrist=shape.links().get(0);
+                Vec3 end=wrist.base().subtract(origin);
+                Vec3 axis=end.subtract(start).normalize();
+                Vec3 edge=axis.cross(new Vec3(0,1,0));
+                if(edge.lengthSqr()<.01)edge=new Vec3(1,0,0);else edge=edge.normalize();
+                Vec3 normal=axis.cross(edge).normalize();
+                float t=hand.controlTime(partial);
+                double arc=Math.min(2.7,start.distanceTo(end)*.095);
+                for(int strand=0;strand<3;strand++){
+                    Vec3[] line=new Vec3[13];
+                    double[] radii=new double[line.length];
+                    for(int j=0;j<line.length;j++){
+                        double u=j/(line.length-1.), taper=Math.sin(Math.PI*u);
+                        double angle=strand*Math.PI*2/3+u*7-t*.075;
+                        double pulse=.5+.5*Math.cos(10*u-.46*t);
+                        line[j]=start.lerp(end,u).add(edge.scale(arc*taper*Math.cos(angle)))
+                                .add(normal.scale(arc*taper*Math.sin(angle))).add(0,-1.45*taper,0);
+                        radii[j]=.09+.20*taper*(.32+.68*pulse);
+                    }
+                    ConsumeTendrilSegmentMesh.draw(poses,skin,jointLight(boss,wrist.middle()),line,radii,edge,0xffbb8993);
+                }
+            }
+        }
         for(var link:shape.links()){
             var a=link.base().subtract(origin);var b=link.end().subtract(origin);
             var center=link.middle().subtract(origin);

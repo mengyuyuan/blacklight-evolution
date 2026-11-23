@@ -17,7 +17,7 @@ import java.util.UUID;
 /** Server-owned attack clocks. The telegraph, fixed aim and closing sphere share one replicated center. */
 public final class GoddessAttacks {
     public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL, HAND, RUSH, STRUGGLE }
-    private static final Move[] ORDERS={Move.VACUOLE,Move.NEEDLE_RAIN,Move.CALL,Move.HAND,Move.BLOOD_SURF,Move.HAND,Move.WALL_SPEARS,Move.HAND,Move.STRONG_CALL,Move.HAND,Move.RUSH,Move.STRUGGLE};
+    private static final Move[] ORDERS={Move.VACUOLE,Move.HAND,Move.CALL,Move.HAND,Move.BLOOD_SURF,Move.NEEDLE_RAIN,Move.WALL_SPEARS,Move.HAND,Move.STRONG_CALL,Move.HAND,Move.RUSH,Move.STRUGGLE};
     public final GoddessHand hand;
     public final GoddessRush rush;
     public final GoddessStruggle struggle;
@@ -78,7 +78,7 @@ public final class GoddessAttacks {
         if(!(boss.level() instanceof ServerLevel level))return;
         elapsed++;
         if(move==Move.REST){
-            if(elapsed<24)return;
+            if(elapsed<(groups>=2?1:order==0?14:8))return;
             var p=nearest(level);
             if(p==null)return;
             if(groups>=2){enter(Move.BREATHER,p);}
@@ -92,7 +92,7 @@ public final class GoddessAttacks {
                 }
                 else if(selected==Move.RUSH){
                     if(!rush.begin(p))selected=Move.WALL_SPEARS;
-                }else if(order>1 && selected!=Move.CALL && selected!=Move.STRONG_CALL && (boss.goddess.removed()&3)!=3
+                }else if(order>1 && selected!=Move.HAND && selected!=Move.CALL && selected!=Move.STRONG_CALL && (boss.goddess.removed()&3)!=3
                         && rush.close(p) && rush.begin(p)){
                     selected=Move.RUSH;
                 }
