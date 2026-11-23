@@ -16,9 +16,10 @@ import java.util.UUID;
 
 /** Server-owned attack clocks. The telegraph, fixed aim and closing sphere share one replicated center. */
 public final class GoddessAttacks {
-    public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL, HAND }
-    private static final Move[] ORDERS={Move.VACUOLE,Move.NEEDLE_RAIN,Move.CALL,Move.HAND,Move.BLOOD_SURF,Move.HAND,Move.WALL_SPEARS,Move.HAND,Move.STRONG_CALL,Move.HAND};
+    public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL, HAND, RUSH }
+    private static final Move[] ORDERS={Move.VACUOLE,Move.NEEDLE_RAIN,Move.CALL,Move.HAND,Move.BLOOD_SURF,Move.HAND,Move.WALL_SPEARS,Move.HAND,Move.STRONG_CALL,Move.HAND,Move.RUSH};
     public final GoddessHand hand;
+    public final GoddessRush rush;
     final GoddessBrood brood;
     private final GoddessVolley volley;
     private final EncounterMob boss;
@@ -32,7 +33,7 @@ public final class GoddessAttacks {
     private final java.util.List<UUID> debris=new java.util.ArrayList<>(4);
     public float captureYaw(){return boss.level().isClientSide?client().getFloat("CaptureYaw"):captureYaw;}
     private static double ease(double t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
-    GoddessAttacks(EncounterMob boss){this.boss=boss;hand=new GoddessHand(boss);brood=new GoddessBrood(boss);volley=new GoddessVolley(boss);}
+    GoddessAttacks(EncounterMob boss){this.boss=boss;hand=new GoddessHand(boss);rush=new GoddessRush(boss);brood=new GoddessBrood(boss);volley=new GoddessVolley(boss);}
 
     private CompoundTag client(){return boss.goddessData().getCompound("Offense");}
     public Move move(){return boss.level().isClientSide?decode(client()):move;}
@@ -40,11 +41,12 @@ public final class GoddessAttacks {
     public Vec3 center(){return boss.level().isClientSide?readCenter(client()):center;}
     public boolean caught(){return boss.level().isClientSide?client().getBoolean("Caught"):caught;}
     public boolean grounded(){return boss.level().isClientSide?client().getBoolean("Ground"):grounded;}
-    public boolean holds(ServerPlayer p){return caught && !paid && p.getUUID().equals(target);}
+    public boolean holds(ServerPlayer p){return p.getUUID().equals(target) && (move==Move.RUSH?rush.holding():caught&&!paid);}
+    public float actorYaw(){return move()==Move.RUSH?rush.yaw()+180:captureYaw();}
     public int sequence(){return boss.level().isClientSide?client().getInt("Sequence"):sequence;}
     public boolean bled(){return boss.level().isClientSide?client().getBoolean("Bled"):bled;}
     public boolean ruptured(){return boss.level().isClientSide?client().getBoolean("Paid"):paid;}
-    public boolean safe(ServerPlayer p){return move==Move.BREATHER || holds(p);}
+    public boolean safe(ServerPlayer p){return move==Move.BREATHER || holds(p) || (move==Move.RUSH && p.getUUID().equals(target) && rush.released() && !rush.landed());}
     public UUID victim(){var t=boss.level().isClientSide?client():null;return t==null?target:t.hasUUID("Target")?t.getUUID("Target"):null;}
     private ServerPlayer player(ServerLevel level){return target==null?null:level.getEntity(target) instanceof ServerPlayer p&&p.isAlive()&&!p.isSpectator()?p:null;}
     private ServerPlayer nearest(ServerLevel level){
@@ -65,7 +67,7 @@ public final class GoddessAttacks {
         abandonMove();
     }
     private void abandonMove(){
-        if(caught && boss.level() instanceof ServerLevel level){
+        if((caught || move==Move.RUSH) && boss.level() instanceof ServerLevel level){
             var p=player(level);if(p!=null)p.fallDistance=0;
         }
         enter(Move.REST,null);
@@ -80,6 +82,12 @@ public final class GoddessAttacks {
             if(groups>=2){enter(Move.BREATHER,p);}
             else {
                 Move selected=ORDERS[Math.floorMod(order++,ORDERS.length)];
+                if(selected==Move.RUSH){
+                    if(!rush.begin(p))selected=Move.WALL_SPEARS;
+                }else if(order>1 && selected!=Move.CALL && selected!=Move.STRONG_CALL && (boss.goddess.removed()&3)!=3
+                        && rush.close(p) && rush.begin(p)){
+                    selected=Move.RUSH;
+                }
                 if(selected==Move.HAND && !hand.begin(level,p))selected=Move.NEEDLE_RAIN;
                 enter(selected,p);
             }
@@ -100,6 +108,7 @@ public final class GoddessAttacks {
         switch(move){
             case VACUOLE -> bubble(level,p);
             case HAND -> {if(hand.tick(level,p,volley) && move==Move.HAND)finish();}
+            case RUSH -> {if(rush.tick(level,p,elapsed))finish();}
             case CALL, STRONG_CALL -> {
                 boolean strong=move==Move.STRONG_CALL;
                 if(elapsed>=26 && elapsed<26+(strong?6:4)*12 && (elapsed-26)%12==0){
@@ -127,6 +136,7 @@ public final class GoddessAttacks {
     int strainingSlot(){
         int wrist=boss.goddess.supportingWrist();
         return switch(move){
+            case RUSH -> elapsed>=12 && elapsed<=26 || rush.grip()<0 && elapsed>=43 && elapsed<60 ? (rush.arm()==1?5:9) : -1;
             case HAND -> elapsed>=5 && elapsed<=34 ? wrist : -1;
             case VACUOLE -> elapsed>=9 && elapsed<=26 ? 0 : -1;
             case NEEDLE_RAIN, BLOOD_SURF -> elapsed>=8 && elapsed<=25 ? 1 : -1;
@@ -272,7 +282,7 @@ public final class GoddessAttacks {
         }
     }
     public CompoundTag save(){
-        var t=new CompoundTag();t.put("Hand",hand.save());t.putString("Move",move.name());t.putInt("Age",elapsed);t.putLong("Start",boss.level().getGameTime()-elapsed);
+        var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.putString("Move",move.name());t.putInt("Age",elapsed);t.putLong("Start",boss.level().getGameTime()-elapsed);
         t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
@@ -286,7 +296,7 @@ public final class GoddessAttacks {
     private static Move decode(CompoundTag t){try{return Move.valueOf(t.getString("Move"));}catch(IllegalArgumentException e){return Move.REST;}}
     private static Vec3 readCenter(CompoundTag t){return new Vec3(t.getDouble("X"),t.getDouble("Y"),t.getDouble("Z"));}
     public void load(CompoundTag t){
-        hand.load(t.getCompound("Hand"));captureYaw=t.getFloat("CaptureYaw");
+        hand.load(t.getCompound("Hand"));rush.load(t.getCompound("Rush"));captureYaw=t.getFloat("CaptureYaw");
         entry=new Vec3(t.getDouble("EntryX"),t.contains("EntryY")?t.getDouble("EntryY"):-.9,t.getDouble("EntryZ"));
         impulse=new Vec3(t.getDouble("PushX"),0,t.getDouble("PushZ"));
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));

@@ -578,7 +578,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         super.jumpFromGround();
     }
     @Override public void travel(Vec3 input){
-        if(goddess.active() && goddess.action()!=GoddessEncounter.Action.FLYING){
+        if(goddess.active() && (goddess.action()!=GoddessEncounter.Action.FLYING || goddess.attacks.move()==GoddessAttacks.Move.RUSH)){
             setDeltaMovement(Vec3.ZERO);
             fallDistance=0;
             return;

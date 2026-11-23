@@ -18,6 +18,13 @@ import org.spongepowered.asm.mixin.injection.At;
 /** Includes custom/Gecko renderers which never fire RenderLivingEvent. */
 @Mixin(EntityRenderDispatcher.class)
 public abstract class BiomassEntityRenderMixin {
+    @com.llamalad7.mixinextras.injector.ModifyExpressionValue(method="render",at=@At(value="INVOKE",
+            target="Lnet/minecraft/client/renderer/entity/EntityRenderer;getRenderOffset(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/world/phys/Vec3;"))
+    private net.minecraft.world.phys.Vec3 blacklight$carryOffset(net.minecraft.world.phys.Vec3 original,Entity entity,
+            double x,double y,double z,float yaw,float partial){
+        return entity instanceof net.minecraft.world.entity.player.Player p
+                ? original.add(com.codex.blacklight.client.animation.GoddessPressurePose.carryOffset(p,partial)):original;
+    }
     @WrapOperation(method="render",at=@At(value="INVOKE",target="Lnet/minecraft/client/renderer/entity/EntityRenderer;render(Lnet/minecraft/world/entity/Entity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     private void blacklight$coat(EntityRenderer<?> renderer,Entity entity,float yaw,float partial,
                                 PoseStack stack,MultiBufferSource buffers,int light,Operation<Void> original){

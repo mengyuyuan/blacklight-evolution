@@ -103,6 +103,7 @@ public final class GoddessEncounter {
         return boss.level().isClientSide ? Math.max(0, boss.level().getGameTime() - boss.goddessData().getLong("Start") + partial) : age + partial;
     }
     public float facing(float partial) {
+        if(action()==Action.FLYING && attacks.move()==GoddessAttacks.Move.RUSH)return attacks.rush.bodyYaw(attacks.age(partial));
         if (action() == Action.FLYING) return net.minecraft.util.Mth.rotLerp(partial,boss.yBodyRotO,boss.yBodyRot);
         var data = boss.goddessData();
         float start = boss.level().isClientSide ? data.getFloat("EntryYaw") : entryYaw;

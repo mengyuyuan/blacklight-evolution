@@ -110,7 +110,10 @@ public final class GoddessRig {
                 }
             }
         }
-        if(frame==0 && boss.goddess.attacks.hand.visible()){
+        if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.RUSH){
+            int wrist=boss.goddess.attacks.rush.arm()==1?7:21;
+            GoddessRushPose.pose(boss,result,partial,bones[wrist].centers[0]);
+        }else if(frame==0 && boss.goddess.attacks.hand.visible()){
             int shoulder=(boss.goddess.removed()&1)==0?3:7;
             int first=-1;
             for(int j=0;j<JOINTS;j++)if(bones[j].part==shoulder){first=j;break;}
