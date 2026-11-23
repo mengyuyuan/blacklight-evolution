@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FVF",
+    "VSV"
+  ],
+  "key": {
+    "F": {
+      "item": "blacklight:tissue_fiber"
+    },
+    "S": {
+      "item": "blacklight:hive_carapace"
+    },
+    "V": {
+      "item": "blacklight:hive_vein"
+    }
+  },
+  "result": {
+    "item": "blacklight:weave_channel",
+    "count": 4
+  }
+}

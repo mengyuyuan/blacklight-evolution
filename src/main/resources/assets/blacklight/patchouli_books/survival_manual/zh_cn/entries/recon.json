@@ -1,0 +1,20 @@
+{
+  "name": "侦察和补给",
+  "category": "blacklight:military",
+  "sortnum": 21,
+  "icon": "blacklight:field_scanner",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "探索军营、检查站和基地，检查补给、弹药、军械与技术箱。军用电路可用于扫描器、武器和任务道具；主线还可在福田截获调度车取得电路。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:field_scanner"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "普通模式手持扫描器使用，会报告 48 格内最近感染目标的名称、方向和约略距离。扫不到时换方向搜索。需要剧情地点时用运输图、行动情报和 $(bold)/blacklightguide$()。"
+    }
+  ]
+}

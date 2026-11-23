@@ -1,0 +1,44 @@
+{
+  "name": "Build the Weave Nest",
+  "category": "blacklight:weave",
+  "sortnum": 26,
+  "icon": "blacklight:weave_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Build a single 5×5 layer: one core in the center, four anchors in the corners, twelve channels along the edges and eight beds inside. Leave level ground along one edge for the operator. The next page can project the arrangement into the world."
+    },
+    {
+      "type": "patchouli:multiblock",
+      "name": "Weave Nest",
+      "multiblock": {
+        "pattern": [
+          [
+            "ACCCA",
+            "CBBBC",
+            "CB0BC",
+            "CBBBC",
+            "ACCCA"
+          ]
+        ],
+        "mapping": {
+          "0": "blacklight:weave_core",
+          "A": "blacklight:weave_anchor",
+          "B": "blacklight:weave_bed",
+          "C": "blacklight:weave_channel"
+        },
+        "symmetrical": true
+      }
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:weave_core",
+      "recipe2": "blacklight:weave_anchor"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:weave_channel",
+      "recipe2": "blacklight:weave_bed"
+    }
+  ]
+}

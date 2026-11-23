@@ -1,0 +1,21 @@
+{
+  "name": "血毒泵与格林外壳",
+  "category": "blacklight:route",
+  "sortnum": 7,
+  "icon": "blacklight:bloodtox_starter",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "把歌利亚的重甲核心与军用电路、红石粉合成血毒泵启动器。已有旧指挥密钥时可用第二张配方。普通模式手持启动器操作泵车，观察地下的动静；出土区需要完整地面和净空。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:bloodtox_starter",
+      "recipe2": "blacklight:bloodtox_starter_from_key"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "逐处击破外壳的攻击组织，抓住主体倒下的窗口。格林的人形显露时，切原型模式贴近抓取，再用吸收。她会挣脱，收好留下的活性母体组织。$(br2)$(l:den)追踪地下母巢$(/l)"
+    }
+  ]
+}

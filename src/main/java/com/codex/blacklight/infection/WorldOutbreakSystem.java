@@ -1,5 +1,6 @@
 package com.codex.blacklight.infection;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.city.*;
 import com.codex.blacklight.config.GameplayBalanceConfig;
 import com.codex.blacklight.config.InfectionEcologyConfig;
@@ -41,7 +42,7 @@ public final class WorldOutbreakSystem {
     public static void release(ServerLevel level,BlockPos pos){
         if(!OutbreakConfig.ENABLED.get())return;
         if(OutbreakData.get(level.getServer()).start(level.getServer().overworld().getGameTime()))
-            for(var p:level.getServer().getPlayerList().getPlayers())p.sendSystemMessage(Component.translatable("message.blacklight.outbreak_started"));
+            for(var p:level.getServer().getPlayerList().getPlayers())FieldNotes.record(p, Component.translatable("message.blacklight.outbreak_started"));
         OutbreakData.get(level.getServer()).markSeeded(level.dimension().location().toString());
         CityEcology.release(level,pos);InfectionEcology.released(level,pos);seed(level,pos);
     }

@@ -72,41 +72,8 @@ public final class HiveCommands {
                     var result = com.codex.blacklight.world.LairSystem.tryPlace(p.serverLevel(), p.getBlockX(), p.getBlockZ(), true);
                     p.sendSystemMessage(Component.literal("母巢: " + result + " " + com.codex.blacklight.world.LairSystem.lairs(p.serverLevel())));
                     return result == com.codex.blacklight.world.LairSystem.Result.PLACED ? 1 : 0; }))
-                .then(Commands.literal("accelerate")
-                        .executes(c -> accelerate(c.getSource().getPlayerOrException(), 20))
-                        .then(Commands.argument("multiplier", IntegerArgumentType.integer(1, 20))
-                                .executes(c -> accelerate(c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "multiplier")))))
                 .then(Commands.literal("cancel").executes(c -> cancel(c.getSource().getPlayerOrException())))
                 .then(Commands.literal("status").executes(c -> status(c.getSource().getPlayerOrException())));
-    }
-
-    private static int accelerate(ServerPlayer player, int multiplier) {
-        ServerLevel level = player.serverLevel();
-        BlacklightHive hive = level.getEntitiesOfClass(BlacklightHive.class, player.getBoundingBox().inflate(96),
-                core -> core.isAlive() && core.getPersistentData().getBoolean("BlacklightColossalHive")
-                        && core.distanceToSqr(player) <= 96 * 96).stream()
-                .min(Comparator.comparingDouble(player::distanceToSqr)).orElse(null);
-        if (hive == null) { tell(player, "96 格内没有已加载的存活巨巢核心。", true); return 0; }
-        if (multiplier == 1) {
-            HiveAcceleration.clear(hive);
-            tell(player, "巨巢 " + location(hive.blockPosition()) + " 已恢复 1× 正常培育与进食间隔。", false);
-            return 1;
-        }
-        var state = hive.getPersistentData().getCompound("BlacklightColossusEvolution");
-        if (state.getBoolean("Spent")) { tell(player, "这座巨巢已经完成巨构诞生，无需加速。", true); return 0; }
-        BlacklightInfectedHost host = level.getEntitiesOfClass(BlacklightInfectedHost.class,
-                hive.getBoundingBox().inflate(96), candidate -> candidate.isAlive() && !candidate.giantBoss()
-                        && HiveAcceleration.belongsTo(candidate, hive)
-                        && (!state.hasUUID("Chosen") || state.getUUID("Chosen").equals(candidate.getUUID()))).stream()
-                .min(Comparator.comparingDouble(hive::distanceToSqr)).orElse(null);
-        if (host == null) {
-            tell(player, "该巨巢的配对吞噬者尚未加载、已失去，或已选中其他宿主；未改变倍率。", true); return 0;
-        }
-        HiveAcceleration.configure(hive, host, multiplier);
-        tell(player, "仅巨巢 " + location(hive.blockPosition()) + " 与配对吞噬者设为 " + multiplier
-                + "×：成熟、成长和餐间等待加速；每次吞噬仍完整播放 4 秒，生物质仍靠真实进食。"
-                + "用 /blacklight colossus_status 查看暂停原因，/blacklight hive accelerate 1 恢复正常；巨构诞生后自动恢复。", false);
-        return 1;
     }
 
     private static boolean available(ServerPlayer player) {

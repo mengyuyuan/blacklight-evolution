@@ -30,6 +30,10 @@ public final class BlacklightRenderPose {
             var compression=GoddessPressurePose.owner(player);
             if(compression!=null)return GoddessPressurePose.sample(compression.goddess.attacks,partial);
         }
+        if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
+            var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
+            if (cell!=null) return WeaveBrace.pose(player,cell,partial);
+        }
         if(mouthStruggle(entity,partial)){
             var action=ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION);
             return MotionLibrary.pose(action.clipId(),action.seconds(PlayerMotionController.actionTime(entity,partial)),false);
@@ -124,6 +128,10 @@ public final class BlacklightRenderPose {
             if(paired!=null)return paired.goddess.actorFacing(partial, PlayerMotionController.facing(entity,partial));
             var pressure=GoddessPressurePose.owner(player);
             if(pressure!=null)return pressure.goddess.attacks.actorYaw();
+        }
+        if (entity instanceof net.minecraft.client.player.AbstractClientPlayer player) {
+            var cell=com.codex.blacklight.world.WeaveCell.channelOf(player);
+            if (cell!=null) return (float)Math.toDegrees(Math.atan2(-cell.inward().x,cell.inward().z));
         }
         if(mouthStruggle(entity,partial))return ModAttachments.getData(entity,ModAttachments.PLAYER_ACTION).yaw();
         if(entity.getVehicle() instanceof com.codex.blacklight.entity.BlackwatchHelicopter craft)return -net.minecraft.util.Mth.rotLerp(partial,craft.yRotO,craft.getYRot());

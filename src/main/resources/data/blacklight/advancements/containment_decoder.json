@@ -11,7 +11,7 @@
       "translate": "survival.blacklight.journal.containment_decoder"
     },
     "frame": "task",
-    "show_toast": true,
+    "show_toast": false,
     "announce_to_chat": false
   },
   "criteria": {

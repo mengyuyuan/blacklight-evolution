@@ -1,0 +1,20 @@
+{
+  "name": "如何开始",
+  "category": "blacklight:route",
+  "sortnum": 0,
+  "icon": "minecraft:compass",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(bold)第一次玩，从这里开始。$()$(br2)检疫哨或雪地村庄 → 研究站取样 → 觉醒与首次吸收 → 进化者与失联车队 → 巨型母巢与九头蛇 → 福田血毒行动 → 地下母巢。$(br2)输入 /blacklightguide，可按你自己的进度找下一步。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "新世界先在平原找废弃检疫哨。值班棚的桶里有冷库调运记录。在主世界拿着记录对空右键，按地图去冰下研究站。铜锭也值得带走。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "另一条路是雪地村庄的学徒制图师。研究站地图的基础价格为 12 颗绿宝石和 1 个指南针。走到红叉，找地面入口下楼。$(br2)$(l:lab)下一站：冷藏区$(/l)"
+    }
+  ]
+}

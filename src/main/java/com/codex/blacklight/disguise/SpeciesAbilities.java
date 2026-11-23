@@ -1,5 +1,6 @@
 package com.codex.blacklight.disguise;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -29,7 +30,7 @@ public final class SpeciesAbilities {
         if(trait==SpeciesTrait.NONE)return false;
         long left=ModAttachments.getData(p,ModAttachments.SPECIES_READY_AT)-now;
         if(left>0) {
-            p.displayClientMessage(Component.translatable("message.blacklight.species_cooldown",(left+19)/20),true);
+            FieldNotes.record(p, Component.translatable("message.blacklight.species_cooldown",(left+19)/20));
             return false;
         }
         Vec3 look=p.getLookAngle();boolean accepted=switch(trait) {
@@ -64,7 +65,7 @@ public final class SpeciesAbilities {
             }
             default -> false;
         };
-        if(!accepted){p.displayClientMessage(Component.translatable("message.blacklight.species_conditions"),true);return false;}
+        if(!accepted){FieldNotes.record(p, Component.translatable("message.blacklight.species_conditions"));return false;}
         ModAttachments.setData(p,ModAttachments.SPECIES_READY_AT,now+trait.cooldown);ModAttachments.syncData(p,ModAttachments.SPECIES_READY_AT);
         if(trait==SpeciesTrait.ARROW||trait==SpeciesTrait.FIREBALL||trait==SpeciesTrait.EXPLODE)DisguiseSystem.speciesAttack(p);
         p.serverLevel().sendParticles(ParticleTypes.SMOKE,p.getX(),p.getY()+.6,p.getZ(),6,.15,.2,.15,.01);

@@ -1,0 +1,37 @@
+{
+  "name": "Vehicles and Garages",
+  "category": "blacklight:military",
+  "sortnum": 24,
+  "icon": "blacklight:military_truck_chassis",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Use a vehicle item on wide solid ground, then use the hull empty-handed to board. Move to drive and steer, jump to brake and sneak to dismount. Stop and dismount to apply repair parts or compatible ammunition to the hull."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_truck_chassis",
+      "recipe2": "blacklight:blackwatch_truck_chassis"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_apc_chassis",
+      "recipe2": "blacklight:blackwatch_apc_chassis"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_tank_chassis",
+      "recipe2": "blacklight:blackwatch_tank_chassis"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:vehicle_repair_parts",
+      "recipe2": "blacklight:autocannon_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:tank_ap_shell",
+      "recipe2": "blacklight:tank_he_shell"
+    }
+  ]
+}

@@ -7,15 +7,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
 /** Draws the mod's square, branching fibre using its original four-sided pixel atlas. */
-final class ConsumeTendrilSegmentMesh {
-    static final ResourceLocation TEXTURE = new ResourceLocation("blacklight","textures/entity/consume_charcoal_fiber.png");
+public final class ConsumeTendrilSegmentMesh {
+    public static final ResourceLocation TEXTURE = new ResourceLocation("blacklight","textures/entity/consume_charcoal_fiber.png");
     private ConsumeTendrilSegmentMesh() {}
 
     static void draw(PoseStack stack,VertexConsumer out,int light,Vec3[] path,double[] widths,Vec3 side,int color){
         draw(stack,out,light,path,widths,side,color,true);
     }
 
-    static void draw(PoseStack stack,VertexConsumer out,int light,Vec3[] path,double[] widths,Vec3 side,int color,boolean jointed){
+    public static void draw(PoseStack stack,VertexConsumer out,int light,Vec3[] path,double[] widths,Vec3 side,int color,boolean jointed){
         if((color>>>24)==0)return;
         var pose=stack.last();
         ConsumeFiberShape.draw(path,widths,side,jointed,(span,fork,face,a,b,c,d,v0,v1)->{

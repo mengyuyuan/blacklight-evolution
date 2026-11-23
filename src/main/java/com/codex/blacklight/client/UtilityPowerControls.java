@@ -80,8 +80,6 @@ public final class UtilityPowerControls {
                 : UtilityPowerSystem.active(mc.player, PowerForm.THERMAL_VISION) ? PowerForm.THERMAL_VISION : PowerForm.NONE;
         if (vision != PowerForm.NONE) {
             g.drawString(mc.font,Component.translatable("hud.blacklight."+vision.id()),10,y,0xFFFFAA83,true);y+=14;
-            if (com.codex.blacklight.client.renderer.VisionPowerRenderer.effectFailed())
-                g.drawString(mc.font,Component.translatable("hud.blacklight.vision_failed"),10,y,0xFFFF795A,true);
         }
     }
 }

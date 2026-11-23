@@ -1,0 +1,16 @@
+{
+  "name": "Research and Repeatable Growth",
+  "category": "blacklight:powers",
+  "sortnum": 15,
+  "icon": "blacklight:evolved_ganglion",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Weaken and consume infected hosts with mature organs to record samples. Check organ research in Upgrades. Sample quality limits the ranks available. Seek older hosts or different organs to advance another line."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 50 for the first adaptation and regeneration tiers, then 150 for the second tiers. Consult the panel for your server's settings."
+    }
+  ]
+}

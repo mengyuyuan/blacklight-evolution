@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BFB",
+    "SBS"
+  ],
+  "key": {
+    "B": {
+      "item": "blacklight:hive_bone"
+    },
+    "F": {
+      "item": "blacklight:tissue_fiber"
+    },
+    "S": {
+      "item": "blacklight:hive_carapace"
+    }
+  },
+  "result": {
+    "item": "blacklight:weave_anchor",
+    "count": 4
+  }
+}

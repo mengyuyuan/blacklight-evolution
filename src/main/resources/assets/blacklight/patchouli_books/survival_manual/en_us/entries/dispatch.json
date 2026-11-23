@@ -1,0 +1,16 @@
+{
+  "name": "Find the Bloodtox Pump",
+  "category": "blacklight:route",
+  "sortnum": 6,
+  "icon": "blacklight:mother_intel",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Read the operation intel in the Blacklight dimension. In the indicated Futian sector, look for the black-and-yellow checkpoint. A military disguise lets you inspect dispatch records for the unloading junction and west service entrance."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Alternatively, tail the departing truck from the workshop roof. If you lose it, wait at the post. Investigate its rear while sneaking for circuitry. You can also seize a vehicle or follow the twin tire tracks and hoses on foot.$(br2)$(l:pump)Activate the pump$(/l)"
+    }
+  ]
+}

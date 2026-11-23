@@ -1,0 +1,16 @@
+{
+  "name": "Your First Consume",
+  "category": "blacklight:powers",
+  "sortnum": 10,
+  "icon": "blacklight:tissue_fiber",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "After awakening, toggle Prototype mode (default B). Approach a cow, sheep or common infected. Face it, grab (E) and use to consume; attack throws a held creature. Open Upgrades (U) and spend your first evolution points."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Check reach and line of sight. Ordinary targets with under 50 base max health can usually be grabbed immediately; tougher prey generally need to be at 15% health. Mature hosts and bosses have special rules. Switch back to normal mode for tools, chests and books. A lethal hit kills targets with 50 or fewer base HP outright."
+    }
+  ]
+}

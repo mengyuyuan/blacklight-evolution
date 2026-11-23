@@ -1,0 +1,16 @@
+{
+  "name": "The Lost Convoy",
+  "category": "blacklight:route",
+  "sortnum": 3,
+  "icon": "blacklight:heavy_armor_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Follow the skid marks to the carrier. Use the decoder on the lock in normal mode. Leave an escape lane by the barrier. If your field notes report a blocked exit, clear the space behind it and restore the floor. The encounter needs a non-Peaceful difficulty."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Bait Goliath into charging the barrier, sidestep and strike the exposed right knee. Follow the weak-point openings, or wear it down with sustained damage. Save the heavy armor core for the pump.$(br2)$(l:hive)Next: the colossal hive$(/l)"
+    }
+  ]
+}

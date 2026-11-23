@@ -31,6 +31,11 @@ public final class StandalonePlayerRendering {
     @SubscribeEvent public static void hand(RenderHandEvent event) {
         if(com.codex.blacklight.client.camera.GoddessExecutionCamera.active()){event.setCanceled(true);return;}
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
+        if(player!=null && com.codex.blacklight.world.WeaveCell.channelOf(player)!=null) {
+            // The planted arms are rendered in world space with the station.
+            event.setCanceled(true);
+            return;
+        }
         if(player!=null){
             var action=ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
             double clock=com.codex.blacklight.animation.PlayerMotionController.actionTime(player,event.getPartialTick());
@@ -201,14 +206,15 @@ public final class StandalonePlayerRendering {
             return;
         }
         var state=com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
-        boolean active=com.codex.blacklight.client.animation.BlacklightRenderPose.mouthStruggle(player,partial)
+        boolean weaving=com.codex.blacklight.world.WeaveCell.channelOf(player)!=null;
+        boolean active=weaving || com.codex.blacklight.client.animation.BlacklightRenderPose.mouthStruggle(player,partial)
                 ||com.codex.blacklight.client.animation.HydraPlayerPose.visible(player)||state.isPrototypeMode()
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.ARMOR,partial)>0
                 ||UtilityPowerSystem.visualWeight(player,PowerForm.SHIELD,partial)>0
                 ||com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUME_VISUAL).active();
         if(!active)return;
         var renderer=RENDERERS.get(player.getModelName());if(renderer==null)return;
-        if(ysm){renderer.renderYsmAttachments(player,partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());return;}
+        if(ysm && !weaving){renderer.renderYsmAttachments(player,partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());return;}
         event.setCanceled(true);
         renderer.render(player,player.getYRot(),partial,event.getPoseStack(),event.getMultiBufferSource(),event.getPackedLight());
     }
@@ -221,7 +227,11 @@ public final class StandalonePlayerRendering {
             com.codex.blacklight.client.model.MercerArmorMesh.invalidate();
             com.codex.blacklight.client.compat.YsmAppearanceBridge.invalidate();
             RENDERERS.clear();
-            for(var skin:event.getSkins())RENDERERS.put(skin,new BlacklightPlayerRenderer(event.getContext(),"slim".equals(skin)));
+            for(var skin:event.getSkins()){
+                net.minecraft.client.renderer.entity.player.PlayerRenderer vanilla=event.getSkin(skin);
+                if(vanilla!=null)vanilla.addLayer(new com.codex.blacklight.client.renderer.layer.SymbioteLayer(vanilla));
+                RENDERERS.put(skin,new BlacklightPlayerRenderer(event.getContext(),"slim".equals(skin)));
+            }
         }
         @SubscribeEvent public static void entities(EntityRenderersEvent.RegisterRenderers event) {
             event.registerEntityRenderer(EntityType.ZOMBIE,InfectedZombieRenderer::new);

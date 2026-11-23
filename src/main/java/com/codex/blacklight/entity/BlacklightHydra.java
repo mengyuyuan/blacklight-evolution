@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.combat.GreeneMolt;
 
 import com.codex.blacklight.city.*;
@@ -372,7 +373,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
             if(t>=36){
                 releaseHeld();
                 boolean entered=prepareDestination(level)&&CityTravel.transferFromHydra(p,this,blockPosition().offset((int)Math.ceil(6*bodySize()),0,0),bodySize());
-                if(!entered){restorePassenger(p);p.displayClientMessage(Component.translatable("hydra.blacklight.wait"),false);}
+                if(!entered){restorePassenger(p);FieldNotes.record(p, Component.translatable("hydra.blacklight.wait"));}
                 destination.release();destinationReady=false;prepareTicks=0;cooldown=240;waitForDeparture=true;action(11);
             }
         }else if(action()==7){
@@ -645,7 +646,7 @@ public final class BlacklightHydra extends Monster implements GeoEntity,Animated
     }
     @Override protected InteractionResult mobInteract(Player p,InteractionHand hand){
         if(planted()){
-            if(!level().isClientSide){p.displayClientMessage(growth()>=1&&!destinationReady?Component.translatable("hydra.blacklight.wait"):Component.translatable("hydra.blacklight.progress",feeds,HydraGrowth.REQUIRED_FEEDS,Math.round(growth()*100)),true);if(p.getUUID().equals(owner)){prepareTicks=0;waitForDeparture=false;}}
+            if(!level().isClientSide){FieldNotes.record(p, growth()>=1&&!destinationReady?Component.translatable("hydra.blacklight.wait"):Component.translatable("hydra.blacklight.progress",feeds,HydraGrowth.REQUIRED_FEEDS,Math.round(growth()*100)));if(p.getUUID().equals(owner)){prepareTicks=0;waitForDeparture=false;}}
             return InteractionResult.sidedSuccess(level().isClientSide);
         }
         return super.mobInteract(p,hand);

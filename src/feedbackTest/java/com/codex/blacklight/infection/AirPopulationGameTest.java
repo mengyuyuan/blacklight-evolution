@@ -74,7 +74,10 @@ public final class AirPopulationGameTest {
     @GameTest(template="wall_test",batch="air_population_outbreak",timeoutTicks=140)
     public static void flyersAreRealAirborneBirthsWithRegionalLimits(GameTestHelper h){
         var w=new World(h,2,295);
-        h.runAfterDelay(25,()->{
+        h.startSequence().thenWaitUntil(()->h.assertTrue(
+                w.level.isPositionEntityTicking(w.center) && w.level.isPositionEntityTicking(w.center.east(22))
+                        && w.level.isPositionEntityTicking(w.center.west(22)), "waiting for all three flight columns to tick"))
+                .thenExecute(()->{
             try(w){
                 h.assertTrue(!AirPopulation.wantsFlyer(0,0) && AirPopulation.wantsFlyer(1,9)
                         && !AirPopulation.wantsFlyer(1,10) && AirPopulation.wantsFlyer(2,19)

@@ -104,6 +104,18 @@ public enum WeaponMove {
     public static WeaponMove byId(int id){return id<0||id>=values().length?null:values()[id];}
     public static boolean supports(PowerForm form){return form==PowerForm.NONE||form==PowerForm.CLAWS||form==PowerForm.BLADE||form==PowerForm.HAMMERFISTS||form==PowerForm.WHIPFIST||form==PowerForm.MUSCLE_MASS;}
     public static boolean controls(PowerForm form,boolean emptyHands){return form==PowerForm.BACKSPINES||supports(form)&&(form!=PowerForm.NONE||emptyHands);}
+    public float damageFor(net.minecraft.world.entity.player.Player player, PowerForm active) {
+        return com.codex.blacklight.item.SymbioteCharm.attackBase(player, damageFor(active));
+    }
+
+    public static float chargeMultiplier(float heldFraction) {
+        return 1 + .5F * heldFraction;
+    }
+
+    public float contactDamage(net.minecraft.world.entity.player.Player player, PowerForm active, float heldFraction) {
+        return damageFor(player,active) * chargeMultiplier(heldFraction);
+    }
+
     public float damageFor(PowerForm active){return damage*(active==PowerForm.NONE?.65F:active==PowerForm.MUSCLE_MASS&&shared()&&!id.startsWith("dev_")&&this!=BULLETDIVE_DROP?2F:1F);}
     public enum Input { ATTACK, SPECIAL, GROUND_POUND, CLAP, PAIN;
         public boolean chord(){return this!=ATTACK&&this!=SPECIAL;}

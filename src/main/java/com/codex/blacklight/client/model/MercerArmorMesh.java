@@ -63,20 +63,37 @@ public final class MercerArmorMesh {
     }
     public void render(AbstractClientPlayer player,PoseStack stack,MultiBufferSource buffers,int light,float partial,Matrix4f[] skin,int firstPersonSide) {
         if(player.isInvisible()||!BlockArmorModel.get().visible(player,partial))return;
-        var out=buffers.getBuffer(RenderType.entityCutoutNoCull(TEXTURE));
+
         var morph=WeaponMorphTracker.sample(player,partial);
         var normals=new Matrix3f[skin.length];for(int i=0;i<skin.length;i++)normals[i]=new Matrix3f(skin[i]).invert().transpose();
         float[] growth=new float[6];for(int i=0;i<6;i++)growth[i]=growth(player,i,partial);
         var p=new Vector3f();var n=new Vector3f();
-        for(var part:parts) {
-            if(firstPersonSide>=0&&part.region!=(firstPersonSide==1?3:2))continue;
-            if((part.region==2||part.region==3)&&morph.coverage(part.region==3)>=.72F&&!part.shoulder)continue;
-            float g=growth[part.region];if(g<=.005F)continue;
-            for(var v:part.vertices) {
-                p.set(v.p).sub(part.center).mul(g).add(part.center);skin[v.bone].transformPosition(p);
-                normals[v.bone].transform(v.n,n).normalize();
-                out.vertex(stack.last().pose(),p.x,p.y,p.z).color(0xFFFFFFFF).uv(v.u,v.v)
-                    .overlayCoords(OverlayTexture.pack(0,player.hurtTime>0)).uv2(light).normal(stack.last().normal(),n.x,n.y,n.z).endVertex();
+        float phase = ArmorFlow.phase(player, partial);
+        for (int pass=0; pass<2; pass++) {
+            boolean flow=pass==1;
+            var out=buffers.getBuffer(flow ? RenderType.entityTranslucent(ArmorFlow.TEXTURE) : RenderType.entityCutoutNoCull(TEXTURE));
+            for(var part:parts) {
+                if(firstPersonSide>=0&&part.region!=(firstPersonSide==1?3:2))continue;
+                if((part.region==2||part.region==3)&&morph.coverage(part.region==3)>=.72F&&!part.shoulder)continue;
+                float g=growth[part.region];if(g<=.005F)continue;
+                var slot = switch(part.region) {
+                    case 1 -> net.minecraft.world.entity.EquipmentSlot.HEAD;
+                    case 4,5 -> part.center.y < .37F ? net.minecraft.world.entity.EquipmentSlot.FEET : net.minecraft.world.entity.EquipmentSlot.LEGS;
+                    default -> net.minecraft.world.entity.EquipmentSlot.CHEST;
+                };
+                if (flow && !ArmorFlow.visible(player,slot)) continue;
+                for(var v:part.vertices) {
+                    p.set(v.p).sub(part.center).mul(g).add(part.center);skin[v.bone].transformPosition(p);
+                    normals[v.bone].transform(v.n,n).normalize();
+                    float u=v.u, tv=v.v;
+                    if (flow) {
+                        p.fma(.0015F,n);
+                        u=ArmorFlow.u(v.p,phase);
+                        tv=ArmorFlow.v(v.p,phase);
+                    }
+                    out.vertex(stack.last().pose(),p.x,p.y,p.z).color(0xFFFFFFFF).uv(u,tv)
+                        .overlayCoords(OverlayTexture.pack(0,player.hurtTime>0)).uv2(light).normal(stack.last().normal(),n.x,n.y,n.z).endVertex();
+                }
             }
         }
     }

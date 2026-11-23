@@ -19,7 +19,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class ModNetwork {
-    private static final String PROTOCOL = "forge-1.20.1-54-consume-contact";
+    private static final String PROTOCOL = "forge-1.20.1-55-goddess";
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BlacklightNeoMod.MOD_ID, "main"), () -> PROTOCOL, PROTOCOL::equals, PROTOCOL::equals);
     private static boolean registered;
@@ -158,6 +158,8 @@ public final class ModNetwork {
                 .playToClient(AttachmentSyncPayload.class, AttachmentSyncPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> com.codex.blacklight.forge.ClientAttachmentSync.accept(payload));
                 })
+                .playToClient(ManualPagesPayload.class,ManualPagesPayload.STREAM_CODEC,(msg,ctx)->ctx.enqueueWork(()->com.codex.blacklight.client.ManualReader.open(msg)))
+                .playToClient(GreeneSignalPayload.class,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())))
                 .playToServer(GoddessStrugglePayload.class,GoddessStrugglePayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer p)

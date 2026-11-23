@@ -1,5 +1,6 @@
 package com.codex.blacklight.disguise;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.power.PowerForm;
 import com.codex.blacklight.power.UtilityPowerSystem;
@@ -64,7 +65,7 @@ public final class DisguiseSystem {
         var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);state.captureIdentity(identity.type());
         if(seen)DisguiseAwareness.expose(p,true);
         ModAttachments.setData(p,ModAttachments.PLAYER_STATE,state);syncAlert(p);
-        p.displayClientMessage(Component.translatable("message.blacklight.identity_captured",identity.entityType().getDescription()),true);
+        FieldNotes.record(p, Component.translatable("message.blacklight.identity_captured",identity.entityType().getDescription()));
     }
     private static void remember(ServerPlayer p,DisguiseIdentity identity) {
         var old=ModAttachments.getData(p,ModAttachments.DISGUISE_LIBRARY);var next=old.remember(identity);
@@ -329,5 +330,5 @@ public final class DisguiseSystem {
             ModAttachments.syncData(p,ModAttachments.DISGUISE_LIBRARY);
         }
     }
-    private static void message(ServerPlayer p,String key){p.displayClientMessage(Component.translatable("message.blacklight."+key),true);}
+    private static void message(ServerPlayer p,String key){FieldNotes.record(p, Component.translatable("message.blacklight."+key));}
 }
