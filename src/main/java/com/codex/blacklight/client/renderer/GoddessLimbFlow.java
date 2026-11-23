@@ -7,6 +7,10 @@ import com.codex.blacklight.entity.EncounterMob;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.IdentityHashMap;
+import java.util.Arrays;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -15,12 +19,36 @@ import org.joml.Vector3f;
 final class GoddessLimbFlow {
     private record Surface(float[] vertices,int[] colors,float[] order){}
     record Profile(int part,Vector3f center,float radius,IdentityHashMap<GreeneGoddessRenderer.Group,Surface> surfaces){}
+    static final class WetSurface {
+        private int count;
+        private float[] xyz=new float[1024*3];
+        private int[] colors=new int[1024];
+        void reset(){count=0;}
+        void add(Vector3f[] quad,int[] rgba){
+            if(count+4>colors.length){
+                colors=Arrays.copyOf(colors,2*colors.length);xyz=Arrays.copyOf(xyz,colors.length*3);
+            }
+            for(int i=0;i<4;i++,count++){
+                int k=count*3;var p=quad[i];xyz[k]=p.x;xyz[k+1]=p.y;xyz[k+2]=p.z;colors[count]=rgba[i];
+            }
+        }
+        void draw(PoseStack.Pose pose,MultiBufferSource buffers){
+            if(count==0)return;
+            var out=buffers.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
+            for(int j=0;j<count;j++){
+                int k=j*3;
+                out.addVertex(pose,xyz[k],xyz[k+1],xyz[k+2]).setColor(colors[j]).setUv(.5F,.5F)
+                        .setOverlay(OverlayTexture.NO_OVERLAY).setLight(0xf000f0).setNormal(pose,0,1,0);
+            }
+        }
+    }
     private final Profile profile;
     private final float time;
     private final Vector3f palm,entry,axis,bend;
     private final Vector3f[] quad={new Vector3f(),new Vector3f(),new Vector3f(),new Vector3f()};
     private final Vector3f normal=new Vector3f(), face=new Vector3f(), edge=new Vector3f(), guide=new Vector3f();
     private final float[] amount=new float[4];
+    private final int[] sheen=new int[4];
 
     private static float edgeLength(float[] v,int a,int b){
         float x=v[a]-v[b],y=v[a+1]-v[b+1],z=v[a+2]-v[b+2];
@@ -96,7 +124,7 @@ final class GoddessLimbFlow {
         int stage=Integer.bitCount(boss.goddess.poseMask()&3);
         float frame=80+1.2F*boss.goddess.age(partial),start=GoddessRig.flowStart(stage),end=GoddessRig.flowEnd(stage);
         if(frame<=start || frame>=end)return null;
-        Vector3f palm=GoddessActor.localPoint(boss,1,partial).toVector3f();
+        Vector3f palm=GoddessActor.gloveLocal(boss,partial);
         Vector3f wrist=GoddessActor.localPoint(boss,2,partial).toVector3f();
         return new GoddessLimbFlow(profiles[stage],(frame-start)/(end-start),palm,wrist);
     }
@@ -123,7 +151,9 @@ final class GoddessLimbFlow {
         float radius=p.distance(palm);
         channel(radius,guide);p.sub(guide);
         float left=1-progress;
-        float width=left*left*(1-.89F*ease(progress/.72F));
+        float width=(1-.72F*ease(progress/.68F))*(1-ease((progress-.77F)/.23F));
+        // Roll the torn surface as it enters. The wet section keeps a solid cross-section until it reaches the glove.
+        edge.set(p).cross(axis);p.fma(.90F*progress*left,edge);
         channel(radius*left,guide);p.mul(width).add(guide);
         return progress;
     }
@@ -133,10 +163,10 @@ final class GoddessLimbFlow {
         float wave=(float)Math.cos(14*order-16*time);
         float ridge=Math.max(0,wave);ridge*=ridge;
         int r=packed>>16&255,g=packed>>8&255,b=packed&255;
-        return packed&0xff000000 | (int)(r+(83+39*ridge-r)*dark)<<16
-                | (int)(g+(15+7*ridge-g)*dark)<<8 | (int)(b+(25+8*ridge-b)*dark);
+        return packed&0xff000000 | (int)(r+(106+46*ridge-r)*dark)<<16
+                | (int)(g+(21+11*ridge-g)*dark)<<8 | (int)(b+(32+11*ridge-b)*dark);
     }
-    void draw(GreeneGoddessRenderer.Group group,Matrix4f source,PoseStack.Pose root,VertexConsumer out,int light,int overlay){
+    void draw(GreeneGoddessRenderer.Group group,Matrix4f source,PoseStack.Pose root,VertexConsumer out,int light,int overlay,WetSurface wet){
         var surface=profile.surfaces.get(group);
         var v=surface.vertices;var colors=surface.colors;var order=surface.order;
         for(int i=0;i<colors.length;i+=4){
@@ -150,6 +180,7 @@ final class GoddessLimbFlow {
             face.set(quad[1]).sub(quad[0]).cross(edge.set(quad[2]).sub(quad[0]));
             boolean hasFace=face.lengthSquared()>1.0e-12F;
             if(hasFace)face.normalize();
+            boolean glazed=false;
             for(int j=0;j<4;j++){
                 int k=(i+j)*8;float f=amount[j];
                 source.transformDirection(v[k+5],v[k+6],v[k+7],normal);
@@ -160,10 +191,15 @@ final class GoddessLimbFlow {
                     normal.mul(1-mix).fma(direction,face);
                     if(normal.lengthSquared()>.000001F)normal.normalize();
                 }
+                float crest=.5F+.5F*(float)Math.cos(23*order[i+j]-18*time);
+                float grazing=.25F+.75F*Math.abs(normal.y*.72F+normal.z*.55F);
+                int alpha=(int)(172*ease((f-.05F)/.48F)*(1-ease((f-.92F)/.08F))*(.35F+.65F*crest)*grazing);
+                sheen[j]=(alpha<<24)|((int)(131+57*crest)<<16)|((int)(23+9*crest)<<8)|36;glazed|=alpha>0;
                 int color=tint(colors[i+j],f,order[i+j],time);var p=quad[j];
                 out.addVertex(root,p.x,p.y,p.z).setColor(color).setUv(v[k+3],v[k+4])
                         .setOverlay(overlay).setLight(light).setNormal(root,normal.x,normal.y,normal.z);
             }
+            if(glazed)wet.add(quad,sheen);
         }
     }
 }
