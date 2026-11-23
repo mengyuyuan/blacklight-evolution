@@ -45,7 +45,7 @@ public final class SpiderPainEffect {
     static void shell(int id,GoddessBubbleRenderer.Shell shape,float strength,float age){
         lastVisible=System.nanoTime();
         float bound=(float)Math.max(shape.axes().x,Math.max(shape.axes().y,shape.axes().z))*1.40F;
-        pending.put(id,new Pulse(shape.center(),shape.center(),bound,strength,age,shape));
+        pending.put(id,new Pulse(shape.center(),shape.eye(),bound,strength,age,shape));
     }
 
     private static void vector(String name,Vector3f v){

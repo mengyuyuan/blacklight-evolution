@@ -29,6 +29,7 @@ public final class StandalonePlayerRendering {
     public static boolean nativeHandPass(){return hands!=null;}
     public static boolean allowFirstPersonHands(boolean mountedVehicle){return !mountedVehicle;}
     @SubscribeEvent public static void hand(RenderHandEvent event) {
+        if(com.codex.blacklight.client.camera.GoddessExecutionCamera.active()){event.setCanceled(true);return;}
         var mc=net.minecraft.client.Minecraft.getInstance();var player=mc.player;
         if(player!=null){
             var action=ModAttachments.getData(player,ModAttachments.PLAYER_ACTION);
