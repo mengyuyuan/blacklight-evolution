@@ -14,6 +14,7 @@ public final class CombatActionProtection {
         if(!(event.getEntity() instanceof ServerPlayer p)||!p.isAlive()||p.isSpectator()
                 ||event.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY))return;
         if(!ModAttachments.available(p))return;
+        if(GoddessStruggle.controlling(p) && GoddessDamage.fromEncounter(p,event.getSource())){event.setCanceled(true);return;}
         var state=ModAttachments.getData(p,ModAttachments.PLAYER_STATE);
         if(state.isInfected()&&state.isPrototypeMode()&&WeaponCombatSystem.groundSpikeGrace(p))event.setCanceled(true);
     }

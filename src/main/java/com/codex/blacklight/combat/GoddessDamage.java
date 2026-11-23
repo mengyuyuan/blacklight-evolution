@@ -16,6 +16,7 @@ public final class GoddessDamage {
         var parent=p.serverLevel().getEntity(entity.getPersistentData().getUUID("EncounterOwner"));
         return parent instanceof EncounterMob m && m.goddess.active()?m:null;
     }
+    static boolean fromEncounter(ServerPlayer p,DamageSource s){return owner(p,s.getEntity())!=null || owner(p,s.getDirectEntity())!=null;}
     public static float health(Player player,DamageSource source,float proposed){
         if(!(player instanceof ServerPlayer p) || proposed>=p.getHealth())return proposed;
         var boss=owner(p,source.getEntity());

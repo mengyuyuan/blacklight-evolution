@@ -1453,5 +1453,13 @@
   "message.blacklight.goddess_confirm": "Press %s to tear free and consume",
   "subtitle.blacklight.greene.pressure.strain": "Membrane strains",
   "subtitle.blacklight.greene.pressure.burst": "Blacklight vacuole bursts",
-  "subtitle.blacklight.greene.pressure.echo": "Rock reverberates"
+  "subtitle.blacklight.greene.pressure.echo": "Rock reverberates",
+  "boss.blacklight.struggle.lift": "Brace yourself",
+  "boss.blacklight.struggle.push": "Hold %s to prise open the thumb",
+  "boss.blacklight.struggle.jump": "Press %s to kick free",
+  "boss.blacklight.struggle.left": "Press %s to tear the left knot",
+  "boss.blacklight.struggle.right": "Press %s to tear the right knot",
+  "boss.blacklight.struggle.reprise": "Press %s on the returning swing",
+  "boss.blacklight.struggle.escape": "Roll clear",
+  "boss.blacklight.struggle.slip": "Losing your grip"
 }

@@ -1453,5 +1453,13 @@
   "message.blacklight.goddess_confirm": "按 %s 拔离并吸收",
   "subtitle.blacklight.greene.pressure.strain": "空泡筋膜绷紧",
   "subtitle.blacklight.greene.pressure.burst": "黑光空泡爆裂",
-  "subtitle.blacklight.greene.pressure.echo": "岩壁传回闷响"
+  "subtitle.blacklight.greene.pressure.echo": "岩壁传回闷响",
+  "boss.blacklight.struggle.lift": "稳住身体",
+  "boss.blacklight.struggle.push": "按住 %s 撑开拇指",
+  "boss.blacklight.struggle.jump": "按 %s 蹬开巨掌",
+  "boss.blacklight.struggle.left": "按 %s 扯断左侧发结",
+  "boss.blacklight.struggle.right": "按 %s 扯断右侧发结",
+  "boss.blacklight.struggle.reprise": "回摆时按 %s 补抓发结",
+  "boss.blacklight.struggle.escape": "翻身落地",
+  "boss.blacklight.struggle.slip": "支撑正在松脱"
 }

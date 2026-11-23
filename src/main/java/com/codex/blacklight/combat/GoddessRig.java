@@ -110,7 +110,23 @@ public final class GoddessRig {
                 }
             }
         }
-        if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.RUSH){
+        if(frame==0 && boss.goddess.attacks.struggle.active()){
+            var q=boss.goddess.attacks.struggle;
+            float fold=q.closure(partial);
+            var head=result[0].getTranslation(new Vector3f());
+            var turn=new Matrix4f().translate(head).rotateX(q.hair()?.28F+.28F*fold:-.18F*fold).translate(-head.x,-head.y,-head.z);
+            result[0].mulLocal(turn);result[33].mulLocal(turn);result[34].mulLocal(turn);
+            if(!q.hair()){
+                int first=(boss.goddess.removed()&1)==0?5:19;
+                var joint=result[first].getTranslation(new Vector3f());
+                var direction=result[first+2].getTranslation(new Vector3f()).sub(joint).normalize();
+                var toFace=new Vector3f(head).sub(joint).add(first==5?-.8F:.8F,-.35F,-1.3F).normalize();
+                float raise=GoddessRush.ease(boss.goddess.attacks.age(partial),0,18);
+                var up=new Quaternionf().slerp(new Quaternionf().rotationTo(direction,toFace),raise*.93F);
+                var rotation=new Matrix4f().translate(joint).rotate(up).translate(-joint.x,-joint.y,-joint.z);
+                for(int i=first;i<first+14;i++)result[i].mulLocal(rotation);
+            }
+        }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.RUSH){
             int wrist=boss.goddess.attacks.rush.arm()==1?7:21;
             GoddessRushPose.pose(boss,result,partial,bones[wrist].centers[0]);
         }else if(frame==0 && boss.goddess.attacks.hand.visible()){
@@ -157,7 +173,18 @@ public final class GoddessRig {
         return root(boss,boss.goddess.facing(partial),(float)boss.goddess.lift(partial),boss.goddess.braceTilt(partial));
     }
     public static List<HydraContact.Region> regions(EncounterMob boss,Vec3 origin,float partial){
-        return build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial));
+        var regions=build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial));
+        var snare=boss.goddess.attacks.struggle;
+        if(snare.active() && snare.hair() && snare.step()!=GoddessStruggle.Step.OPEN){
+            var region=regions.get(11);
+            var boxes=new ArrayList<>(region.boxes());
+            Vec3 root=snare.supportTip(partial);
+            var support=HydraContact.affine(root,new Vec3(.42,1.15,.42),snare.right(),new Vec3(0,1,0),snare.front());
+            boxes.add(support);
+            regions=new ArrayList<>(regions);
+            regions.set(11,new HydraContact.Region(region.bone(),boxes,region.bounds().minmax(support.bounds)));
+        }
+        return regions;
     }
     static List<HydraContact.Region> resting(EncounterMob boss,float yaw,boolean melee){
         return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80),null);

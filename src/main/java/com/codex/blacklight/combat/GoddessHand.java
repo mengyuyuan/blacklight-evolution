@@ -34,6 +34,8 @@ public final class GoddessHand {
     private CompoundTag remote(){return boss.goddessData().getCompound("Offense").getCompound("Hand");}
     private static Vec3 read(CompoundTag t,String k){return new Vec3(t.getDouble(k+"X"),t.getDouble(k+"Y"),t.getDouble(k+"Z"));}
     private static void put(CompoundTag t,String k,Vec3 v){t.putDouble(k+"X",v.x);t.putDouble(k+"Y",v.y);t.putDouble(k+"Z",v.z);}
+    int gripSide(){return boss.level().isClientSide?remote().getInt("Side"):side;}
+    boolean readyForGrip(){return formed && !acting && !forming && lost==0 && stone==null;}
     public boolean visible(){return boss.level().isClientSide?remote().getBoolean("Visible"):forming||formed;}
     public int skins(){return boss.level().isClientSide?remote().getInt("Skins"):skins;}
     private Vec3 position(Vec3 start,Vec3 goal,long began,float partial){
@@ -47,6 +49,10 @@ public final class GoddessHand {
         double recoil=Mth.clamp(1-(now()-(t==null?kicked:t.getLong("Kick"))+partial)/11.,0,1);
         Vec3 pos=t==null?position(from,anchor,travelAt,partial):position(read(t,"From"),read(t,"At"),t.getLong("Travel"),partial);
         boolean playing=t==null?acting:t.getBoolean("Acting");
+        var struggle=boss.goddess.attacks.struggle;
+        if(struggle.active() && !struggle.hair())
+            return new GoddessHandPose(struggle.palm(partial),struggle.palmYaw(partial),gripSide(),
+                    4,struggle.step()==GoddessStruggle.Step.WARN?-1-struggle.age(partial):struggle.closure(partial),0,1,now()+partial,0);
         return new GoddessHandPose(pos,t==null?yaw:t.getFloat("Yaw"),t==null?side:t.getInt("Side"),
                 playing&&!growing?(t==null?pattern:t.getInt("Move")):0,playing&&!growing?age:60,
                 t==null?lost:t.getInt("Lost"),growing?.05+.95*Mth.clamp(age/35.,0,1):1,now()+partial,recoil);

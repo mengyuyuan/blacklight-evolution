@@ -21,7 +21,7 @@ public final class GoddessPressurePose {
         if(cached!=null && cached.tick()==tick)return cached.owner();
         EncounterMob owner=null;
         for(var b:player.level().getEntitiesOfClass(EncounterMob.class,player.getBoundingBox().inflate(120),
-                b->b.goddess.active() && (b.goddess.attacks.move()==GoddessAttacks.Move.VACUOLE && b.goddess.attacks.caught()
+                b->b.goddess.active() && (b.goddess.attacks.struggle.holds() || b.goddess.attacks.move()==GoddessAttacks.Move.VACUOLE && b.goddess.attacks.caught()
                         || b.goddess.attacks.move()==GoddessAttacks.Move.RUSH && b.goddess.attacks.rush.grip()>=0 && !b.goddess.attacks.rush.landed()))){
             if(player.getUUID().equals(b.goddess.attacks.victim())){ owner=b;break; }
         }
@@ -35,6 +35,7 @@ public final class GoddessPressurePose {
     }
 
     public static BlacklightPose sample(GoddessAttacks attack,float partial){
+        if(attack.struggle.holds())return GoddessFatalActor.pose(attack.struggle,partial);
         if(attack.move()==GoddessAttacks.Move.RUSH)return GoddessThrowActor.sample(attack,partial);
         float age=attack.age(partial);
         boolean ground=attack.grounded();
@@ -89,6 +90,7 @@ public final class GoddessPressurePose {
         var boss=owner(p);
         if(boss==null)return Vec3.ZERO;
         var attack=boss.goddess.attacks;
+        if(attack.struggle.holds())return attack.struggle.seat(partial).subtract(p.getPosition(partial));
         if(attack.move()!=GoddessAttacks.Move.RUSH || !attack.rush.holding())return Vec3.ZERO;
         var wrist=boss.hurtRegions(partial).get(attack.rush.arm()==1?5:9);
         if(wrist.boxes().isEmpty())return Vec3.ZERO;
@@ -103,6 +105,7 @@ public final class GoddessPressurePose {
         var a=owner.goddess.attacks;
         var rig=BlacklightSkeleton.get();
         var neutral=new Vector3f(0,.21F,-.07F);
+        if(a.struggle.holds() && a.struggle.hair())return;
         var compressed=rig.getBoundTransformFor(sample(a,partial),rig.head).transformPosition(new Vector3f(neutral));
         rig.getBoundTransformFor(new BlacklightPose(),rig.head).transformPosition(neutral);
         Vec3 offset=BlockThrowMotion.world(p,compressed,a.actorYaw(),partial).subtract(BlockThrowMotion.world(p,neutral,a.actorYaw(),partial));
