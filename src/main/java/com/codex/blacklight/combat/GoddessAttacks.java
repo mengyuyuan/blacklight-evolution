@@ -56,6 +56,7 @@ public final class GoddessAttacks {
     }
     private void send(){boss.goddess.publish();}
     private void enter(Move next,ServerPlayer p){
+        if(move==Move.VACUOLE && caught && !paid && boss.level() instanceof ServerLevel level)GoddessHeldMovement.release(player(level),boss);
         debris.clear();
         if(move==Move.BREATHER || next==Move.BREATHER)brood.clearMeals();
         move=next;elapsed=0;caught=false;grounded=false;paid=false;bled=false;
@@ -194,6 +195,24 @@ public final class GoddessAttacks {
     private boolean clear(Vec3 from,Vec3 to){
         return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()!=HitResult.Type.BLOCK;
     }
+    public void moveInsideBubble(net.minecraft.world.entity.player.Player player){
+        double time=age(0)-28;
+        double strike=ease(time/4)*(1-ease((time-4)/10));
+        double close=ease((time-5)/18);
+        var data=boss.level().isClientSide?client():null;
+        var initial=data==null?entry:new Vec3(data.getDouble("EntryX"),data.getDouble("EntryY"),data.getDouble("EntryZ"));
+        var direction=data==null?impulse:new Vec3(data.getDouble("PushX"),0,data.getDouble("PushZ"));
+        var origin=center();
+        boolean ground=grounded();
+        var feet=origin.add(initial.multiply(1-ease(time/15),0,1-ease(time/15)))
+                .add(direction.scale((ground?.34:.65)*strike-.14*close));
+        double y=ground?origin.y+initial.y:origin.y+initial.y+.18*strike-.13*close;
+        var push=new Vec3(feet.x,y,feet.z).subtract(player.position());
+        if(push.lengthSqr()>.45*.45)push=push.normalize().scale(.45);
+        player.move(net.minecraft.world.entity.MoverType.SELF,push);
+        player.setDeltaMovement(Vec3.ZERO);
+        player.fallDistance=0;
+    }
     private void bubble(ServerLevel level,ServerPlayer p){
         if(elapsed<=20){
             if(!clear(eyes(),p.getEyePosition())){abandonMove();return;}
@@ -225,22 +244,13 @@ public final class GoddessAttacks {
             send();
         }
         if(caught && elapsed>=28 && elapsed<52){
-            double time=elapsed-28;
-            double strike=ease(time/4)*(1-ease((time-4)/10));
-            double close=ease((time-5)/18);
-            Vec3 offset=entry.multiply(1-ease(time/15),0,1-ease(time/15));
-            Vec3 feet=center.add(offset).add(impulse.scale((grounded?.34:.65)*strike-.14*close));
-            double y=grounded?p.getY():center.y+entry.y+.18*strike-.13*close;
-            Vec3 push=new Vec3(feet.x,y,feet.z).subtract(p.position());
-            if(push.lengthSqr()>.45*.45)push=push.normalize().scale(.45);
-            // Resolve against the real world first. Send the resolved feet to the owning client too.
-            p.move(net.minecraft.world.entity.MoverType.SELF,push);
-            if(push.lengthSqr()>.000025 || !grounded)p.connection.teleport(p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot());
-            p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
+            moveInsideBubble(p);
+            GoddessHeldMovement.commit(p,boss);
             if(grounded)pullDebris(level);
         }
         if(elapsed==34 && caught)sound(level,center,com.codex.blacklight.registry.ModInfectedSounds.Pressure.STRAIN,.75F);
         if(elapsed==52 && caught && !paid){
+            GoddessHeldMovement.release(p,boss);
             paid=true;
             float before=p.getHealth();
             p.hurt(boss.damageSources().mobAttack(boss),.30F*p.getMaxHealth()/com.codex.blacklight.power.CombatScale.units(p));

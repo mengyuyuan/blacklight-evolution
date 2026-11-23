@@ -80,6 +80,25 @@ public final class GoddessRig {
         int f=(int)sample;
         return interpolate(bones[joint].idle,7*f,7*((f+1)%frames),sample-f,false);
     }
+    static Matrix4f executionOffset(int stage,int joint,float frame){
+        float sample=Math.min(fallFrames-1,Math.max(0,frame-1));
+        int first=(int)sample;
+        int a=(first*JOINTS+joint)*10, b=(Math.min(fallFrames-1,first+1)*JOINTS+joint)*10;
+        return interpolate(falls[stage],a,b,sample-first,true);
+    }
+    /** Let the surviving joints settle from the actual release pose as the rise begins. */
+    static Matrix4f risingOffset(int stage,int joint,float frame,float age){
+        var target=executionOffset(stage,joint,frame);
+        if(age>=12)return target;
+        var released=executionOffset(stage,joint,80+GoddessEncounter.EXTRACTION_TICKS*1.2F);
+        if(age<=0)return released;
+        float t=age/12F;
+        t=t*t*(3-2*t);
+        var position=released.getTranslation(new Vector3f()).lerp(target.getTranslation(new Vector3f()),t);
+        var rotation=released.getUnnormalizedRotation(new Quaternionf()).slerp(target.getUnnormalizedRotation(new Quaternionf()),t);
+        var scale=released.getScale(new Vector3f()).lerp(target.getScale(new Vector3f()),t);
+        return target.translationRotateScale(position,rotation,scale);
+    }
     private static float executionFrame(EncounterMob boss,float partial) {
         float age=boss.goddess.age(partial);
         return switch(boss.goddess.action()){
@@ -95,13 +114,14 @@ public final class GoddessRig {
     }
     private static Matrix4f[] pose(EncounterMob boss,float partial,float frame){
         var result=new Matrix4f[JOINTS];
-        var fall=falls[Integer.bitCount(boss.goddess.poseMask()&3)];
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
+        float riseAge=boss.goddess.age(partial);
+        boolean settling=boss.goddess.action()==GoddessEncounter.Action.RISING && riseAge<12;
         for(int j=0;j<JOINTS;j++){
             if(frame==0) result[j]=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
             else {
-                float sample=Math.min(fallFrames-1,frame-1);
-                int f=(int)sample, a=(f*JOINTS+j)*10, b=(Math.min(fallFrames-1,f+1)*JOINTS+j)*10;
-                result[j]=interpolate(fall,a,b,sample-f,true).mul(idle(j,0));
+                var offset=settling && visible(boss,j) ? risingOffset(stage,j,frame,riseAge) : executionOffset(stage,j,frame);
+                result[j]=offset.mul(idle(j,0));
                 if(frame < 14){
                     float blend=(frame-1)/13;
                     blend=blend*blend*(3-2*blend);

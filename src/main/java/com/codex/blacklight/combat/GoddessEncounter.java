@@ -19,11 +19,18 @@ public final class GoddessEncounter {
     private Action action = Action.FLYING;
     private UUID actor;
     private Vec3 grabFrom=Vec3.ZERO;
+    static final int EXTRACTION_TICKS = 139;
+    private int gripLead;
+    private float gripYaw;
+
     public static EncounterMob paired(Player p){
-        return p.level().getEntitiesOfClass(EncounterMob.class,p.getBoundingBox().inflate(76),b->b.goddess.active() &&
-                b.goddess.action()==Action.EXTRACTING && b.goddess.isActor(p)).stream().findFirst().orElse(null);
+        return actorOwner(p, false);
     }
-    private boolean isActor(Player p){
+    public static EncounterMob actorOwner(Player p, boolean includeGrip){
+        return p.level().getEntitiesOfClass(EncounterMob.class,p.getBoundingBox().inflate(76),b->b.goddess.active() &&
+                (b.goddess.action()==Action.EXTRACTING || includeGrip && b.goddess.action()==Action.GRIPPED) && b.goddess.isActor(p)).stream().findFirst().orElse(null);
+    }
+    boolean isActor(Player p){
         if(!boss.level().isClientSide)return p.getUUID().equals(actor);
         var state=boss.goddessData();return state.hasUUID("Actor")&&state.getUUID("Actor").equals(p.getUUID());
     }
@@ -33,6 +40,30 @@ public final class GoddessEncounter {
     private boolean staggerLocked;
     static final int LOWER_TICKS = 20, OPEN_TICKS = 80, RECOVER_TICKS = 24;
     private static float fraction(float value) { return Math.max(0, Math.min(1, value)); }
+    private static float ease(float t) {
+        t = fraction(t);
+        return t*t*(3-2*t);
+    }
+    private static float gripBlend(Action action, int lead, float ticks) {
+        return ease((action==Action.GRIPPED ? Math.min(6,ticks) : lead+ticks)/12F);
+    }
+    private int confirmedGripLead() {
+        return boss.level().isClientSide ? boss.goddessData().getInt("GripLead") : gripLead;
+    }
+    static float actorBlend(Action action, int lead, float ticks) {
+        return gripBlend(action,lead,ticks) * (action==Action.GRIPPED ? 1 : ease((EXTRACTION_TICKS-ticks)/10F));
+    }
+    public float actorBlend(float partial) {
+        return actorBlend(action(),confirmedGripLead(),age(partial));
+    }
+    public float actorFacing(float partial, float ordinaryYaw) {
+        float target = GoddessActor.yaw(boss, partial);
+        if (action() == Action.GRIPPED) return net.minecraft.util.Mth.rotLerp(gripBlend(action(),confirmedGripLead(),age(partial)), ordinaryYaw, target);
+        var data = boss.goddessData();
+        float start = boss.level().isClientSide ? (data.contains("GripYaw") ? data.getFloat("GripYaw") : target) : gripYaw;
+        float facing = net.minecraft.util.Mth.rotLerp(gripBlend(action(),confirmedGripLead(),age(partial)), start, target);
+        return net.minecraft.util.Mth.rotLerp(ease((EXTRACTION_TICKS-age(partial))/10F), ordinaryYaw, facing);
+    }
     public float lowered(float partial) {
         float t = age(partial);
         return switch (action()) {
@@ -216,6 +247,8 @@ public final class GoddessEncounter {
                 else {
                     fight.committed = false;
                     fight.grabFrom=player.position();
+                    fight.gripLead = Math.min(6, fight.age);
+                    fight.gripYaw = player.yBodyRot;
                     fight.change(Action.EXTRACTING);
                     player.displayClientMessage(Component.empty(),true);
                 }
@@ -295,9 +328,12 @@ public final class GoddessEncounter {
     public void placeActor(Player p){
         if(action()!=Action.EXTRACTING || !isActor(p) || !p.isAlive())return;
         Vec3 next=supportedActorPosition(p,0);
-        if(next!=null)p.setPos(next.x,next.y,next.z);
+        if(next!=null){
+            p.setPos(next.x,next.y,next.z);
+            if(p instanceof ServerPlayer server)GoddessHeldMovement.commit(server,boss);
+        }
         p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
-        float yaw=GoddessActor.yaw(boss,0);
+        float yaw=actorFacing(0,p.yBodyRot);
         p.setYRot(yaw);p.yBodyRot=yaw;p.yHeadRot=yaw;
     }
     private void tickExecution(Player player) {
@@ -319,9 +355,9 @@ public final class GoddessEncounter {
             SpiderFoley.play(boss,GoddessActor.point(boss,1,0),SpiderFoley.Cue.FRACTURE,1.4F);
             publish();
         }
-        if (age < 139) return;
+        if (age < EXTRACTION_TICKS) return;
         // The paired actor is driven on both sides during the shot. Send one final authoritative position.
-        if(player instanceof ServerPlayer p && p.isAlive())p.connection.teleport(p.getX(),p.getY(),p.getZ(),p.getYRot(),p.getXRot());
+        if(player instanceof ServerPlayer p)GoddessHeldMovement.release(p,boss);
         if (life.finished()) {
             var source = player == null ? boss.damageSources().generic() : boss.damageSources().playerAttack(player);
             boss.setHealth(0);
@@ -329,7 +365,8 @@ public final class GoddessEncounter {
         } else {
             actor=null;
             committed=false;
-            if (life.waiting()) fall(); else change(Action.RISING);
+            // Carry-over damage can queue another fall. Finish this rise before starting its fall track.
+            change(Action.RISING);
         }
     }
     void publish() {
@@ -346,6 +383,8 @@ public final class GoddessEncounter {
         t.putInt("Part",part);
         t.putInt("Removed",life.removed());
         t.putInt("Before",previousMask);
+        t.putInt("GripLead",gripLead);
+        t.putFloat("GripYaw",gripYaw);
         t.putFloat("Remainder",life.remainder());
         t.putBoolean("Waiting",life.waiting());
         t.putBoolean("Committed",committed);
@@ -364,6 +403,8 @@ public final class GoddessEncounter {
         age=Math.max(0,t.getInt("Age"));
         part=t.getInt("Part");
         previousMask=t.getInt("Before") & 7;
+        gripLead=Math.max(0,Math.min(6,t.getInt("GripLead")));
+        gripYaw=t.contains("GripYaw") ? t.getFloat("GripYaw") : t.getFloat("Facing");
         staggerLocked=t.getBoolean("StaggerLocked") || action==Action.STAGGER;
         entryYaw=t.contains("EntryYaw") ? t.getFloat("EntryYaw") : t.getFloat("Facing");
         fallFrom=fraction(t.getFloat("FallFrom"));

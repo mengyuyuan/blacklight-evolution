@@ -25,7 +25,7 @@ public final class GoddessActor {
     }
     private static Sample sample(EncounterMob boss,float partial){
         int clip=Integer.bitCount(boss.goddess.poseMask()&3);
-        float frame=Math.min(248,79+boss.goddess.age(partial)*1.2F);
+        float frame=boss.goddess.action()==GoddessEncounter.Action.GRIPPED ? 79 : Math.min(248,79+boss.goddess.age(partial)*1.2F);
         int index=(int)frame;
         return new Sample(clips[clip],index*STRIDE,Math.min(248,index+1)*STRIDE,frame-index);
     }

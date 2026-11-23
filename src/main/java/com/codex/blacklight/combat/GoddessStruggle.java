@@ -205,11 +205,16 @@ public final class GoddessStruggle {
         var motion=Entity.collideBoundingBox(p,d,p.getBoundingBox(),p.level(),List.of());
         if(d.distanceToSqr(motion)>.10 || !p.level().getWorldBorder().isWithinBounds(p.getBoundingBox().move(motion)))return false;
         var at=p.position().add(motion);
-        p.connection.teleport(at.x,at.y,at.z,hair?facing:p.getYRot(),p.getXRot());
+        p.setPos(at.x,at.y,at.z);
+        if(hair)p.setYRot(facing);
+        GoddessHeldMovement.commit(p,boss);
         p.fallDistance=0;p.setDeltaMovement(Vec3.ZERO);return true;
     }
     void cancel(ServerPlayer p){
-        if(captive.get()!=null)bound.remove(captive.get(),this);
+        if(captive.get()!=null){
+            GoddessHeldMovement.release(captive.get(),boss);
+            bound.remove(captive.get(),this);
+        }
         captive.clear();
         if(p!=null && holds()){p.fallDistance=0;p.setDeltaMovement(Vec3.ZERO);}
         token++;step=Step.OPEN;keys=0;shown=pressed=-1;
@@ -257,8 +262,10 @@ public final class GoddessStruggle {
                 else change(Step.SLIP);
             }
         }else if(step==Step.ESCAPE && age>=17){
+            GoddessHeldMovement.release(p,boss);
             p.fallDistance=0;SpiderFoley.ground(boss,p.position(),1,SpiderFoley.Cue.BRACE);return 2;
         }else if(step==Step.SLIP && age>=22){
+            GoddessHeldMovement.release(p,boss);
             committed=true;
             change(Step.OPEN);
             SpiderFoley.play(boss,p.position(),hair?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.GULP,1.8F);

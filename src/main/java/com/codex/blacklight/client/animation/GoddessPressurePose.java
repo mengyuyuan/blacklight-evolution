@@ -29,6 +29,22 @@ public final class GoddessPressurePose {
         return owner;
     }
 
+    public static void placeCaptive(Player player){
+        var boss=owner(player);
+        if(boss==null || player.isSpectator() || !player.isAlive())return;
+        var attacks=boss.goddess.attacks;
+        if(attacks.move()==GoddessAttacks.Move.VACUOLE && attacks.caught() && !attacks.ruptured() && attacks.age(0)<52){
+            attacks.moveInsideBubble(player);
+        }else if(attacks.struggle.holds()){
+            var delta=attacks.struggle.seat(0).subtract(player.position());
+            var motion=net.minecraft.world.entity.Entity.collideBoundingBox(player,delta,player.getBoundingBox(),player.level(),java.util.List.of());
+            if(!player.level().getWorldBorder().isWithinBounds(player.getBoundingBox().move(motion)))return;
+            player.setPos(player.position().add(motion));
+            player.setDeltaMovement(Vec3.ZERO);
+            player.fallDistance=0;
+        }
+    }
+
     private static float rise(float age,float start,float end){
         float t=Mth.clamp((age-start)/(end-start),0F,1F);
         return t*t*(3-2*t);
