@@ -61,8 +61,9 @@ public final class GoddessEncounter {
         if (action() == Action.GRIPPED) return net.minecraft.util.Mth.rotLerp(gripBlend(action(),confirmedGripLead(),age(partial)), ordinaryYaw, target);
         var data = boss.goddessData();
         float start = boss.level().isClientSide ? (data.contains("GripYaw") ? data.getFloat("GripYaw") : target) : gripYaw;
-        float facing = net.minecraft.util.Mth.rotLerp(gripBlend(action(),confirmedGripLead(),age(partial)), start, target);
-        return net.minecraft.util.Mth.rotLerp(ease((EXTRACTION_TICKS-age(partial))/10F), ordinaryYaw, facing);
+        // The actor hands back the final heading. Feeding stale locomotion yaw into the release
+        // rotates the body again every tick even when the player has supplied no turn input.
+        return net.minecraft.util.Mth.rotLerp(gripBlend(action(),confirmedGripLead(),age(partial)), start, target);
     }
     public float lowered(float partial) {
         float t = age(partial);

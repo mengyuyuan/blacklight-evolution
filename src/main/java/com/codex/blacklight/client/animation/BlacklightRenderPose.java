@@ -137,6 +137,8 @@ public final class BlacklightRenderPose {
     }
     public static float rawFacing(LivingEntity entity,float partial) {
         if(entity instanceof net.minecraft.world.entity.player.Player player){
+            var paired=com.codex.blacklight.combat.GoddessEncounter.paired(player);
+            if(paired!=null)return paired.goddess.actorFacing(partial,player.yBodyRot);
             var pressure=GoddessPressurePose.owner(player);
             if(pressure!=null)return pressure.goddess.attacks.actorYaw();
         }

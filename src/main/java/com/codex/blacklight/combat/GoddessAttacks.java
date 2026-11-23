@@ -79,10 +79,10 @@ public final class GoddessAttacks {
         if(!(boss.level() instanceof ServerLevel level))return;
         elapsed++;
         if(move==Move.REST){
-            if(elapsed<(groups>=2?1:order==0?14:8))return;
+            if(elapsed<(groups>=3?1:order==0?12:3))return;
             var p=nearest(level);
             if(p==null)return;
-            if(groups>=2){enter(Move.BREATHER,p);}
+            if(groups>=3){enter(Move.BREATHER,p);}
             else {
                 Move selected=ORDERS[Math.floorMod(order++,ORDERS.length)];
                 if((selected==Move.CALL || selected==Move.STRONG_CALL) && !brood.ready(selected==Move.STRONG_CALL))selected=Move.NEEDLE_RAIN;
@@ -138,6 +138,10 @@ public final class GoddessAttacks {
                         if(move!=Move.STRONG_CALL)return;
                     }
                 }
+                if(elapsed==38 && !brood.issued(sequence)){
+                    enter(Move.NEEDLE_RAIN,p);
+                    return;
+                }
                 if(brood.issued(sequence)){
                     if(elapsed==39)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,strong || (sequence&1)==0);
                     if(strong && elapsed==63)com.codex.blacklight.entity.GoddessEmplacement.deploy(boss,p,false);
@@ -148,16 +152,26 @@ public final class GoddessAttacks {
                 }
             }
             case NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF -> {
-                if(elapsed<=10){
+                if(elapsed<=10 || move==Move.BLOOD_SURF && elapsed>=21 && elapsed<=28){
                     center=p.getBoundingBox().getCenter();boss.getLookControl().setLookAt(p,18,12);
-                    if(elapsed%3==0 || elapsed==10)send();
+                    if(elapsed%3==0 || elapsed==10 || elapsed==28)send();
                 }
                 if(move==Move.NEEDLE_RAIN && elapsed>=12&&elapsed<=36&&(elapsed-12)%6==0)volley.rain(level,center,(elapsed-12)/6);
                 if(move==Move.WALL_SPEARS && elapsed==28 && !volley.spears(level,center)){
                     enter(Move.NEEDLE_RAIN,p);
                     return;
                 }
-                if(move==Move.BLOOD_SURF && (elapsed==12||elapsed==38))volley.waves(level,center,elapsed==38);
+                if(move==Move.BLOOD_SURF && (elapsed==12||elapsed==38) && !volley.waves(level,center,elapsed==38)){
+                    enter(Move.NEEDLE_RAIN,p);
+                    return;
+                }
+                // A countered spear fan has nothing left to recall. Do not wait through the empty recall.
+                if(move==Move.WALL_SPEARS && elapsed>=44 && elapsed%5==0
+                        && level.getEntitiesOfClass(com.codex.blacklight.entity.EvolvedQuill.class,boss.getBoundingBox().inflate(84),
+                            bolt->bolt.bloodSpear() && bolt.getOwner()==boss && bolt.getPersistentData().getInt("GoddessSequence")==sequence).isEmpty()){
+                    finish();
+                    return;
+                }
                 if(elapsed>=(move==Move.WALL_SPEARS?112:55))finish();
             }
             default -> { }
@@ -268,7 +282,7 @@ public final class GoddessAttacks {
             var wall=reflector(level);
             if(wall!=null)sound(level,wall,com.codex.blacklight.registry.ModInfectedSounds.Pressure.ECHO,1.0F);
         }
-        if(elapsed>=62)finish();
+        if(elapsed>=(caught?62:34))finish();
     }
     private void drawGround(ServerLevel level,ServerPlayer p){
         if(!level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
