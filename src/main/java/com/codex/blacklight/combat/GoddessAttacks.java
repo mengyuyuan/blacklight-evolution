@@ -151,9 +151,12 @@ public final class GoddessAttacks {
                     if(elapsed==10)send();
                 }
                 if(move==Move.NEEDLE_RAIN && elapsed>=12&&elapsed<=36&&(elapsed-12)%6==0)volley.rain(level,center,(elapsed-12)/6);
-                if(move==Move.WALL_SPEARS && elapsed==28)volley.spears(level,center);
+                if(move==Move.WALL_SPEARS && elapsed==28 && !volley.spears(level,center)){
+                    enter(Move.NEEDLE_RAIN,p);
+                    return;
+                }
                 if(move==Move.BLOOD_SURF && (elapsed==12||elapsed==38))volley.waves(level,center,elapsed==38);
-                if(elapsed>=(move==Move.WALL_SPEARS?92:55))finish();
+                if(elapsed>=(move==Move.WALL_SPEARS?112:55))finish();
             }
             default -> { }
         }
