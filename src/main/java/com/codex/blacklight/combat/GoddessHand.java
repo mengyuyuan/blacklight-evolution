@@ -135,9 +135,8 @@ public final class GoddessHand {
             }
             forming=true;lost=0;next=0;Arrays.fill(strain,0);
         }
-        boolean close=boss.position().subtract(p.position()).horizontalDistance()<27
-                || formed && anchor.distanceToSqr(eye)<12*12;
-        pattern=close && !lastWasMelee?GoddessPalmCombo.MOVE:Math.floorMod(next,4);
+        // The hand has its own clear staging position beside its target, even across the cavern from Greene.
+        pattern=lastWasMelee?Math.floorMod(next,4):GoddessPalmCombo.MOVE;
         if(formed && pattern==3){
             vein=stoneSite(l,p,goal);
             if(vein==null || (lost&1)!=0)pattern=0;
