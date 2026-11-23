@@ -79,6 +79,16 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
     }
     @Override public boolean shouldRender(EncounterMob boss,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){
         if(super.shouldRender(boss,frustum,x,y,z))return true;
+        if(boss.goddess.active() && com.codex.blacklight.combat.GoddessCastPose.active(boss.goddess.attacks.move())){
+            var reach=new net.minecraft.world.phys.AABB(boss.position(),boss.goddess.attacks.center()).expandTowards(0,50,0).inflate(4);
+            if(frustum.isVisible(reach))return true;
+        }
+        if(boss.goddess.active()){
+            if(boss.goddess.action()==com.codex.blacklight.combat.GoddessEncounter.Action.EXTRACTING)return true;
+            var hand=boss.goddess.attacks.hand.pose(1);
+            if(hand!=null)for(var link:hand.links())
+                if(frustum.isVisible(new net.minecraft.world.phys.AABB(link.base(),link.end()).inflate(link.width()+link.depth())))return true;
+        }
         var snare=boss.goddess.attacks.struggle;
         if(snare.active()){
             net.minecraft.world.phys.Vec3 edge=snare.hair()?snare.supportTip(1):snare.palm(1);
@@ -102,11 +112,13 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             return;
         }
         if(boss.goddess.active()){
+            GoddessCastRenderer.draw(boss,partial,stack,buffers,light);
             GoddessLeaderRenderer.draw(boss,partial,stack,buffers,light);
             GoddessStruggleRenderer.draw(boss,partial,stack,buffers,light);
             colonyHand.draw(boss,partial,stack,buffers);
             stack.pushPose();
             stack.mulPose(com.codex.blacklight.combat.GoddessRig.root(boss,partial));
+            GoddessExecutionTracks.draw(boss,partial,stack,buffers,light);
             int overlay=net.minecraft.client.renderer.texture.OverlayTexture.pack(0,net.minecraft.client.renderer.texture.OverlayTexture.v(boss.hurtTime>0));
             goddess.draw(boss.tickCount+partial,stack,buffers,light,overlay,com.codex.blacklight.combat.GoddessRig.renderOffsets(boss,partial));
             stack.popPose();

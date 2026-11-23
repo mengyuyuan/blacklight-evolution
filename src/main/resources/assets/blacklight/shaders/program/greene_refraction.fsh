@@ -110,7 +110,34 @@ void main() {
     vec3 ray = normalize(vec3((texCoord * 2.0 - 1.0 + vec2(OffsetX, OffsetY)) / projection, -1.0));
     float visible = sceneDepth(texCoord) / -ray.z;
     vec3 start = vec3(Ax, Ay, Az);
-    if(Inward>.5){fragColor=compressVolume(original,start,ray,visible,projection);return;}
+    if(Inward>.5){
+        fragColor=compressVolume(original,start,ray,visible,projection);
+        // The caster compresses the image at her eyes, then sends that deformation into the receiver.
+        // The target shell and its approaching pressure front share the same depth and world-color samples.
+        if(Age<3.0 || Age>=52.0)return;
+        if(Age>=28.0 && Contact<=.001)return;
+        vec3 eye=vec3(Bx,By,Bz);
+        float flight=Age<20.0?0.0:(Age<28.0?(Age-20.0)/8.0:fract((Age-28.0)/8.0));
+        vec3 focus=mix(eye,start,flight);
+        float r=Age<20.0?mix(1.0,2.4,smoothstep(3.0,20.0,Age)):mix(2.6,1.9,flight);
+        float depth=dot(focus,ray);
+        if(depth<=.10 || depth-r>=visible)return;
+        vec3 radial=depth*ray-focus;
+        float d=length(radial)/r;
+        if(d>=1.0)return;
+        float nearFace=smoothstep(0.0,r,visible-(depth-r));
+        float power=nearFace*(Age<20.0?smoothstep(3.0,18.0,Age):1.0);
+        float rim=smoothstep(.57,.81,d)*(1.0-smoothstep(.82,1.0,d));
+        vec2 extent=.5*projection*r/max(1.0,-focus.z);
+        vec2 shift=extent*radial.xy/r*(.62+.32*sin(6.5*d-Age*.67))*(1.-smoothstep(.78,1.,d));
+        vec2 guard=.5/InSize;
+        vec2 uv=clamp(texCoord-shift*power,guard,1.-guard);
+        if(sceneDepth(uv)<-focus.z-r)uv=texCoord;
+        vec3 transmitted=texture(DiffuseSampler,uv).rgb*(1.-power*(.18+.46*rim));
+        transmitted+=power*pow(rim,3.)*.16*vec3(.79,.76,.84);
+        fragColor.rgb=mix(fragColor.rgb,transmitted,power*(1.-smoothstep(.88,1.,d)));
+        return;
+    }
     vec3 segment = vec3(Bx, By, Bz) - start;
     // Closest points between this pixel's *visible* ray and the finite discharge.
     vec3 transverse = segment - ray * dot(segment, ray);

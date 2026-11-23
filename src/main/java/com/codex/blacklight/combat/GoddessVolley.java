@@ -16,25 +16,34 @@ final class GoddessVolley {
         return forward.lengthSqr()<.1?new Vec3(1,0,0):new Vec3(forward.z,0,-forward.x);
     }
     void quill(ServerLevel level,Vec3 origin,Vec3 direction,double speed,float damage,boolean spear){
+        quill(level,origin,direction,speed,damage,spear,0);
+    }
+    private void quill(ServerLevel level,Vec3 origin,Vec3 direction,double speed,float damage,boolean spear,int kind){
         if(direction.lengthSqr()<.001)return;
         var bolt=new EvolvedQuill(level,boss);
         bolt.setPos(origin);bolt.damage(damage);
         bolt.getPersistentData().putInt("GoddessSequence",boss.goddess.attacks.sequence());
         if(spear)bolt.makeBloodSpear();
+        else if(kind!=0)bolt.barrage(kind);
         bolt.shoot(direction.x,direction.y,direction.z,(float)speed,0);
         level.addFreshEntity(bolt);
     }
     void rain(ServerLevel level,Vec3 aim,int row){
-        var hair=boss.hurtRegions(1).get(11).bounds().getCenter();
+        var crown=boss.hurtRegions(1).get(11);
+        if(crown.boxes().isEmpty())return;
         var across=across(aim);
         var forward=new Vec3(-across.z,0,across.x);
+        var tufts=new java.util.ArrayList<>(crown.boxes());
+        tufts.sort(java.util.Comparator.comparingDouble(p->p.center.dot(across)));
+        int opening=2-row;
         for(int i=-3;i<=3;i++){
-            if(i==1-row%3)continue;
+            if(i==opening || i==opening-1 && (boss.goddess.removed()&GoddessVitals.LEFT_ARM)!=0
+                    || i==opening+1 && (boss.goddess.removed()&GoddessVitals.RIGHT_ARM)!=0)continue;
             var endpoint=aim.add(across.scale(i*2.3)).add(forward.scale((row-2)*1.65+.38*i));
-            var origin=hair.add(across.scale(i*1.4));
-            quill(level,origin,endpoint.subtract(origin),2.45,12,false);
+            var origin=tufts.get((i+3)*(tufts.size()-1)/6).nearest(endpoint);
+            quill(level,origin,endpoint.subtract(origin),2.45,12,false,EvolvedQuill.CROWN_NEEDLE);
         }
-        SpiderFoley.play(boss,hair.add(across.scale((row-2)*1.5)),SpiderFoley.Cue.NEEDLE,1.15F);
+        SpiderFoley.play(boss,tufts.get(row*(tufts.size()-1)/4).center,SpiderFoley.Cue.NEEDLE,3.6F);
     }
     void waves(ServerLevel level,Vec3 aim,boolean high){
         Vec3 side=across(aim),forward=new Vec3(-side.z,0,side.x);
@@ -45,8 +54,11 @@ final class GoddessVolley {
             var ground=level.clip(new ClipContext(p.add(0,4,0),p.add(0,-7,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
             if(ground.getType()!=HitResult.Type.BLOCK)continue;
             var origin=ground.getLocation().add(0,high?2.30:.65,0);
-            quill(level,origin,forward,high?1.25:1.55,16,false);
+            quill(level,origin,forward,high?1.25:1.55,16,false,high?EvolvedQuill.HIGH_SURF:EvolvedQuill.LOW_SURF);
         }
+        int wrist=boss.goddess.supportingWrist();
+        var joint=boss.hurtRegions(1).get(wrist>=0?wrist:1).bounds().getCenter();
+        SpiderFoley.play(boss,joint,high?SpiderFoley.Cue.STRIKE:SpiderFoley.Cue.BRACE,3.7F);
         SpiderFoley.play(boss,first,high?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.STRAIN,1.3F);
     }
     boolean spears(ServerLevel level, Vec3 aim) {
@@ -65,7 +77,7 @@ final class GoddessVolley {
             quill(level, start, pin.subtract(start), 3.2, 18, true);
             fired = true;
         }
-        if (fired) SpiderFoley.play(boss, chest, SpiderFoley.Cue.TEAR, 1.25F);
+        if (fired) SpiderFoley.play(boss, chest, SpiderFoley.Cue.TEAR, 3.7F);
         return fired;
     }
     private Vec3 wallPin(ServerLevel level, Vec3 start, Vec3 aim, Vec3 direction) {

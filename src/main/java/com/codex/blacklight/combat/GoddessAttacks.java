@@ -99,7 +99,8 @@ public final class GoddessAttacks {
                 if(selected==Move.HAND && !hand.begin(level,p))selected=Move.NEEDLE_RAIN;
                 enter(selected,p);
             }
-            if(move==Move.VACUOLE)SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.INHALE,1.35F);
+            if(move==Move.VACUOLE)SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.INHALE,3.8F);
+            else if(GoddessCastPose.active(move))SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.LOAD,3.6F);
             else SpiderFoley.play(boss,eyes(),move==Move.BREATHER?SpiderFoley.Cue.BRACE:SpiderFoley.Cue.LOAD,1.25F);
             return;
         }
@@ -148,7 +149,7 @@ public final class GoddessAttacks {
             case NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF -> {
                 if(elapsed<=10){
                     center=p.getBoundingBox().getCenter();boss.getLookControl().setLookAt(p,18,12);
-                    if(elapsed==10)send();
+                    if(elapsed%3==0 || elapsed==10)send();
                 }
                 if(move==Move.NEEDLE_RAIN && elapsed>=12&&elapsed<=36&&(elapsed-12)%6==0)volley.rain(level,center,(elapsed-12)/6);
                 if(move==Move.WALL_SPEARS && elapsed==28 && !volley.spears(level,center)){
@@ -169,7 +170,8 @@ public final class GoddessAttacks {
             case RUSH -> elapsed>=12 && elapsed<=26 || rush.grip()<0 && elapsed>=43 && elapsed<60 ? (rush.arm()==1?5:9) : -1;
             case HAND -> elapsed>=5 && elapsed<=34 ? wrist : -1;
             case VACUOLE -> elapsed>=9 && elapsed<=26 ? 0 : -1;
-            case NEEDLE_RAIN, BLOOD_SURF -> elapsed>=8 && elapsed<=25 ? 1 : -1;
+            case NEEDLE_RAIN -> elapsed>=4 && elapsed<=35 ? 11 : -1;
+            case BLOOD_SURF -> elapsed<=12 || elapsed>=22 && elapsed<=38 ? (wrist>=0?wrist:1) : -1;
             case CALL, STRONG_CALL, WALL_SPEARS -> elapsed>=12 && elapsed<=32 ? (wrist>=0?wrist:1) : -1;
             default -> -1;
         };
@@ -188,7 +190,7 @@ public final class GoddessAttacks {
         groups=move==Move.STRONG_CALL && paid ? 2 : groups+1;
         enter(Move.REST,null);
     }
-    private Vec3 eyes(){return boss.hurtRegions(1).get(0).bounds().getCenter();}
+    private Vec3 eyes(){return GoddessCastPose.face(boss,1);}
     private boolean clear(Vec3 from,Vec3 to){
         return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()!=HitResult.Type.BLOCK;
     }
@@ -198,7 +200,10 @@ public final class GoddessAttacks {
             center=p.getBoundingBox().getCenter();
             boss.getLookControl().setLookAt(p,18,12);
             if(elapsed%3==0 || elapsed==20)send();
-            if(elapsed==20)SpiderFoley.play(boss,center,SpiderFoley.Cue.LOAD,1.15F);
+            if(elapsed==20){
+                SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.STRAIN,3.8F);
+                SpiderFoley.play(boss,center,SpiderFoley.Cue.LOAD,1.15F);
+            }
         } else if(elapsed==28){
             Vec3 nearest=new Vec3(Math.max(p.getBoundingBox().minX,Math.min(center.x,p.getBoundingBox().maxX)),
                     Math.max(p.getBoundingBox().minY,Math.min(center.y,p.getBoundingBox().maxY)),

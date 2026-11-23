@@ -148,23 +148,8 @@ public final class GoddessRig {
                         .rotateX(-.88F*cue-.45F*point*share).translate(-pivot.x,-pivot.y,-pivot.z);
                 for(int j=first;j<first+14;j++)result[j].mulLocal(gesture);
             }
-        }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.WALL_SPEARS){
-            float age=boss.goddess.attacks.age(partial);
-            float draw=GoddessRush.ease(age,1,24)*(1-GoddessRush.ease(age,26,31));
-            float spread=GoddessRush.ease(age,26,31)*(1-GoddessRush.ease(age,55,68));
-            float pull=GoddessRush.ease(age,52,67)*(1-GoddessRush.ease(age,74,94));
-            var head=result[0].getTranslation(new Vector3f());
-            var whip=new Matrix4f().translate(head).rotateX(-.22F*draw+.31F*spread-.39F*pull)
-                    .rotateY(.31F*draw-.18F*pull).translate(-head.x,-head.y,-head.z);
-            result[0].mulLocal(whip);result[33].mulLocal(whip);result[34].mulLocal(whip);
-            for(int arm=0;arm<2;arm++){
-                if((boss.goddess.removed()&(1<<arm))!=0)continue;
-                int first=arm==0?5:19;
-                var pivot=result[first].getTranslation(new Vector3f());
-                var sweep=new Matrix4f().translate(pivot).rotateZ((arm==0?1:-1)*(.24F*draw-.63F*spread+.43F*pull))
-                        .rotateX(-.48F*draw+.27F*spread-.32F*pull).translate(-pivot.x,-pivot.y,-pivot.z);
-                for(int j=first;j<first+14;j++)result[j].mulLocal(sweep);
-            }
+        }else if(frame==0 && GoddessCastPose.active(boss.goddess.attacks.move())){
+            GoddessCastPose.apply(boss,result,partial);
         }else if(frame==0 && boss.goddess.attacks.hand.melee()){
             int first=(boss.goddess.removed()&1)==0?5:19;
             GoddessPalmCombo.conduct(result,first,boss.goddess.attacks.hand.controlTime(partial));
@@ -184,7 +169,7 @@ public final class GoddessRig {
     public static Matrix4f[] renderOffsets(EncounterMob boss,float partial){
         var output=pose(boss,partial);
         for(int j=0;j<JOINTS;j++){
-            boolean inTransfer=boss.goddess.action()==GoddessEncounter.Action.EXTRACTING && flag(bones[j].part)==boss.goddess.part() && executionFrame(boss,partial)<202;
+            boolean inTransfer=boss.goddess.action()==GoddessEncounter.Action.EXTRACTING && flag(bones[j].part)==boss.goddess.part() && executionFrame(boss,partial)<(boss.goddess.poseMask()==0?233:195);
             if(!visible(boss,j) && !inTransfer)output[j].zero();
             else output[j].mul(idle(j,boss.tickCount+partial).invert());
         }

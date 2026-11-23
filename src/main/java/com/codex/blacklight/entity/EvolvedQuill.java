@@ -11,6 +11,14 @@ import net.minecraft.world.phys.*;
 public final class EvolvedQuill extends ThrowableItemProjectile {
     private float damage=8;
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> SPEAR=net.minecraft.network.syncher.SynchedEntityData.defineId(EvolvedQuill.class,net.minecraft.network.syncher.EntityDataSerializers.INT);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> BARRAGE =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(EvolvedQuill.class,net.minecraft.network.syncher.EntityDataSerializers.INT);
+    public static final int CROWN_NEEDLE=1, LOW_SURF=2, HIGH_SURF=3;
+    public int barrage(){return entityData.get(BARRAGE);}
+    public void barrage(int kind){
+        entityData.set(BARRAGE,kind);
+        if(kind!=0)setNoGravity(true);
+    }
     private net.minecraft.core.BlockPos support;
     private int lodgedTicks;
     private net.minecraft.core.Direction anchorFace;
@@ -40,14 +48,14 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
         com.codex.blacklight.combat.SpiderFoley.play(this,position(),com.codex.blacklight.combat.SpiderFoley.Cue.FRACTURE,.85F);
         discard();return true;
     }
-    @Override protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(SPEAR,0);}
+    @Override protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder b){super.defineSynchedData(b);b.define(SPEAR,0);b.define(BARRAGE,0);}
 
     public EvolvedQuill(EntityType<? extends EvolvedQuill> type,Level level){super(type,level);}
     public EvolvedQuill(Level level,LivingEntity owner){super(com.codex.blacklight.registry.ModEntities.EVOLVED_QUILL.get(),owner,level);}
     public void damage(float amount){damage=Float.isFinite(amount)?Math.clamp(amount,0,1000000):0;}
     @Override protected Item getDefaultItem(){return Items.IRON_NUGGET;}
     @Override protected double getDefaultGravity(){return .012;}
-    @Override protected boolean canHitEntity(Entity e){if(bloodSpear() && e instanceof EvolvedQuill other && other.getOwner()==getOwner())return false;
+    @Override protected boolean canHitEntity(Entity e){if((bloodSpear() || barrage()!=0) && e instanceof EvolvedQuill other && other.getOwner()==getOwner())return false;
         return entityData.get(SPEAR)!=4 && !(getPersistentData().hasUUID("GoddessSpineCaster") && e.getUUID().equals(getPersistentData().getUUID("GoddessSpineCaster")))
             && super.canHitEntity(e)&&e!=getOwner()&&(!(getOwner() instanceof LivingEntity owner)||!owner.isAlliedTo(e));}
     @Override protected void onHitEntity(EntityHitResult hit){
@@ -94,6 +102,6 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
             setPos(position().add(direction.scale(.32)));shoot(direction.x,direction.y,direction.z,3.2F,0);hurtMarked=true;
         }
         super.tick();if(level().isClientSide&&tickCount%2==0)level().addParticle(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(.55F,.09F,.12F),.65F),getX(),getY(),getZ(),0,0,0);if(!level().isClientSide&&tickCount>65)discard();}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("SpearStage",entityData.get(SPEAR));if(anchorFace!=null)tag.putString("SpearFace",anchorFace.getName());tag.putInt("SpearWait",lodgedTicks);if(support!=null)tag.putLong("SpearBlock",support.asLong());tag.putFloat("QuillDamage",damage);tag.putInt("QuillAge",tickCount);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);entityData.set(SPEAR,tag.getInt("SpearStage"));lodgedTicks=tag.getInt("SpearWait");anchorFace=net.minecraft.core.Direction.byName(tag.getString("SpearFace"));support=tag.contains("SpearBlock")?net.minecraft.core.BlockPos.of(tag.getLong("SpearBlock")):null;damage(tag.getFloat("QuillDamage"));tickCount=Math.clamp(tag.getInt("QuillAge"),0,66);}
+    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putInt("BarrageKind",barrage());tag.putInt("SpearStage",entityData.get(SPEAR));if(anchorFace!=null)tag.putString("SpearFace",anchorFace.getName());tag.putInt("SpearWait",lodgedTicks);if(support!=null)tag.putLong("SpearBlock",support.asLong());tag.putFloat("QuillDamage",damage);tag.putInt("QuillAge",tickCount);}
+    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);barrage(tag.getInt("BarrageKind"));entityData.set(SPEAR,tag.getInt("SpearStage"));lodgedTicks=tag.getInt("SpearWait");anchorFace=net.minecraft.core.Direction.byName(tag.getString("SpearFace"));support=tag.contains("SpearBlock")?net.minecraft.core.BlockPos.of(tag.getLong("SpearBlock")):null;damage(tag.getFloat("QuillDamage"));tickCount=Math.clamp(tag.getInt("QuillAge"),0,66);}
 }

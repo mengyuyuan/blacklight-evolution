@@ -269,12 +269,20 @@ public final class GoddessEncounter {
             p.setDeltaMovement(Vec3.ZERO);p.fallDistance=0;
             p.setYRot(GoddessActor.yaw(boss,0));p.yBodyRot=p.getYRot();p.yHeadRot=p.getYRot();
         }
-        if (!committed && age >= 56) {
+        int tearTick=previousMask==0?62:49;
+        int separationTick=previousMask==0?78:55;
+        int braceTick=previousMask==0?34:35;
+        if(age==braceTick || age==braceTick+9 || age==tearTick || age==separationTick+16){
+            var cue=age==braceTick?SpiderFoley.Cue.CATCH:age==braceTick+9?SpiderFoley.Cue.STRAIN:
+                    age==tearTick?SpiderFoley.Cue.TEAR:SpiderFoley.Cue.GULP;
+            SpiderFoley.play(boss,GoddessActor.point(boss,1,0),cue,age==tearTick?1.8F:1.2F);
+        }
+        if (!committed && age >= separationTick) {
             previousMask = life.removed();
             float hp = life.absorb(part,boss.getHealth());
             committed = true;
             boss.setHealth(Math.max(1,hp));
-            boss.playSound(SoundEvents.GENERIC_EXPLODE.value(),1.2F,.75F);
+            SpiderFoley.play(boss,GoddessActor.point(boss,1,0),SpiderFoley.Cue.FRACTURE,1.4F);
             publish();
         }
         if (age < 139) return;
