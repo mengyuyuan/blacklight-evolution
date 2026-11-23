@@ -76,8 +76,14 @@ public final class GoddessHand {
         Vec3 goal=data==null?anchor:read(data,"At");
         Vec3 start=data==null?from:read(data,"From");
         Vec3 home=start.lerp(goal,GoddessPalmCombo.ease(t/18.));
-        Vec3 palm=GoddessPalmCombo.palm(home,data==null?aim:read(data,"Aim"),
-                data==null?combo.drop():read(data,"Drop"),heading,mirror,t);
+        Vec3 target=data==null?aim:read(data,"Aim"), drop=data==null?combo.drop():read(data,"Drop");
+        float stop=data==null?combo.stopped():data.getFloat("Stop");
+        Vec3 palm=GoddessPalmCombo.palm(home,target,drop,heading,mirror,t);
+        if(stop>=42 && age>stop){
+            Vec3 impact=GoddessPalmCombo.palm(goal,target,drop,heading,mirror,stop);
+            float pull=GoddessPalmCombo.ease((age-stop-3)/19.);
+            palm=impact.lerp(goal,pull).add(0,4*Math.sin(Math.PI*pull),0);
+        }
         return new GoddessHandPose(palm,heading,mirror,GoddessPalmCombo.MOVE,t,data==null?lost:data.getInt("Lost"),1,0,0);
     }
     public float gesture(float partial){
