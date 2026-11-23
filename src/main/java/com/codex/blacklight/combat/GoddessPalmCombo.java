@@ -99,9 +99,15 @@ final class GoddessPalmCombo {
         for(int i=0;i<=steps;i++){
             float sample=age-1+(float)i/steps;
             var pose=i==0?before:i==steps?after:hand.comboPose(sample);
-            for(var link:pose.links()){
-                var skin=link.surface();
-                for(var block:terrain)if(skin.touches(block)){
+            var surfaces=new HydraContact.Box[pose.links().size()];
+            for(int k=0;k<pose.links().size();k++){
+                var link=pose.links().get(k);
+                AABB envelope=new AABB(link.base(),link.end()).inflate(Math.max(link.width(),link.depth())*1.55);
+                for(var block:terrain){
+                    if(!block.intersects(envelope))continue;
+                    if(surfaces[k]==null)surfaces[k]=link.surface();
+                    var skin=surfaces[k];
+                    if(!skin.touches(block))continue;
                     stopped=Math.max(0,sample-1F/steps);
                     Vec3 contact=skin.contact(block);
                     SpiderFoley.play(boss,contact,slam?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.STRIKE,slam?2.3F:1.5F);
@@ -113,9 +119,12 @@ final class GoddessPalmCombo {
             }
             for(var p:players){
                 if(hit.contains(p.getUUID()) || boss.goddess.attacks.safe(p))continue;
-                for(var link:pose.links()){
-                    if(link.slot()==GoddessHandPose.WRIST)continue;
-                    var skin=link.surface();
+                for(int k=1;k<pose.links().size();k++){
+                    var link=pose.links().get(k);
+                    if(!new AABB(link.base(),link.end()).inflate(Math.max(link.width(),link.depth())*1.55)
+                            .intersects(p.getBoundingBox()))continue;
+                    if(surfaces[k]==null)surfaces[k]=link.surface();
+                    var skin=surfaces[k];
                     if(!skin.touches(p.getBoundingBox()))continue;
                     var point=skin.contact(p.getBoundingBox());
                     if(l.clip(new ClipContext(point,p.getBoundingBox().getCenter(),ClipContext.Block.COLLIDER,
