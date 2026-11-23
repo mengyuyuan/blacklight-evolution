@@ -15,7 +15,7 @@ public final class InfectionEcologyConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue LOCAL_SOURCE, PRESERVE_EXTERNAL, PROTECT_NAMED, PROTECT_PETS, PROTECT_TRADERS, PROTECT_CLAIMS;
     public static final ForgeConfigSpec.IntValue SOURCE_RADIUS, TISSUE_RADIUS, WORLD_CAP, CITY_CAP;
-    public static final ForgeConfigSpec.DoubleValue WORLD_SHARE, CITY_SHARE, REWARD_STRENGTH, REWARD_MAX;
+    public static final ForgeConfigSpec.DoubleValue WORLD_SHARE, CITY_SHARE;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> IMMUNE, PRESERVE, EXCLUDED_DIMENSIONS;
     public static final ForgeConfigSpec.BooleanValue NATIVE_FALLBACK;
     public static final ForgeConfigSpec.DoubleValue FALLBACK_DAMAGE,FALLBACK_SPEED;
@@ -38,8 +38,6 @@ public final class InfectionEcologyConfig {
         IMMUNE=b.comment("Absolute immunity: entity ID, namespace:* or #entity_type_tag. Applies to manual and natural exposure. The blacklight:infection_immune entity tag is always honored.").defineListAllowEmpty("immuneEntities",List.of(),v->v instanceof String);
         PRESERVE=b.comment("Additional IDs/namespace:*/#tags to preserve in place, including selected vanilla species.").defineListAllowEmpty("preserveEntities",List.of(),v->v instanceof String);
         EXCLUDED_DIMENSIONS=b.comment("Disable automatic infection and replenishment in these dimension IDs. Manual exposure remains local and explicit.").defineListAllowEmpty("naturalDisabledDimensions",List.of(),v->v instanceof String);
-        REWARD_STRENGTH=b.comment("Logarithmic biomass/EP reward gain from native effective health, attack and armor. No copying foreign realms or spells; kill rewards remain the configured fraction.").defineInRange("threatRewardStrength",1D,0,10);
-        REWARD_MAX=b.comment("Maximum threat-based reward multiplier only, NOT a limit on evolution, attributes or generations.").defineInRange("threatRewardMaximum",8D,1,100);
         b.push("nativeAttackFallback");
         NATIVE_FALLBACK=b.comment("Add a cooperative attack goal to otherwise unarmed passive preserved animals. Native targeting, ranged AI, controllers and attributes are not replaced.").define("enabled",true);
         FALLBACK_DAMAGE=b.comment("Base contact damage before existing tissue growth; no generation or evolution cap is added.").defineInRange("baseDamage",4D,0,1000);

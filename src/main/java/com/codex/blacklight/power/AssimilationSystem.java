@@ -32,6 +32,11 @@ public final class AssimilationSystem {
         return fraction<=(TissueCore.quality(h.tissueAge())>=2?.10F:.15F)
                 &&(TissueCore.quality(h.tissueAge())<2||h.tissueCoreFracture()>=1);
     }
+    /** Both currencies use the live maximum, including the target's combat health scaling. */
+    public static int fullReward(LivingEntity target) {
+        float maximum = target.getMaxHealth();
+        return Float.isFinite(maximum) && maximum > 0 ? Math.round(maximum * 0.25F) : 0;
+    }
     public static Yield quote(ServerPlayer p,Mob target){
         boolean hunter=target instanceof BlacklightHunter;
         float health=CombatScale.originalMaximum(target);if(!Float.isFinite(health)||health<0)health=0;
@@ -39,24 +44,18 @@ public final class AssimilationSystem {
         if(target instanceof BlacklightCommonInfected)
             heal=Math.max(heal,(float)(p.getMaxHealth()/CombatScale.units(p)*OutbreakConfig.COMMON_HEAL.get()));
         heal*=ConsumeProgression.healingMultiplier(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.GROWTH));
-        int biomass=hunter?120:(int)com.codex.blacklight.forge.WingMath.clamp(health*2,10,60),ep=hunter?30:target.getType().is(com.codex.blacklight.combat.ConsumeSystem.PASSIVE)?2:10;
+        int reward = fullReward(target);
         TissueCore core=null;int quality=0;
         if(tissue(target)){
             var host=(BlacklightInfectedHost)target;float factor=TissueCore.yieldMultiplier(host.tissueAge());
-            heal*=factor;biomass=Math.round(biomass*factor);ep=Math.round(ep*factor);
+            heal*=factor;
             core=host.knownNativeTissueCore();quality=core==null?0:TissueCore.quality(host.tissueAge());
         }
         if(NativeInfection.active(target)){
-            long age=NativeInfection.age(target);float factor=TissueCore.yieldMultiplier(age);heal*=factor;biomass=Math.round(biomass*factor);ep=Math.round(ep*factor);
+            long age=NativeInfection.age(target);float factor=TissueCore.yieldMultiplier(age);heal*=factor;
             core=NativeInfection.core(target);quality=TissueCore.quality(age);
         }
-        // Native effective threat pays resources, not foreign progression/capability copies.
-        double attack=target.getAttribute(Attributes.ATTACK_DAMAGE)==null?0:target.getAttributeValue(Attributes.ATTACK_DAMAGE);
-        double threat=Math.max(1,Math.max(health/40D,Math.max(attack/8D,target.getArmorValue()/10D)));
-        double factor=Math.min(com.codex.blacklight.config.InfectionEcologyConfig.value(com.codex.blacklight.config.InfectionEcologyConfig.REWARD_MAX),
-                1+Math.log(threat)/Math.log(4)*com.codex.blacklight.config.InfectionEcologyConfig.value(com.codex.blacklight.config.InfectionEcologyConfig.REWARD_STRENGTH));
-        if(Double.isFinite(factor)&&factor>1){biomass=(int)Math.min(Integer.MAX_VALUE,Math.round(biomass*factor));ep=(int)Math.min(Integer.MAX_VALUE,Math.round(ep*factor));}
-        int jaw=rank(p,TissueCore.JAW);heal*=1+.1F*jaw;biomass=Math.round(biomass*(1+.05F*jaw));
+        heal *= 1 + .1F * rank(p, TissueCore.JAW);
         var samples=new java.util.EnumMap<TissueCore,Integer>(TissueCore.class);
         if(core!=null&&quality>0)samples.put(core,quality);
         var inherited=tissue(target)?((BlacklightInfectedHost)target).tissueInheritance()
@@ -65,7 +64,7 @@ public final class AssimilationSystem {
             var organ=entry.getValue();
             if(organ.mature()&&organ.integrated()>=100)samples.merge(entry.getKey(),(int)Math.min(3,Math.floor(organ.integrated()/100)),Math::max);
         }
-        return new Yield(heal,biomass,ep,core,quality,samples);
+        return new Yield(heal,reward,reward,core,quality,samples);
     }
     /** Called only after successful execution/removal. A cancelled attempt pays nothing. */
     public static boolean settle(ServerPlayer p,Mob target,Yield reward,boolean heal){
@@ -82,7 +81,7 @@ public final class AssimilationSystem {
             FieldNotes.record(p, Component.translatable("message.blacklight.organ_discovered",Component.translatable("upgrade.blacklight."+core.id),quality,sampleBonus));
         }
         if(research!=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.ORGAN_RESEARCH)){com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.ORGAN_RESEARCH,research);com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.ORGAN_RESEARCH);}
-        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.addBiomass(reward.biomass());state.addEvolutionPoints(reward.ep()+bonus);
+        var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.addBiomass(reward.biomass());state.addEvolutionPoints(reward.ep());state.addEvolutionPoints(bonus);
         com.codex.blacklight.registry.ModAttachments.syncData(p, ModAttachments.PLAYER_STATE);GrowthSystem.consumed(p,target);
         if(heal)CriticalMassSystem.healFromConsume(p,reward.healing());
         PrototypeMetabolism.feed(p,target);
