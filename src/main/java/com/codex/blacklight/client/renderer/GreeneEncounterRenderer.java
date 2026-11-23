@@ -79,6 +79,11 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
     }
     @Override public boolean shouldRender(EncounterMob boss,net.minecraft.client.renderer.culling.Frustum frustum,double x,double y,double z){
         if(super.shouldRender(boss,frustum,x,y,z))return true;
+        var snare=boss.goddess.attacks.struggle;
+        if(snare.active()){
+            net.minecraft.world.phys.Vec3 edge=snare.hair()?snare.supportTip(1):snare.palm(1);
+            if(frustum.isVisible(new net.minecraft.world.phys.AABB(boss.position(),edge).inflate(8)))return true;
+        }
         if(!boss.spider.live() || boss.spider.actions.move()!=com.codex.blacklight.combat.SpiderActions.Move.MOUTH_BEAM)return false;
         var lane=com.codex.blacklight.combat.SpiderPainBeam.lane(boss,1);
         return frustum.isVisible(new net.minecraft.world.phys.AABB(lane.mouth(),lane.end()).inflate(lane.radius()));
@@ -97,6 +102,7 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             return;
         }
         if(boss.goddess.active()){
+            GoddessStruggleRenderer.draw(boss,partial,stack,buffers,light);
             colonyHand.draw(boss,partial,stack,buffers);
             stack.pushPose();
             stack.mulPose(com.codex.blacklight.combat.GoddessRig.root(boss,partial));

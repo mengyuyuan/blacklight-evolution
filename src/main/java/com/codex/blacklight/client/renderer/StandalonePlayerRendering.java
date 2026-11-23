@@ -45,6 +45,8 @@ public final class StandalonePlayerRendering {
                             var stack=event.getPoseStack();stack.pushPose();
                             try{
                                 if(pressure==null)mouthHand(stack,side,action.clipId(),action.seconds(clock)*20);
+                                else if(pressure.goddess.attacks.struggle.holds())
+                                    com.codex.blacklight.client.animation.GoddessFatalActor.hand(stack,side,pressure.goddess.attacks.struggle,event.getPartialTick());
                                 else if(pressure.goddess.attacks.move()==com.codex.blacklight.combat.GoddessAttacks.Move.RUSH)
                                     com.codex.blacklight.client.animation.GoddessThrowActor.hand(stack,side,pressure.goddess.attacks,event.getPartialTick());
                                 else pressureHand(stack,side,pressure.goddess.attacks.age(event.getPartialTick()),pressure.goddess.attacks.grounded());

@@ -80,7 +80,7 @@ public final class ModNetwork {
                 .playToServer(WeaponInputPayload.TYPE,WeaponInputPayload.STREAM_CODEC,(payload,context)->
                     context.enqueueWork(()->{
                         if(context.player() instanceof ServerPlayer player){
-                            if(payload.cancelled())com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
+                            if(payload.cancelled() || com.codex.blacklight.combat.GoddessStruggle.controlling(player))com.codex.blacklight.combat.WeaponCombatSystem.cancelHeldInput(player);
                             else com.codex.blacklight.combat.WeaponCombatSystem.acceptInput(player,payload.attack(),payload.special(),payload.action(),payload.jump());
                         }
                     }))
@@ -142,11 +142,16 @@ public final class ModNetwork {
                 })
                 .playToClient(LandingVisualPayload.TYPE, LandingVisualPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> ClientLandingVisuals.accept(payload));
-                });
+                })
+                .playToServer(GoddessStrugglePayload.TYPE,GoddessStrugglePayload.STREAM_CODEC,(payload,context)->
+                    context.enqueueWork(()->{
+                        if(context.player() instanceof ServerPlayer p)
+                            com.codex.blacklight.combat.GoddessStruggle.input(p,payload.entityId(),payload.sequence(),payload.controls());
+                    }));
     }
 
     private static boolean canAct(ServerPlayer player) {
-        return player != null && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
+        return player != null && !com.codex.blacklight.combat.GoddessStruggle.controlling(player) && !com.codex.blacklight.city.HydraTransport.active(player) && !com.codex.blacklight.power.BiomassSystem.active(player) && player.isAlive() && !player.isSpectator() && !player.isDeadOrDying();
     }
 
     @SubscribeEvent

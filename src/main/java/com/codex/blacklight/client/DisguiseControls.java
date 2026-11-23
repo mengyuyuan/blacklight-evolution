@@ -75,6 +75,7 @@ public final class DisguiseControls {
         if(p!=null&&DisguiseSystem.active(p))e.setCanceled(true);
     }
     @SubscribeEvent public static void hud(RenderGuiEvent.Post e){
+        GoddessStruggleHud.render(e.getGuiGraphics());
         var mc=Minecraft.getInstance();
         if(mc.player==null||mc.screen!=null||mc.options.hideGui||!com.codex.blacklight.mode.PrototypeModeSystem.isActive(mc.player))return;
         var id=mc.player.getData(ModAttachments.DISGUISE_IDENTITY);if(!id.valid())return;

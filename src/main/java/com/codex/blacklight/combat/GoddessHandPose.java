@@ -18,6 +18,7 @@ public final class GoddessHandPose {
     private static double ease(double t){t=Mth.clamp(t,0,1);return t*t*(3-2*t);}
     static double bend(int move,int digit,double t){
         return switch(move){
+            case 4 -> t<0?.06+.75*(1-ease((-t-1-digit*2.8)/11)):.06+t*(digit==0?1.68:1.46);
             case 0 -> {
                 double fire=digit==2?39:13;
                 double fold=ease((t-(digit==2?15:0))/8)*(1-ease((t-fire+2)/3));
@@ -41,7 +42,7 @@ public final class GoddessHandPose {
         right=new Vec3(front.z,0,-front.x).scale(side);
         double pitch=(pattern==2?-.33*ease(t/26)+.66*ease((t-38)/3)*(1-ease((t-42)/15)):0)+recoil*.40;
         up=new Vec3(front.x*Math.sin(pitch),Math.cos(pitch),front.z*Math.sin(pitch));
-        origin=anchor.add(0,.22*Math.sin(clock*.071),0).add(lateral.scale(.56*Math.sin(clock*.047)))
+        origin=pattern==4?anchor:anchor.add(0,.22*Math.sin(clock*.071),0).add(lateral.scale(.56*Math.sin(clock*.047)))
                 .subtract(front.scale(recoil*.9));
         Vec3 wrist=world(0,-2.0,-.4);
         link(WRIST,world(-.22,-4.9,-1.05),wrist,1.05,.80);
@@ -53,7 +54,7 @@ public final class GoddessHandPose {
             double y=finger==0?-.75:1.58-.18*Math.abs(finger-2);
             double z=finger==0?.20:.01;
             var from=world(x,y,z);
-            double curl=bend(pattern,finger,Math.max(0,t));
+            double curl=bend(pattern,finger,pattern==4?t:Math.max(0,t));
             for(int j=0;j<3;j++){
                 double a=curl*(.55+j*.94);
                 double len=lengths[finger]*(1-j*.16);

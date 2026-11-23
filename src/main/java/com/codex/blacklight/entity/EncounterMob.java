@@ -1313,8 +1313,15 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(source.getEntity() instanceof LivingEntity attacker&&isAlliedTo(attacker))return false;
         if(goddess.active()){
             if(!goddess.damageable())return false;
+            if(source.getEntity() instanceof ServerPlayer held && GoddessStruggle.controlling(held))return false;
             if(incomingContact!=null){
                 int slot=GoddessRig.PARTS.indexOf(incomingContact.bone());
+                if(source.getEntity() instanceof ServerPlayer helper && goddess.attacks.struggle.rescue(helper,slot,incomingContact.point(),
+                        source.getDirectEntity() instanceof ThrownBlock rock && rock.chargedImpact())){
+                    BossSiteData.participant(this,helper);
+                    BossImpactFeedback.contact(this,source,incomingContact.point(),BossImpactFeedback.Contact.WEAK,amount);
+                    return true;
+                }
                 if(slot>=GoddessHandPose.WRIST){
                     if(!goddess.attacks.hand.hit(slot,source,amount,incomingContact.point()))return false;
                     BossSiteData.participant(this,source.getEntity());
