@@ -16,6 +16,13 @@ import java.util.UUID;
 
 @GameTestHolder("blacklight") @PrefixGameTestTemplate(false)
 public final class MovingCombatGameTest {
+    // Keep the target alive long enough to observe duplicate contacts and later combo hits.
+    static float prepareDamageTarget(net.minecraft.world.entity.LivingEntity target) {
+        target.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(500);
+        target.setHealth(target.getMaxHealth());
+        return target.getHealth();
+    }
+
     static void supportFloor(GameTestHelper h,int y) {
         // Grounded fixtures need real support now that server action movement resolves collisions.
         for(int x=0;x<10;x++)for(int z=0;z<10;z++)h.setBlock(x,y,z,Blocks.STONE);
