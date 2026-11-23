@@ -84,8 +84,7 @@ public final class GoddessRig {
         float age=boss.goddess.age(partial);
         return switch(boss.goddess.action()){
             case FLYING -> 0;
-            case STAGGER -> age<20?1+age*3.6F:age<100?73:1;
-            case FALLING -> Math.min(80,1+age*2.1F);
+            case STAGGER, FALLING -> 1 + 79 * boss.goddess.lowered(partial);
             case DOWN,GRIPPED -> 80;
             case EXTRACTING -> Math.min(fallFrames,80+age*1.2F);
             case RISING -> Math.max(1,80-age*1.58F);
@@ -103,6 +102,12 @@ public final class GoddessRig {
                 float sample=Math.min(fallFrames-1,frame-1);
                 int f=(int)sample, a=(f*JOINTS+j)*10, b=(Math.min(fallFrames-1,f+1)*JOINTS+j)*10;
                 result[j]=interpolate(fall,a,b,sample-f,true).mul(idle(j,0));
+                if(frame < 14){
+                    float blend=(frame-1)/13;
+                    blend=blend*blend*(3-2*blend);
+                    var hover=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
+                    result[j]=hover.lerp(result[j],blend);
+                }
             }
         }
         return result;
@@ -116,12 +121,32 @@ public final class GoddessRig {
         }
         return output;
     }
-    public static Matrix4f root(EncounterMob boss,float partial){return new Matrix4f().translate(0,(float)boss.goddess.lift(partial),0).rotateY((float)Math.toRadians(180-boss.goddess.facing(partial))).scale(2);}
+    // Floor normals and brace pivots fitted to the head, exposed chest and remaining wrist
+    // of each authored prone mesh. All vectors are in unscaled model coordinates.
+    private static final Vector3f[] BRACE_PIVOTS={
+        new Vector3f(.2092F,.5071F,-3.9365F),new Vector3f(-7.1954F,.7931F,-3.4076F),new Vector3f(2.2989F,1.8205F,-4.5788F)
+    };
+    private static final Quaternionf[] BRACE_ROTATIONS={
+        new Quaternionf().rotationTo(-.395715F,.890889F,-.222994F,0,1,0),
+        new Quaternionf().rotationTo(-.086292F,.990889F,-.103407F,0,1,0),
+        new Quaternionf().rotationTo(-.143025F,.988667F,-.045629F,0,1,0)
+    };
+    private static Matrix4f root(EncounterMob boss,float yaw,float lift,float tilt){
+        var m=new Matrix4f().translation(0,lift,0).rotateY((float)Math.toRadians(180-yaw)).scale(2);
+        if(tilt<=0)return m;
+        int stage=Integer.bitCount(boss.goddess.poseMask()&3);
+        var pivot=BRACE_PIVOTS[stage];
+        return m.translate(pivot).rotate(new Quaternionf().slerp(BRACE_ROTATIONS[stage],tilt))
+                .translate(-pivot.x,-pivot.y,-pivot.z);
+    }
+    public static Matrix4f root(EncounterMob boss,float partial){
+        return root(boss,boss.goddess.facing(partial),(float)boss.goddess.lift(partial),boss.goddess.braceTilt(partial));
+    }
     public static List<HydraContact.Region> regions(EncounterMob boss,Vec3 origin,float partial){
         return build(boss,origin,root(boss,partial),pose(boss,partial));
     }
-    static List<HydraContact.Region> resting(EncounterMob boss,float yaw){
-        return build(boss,boss.position(),new Matrix4f().rotateY((float)Math.toRadians(180-yaw)).scale(2),pose(boss,1,80));
+    static List<HydraContact.Region> resting(EncounterMob boss,float yaw,boolean melee){
+        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80));
     }
     private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed){
         var slots=new ArrayList<List<HydraContact.Box>>(PARTS.size());

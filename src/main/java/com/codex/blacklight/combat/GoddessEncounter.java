@@ -29,22 +29,39 @@ public final class GoddessEncounter {
     }
     private boolean initialized, committed;
     private int age, part, previousMask;
-    private float facing;
+    private float facing, entryYaw, fallFrom;
+    private boolean staggerLocked;
+    static final int LOWER_TICKS = 20, OPEN_TICKS = 80, RECOVER_TICKS = 24;
+    private static float fraction(float value) { return Math.max(0, Math.min(1, value)); }
+    public float lowered(float partial) {
+        float t = age(partial);
+        return switch (action()) {
+            case FLYING -> 0;
+            case STAGGER -> Math.min(fraction(t / LOWER_TICKS), fraction((LOWER_TICKS + OPEN_TICKS + RECOVER_TICKS - t) / RECOVER_TICKS));
+            case FALLING -> {
+                float start = boss.level().isClientSide ? boss.goddessData().getFloat("FallFrom") : fallFrom;
+                yield start + (1 - start) * fraction(t / 38F);
+            }
+            case RISING -> 1 - fraction(t / 50F);
+            default -> 1;
+        };
+    }
     private double lift;
     private Vec3 approach;
     public Vec3 approach(){return approach;}
+    float braceTilt(float partial) {
+        if(action()==Action.STAGGER) return lowered(partial);
+        if(action()!=Action.FALLING) return 0;
+        float start=boss.level().isClientSide ? boss.goddessData().getFloat("FallFrom") : fallFrom;
+        float t=fraction(age(partial)/38F);
+        return start*(1-t*t*(3-2*t));
+    }
     public double lift(float partial){
         double dy=boss.level().isClientSide?boss.goddessData().getDouble("LandingLift"):lift;
-        float t=age(partial);
-        return dy*switch(action()){
-            case FLYING -> 0F;
-            case STAGGER,FALLING -> net.minecraft.util.Mth.clamp(t/(action()==Action.STAGGER?20F:38F),0,1);
-            case RISING -> Math.max(0,1-t/50);
-            default -> 1F;
-        };
+        return dy * lowered(partial);
     }
     private void site(int exposed){
-        var site=GoddessLanding.find(boss,exposed,facing);
+        var site=GoddessLanding.find(boss,exposed,facing,false);
         if(site!=null){facing=site.yaw();lift=site.lift();approach=site.approach();}
         else {lift=0;approach=null;}
     }
@@ -85,8 +102,11 @@ public final class GoddessEncounter {
         return boss.level().isClientSide ? Math.max(0, boss.level().getGameTime() - boss.goddessData().getLong("Start") + partial) : age + partial;
     }
     public float facing(float partial) {
-        return action() == Action.FLYING ? net.minecraft.util.Mth.rotLerp(partial,boss.yBodyRotO,boss.yBodyRot)
-                : boss.level().isClientSide ? boss.goddessData().getFloat("Facing") : facing;
+        if (action() == Action.FLYING) return net.minecraft.util.Mth.rotLerp(partial,boss.yBodyRotO,boss.yBodyRot);
+        var data = boss.goddessData();
+        float start = boss.level().isClientSide ? data.getFloat("EntryYaw") : entryYaw;
+        float end = boss.level().isClientSide ? data.getFloat("Facing") : facing;
+        return net.minecraft.util.Mth.rotLerp(lowered(partial), start, end);
     }
     public boolean terminal() { return life.finished(); }
     public boolean zeroOnBar() { return (removed() & 3) == 3 && part() == GoddessVitals.HEAD && action()!=Action.FLYING && action()!=Action.STAGGER && action()!=Action.RISING; }
@@ -119,21 +139,62 @@ public final class GoddessEncounter {
     public void afterDamage() {
         if (life.waiting() && damageable()) fall();
     }
-    public void stagger() {
-        if (action != Action.FLYING || life.waiting()) return;
-        facing = boss.yBodyRot;
+    private int nextPart() {
+        if ((removed() & GoddessVitals.LEFT_ARM) == 0) return GoddessVitals.LEFT_ARM;
+        return (removed() & GoddessVitals.RIGHT_ARM) == 0 ? GoddessVitals.RIGHT_ARM : GoddessVitals.HEAD;
+    }
+    int supportingWrist() {
+        return switch (nextPart()) {
+            case GoddessVitals.LEFT_ARM -> 5;
+            case GoddessVitals.RIGHT_ARM -> 9;
+            default -> -1;
+        };
+    }
+    public boolean groundWeakSpot(net.minecraft.world.damagesource.DamageSource source, HydraHurtContact.Contact hit) {
+        if (action != Action.STAGGER || age < LOWER_TICKS || age >= LOWER_TICKS + OPEN_TICKS || hit == null
+                || !(source.getDirectEntity() instanceof ServerPlayer player)) return false;
+        if (!player.onGround() && (player.getDeltaMovement().y > .01
+                || !player.level().getBlockCollisions(player,player.getBoundingBox().move(0,-.04,0)).iterator().hasNext())) return false;
+        int slot = GoddessRig.PARTS.indexOf(hit.bone());
+        if (slot < 0 || (slot != 0 && slot != 1 && slot != supportingWrist())) return false;
+        double reach = player.entityInteractionRange() + 0.5;
+        return player.getEyePosition().distanceToSqr(hit.point()) <= reach * reach
+                && HydraHurtContact.clear(boss, player.getEyePosition(), hit.point());
+    }
+    public void rockImpact(com.codex.blacklight.entity.ThrownBlock rock, HydraHurtContact.Contact hit) {
+        if (hit == null || !(rock.getOwner() instanceof ServerPlayer)) return;
+        int slot = GoddessRig.PARTS.indexOf(hit.bone());
+        if (slot == 0 && (rock.twoHanded() || rock.chargedImpact())
+                || slot >= 0 && slot == supportingWrist() && rock.chargedImpact()) stagger(hit);
+    }
+    public void aerialImpact(HydraHurtContact.Contact hit) {
+        if (hit != null && attacks.strainingSlot() == GoddessRig.PARTS.indexOf(hit.bone()) && attacks.strainingSlot() >= 0) stagger(hit);
+    }
+    void finishedAttack() { staggerLocked = false; }
+    private void stagger(HydraHurtContact.Contact hit) {
+        if (action != Action.FLYING || life.waiting() || staggerLocked) return;
+        var landing = GoddessLanding.find(boss, nextPart(), boss.yBodyRot,true);
+        if (landing == null) return;
+        entryYaw = boss.yBodyRot;
+        facing = landing.yaw();
+        lift = landing.lift();
+        approach = landing.approach();
+        staggerLocked = true;
         attacks.cancel();
-        site(life.removed()==3?GoddessVitals.HEAD:(life.removed()&1)==0?1:2);
         change(Action.STAGGER);
+        SpiderFoley.play(boss, hit.point(), SpiderFoley.Cue.STRAIN, 1.6F);
     }
     private void fall() {
+        boolean continuing = action == Action.STAGGER;
+        fallFrom = continuing ? lowered(0) : 0;
         attacks.cancel();
         boss.cancelAttack();
-        facing = boss.yBodyRot;
         previousMask = life.removed();
-        part = (previousMask & 3) == 3 ? GoddessVitals.HEAD :
-                (previousMask & GoddessVitals.LEFT_ARM) == 0 ? GoddessVitals.LEFT_ARM : GoddessVitals.RIGHT_ARM;
-        site(part);
+        part = nextPart();
+        if (!continuing) {
+            entryYaw = facing = boss.yBodyRot;
+            site(part);
+        }
         change(Action.FALLING);
         boss.playSound(SoundEvents.RAVAGER_ROAR, 2F,.65F);
     }
@@ -186,7 +247,10 @@ public final class GoddessEncounter {
         else if (action == Action.EXTRACTING) tickExecution(player);
         else if (action == Action.RISING && age >= 50) {
             if (life.waiting()) fall(); else change(Action.FLYING);
-        } else if (action == Action.STAGGER && age >= 100) change(Action.FLYING);
+        } else if (action == Action.STAGGER) {
+            if (age == LOWER_TICKS && approach != null) SpiderFoley.ground(boss,approach,1.8F,SpiderFoley.Cue.BRACE);
+            if (age >= LOWER_TICKS + OPEN_TICKS + RECOVER_TICKS) change(Action.FLYING);
+        }
         if (action == Action.DOWN && age % 20 == 1) {
             for (var p : boss.level().players()) if (nearPart(p))
                 p.displayClientMessage(Component.translatable("message.blacklight.goddess_grab",Component.keybind("key.blacklight.grab")),true);
@@ -239,6 +303,9 @@ public final class GoddessEncounter {
         t.putFloat("Remainder",life.remainder());
         t.putBoolean("Waiting",life.waiting());
         t.putBoolean("Committed",committed);
+        t.putBoolean("StaggerLocked",staggerLocked);
+        t.putFloat("EntryYaw",entryYaw);
+        t.putFloat("FallFrom",fallFrom);
         t.putFloat("Facing",facing);t.putDouble("LandingLift",lift);
         if(approach!=null){t.putDouble("FloorX",approach.x);t.putDouble("FloorY",approach.y);t.putDouble("FloorZ",approach.z);}
         if (actor!=null){t.putUUID("Actor",actor);t.putDouble("GripX",grabFrom.x);t.putDouble("GripY",grabFrom.y);t.putDouble("GripZ",grabFrom.z);}
@@ -251,6 +318,9 @@ public final class GoddessEncounter {
         age=Math.max(0,t.getInt("Age"));
         part=t.getInt("Part");
         previousMask=t.getInt("Before") & 7;
+        staggerLocked=t.getBoolean("StaggerLocked") || action==Action.STAGGER;
+        entryYaw=t.contains("EntryYaw") ? t.getFloat("EntryYaw") : t.getFloat("Facing");
+        fallFrom=fraction(t.getFloat("FallFrom"));
         facing=t.getFloat("Facing");lift=t.getDouble("LandingLift");
         approach=t.contains("FloorX")?new Vec3(t.getDouble("FloorX"),t.getDouble("FloorY"),t.getDouble("FloorZ")):null;
         committed=t.getBoolean("Committed");

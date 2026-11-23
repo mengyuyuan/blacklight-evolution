@@ -259,6 +259,9 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                         spider.broken(leg)?BossImpactFeedback.Contact.FLESH:BossImpactFeedback.Contact.ARMOR;
                 BossImpactFeedback.contact(this,source,c.point(),response,amount);
             }
+        }else if(goddess.active()){
+            var response=goddess.groundWeakSpot(source,c)?BossImpactFeedback.Contact.WEAK:BossImpactFeedback.Contact.FLESH;
+            BossImpactFeedback.contact(this,source,c.point(),response,amount);
         }else if(kind==EncounterKind.ELIZABETH_GREENE){
             int slot=c.bone()!=null&&c.bone().startsWith("weak_")?Integer.parseInt(c.bone().substring(5,6)):3;
             if (slot == 3 || armor[slot] > 0)
@@ -575,6 +578,11 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         super.jumpFromGround();
     }
     @Override public void travel(Vec3 input){
+        if(goddess.active() && goddess.action()!=GoddessEncounter.Action.FLYING){
+            setDeltaMovement(Vec3.ZERO);
+            fallDistance=0;
+            return;
+        }
         if(spider!=null && spider.live()){
             setDeltaMovement(0,Math.min(0,getDeltaMovement().y),0);
             super.travel(Vec3.ZERO);return;
@@ -1305,10 +1313,16 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         if(source.getEntity() instanceof LivingEntity attacker&&isAlliedTo(attacker))return false;
         if(goddess.active()){
             if(!goddess.damageable())return false;
+            if(goddess.groundWeakSpot(source,incomingContact))amount*=1.5F;
             boolean accepted;
             greeneOwnDamageDepth++;
             try{accepted=super.hurt(source,amount);}finally{greeneOwnDamageDepth--;}
-            if(accepted){BossSiteData.participant(this,source.getEntity());goddess.afterDamage();}
+            if(accepted){
+                BossSiteData.participant(this,source.getEntity());
+                if(incomingContact!=null)confirmedIncoming(source,amount);
+                goddess.afterDamage();
+                if(source.getDirectEntity() instanceof ThrownBlock rock)goddess.rockImpact(rock,incomingContact);
+            }
             return accepted;
         }
         if(spider.first()){
