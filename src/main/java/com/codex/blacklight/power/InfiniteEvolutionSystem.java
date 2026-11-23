@@ -19,6 +19,9 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 public final class InfiniteEvolutionSystem {
     private static final ResourceLocation SPEED=ResourceLocation.fromNamespaceAndPath("blacklight","infinite_mobility");
     private static final Map<ServerPlayer,Integer> LAST_HURT=new WeakHashMap<>();
+    @SubscribeEvent public static void serverStarting(net.neoforged.neoforge.event.server.ServerStartingEvent event) {
+        PlayerEvolutionConfig.migratePassiveThresholds();
+    }
     private InfiniteEvolutionSystem(){}
     public static long rank(Player p,EvolutionAttribute a){return p.getData(ModAttachments.INFINITE_EVOLUTION).rank(a);}
     public static long effectiveRank(Player p,EvolutionAttribute a){return EvolutionProgression.infiniteUnlocked(p)?rank(p,a):0;}

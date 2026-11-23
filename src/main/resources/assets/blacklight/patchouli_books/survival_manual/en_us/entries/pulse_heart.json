@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Cost: 180 biomass. Offer 2 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Hive carapace, 1 Evolved Ganglion.$(br2)Equip in the chest slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.$(br2)Black currents pass over the chest, back and upper arms, fading before changing course."
+      "text": "Cost: 180 biomass. Offer 2 Tissue Fiber, 2 Hive Vein, 2 Living Hive Tissue, 1 Hive carapace, 1 Evolved Ganglion, 1 Blighted Wither Core. Each infected Wither drops one core.$(br2)Equip in the chest slot for +25 attack damage. All four add 100 to the opening hit before the infinite Strength multiplier.$(br2)Black currents pass over the chest, back and upper arms, fading before changing course."
     },
     {
       "type": "blacklight:layout_pulse_heart"

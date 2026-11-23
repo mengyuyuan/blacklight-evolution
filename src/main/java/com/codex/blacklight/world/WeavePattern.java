@@ -7,10 +7,10 @@ import java.util.function.Supplier;
 
 /** Rows run north to south. Rotating the entire offering also matches. */
 public enum WeavePattern {
-    CHEST(ModItems.PULSE_HEART, 180, "F...F",".V.V.","..G..",".L.L.","..C.."),
-    KNEES(ModItems.SINEW_KNOT, 120, ".F.F.",".V.V.","L...L",".F.F.","....."),
-    FEET(ModItems.SPORE_ANKLET, 80, ".....",".V.V.",".F.F.","L...L","FF.FF"),
-    TEMPLE(ModItems.TEMPLE_BUD, 100, ".FVF.","C...C",".L.L.",".....",".....");
+    CHEST(ModItems.PULSE_HEART, 180, "F.G.F",".V.V.","..W..",".L.L.","..C.."),
+    KNEES(ModItems.SINEW_KNOT, 120, ".F.F.",".V.V.","L.W.L",".F.F.","....."),
+    FEET(ModItems.SPORE_ANKLET, 80, ".....",".V.V.",".FWF.","L...L","FF.FF"),
+    TEMPLE(ModItems.TEMPLE_BUD, 100, ".FVF.","C...C",".LWL.",".....",".....");
 
     public final Supplier<? extends Item> result;
     public final int biomass;
@@ -23,6 +23,7 @@ public enum WeavePattern {
             case 'F' -> ModItems.TISSUE_FIBER.get();
             case 'V' -> ModItems.HIVE_VEIN.get();
             case 'L' -> ModItems.LIVING_HIVE_TISSUE.get();
+            case 'W' -> ModItems.WITHER_CORE.get();
             case 'G' -> ModItems.EVOLVED_GANGLION.get();
             case 'C' -> ModItems.HIVE_CARAPACE.get();
             default -> null;

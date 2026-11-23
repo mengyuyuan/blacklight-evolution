@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Consume to replenish biomass. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
+      "text": "Consuming grants biomass and EP, each equal to 25% of the target’s maximum health. Ordinary kills pay half the consumption reward by default. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
     },
     {
       "type": "patchouli:text",

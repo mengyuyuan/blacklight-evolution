@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 50 for the first adaptation and regeneration tiers, then 150 for the second tiers. Consult the panel for your server's settings."
+      "text": "Finish the finite base checklist in Upgrades to unlock repeatable core attributes. By default, all six must reach 300 for the first adaptation and regeneration tiers, then 500 for the second tiers. Consult the panel for your server's settings."
     }
   ]
 }

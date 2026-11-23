@@ -158,7 +158,10 @@ public final class QuillOrgan extends Entity {
         var identity=com.codex.blacklight.disguise.DisguiseIdentity.capture(victim);
         var progressOnly=new AssimilationSystem.Yield(0,0,reward.ep(),reward.core(),reward.quality(),reward.samples());
         if(!AssimilationSystem.settle(p,victim,progressOnly,false))return false;
-        initial=(int)Math.floor(reward.biomass()*QUILL_SPLIT.get());supply=initial;
+        double carriedFraction = QUILL_SPLIT.get();
+        initial = carriedFraction > 0 && reward.biomass() > 0
+                ? Math.max(1, (int)Math.floor(reward.biomass() * carriedFraction)) : 0;
+        supply=initial;
         deposit=reward.biomass()-initial;heal=(float)(reward.healing()*QUILL_HEAL.get());
         totalLife=QuillHarvest.state(p).hasCombatSkill(CombatSkill.QUILL_ORBIT)?QUILL_LIFE_UP.get():QUILL_LIFE.get();
         life=totalLife;collected=true;
