@@ -129,6 +129,25 @@ public final class GoddessRig {
         }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.RUSH){
             int wrist=boss.goddess.attacks.rush.arm()==1?7:21;
             GoddessRushPose.pose(boss,result,partial,bones[wrist].centers[0]);
+        }else if(frame==0 && (boss.goddess.attacks.move()==GoddessAttacks.Move.CALL || boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL)){
+            float age=boss.goddess.attacks.age(partial);
+            boolean strong=boss.goddess.attacks.move()==GoddessAttacks.Move.STRONG_CALL;
+            float cue=GoddessRush.ease(age,1,15)*(1-GoddessRush.ease(age,22,33));
+            float point=GoddessRush.ease(age,19,27)*(1-GoddessRush.ease(age,strong?85:62,strong?100:76));
+            float shift=strong?GoddessRush.ease(age,53,63):0;
+            var head=result[0].getTranslation(new Vector3f());
+            var call=new Matrix4f().translate(head).rotateX(-.31F*cue+.22F*point)
+                    .rotateY((.32F-.76F*shift)*point).translate(-head.x,-head.y,-head.z);
+            result[0].mulLocal(call);result[33].mulLocal(call);result[34].mulLocal(call);
+            for(int arm=0;arm<2;arm++){
+                if((boss.goddess.removed()&(1<<arm))!=0)continue;
+                int first=arm==0?5:19;
+                float share=strong?(arm==0?1-shift:shift):(boss.goddess.removed()==0 && arm==1?.22F:1);
+                var pivot=result[first].getTranslation(new Vector3f());
+                var gesture=new Matrix4f().translate(pivot).rotateZ((arm==0?1:-1)*(.32F*cue+.63F*point*share))
+                        .rotateX(-.88F*cue-.45F*point*share).translate(-pivot.x,-pivot.y,-pivot.z);
+                for(int j=first;j<first+14;j++)result[j].mulLocal(gesture);
+            }
         }else if(frame==0 && boss.goddess.attacks.hand.visible()){
             int shoulder=(boss.goddess.removed()&1)==0?3:7;
             int first=-1;

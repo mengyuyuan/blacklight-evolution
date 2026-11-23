@@ -16,6 +16,86 @@ import net.minecraft.world.phys.*;
 final class GoddessBrood {
     private final EncounterMob boss;
     GoddessBrood(EncounterMob boss){this.boss=boss;}
+    private long nextCall,nextStrongCall;
+    private int callId=-1,commonRemaining,evolvedRemaining,evolvedCap=4;
+    private int rearCommon,rearEvolved,leaderSequence=-1,leaderId=-1;
+    private UUID leader;
+    private boolean issued;
+    boolean issued(int sequence){return callId==sequence && issued;}
+    private void nominate(Mob mob){
+        if(leader!=null || !SpiderPhase.reservedForThrow(mob))return;
+        leader=mob.getUUID();leaderId=mob.getId();boss.goddess.publish();
+    }
+    boolean orderBroken(ServerLevel level,int sequence){
+        if(leaderSequence!=sequence || leader==null)return false;
+        var entity=level.getEntity(leader);
+        if(entity instanceof Mob mob && mob.isAlive() && !ImpactControl.knockedDown(mob) && available(mob)){
+            if(mob.getId()!=leaderId){leaderId=mob.getId();boss.goddess.publish();}
+            return false;
+        }
+        for(var m:population(level)){
+            if(ours(m) && available(m) && m.getPersistentData().getInt("GoddessOrder")==sequence)
+                pacify(m,level.getGameTime()+25);
+        }
+        SpiderFoley.play(boss,entity==null?boss.getEyePosition():entity.position(),SpiderFoley.Cue.TEAR,1.35F);
+        return true;
+    }
+    private static int ordinaryCap(boolean strong){return strong?24:16;}
+    private static int eliteCap(boolean strong){return strong?6:4;}
+    boolean ready(boolean strong){return boss.level().getGameTime()>=(strong?nextStrongCall:nextCall);}
+    void saveCall(net.minecraft.nbt.CompoundTag t){
+        t.putLong("NextCall",nextCall);t.putLong("NextStrongCall",nextStrongCall);
+        t.putInt("CallId",callId);t.putInt("CommonRemaining",commonRemaining);
+        t.putBoolean("CallIssued",issued);
+        t.putInt("LeaderSequence",leaderSequence);t.putInt("LeaderId",leaderId);
+        if(leader!=null)t.putUUID("WaveLeader",leader);
+        t.putInt("RearCommon",rearCommon);t.putInt("RearEvolved",rearEvolved);
+        t.putInt("EvolvedRemaining",evolvedRemaining);t.putInt("EvolvedCap",evolvedCap);
+    }
+    void loadCall(net.minecraft.nbt.CompoundTag t){
+        nextCall=t.getLong("NextCall");nextStrongCall=t.getLong("NextStrongCall");
+        callId=t.contains("CallId")?t.getInt("CallId"):-1;
+        commonRemaining=Math.max(0,Math.min(24,t.getInt("CommonRemaining")));
+        evolvedRemaining=Math.max(0,Math.min(6,t.getInt("EvolvedRemaining")));
+        issued=t.contains("CallIssued")?t.getBoolean("CallIssued"):t.getBoolean("Paid");
+        leaderSequence=t.contains("LeaderSequence")?t.getInt("LeaderSequence"):-1;
+        leader=t.hasUUID("WaveLeader")?t.getUUID("WaveLeader"):null;
+        leaderId=-1;
+        rearCommon=t.contains("RearCommon")?Math.max(0,Math.min(commonRemaining,t.getInt("RearCommon"))):commonRemaining/2;
+        rearEvolved=t.contains("RearEvolved")?Math.max(0,Math.min(evolvedRemaining,t.getInt("RearEvolved"))):evolvedRemaining/2;
+        evolvedCap=t.getInt("EvolvedCap")==6?6:4;
+    }
+    static boolean canEvolve(ServerLevel level,BlacklightInfectedHost host){
+        var mothers=level.getEntitiesOfClass(EncounterMob.class,host.getBoundingBox().inflate(95),b->b.goddess.active()
+                && b.getBoundingBox().inflate(83).contains(host.position()));
+        for(var mother:mothers){
+            var brood=mother.goddess.attacks.brood;
+            int cap=switch(mother.goddess.attacks.move()){
+                case STRONG_CALL -> 6;
+                case CALL -> 4;
+                default -> brood.evolvedCap;
+            };
+            if(level.getEntitiesOfClass(BlacklightInfectedHost.class,mother.getBoundingBox().inflate(83),
+                    m->m.isAlive() && !QuillHarvest.protectedPet(m) && SpiderPhase.reservedForThrow(m)).size()>=cap)return false;
+        }
+        return true;
+    }
+    void signal(ServerLevel level,ServerPlayer p,boolean strong){
+        Vec3 crown=boss.hurtRegions(0).get(11).bounds().getCenter();
+        leader=null;leaderId=-1;leaderSequence=boss.goddess.attacks.sequence();
+        int ordinary=0,elite=0;
+        for(var m:population(level)){
+            if(!available(m) || m.isNoAi() || m.distanceToSqr(p)>55*55 || !m.hasLineOfSight(p))continue;
+            if(SpiderPhase.reservedForThrow(m)){if(elite>=eliteCap(strong))continue;elite++;}
+            else {if(ordinary>=ordinaryCap(strong))continue;ordinary++;}
+            nominate(m);
+            pacify(m,level.getGameTime());
+            m.getPersistentData().putLong("GoddessReleaseAt",level.getGameTime()+18);
+            m.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,crown);
+            SpiderFoley.strands(boss,m.getEyePosition(),new Vec3(0,.9,0),2);
+        }
+        SpiderFoley.play(boss,crown,strong?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.STRAIN,strong?1.5F:1.1F);
+    }
     private List<Mob> population(ServerLevel level){
         return level.getEntitiesOfClass(Mob.class,boss.getBoundingBox().inflate(83),
             m -> m.isAlive() && SpiderPhase.edible(m) && !QuillHarvest.protectedPet(m));
@@ -33,11 +113,13 @@ final class GoddessBrood {
         if(h.getType()!=HitResult.Type.BLOCK || h.getDirection()!=net.minecraft.core.Direction.UP || !level.getFluidState(h.getBlockPos().above()).isEmpty()) return null;
         return h.getLocation().add(0,.01,0);
     }
-    private Mob spawn(ServerLevel level,ServerPlayer p,boolean elite,boolean food,int seed){
+    private Mob spawn(ServerLevel level,ServerPlayer p,boolean elite,boolean food,int seed,double heading){
         double radius=food?4.0:15+Math.floorMod(seed,11);
-        Vec3 start=food?p.position():boss.position().lerp(p.position(),.45);
+        Vec3 start=food?p.position():boss.position().lerp(p.position(),.55);
+        Vec3 destination=food?null:floor(level,p.position());
+        if(!food && destination==null)return null;
         for(int i=0;i<12;i++){
-            double a=(seed*.81+i*2.40);
+            double a=food?seed*.81+i*2.40:heading+Math.sin(seed*.81+i*2.40)*.80;
             var feet=floor(level,start.add(radius*Math.cos(a),0,radius*Math.sin(a)));
             if(feet==null || !level.hasChunkAt(net.minecraft.core.BlockPos.containing(feet)))continue;
             Mob m=elite?ModEntities.INFECTED_HOST.get().create(level):ModEntities.COMMON_INFECTED.get().create(level);
@@ -46,7 +128,10 @@ final class GoddessBrood {
             if(!level.noCollision(m) || level.containsAnyLiquid(m.getBoundingBox()))continue;
             m.setOnGround(true);
             if(food && !walkingRoute(p,m))continue;
-            if(!food && Math.abs(p.getY()-feet.y)<4 && !m.getNavigation().isStableDestination(m.blockPosition()))continue;
+            if(!food){
+                var path=m.getNavigation().createPath(net.minecraft.core.BlockPos.containing(destination),1);
+                if(path==null || !path.canReach())continue;
+            }
             m.getPersistentData().putUUID("EncounterOwner",boss.getUUID());
             if(!level.addFreshEntity(m))return null;
             if(food){
@@ -64,29 +149,60 @@ final class GoddessBrood {
         var brood=population(level);
         int eliteCount=0,ordinary=0;
         for(var m:brood){if(SpiderPhase.reservedForThrow(m))eliteCount++;else ordinary++;}
-        int eliteCap=strong?6:4,ordinaryCap=strong?24:16;
+        int eliteCap=eliteCap(strong),ordinaryCap=ordinaryCap(strong);
         int participants=(int)level.players().stream().filter(p->p.isAlive() && !p.isCreative() && !p.isSpectator()
                 && p.distanceToSqr(boss)<100*100).count();
         ordinaryCap=Math.max(0,ordinaryCap-Math.min(ordinaryCap,participants));
+        if(callId!=sequence){
+            callId=sequence;issued=false;
+            commonRemaining=Math.max(0,ordinaryCap-ordinary);
+            evolvedRemaining=Math.max(0,eliteCap-eliteCount);
+            rearCommon=strong?commonRemaining/2:0;
+            rearEvolved=strong?evolvedRemaining/2:0;
+        }
+        double approach=Math.atan2(target.getZ()-boss.getZ(),target.getX()-boss.getX())+Math.PI*.55;
+        if(strong && rank>=3)approach+=Math.PI;
         boolean any=false;
+        int orderedCommon=0,orderedElite=0;
         for(var m:brood){
-            if(!available(m) || m.getPersistentData().getInt("GoddessOrder")==sequence)continue;
+            if(!ours(m) || m.getPersistentData().getInt("GoddessOrder")!=sequence)continue;
+            if(SpiderPhase.reservedForThrow(m))orderedElite++;else orderedCommon++;
+        }
+        for(var m:brood){
+            if(!available(m) || m.getPersistentData().getInt("GoddessOrder")==sequence
+                    || ours(m) && m.getTarget()==target && m.getPersistentData().contains("GoddessOrder"))continue;
             if(m.distanceToSqr(target)>55*55 || !m.hasLineOfSight(target))continue;
+            if(m.isNoAi() && !m.getPersistentData().contains("GoddessReleaseAt"))continue;
+            if(SpiderPhase.reservedForThrow(m)){if(orderedElite>=eliteCap)continue;orderedElite++;}
+            else {if(orderedCommon>=ordinaryCap)continue;orderedCommon++;}
             m.getPersistentData().putUUID("EncounterOwner",boss.getUUID());
             m.getPersistentData().putInt("GoddessOrder",sequence);
             m.setTarget(target);
+            nominate(m);
             any=true;
         }
         int seed=rank+sequence*17;
-        for(int i=0;i<4 && ordinary<ordinaryCap;i++) {
-            var m=spawn(level,target,false,false,seed+i);
-            if(m!=null){ordinary++;any=true;m.getPersistentData().putInt("GoddessOrder",sequence);}
+        boolean front=strong && rank<3;
+        int availableCommon=Math.max(0,commonRemaining-(front?rearCommon:0));
+        int ranksLeft=(strong?(front?3:6):4)-rank;
+        int batch=Math.min(4,(availableCommon+ranksLeft-1)/ranksLeft);
+        for(int i=0;i<batch && ordinary<ordinaryCap;i++) {
+            var m=spawn(level,target,false,false,seed+i,approach);
+            if(m!=null){ordinary++;commonRemaining--;any=true;m.getPersistentData().putInt("GoddessOrder",sequence);}
         }
-        if(eliteCount<eliteCap){
-            var m=spawn(level,target,true,false,seed+11);
-            if(m!=null){any=true;m.getPersistentData().putInt("GoddessOrder",sequence);}
+        if(eliteCount<eliteCap && evolvedRemaining>(front?rearEvolved:0)){
+            var m=spawn(level,target,true,false,seed+11,approach);
+            if(m!=null){nominate(m);evolvedRemaining--;any=true;m.getPersistentData().putInt("GoddessOrder",sequence);}
         }
-        if(any)SpiderFoley.play(boss,boss.position().add(0,5,0),SpiderFoley.Cue.SHED,1.1F);
+        if(any){
+            issued=true;
+            if(ready(strong)){
+                if(strong)nextStrongCall=level.getGameTime()+900;
+                else nextCall=level.getGameTime()+360;
+            }
+            evolvedCap=eliteCap;
+            SpiderFoley.play(boss,boss.position().add(0,5,0),SpiderFoley.Cue.SHED,1.1F);
+        }
         return any;
     }
     private static final class Meal {
@@ -187,7 +303,7 @@ final class GoddessBrood {
                     prey=brood.stream().filter(candidate->!assigned.contains(candidate.getUUID()) && reachableMeal(p,candidate))
                             .min(Comparator.comparingDouble(candidate->Math.abs(p.distanceTo(candidate)-5))).orElse(null);
                     if(prey==null && brood.stream().filter(candidate->!SpiderPhase.reservedForThrow(candidate)).count()<24){
-                        prey=spawn(level,p,false,true,p.getId()+age/10);
+                        prey=spawn(level,p,false,true,p.getId()+age/10,0);
                         if(prey!=null)brood.add(prey);
                     }
                     if(prey!=null && reachableMeal(p,prey)){
