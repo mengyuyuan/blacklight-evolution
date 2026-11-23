@@ -1,13 +1,16 @@
 package com.codex.blacklight.power;
 
-/** Sponsor passive formulas. HP means health points, never heart icons or rounded HUD values. */
+/** Blacklight skill formulas. HP means health points, never heart icons or rounded HUD values. */
 public final class AdaptivePassiveRules {
+    private static final double HEAL_PER_SPENT_LAYER = 2.4;
+
     private AdaptivePassiveRules() {}
     public static int mitigation(int layers, double health, double maximum, boolean percentBased) {
         if (layers <= 0 || !Double.isFinite(health) || health <= 0) return 0;
         double denominator = percentBased && Double.isFinite(maximum) && maximum > 0
                 ? Math.max(1, Math.ceil(100.0 * health / maximum)) : health;
-        return Math.min(100, ceil(100.0 * layers / (layers + denominator)));
+        double maximumReduction = percentBased ? 65.0 : 50.0;
+        return ceil(maximumReduction * layers / (layers + denominator));
     }
     public static double remainingFraction(int layers, double health, double maximum, boolean percentBased) {
         return (100-mitigation(layers,health,maximum,percentBased))/100.0;
@@ -28,12 +31,11 @@ public final class AdaptivePassiveRules {
     public static float healing(int layers, double health, double maximum, boolean percentBased) {
         if(layers<=0||!Double.isFinite(health)||!Double.isFinite(maximum))return 0;
         double missing=Math.max(0,maximum-health);
-        return (float)Math.min(missing,percentBased?missing*(layers/100.0):layers);
-    }
-    public static int regenerationAfterPulse(int layers) {
-        return regenerationAfterPulse(layers,layers);
+        if (!percentBased) return (float)Math.min(missing, layers * 0.5);
+        double missingFraction = Math.min(0.40, layers * 0.005);
+        return (float)Math.min(missing * missingFraction, layers * HEAL_PER_SPENT_LAYER);
     }
     public static int regenerationAfterPulse(int layers, double healed) {
-        return Math.max(0, layers - Math.max(1,ceil(healed * .2)));
+        return Math.max(0, layers - Math.max(1,ceil(healed / HEAL_PER_SPENT_LAYER)));
     }
 }

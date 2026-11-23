@@ -50,16 +50,16 @@ public final class CompatibilityGameTests {
         p.invulnerableTime=0;p.hurt(p.damageSources().generic(),60);
         near(h,p.getHealth(),730,"one potion adaptation pass");near(h,PassiveData.read(p).adaptation,142,"potion adaptation layers");
         near(h,(int)call(data(p,"ADAPTIVE_PASSIVES"),"regeneration"),45,"native regeneration uses 270 actual, not 300 incoming HP");
-        h.runAfterDelay(20,()->{try{call(clazz("power.AdaptivePassiveSystem"),"tick",new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));near(h,p.getHealth(),775,"native healing remains 45 actual HP");}
+        h.runAfterDelay(20,()->{try{call(clazz("power.AdaptivePassiveSystem"),"tick",new net.neoforged.neoforge.event.tick.PlayerTickEvent.Post(p));near(h,p.getHealth(),752.5,"native regeneration restores 22.5 HP");}
             catch(Exception e){throw new RuntimeException(e);}finally{p.discard();}h.succeed();});
     }
     @GameTest(template="empty",timeoutTicks=65)
     public static void nativeAdaptationAndPotionRegenerationUsePostMitigationDamage(GameTestHelper h) throws Exception {
         var p=player(h);qualifyNative(p);PassiveApi.grant(p,2,1);
         p.invulnerableTime=0;p.hurt(p.damageSources().generic(),60);
-        near(h,p.getHealth(),730,"one native adaptation pass");near(h,(int)call(data(p,"ADAPTIVE_PASSIVES"),"adaptation"),142,"native adaptation layers");
-        near(h,PassiveData.read(p).regeneration,45,"potion regeneration uses post-native actual damage");
-        h.runAfterDelay(20,()->{try{PassiveSystem.tick(p);near(h,p.getHealth(),775,"potion healing also restores only 45 HP");near(h,PassiveData.read(p).regeneration,36,"potion actual-heal cost");}
+        near(h,p.getHealth(),715,"one native adaptation pass");near(h,(int)call(data(p,"ADAPTIVE_PASSIVES"),"adaptation"),146,"native adaptation layers");
+        near(h,PassiveData.read(p).regeneration,48,"potion regeneration uses post-native actual damage");
+        h.runAfterDelay(20,()->{try{PassiveSystem.tick(p);near(h,p.getHealth(),763,"potion regeneration restores 48 HP");near(h,PassiveData.read(p).regeneration,38,"potion actual-heal cost");}
             finally{p.discard();}h.succeed();});
     }
     @GameTest(template="empty",timeoutTicks=70)
