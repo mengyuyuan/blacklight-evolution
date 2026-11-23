@@ -1,0 +1,80 @@
+{
+  "components": [
+    {
+      "type": "patchouli:image",
+      "x": 10,
+      "y": 17,
+      "image": "blacklight:textures/gui/field_manual/offering_grid.png",
+      "width": 90,
+      "height": 90,
+      "texture_width": 90,
+      "texture_height": 90
+    },
+    {
+      "type": "patchouli:item",
+      "x": 29,
+      "y": 36,
+      "item": "blacklight:hive_vein"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 65,
+      "y": 36,
+      "item": "blacklight:hive_vein"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 29,
+      "y": 54,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 65,
+      "y": 54,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 11,
+      "y": 72,
+      "item": "blacklight:living_hive_tissue"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 83,
+      "y": 72,
+      "item": "blacklight:living_hive_tissue"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 11,
+      "y": 90,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 29,
+      "y": 90,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 65,
+      "y": 90,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:item",
+      "x": 83,
+      "y": 90,
+      "item": "blacklight:tissue_fiber"
+    },
+    {
+      "type": "patchouli:text",
+      "x": 1,
+      "y": 113,
+      "text": "每格一件，可整体旋转。"
+    }
+  ]
+}

@@ -157,7 +157,9 @@ public final class ModNetwork {
                 })
                 .playToClient(AttachmentSyncPayload.class, AttachmentSyncPayload.STREAM_CODEC, (payload, context) -> {
                     context.enqueueWork(() -> com.codex.blacklight.forge.ClientAttachmentSync.accept(payload));
-                });
+                })
+                .playToClient(ManualPagesPayload.class,ManualPagesPayload.STREAM_CODEC,(msg,ctx)->ctx.enqueueWork(()->com.codex.blacklight.client.ManualReader.open(msg)))
+                .playToClient(GreeneSignalPayload.class,GreeneSignalPayload.STREAM_CODEC,(payload,context)->context.enqueueWork(()->com.codex.blacklight.client.TargetLockHud.greeneSignal(payload.site())));
     }
 
     private static boolean canAct(ServerPlayer player) {

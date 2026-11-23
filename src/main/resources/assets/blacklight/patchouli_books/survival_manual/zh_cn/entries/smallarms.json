@@ -1,0 +1,26 @@
+{
+  "name": "单兵武器与弹药",
+  "category": "blacklight:military",
+  "sortnum": 22,
+  "icon": "blacklight:military_carbine",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "先选择武器，再制作对应弹药。卡宾枪和机枪适合不同的持续射击需求；在普通模式手持使用。重型发射器和专用弹药另见下一条。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_carbine",
+      "recipe2": "blacklight:rifle_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_machine_gun",
+      "recipe2": "blacklight:machine_gun_round"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:military_rifle"
+    }
+  ]
+}

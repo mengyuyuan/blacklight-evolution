@@ -51,7 +51,7 @@ public final class WeaponCombatGameTest {
             var first=WeaponMove.choose(form,false,false,false,false);
             var second=WeaponMove.choose(form,false,false,false,true);
             var target=h.spawn(EntityType.IRON_GOLEM,4,2,5);target.setNoAi(true);
-            target.setPos(home.add(0,0,20));float before=target.getHealth();int hits=0;
+            target.setPos(home.add(0,0,20));float before=MovingCombatGameTest.prepareDamageTarget(target);int hits=0;
             WeaponCombatSystem.request(p,false);
             int link=first.comboLinkTick();
             for(int t=1;t<=link+second.duration+2;t++){
@@ -69,13 +69,13 @@ public final class WeaponCombatGameTest {
                     hits++;
                     var hitMove=t<link?first:second;int elapsed=t<link?t:t-link;
                     h.assertTrue(hitMove.contactIndex(elapsed)>=0,"queued hit stays inside its own window");
-                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damage)<.01,"queued strike deals full declared damage");
+                    h.assertTrue(Math.abs(previous-target.getHealth()-hitMove.damageFor(form)*CombatScale.UNITS)<.01,"queued strike deals full declared damage");
                 }
                 var visual=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec();
                 if(t<link)h.assertTrue(visual==first,"first action remains through contact and follow-through");
                 else if(t<link+second.duration)h.assertTrue(visual==second&&WeaponCombatSystem.busy(p),"direct active-to-active link with no idle state: form="+form+" t="+t+" link="+link+" duration="+second.duration+" visual="+visual);
             }
-            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-(first.damage+second.damage))<.01,"one full hit per queued action: "+form);
+            h.assertTrue(hits==2&&Math.abs(before-target.getHealth()-(first.damageFor(form)+second.damageFor(form))*CombatScale.UNITS)<.01,"one full hit per queued action: "+form);
             h.assertTrue(!WeaponCombatSystem.busy(p)&&com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.CLAW_COMBAT).action()==ClawCombatState.Action.IDLE,"queue is consumed once and normal recovery returns to idle");
             WeaponCombatSystem.cancel(p);target.discard();
         }
@@ -138,7 +138,7 @@ public final class WeaponCombatGameTest {
                 for(int i=0;i<firstDuration;i++){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
             }
             p.setSprinting(move.rush());p.setOnGround(referenced!=WeaponMove.MUSCLE_AIR);
-            var target=h.spawn(EntityType.IRON_GOLEM,4,2,5);target.setNoAi(true);float before=target.getHealth();
+            var target=h.spawn(EntityType.IRON_GOLEM,4,2,5);target.setNoAi(true);float before=MovingCombatGameTest.prepareDamageTarget(target);
             // FakePlayer has no client Coord playback; exercise the near blade contact here.
             if(move==WeaponMove.BLADE_RUSH||move==WeaponMove.BLADE_RETURN)target.setPos(home.add(0,0,1.5));
             WeaponCombatSystem.request(p,referenced==WeaponMove.MUSCLE_UPPERCUT||move==WeaponMove.BLADE_RUSH);
@@ -149,7 +149,7 @@ public final class WeaponCombatGameTest {
                 p.tickCount++;float last=target.getHealth();WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));
                 if(target.getHealth()<last){hits++;h.assertTrue(move.contactIndex(t)>=0,"adapted contact is in server window: "+move);}
             }
-            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damageFor(referenced.form))<.01,"one damage event for "+move+", got "+hits);
+            h.assertTrue(hits==1&&Math.abs(before-target.getHealth()-move.damageFor(referenced.form)*CombatScale.UNITS)<.01,"one damage event for "+move+", got "+hits);
             h.assertTrue(!WeaponCombatSystem.busy(p),"adapted recovery ends: "+move);
             target.discard();
         }
@@ -165,7 +165,7 @@ public final class WeaponCombatGameTest {
         var move=WeaponMove.BLADE_RUSH;
         for(boolean sprint:new boolean[]{false,true}){
             p.setPos(home);p.setOnGround(true);p.setSprinting(sprint);
-            var target=h.spawn(EntityType.IRON_GOLEM,5,2,7);target.setNoAi(true);float before=target.getHealth();
+            var target=h.spawn(EntityType.IRON_GOLEM,5,2,7);target.setNoAi(true);float before=MovingCombatGameTest.prepareDamageTarget(target);
             // These synchronous FakePlayer tests run authoritative combat ticks, not the
             // client's EF Coord movement. Keep a fixed near target inside the actual blade
             // envelope; a 3-block moving interception is covered by BladeSpecialPreview.
@@ -189,7 +189,7 @@ public final class WeaponCombatGameTest {
                 if(now<previous){contacts++;h.assertTrue(move.contactIndex(t)>=0,"dash damage stays inside its contact window");}
                 previous=now;
             }
-            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage)<.01,"one hit per target in this Mod's dash policy");
+            h.assertTrue(contacts==1&&Math.abs(before-target.getHealth()-move.damage*CombatScale.UNITS)<.01,"one hit per target in this Mod's dash policy");
             if(outsideBlade!=null){
                 h.assertTrue(outsideBlade.getHealth()==outsideBefore,"broad reach alone cannot hit beyond the blade envelope without Coord displacement");
                 outsideBlade.discard();
@@ -203,7 +203,7 @@ public final class WeaponCombatGameTest {
         WeaponCombatSystem.request(p,true);
         h.assertTrue(com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.WEAPON_VISUAL).spec()==WeaponMove.WHIP_SWEEP,"Special follows a combo opportunity into sweep");
         for(int t=1;t<=WeaponMove.WHIP_SWEEP.duration;t++){p.tickCount++;WeaponCombatSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,p));}
-        h.assertTrue(Math.abs(before-behind.getHealth()-12)<.01,"full sweep reaches a rear target once");
+        h.assertTrue(Math.abs(before-behind.getHealth()-12*CombatScale.UNITS)<.01,"full sweep reaches a rear target once");
         behind.discard();h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=40)

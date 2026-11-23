@@ -725,6 +725,25 @@ public final class BlacklightInfectedHost extends Monster {
         getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(1.4);
         xpReward=profile==InfectedBossProfile.ENDER_DRAGON?1000:150;noCulling=true;
     }
+    private void restoreCompactAttributes(CompoundTag data) {
+        var species = switch (data.getString("Type")) {
+            case "minecraft:warden" -> EntityType.WARDEN;
+            case "minecraft:iron_golem" -> EntityType.IRON_GOLEM;
+            case "minecraft:wither" -> EntityType.WITHER;
+            default -> EntityType.ENDER_DRAGON;
+        };
+        var nativeStats=net.minecraft.world.entity.ai.attributes.DefaultAttributes.getSupplier(species);
+        if(!data.contains("InfectionSourceHealth",99))
+            data.putDouble("InfectionSourceHealth",nativeStats.getBaseValue(Attributes.MAX_HEALTH));
+        if(!data.contains("InfectionSourceAttack",99))
+            data.putDouble("InfectionSourceAttack",nativeStats.hasAttribute(Attributes.ATTACK_DAMAGE)?nativeStats.getBaseValue(Attributes.ATTACK_DAMAGE):0);
+        // refreshInfectionStats restores the saved attack and health after HOST is published, preserving health fraction.
+        data.remove("InfectionNoSourceStats");
+        getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(Math.max(.22,nativeStats.getBaseValue(Attributes.MOVEMENT_SPEED)*1.08));
+        getAttribute(Attributes.FLYING_SPEED).setBaseValue(nativeStats.hasAttribute(Attributes.FLYING_SPEED)?Math.max(.35,nativeStats.getBaseValue(Attributes.FLYING_SPEED)*1.08):.35);
+        getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(24);
+        getAttribute(net.minecraftforge.common.ForgeMod.STEP_HEIGHT_ADDITION.get()).setBaseValue(.4);
+    }
     private void applyCompactEncounterAttributes(InfectedBossProfile profile) {
         getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(64);
         getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
@@ -1306,25 +1325,22 @@ public final class BlacklightInfectedHost extends Monster {
         }
         InfectedBossProfile profile=InfectedBossProfile.forSpecies(data.getString("Type"));
         if(profile!=null) {
-            // RC51 did not save how a giant was created. Preserve every already-saved
-            // RC51 giant; older compact infections must never be promoted by loading.
-            boolean colossal=data.contains("Colossal")?data.getBoolean("Colossal"):data.getInt("BossProfileVersion")>=1;
-            data.putBoolean("Colossal",colossal);data.putInt("FormVersion",2);
-            float baselineHeight=switch(data.getString("Type")) {
-                case "minecraft:warden" -> 2.9F;
-                case "minecraft:iron_golem" -> 2.7F;
-                case "minecraft:wither" -> 3.5F;
-                default -> 8;
-            };
-            float scale=colossal?1:data.contains("BodyScale")?Mth.clamp(data.getFloat("BodyScale"),.005F,4)
-                    :Mth.clamp((data.contains("Height")?data.getFloat("Height"):baselineHeight*1.12F)/profile.visualHeight(),.005F,4);
-            data.putFloat("BodyScale",scale);data.putString("Family",profile.family());
-            if(!data.contains("BaseBodyScale"))data.putFloat("BaseBodyScale",scale);
-            data.putInt("EvolutionTicks",colossal?18000:Mth.clamp(data.getInt("EvolutionTicks"),0,18000));
-            scale=colossal?1:growthScale(data.getFloat("BaseBodyScale"),data.getInt("EvolutionTicks"));
+            boolean wasGiant=data.contains("Colossal") ? data.getBoolean("Colossal") : data.getInt("BossProfileVersion")>=1;
+            float nativeScale=Mth.clamp(sourceType.getHeight()*1.12F/profile.visualHeight(),.005F,4);
+            float scale=data.contains("BaseBodyScale") ? data.getFloat("BaseBodyScale") :
+                    !wasGiant && data.contains("BodyScale") ? data.getFloat("BodyScale") : nativeScale;
+            // Older directly spawned giants recorded 1 as both size and baseline.
+            if(wasGiant && scale>=1)scale=nativeScale;
+            scale=Mth.clamp(scale,.005F,4);
+            data.putBoolean("Colossal",false);data.putInt("FormVersion",2);
+            data.remove("BossProfileVersion");data.remove("EvolutionRegressing");
+            data.putInt("EvolutionTicks",0);data.putFloat("BaseBodyScale",scale);data.putFloat("BodyScale",scale);
+            data.putString("Family",profile.family());
             data.putFloat("Width",profile.width()*scale);data.putFloat("Height",profile.height()*scale);
-            if(colossal)applyBossAttributes(profile);
-            else if(profile==InfectedBossProfile.WITHER||profile==InfectedBossProfile.ENDER_DRAGON)applyCompactEncounterAttributes(profile);
+            if(wasGiant)restoreCompactAttributes(data);
+            if(profile==InfectedBossProfile.WITHER||profile==InfectedBossProfile.ENDER_DRAGON)applyCompactEncounterAttributes(profile);
+            getPersistentData().remove("BlacklightColossusLink");
+            getPersistentData().remove("BlacklightDevourAccelerationCore");
         }
         if(!data.contains("NativeCore"))data.putString("NativeCore",TissueCore.forSeed(TissueOrgans.seed(getUUID())).key());
         TissueVitalSystem.migrate(this,data);

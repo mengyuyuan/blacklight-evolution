@@ -1,0 +1,16 @@
+{
+  "name": "身份、潜入与感知",
+  "category": "blacklight:powers",
+  "sortnum": 13,
+  "icon": "blacklight:military_circuit",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "吸收可记录的生物来收藏身份。轻按变形键（默认 X）在本体和身份间切换；长按进入轮盘，选身份收藏。收藏页显示物种能力与按键。需要进调度室时，提前准备一个军方身份。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "伪装后注意目击者；在岗哨附近袭击或劫车可能拉响警报。用街角、屋顶和遮挡甩开追兵。解锁后可用防御和感知键切换盾牌或视野，在接近感染体前先辨认目标。"
+    }
+  ]
+}

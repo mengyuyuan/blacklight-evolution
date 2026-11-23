@@ -1,5 +1,6 @@
 package com.codex.blacklight.city;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.*;
 import com.codex.blacklight.infection.*;
 import com.codex.blacklight.military.*;
@@ -252,7 +253,7 @@ public final class MilitaryCampaignSystem {
     }
     private static void reward(ServerPlayer player,int points){var state=com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);state.addEvolutionPoints(points);com.codex.blacklight.registry.ModAttachments.setData(player, ModAttachments.PLAYER_STATE,state);com.codex.blacklight.registry.ModAttachments.syncData(player, ModAttachments.PLAYER_STATE);}
     private static Component factionName(MilitaryFaction faction){return Component.translatable("campaign.blacklight."+faction.id());}
-    private static void message(ServerPlayer player,String key,Object... args){player.displayClientMessage(Component.translatable("campaign.blacklight."+key,args),false);}
+    private static void message(ServerPlayer player,String key,Object... args){FieldNotes.record(player, Component.translatable("campaign.blacklight."+key,args));}
     /** Called only after the hive's LivingDeath has actually been accepted. */
     public static void hiveDefeated(BlacklightHive hive){
         if(!(hive.level() instanceof ServerLevel level)||!supported(level))return;

@@ -1,0 +1,15 @@
+{
+  "name": "黑光踝环",
+  "category": "blacklight:weave",
+  "sortnum": 72,
+  "icon": "blacklight:spore_anklet",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "生物质：80。放入组织纤维 ×6、蜂巢血管 ×2、活性蜂巢组织 ×2。$(br2)装备在足部槽，攻击伤害 +25。全套基础首击 +100，再乘无限进化的力量倍率。$(br2)细窄的黑光绕过脚踝和鞋面。"
+    },
+    {
+      "type": "blacklight:layout_spore_anklet"
+    }
+  ]
+}

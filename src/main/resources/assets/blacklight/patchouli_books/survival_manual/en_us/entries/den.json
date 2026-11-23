@@ -1,0 +1,16 @@
+{
+  "name": "The Underground Den",
+  "category": "blacklight:route",
+  "sortnum": 8,
+  "icon": "blacklight:greene_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "After the plaza fight, bring Greene's tissue back to Futian. Hold it and use it to follow the spore trail. Holding the tissue marks the den and its distance in the world. The marker is hidden in superflat saves. Once you are above the den, descend to the chamber."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Enter the chamber carrying the tissue on a non-Peaceful difficulty. Survive Greene's ground and airborne phases to complete the outbreak milestone. Parasite experiments, repeatable evolution and symbiotes remain open.$(br2)$(l:recovery)Recover a lost lead$(/l)"
+    }
+  ]
+}

@@ -21,8 +21,6 @@ public final class GrabHud {
         if(slime.active()){
             int x=mc.getWindow().getGuiScaledWidth()/2,y=mc.getWindow().getGuiScaledHeight()-110;
             var g=event.getGuiGraphics();float integrity=com.codex.blacklight.power.BiomassEvolution.integrity(mc.player);
-            String stage=slime.phase()==com.codex.blacklight.power.BiomassState.SHATTERING?"shattering":slime.consumed()?"reforming":slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?"absorbing":slime.fatal()?"fatal":"voluntary";
-            g.drawCenteredString(mc.font,Component.translatable("hud.blacklight.slime_"+stage),x,y,0xffe5ddd7);
             float amount=slime.phase()==com.codex.blacklight.power.BiomassState.ABSORBING?slime.progress(mc.level.getGameTime(),com.codex.blacklight.power.ConsumeProgression.absorbTicks(mc.player)):integrity;
             g.fill(x-50,y+12,x+50,y+16,0xDF29252A);g.fill(x-50,y+12,x-50+(int)(100*amount),y+16,0xffa53142);
             int life=com.codex.blacklight.power.BiomassEvolution.lifetime(mc.player);
@@ -56,7 +54,5 @@ public final class GrabHud {
             g.fill(x-45,y+12,x-45+90*charge/max,y+16,charge>=max?0xffff5a4a:0xffc52c36);
             return;
         }
-        event.getGuiGraphics().drawCenteredString(mc.font,Component.translatable(com.codex.blacklight.combat.BlockThrowSystem.held(mc.player)!=null?"message.blacklight.block_held":stage==ConsumeVisual.MOUNT_HOLD?"message.blacklight.grab_mounted":"message.blacklight.grab_held"),
-                mc.getWindow().getGuiScaledWidth()/2,mc.getWindow().getGuiScaledHeight()/2+42,0xffe5ddd7);
     }
 }

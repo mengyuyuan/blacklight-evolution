@@ -1,0 +1,16 @@
+{
+  "name": "Load and Infuse",
+  "category": "blacklight:weave",
+  "sortnum": 27,
+  "icon": "blacklight:weave_channel",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Use the empty core with an empty hand to cycle recipe ghosts. Use each ingredient on its cell's top face to deposit one; use the cell empty-handed to take it back. Quarter-turn rotations work. Keep unused cells clear. Each of the four equipment entries has a 5×5 layout."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "As an infected survivor, stand close to an edge at the base level. Sneak-use the rim empty-handed and stand still for about 4.8 seconds. When infusion finishes, ingredients and biomass are spent. Take the result from the core. Moving away cancels the channel."
+    }
+  ]
+}

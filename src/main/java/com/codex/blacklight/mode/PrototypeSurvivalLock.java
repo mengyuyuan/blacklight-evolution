@@ -1,5 +1,6 @@
 package com.codex.blacklight.mode;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.item.GreeneTissueItem;
 import com.codex.blacklight.registry.ModAttachments;
 import com.codex.blacklight.world.BossSiteBlock;
@@ -24,7 +25,8 @@ public final class PrototypeSurvivalLock {
 
     /** Mission reports and placement tools retain their use action in Prototype mode. */
     public static boolean placementItem(Player player,net.minecraft.world.item.ItemStack stack){
-        return stack.getItem() instanceof com.codex.blacklight.item.EncounterDossierItem
+        return stack.getItem() instanceof com.codex.blacklight.item.SurvivalManualItem
+                || stack.getItem() instanceof com.codex.blacklight.item.EncounterDossierItem
                 || com.codex.blacklight.military.vehicle.VehicleRegistry.isVehicleTool(stack)
                 ||player.isCreative()&&stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
     }
@@ -40,7 +42,7 @@ public final class PrototypeSurvivalLock {
     public static boolean canOperateConsole(Player player, BlockPos pos) {
         if(player==null || player.isSpectator() || player.isPassenger()) return false;
         var state=player.level().getBlockState(pos);
-        if (state.is(com.codex.blacklight.registry.ModBlocks.FIELD_POST.get())) return !ModAttachments.getData(player, ModAttachments.CONSUMING);
+        if (state.getBlock() instanceof com.codex.blacklight.world.WeaveBlock || state.is(com.codex.blacklight.registry.ModBlocks.FIELD_POST.get())) return !ModAttachments.getData(player, ModAttachments.CONSUMING);
         if(!(state.getBlock() instanceof BossSiteBlock) || ModAttachments.getData(player, ModAttachments.CONSUMING)) return false;
         return (player.getMainHandItem().isEmpty() && player.getOffhandItem().isEmpty())
                 || player.isHolding(com.codex.blacklight.registry.ModItems.CONTAINMENT_DECODER.get())
@@ -191,10 +193,6 @@ public final class PrototypeSurvivalLock {
         if (now - last < 20) return;
         LAST_CLIENT_NOTICE.put(player, now);
         Component message = Component.translatable("message.blacklight.survival_locked");
-        if (player.level().isClientSide()) {
-            player.displayClientMessage(message, true);
-        } else {
-            player.displayClientMessage(message, true);
-        }
+        FieldNotes.record(player, message);
     }
 }

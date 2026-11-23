@@ -67,15 +67,15 @@ public final class VehicleHud {
         var seatName=Component.translatable("seat.blacklight."+(seat==null?"passenger":seat));
         if(com.codex.blacklight.config.GunplayClientConfig.COMPACT_VEHICLE_HUD.get()&&!ClientClawEvents.targetInfoKey().isDown()){
             int w=146,x=g.guiWidth()-w-8,y=g.guiHeight()-100;
-            var seatStatus=Component.translatable("hud.blacklight.vehicle_seat_status",seatName,VehicleControls.seatKey()).getString();
-            BlacklightUi.hud(g,x-5,y-4,x+w+4,y+54,BlacklightUi.GOLD);
+            var seatStatus=seatName.getString();
+            BlacklightUi.hud(g,x-5,y-4,x+w+4,y+42,BlacklightUi.GOLD);
             g.drawString(mc.font,mc.font.plainSubstrByWidth(seatStatus,w),x,y,0xFFD6D6D6,false);
             y+=12;
             g.drawString(mc.font,Component.literal(Math.round(vehicle.health())+" / "+Math.round(vehicle.maxHealth())+" HP"),x,y,0xFFE8EDD9,false);
             g.fill(x,y+12,x+w,y+15,0xFF333A42);g.fill(x,y+12,x+(int)(w*com.codex.blacklight.forge.WingMath.clamp(vehicle.health()/vehicle.maxHealth(),0,1)),y+15,0xFFCA7B65);
             String selected=vehicle.selectedPrimaryWeapon();var def=vehicle.definition().weapons().get(selected);
             if(def!=null){var text=Component.translatable("weapon.blacklight."+selected).getString()+"  "+vehicle.inventory().ammunition(def.ammunitionId());g.drawString(mc.font,mc.font.plainSubstrByWidth(text,w),x,y+20,0xFFF7D699,false);}
-            g.drawString(mc.font,Component.translatable("hud.blacklight.vehicle_details",ClientClawEvents.targetInfoKey().getTranslatedKeyMessage()),x,y+31,0xFF9FAFB9,false);return;
+            return;
         }
         int width=layout(g.guiWidth(),g.guiHeight(),0).width();var rows=new ArrayList<Row>();
         var status=Component.translatableWithFallback("hud.blacklight.vehicle_status","HP %s/%s | %s",Math.round(vehicle.health()),Math.round(vehicle.maxHealth()),
@@ -96,14 +96,6 @@ public final class VehicleHud {
                         Component.translatable("hud.blacklight.vehicle_ammo",Component.translatable("weapon.blacklight."+secondary.id()),inventory.ammunition(secondary.ammunitionId()))),width,0xFFF7D699);
             }
         }
-        var occupied=vehicle.getPassengers().stream().map(p->vehicle.seatOf(p.getUUID())).filter(java.util.Objects::nonNull).collect(java.util.stream.Collectors.toSet());
-        var permissions=new VehicleControls.SeatInput(vehicle.definition(),seat,occupied);
-        add(rows,mc.font,controlHints(mc.options.keyMappings,permissions.driver(),permissions.weaponOperator()),width,0xFFD6D6D6);
-        if(permissions.driver()&&!permissions.weaponOperator()&&!vehicle.definition().weapons().isEmpty())
-            add(rows,mc.font,Component.translatable("hud.blacklight.vehicle_other_gunner"),width,0xFFBECAC3);
-        if(VehicleControls.seatUnbound()||permissions.weaponOperator()&&VehicleControls.ammunitionUnbound())
-            add(rows,mc.font,Component.translatable("hud.blacklight.vehicle_bind_controls"),width,0xFFF7D699);
-        add(rows,mc.font,Component.translatableWithFallback("hud.blacklight.vehicle_supply_hint","Supply: stop, dismount, use ammo / repair parts"),width,0xFFBECAC3);
         var layout=layout(g.guiWidth(),g.guiHeight(),rows.size());
         g.fill(layout.x()-4,layout.y()-4,(int)Math.ceil(layout.x()+layout.width()*layout.scale())+4,(int)Math.ceil(layout.bottom(rows.size()))+4,0xE0121819);
         g.pose().pushPose();

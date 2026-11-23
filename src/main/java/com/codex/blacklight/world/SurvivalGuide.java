@@ -18,9 +18,15 @@ public final class SurvivalGuide {
     @SubscribeEvent public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         BossSiteData.get(player.server.overworld()).deliver(player);
+        var saved = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        if (!saved.getBoolean("BlacklightManualIssued")) {
+            var manual = new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.SURVIVAL_MANUAL.get());
+            if (!player.getInventory().contains(manual) && !player.getInventory().add(manual)) player.drop(manual, false);
+            saved.putBoolean("BlacklightManualIssued", true);
+            player.getPersistentData().put(Player.PERSISTED_NBT_TAG, saved);
+        }
         if (!done(player, "root")) {
             GrowthSystem.award(player, "root");
-            player.displayClientMessage(introduction(), false);
         }
     }
     @SubscribeEvent public static void outbreak(net.minecraftforge.event.TickEvent.PlayerTickEvent event){
@@ -56,42 +62,47 @@ public final class SurvivalGuide {
         saved.putLong("blacklight_" + site, pos.asLong());
         saved.putString("blacklight_" + site + "_dimension", player.level().dimension().location().toString());
         data.put(Player.PERSISTED_NBT_TAG, saved);
-        destination(player, site, pos);
     }
-    private static void destination(ServerPlayer player, String site, BlockPos pos) {
+    private static Component destination(ServerPlayer player, String site, BlockPos pos) {
         var saved=player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
-        boolean city=saved.getString("blacklight_"+site+"_dimension").equals("blacklight:world");
+        String dimension=saved.getString("blacklight_"+site+"_dimension");
+        boolean city=dimension.equals("blacklight:world") || dimension.equals("blacklight:city");
         if(city && site.equals("mother_plaza")){
             int column=net.minecraft.util.Mth.clamp(pos.getX()/480,0,2);
             int row=net.minecraft.util.Mth.clamp(pos.getZ()/411,0,2);
-            player.displayClientMessage(Component.translatable("survival.blacklight.plaza_search",
-                    Component.translatable("survival.blacklight.sector."+(row*3+column))),false);
+            return Component.translatable("survival.blacklight.plaza_search",
+                    Component.translatable("survival.blacklight.sector."+(row*3+column)));
         } else {
-            player.displayClientMessage(Component.translatable("survival.blacklight.destination",
-                    Component.translatable("survival.blacklight.map."+site),pos.getX(),pos.getZ()),false);
+            return Component.translatable(city ? "book.blacklight.notes.city_site" : "survival.blacklight.destination",
+                    Component.translatable("survival.blacklight.map."+site),pos.getX(),pos.getZ());
         }
     }
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
         event.getDispatcher().register(Commands.literal("blacklightguide").executes(ctx -> {
             var player = ctx.getSource().getPlayerOrException();
-            Component next;
-            if (!com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
-                next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
-                        : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-            } else if (done(player,"greene_outbreak")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
-            else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
-            else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
-            else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
-            else if (done(player,"containment_decoder")) next=Component.translatable("survival.blacklight.journal.containment_decoder");
-            else if (done(player,"evolved_ganglion")) next=Component.translatable("survival.blacklight.journal.evolved_ganglion");
-            else if (!done(player, "first_consume")) next = consumeHint();
-            else if (!done(player, "first_evolution")) next = Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades"));
-            else next = Component.translatable("survival.blacklight.branch");
-            player.displayClientMessage(next, false);
-            var saved = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
-            for (String site : SITES) if (saved.contains("blacklight_" + site))
-                destination(player, site, BlockPos.of(saved.getLong("blacklight_" + site)));
+            FieldNotes.open(player, false);
             return 1;
         }));
+    }
+    static java.util.List<Component> currentLeads(ServerPlayer player) {
+        var pages = new java.util.ArrayList<Component>();
+        Component next;
+        if (!com.codex.blacklight.registry.ModAttachments.getData(player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
+            next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
+                    : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
+        } else if (done(player,"greene_outbreak")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
+        else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
+        else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
+        else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
+        else if (done(player,"containment_decoder")) next=Component.translatable("survival.blacklight.journal.containment_decoder");
+        else if (done(player,"evolved_ganglion")) next=Component.translatable("survival.blacklight.journal.evolved_ganglion");
+        else if (!done(player, "first_consume")) next = consumeHint();
+        else if (!done(player, "first_evolution")) next = Component.translatable("survival.blacklight.upgrade", Component.keybind("key.blacklight.upgrades"));
+        else next = Component.translatable("survival.blacklight.branch");
+        pages.add(next);
+        var saved = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        for (String site : SITES) if (saved.contains("blacklight_" + site))
+            pages.add(destination(player, site, BlockPos.of(saved.getLong("blacklight_" + site))));
+        return pages;
     }
 }

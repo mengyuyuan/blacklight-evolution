@@ -1,0 +1,204 @@
+{
+  "textures": {
+    "shell": "blacklight:block/weave_enamel",
+    "tissue": "blacklight:block/weave_sinew",
+    "bone": "blacklight:block/weave_bone",
+    "pad": "blacklight:block/weave_bed",
+    "particle": "blacklight:block/weave_enamel"
+  },
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        2,
+        15
+      ],
+      "faces": {
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        2,
+        2
+      ],
+      "to": [
+        14,
+        8,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#tissue"
+        },
+        "down": {
+          "texture": "#tissue"
+        },
+        "north": {
+          "texture": "#tissue"
+        },
+        "south": {
+          "texture": "#tissue"
+        },
+        "west": {
+          "texture": "#tissue"
+        },
+        "east": {
+          "texture": "#tissue"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        7,
+        0.5
+      ],
+      "to": [
+        15.5,
+        9,
+        15.5
+      ],
+      "faces": {
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        9,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#pad"
+        },
+        "down": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        1.5,
+        12,
+        2
+      ],
+      "to": [
+        3.5,
+        12.7,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        }
+      }
+    },
+    {
+      "from": [
+        12.5,
+        12,
+        2
+      ],
+      "to": [
+        14.5,
+        12.7,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#shell"
+        },
+        "down": {
+          "texture": "#shell"
+        },
+        "north": {
+          "texture": "#shell"
+        },
+        "south": {
+          "texture": "#shell"
+        },
+        "west": {
+          "texture": "#shell"
+        },
+        "east": {
+          "texture": "#shell"
+        }
+      }
+    }
+  ]
+}

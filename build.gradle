@@ -191,6 +191,10 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 // Disposable client acceptance for the backported physical bodies and vehicle audio.
 if (project.hasProperty('ragdollVisual')) sourceSets.main.java.srcDir('src/ragdollVisualTest/java')
 if (project.hasProperty('vehicleFeedbackVisual')) sourceSets.main.java.srcDir('src/vehicleFeedbackVisual/java')
+if (project.hasProperty('symbioteTest')) {
+    sourceSets.main.java.srcDir('src/symbioteTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
 if (project.hasProperty('slowMotionVisual')) sourceSets.main.java.srcDir('src/slowMotionTest/java')
 if (project.hasProperty('silentQa')) {
     sourceSets.main.java.srcDir('src/silentQa/java')

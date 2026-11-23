@@ -32,7 +32,6 @@ final class GreeneOutbreak {
                 var p=from.add(direction.scale(i*.26));
                 level.sendParticles(player,ParticleTypes.CRIMSON_SPORE,false,p.x,p.y,p.z,1,.025,.025,.025,0);
             }
-            if(player.tickCount%60==0)player.displayClientMessage(Component.translatable("survival.blacklight.greene_tissue_signal",Math.round(Math.sqrt(den.distSqr(player.blockPosition())))),true);
         }
         if(player.distanceToSqr(Vec3.atCenterOf(den))>88*88)return;
         if(!prepareLoaded(level,den,player))return;
@@ -54,7 +53,7 @@ final class GreeneOutbreak {
         }
         if(!player.isCreative())boss.setTarget(player);
         for(var p:level.players())if(p.distanceToSqr(boss)<72*72)
-            p.displayClientMessage(Component.translatable("survival.blacklight.greene_den_awake"),false);
+            FieldNotes.record(p, Component.translatable("survival.blacklight.greene_den_awake"));
     }
 
     /** Retrofit only matching natural rock in already-generated chunks. A visited chunk is never rebuilt. */

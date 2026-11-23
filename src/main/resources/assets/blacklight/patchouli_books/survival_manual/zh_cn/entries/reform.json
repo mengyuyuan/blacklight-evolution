@@ -1,0 +1,16 @@
+{
+  "name": "生物质与死亡重构",
+  "category": "blacklight:powers",
+  "sortnum": 14,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "吸收会补充生物质。进化点用于学习，生物质另用于织巢和死亡重构。长按变形键，选择病毒聚合体可主动脱壳；贴近可吞噬的猎物重构。原壳仍安全且已加载时，轻按变形键可回去。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "符合死亡化液条件时会扣生物质。死亡化液没有原壳可回，尽快靠近可吞噬的活物并完成吞噬。避开宠物、坐骑或无法受伤的目标，重构时找足够站立的空间。"
+    }
+  ]
+}

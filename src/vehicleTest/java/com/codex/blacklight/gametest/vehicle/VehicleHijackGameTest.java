@@ -14,6 +14,8 @@ import net.minecraftforge.gametest.*;
 public final class VehicleHijackGameTest {
     private static ServerPlayer prototype(GameTestHelper h,MilitaryVehicleGameTest.Fixture f){
         var p=MilitaryVehicleGameTest.mockPlayer(h);f.entities.add(p);p.setPos(f.x-2,81,0);
+        // Slot zero may contain the field manual issued at login. Hijacking requires an empty hand.
+        p.getInventory().selected=1;
         var state=com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.PLAYER_STATE);state.infect();state.setPrototypeMode(true);com.codex.blacklight.registry.ModAttachments.setData(p, ModAttachments.PLAYER_STATE,state);return p;
     }
     private static MilitarySoldier crew(MilitaryVehicleGameTest.Fixture f,MilitaryVehicle v){

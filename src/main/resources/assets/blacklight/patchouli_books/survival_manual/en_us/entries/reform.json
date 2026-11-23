@@ -1,0 +1,16 @@
+{
+  "name": "Biomass and Reconstruction",
+  "category": "blacklight:powers",
+  "sortnum": 14,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Consume to replenish biomass. Evolution points purchase skills; biomass powers the nest and death reconstruction. Hold transform and choose the aggregate to shed your shell. Feed to rebuild, or tap transform to return to a safe, loaded shell."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A qualifying lethal hit spends biomass to enter liquid form. There is no shell to return to after death. Find living, consumable prey quickly and finish feeding. Tamed, mounted or invulnerable targets are poor choices. Find standing room to reform."
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Weapons and Traversal",
+  "category": "blacklight:powers",
+  "sortnum": 11,
+  "icon": "blacklight:hive_bone",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold the power wheel (Z) to choose a form; change tabs for defenses and senses. Claws pounce, Whipfist reaches out, Hammerfists slam, Muscle Mass improves throwing and Blade pursues a target. Lock on (Tab) and aim for the exposed part."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Buy movement skills, then practise charged jumps, wall running and gliding in open ground. Use in midair for a heavy attack. After learning Bulletdive, hold use during a glide. Sovereign Wings offer a separate flight form. Check bindings for takeoff and descent."
+    }
+  ]
+}
