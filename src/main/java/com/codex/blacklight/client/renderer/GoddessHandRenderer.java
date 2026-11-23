@@ -16,47 +16,72 @@ final class GoddessHandRenderer {
     private final CommonInfectedModel body=new CommonInfectedModel(CommonInfectedModel.layer().bakeRoot());
     private int jointLight(EncounterMob boss,Vec3 point){
         int local=net.minecraft.client.renderer.LevelRenderer.getLightColor(boss.level(),net.minecraft.core.BlockPos.containing(point));
-        return net.minecraft.client.renderer.LightTexture.pack(Math.max(10,net.minecraft.client.renderer.LightTexture.block(local)),
+        return net.minecraft.client.renderer.LightTexture.pack(Math.max(13,net.minecraft.client.renderer.LightTexture.block(local)),
                 net.minecraft.client.renderer.LightTexture.sky(local));
+    }
+    private void controlLines(EncounterMob boss,float partial,Vec3 origin,GoddessHandPose shape,PoseStack poses,
+                              com.mojang.blaze3d.vertex.VertexConsumer out,boolean glow){
+        var controller=boss.hurtRegions(partial).get((boss.goddess.removed()&1)==0?5:9);
+        if(!controller.boxes().isEmpty()){
+            Vec3 start=controller.bounds().getCenter().subtract(origin);
+            var wrist=shape.links().get(0);
+            Vec3 end=wrist.base().subtract(origin);
+            Vec3 axis=end.subtract(start).normalize();
+            Vec3 edge=axis.cross(new Vec3(0,1,0));
+            if(edge.lengthSqr()<.01)edge=new Vec3(1,0,0);else edge=edge.normalize();
+            Vec3 normal=axis.cross(edge).normalize();
+            float t=boss.goddess.attacks.hand.melee()?boss.goddess.attacks.hand.controlTime(partial):boss.tickCount+partial;
+            double arc=Math.min(2.7,start.distanceTo(end)*.095);
+            for(int strand=0;strand<3;strand++){
+                Vec3[] line=new Vec3[13];
+                double[] radii=new double[line.length];
+                for(int j=0;j<line.length;j++){
+                    double u=j/(line.length-1.), taper=Math.sin(Math.PI*u);
+                    double angle=strand*Math.PI*2/3+u*7-t*.075;
+                    double pulse=.5+.5*Math.cos(10*u-.46*t);
+                    line[j]=start.lerp(end,u).add(edge.scale(arc*taper*Math.cos(angle)))
+                            .add(normal.scale(arc*taper*Math.sin(angle))).add(0,-1.45*taper,0);
+                    double width=.11+.22*taper*(.32+.68*pulse);
+                    if(glow)line[j]=line[j].add(edge.scale(width*.91));
+                    radii[j]=glow?.045+.11*pulse*pulse:width;
+                }
+                ConsumeTendrilSegmentMesh.draw(poses,out,glow?0xf000f0:jointLight(boss,wrist.middle()),line,radii,edge,
+                        glow?0xc6f4825d:0xffbb8993,!glow);
+            }
+        }
     }
     void draw(EncounterMob boss,float partial,PoseStack poses,MultiBufferSource buffers){
         var hand=boss.goddess.attacks.hand;
         var shape=hand.pose(partial);if(shape==null)return;
         var origin=boss.getPosition(partial);
         var skin=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumeTendrilSegmentMesh.TEXTURE));
-        if(hand.melee()){
-            var controller=boss.hurtRegions(partial).get((boss.goddess.removed()&1)==0?5:9);
-            if(!controller.boxes().isEmpty()){
-                Vec3 start=controller.bounds().getCenter().subtract(origin);
-                var wrist=shape.links().get(0);
-                Vec3 end=wrist.base().subtract(origin);
-                Vec3 axis=end.subtract(start).normalize();
-                Vec3 edge=axis.cross(new Vec3(0,1,0));
-                if(edge.lengthSqr()<.01)edge=new Vec3(1,0,0);else edge=edge.normalize();
-                Vec3 normal=axis.cross(edge).normalize();
-                float t=hand.controlTime(partial);
-                double arc=Math.min(2.7,start.distanceTo(end)*.095);
-                for(int strand=0;strand<3;strand++){
-                    Vec3[] line=new Vec3[13];
-                    double[] radii=new double[line.length];
-                    for(int j=0;j<line.length;j++){
-                        double u=j/(line.length-1.), taper=Math.sin(Math.PI*u);
-                        double angle=strand*Math.PI*2/3+u*7-t*.075;
-                        double pulse=.5+.5*Math.cos(10*u-.46*t);
-                        line[j]=start.lerp(end,u).add(edge.scale(arc*taper*Math.cos(angle)))
-                                .add(normal.scale(arc*taper*Math.sin(angle))).add(0,-1.45*taper,0);
-                        radii[j]=.09+.20*taper*(.32+.68*pulse);
-                    }
-                    ConsumeTendrilSegmentMesh.draw(poses,skin,jointLight(boss,wrist.middle()),line,radii,edge,0xffbb8993);
-                }
-            }
-        }
+        boolean conducting=boss.goddess.attacks.move()==com.codex.blacklight.combat.GoddessAttacks.Move.HAND;
+        if(conducting)controlLines(boss,partial,origin,shape,poses,skin,false);
         for(var link:shape.links()){
             var a=link.base().subtract(origin);var b=link.end().subtract(origin);
             var center=link.middle().subtract(origin);
             double girth=link.width();
             ConsumeTendrilSegmentMesh.draw(poses,skin,jointLight(boss,link.middle()),new Vec3[]{a,center,b},
                     new double[]{girth*.60,girth*.85,girth*.53},link.right(),0xffaa8790);
+        }
+        if(conducting){
+            var glow=buffers.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
+            controlLines(boss,partial,origin,shape,poses,glow,true);
+            float phase=(boss.tickCount+partial)*.30F;
+            for(var link:shape.links()){
+                var a=link.base().subtract(origin);var b=link.end().subtract(origin);
+                for(int side:new int[]{-1,1}){
+                    var rim=link.normal().scale(link.depth()*1.18*side);
+                    Vec3[] vein={a.lerp(b,.04).add(rim.scale(.63)),
+                            a.lerp(b,.46).add(rim).add(link.right().scale(link.width()*.47)),
+                            a.lerp(b,.83).add(rim).subtract(link.right().scale(link.width()*.25)),
+                            b.add(rim.scale(.72))};
+                    double pulse=.5+.5*Math.cos(phase-link.slot()*.69);
+                    double width=(link.slot()<14?.22:.14)*(.55+.45*pulse);
+                    ConsumeTendrilSegmentMesh.draw(poses,glow,0xf000f0,vein,
+                            new double[]{width*.40,width,width*.72,width*.30},link.right(),0xeff39773,false);
+                }
+            }
         }
         int skins=hand.skins();
         for(int appearance=0;appearance<4;appearance++){
