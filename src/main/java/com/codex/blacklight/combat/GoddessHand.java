@@ -28,6 +28,8 @@ public final class GoddessHand {
     private float yaw;
     private boolean forming,formed,acting;
     private UUID stone;
+    private final GoddessPalmCombo combo=new GoddessPalmCombo();
+    private boolean lastWasMelee;
     private BlockPos vein;
     GoddessHand(EncounterMob boss){this.boss=boss;}
     private long now(){return boss.level().getGameTime();}
@@ -53,9 +55,30 @@ public final class GoddessHand {
         if(struggle.active() && !struggle.hair())
             return new GoddessHandPose(struggle.palm(partial),struggle.palmYaw(partial),gripSide(),
                     4,struggle.step()==GoddessStruggle.Step.WARN?-1-struggle.age(partial):struggle.closure(partial),0,1,now()+partial,0);
+        if(playing && !growing && (t==null?pattern:t.getInt("Move"))==GoddessPalmCombo.MOVE)
+            return comboPose(age);
         return new GoddessHandPose(pos,t==null?yaw:t.getFloat("Yaw"),t==null?side:t.getInt("Side"),
                 playing&&!growing?(t==null?pattern:t.getInt("Move")):0,playing&&!growing?age:60,
                 t==null?lost:t.getInt("Lost"),growing?.05+.95*Mth.clamp(age/35.,0,1):1,now()+partial,recoil);
+    }
+    public boolean melee(){
+        if(boss.level().isClientSide){var t=remote();return t.getBoolean("Acting") && !t.getBoolean("Forming") && t.getInt("Move")==GoddessPalmCombo.MOVE;}
+        return acting && !forming && pattern==GoddessPalmCombo.MOVE;
+    }
+    private float comboTime(float age){return GoddessPalmCombo.clock(age,boss.level().isClientSide?remote().getFloat("Stop"):combo.stopped());}
+    public float controlTime(float partial){
+        return comboTime(now()-(boss.level().isClientSide?remote().getLong("Start"):started)+partial);
+    }
+    GoddessHandPose comboPose(float age){
+        var data=boss.level().isClientSide?remote():null;
+        float t=comboTime(age),heading=data==null?yaw:data.getFloat("Yaw");
+        int mirror=data==null?side:data.getInt("Side");
+        Vec3 goal=data==null?anchor:read(data,"At");
+        Vec3 start=data==null?from:read(data,"From");
+        Vec3 home=start.lerp(goal,GoddessPalmCombo.ease(t/18.));
+        Vec3 palm=GoddessPalmCombo.palm(home,data==null?aim:read(data,"Aim"),
+                data==null?combo.drop():read(data,"Drop"),heading,mirror,t);
+        return new GoddessHandPose(palm,heading,mirror,GoddessPalmCombo.MOVE,t,data==null?lost:data.getInt("Lost"),1,0,0);
     }
     public float gesture(float partial){
         if(!visible())return 0;
@@ -106,7 +129,9 @@ public final class GoddessHand {
             }
             forming=true;lost=0;next=0;Arrays.fill(strain,0);
         }
-        pattern=next%4;
+        boolean close=boss.position().subtract(p.position()).horizontalDistance()<27
+                || formed && anchor.distanceToSqr(eye)<12*12;
+        pattern=close && !lastWasMelee?GoddessPalmCombo.MOVE:Math.floorMod(next,4);
         if(formed && pattern==3){
             vein=stoneSite(l,p,goal);
             if(vein==null || (lost&1)!=0)pattern=0;
@@ -114,7 +139,13 @@ public final class GoddessHand {
         from=formed?position(from,anchor,travelAt,0):goal;
         anchor=goal;travelAt=started=now();acting=true;aim=eye;flinched=-1;
         yaw=(float)Math.toDegrees(Math.atan2(goal.x-eye.x,eye.z-goal.z));
+        if(pattern==GoddessPalmCombo.MOVE)prepareCombo(p);
         return true;
+    }
+    private void prepareCombo(ServerPlayer p){
+        aim=p.getBoundingBox().getCenter();combo.begin(aim);
+        Vec3 forward=aim.subtract(boss.position());
+        yaw=(float)Math.toDegrees(Math.atan2(-forward.x,forward.z));
     }
     private BlockPos stoneSite(ServerLevel l,ServerPlayer p,Vec3 at){
         for(int i=0;i<12;i++){
@@ -157,9 +188,23 @@ public final class GoddessHand {
             if(close<3){if(t<49)return false;cancel();return true;}
             for(UUID id:donors)if(l.getEntity(id) instanceof BlacklightCommonInfected m && available(m) && m.getBoundingBox().getCenter().distanceToSqr(anchor)<6.25)m.discard();
             donors.clear();forming=false;formed=true;started=now();cooldown=now()+440;
+            if(pattern==GoddessPalmCombo.MOVE){from=anchor;prepareCombo(p);}
             SpiderFoley.play(boss,anchor,SpiderFoley.Cue.CATCH,1.6F);
             boss.goddess.publish();boss.goddess.paid(3000);
             return false;
+        }
+        if(pattern==GoddessPalmCombo.MOVE){
+            if(combo.stopped()<0 && (t==1 || t==23))SpiderFoley.play(boss,boss.hurtRegions(0).get(boss.goddess.supportingWrist()).bounds().getCenter(),
+                    t==1?SpiderFoley.Cue.LOAD:SpiderFoley.Cue.STRAIN,1.8F);
+            if(combo.stopped()<0 && (t==12 || t==43))SpiderFoley.play(boss,pose(0).palm(),t==12?SpiderFoley.Cue.SHED:SpiderFoley.Cue.STRIKE,1.9F);
+            if(t==27 && combo.stopped()<0){
+                Vec3 target=p.getBoundingBox().getCenter(),offset=target.subtract(aim);
+                if(offset.length()>12)target=aim.add(offset.normalize().scale(12));
+                if(sight(aim.add(0,8,0),target.add(0,6,0)))combo.aimDrop(target);
+                boss.goddess.publish();
+            }
+            if(!combo.tick(l,boss,this,t))return false;
+            from=comboPose(t).palm();travelAt=now();lastWasMelee=true;acting=false;return true;
         }
         var pose=pose(0);
         if(t==7 || pattern==0&&t==29){aim=p.getBoundingBox().getCenter();boss.goddess.publish();}
@@ -190,7 +235,8 @@ public final class GoddessHand {
             if(t<41){var d=grip.subtract(block.position());block.setDeltaMovement(d.scale(Math.min(.32,1.45/Math.max(.001,d.length()))));block.hurtMarked=true;}
             else {releaseRock(aim.subtract(grip).normalize().scale(1.5).add(0,.20,0));kicked=now();boss.goddess.publish();}
         }
-        if(t<60)return false;
+        if(t<(pattern==2?51:pattern==1?52:pattern==3?48:47))return false;
+        lastWasMelee=false;
         acting=false;next=(pattern+1)%4;releaseRock(Vec3.ZERO);return true;
     }
     private void flesh(ServerLevel l,ServerPlayer p,Vec3 muzzle,boolean deflect,boolean cannon){
@@ -241,6 +287,7 @@ public final class GoddessHand {
         var t=new CompoundTag();
         t.putBoolean("Visible",forming||formed);t.putBoolean("Forming",forming);t.putBoolean("Formed",formed);t.putBoolean("Acting",acting);
         t.putInt("Move",pattern);t.putInt("Next",next);t.putInt("Lost",lost);t.putInt("Side",side);t.putInt("Skins",skins);t.putInt("Flinch",flinched);
+        t.putBoolean("LastMelee",lastWasMelee);if(pattern==GoddessPalmCombo.MOVE)combo.save(t);
         t.putLong("Start",started);t.putLong("Travel",travelAt);t.putLong("Kick",kicked);t.putLong("Cooldown",cooldown);
         t.putFloat("Yaw",yaw);put(t,"Aim",aim);put(t,"At",anchor);put(t,"From",from);
         for(int i=0;i<5;i++)t.putFloat("Strain"+i,strain[i]);
@@ -250,6 +297,7 @@ public final class GoddessHand {
     }
     void load(CompoundTag t){
         forming=t.getBoolean("Forming");formed=t.getBoolean("Formed");acting=t.getBoolean("Acting");
+        lastWasMelee=t.getBoolean("LastMelee");combo.load(t);
         pattern=t.getInt("Move");next=t.getInt("Next");lost=t.getInt("Lost")&31;side=t.getInt("Side");
         skins=t.getInt("Skins");flinched=t.getInt("Flinch");started=t.getLong("Start");travelAt=t.getLong("Travel");
         kicked=t.getLong("Kick");cooldown=t.getLong("Cooldown");yaw=t.getFloat("Yaw");aim=read(t,"Aim");anchor=read(t,"At");from=read(t,"From");
