@@ -259,7 +259,7 @@ public final class GrabInteractionGameTest {
         tick(p,ConsumeSequence.completionTick(PowerForm.CLAWS,false,cow.getData(ModAttachments.CONSUME_VISUAL).variant())-1);
         h.assertTrue(cow.isAlive()&&p.getHealth()==10,"queue cannot shorten the consume sequence");
         tick(p,2);ClawCombatSystem.handle(p,Action.CONSUME);tick(p,20);
-        h.assertTrue(cow.isRemoved()&&p.getHealth()==12&&p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==2,"queued consume and repeated input pay exactly once");h.succeed();
+        h.assertTrue(cow.isRemoved()&&p.getHealth()==12&&p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==3,"queued consume and repeated input pay exactly once");h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=30)
     public static void grabKeyKeepsBodyAndPrimaryReleaseThrowsOnce(GameTestHelper h) {

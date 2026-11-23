@@ -43,10 +43,10 @@ public final class AdaptivePassiveDocumentGameTest {
         p.setData(ModAttachments.ADAPTIVE_PASSIVES,new AdaptivePassiveState(0,adaptation,regeneration,p.level().getGameTime()+20));
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="document_adaptation")
-    public static void adaptationOneFollowsThreeDocumentHits(GameTestHelper h){
+    public static void adaptationOneFollowsThreeHits(GameTestHelper h){
         var p=player(h,false,CombatSkill.ADAPTATION);due(p,100,0);
         try{
-            int[] health={730,481,265},stacks={142,178,205};
+            int[] health={715,442,187},stacks={146,189,227};
             for(int i=0;i<3;i++){hit(p,300);near(h,p.getHealth(),health[i],"actual HP hit "+i);near(h,AdaptivePassiveSystem.state(p).adaptation(),stacks[i],"adaptation layers "+i);}
         }finally{p.discard();}h.succeed();
     }
@@ -54,34 +54,47 @@ public final class AdaptivePassiveDocumentGameTest {
     public static void adaptationTwoRoundsHealthPercentBeforeMitigation(GameTestHelper h){
         var p=player(h,false,CombatSkill.ADAPTATION,CombatSkill.ADAPTATION_PERCENT);due(p,100,0);
         try{
-            int[] health={850,721,604},stacks={110,114,115};
+            int[] health={799,619,457},stacks={124,142,155};
             for(int i=0;i<3;i++){hit(p,300);near(h,p.getHealth(),health[i],"actual HP hit "+i);near(h,AdaptivePassiveSystem.state(p).adaptation(),stacks[i],"adaptation II layers "+i);}
         }finally{p.discard();}h.succeed();
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="document_healing")
     public static void scaledDamageAndHealingConvertActualHpOnlyOnce(GameTestHelper h){
         var p=player(h,true,CombatSkill.ADAPTATION,CombatSkill.TISSUE_REGENERATION);due(p,100,0);hit(p,60);
-        near(h,p.getHealth(),730,"300 damage becomes 270 actual HP");
-        near(h,AdaptivePassiveSystem.state(p).adaptation(),142,"accepted mitigation consumes layers");
-        near(h,AdaptivePassiveSystem.state(p).regeneration(),45,"regeneration gains from post-mitigation 270 HP");
-        h.runAfterDelay(20,()->{try{pulse(p);near(h,p.getHealth(),775,"45 HP is not multiplied to 225");near(h,AdaptivePassiveSystem.state(p).regeneration(),36,"20 percent of restored HP consumed");}finally{p.discard();}h.succeed();});
+        near(h,p.getHealth(),715,"300 damage becomes 285 actual HP");
+        near(h,AdaptivePassiveSystem.state(p).adaptation(),146,"accepted mitigation consumes layers");
+        near(h,AdaptivePassiveSystem.state(p).regeneration(),48,"regeneration gains from post-mitigation 285 HP");
+        h.runAfterDelay(20,()->{try{pulse(p);near(h,p.getHealth(),739,"48 layers restore 24 HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),38,"24 HP spends ten layers");}finally{p.discard();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=80,batch="document_healing")
     public static void secondTierUsesMissingHealthAndUpdatesEffectTier(GameTestHelper h){
         var p=player(h,false,CombatSkill.TISSUE_REGENERATION,CombatSkill.TISSUE_REGENERATION_PERCENT);
         p.setHealth(600);due(p,0,75);
-        h.runAfterDelay(20,()->{pulse(p);near(h,p.getHealth(),900,"75 percent of missing 400 HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),15,"actual 300 HP costs 60 layers");
+        h.runAfterDelay(20,()->{pulse(p);near(h,p.getHealth(),750,"75 layers restore 37.5 percent of missing HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),12,"150 HP costs 63 layers");
             var marker=p.getEffect(ModEffects.TISSUE_REGENERATION);
             near(h,marker.getAmplifier(),1,"second-tier marker");
             h.assertTrue(!marker.showIcon(),"Blacklight regeneration leaves the buff row clear");});
-        h.runAfterDelay(40,()->{try{pulse(p);near(h,p.getHealth(),915,"15 percent of missing 100 HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),12,"actual 15 HP costs three layers");}finally{p.discard();}h.succeed();});
+        h.runAfterDelay(40,()->{try{pulse(p);near(h,p.getHealth(),765,"12 layers restore six percent of missing HP");near(h,AdaptivePassiveSystem.state(p).regeneration(),5,"15 HP costs seven layers");}finally{p.discard();}h.succeed();});
+    }
+    @GameTest(template="wall_test",timeoutTicks=80,batch="document_healing")
+    public static void oneHeavyHitDoesNotHealItself(GameTestHelper h){
+        var p=player(h,false,CombatSkill.TISSUE_REGENERATION,CombatSkill.TISSUE_REGENERATION_PERCENT);
+        hit(p,600);
+        near(h,p.getHealth(),400,"initial 600 HP loss");
+        near(h,AdaptivePassiveSystem.state(p).regeneration(),100,"one hit earned 100 stacks");
+        h.runAfterDelay(20,()->{
+            pulse(p);
+            near(h,p.getHealth(),640,"first pulse restores 240 HP");
+            near(h,AdaptivePassiveSystem.state(p).regeneration(),0,"the pulse spends all earned stacks");
+        });
+        h.runAfterDelay(40,()->{try{pulse(p);near(h,p.getHealth(),640,"no deferred heal from that hit");}finally{p.discard();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="document_healing")
     public static void fullHealthAndOverhealConsumeOnlyActualRestoration(GameTestHelper h){
         var full=player(h,false,CombatSkill.TISSUE_REGENERATION);due(full,0,100);
         var hurt=player(h,false,CombatSkill.TISSUE_REGENERATION);hurt.setHealth(990);due(hurt,0,100);
         h.runAfterDelay(20,()->{try{pulse(full);pulse(hurt);near(h,full.getHealth(),1000,"full HP unchanged");near(h,AdaptivePassiveSystem.state(full).regeneration(),99,"full HP still costs minimum one");
-            near(h,hurt.getHealth(),1000,"overheal capped");near(h,AdaptivePassiveSystem.state(hurt).regeneration(),98,"only ten restored HP costs two");}finally{full.discard();hurt.discard();}h.succeed();});
+            near(h,hurt.getHealth(),1000,"overheal capped");near(h,AdaptivePassiveSystem.state(hurt).regeneration(),95,"ten restored HP costs five layers");}finally{full.discard();hurt.discard();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=60,batch="document_healing")
     public static void canceledHealingDoesNotConsumeTheRequestedAmount(GameTestHelper h){
@@ -96,12 +109,12 @@ public final class AdaptivePassiveDocumentGameTest {
         var p=player(h,false,CombatSkill.ADAPTATION,CombatSkill.TISSUE_REGENERATION);p.setHealth(500);due(p,90,2);
         h.runAfterDelay(20,()->{pulse(p);near(h,AdaptivePassiveSystem.state(p).regeneration(),1,"two layers become one");});
         h.runAfterDelay(40,()->{pulse(p);near(h,AdaptivePassiveSystem.state(p).regeneration(),0,"last layer reaches zero");});
-        h.runAfterDelay(60,()->{try{pulse(p);near(h,p.getHealth(),503,"no permanent leftover healing");near(h,AdaptivePassiveSystem.state(p).adaptation(),90,"no timed adaptation decay");}finally{p.discard();}h.succeed();});
+        h.runAfterDelay(60,()->{try{pulse(p);near(h,p.getHealth(),501.5,"no permanent leftover healing");near(h,AdaptivePassiveSystem.state(p).adaptation(),90,"no timed adaptation decay");}finally{p.discard();}h.succeed();});
     }
     @GameTest(template="wall_test",timeoutTicks=45,batch="document_adaptation")
-    public static void fullMitigationSpendsLayersWithoutGeneratingTissue(GameTestHelper h){
-        var p=player(h,false,CombatSkill.ADAPTATION,CombatSkill.TISSUE_REGENERATION);p.setHealth(10);due(p,1000,0);
-        try{hit(p,60);near(h,p.getHealth(),10,"100 percent mitigation");near(h,AdaptivePassiveSystem.state(p).adaptation(),994,"fully blocked 60 HP costs six");near(h,AdaptivePassiveSystem.state(p).regeneration(),0,"zero actual damage earns no regeneration");}
+    public static void oldHighStacksStillAllowDamageAndTissueGain(GameTestHelper h){
+        var p=player(h,false,CombatSkill.ADAPTATION,CombatSkill.TISSUE_REGENERATION);p.setHealth(100);due(p,10000,0);
+        try{hit(p,60);near(h,p.getHealth(),70,"half the hit reaches health");near(h,AdaptivePassiveSystem.state(p).adaptation(),10002,"five layers earned and three spent");near(h,AdaptivePassiveSystem.state(p).regeneration(),5,"thirty actual damage earns five layers");}
         finally{p.discard();}h.succeed();
     }
 }

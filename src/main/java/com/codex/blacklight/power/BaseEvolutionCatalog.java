@@ -24,7 +24,7 @@ public final class BaseEvolutionCatalog {
         add(list,Kind.MOVEMENT,"jump_1 jump_2 jump_3 sprint_1 sprint_2 wall_1 wall_2 glide_1 glide_2 air_dash_plus wing_speed_1 wing_speed_2 wing_speed_3");
         add(list,Kind.CLAW,"range damage dashing_slice pounce");
         add(list,Kind.COMBAT,"critical_mass adrenaline_surge bulletdive_drop groundspike_graveyard tendril_barrage critical_pain critical_mass_boost_1 critical_mass_boost_2 critical_mass_boost_3 shield_borer shield_borer_boost_1 shield_borer_boost_2 block_throw_1 block_throw_2 block_throw_3");
-        add(list,Kind.GROWTH,"vitality regeneration assimilation reach_1 reach_2 reach_3 vitality_2 vitality_3 vitality_4 slime_size_1 slime_size_2 slime_size_3 slime_decay_1 slime_decay_2 slime_decay_3 assimilation_2 slime_mobility_1 slime_mobility_2 slime_mobility_3 biomass_metabolism");
+        add(list,Kind.GROWTH,"vitality regeneration assimilation reach_1 reach_2 reach_3 vitality_2 vitality_3 vitality_4 slime_size_1 slime_size_2 slime_size_3 slime_decay_1 slime_decay_2 slime_decay_3 assimilation_2 slime_mobility_1 slime_mobility_2 slime_mobility_3");
         REQUIREMENTS=List.copyOf(list);
     }
     private BaseEvolutionCatalog(){}

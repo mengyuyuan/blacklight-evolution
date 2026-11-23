@@ -10,14 +10,16 @@ public final class PlayerEvolutionConfig {
     public static final ModConfigSpec.DoubleValue HEALTH_PER_LEVEL,ATTACK_PER_LEVEL,SKILL_PER_LEVEL,DEFENSE_PER_LEVEL,RECOVERY_PER_LEVEL,MOBILITY_PER_LEVEL;
     public static final ModConfigSpec.IntValue RECOVERY_DELAY;
     public static final ModConfigSpec.BooleanValue KEEP_LEGACY_PASSIVES;
+    private static final ModConfigSpec.BooleanValue UPDATED_PASSIVE_THRESHOLDS;
     static {
         var b=new ModConfigSpec.Builder();
         COST=b.comment("Fixed EP cost for every repeatable attribute purchase, independent of rank.")
                 .defineInRange("repeatableAttributeCost",200,1,1000000);
-        PASSIVE_LEVEL=b.comment("适应性I和组织再生I的门槛：六项无限进化属性分别达到此等级，非等级总和。旧20/50键不再使用，首次生成新键默认50/150。")
-                .defineInRange("passiveTierOneAttributeRank",50,1,1000000);
+        PASSIVE_LEVEL=b.comment("适应性I和组织再生I的门槛：六项无限进化属性分别达到此等级，非等级总和。默认每项300级。")
+                .defineInRange("passiveTierOneAttributeRank",300,1,1000000);
         PERCENT_LEVEL=b.comment("适应性II和组织再生II的逐项等级门槛；有效值不低于一级门槛，仍需购买对应一级技能。")
-                .defineInRange("passiveTierTwoAttributeRank",150,1,1000000);
+                .defineInRange("passiveTierTwoAttributeRank",500,1,1000000);
+        UPDATED_PASSIVE_THRESHOLDS=b.comment("Tracks the one-time upgrade of the previous default 50/150 pair.").define("updatedPassiveThresholds",false);
         KEEP_LEGACY_PASSIVES=b.comment("Keep old learned passives active without new qualifications. False preserves learning/stacks but suspends effects until qualified.")
                 .define("keepLegacyPassivesActive",false);
         HEALTH_PER_LEVEL=b.comment("每级生命无限强化增加的实际HP。").defineInRange("healthPerLevel",25D,0,1000000);
@@ -28,6 +30,15 @@ public final class PlayerEvolutionConfig {
         RECOVERY_DELAY=b.comment("无限恢复属性的脱战等待刻数；20刻约1秒。").defineInRange("recoveryDelayTicks",80,0,240000);
         MOBILITY_PER_LEVEL=b.comment("移速倍率=1+本值×ln(1+等级)，不改变动作播放速度。").defineInRange("mobilityLogCoefficient",.025,0,10);
         SPEC=b.build();
+    }
+    public static void migratePassiveThresholds() {
+        if (UPDATED_PASSIVE_THRESHOLDS.get()) return;
+        if (PASSIVE_LEVEL.get() == 50 && PERCENT_LEVEL.get() == 150) {
+            PASSIVE_LEVEL.set(300);
+            PERCENT_LEVEL.set(500);
+        }
+        UPDATED_PASSIVE_THRESHOLDS.set(true);
+        SPEC.save();
     }
     private PlayerEvolutionConfig(){}
     public static <T> T value(ModConfigSpec.ConfigValue<T> setting){return SPEC.isLoaded()?setting.get():setting.getDefault();}

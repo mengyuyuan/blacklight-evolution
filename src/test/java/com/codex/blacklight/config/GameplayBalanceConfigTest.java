@@ -7,13 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameplayBalanceConfigTest {
-    @Test void thresholdsAreFiftyAndOneHundredFiftyAndOldFlagsCannotUnlockThem(){
-        assertEquals(50,PlayerEvolutionConfig.PASSIVE_LEVEL.getDefault());
-        assertEquals(150,PlayerEvolutionConfig.PERCENT_LEVEL.getDefault());
+    @Test void newThresholdsPreserveEarnedQualificationsAndIgnorePredecessorFlags(){
+        assertEquals(300,PlayerEvolutionConfig.PASSIVE_LEVEL.getDefault());
+        assertEquals(500,PlayerEvolutionConfig.PERCENT_LEVEL.getDefault());
         var old=new EvolutionMilestones(7);
         assertTrue(old.has(EvolutionMilestones.INFINITE));
         assertFalse(old.has(EvolutionMilestones.PASSIVES));assertFalse(old.has(EvolutionMilestones.PERCENT));
         assertTrue(old.has(EvolutionMilestones.LEGACY_PERCENT));
+        var earned=new EvolutionMilestones(31);
+        assertTrue(earned.has(EvolutionMilestones.PASSIVES));assertTrue(earned.has(EvolutionMilestones.PERCENT));
     }
     @Test void weightedBirthsSupportTinyWeightsZerosAndNonHundredTotals(){
         assertEquals(OutbreakRules.Tier.GROWING,OutbreakRules.weighted(new int[]{0,1,0,0,0},0));
@@ -31,11 +33,11 @@ class GameplayBalanceConfigTest {
         assertEquals(1,GameplayBalanceConfig.exposureChance(4));
         assertArrayEquals(new int[]{60,14,16,8,2},GameplayBalanceConfig.weights(4));
     }
-    @Test void legacyConfigGetsNewFiftyAndOneHundredFiftyDefaults(){
+    @Test void legacyConfigGetsCurrentThresholdDefaults(){
         var config=com.electronwill.nightconfig.core.CommentedConfig.inMemory();
         config.set("passiveAttributeRank",20);config.set("percentAdaptationAttributeRank",50);
         PlayerEvolutionConfig.SPEC.correct(config);
-        assertEquals(50,(int)config.get("passiveTierOneAttributeRank"));assertEquals(150,(int)config.get("passiveTierTwoAttributeRank"));
+        assertEquals(300,(int)config.get("passiveTierOneAttributeRank"));assertEquals(500,(int)config.get("passiveTierTwoAttributeRank"));
         assertTrue(PlayerEvolutionConfig.SPEC.isCorrect(config));
     }
 }

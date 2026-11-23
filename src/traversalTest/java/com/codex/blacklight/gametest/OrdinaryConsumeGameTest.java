@@ -37,8 +37,8 @@ public final class OrdinaryConsumeGameTest {
             h.assertTrue(!cow.isRemoved()&&p.getHealth()==10,"no early award in "+form);
             tick(p);tick(p);
             h.assertTrue(cow.isRemoved()&&!p.getData(ModAttachments.CONSUMING),"complete releases target and player "+form);
-            h.assertTrue(p.getHealth()==12&&p.getData(ModAttachments.PLAYER_STATE).getBiomass()==270
-                    &&p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==2,"cow reward once, not hunter reward "+form);
+            h.assertTrue(p.getHealth()==12&&p.getData(ModAttachments.PLAYER_STATE).getBiomass()==253
+                    &&p.getData(ModAttachments.PLAYER_STATE).getEvolutionPoints()==3,"cow reward once, not hunter reward "+form);
         }
         h.succeed();
     }

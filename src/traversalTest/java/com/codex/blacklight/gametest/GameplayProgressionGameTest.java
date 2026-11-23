@@ -55,9 +55,12 @@ public final class GameplayProgressionGameTest {
         float health=hive.getHealth();
         h.assertTrue(hive.hurt(p.damageSources().playerAttack(p),1000)&&hive.isAlive()&&hive.getHealth()<health,"conventional damage chips the living hive");
         h.assertTrue(ConsumeSystem.executeConsumption(p,hive,hive.getMaxHealth()*20)&&!hive.isAlive(),"the completed finisher clears the hive");
-        int ep=state.getEvolutionPoints(),bio=state.getBiomass();
+        int amount=CombatRewards.fraction(AssimilationSystem.fullReward(hive),.5);
         hive.die(p.damageSources().playerAttack(p));
-        h.assertTrue(ep==180&&bio==500&&state.getEvolutionPoints()==ep&&state.getBiomass()==bio,"one clear produces exactly one reward");hive.discard();restored.discard();h.succeed();
+        h.runAfterDelay(3,()->{
+            h.assertTrue(state.getEvolutionPoints()==amount && state.getBiomass()==Math.min(1000,250+amount),"one clear produces exactly one reward");
+            hive.discard();restored.discard();h.succeed();
+        });
     }
     @GameTest(template="wall_test",timeoutTicks=40)
     public static void survivalRecipeAndGuidanceAreLoaded(GameTestHelper h){

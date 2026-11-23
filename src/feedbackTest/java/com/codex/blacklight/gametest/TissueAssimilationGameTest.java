@@ -187,7 +187,7 @@ public final class TissueAssimilationGameTest {
             p.setHealth(p.getMaxHealth());p.invulnerableTime=0;playerBefore=p.getHealth();p.hurt(p.damageSources().generic(),2);
             h.assertTrue(incoming>0&&Math.abs((playerBefore-p.getHealth())-incoming*.85F)<.001,"carapace rank III reduces actual ordinary damage by 15 percent; baseline="+incoming+", enhanced="+(playerBefore-p.getHealth())+", health="+playerBefore+", mode="+p.gameMode.getGameModeForPlayer());
             var improved=AssimilationSystem.quote(p,b);
-            h.assertTrue(Math.abs(improved.healing()-quote.healing()*1.3F)<.001&&improved.biomass()==Math.round(quote.biomass()*1.15F)&&improved.ep()==quote.ep(),"jaw changes healing and biomass without multiplying EP");
+            h.assertTrue(Math.abs(improved.healing()-quote.healing()*1.3F)<.001&&improved.biomass()==quote.biomass()&&improved.ep()==quote.ep(),"jaw increases healing while both resource rewards follow actual maximum health");
             p.setOnGround(true);ConsumeSystem.request(p);h.assertTrue(p.getData(ModAttachments.CONSUMING),"grasp rank III reaches the same creature beyond the baseline range");
         }finally{for(var cow:java.util.List.of(a,b,grabbed))cow.discard();cleanup(p);}h.succeed();
     }
