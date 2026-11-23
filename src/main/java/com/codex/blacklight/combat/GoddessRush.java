@@ -70,6 +70,7 @@ public final class GoddessRush {
         return boss.hurtRegions(0).get(slot).boxes().stream().anyMatch(b->b.nearest(p.getEyePosition()).distanceToSqr(p.getEyePosition())<49);
     }
     boolean begin(ServerPlayer p){
+        if(com.codex.blacklight.entity.GoddessEmplacement.releaseGrace(p,boss))return false;
         if(boss.level().getGameTime()<next || (boss.goddess.removed()&3)==3 || p.isPassenger() || p.isCreative()
                 || p.isSpectator() || p.distanceToSqr(boss)>40*40 || !p.isAlive())return false;
         Vec3 delta=p.position().subtract(boss.position()).multiply(1,0,1);

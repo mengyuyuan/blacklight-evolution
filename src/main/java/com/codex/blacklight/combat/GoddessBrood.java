@@ -37,6 +37,8 @@ final class GoddessBrood {
             if(ours(m) && available(m) && m.getPersistentData().getInt("GoddessOrder")==sequence)
                 pacify(m,level.getGameTime()+25);
         }
+        for(var organ:level.getEntitiesOfClass(com.codex.blacklight.entity.GoddessEmplacement.class,
+                boss.getBoundingBox().inflate(120),e->e.fromOrder(boss,sequence)))organ.discard();
         SpiderFoley.play(boss,entity==null?boss.getEyePosition():entity.position(),SpiderFoley.Cue.TEAR,1.35F);
         return true;
     }

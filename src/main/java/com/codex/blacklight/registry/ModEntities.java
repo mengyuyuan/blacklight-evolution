@@ -27,6 +27,12 @@ public final class ModEntities {
     public static final RegistryObject<EntityType<com.codex.blacklight.entity.GreeneTendrilPod>> GREENE_TENDRIL_POD =
             ENTITIES.register("greene_tendril_pod",()->EntityType.Builder.<com.codex.blacklight.entity.GreeneTendrilPod>of(
                     com.codex.blacklight.entity.GreeneTendrilPod::new,MobCategory.MISC).sized(1.20F,.94F).clientTrackingRange(8).updateInterval(2).build("greene_tendril_pod"));
+    public static final RegistryObject<EntityType<com.codex.blacklight.entity.GoddessEmplacement>> GREENE_SPINE_CANNON =
+            ENTITIES.register("greene_spine_cannon",()->EntityType.Builder.<com.codex.blacklight.entity.GoddessEmplacement>of(
+                    com.codex.blacklight.entity.GoddessEmplacement::new,MobCategory.MISC).sized(.86F,.80F).clientTrackingRange(8).updateInterval(2).build("greene_spine_cannon"));
+    public static final RegistryObject<EntityType<com.codex.blacklight.entity.GoddessEmplacement>> GREENE_GROUND_WRIST =
+            ENTITIES.register("greene_ground_wrist",()->EntityType.Builder.<com.codex.blacklight.entity.GoddessEmplacement>of(
+                    com.codex.blacklight.entity.GoddessEmplacement::new,MobCategory.MISC).sized(.78F,.76F).clientTrackingRange(8).updateInterval(2).build("greene_ground_wrist"));
 
     public static final RegistryObject<EntityType<GroundSpikeEntity>> GROUND_SPIKE =
             ENTITIES.register("ground_spike", () -> EntityType.Builder
@@ -119,6 +125,8 @@ public final class ModEntities {
             event.put(HIVE_TENDRIL.get(),com.codex.blacklight.entity.HiveTendril.attributes().build());
             event.put(INFECTED_HOST.get(),com.codex.blacklight.entity.BlacklightInfectedHost.attributes().build());
             event.put(GREENE_TENDRIL_POD.get(),net.minecraft.world.entity.Mob.createMobAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH,2).build());
+            event.put(GREENE_SPINE_CANNON.get(),net.minecraft.world.entity.Mob.createMobAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH,2).build());
+            event.put(GREENE_GROUND_WRIST.get(),net.minecraft.world.entity.Mob.createMobAttributes().add(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH,2).build());
             event.put(COMMON_INFECTED.get(),com.codex.blacklight.entity.BlacklightCommonInfected.attributes().build());
             event.put(BLACKLIGHT_STALKER.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.STALKER).build());
             event.put(BLACKLIGHT_SPITTER.get(),com.codex.blacklight.entity.BlacklightMutant.attributes(com.codex.blacklight.entity.BlacklightMutant.Kind.SPITTER).build());
