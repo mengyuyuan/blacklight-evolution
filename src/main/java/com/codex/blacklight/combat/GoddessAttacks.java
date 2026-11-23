@@ -18,11 +18,11 @@ import java.util.UUID;
 public final class GoddessAttacks {
     public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL }
     private static final Move[] ORDERS={Move.VACUOLE,Move.NEEDLE_RAIN,Move.CALL,Move.BLOOD_SURF,Move.WALL_SPEARS,Move.STRONG_CALL};
-    private final GoddessBrood brood;
+    final GoddessBrood brood;
     private final GoddessVolley volley;
     private final EncounterMob boss;
     private Move move=Move.REST;
-    private int elapsed, sequence, groups, order, recovery;
+    private int elapsed, sequence, groups, order;
     private UUID target;
     private Vec3 center=Vec3.ZERO;
     private boolean caught,grounded,paid,bled;
@@ -53,6 +53,7 @@ public final class GoddessAttacks {
     private void send(){boss.goddess.publish();}
     private void enter(Move next,ServerPlayer p){
         debris.clear();
+        if(move==Move.BREATHER || next==Move.BREATHER)brood.clearMeals();
         move=next;elapsed=0;caught=false;grounded=false;paid=false;bled=false;
         target=p==null?null:p.getUUID();
         if(p!=null){center=p.getBoundingBox().getCenter();captureYaw=p.yBodyRot;}
@@ -71,15 +72,17 @@ public final class GoddessAttacks {
             if(elapsed<24)return;
             var p=nearest(level);
             if(p==null)return;
-            if(groups>=2){recovery=0;enter(Move.BREATHER,p);}
+            if(groups>=2){enter(Move.BREATHER,p);}
             else {enter(ORDERS[Math.floorMod(order++,ORDERS.length)],p);}
             if(move==Move.VACUOLE)SpiderFoley.play(boss,eyes(),SpiderFoley.Cue.INHALE,1.35F);
             else SpiderFoley.play(boss,eyes(),move==Move.BREATHER?SpiderFoley.Cue.BRACE:SpiderFoley.Cue.LOAD,1.25F);
             return;
         }
         if(move==Move.BREATHER){
-            if(elapsed%10==0 && brood.rest(level))recovery+=10;
-            if(recovery>=180 && level.players().stream().noneMatch(p->p.distanceToSqr(boss)<100*100&&ConsumeSystem.active(p))){groups=0;enter(Move.REST,null);}
+            if(brood.rest(level,elapsed)){
+                groups=0;
+                enter(Move.REST,null);
+            }
             return;
         }
         var p=player(level);
@@ -129,7 +132,11 @@ public final class GoddessAttacks {
         var edge=region.boxes().get((elapsed/4)%region.boxes().size()).nearest(center);
         SpiderFoley.strands(boss,edge,joint.subtract(edge),4);
     }
-    private void finish(){boss.goddess.finishedAttack();groups++;enter(Move.REST,null);}
+    private void finish(){
+        boss.goddess.finishedAttack();
+        groups=move==Move.STRONG_CALL && paid ? 2 : groups+1;
+        enter(Move.REST,null);
+    }
     private Vec3 eyes(){return boss.hurtRegions(1).get(0).bounds().getCenter();}
     private boolean clear(Vec3 from,Vec3 to){
         return boss.level().clip(new ClipContext(from,to,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss)).getType()!=HitResult.Type.BLOCK;
@@ -255,7 +262,7 @@ public final class GoddessAttacks {
     }
     public CompoundTag save(){
         var t=new CompoundTag();t.putString("Move",move.name());t.putInt("Age",elapsed);t.putLong("Start",boss.level().getGameTime()-elapsed);
-        t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.putInt("Recovery",recovery);
+        t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
         t.putFloat("CaptureYaw",captureYaw);
@@ -272,7 +279,7 @@ public final class GoddessAttacks {
         entry=new Vec3(t.getDouble("EntryX"),t.contains("EntryY")?t.getDouble("EntryY"):-.9,t.getDouble("EntryZ"));
         impulse=new Vec3(t.getDouble("PushX"),0,t.getDouble("PushZ"));
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));
-        move=decode(t);elapsed=Math.max(0,t.getInt("Age"));sequence=t.getInt("Sequence");groups=t.getInt("Groups");order=t.getInt("Order");recovery=t.getInt("Recovery");
+        move=decode(t);elapsed=Math.max(0,t.getInt("Age"));sequence=t.getInt("Sequence");groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));
         caught=t.getBoolean("Caught");grounded=t.getBoolean("Ground");paid=t.getBoolean("Paid");bled=t.getBoolean("Bled");center=readCenter(t);target=t.hasUUID("Target")?t.getUUID("Target"):null;
     }
 }
