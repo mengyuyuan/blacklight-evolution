@@ -724,6 +724,15 @@ public final class WeaponCombatSystem {
             meleePitch=WhipCurveContact.aimPitch(p);
             if(meleePitch!=0)hullSearch=hullSearch.inflate(0,moveReach,0);
         }
+        for(var spear:p.level().getEntitiesOfClass(com.codex.blacklight.entity.EvolvedQuill.class,
+                hullSearch.inflate(2.3),com.codex.blacklight.entity.EvolvedQuill::lodgedSpear)){
+            var shaft=spear.shaft();
+            Vec3 contact=cutting.hullContact(p,List.of(shaft),whip==null?0:whip.collisionRadius());
+            if(contact==null && !preciseOnly && bounds!=null && !cutting.sharp()
+                    && meleeContact(p,s,shaft.bounds,shaft.bounds,bounds))contact=shaft.nearest(p.getEyePosition());
+            if(contact!=null && CombatTargeting.clearRay(p,p.getEyePosition(),contact))
+                spear.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form));
+        }
         for(Entity hull:ExplicitTarget.hullsIn(p,hullSearch)){
             if(!currentSession(p,s))return;
             if(s.hit.contains(hull.getUUID())||s.hit.size()>=(s.move.quake()?48:8))continue;

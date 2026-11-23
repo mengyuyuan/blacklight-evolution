@@ -49,12 +49,41 @@ final class GoddessVolley {
         }
         SpiderFoley.play(boss,first,high?SpiderFoley.Cue.RUPTURE:SpiderFoley.Cue.STRAIN,1.3F);
     }
-    void spears(ServerLevel level,Vec3 aim){
-        Vec3 chest=boss.hurtRegions(1).get(1).bounds().getCenter(),side=across(aim);
-        for(int i=-3;i<=3;i++){
-            var dir=aim.add(side.scale(2.4*i)).subtract(chest).normalize();
-            quill(level,chest.add(side.scale(i*.7)),dir,2.6,18,true);
+    boolean spears(ServerLevel level, Vec3 aim) {
+        Vec3 chest = boss.hurtRegions(1).get(1).bounds().getCenter();
+        Vec3 side = across(aim);
+        Vec3 forward = new Vec3(-side.z, 0, side.x);
+        int missing = boss.goddess.removed();
+        boolean fired = false;
+        for (int lane = -3; lane <= 3; lane++) {
+            if (lane == -2 && (missing & GoddessVitals.LEFT_ARM) != 0
+                    || lane == 2 && (missing & GoddessVitals.RIGHT_ARM) != 0) continue;
+            Vec3 direction = forward.add(side.scale(lane * .32)).normalize();
+            Vec3 start = chest.add(side.scale(lane * 1.15));
+            Vec3 pin = wallPin(level, start, aim, direction);
+            if (pin == null) continue;
+            quill(level, start, pin.subtract(start), 3.2, 18, true);
+            fired = true;
         }
-        SpiderFoley.play(boss,chest,SpiderFoley.Cue.TEAR,1.25F);
+        if (fired) SpiderFoley.play(boss, chest, SpiderFoley.Cue.TEAR, 1.25F);
+        return fired;
     }
+    private Vec3 wallPin(ServerLevel level, Vec3 start, Vec3 aim, Vec3 direction) {
+        // A line at ankle height can terminate on a step whose top conceals the side from the chest.
+        // Climb the actual wall until both the target and the firing joint have a clear line.
+        for (int rise = 0; rise <= 12; rise += 2) {
+            Vec3 from = aim.add(0, rise, 0);
+            var wall = level.clip(new ClipContext(from, from.add(direction.scale(72)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+            if (wall.getType() != HitResult.Type.BLOCK || wall.getDirection().getAxis().isVertical() || wall.isInside()) continue;
+            Vec3 inside = wall.getLocation().add(Vec3.atLowerCornerOf(wall.getDirection().getNormal()).scale(-.06));
+            if (start.distanceToSqr(inside) > 72 * 72) continue;
+            var approach = level.clip(new ClipContext(start, inside, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+            if (approach.getType() == HitResult.Type.BLOCK && !approach.getDirection().getAxis().isVertical()
+                    && !approach.isInside() && approach.getLocation().distanceToSqr(inside) < 4) {
+                return approach.getLocation().add(Vec3.atLowerCornerOf(approach.getDirection().getNormal()).scale(-.04));
+            }
+        }
+        return null;
+    }
+
 }
