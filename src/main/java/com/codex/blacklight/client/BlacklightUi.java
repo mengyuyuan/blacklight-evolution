@@ -31,6 +31,7 @@ public final class BlacklightUi {
         g.fill(x,y,right,y+1,LINE);
     }
     public static void hud(GuiGraphics g,int x,int y,int right,int bottom,int accent) {
+        PrototypeHealthHud.reserve(x,y,right,bottom);
         g.fillGradient(x,y,right,bottom,0xDE23242A,0xD2101116);
         g.fill(x,y,x+2,bottom,accent);
     }

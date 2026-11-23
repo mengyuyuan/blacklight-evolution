@@ -32,7 +32,7 @@ public final class GoddessCastPose {
         var attack=boss.goddess.attacks;
         float t=attack.age(partial);
         var move=attack.move();
-        float end=switch(move){case WALL_SPEARS -> 112; case VACUOLE -> 62; default -> 55;};
+        float end=switch(move){case WALL_SPEARS -> GoddessAttacks.SPEARS_END; case VACUOLE -> 62; case BLOOD_SURF -> GoddessAttacks.SURF_END; default -> GoddessAttacks.RAIN_END;};
         float engage=beat(t,0,move==GoddessAttacks.Move.VACUOLE?17:10,end-10,end);
         var target=attack.center().subtract(boss.getPosition(partial)).toVector3f();
         new Matrix4f(GoddessRig.root(boss,partial)).invert().transformPosition(target);
@@ -60,14 +60,14 @@ public final class GoddessCastPose {
             }
             case BLOOD_SURF -> {
                 draw=beat(t,0,8,9,13)+beat(t,19,31,33,39);
-                strike=beat(t,9,12,14,23)+beat(t,34,38,40,51);
+                strike=beat(t,9,12,14,23)+beat(t,34,38,40,GoddessAttacks.SURF_END);
                 roll=(t<24?1:-1)*(.34F*draw-.30F*strike);
                 crown=-.30F*draw+.35F*strike;
             }
             case WALL_SPEARS -> {
                 draw=beat(t,0,22,25,30);
                 strike=beat(t,25,28,35,51);
-                fold=beat(t,52,65,71,93);
+                fold=beat(t,48,60,66,GoddessAttacks.SPEARS_END);
                 crown=-.28F*draw+.30F*strike-.32F*fold;
             }
             default -> {return;}

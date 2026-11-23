@@ -19,7 +19,13 @@ public final class SupremeHunterBossBar {
     private static String key(Component name){return name.getContents() instanceof TranslatableContents t?t.getKey():"";}
     static boolean ours(Component name){return java.util.Set.of(KEY,"boss.blacklight.phase","boss.blacklight.greene_spider.name","boss.blacklight.greene_goddess.name","boss.blacklight.weakpoints","boss.blacklight.exposed","boss.blacklight.collapsing").contains(key(name));}
     @SubscribeEvent public static void bar(CustomizeGuiOverlayEvent.BossEventProgress event){
-        var boss=event.getBossEvent();if(!ours(boss.getName()))return;
+        var boss=event.getBossEvent();
+        if(!ours(boss.getName())){
+            int x=event.getX(),y=event.getY();
+            int half=Math.max(91,Minecraft.getInstance().font.width(boss.getName())/2+1);
+            PrototypeHealthHud.reserve(x+91-half,y-10,x+91+half,y+6);
+            return;
+        }
         var mc=Minecraft.getInstance();if(world!=mc.level){world=mc.level;TRAILS.clear();}
         String key=key(boss.getName());
         if(key.equals("boss.blacklight.weakpoints")||key.equals("boss.blacklight.exposed")||key.equals("boss.blacklight.collapsing")){defense(event,key.equals("boss.blacklight.exposed"));return;}
@@ -50,6 +56,8 @@ public final class SupremeHunterBossBar {
         if(supreme){int wx=left+Math.round(width*.12F);g.fill(wx,top-4,wx+1,top+h+4,0xFFB070FF);}
         // name plate and percentage
         Component name=boss.getName();int nw=font.width(name);
+        PrototypeHealthHud.reserve(Math.min(left-3,center-nw/2-6),top-15,
+                Math.max(left+width+3,center+nw/2+6),top+h+4+font.lineHeight);
         g.fill(center-nw/2-6,top-15,center+nw/2+6,top-4,0xC0100606);
         g.drawString(font,name,center-nw/2,top-13,0xFFF2D7B0,true);
         String pct=Math.round(p*100)+"%";g.drawString(font,pct,left+width-font.width(pct),top+h+4,weak?0xFFB070FF:0xFFD9B8A0,true);
@@ -58,6 +66,7 @@ public final class SupremeHunterBossBar {
         event.setCanceled(true);event.setIncrement(11);
         var g=event.getGuiGraphics();var font=Minecraft.getInstance().font;var boss=event.getBossEvent();
         int width=Math.min(300,g.guiWidth()-40),left=event.getX()+91-width/2,top=event.getY()+1;
+        PrototypeHealthHud.reserve(left-3,top-3,left+width+3,top+7);
         int fill=Math.round(width*net.minecraft.util.Mth.clamp(boss.getProgress(),0,1));
         g.fill(left-3,top-3,left+width+3,top+7,0xE0100606);
         g.fill(left-2,top-2,left+width+2,top-1,0xFF5A1410);g.fill(left-2,top+5,left+width+2,top+6,0xFF5A1410);

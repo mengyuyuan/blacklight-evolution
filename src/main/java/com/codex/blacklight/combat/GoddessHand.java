@@ -148,7 +148,7 @@ public final class GoddessHand {
         return true;
     }
     private void prepareCombo(ServerPlayer p){
-        aim=p.getBoundingBox().getCenter();combo.begin(aim);
+        aim=boss.goddess.attacks.lead(p, 16);combo.begin(aim);
         Vec3 forward=aim.subtract(boss.position());
         yaw=(float)Math.toDegrees(Math.atan2(-forward.x,forward.z));
     }
@@ -203,7 +203,7 @@ public final class GoddessHand {
                     t==1?SpiderFoley.Cue.LOAD:SpiderFoley.Cue.STRAIN,1.8F);
             if(combo.stopped()<0 && (t==12 || t==43))SpiderFoley.play(boss,pose(0).palm(),t==12?SpiderFoley.Cue.SHED:SpiderFoley.Cue.STRIKE,1.9F);
             if(t==27 && combo.stopped()<0){
-                Vec3 target=p.getBoundingBox().getCenter(),offset=target.subtract(aim);
+                Vec3 target=boss.goddess.attacks.lead(p, 21),offset=target.subtract(aim);
                 if(offset.length()>12)target=aim.add(offset.normalize().scale(12));
                 if(sight(aim.add(0,8,0),target.add(0,6,0)))combo.aimDrop(target);
                 boss.goddess.publish();
@@ -212,7 +212,19 @@ public final class GoddessHand {
             from=comboPose(t).palm();travelAt=now();lastWasMelee=true;acting=false;return true;
         }
         var pose=pose(0);
-        if(t==7 || pattern==0&&t==29){aim=p.getBoundingBox().getCenter();boss.goddess.publish();}
+        int untilShot = switch (pattern) {
+            case 0 -> t == 7 ? 6 : t == 29 ? 10 : 0;
+            case 1 -> t >= 11 && t <= 39 && (t - 11) % 7 == 0 ? 6 : 0;
+            case 2 -> t == 27 ? 11 : 0;
+            case 3 -> t == 31 ? 10 : 0;
+            default -> 0;
+        };
+        if (untilShot > 0) {
+            double speed = pattern == 1 ? 1.65 : pattern == 3 ? 1.5 : 2.0;
+            double range = pose.palm().distanceTo(p.getBoundingBox().getCenter());
+            aim = boss.goddess.attacks.lead(p, untilShot + range / speed);
+            boss.goddess.publish();
+        }
         if(pattern==0 && (t==13||t==39)){
             int finger=t==13?1:2;
             var tip=pose.tip(finger);

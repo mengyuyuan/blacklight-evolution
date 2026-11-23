@@ -37,6 +37,7 @@ public final class GoddessStruggleHud {
         var text=Component.translatable("boss.blacklight.struggle."+key,mapping==null?Component.empty():mapping.getTranslatedKeyMessage());
         int x=gui.guiWidth()/2,y=gui.guiHeight()/2+20;
         int width=Math.max(78,mc.font.width(text)+20);
+        PrototypeHealthHud.reserve(x-width/2,y-5,x+width/2,y+14);
         gui.fill(x-width/2,y-5,x+width/2,y+14,0xc523131b);
         gui.drawCenteredString(mc.font,text,x,y,0xffffe7db);
         if(q.step()==GoddessStruggle.Step.PUSH)

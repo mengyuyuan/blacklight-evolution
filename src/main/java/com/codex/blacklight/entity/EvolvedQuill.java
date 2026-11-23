@@ -87,8 +87,7 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
     }
     @Override public void tick(){
         if(getPersistentData().contains("GoddessSequence") && !level().isClientSide &&
-            (!(getOwner() instanceof EncounterMob boss) || !boss.goddess.active() || !boss.goddess.damageable() ||
-                getPersistentData().getInt("GoddessSequence")!=boss.goddess.attacks.sequence())){discard();return;}
+            (!(getOwner() instanceof EncounterMob boss) || !boss.goddess.attacks.keepsProjectile(getPersistentData().getInt("GoddessSequence")))){discard();return;}
         if(entityData.get(SPEAR)==2){
             if(level().isClientSide)return;
             if(!hasAnchor()){

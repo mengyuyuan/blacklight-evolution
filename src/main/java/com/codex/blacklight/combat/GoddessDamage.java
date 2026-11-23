@@ -24,7 +24,11 @@ public final class GoddessDamage {
         if(boss==null)return proposed;
         var attacks=boss.goddess.attacks;
         if(attacks.safe(p))return p.getHealth();
-        float lost=windows.computeIfAbsent(p,key->new GoddessDamageBudget()).debit(boss.getUUID(),attacks.sequence(),
+        var direct = source.getDirectEntity();
+        int cast = direct != null && direct.getPersistentData().contains("GoddessSequence")
+                ? direct.getPersistentData().getInt("GoddessSequence") : attacks.sequence();
+        int otherCast = cast == attacks.sequence() ? attacks.previousVolley() : attacks.sequence();
+        float lost=windows.computeIfAbsent(p,key->new GoddessDamageBudget()).debit(boss.getUUID(),cast,otherCast,
                 p.level().getGameTime(),p.getMaxHealth(),p.getHealth()-proposed);
         return p.getHealth()-lost;
     }
