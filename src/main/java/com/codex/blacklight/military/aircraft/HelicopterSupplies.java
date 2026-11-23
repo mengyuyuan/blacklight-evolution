@@ -1,5 +1,6 @@
 package com.codex.blacklight.military.aircraft;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlackwatchHelicopter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -28,10 +29,10 @@ public final class HelicopterSupplies {
                 ||!craft.pilot().owned()||!craft.level().mayInteract(player,craft.blockPosition())||eye.distanceToSqr(port)>16
                 ||!Double.isFinite(speed)||speed>.0004||!supported(craft)
                 ||craft.level().clip(new ClipContext(eye,port,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,player)).getType()!=HitResult.Type.MISS){
-            player.displayClientMessage(Component.translatable("message.blacklight.helicopter_supply_grounded"),true);return InteractionResult.FAIL;
+            FieldNotes.record(player, Component.translatable("message.blacklight.helicopter_supply_grounded"));return InteractionResult.FAIL;
         }
         int taken=craft.combat().addPlayerAmmunition(key.getPath(),stack.getCount());
-        if(taken==0){player.displayClientMessage(Component.translatable("message.blacklight.helicopter_supply_full"),true);return InteractionResult.FAIL;}
+        if(taken==0){FieldNotes.record(player, Component.translatable("message.blacklight.helicopter_supply_full"));return InteractionResult.FAIL;}
         // Match ground-vehicle logistics: even creative transfer moves real
         // finite items, rather than letting Player.interactOn restore the count.
         if(player.getAbilities().instabuild){var remainder=stack.copy();remainder.shrink(taken);player.setItemInHand(hand,remainder);}

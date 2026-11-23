@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -144,7 +145,7 @@ public final class CriticalMassSystem {
         long now = p.level().getGameTime();
         publish(p, new AdrenalineState(now + AdrenalineState.DURATION_TICKS,
                 now + AdrenalineState.UNDAMAGEABLE_TICKS, true));
-        p.displayClientMessage(Component.translatable("message.blacklight.adrenaline_started"), true);
+        FieldNotes.record(p, Component.translatable("message.blacklight.adrenaline_started"));
     }
     @SubscribeEvent public static void tick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer p)) return;

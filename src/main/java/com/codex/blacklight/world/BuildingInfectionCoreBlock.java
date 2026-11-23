@@ -20,7 +20,7 @@ public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) { b.add(FACING, TissueAttachmentBlock.AGE); }
     @Override public BlockState getStateForPlacement(BlockPlaceContext c) {
         if(c.getLevel() instanceof ServerLevel server && !BuildingInfectionSystem.canRegister(server,c.getClickedPos())) {
-            if(c.getPlayer()!=null)c.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.site_unavailable"),true);
+            if(c.getPlayer()!=null)FieldNotes.record(c.getPlayer(), net.minecraft.network.chat.Component.translatable("building.blacklight.site_unavailable"));
             return null;
         }
         return defaultBlockState().setValue(FACING, c.getClickedFace().getAxis().isHorizontal() ? c.getClickedFace() : c.getHorizontalDirection().getOpposite());
@@ -40,8 +40,8 @@ public final class BuildingInfectionCoreBlock extends HorizontalDirectionalBlock
             if(colony.isPresent()) {
                 var c=colony.get();
                 int percent=(int)Math.min(100,100L*c.activeTicks/(com.codex.blacklight.infection.BuildingInfectionConfig.MATURITY.get()*20L));
-                player.displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.supply_status",c.stage+1,percent,c.surfaces.size(),c.supply.reserve(),c.supply.queued()),true);
-            } else player.displayClientMessage(net.minecraft.network.chat.Component.translatable("building.blacklight.site_unavailable"),true);
+                FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("building.blacklight.supply_status",c.stage+1,percent,c.surfaces.size(),c.supply.reserve(),c.supply.queued()));
+            } else FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("building.blacklight.site_unavailable"));
         }
         return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
     }

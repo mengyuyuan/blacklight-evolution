@@ -18,10 +18,20 @@ public final class ModItems {
     private static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BlacklightNeoMod.MOD_ID);
 
+    public static final DeferredItem<com.codex.blacklight.item.SurvivalManualItem> SURVIVAL_MANUAL = ITEMS.register("survival_manual",
+            () -> new com.codex.blacklight.item.SurvivalManualItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> CONVOY_MANIFEST = ITEMS.register("convoy_manifest",
             () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "lost_convoy"));
     public static final DeferredItem<com.codex.blacklight.item.EncounterDossierItem> MOTHER_INTEL = ITEMS.register("mother_intel",
             () -> new com.codex.blacklight.item.EncounterDossierItem(new Item.Properties().stacksTo(1), "mother_plaza"));
+    public static final DeferredItem<com.codex.blacklight.item.SymbioteCharm> TEMPLE_BUD = ITEMS.register("temple_bud",
+            () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.HEAD));
+    public static final DeferredItem<com.codex.blacklight.item.SymbioteCharm> PULSE_HEART = ITEMS.register("pulse_heart",
+            () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.CHEST));
+    public static final DeferredItem<com.codex.blacklight.item.SymbioteCharm> SINEW_KNOT = ITEMS.register("sinew_knot",
+            () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.LEGS));
+    public static final DeferredItem<com.codex.blacklight.item.SymbioteCharm> SPORE_ANKLET = ITEMS.register("spore_anklet",
+            () -> new com.codex.blacklight.item.SymbioteCharm(net.minecraft.world.entity.EquipmentSlot.FEET));
     public static final DeferredItem<Item> EVOLVED_GANGLION = ITEMS.register("evolved_ganglion",
             () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final DeferredItem<Item> CONTAINMENT_DECODER = ITEMS.register("containment_decoder",
@@ -64,6 +74,10 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HIVE_VEIN = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_VEIN);
     public static final DeferredItem<BlockItem> HIVE_MEMBRANE = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_MEMBRANE);
     public static final DeferredItem<BlockItem> HIVE_BONE = ITEMS.registerSimpleBlockItem(ModBlocks.HIVE_BONE);
+    public static final DeferredItem<BlockItem> WEAVE_CORE = ITEMS.registerSimpleBlockItem(ModBlocks.WEAVE_CORE);
+    public static final DeferredItem<BlockItem> WEAVE_ANCHOR = ITEMS.registerSimpleBlockItem(ModBlocks.WEAVE_ANCHOR);
+    public static final DeferredItem<BlockItem> WEAVE_CHANNEL = ITEMS.registerSimpleBlockItem(ModBlocks.WEAVE_CHANNEL);
+    public static final DeferredItem<BlockItem> WEAVE_BED = ITEMS.registerSimpleBlockItem(ModBlocks.WEAVE_BED);
     public static final DeferredItem<BlockItem> NUTRIENT_NODE = ITEMS.registerSimpleBlockItem(ModBlocks.NUTRIENT_NODE);
 
     public static final DeferredItem<net.neoforged.neoforge.common.DeferredSpawnEggItem> BLACKWATCH_SOLDIER_SPAWN_EGG=ITEMS.registerItem("blackwatch_soldier_spawn_egg",p->new net.neoforged.neoforge.common.DeferredSpawnEggItem(ModEntities.BLACKWATCH_SOLDIER,0x20262a,0x8a2222,p),new Item.Properties());
@@ -94,21 +108,27 @@ public final class ModItems {
                         output.accept(BLACKLIGHT_SAMPLE.get()); output.accept(SUPREME_PARASITE_SYRINGE.get());
                         output.accept(MILITARY_CIRCUIT.get()); output.accept(FIELD_SCANNER.get());
                         output.accept(LIVING_HIVE_TISSUE.get());
+                        output.accept(TEMPLE_BUD.get());
+                        output.accept(PULSE_HEART.get());
+                        output.accept(SINEW_KNOT.get());
+                        output.accept(SPORE_ANKLET.get());
                         output.accept(STATION_RECORD.get());
                         output.accept(EVOLVED_GANGLION.get());
                         output.accept(CONTAINMENT_DECODER.get());
                         output.accept(HEAVY_ARMOR_CORE.get());
                         output.accept(BLOODTOX_STARTER.get());
                         output.accept(GREENE_TISSUE.get());
-                        output.accept(CONVOY_MANIFEST.get()); output.accept(MOTHER_INTEL.get());
+                        output.accept(SURVIVAL_MANUAL.get()); output.accept(CONVOY_MANIFEST.get()); output.accept(MOTHER_INTEL.get());
                         output.accept(INFECTED_SOIL.get()); output.accept(INFECTED_STONE.get());
                         output.accept(TISSUE_ATTACHMENT.get()); output.accept(TISSUE_FIBER.get()); output.accept(HIVE_FLESH.get());
                         output.accept(BUILDING_CORE.get());
+                        output.accept(WEAVE_CORE.get()); output.accept(WEAVE_ANCHOR.get()); output.accept(WEAVE_CHANNEL.get()); output.accept(WEAVE_BED.get());
                         output.accept(HIVE_CARAPACE.get()); output.accept(HIVE_VEIN.get());
                         output.accept(HIVE_MEMBRANE.get()); output.accept(HIVE_BONE.get());
                         output.accept(HIVE_SAC.get()); output.accept(NUTRIENT_NODE.get());
                     })
                     .build());
+
 
 
     private ModItems() {

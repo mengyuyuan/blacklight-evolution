@@ -1,5 +1,6 @@
 package com.codex.blacklight.combat;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.QuillOrgan;
 import com.codex.blacklight.entity.BackspineQuill;
 import com.codex.blacklight.power.*;
@@ -50,7 +51,7 @@ public final class QuillHarvest {
         }
         long now = p.level().getGameTime();
         if (now >= EMPTY_HINT.getOrDefault(p, 0L)) {
-            p.displayClientMessage(Component.translatable("message.blacklight.quill_empty"), true);
+            FieldNotes.record(p, Component.translatable("message.blacklight.quill_empty"));
             EMPTY_HINT.put(p, now + 20);
         }
         return false;
@@ -154,7 +155,7 @@ public final class QuillHarvest {
         }
         selected.sort(Comparator.comparingDouble(q->q.distanceToSqr(p)));
         if(selected.isEmpty()) {
-            p.displayClientMessage(Component.translatable("message.blacklight.no_quill_recall",(int)radius),true);
+            FieldNotes.record(p, Component.translatable("message.blacklight.no_quill_recall",(int)radius));
             return;
         }
         Vec3 first=selected.get(0).position().subtract(p.position()).yRot((float)Math.toRadians(p.yBodyRot));
@@ -192,7 +193,7 @@ public final class QuillHarvest {
         var source=new DamageSource(type, null, owner!=null&&owner.level()==level?owner:null);
         var reward=harvest ? AssimilationSystem.quote(owner,mob) : null;
         float damage=(float)Math.min(Float.MAX_VALUE,amount/CombatScale.units(mob));
-        boolean hit=harvest && mob.getMaxHealth()<ConsumeSystem.DIRECT_GRAB_MAX_HEALTH ? ConsumeLastChance.execute(mob,()->mob.hurt(source,damage)) : mob.hurt(source,damage);
+        boolean hit=harvest && ConsumeSystem.smallHealthTarget(mob) ? ConsumeLastChance.execute(mob,()->mob.hurt(source,damage)) : mob.hurt(source,damage);
         if(hit && harvest && ConsumeLastChance.awaitingFinisher(mob)) q.harvest(false);
         if(hit && harvest && !mob.isAlive() && ((com.codex.blacklight.mixin.LivingDeathAccess)mob).blacklight$deathAccepted()
                 && q.collect(owner,mob,reward)) q.harvest(true);

@@ -53,10 +53,9 @@ public final class SupremeHunterBossBar {
         g.fill(center-nw/2-6,top-15,center+nw/2+6,top-4,0xC0100606);
         g.drawString(font,name,center-nw/2,top-13,0xFFF2D7B0,true);
         String pct=Math.round(p*100)+"%";g.drawString(font,pct,left+width-font.width(pct),top+h+4,weak?0xFFB070FF:0xFFD9B8A0,true);
-        if(weak)g.drawString(font,Component.translatable(supreme?"hud.blacklight.supreme_weakened":"boss.blacklight.exposed"),left,top+h+4,0xFFB070FF,true);
     }
     private static void defense(CustomizeGuiOverlayEvent.BossEventProgress event,boolean exposed){
-        event.setCanceled(true);event.setIncrement(21);
+        event.setCanceled(true);event.setIncrement(11);
         var g=event.getGuiGraphics();var font=Minecraft.getInstance().font;var boss=event.getBossEvent();
         int width=Math.min(300,g.guiWidth()-40),left=event.getX()+91-width/2,top=event.getY()+1;
         int fill=Math.round(width*net.minecraft.util.Mth.clamp(boss.getProgress(),0,1));
@@ -65,6 +64,5 @@ public final class SupremeHunterBossBar {
         g.fill(left,top,left+width,top+4,0xFF1C0B0A);
         g.fill(left,top,left+fill,top+2,exposed?0xFFE5B756:0xFFB070FF);
         g.fill(left,top+2,left+fill,top+4,exposed?0xFF8A5822:0xFF5A2A90);
-        g.drawString(font,boss.getName(),left,top+8,exposed?0xFFE5B756:0xFFCAA9E8,true);
     }
 }

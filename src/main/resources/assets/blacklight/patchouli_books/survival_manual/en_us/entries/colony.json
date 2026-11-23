@@ -1,0 +1,20 @@
+{
+  "name": "Cultivate a Building Hive",
+  "category": "blacklight:ecology",
+  "sortnum": 19,
+  "icon": "blacklight:building_infection_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Craft a building infection core with living hive tissue and three rotten flesh. Place it against a supported outer wall. Use an empty hand to inspect growth. Feed the core or leave edible drops where its mouth can reach them. Keep the area loaded."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:building_infection_core"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A mature colony produces infected according to stage and stored nutrients. Several mouths can belong to one hive. An empty reserve, blocked exit or full local population can stall production. For a city portal, plant unprocessed tissue as described in $(l:gateway)Grow a Passage$(/l)."
+    }
+  ]
+}

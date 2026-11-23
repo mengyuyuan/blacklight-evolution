@@ -47,13 +47,13 @@ public final class FieldPostBlock extends HorizontalDirectionalBlock {
     }
     private void investigate(ServerLevel level, BlockPos gate, BlockState state, ServerPlayer player) {
         if (level.getDifficulty() == Difficulty.PEACEFUL) {
-            player.displayClientMessage(Component.translatable("survival.blacklight.peaceful"), false);
+            FieldNotes.record(player, Component.translatable("survival.blacklight.peaceful"));
             return;
         }
         if (state.getValue(SEARCHED) || !level.getEntitiesOfClass(com.codex.blacklight.entity.BlacklightInfectedHost.class,
                 new AABB(gate).inflate(64), mob -> mob.getPersistentData().contains("QuarantineGate")
                 && mob.getPersistentData().getLong("QuarantineGate") == gate.asLong()).isEmpty()) {
-            player.displayClientMessage(Component.translatable("survival.blacklight.trail_cold"), false);
+            FieldNotes.record(player, Component.translatable("survival.blacklight.trail_cold"));
             return;
         }
         var direction = state.getValue(FACING);
@@ -73,10 +73,10 @@ public final class FieldPostBlock extends HorizontalDirectionalBlock {
             level.setBlock(gate, state.setValue(SEARCHED, true), 3);
             level.scheduleTick(gate, this, 6000);
             level.playSound(null, end, SoundEvents.ZOMBIE_BREAK_WOODEN_DOOR, SoundSource.HOSTILE, 2F, .65F);
-            player.displayClientMessage(Component.translatable("survival.blacklight.trail_warm"), false);
+            FieldNotes.record(player, Component.translatable("survival.blacklight.trail_warm"));
             return;
         }
-        player.displayClientMessage(Component.translatable("survival.blacklight.trail_blocked"), false);
+        FieldNotes.record(player, Component.translatable("survival.blacklight.trail_blocked"));
     }
     @Override public void tick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
         if (state.getValue(SEARCHED)) level.setBlock(pos, state.setValue(SEARCHED, false), 3);

@@ -1,0 +1,16 @@
+{
+  "name": "我下一步去哪？",
+  "category": "blacklight:route",
+  "sortnum": 9,
+  "icon": "minecraft:map",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "输入 $(bold)/blacklightguide$() 重看当前目标和已登记的现场线索。打开原版进度页查看黑光进度树。冷库记录和运输单在主世界解读，行动情报在黑光维度解读。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "现场已激活时回战场找现有目标。若无法开门或使用终端，先退出原型模式，检查手持物、难度和出场区。寻找自然结构时，去允许生成结构的新区域。"
+    }
+  ]
+}

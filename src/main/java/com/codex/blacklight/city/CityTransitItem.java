@@ -1,4 +1,5 @@
 package com.codex.blacklight.city;
+import com.codex.blacklight.world.FieldNotes;
 import net.minecraft.world.item.*;
 import net.minecraft.world.*;
 import net.minecraft.world.level.Level;
@@ -13,7 +14,7 @@ public final class CityTransitItem extends Item {
     }
     @Override public InteractionResultHolder<ItemStack> use(Level l,Player p,InteractionHand hand){
         if(!p.hasPermissions(2)){
-            if(!l.isClientSide)p.displayClientMessage(net.minecraft.network.chat.Component.translatable("city.blacklight.hydra_required"),true);
+            if(!l.isClientSide)FieldNotes.record(p, net.minecraft.network.chat.Component.translatable("city.blacklight.hydra_required"));
             return InteractionResultHolder.fail(p.getItemInHand(hand));
         }
         if(p instanceof ServerPlayer sp)CityTravel.travel(sp);

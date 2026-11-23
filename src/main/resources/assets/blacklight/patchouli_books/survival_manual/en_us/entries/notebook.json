@@ -1,0 +1,22 @@
+{
+  "name": "Your Field Notes",
+  "category": "blacklight:route",
+  "sortnum": 31,
+  "icon": "minecraft:writable_book",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Use the manual to read. Sneak-use to open your field notes: your current objective, recorded destinations and recent discoveries or field feedback. You can also open the notes with /blacklightguide."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "The next page links to the community wiki. Published defaults can differ from your current release or server settings. Use your own notes and the site itself for active missions."
+    },
+    {
+      "type": "patchouli:link",
+      "url": "https://prototype.qibusu.com/wiki",
+      "link_text": "Community wiki",
+      "text": "Reference for infection stages, colonies, hosts and configurable defaults."
+    }
+  ]
+}

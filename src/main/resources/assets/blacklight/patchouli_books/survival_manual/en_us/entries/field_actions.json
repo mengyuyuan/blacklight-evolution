@@ -1,0 +1,16 @@
+{
+  "name": "Terrain and Field Survival",
+  "category": "blacklight:powers",
+  "sortnum": 30,
+  "icon": "blacklight:hive_bone",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "With Muscle Mass and a terrain-throw upgrade, hold grab on connected terrain and release to lift it. Hold attack to charge and release to throw; use sets it down. A grabbable creature in front takes priority."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Normal mode uses ordinary hunger. If the server enables Prototype hunger, consuming replenishes food. Keep prey or provisions nearby before a long sprint. Check your active key bindings after rebinding controls."
+    }
+  ]
+}

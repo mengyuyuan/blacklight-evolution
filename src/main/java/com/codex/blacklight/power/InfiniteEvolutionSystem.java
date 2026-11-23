@@ -42,6 +42,9 @@ public final class InfiniteEvolutionSystem {
     }
     public static double mobility(Player p){return PrototypeMetabolism.active(p)?EvolutionAttribute.mobilityMultiplier(effectiveRank(p,EvolutionAttribute.MOBILITY)):1;}
     private static void updateMobility(ServerPlayer p){CombatScale.modifier(p.getAttribute(Attributes.MOVEMENT_SPEED),SPEED,mobility(p)-1,AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);}
+    public static double strengthMultiplier(Player player) {
+        return PrototypeMetabolism.active(player) ? EvolutionAttribute.attackMultiplier(effectiveRank(player,EvolutionAttribute.STRENGTH)) : 1;
+    }
     /** Called after the existing health-unit conversion. Never scales a hit twice. */
     public static float damage(LivingEntity victim,DamageSource source,float amount){
         if(CrossModCombat.administrative(source) || source.is(com.codex.blacklight.combat.QuillHarvest.DRAIN))return amount;
@@ -49,7 +52,7 @@ public final class InfiniteEvolutionSystem {
         if(source.getEntity() instanceof Player owner&&PrototypeMetabolism.active(owner)&&CrossModCombat.nativeAttack(source)){
             boolean skill=DevastatorDamage.isTrueDamage(source)||!source.is(com.codex.blacklight.combat.QuillHarvest.VOLLEY_DAMAGE) && source.typeHolder().unwrapKey().map(k->k.location().getNamespace().equals("blacklight")).orElse(false);
             value*=skill?EvolutionAttribute.skillMultiplier(effectiveRank(owner,EvolutionAttribute.SKILL_POWER)):
-                    EvolutionAttribute.attackMultiplier(effectiveRank(owner,EvolutionAttribute.STRENGTH));
+                    strengthMultiplier(owner);
         }
         if(victim instanceof Player p&&PrototypeMetabolism.active(p))value*=EvolutionAttribute.defenseMultiplier(effectiveRank(p,EvolutionAttribute.RESILIENCE));
         return (float)Math.min(Float.MAX_VALUE,Math.max(0,value));

@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.*;
 import com.codex.blacklight.infection.*;
 import com.codex.blacklight.registry.ModAttachments;
@@ -80,7 +81,7 @@ public final class AssimilationSystem {
             int previous=research.sample(core),sampleBonus=0;
             for(int rank=previous+1;rank<=quality;rank++)sampleBonus+=40*rank;
             bonus+=sampleBonus;research=research.discover(core,quality);
-            p.displayClientMessage(Component.translatable("message.blacklight.organ_discovered",Component.translatable("upgrade.blacklight."+core.id),quality,sampleBonus),false);
+            FieldNotes.record(p, Component.translatable("message.blacklight.organ_discovered",Component.translatable("upgrade.blacklight."+core.id),quality,sampleBonus));
         }
         if(research!=p.getData(ModAttachments.ORGAN_RESEARCH)){p.setData(ModAttachments.ORGAN_RESEARCH,research);p.syncData(ModAttachments.ORGAN_RESEARCH);}
         var state=p.getData(ModAttachments.PLAYER_STATE);state.addBiomass(reward.biomass());state.addEvolutionPoints(reward.ep()+bonus);
@@ -94,7 +95,7 @@ public final class AssimilationSystem {
                 && target.getRandom().nextInt(3)==0){
             var key=new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.BLOODTOX_COMMAND_KEY.get());
             if(!p.getInventory().add(key)) p.drop(key,false,true);
-            p.displayClientMessage(Component.translatable("survival.blacklight.command_acquired"),false);
+            FieldNotes.record(p, Component.translatable("survival.blacklight.command_acquired"));
         }
         return true;
     }

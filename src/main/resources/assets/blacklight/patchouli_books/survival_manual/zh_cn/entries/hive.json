@@ -1,0 +1,16 @@
+{
+  "name": "攻破巨型母巢",
+  "category": "blacklight:route",
+  "sortnum": 4,
+  "icon": "blacklight:living_hive_tissue",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "在主世界探索新区域，找到巨型母巢。用原型体模式突破守卫、攻击活体核心。战后找活性蜂巢组织和行动情报，两件都带走。组织负责开路，情报负责在福田指出搜索片区。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "把第一份组织留给$(l:gateway)九头蛇通道$(/l)。额外组织可用来培养寄生针、制作建筑感染核心或供给织巢。要挑战至尊猎手，先看$(l:apex)寄生与首领$(/l)。"
+    }
+  ]
+}

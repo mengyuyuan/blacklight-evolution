@@ -1,5 +1,6 @@
 package com.codex.blacklight.item;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.entity.BlacklightHive;
 import com.codex.blacklight.entity.BlacklightHunter;
 import com.codex.blacklight.power.ParasiteSystem;
@@ -27,7 +28,7 @@ public final class ParasiteSyringeItem extends Item {
     @Override public InteractionResult interactLivingEntity(ItemStack stack,Player player,LivingEntity target,InteractionHand hand){
         if(player.level().isClientSide)return InteractionResult.SUCCESS;
         if(!(target instanceof Player||target instanceof BlacklightHunter||target instanceof BlacklightHive)){
-            player.displayClientMessage(Component.translatable("message.blacklight.syringe_no_effect"),true);return InteractionResult.FAIL;
+            FieldNotes.record(player, Component.translatable("message.blacklight.syringe_no_effect"));return InteractionResult.FAIL;
         }
         if(!ParasiteSystem.inject((ServerPlayer)player,target))return InteractionResult.FAIL;
         spend(player,player.getItemInHand(hand));return InteractionResult.CONSUME;

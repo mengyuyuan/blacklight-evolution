@@ -237,6 +237,10 @@ if (project.hasProperty('hydraVisualTest')) sourceSets.main.java.srcDir('src/hyd
 if (project.hasProperty('cityVisualTest')) sourceSets.main.java.srcDir('src/cityVisualTest/java')
 if (project.hasProperty('weaponModelPreview')) sourceSets.main.java.srcDir('src/weaponVisualTest/java')
 if (project.hasProperty('ragdollVisual')) sourceSets.main.java.srcDir('src/ragdollVisualTest/java')
+if (project.hasProperty('symbioteTest')) {
+    sourceSets.main.java.srcDir('src/symbioteTest/java')
+    sourceSets.main.resources.srcDir('src/traversalTest/resources')
+}
 if (project.hasProperty('leanArmorPreview')) sourceSets.main.java.srcDir('src/armorVisualTest/java')
 if (project.hasProperty('hiveFeedingTest')) {
     sourceSets.main.java.srcDir('src/hiveTest/java')

@@ -1,0 +1,20 @@
+{
+  "name": "Recon and Supplies",
+  "category": "blacklight:military",
+  "sortnum": 21,
+  "icon": "blacklight:field_scanner",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Explore camps, checkpoints and bases for supply, ammo, armory and technology caches. Military circuitry goes into equipment and mission devices. In Futian you can also intercept the dispatch truck for circuitry."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:field_scanner"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Use the scanner in normal mode for the name, bearing and distance of the nearest infected within 48 blocks. Move and scan again for other contacts. For story locations use the maps, intel and $(bold)/blacklightguide$()."
+    }
+  ]
+}

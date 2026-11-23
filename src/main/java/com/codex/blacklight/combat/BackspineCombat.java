@@ -238,7 +238,7 @@ public final class BackspineCombat {
                 int shot=ScapulaCycle.shotTick(s.clip,s.leadRight);
                 int otherShot=ScapulaCycle.shotTick(s.clip,!s.leadRight);
                 if(RooftopRig.four(s.clip)?age>=5&&age<=8:age==shot||age==otherShot){
-                    fire(p,s,s.charged?21:s.heavy==Heavy.CRUSH?12:18);
+                    fire(p,s,s.heavy==Heavy.CRUSH?12:18);
                     s.awaitingLanding=s.air;
                 }
                 if((!s.queuedHeavy.isEmpty()||s.pendingLight)&&age>=(s.air?5:RooftopRig.four(s.clip)?10:Math.max(shot,otherShot)+2)){
@@ -288,6 +288,8 @@ public final class BackspineCombat {
     }
     private static void fire(ServerPlayer p,State s,float damage){
         boolean heavyShot = s.phase == Phase.THROW;
+        float multiplier = heavyShot && s.charged ? 21F / damage : 1F;
+        damage = com.codex.blacklight.item.SymbioteCharm.attackBase(p,damage) * multiplier;
         if (!heavyShot || !s.heavyPaid) {
             if (!QuillHarvest.payShot(p, heavyShot, s.charged, s.comboHeavy)) {
                 s.phase = Phase.READY;

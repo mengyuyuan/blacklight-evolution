@@ -14,6 +14,9 @@ public final class ModBlockEntities {
             TYPES.register("building_heart",()->BlockEntityType.Builder.of(BuildingHeartBlockEntity::new,ModBlocks.BUILDING_CORE.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<com.codex.blacklight.world.PumpStation>> PUMP =
             TYPES.register("pump_station",()->BlockEntityType.Builder.of(com.codex.blacklight.world.PumpStation::new,ModBlocks.ENCOUNTER_CONSOLE.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<com.codex.blacklight.world.WeaveCell>> WEAVE_CELL =
+            TYPES.register("weave_cell",()->BlockEntityType.Builder.of(com.codex.blacklight.world.WeaveCell::new,
+                    ModBlocks.WEAVE_CORE.get(), ModBlocks.WEAVE_ANCHOR.get(), ModBlocks.WEAVE_CHANNEL.get(), ModBlocks.WEAVE_BED.get()).build(null));
     private ModBlockEntities() {}
     public static void register(IEventBus bus) { TYPES.register(bus); }
 }

@@ -1,5 +1,6 @@
 package com.codex.blacklight.power;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.combat.ClawCombatState;
 import com.codex.blacklight.registry.ModAttachments;
 import net.minecraft.network.chat.Component;
@@ -30,7 +31,7 @@ public final class PowerFormSystem {
                 : combat.action()!=ClawCombatState.Action.IDLE || !combat.canToggleTransform(player.tickCount))return false;
         // Validate the requested form before touching the current attack.
         if (form != PowerForm.NONE && !state.hasUnlocked(form) && !(purchase && state.buy(form))) {
-            player.displayClientMessage(Component.translatable("message.blacklight.form_locked", Component.translatable("power.blacklight." + form.id()), form.epCost()), true);
+            FieldNotes.record(player, Component.translatable("message.blacklight.form_locked", Component.translatable("power.blacklight." + form.id()), form.epCost()));
             return false;
         }
         if(weapon){
@@ -50,7 +51,7 @@ public final class PowerFormSystem {
         player.setData(ModAttachments.PLAYER_STATE, state); player.syncData(ModAttachments.PLAYER_STATE);
         String message = UtilityPowerSystem.supported(form) && !UtilityPowerSystem.active(player, form)
                 ? "message.blacklight.form_disabled" : "message.blacklight.form_selected";
-        player.displayClientMessage(Component.translatable(message, Component.translatable("power.blacklight." + form.id())), true);
+        FieldNotes.record(player, Component.translatable(message, Component.translatable("power.blacklight." + form.id())));
         return true;
     }
     public static void playWeaponMorph(ServerPlayer player, PowerForm form, boolean deploying) {

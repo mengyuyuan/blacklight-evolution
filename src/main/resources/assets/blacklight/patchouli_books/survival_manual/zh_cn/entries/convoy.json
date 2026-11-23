@@ -1,0 +1,16 @@
+{
+  "name": "失联车队与歌利亚",
+  "category": "blacklight:route",
+  "sortnum": 3,
+  "icon": "blacklight:heavy_armor_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "沿刹车印找收容车。切回普通模式，手持破解器操作门锁。留出路障旁的退路。行动记录显示出场区受阻时，清开后方障碍并补好地面；和平难度需先调整。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "让歌利亚向路障冲锋，临近时侧闪，趁硬直打暴露的右膝，再追打开放的弱点。持续伤害也能击杀。战后收取重甲核心，留给血毒泵。$(br2)$(l:hive)下一站：巨型母巢$(/l)"
+    }
+  ]
+}

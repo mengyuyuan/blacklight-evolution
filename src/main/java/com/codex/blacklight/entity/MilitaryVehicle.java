@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.world.FieldNotes;
 import com.codex.blacklight.combat.ConsumeControl;
 import com.codex.blacklight.combat.ConsumeVisual;
 import com.codex.blacklight.combat.ImpactControl;
@@ -413,8 +414,8 @@ public final class MilitaryVehicle extends Entity {
         }
         com.codex.blacklight.firearms.GunplayEffects.vehicleImpact(this,contact,incoming.scale(-1),(float)strength,kind==VehicleFeedbackMotion.Impact.BULLET);
         if(source.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
-            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hull",getDisplayName(),
-                    (int)Math.ceil(mechanicalHealth),(int)maxHealth()),true);
+            FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("message.blacklight.vehicle_hull",getDisplayName(),
+                    (int)Math.ceil(mechanicalHealth),(int)maxHealth()));
     }
     private void destroyOnce() {
         if (destroyed || isRemoved()) return;

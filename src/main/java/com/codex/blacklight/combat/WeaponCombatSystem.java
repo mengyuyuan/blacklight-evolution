@@ -33,7 +33,7 @@ public final class WeaponCombatSystem {
     private static final class Session {
         final UUID attackId=UUID.randomUUID();
         double clawSlideSpeed;
-        float groundTravelCharge;
+        float heldCharge;
         boolean sprintBlade;
         long cutStroke=++nextCutStroke;
         int cutWindow=-1;
@@ -377,7 +377,7 @@ public final class WeaponCombatSystem {
                 float heldFraction=(float)Math.clamp((t-minimum)/(double)charge.holdTicks(),0,1);
                 if(move==WeaponMove.AIR_KICK||move==WeaponMove.AIR_PAIN||move==WeaponMove.CLAW_POUNCE||move==WeaponMove.BLADE_DIVE||move==WeaponMove.HAMMER_DROP||move==WeaponMove.HAMMER_RAM||move==WeaponMove.BLADE_RUSH)
                     released.chargePower=heldFraction;
-                released.groundTravelCharge=heldFraction;
+                released.heldCharge=heldFraction;
                 released.sprintBlade=s.sprintBlade && move==WeaponMove.BLADE_RUSH;
             }
             return;
@@ -481,7 +481,7 @@ public final class WeaponCombatSystem {
         }else if(!physicalQuake&&!s.groundEffect&&s.move.groundImpactTick()>=0&&t>=s.move.groundImpactTick()){
             s.groundEffect=CombatImpactEffects.ground(p,s.move,s.direction);
         }
-        com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw, s.groundTravelCharge);
+        com.codex.blacklight.animation.NativeRootMotion.weapon(p, s.move, t, s.clipOffset, s.yaw, s.heldCharge);
         if(physicalQuake&&!s.groundEffect&&t<s.move.end){
             var ground=HammerQuakeContact.sweep(p,s.move,t,s.clipOffset,safeFeet(p,s),s.previousYaw,s.yaw);
             if(ground!=null){
@@ -512,7 +512,7 @@ public final class WeaponCombatSystem {
             }
             if(!s.effect){s.effect=true;CombatImpactEffects.swing(p,s.move,s.direction);}
             if(s.move.groundSpike()){
-                if(s.hit.isEmpty()){ClawCombatSystem.eruptGroundSpike(p);s.hit.add(p.getUUID());}
+                if(s.hit.isEmpty()){ClawCombatSystem.eruptGroundSpike(p,s.heldCharge);s.hit.add(p.getUUID());}
             }else strike(p,s,t);
         }else {
             s.effect=false; // A later active interval can sound again without clearing the target ledger.
@@ -765,7 +765,7 @@ public final class WeaponCombatSystem {
             }
             if(point==null||point.distanceToSqr(p.getEyePosition())>Math.pow(whip==null?moveReach+1:30*AttackReach.scale(p),2)
                     ||!com.codex.blacklight.military.vehicle.VehicleDamageBridge.loaded(p.serverLevel(),p.getEyePosition(),point))continue;
-            float damage=s.move.damageFor(s.form)*(1+.5F*s.chargePower);
+            float damage=s.move.contactDamage(p,s.form,s.heldCharge);
             if(ExplicitTarget.hurtHull(p,hull,damage,point,()->currentSession(p,s)))s.hit.add(hull.getUUID());
             if(!currentSession(p,s))return;
         }
@@ -835,11 +835,12 @@ public final class WeaponCombatSystem {
             boolean ownPrevious=last!=null&&last.owner.equals(p.getUUID())&&p.level().getGameTime()-last.time<=10;
             if(ownPrevious)v.invulnerableTime=0;
             float healthBefore=v.getHealth();
+            float contactDamage=com.codex.blacklight.power.CombatScale.weaponContact(v,s.move.contactDamage(p,s.form,s.heldCharge));
             boolean accepted=v instanceof AnimatedHurtBody hydra&&hydra.animatedHurtBody()
-                    ?hydra.hurtAt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower),hydraHit)
+                    ?hydra.hurtAt(p.damageSources().playerAttack(p),contactDamage,hydraHit)
                     :v instanceof com.codex.blacklight.entity.EncounterMob encounter
-                    ?encounter.hurtWeapon(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower),cut,box->!cutting.sharp()&&bounds!=null&&meleeContact(p,s,box,box,bounds))
-                    :v.hurt(p.damageSources().playerAttack(p),s.move.damageFor(s.form)*(1+.5F*s.chargePower));
+                    ?encounter.hurtWeapon(p.damageSources().playerAttack(p),contactDamage,cut,box->!cutting.sharp()&&bounds!=null&&meleeContact(p,s,box,box,bounds))
+                    :v.hurt(p.damageSources().playerAttack(p),contactDamage);
             com.codex.blacklight.BlacklightNeoMod.LOGGER.debug("Weapon contact move={} victim={} id={} accepted={} health={} -> {} cuts={} meshContacts={} preciseTail={}",s.move.id,v.getType().getDescriptionId(),v.getId(),accepted,healthBefore,v.getHealth(),cut.contacts().size(),impact.contacts().size(),preciseOnly);
             // Restore only the timer we temporarily cleared, never overwrite a
             // newer protection installed by another damage callback.
@@ -871,7 +872,7 @@ public final class WeaponCombatSystem {
                 }
                 if(s.hammerFloor!=null && impact.contacts().isEmpty())
                     impact=WeaponCutContact.hammerPress(v,s.hammerFloor,AttackReach.scale(p));
-                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.chargePower,impact,s.fullyCharged);
+                WeaponImpact.apply(p,v,s.move,push,s.hit.size()==1,s.heldCharge,impact,s.fullyCharged);
                 if(s.hit.size()==1)beginHitstop(p,s,ImpactTier.of(s.move));
                 if(s.move.form==com.codex.blacklight.power.PowerForm.HAMMERFISTS&&!s.move.quake()&&!s.impactEffect){
                     s.impactEffect=true;hammerSplash(p,s,v);
@@ -1034,7 +1035,7 @@ public final class WeaponCombatSystem {
             var delta=CombatTargeting.closestPoint(center,v).subtract(center);
             if(delta.horizontalDistance()>radius||Math.abs(delta.y)>1.5)continue;
             if(CombatTargeting.hitboxes(v).stream().noneMatch(box->box.intersects(search)&&CombatTargeting.visible(p,splashOrigin,box)))continue;
-            boolean accepted=v.hurt(p.damageSources().playerAttack(p),s.move.damage*.65F);
+            boolean accepted=v.hurt(p.damageSources().playerAttack(p),com.codex.blacklight.power.CombatScale.weaponContact(v,s.move.contactDamage(p,s.form,s.heldCharge)*.65F));
             if(!currentSession(p,s))return;
             if(accepted){
                 s.hit.add(v.getUUID());LAST_CONTACT.put(v,new LastContact(p.getUUID(),p.level().getGameTime()));

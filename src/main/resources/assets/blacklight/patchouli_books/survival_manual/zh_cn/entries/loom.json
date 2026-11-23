@@ -1,0 +1,44 @@
+{
+  "name": "建造 5×5 黑光织巢",
+  "category": "blacklight:weave",
+  "sortnum": 26,
+  "icon": "blacklight:weave_core",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "在同一高度摆一层 5×5。中央放 1 个织巢髓核，四角各 1 个骨锚，四边的其余 12 格放输质脊槽，内圈剩余 8 格放承料菌床。留出一侧平地站人，翻页可把结构投影到地上。"
+    },
+    {
+      "type": "patchouli:multiblock",
+      "name": "黑光织巢",
+      "multiblock": {
+        "pattern": [
+          [
+            "ACCCA",
+            "CBBBC",
+            "CB0BC",
+            "CBBBC",
+            "ACCCA"
+          ]
+        ],
+        "mapping": {
+          "0": "blacklight:weave_core",
+          "A": "blacklight:weave_anchor",
+          "B": "blacklight:weave_bed",
+          "C": "blacklight:weave_channel"
+        },
+        "symmetrical": true
+      }
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:weave_core",
+      "recipe2": "blacklight:weave_anchor"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "blacklight:weave_channel",
+      "recipe2": "blacklight:weave_bed"
+    }
+  ]
+}
