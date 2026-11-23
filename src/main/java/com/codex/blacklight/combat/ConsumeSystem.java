@@ -200,6 +200,12 @@ public final class ConsumeSystem {
         }
     }
     public static boolean active(ServerPlayer player){return ACTIVE.containsKey(player);}
+    static int mealStage(ServerPlayer player,Mob prey){
+        var active=ACTIVE.get(player);
+        if(active!=null && active.victim==prey)return active.stage;
+        var mobile=ABSORBING.get(prey);
+        return mobile!=null && mobile.owner()==player ? ConsumeVisual.MOBILE_CONSUME : ConsumeVisual.NONE;
+    }
     public static int sessionAge(ServerPlayer player){var s=ACTIVE.get(player);return s==null?-1:player.tickCount-s.started;}
     public static boolean holding(ServerPlayer player) {
         var session=ACTIVE.get(player);return session!=null&&ConsumeVisual.holding(session.stage);
@@ -960,6 +966,7 @@ public final class ConsumeSystem {
         }
         if(paired)play(player,PlayerAction.CLAW_IDLE);
         if(!com.codex.blacklight.power.AssimilationSystem.settle(player,target,session.reward,true))return;
+        GoddessBrood.settled(player,target);
         if (session.smallDirect && Float.isFinite(ConsumeGiverEffect.exteriorStart(settledScene))
                 && settledScene.started() >= ModAttachments.getData(player,ModAttachments.CONSUME_RESIDUE_VISUAL).started()) {
             ModAttachments.setData(player, ModAttachments.CONSUME_RESIDUE_VISUAL, settledScene);
