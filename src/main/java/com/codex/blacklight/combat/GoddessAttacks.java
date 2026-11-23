@@ -189,7 +189,8 @@ public final class GoddessAttacks {
         return switch(move){
             case RUSH -> elapsed>=12 && elapsed<=26 || rush.grip()<0 && elapsed>=43 && elapsed<60 ? (rush.arm()==1?5:9) : -1;
             case HAND -> elapsed>=5 && elapsed<=34 ? wrist : -1;
-            case VACUOLE -> elapsed>=9 && elapsed<=26 ? 0 : -1;
+            // A fully charged rock needs about 20 ticks to leave the hand and reach her face from the cave floor.
+            case VACUOLE -> elapsed>=1 && elapsed<28 ? 0 : -1;
             case NEEDLE_RAIN -> elapsed>=4 && elapsed<=35 ? 11 : -1;
             case BLOOD_SURF -> elapsed<=12 || elapsed>=22 && elapsed<=38 ? (wrist>=0?wrist:1) : -1;
             case CALL, STRONG_CALL, WALL_SPEARS -> elapsed>=12 && elapsed<=32 ? (wrist>=0?wrist:1) : -1;
@@ -198,7 +199,7 @@ public final class GoddessAttacks {
     }
     private void telegraphStrain(){
         int slot=strainingSlot();
-        if(slot<0 || elapsed%4!=0)return;
+        if(slot<0 || elapsed%4!=0 && !(move==Move.VACUOLE && elapsed==1))return;
         var region=boss.hurtRegions(0).get(slot);
         if(region.boxes().isEmpty())return;
         var joint=region.bounds().getCenter();
