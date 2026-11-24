@@ -335,6 +335,8 @@ public final class DevastatorSystem {
             if(kind==3)damage=BulletdivePhysics.impactDamage(damage,s.highest-s.origin.y);
             if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,skin,new HitContext("target_control",0,contact,damage))){
                 s.struck.add(target.getUUID());s.hits++;
+                // A damage listener can replace the victim before hurt() returns.
+                if(!ModAttachments.available(target))continue;
                 if(kind==0){
                     int ticks=(int)Math.ceil((s.timing.effectEnd()-.2-age)*20);
                     if(!GroundSpikePin.catchMob(target,plan.groundAnchor(),ticks,s.yaw,p,s.id))
@@ -457,7 +459,8 @@ public final class DevastatorSystem {
                 float damage=DevastatorDamage.secondary(track.damage());
                 if(hurt(p,target,damage,s.move==WeaponMove.BULLETDIVE_DROP,skin,new HitContext("direct_"+track.sourceTrack(),track.sourceTrack(),
                         DevastatorCollision.activeStart(s.move,s.timing)+track.begin(),damage))){
-                    struck.add(target.getUUID());s.hits++;CombatImpactEffects.devastator(p,target,s.move,capsuleOrigin);
+                    struck.add(target.getUUID());s.hits++;
+                    if(ModAttachments.available(target))CombatImpactEffects.devastator(p,target,s.move,capsuleOrigin);
                 }
             }
         }
