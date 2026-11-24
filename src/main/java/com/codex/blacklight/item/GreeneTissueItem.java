@@ -29,18 +29,6 @@ public final class GreeneTissueItem extends Item {
     public static boolean isTissue(ItemStack stack) { return stack.getItem() instanceof GreeneTissueItem; }
     public static boolean held(Player player) { return player != null && player.isHolding(GreeneTissueItem::isTissue); }
 
-    @Override public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity,
-                                        int slot, boolean selected) {
-        if (!(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0 || player.isSpectator()
-                || !(selected || player.getOffhandItem() == stack) || level.dimension() != CityTravel.WORLD
-                || !SurvivalGuide.followingGreene(player)) return;
-        // The city itself uses a custom flat-derived generator. Check the save's overworld preset.
-        if (player.serverLevel().getServer().overworld().getChunkSource().getGenerator().getClass()
-                == net.minecraft.world.level.levelgen.FlatLevelSource.class) return;
-        var site = GreeneHiveCave.nearest(player.serverLevel().getSeed(), player.blockPosition());
-        net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new com.codex.blacklight.network.GreeneSignalPayload(site));
-    }
-
     @Override public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player.getData(ModAttachments.CONSUMING)) return InteractionResultHolder.fail(stack);

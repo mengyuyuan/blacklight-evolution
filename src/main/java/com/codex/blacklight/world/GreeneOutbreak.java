@@ -17,6 +17,11 @@ final class GreeneOutbreak {
         // The escape drops one tracking sample for the party. Every credited participant can enter the den.
         var level = player.serverLevel();
         var den = GreeneHiveCave.nearest(level.getSeed(), player.blockPosition());
+        // Check the overworld preset: the city dimension itself uses a flat-derived generator.
+        if (player.server.overworld().getChunkSource().getGenerator().getClass()
+                != net.minecraft.world.level.levelgen.FlatLevelSource.class) {
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new com.codex.blacklight.network.GreeneSignalPayload(den));
+        }
         if (GreeneTissueItem.held(player) && !GreeneTissueItem.isTissue(player.getUseItem())) {
             var from=player.getEyePosition().add(player.getLookAngle().scale(.6)).add(0,-.24,0);
             var direction=GreeneHiveCave.guidance(den,from);
