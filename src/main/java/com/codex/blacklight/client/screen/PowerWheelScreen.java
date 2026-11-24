@@ -94,7 +94,7 @@ public final class PowerWheelScreen extends Screen {
             int y=cy-lines.size()*5;
             for(var line:lines){g.drawCenteredString(font,line,cx,y,BlacklightUi.TEXT);y+=10;}
             if(current!=PowerForm.NONE&&!state.hasUnlocked(current))
-                g.drawCenteredString(font,Component.literal(current.epCost()+" EP"),cx,y+1,BlacklightUi.GOLD);
+                g.drawCenteredString(font,current==PowerForm.GAZE_VACUOLE ? Component.translatable("message.blacklight.gaze_source") : Component.literal(current.epCost()+" EP"),cx,y+1,BlacklightUi.GOLD);
         }
         Component hint=Component.translatable("screen.blacklight.wheel.hint",binding.getTranslatedKeyMessage());
         if(current!=null&&!PowerMorph.key(current).isEmpty())

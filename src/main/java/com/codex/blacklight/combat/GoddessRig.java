@@ -15,7 +15,8 @@ import java.util.zip.GZIPInputStream;
 public final class GoddessRig {
     public static final List<String> PARTS=List.of("goddess_head","goddess_chest","goddess_base","goddess_left_shoulder",
             "goddess_left_elbow","goddess_left_wrist","goddess_left_hand","goddess_right_shoulder","goddess_right_elbow",
-            "goddess_right_wrist","goddess_right_hand","goddess_hair","colony_wrist","colony_palm","colony_thumb","colony_index","colony_middle","colony_ring","colony_pinky");
+            "goddess_right_wrist","goddess_right_hand","goddess_hair","colony_wrist","colony_palm","colony_thumb","colony_index","colony_middle","colony_ring","colony_pinky",
+            "goddess_inner_spitters","goddess_outer_spitters");
     public static final int JOINTS=35;
     private record Bone(int part,float[] idle,Vec3[] centers,Vec3[] half) {}
     private static final Bone[] bones=new Bone[JOINTS];
@@ -75,7 +76,7 @@ public final class GoddessRig {
         var matrix=new Matrix4f().translationRotate(lerp(data[a],data[b],mix),lerp(data[a+1],data[b+1],mix),lerp(data[a+2],data[b+2],mix),rotation);
         return scale?matrix.scale(lerp(data[a+7],data[b+7],mix),lerp(data[a+8],data[b+8],mix),lerp(data[a+9],data[b+9],mix)):matrix;
     }
-    private static Matrix4f idle(int joint,float ticks){
+    static Matrix4f idle(int joint,float ticks){
         float sample=Math.max(0,ticks)*rate/20F%frames;
         int f=(int)sample;
         return interpolate(bones[joint].idle,7*f,7*((f+1)%frames),sample-f,false);
@@ -94,10 +95,16 @@ public final class GoddessRig {
         if(age<=0)return released;
         float t=age/12F;
         t=t*t*(3-2*t);
+        return blendPose(released,target,t);
+    }
+
+    static Matrix4f blendPose(Matrix4f released,Matrix4f target,float t){
+        if(t<=0)return released;
+        if(t>=1)return target;
         var position=released.getTranslation(new Vector3f()).lerp(target.getTranslation(new Vector3f()),t);
         var rotation=released.getUnnormalizedRotation(new Quaternionf()).slerp(target.getUnnormalizedRotation(new Quaternionf()),t);
         var scale=released.getScale(new Vector3f()).lerp(target.getScale(new Vector3f()),t);
-        return target.translationRotateScale(position,rotation,scale);
+        return new Matrix4f().translationRotateScale(position,rotation,scale);
     }
     private static float executionFrame(EncounterMob boss,float partial) {
         float age=boss.goddess.age(partial);
@@ -109,6 +116,9 @@ public final class GoddessRig {
             case RISING -> Math.max(1,80-age*1.58F);
         };
     }
+    public static float hover(float ticks) {
+        return 4+.15F*(float)Math.sin(ticks*.054);
+    }
     public static Matrix4f[] pose(EncounterMob boss,float partial){
         return pose(boss,partial,executionFrame(boss,partial));
     }
@@ -118,15 +128,15 @@ public final class GoddessRig {
         float riseAge=boss.goddess.age(partial);
         boolean settling=boss.goddess.action()==GoddessEncounter.Action.RISING && riseAge<12;
         for(int j=0;j<JOINTS;j++){
-            if(frame==0) result[j]=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
+            if(frame==0) result[j]=new Matrix4f().translation(0,hover(boss.tickCount+partial),0).mul(idle(j,boss.tickCount+partial));
             else {
                 var offset=settling && visible(boss,j) ? risingOffset(stage,j,frame,riseAge) : executionOffset(stage,j,frame);
                 result[j]=offset.mul(idle(j,0));
                 if(frame < 14){
                     float blend=(frame-1)/13;
                     blend=blend*blend*(3-2*blend);
-                    var hover=new Matrix4f().translation(0,4+.15F*(float)Math.sin((boss.tickCount+partial)*.054),0).mul(idle(j,boss.tickCount+partial));
-                    result[j]=hover.lerp(result[j],blend);
+                    var hover=new Matrix4f().translation(0,hover(boss.tickCount+partial),0).mul(idle(j,boss.tickCount+partial));
+                    result[j]=blendPose(hover,result[j],blend);
                 }
             }
         }
@@ -171,12 +181,14 @@ public final class GoddessRig {
                         .rotateX(-.88F*cue-(.45F*point+.12F*pulse)*share).translate(-pivot.x,-pivot.y,-pivot.z);
                 for(int j=first;j<first+14;j++)result[j].mulLocal(gesture);
             }
+        }else if(frame==0 && GoddessCrownCast.active(boss.goddess.attacks.move())){
+            boss.goddess.attacks.crown.pose(result,partial);
         }else if(frame==0 && GoddessCastPose.active(boss.goddess.attacks.move())){
             GoddessCastPose.apply(boss,result,partial);
-        }else if(frame==0 && boss.goddess.attacks.hand.melee()){
+        }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.HAND && boss.goddess.attacks.hand.melee()){
             int first=(boss.goddess.removed()&1)==0?5:19;
             GoddessPalmCombo.conduct(result,first,boss.goddess.attacks.hand.controlTime(partial));
-        }else if(frame==0 && boss.goddess.attacks.hand.visible()){
+        }else if(frame==0 && boss.goddess.attacks.move()==GoddessAttacks.Move.HAND && boss.goddess.attacks.hand.visible()){
             int shoulder=(boss.goddess.removed()&1)==0?3:7;
             int first=-1;
             for(int j=0;j<JOINTS;j++)if(bones[j].part==shoulder){first=j;break;}
@@ -187,6 +199,7 @@ public final class GoddessRig {
                 for(int j=0;j<JOINTS;j++)if(bones[j].part>=shoulder && bones[j].part<=shoulder+3)result[j].mulLocal(gesture);
             }
         }
+        GoddessGesture.secondary(boss,result,partial,frame);
         return result;
     }
     public static int flowStart(int stage){return stage==0?171:163;}
@@ -195,6 +208,11 @@ public final class GoddessRig {
     public static Matrix4f fullLimbOffset(int stage,int joint){
         int at=((flowStart(stage)-1)*JOINTS+joint)*10;
         return interpolate(falls[stage],at,at,0,true);
+    }
+    /** The portrait's two-eye midpoint in the last full-size head pose before it flows into the glove. */
+    public static Vec3 extractionEye(EncounterMob boss,float partial){
+        var head=root(boss,partial).mul(fullLimbOffset(2,0)).mul(idle(0,0));
+        return boss.skinOrigin(partial).add(new Vec3(head.transformPosition(new Vector3f(-.149738F,1.058815F,-.937716F))));
     }
     public static Matrix4f[] renderOffsets(EncounterMob boss,float partial){
         float frame=executionFrame(boss,partial);
@@ -232,7 +250,7 @@ public final class GoddessRig {
         return root(boss,boss.goddess.facing(partial),(float)boss.goddess.lift(partial),boss.goddess.braceTilt(partial));
     }
     public static List<HydraContact.Region> regions(EncounterMob boss,Vec3 origin,float partial){
-        var regions=build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial));
+        var regions=build(boss,origin,root(boss,partial),pose(boss,partial),boss.goddess.attacks.hand.pose(partial),partial);
         var snare=boss.goddess.attacks.struggle;
         if(snare.active() && snare.hair() && snare.step()!=GoddessStruggle.Step.OPEN){
             var region=regions.get(11);
@@ -246,9 +264,9 @@ public final class GoddessRig {
         return regions;
     }
     static List<HydraContact.Region> resting(EncounterMob boss,float yaw,boolean melee){
-        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80),null);
+        return build(boss,boss.position(),root(boss,yaw,0,melee?1:0),pose(boss,1,80),null,-1);
     }
-    private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed,GoddessHandPose hand){
+    private static List<HydraContact.Region> build(EncounterMob boss,Vec3 origin,Matrix4f root,Matrix4f[] posed,GoddessHandPose hand,float partial){
         var slots=new ArrayList<List<HydraContact.Box>>(PARTS.size());
         for(int i=0;i<PARTS.size();i++) slots.add(new ArrayList<>());
         for(int j=0;j<JOINTS;j++){
@@ -263,6 +281,7 @@ public final class GoddessRig {
                 slots.get(bone.part).add(HydraContact.affine(center,bone.half[i],x,y,z));
             }
         }
+        if(partial>=0)boss.goddess.attacks.crown.addRegions(slots,origin,root,posed,partial);
         if(hand!=null)for(var link:hand.links())slots.get(link.slot()).add(link.surface());
         var result=new ArrayList<HydraContact.Region>();
         for(int i=0;i<slots.size();i++){

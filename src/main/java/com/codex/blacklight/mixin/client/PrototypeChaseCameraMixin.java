@@ -16,7 +16,8 @@ public abstract class PrototypeChaseCameraMixin {
             boolean reverse,float partial,Operation<Void> original) {
         boolean cinematic=com.codex.blacklight.client.camera.HydraCinematicCamera.update();
         boolean executing=com.codex.blacklight.client.camera.GoddessExecutionCamera.update(entity);
-        original.call(level,entity,cinematic||executing||detached,cinematic||executing?false:reverse,partial);
+        boolean preserveUserOrbit=executing && com.codex.blacklight.client.camera.GoddessExecutionCamera.finalHead();
+        original.call(level,entity,cinematic||executing||detached,cinematic||executing&&!preserveUserOrbit?false:reverse,partial);
         if(executing){com.codex.blacklight.client.camera.GoddessExecutionCamera.apply((Camera)(Object)this,partial);return;}
         if(cinematic){com.codex.blacklight.client.camera.HydraCinematicCamera.apply((Camera)(Object)this);return;}
         if(com.codex.blacklight.client.vehicle.VehicleCamera.apply((Camera)(Object)this,partial))return;

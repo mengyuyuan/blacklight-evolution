@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GoddessImpact;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -58,9 +59,23 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
     @Override protected boolean canHitEntity(Entity e){if((bloodSpear() || barrage()!=0) && e instanceof EvolvedQuill other && other.getOwner()==getOwner())return false;
         return entityData.get(SPEAR)!=4 && !(getPersistentData().hasUUID("GoddessSpineCaster") && e.getUUID().equals(getPersistentData().getUUID("GoddessSpineCaster")))
             && super.canHitEntity(e)&&e!=getOwner()&&(!(getOwner() instanceof LivingEntity owner)||!owner.isAlliedTo(e));}
+    private float impactDamage(LivingEntity target) {
+        if (!(target instanceof net.minecraft.world.entity.player.Player player) || !(getOwner() instanceof EncounterMob boss)
+                || !boss.goddess.active() || !getPersistentData().contains("GoddessSequence")) return damage;
+        GoddessImpact impact;
+        if (bloodSpear()) impact = GoddessImpact.WALL_SPEAR;
+        else if (getPersistentData().hasUUID("GoddessSpineCaster")) impact = GoddessImpact.SPINE_BOLT;
+        else impact = switch (barrage()) {
+            case CROWN_NEEDLE -> GoddessImpact.CROWN_NEEDLE;
+            case LOW_SURF -> GoddessImpact.LOW_SURF;
+            case HIGH_SURF -> GoddessImpact.HIGH_SURF;
+            default -> GoddessImpact.FINGER_NEEDLE;
+        };
+        return impact.incoming(player);
+    }
     @Override protected void onHitEntity(EntityHitResult hit){
         super.onHitEntity(hit);if(level().isClientSide||hit.getEntity()==getOwner())return;
-        if(hit.getEntity() instanceof LivingEntity target&&target.hurt(damageSources().thrown(this,getOwner()),damage)){
+        if(hit.getEntity() instanceof LivingEntity target&&target.hurt(damageSources().thrown(this,getOwner()),impactDamage(target))){
             var server=(net.minecraft.server.level.ServerLevel)level();server.sendParticles(com.codex.blacklight.registry.ModParticles.BIOMASS_SLASH.get(),target.getX(),target.getY()+target.getBbHeight()*.5,target.getZ(),5,.15,.2,.15,.03);
             // Accepted-hit observer provides the bone/flesh contact sound once.
         }

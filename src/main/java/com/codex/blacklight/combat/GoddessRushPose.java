@@ -18,7 +18,9 @@ final class GoddessRushPose {
     }
     static void pose(EncounterMob boss,Matrix4f[] m,float partial,Vec3 palmCenter){
         var attack=boss.goddess.attacks;var rush=attack.rush;
-        float t=attack.age(partial);
+        float actual=attack.age(partial);
+        boolean swipe=rush.backhand();
+        float t=swipe?(actual<=11?actual*26/11:actual<=19?26+(actual-11)*16/8:42+(actual-19)*26/13):actual;
         boolean left=rush.arm()==1;
         int start=left?5:19, wrist=start+2, end=start+13;
         int g=rush.grip(),s=left?1:-1;
@@ -36,6 +38,11 @@ final class GoddessRushPose {
         var swing=around(joint(m[start]),new Quaternionf().rotateZ(-s*.22F*lower+s*lift*.68F)
                 .rotateX(-.54F*lower+.90F*lift+1.08F*sling));
         rotate(m,start,end,swing);
+        if(swipe){
+            float turn=ease(actual,2,10)*(1-ease(actual,19,31));
+            rotate(m,wrist,end,around(joint(m[wrist]),new Quaternionf().rotateZ(s*1.36F*turn)
+                    .rotateY(s*(.45F*turn-.87F*ease(actual,11,18)*(1-ease(actual,20,32))))));
+        }
         if(lift>0){
             // The forearm folds toward the face without stretching its distance to the shoulder.
             var elbow=joint(m[start+1]);
@@ -58,7 +65,7 @@ final class GoddessRushPose {
         float registration=ease(t,0,26)*(1-(g<0?ease(t,45,68):ease(held,5,31)));
         if(registration>0){
             Vec3 origin=boss.level().isClientSide?boss.getPosition(partial):boss.position();
-            Vec3 desired=rush.lane(t).subtract(origin).yRot((float)Math.toRadians(rush.bodyYaw(t)-180)).scale(.5);
+            Vec3 desired=rush.lane(swipe?actual:t).subtract(origin).yRot((float)Math.toRadians(rush.bodyYaw(actual)-180)).scale(.5);
             var palm=m[wrist].transformPosition(palmCenter.toVector3f());
             var offset=desired.subtract(new Vec3(palm)).scale(registration);
             for(var matrix:m)matrix.translateLocal((float)offset.x,(float)offset.y,(float)offset.z);

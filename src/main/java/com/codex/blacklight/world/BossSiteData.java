@@ -98,7 +98,10 @@ public final class BossSiteData extends SavedData {
         var bits = pending.remove(player.getUUID());
         if (bits == null) return;
         if ((bits & 1) != 0) GrowthSystem.award(player, "convoy_cleared");
-        if ((bits & 4) != 0) GrowthSystem.award(player,"greene_outbreak");
+        if ((bits & 4) != 0) {
+            GrowthSystem.award(player,"greene_outbreak");
+            com.codex.blacklight.combat.PlayerGazeField.inherit(player);
+        }
         if ((bits & 2) != 0) GrowthSystem.award(player, "plaza_cleared");
         setDirty();
     }

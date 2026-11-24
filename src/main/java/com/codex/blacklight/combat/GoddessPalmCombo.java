@@ -133,7 +133,7 @@ final class GoddessPalmCombo {
                             ClipContext.Fluid.NONE,boss)).getType()!=HitResult.Type.MISS)continue;
                     hit.add(p.getUUID());
                     float hp=p.getHealth();
-                    float amount=p.getMaxHealth()*(slam?.24F:.13F)/com.codex.blacklight.power.CombatScale.units(p);
+                    float amount=(slam ? GoddessImpact.HAND_SLAM : GoddessImpact.HAND_SWEEP).incoming(p);
                     if(p.hurt(boss.damageSources().mobAttack(boss),amount) && p.getHealth()<hp){
                         Vec3 velocity=after.palm().subtract(before.palm()).multiply(1,0,1);
                         if(slam || velocity.lengthSqr()<.01)velocity=p.position().subtract(pose.palm()).multiply(1,0,1);

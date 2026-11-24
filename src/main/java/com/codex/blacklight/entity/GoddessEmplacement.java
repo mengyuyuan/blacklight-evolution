@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GoddessImpact;
 import com.codex.blacklight.combat.AnimatedHurtBody;
 import com.codex.blacklight.combat.HydraContact;
 import com.codex.blacklight.combat.HydraHurtContact;
@@ -163,7 +164,7 @@ public final class GoddessEmplacement extends Mob implements AnimatedHurtBody {
         var contact=p.getBoundingBox().inflate(.35,.09,.35);
         if(t>=14 && t<=24 && !caught && (contact.contains(last) || contact.clip(last,point).isPresent())
                 && trace(level(),this,point,p.position().add(0,.45,0)).getType()==HitResult.Type.MISS){
-            if(p.hurt(b.damageSources().mobAttack(b),12)){
+            if(p.hurt(b.damageSources().mobAttack(b),GoddessImpact.GROUND_WRIST.incoming(p))){
                 caught=true;grace(p);SpiderFoley.play(this,point,SpiderFoley.Cue.CATCH,1.15F);
             }
         }

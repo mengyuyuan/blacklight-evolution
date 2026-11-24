@@ -8,7 +8,7 @@ import net.minecraft.world.phys.Vec3;
 
 /** Shape and support points for the refracting, world-space pressure membrane. */
 final class GoddessBubbleRenderer {
-    record Shell(Vec3 center,Vec3 eye,Vec3 axes,Vec3 right,Vec3 palmR,Vec3 palmL,Vec3 knee,Vec3 shoulder,float contact,float age,float rupture) {
+    record Shell(Vec3 center,Vec3 axes,Vec3 right,Vec3 palmR,Vec3 palmL,Vec3 knee,Vec3 shoulder,float contact,float age,float rupture) {
         Vec3 toUnit(Vec3 delta){
             Vec3 z=right.cross(new Vec3(0,1,0));
             return new Vec3(delta.dot(right)/axes.x,delta.y/axes.y,delta.dot(z)/axes.z);
@@ -37,11 +37,19 @@ final class GoddessBubbleRenderer {
         var attack=boss.goddess.attacks;
         if(attack.move()!=GoddessAttacks.Move.VACUOLE)return;
         float age=attack.age(partial);
-        if(age<3 || age>=62)return;
-        float strength=(.16F*smooth((age-3)/14)+.84F*smooth((age-18)/9))*(1-smooth((age-54)/8));
+        if(age<20 || age>=62)return;
+        float strength=(.20F+.80F*smooth((age-20)/7))*(1-smooth((age-54)/8));
         if(age>=28 && !attack.caught())strength*=1-smooth((age-28)/10);
         if(strength<.005F)return;
         SpiderPainEffect.shell(boss.getId(),shape(boss,partial),strength,age);
+    }
+    static void playerField(int id,Vec3 center,float age,net.minecraft.world.entity.LivingEntity victim,boolean preview){
+        float squeeze=preview?0:smooth((age-6)/23);
+        float pop=preview?0:smooth((age-32)/9);
+        double minimum=victim==null?.8:Mth.clamp(victim.getBbWidth()*.55,.53,1.35);
+        Vec3 axes=new Vec3(2.6-(2.6-minimum)*squeeze+1.9*pop,2.55-1.62*squeeze+1.2*pop,2.62-(2.62-minimum)*squeeze+1.6*pop);
+        var shape=new Shell(center,axes,new Vec3(1,0,0),Vec3.ZERO,Vec3.ZERO,Vec3.ZERO,Vec3.ZERO,0,age,pop);
+        SpiderPainEffect.shell(id,shape,preview?.23F:(.35F+.65F*smooth(age/7))*(1-pop),age);
     }
     static Shell shape(EncounterMob boss,float partial){
         var attack=boss.goddess.attacks;
@@ -68,7 +76,7 @@ final class GoddessBubbleRenderer {
             knee=GoddessPressurePose.contact(player,pose,"Leg_R",attack.captureYaw(),partial).subtract(center);
             shoulder=GoddessPressurePose.contact(player,pose,"Arm_L",attack.captureYaw(),partial).subtract(center);
         }else grip=0;
-        return new Shell(center,com.codex.blacklight.combat.GoddessCastPose.face(boss,partial),axes,right,handR,handL,knee,shoulder,grip,age,rupture);
+        return new Shell(center,axes,right,handR,handL,knee,shoulder,grip,age,rupture);
     }
     private static float smooth(float x){float t=Mth.clamp(x,0F,1F);return t*t*(3-2*t);}
     private GoddessBubbleRenderer(){}

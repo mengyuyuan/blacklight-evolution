@@ -14,6 +14,19 @@ class GoddessSceneClockTest {
         assertEquals(72.34F, clock.age(104, .34F), .0001F);
     }
 
+    @Test void vacuoleReachesCaptureAndBurstOnTheirPacketsEvenWhenClientTicksFallBehind() {
+        var clock = new GoddessSceneClock();
+        clock.synchronize(4, 1, 1000, 1000, 200);
+        clock.catchUpTo(40, 233);
+        assertEquals(40.5F, clock.age(233, .5F));
+        clock.catchUpTo(64, 247);
+        assertEquals(64F, clock.age(247, 0));
+        clock.catchUpTo(40, 248);
+        assertEquals(65.25F, clock.age(248, .25F));
+        clock.synchronize(5, 0, 1074, 1074, 257);
+        assertEquals(0F, clock.age(257, 0));
+    }
+
     @Test void newActionOrStepStartsAtItsSynchronizedProgress() {
         var clock = new GoddessSceneClock();
         clock.synchronize(3, 1, 800, 900, 600);

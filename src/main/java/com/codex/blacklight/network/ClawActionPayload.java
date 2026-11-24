@@ -38,7 +38,7 @@ public record ClawActionPayload(Action action) implements CustomPacketPayload {
         BLOCK_THROW_RELEASE(13),
         BLOCK_THROW_CANCEL(14),
         TERRAIN_GRAB_KEEPALIVE(15), TERRAIN_GRAB_RELEASE(16), TERRAIN_GRAB_CANCEL(17),
-        GRAB_THROW_START(18), GRAB_THROW_RELEASE(19), GRAB_THROW_CANCEL(20), IMPLANT_HELD(21), SPIDER_ESCAPE(22);
+        GRAB_THROW_START(18), GRAB_THROW_RELEASE(19), GRAB_THROW_CANCEL(20), IMPLANT_HELD(21), SPIDER_ESCAPE(22), GAZE_RELEASE(23);
 
         private final int id;
 
@@ -75,6 +75,7 @@ public record ClawActionPayload(Action action) implements CustomPacketPayload {
                 case 20 -> GRAB_THROW_CANCEL;
                 case 21 -> IMPLANT_HELD;
                 case 22 -> SPIDER_ESCAPE;
+                case 23 -> GAZE_RELEASE;
                 default -> throw new IllegalArgumentException("Invalid claw action id: " + id);
             };
         }

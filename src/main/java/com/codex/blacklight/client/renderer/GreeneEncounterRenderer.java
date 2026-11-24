@@ -84,6 +84,10 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
             if(frustum.isVisible(reach))return true;
         }
         if(boss.goddess.active()){
+            if(boss.goddess.attacks.crown.acting()){
+                var bounds=new net.minecraft.world.phys.AABB(boss.position(),boss.goddess.attacks.center()).inflate(42,65,42);
+                if(frustum.isVisible(bounds))return true;
+            }
             if(boss.goddess.action()==com.codex.blacklight.combat.GoddessEncounter.Action.EXTRACTING)return true;
             var hand=boss.goddess.attacks.hand.pose(1);
             if(hand!=null)for(var link:hand.links())
@@ -108,11 +112,12 @@ public final class GreeneEncounterRenderer extends BlacklightCreatureRenderer<En
         if(boss.spider.first() || boss.greeneStage()==com.codex.blacklight.combat.GreeneBattleCycle.MOLTING)
             nursery.draw(boss,partial,stack,buffers,light);
         if(boss.greeneStage()==com.codex.blacklight.combat.GreeneBattleCycle.MOLTING){
-            GreeneMoltRenderer.draw(boss,partial,stack,light);
+            GreeneMoltRenderer.draw(boss,partial,stack,buffers,light,spider,goddess);
             return;
         }
         if(boss.goddess.active()){
             GoddessCastRenderer.draw(boss,partial,stack,buffers,light);
+            GoddessCrownRenderer.draw(boss,partial,stack,buffers,light);
             GoddessLeaderRenderer.draw(boss,partial,stack,buffers,light);
             GoddessStruggleRenderer.draw(boss,partial,stack,buffers,light);
             colonyHand.draw(boss,partial,stack,buffers);

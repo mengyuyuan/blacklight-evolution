@@ -51,6 +51,52 @@ public final class GreeneSpiderRenderer extends GeoEntityRenderer<GreeneSpider> 
         if(shell.fragment()>=0 && !name.equals(com.codex.blacklight.combat.SpiderAnatomy.shin(shell.fragment())))return;
         if(!bone.getCubes().isEmpty())meshes.computeIfAbsent(bone,SpiderBoneMesh::new).draw(stack.last(),out,light,overlay,color);
     }
+    void drawMolt(com.codex.blacklight.entity.EncounterMob boss,float partial,PoseStack stack,
+                  net.minecraft.client.renderer.MultiBufferSource buffers,int light,float[] matrices,
+                  float seconds,float[] bends) {
+        var shell=boss.greeneSpiderShell();
+        var baked=getGeoModel().getBakedModel(BROOD_MESH);
+        var root=baked.topLevelBones().get(0);
+        if(root!=meshRoot){meshRoot=root;meshes.clear();}
+        var type=getRenderType(shell,BROOD,buffers,partial);
+        var out=buffers.getBuffer(type);
+        float close=net.minecraft.util.Mth.clamp((seconds-11.65F)/(13.15F-11.65F),0,1);
+        close=close*close*(3-2*close);
+        if(close>=1)return;
+        stack.pushPose();
+        stack.translate(.6F*close,3.15F*close,-.65F*close);
+        float scale=.9912102F*(1-close);
+        stack.scale(scale,scale,scale);
+        var transform=new org.joml.Matrix4f();
+        var joints=com.codex.blacklight.combat.SpiderAnatomy.MOLT_JOINTS;
+        for(int joint=0;joint<joints.size();joint++){
+            var name=joints.get(joint);
+            var bone=baked.getBone(name).orElseThrow();
+            if(bone.getCubes().isEmpty())continue;
+            int leg=com.codex.blacklight.combat.SpiderAnatomy.leg(name);
+            boolean shin=name.startsWith("tibia_");
+            if(shin && boss.spider.severed(leg))continue;
+            transform.set(matrices,joint*16);
+            if(leg>=0){
+                rollJoint(transform,joints.get(13+leg*2),bends[leg*2]);
+                if(shin)rollJoint(transform,name,bends[leg*2+1]);
+            }
+            stack.pushPose();
+            stack.mulPose(transform);
+            meshes.computeIfAbsent(bone,SpiderBoneMesh::new).draw(stack.last(),out,light,
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,0xffffffff);
+            stack.popPose();
+        }
+        stack.popPose();
+        // The translucent shroud draws immediately on vanilla; commit just this body's depth first.
+        if(!com.codex.blacklight.client.ShaderPackCompat.active() && buffers instanceof net.minecraft.client.renderer.MultiBufferSource.BufferSource batch)
+            batch.endBatch(type);
+    }
+    private static void rollJoint(org.joml.Matrix4f matrix,String joint,float angle){
+        if(angle==0)return;
+        var p=com.codex.blacklight.combat.SpiderAnatomy.PIVOTS.get(joint);
+        matrix.translate((float)p.x,(float)p.y,(float)p.z).rotateZ(angle).translate((float)-p.x,(float)-p.y,(float)-p.z);
+    }
     @Override protected void applyRotations(GreeneSpider entity, PoseStack stack, float age, float yaw, float partial, float scale) {
         if(entity.fragment()>=0){
             stack.mulPose(entity.fragmentPose(partial));

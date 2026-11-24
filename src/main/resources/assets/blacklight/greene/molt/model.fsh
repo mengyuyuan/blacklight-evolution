@@ -1,7 +1,7 @@
 #version 150
 in vec3 rgb,norm,wp;in vec2 texuv;flat in int surface;
 in float digested;uniform sampler2D animal;uniform float sceneLight;out vec4 color;uniform sampler2D atlas,spiderSkin,civilian0,civilian1,civilian2,civilian3;uniform vec3 eye;uniform float time;
-uniform float ventFloor;uniform int liveForm;uniform float damage,coreFlash;uniform ivec2 lightUV;uniform sampler2D levelLight;
+uniform float radiance;uniform float ventFloor;uniform int liveForm;uniform float damage,coreFlash;uniform ivec2 lightUV;uniform sampler2D levelLight;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 vec4 civilian(int tile,vec2 uv){
     if(tile==0)return texture(civilian0,uv);if(tile==1)return texture(civilian1,uv);if(tile==2)return texture(civilian2,uv);return texture(civilian3,uv);
@@ -14,12 +14,22 @@ void main(){
  if(surface==8)c*=texture(spiderSkin,texuv).rgb;
  if(surface==6 || surface==9){vec4 tx=texture(animal,texuv);c*=tx.rgb;}
  if(surface==2){vec2 at=texuv*2.;vec4 tx=civilian(int(floor(at.x))+2*int(floor(at.y)),fract(at));if(tx.a<.42)discard;c*=tx.rgb;}
- if(liveForm==1){
+ if(liveForm!=0){
    vec3 view=normalize(eye-wp);if(dot(n,view)<0.)n=-n;
    vec3 sun=normalize(vec3(-.42,.78,-.48));float diffuse=.66+.31*max(0.,dot(n,sun))+.06*max(0.,n.y);
    float wet=surface==7?smoothstep(.09,.24,c.r-c.g):0.;
    float shine=.13*wet*pow(max(0.,dot(n,normalize(sun+view))),23.);
+   // Pigment, tissue creases and directional rim all contribute; the central face and torso remain readable.
+   float value=dot(c,vec3(.27,.59,.14));
+   float rim=pow(1.-clamp(dot(n,view),0.,1.),3.);
+   float side=.48+.52*max(0.,dot(n,normalize(vec3(-.60,.62,.50))));
+   float pigment=smoothstep(.035,.48,value)*(1.-.62*smoothstep(.55,1.,value));
+   float warm=smoothstep(.025,.26,c.r-c.b);
+   vec3 pearl=mix(vec3(.76,.87,1.),vec3(1.,.84,.62),warm);
+   vec3 emission=radiance*(c*(.33+.14*side)+pearl*pigment*(.115+.13*rim*side)+pearl*.065*wet);
+   if(liveForm==2){color=vec4(emission,1.);return;}
    vec3 lit=(diffuse*c+shine*vec3(1.,.87,.82))*texelFetch(levelLight,lightUV,0).rgb;
+   lit+=emission;
    lit=mix(lit,vec3(.98,.28,.25),damage*.28);lit=mix(lit,vec3(.98,.89,.80),coreFlash*.4);
    color=vec4(lit,1);return;
  }

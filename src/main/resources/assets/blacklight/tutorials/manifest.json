@@ -1,4 +1,11 @@
 {
+  "gaze_vacuole": {
+    "file": "gaze_vacuole.gif",
+    "frames": 102,
+    "duration_ms": 10200,
+    "source": "In-game footage of the inherited gaze, ground and airborne casts",
+    "sha256": "72744f5fd492410edee057694897d58bfb3e489042b7842ee58617f4fecdfac0"
+  },
   "adrenaline": {
     "file": "adrenaline.gif",
     "frames": 60,
