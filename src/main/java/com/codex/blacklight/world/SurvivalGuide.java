@@ -45,8 +45,6 @@ public final class SurvivalGuide {
     public static void revisitGreene(ServerPlayer player) {
         if (!player.isShiftKeyDown() || player.isSpectator() || player.serverLevel().dimension()!=com.codex.blacklight.city.CityTravel.WORLD
                 || !done(player,"plaza_cleared") || !done(player,"greene_outbreak") || BossSiteData.headConfirmed(player)) return;
-        var site=GreeneHiveCave.nearest(player.serverLevel().getSeed(),player.blockPosition());
-        if (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(site))>88*88) return;
         var saved=player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
         saved.putBoolean(REPLAY_GREENE,true);
         player.getPersistentData().put(Player.PERSISTED_NBT_TAG,saved);
@@ -106,7 +104,7 @@ public final class SurvivalGuide {
         if (!player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
             next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
                     : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-        } else if (done(player,"greene_outbreak")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
+        } else if (!followingGreene(player)) next=Component.translatable("survival.blacklight.journal.greene_defeated");
         else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
         else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
         else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");
