@@ -250,7 +250,7 @@ public final class ConsumeSystem {
     }
     /** Right click confirms a held target. It can never acquire or auto-consume a new target. */
     public static void consume(ServerPlayer player) {
-        var s=ACTIVE.get(player);if(s==null||!valid(player,s))return;
+        var s=ACTIVE.get(player);if(s==null||s.victim instanceof com.codex.blacklight.world.GreeneHost||!valid(player,s))return;
         if (ConsumeVisual.acquiring(s.stage)) {
             clearThrowCharge(player,s);
             s.throwAim = null;
@@ -263,17 +263,16 @@ public final class ConsumeSystem {
         if (!healthReady(player,s.victim)) { message(player,"consume_weaken"); return; }
         beginConsume(player,s,ConsumeVariant.choose(s.form,s.large,player.getRandom()));
     }
+    private static void escapeFromGrip(ServerPlayer player, Session s, com.codex.blacklight.world.GreeneHost host) {
+        if(!host.beginEscape(player)) { cancel(player); return; }
+        ACTIVE.remove(player);
+        clearThrowCharge(player,s);
+        clearRecovery(player);
+        release(host);
+        unlock(player);
+        play(player,PlayerAction.GRAB_REACH);
+    }
     private static void beginConsume(ServerPlayer player,Session s,int variant){
-        if(s.victim instanceof com.codex.blacklight.world.GreeneHost host) {
-            if(!host.beginEscape(player)) { cancel(player); return; }
-            ACTIVE.remove(player);
-            clearThrowCharge(player,s);
-            clearRecovery(player);
-            release(host);
-            unlock(player);
-            play(player,PlayerAction.GRAB_REACH);
-            return;
-        }
         if(!ConsumeSequence.bruteMount(s.victim))s.facing=player.getYRot();
         s.consumeTargetStart=s.victim.position();
         s.variant=variant;
@@ -511,7 +510,9 @@ public final class ConsumeSystem {
         var state = com.codex.blacklight.registry.ModAttachments.getData(player,ModAttachments.PLAYER_STATE);
         if (!player.isAlive() || player.isSpectator() || !state.isInfected() || !state.isPrototypeMode()
                 || ACTIVE.containsKey(player) || player.isPassenger()) return;
-        if (state.getActivePower() == PowerForm.BACKSPINES) {
+        var storyTarget = com.codex.blacklight.world.GreeneHost.aimedForGrab(player);
+        if (storyTarget != null && !grabCandidate(player, storyTarget, 3)) return;
+        if (storyTarget == null && state.getActivePower() == PowerForm.BACKSPINES) {
             QuillHarvest.recall(player);
             return;
         }
@@ -526,7 +527,7 @@ public final class ConsumeSystem {
         double range = (form == PowerForm.WHIPFIST ? WHIP_GRAB_RANGE : 3)+com.codex.blacklight.power.AssimilationSystem.grabBonus(player);
         // A lock supplies combat aim; it must not steal an explicit terrain grab.
         // A real creature intersecting the view ray before that block keeps grab priority.
-        if(!queuedGrab&&BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
+        if(storyTarget==null&&!queuedGrab&&BlockThrowSystem.canUse(player)&&TerrainGrabSelection.targetsTerrain(player)){
             if(!TerrainGrabSelection.start(player))message(player,TerrainGrabSelection.failureMessage(player));
             return;
         }
@@ -534,7 +535,8 @@ public final class ConsumeSystem {
         var previous=ABSORBING.get(locked);
         if(previous!=null&&previous.owner()==player)locked=null;
         // A boss part can remain the throw destination while the hand picks up nearby cargo.
-        Mob target = locked instanceof Mob mob && grabCandidate(player,mob,range) ? mob : null;
+        Mob target = storyTarget;
+        if (target == null && locked instanceof Mob mob && grabCandidate(player, mob, range)) target = mob;
         if(target==null){
             var nearby=CombatTargeting.candidates(player,player.getBoundingBox().inflate(range),
                     e->e instanceof Mob mob && grabCandidate(player,mob,range) && withinGrabArc(player,mob))
@@ -589,7 +591,7 @@ public final class ConsumeSystem {
             return;
         }
         if(!session.large){target.setYRot(player.getYRot()+180); target.setYHeadRot(target.getYRot()); target.yBodyRot=target.getYRot();}
-        play(player,form==PowerForm.BLADE?PlayerAction.GRAB_BLADE:form==PowerForm.WHIPFIST?PlayerAction.GRAB_WHIP:PlayerAction.GRAB_REACH);
+        play(player,target instanceof com.codex.blacklight.world.GreeneHost?PlayerAction.GRAB_REACH:form==PowerForm.BLADE?PlayerAction.GRAB_BLADE:form==PowerForm.WHIPFIST?PlayerAction.GRAB_WHIP:PlayerAction.GRAB_REACH);
         if (form == PowerForm.WHIPFIST)
             com.codex.blacklight.registry.ModWeaponSounds.play(player, form, "swing", player.getEyePosition(), .52F, 1.16F);
 
@@ -702,6 +704,10 @@ public final class ConsumeSystem {
             }
             if(elapsed>=ConsumeVisual.captureDuration(session.form)) {
                 if(target.position().distanceToSqr(anchor(player,target))>.36){cancel(player);return;}
+                if (target instanceof com.codex.blacklight.world.GreeneHost host) {
+                    escapeFromGrip(player, session, host);
+                    return;
+                }
                 phase(player,session,ConsumeVisual.HOLD);
                 if(SpiderPhase.edible(target))FieldNotes.record(player, net.minecraft.network.chat.Component.translatable("message.blacklight.greene_grip_hint",net.minecraft.network.chat.Component.keybind("key.blacklight.disguise")));
                 else message(player,"grab_held");

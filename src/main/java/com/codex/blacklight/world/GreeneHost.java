@@ -49,6 +49,15 @@ public final class GreeneHost extends PathfinderMob {
         entityData.define(WATCHING,-1);
         entityData.define(NOTICED,-1000L);
     }
+    /** Only the first visible entity within a hand's reach can take priority over a weapon's grab binding. */
+    public static GreeneHost aimedForGrab(net.minecraft.world.entity.player.Player player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 end = player.pick(3, 1, false).getLocation();
+        var hit = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(player, eye, end,
+                new AABB(eye, end).inflate(1), e -> e.isPickable() && !e.isSpectator(), eye.distanceToSqr(end));
+        return hit != null && hit.getEntity() instanceof GreeneHost host && host.stage() == SPENT
+                && host.isAlive() ? host : null;
+    }
     public int stage() { return entityData.get(STAGE); }
     public float age(float partial) {
         if(stage()==BLOCKED) return BREAKOUT;
@@ -149,7 +158,7 @@ public final class GreeneHost extends PathfinderMob {
             case ESCAPING -> tickEscape(level);
             case SPENT -> {
                 if(tickCount%60==1) for (var p:level.players()) if(p.distanceToSqr(this)<12*12 && !p.isSpectator())
-                    FieldNotes.record(p, Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab"),Component.keybind("key.use")));
+                    FieldNotes.record(p, Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab")));
             }
         }
     }

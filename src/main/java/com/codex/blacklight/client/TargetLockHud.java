@@ -34,22 +34,22 @@ public final class TargetLockHud {
             denLevel = null;
             return;
         }
-        if (mc.player.isSpectator() || !com.codex.blacklight.item.GreeneTissueItem.held(mc.player)) return;
+        if (mc.player.isSpectator()) return;
         var at = Vec3.atCenterOf(den);
         var clip = handTarget(at);
-        if (clip == null || clip.w <= .001F) return;
-        float nx = clip.x / clip.w, ny = clip.y / clip.w;
-        if (Math.abs(nx) > 1 || Math.abs(ny) > 1) return;
-        int x = Math.round((nx + 1) * g.guiWidth() * .5F);
-        int y = Math.round((1 - ny) * g.guiHeight() * .5F);
+        if (clip == null || !clip.isFinite()) return;
+        var bearing = WorldHudProjection.waypointBearing(clip);
+        long distance = Math.round(mc.player.getPosition(world.partial).distanceTo(at));
+        var label = net.minecraft.network.chat.Component.translatable("hud.blacklight.greene_signal",distance);
+        int margin = Math.min(g.guiWidth()/2, mc.font.width(label)/2 + 3);
+        int x = net.minecraft.util.Mth.clamp(Math.round((1+bearing.x)*g.guiWidth()*.5F),margin,g.guiWidth()-margin);
+        int y = net.minecraft.util.Mth.clamp(Math.round((1-bearing.y)*g.guiHeight()*.5F),8,g.guiHeight()-34);
         for (int row = -4; row <= 4; row++) {
             int edge = 4 - Math.abs(row);
             g.fill(x-edge, y+row, x+edge+1, y+row+1, 0xD52E1722);
             g.fill(x-edge, y+row, x-edge+1, y+row+1, 0xFFF39EAD);
             g.fill(x+edge, y+row, x+edge+1, y+row+1, 0xFFF39EAD);
         }
-        long distance = Math.round(mc.player.getPosition(world.partial).distanceTo(at));
-        var label = net.minecraft.network.chat.Component.translatable("hud.blacklight.greene_signal",distance);
         g.drawCenteredString(mc.font,label,x,y+7,0xFFF5D6DA);
     }
     private static long frame;
@@ -141,6 +141,13 @@ public final class TargetLockHud {
     private static void consumeMarkers(GuiGraphics g,Minecraft mc){
         var state=com.codex.blacklight.registry.ModAttachments.getData(mc.player, com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);var captured=world;
         if(!state.isInfected()||!state.isPrototypeMode()||captured==null||captured.level!=mc.level||captured.frame!=frame)return;
+        if (mc.crosshairPickEntity instanceof com.codex.blacklight.world.GreeneHost host
+                && host.stage() == com.codex.blacklight.world.GreeneHost.SPENT && ready(mc,host)
+                && com.codex.blacklight.world.GreeneHost.aimedForGrab(mc.player) == host) {
+            var hint = net.minecraft.network.chat.Component.translatable("hud.blacklight.grab_greene",
+                    net.minecraft.network.chat.Component.keybind("key.blacklight.grab"));
+            g.drawCenteredString(mc.font,hint,g.guiWidth()/2,g.guiHeight()/2+14,0xFFFFD4D4);
+        }
         int radius=state.getActivePower()==com.codex.blacklight.power.PowerForm.BACKSPINES ? com.codex.blacklight.combat.QuillHarvest.harvestRange(state) : -1;
         if(candidateLevel!=mc.level||quillRadius!=radius||mc.player.tickCount-candidateTick>=5||mc.player.tickCount<candidateTick){
             candidateLevel=mc.level;candidateTick=mc.player.tickCount;
