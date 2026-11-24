@@ -35,7 +35,10 @@ public final class EvolvedVariantsGameTest {
         host.setOnGround(true);host.setHealth(host.getMaxHealth());return host;
     }
     static Mob enemy(GameTestHelper h,BlacklightInfectedHost host,double distance){
-        var e=EntityType.HUSK.create(h.getLevel());e.setPersistenceRequired();e.setNoAi(true);e.setPos(host.position().add(0,0,distance));e.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);e.setHealth(100000);e.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);e.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);var chunk=new net.minecraft.world.level.ChunkPos(e.blockPosition());h.getLevel().setChunkForced(chunk.x,chunk.z,true);h.getLevel().getChunk(chunk.x,chunk.z);h.getLevel().addFreshEntity(e);return e;
+        return enemy(h,host,distance,EntityType.HUSK);
+    }
+    private static Mob enemy(GameTestHelper h,BlacklightInfectedHost host,double distance,EntityType<? extends Mob> species){
+        var e=species.create(h.getLevel());e.setPersistenceRequired();e.setNoAi(true);e.setPos(host.position().add(0,0,distance));e.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100000);e.setHealth(100000);e.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(1);e.getPersistentData().putLong(InfectionRules.NEXT_CONTACT_EXPOSURE,Long.MAX_VALUE);var chunk=new net.minecraft.world.level.ChunkPos(e.blockPosition());h.getLevel().setChunkForced(chunk.x,chunk.z,true);h.getLevel().getChunk(chunk.x,chunk.z);h.getLevel().addFreshEntity(e);return e;
     }
     @GameTest(template="wall_test",timeoutTicks=80,batch="variants_lineage_save")
     public static void allEightActualSelectedBodiesTransformAndSurviveSavingWithoutReroll(GameTestHelper h){
@@ -53,25 +56,59 @@ public final class EvolvedVariantsGameTest {
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_armor") public static void shieldAiUsesItsOwnBash(GameTestHelper h){attack(h,EvolvedArchetype.ARMORED,2.4);}
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_predator") public static void predatorAiActuallyPouncesIntoContact(GameTestHelper h){attack(h,EvolvedArchetype.PREDATOR,5);}
     @GameTest(template="wall_test",timeoutTicks=210,batch="variant_mobility") public static void mobileAiActuallyDashesIntoContact(GameTestHelper h){attack(h,EvolvedArchetype.SKIRMISHER,6);}
-    @GameTest(template="wall_test",timeoutTicks=180,batch="variant_quill")
+    @GameTest(template="wall_test",timeoutTicks=260,batch="variant_quill")
     public static void rangedAiFiresRealCollidingProjectiles(GameTestHelper h){
+        verifyVolley(h,12,EntityType.HUSK);
+    }
+    @GameTest(template="wall_test",timeoutTicks=260,batch="variant_quill_range")
+    public static void volleyAtFullRangeHitsItsAssignedTarget(GameTestHelper h){
+        verifyVolley(h,22,EntityType.PIG);
+    }
+    private static void verifyVolley(GameTestHelper h,int range,EntityType<? extends Mob> species){
+        var anchor=h.absolutePos(new BlockPos(5,0,5));
+        var lane=new BlockPos((anchor.getX() & ~15)+8,h.getLevel().getMaxBuildHeight()-16,anchor.getZ());
+        var ticket=UUID.randomUUID();
+        var type=net.minecraft.server.level.TicketType.create("blacklight_volley_qa",UUID::compareTo);
+        var owned=new HashSet<net.minecraft.world.level.ChunkPos>();
+        for(int z=lane.getZ()>>4;z<=(lane.getZ()+range)>>4;z++){
+            var chunk=new net.minecraft.world.level.ChunkPos(lane.getX()>>4,z);
+            owned.add(chunk);
+            h.getLevel().getChunkSource().addRegionTicket(type,chunk,3,ticket);
+            h.getLevel().getChunk(chunk.x,chunk.z);
+        }
+        var observer=net.neoforged.neoforge.common.util.FakePlayerFactory.get(h.getLevel(),new com.mojang.authlib.GameProfile(UUID.randomUUID(),"QuillObserver"));
+        observer.setGameMode(net.minecraft.world.level.GameType.SPECTATOR);
+        observer.setPos(net.minecraft.world.phys.Vec3.atCenterOf(lane.south(range/2)).add(3,3,0));
+        h.getLevel().addNewPlayer(observer);
+        Runnable cleanup=()->{
+            h.getLevel().removePlayerImmediately(observer,Entity.RemovalReason.DISCARDED);
+            for(var chunk:owned)h.getLevel().getChunkSource().removeRegionTicket(type,chunk,3,ticket);
+        };
+        h.testInfo.addListener(new GameTestListener(){
+            public void testStructureLoaded(GameTestInfo info){}
+            public void testPassed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
+            public void testFailed(GameTestInfo info,GameTestRunner runner){cleanup.run();}
+            public void testAddedForRerun(GameTestInfo original,GameTestInfo retry,GameTestRunner runner){}
+        });
+        h.startSequence().thenWaitUntil(()->{
+            boolean ready=h.getLevel().isPositionEntityTicking(lane) && h.getLevel().isPositionEntityTicking(lane.south(range));
+            if(!ready)java.util.concurrent.locks.LockSupport.parkNanos(50_000_000L);
+            h.assertTrue(ready,"waiting for the firing lane to tick");
+        }).thenExecute(()->fireAtTarget(h,lane,range,species));
+    }
+    private static void fireAtTarget(GameTestHelper h,BlockPos lane,int range,EntityType<? extends Mob> species){
         var body=host(h,EvolvedArchetype.SENSORY);
-        // Keep the actual projectile lane above the shared melee and ecology arenas.
-        var lane=h.absolutePos(new BlockPos(5,80,5));
-        var casterChunk=new net.minecraft.world.level.ChunkPos(lane);
-        boolean forcedCaster=h.getLevel().setChunkForced(casterChunk.x,casterChunk.z,true);
-        h.getLevel().getChunk(casterChunk.x,casterChunk.z);
-        for(var pos:BlockPos.betweenClosed(lane.offset(-3,-1,-3),lane.offset(3,-1,15)))
+        for(var pos:BlockPos.betweenClosed(lane.offset(-3,-1,-3),lane.offset(3,-1,range+3)))
             h.getLevel().setBlock(pos,Blocks.STONE.defaultBlockState(),2);
-        for(var pos:BlockPos.betweenClosed(lane.offset(-2,0,-2),lane.offset(2,4,14)))
+        for(var pos:BlockPos.betweenClosed(lane.offset(-2,0,-2),lane.offset(2,4,range+2)))
             h.getLevel().setBlock(pos,Blocks.AIR.defaultBlockState(),2);
-        body.setPos(lane.getX()+.5,lane.getY(),lane.getZ()+.5);
+        body.moveTo(lane.getX()+.5,lane.getY(),lane.getZ()+.5,0,0);
         body.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
-        var target=enemy(h,body,12);
+        body.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0);
+        var target=enemy(h,body,range,species);
         // Exercise the attack AI against this target even when another suite has living mobs nearby.
         body.targetSelector.removeAllGoals(goal->true);
         body.setTarget(target);
-        body.setNoAi(false);
         var volley=new java.util.concurrent.atomic.AtomicBoolean();
         var emitted=new java.util.concurrent.atomic.AtomicBoolean();
         var hit=new java.util.concurrent.atomic.AtomicBoolean();
@@ -88,7 +125,8 @@ public final class EvolvedVariantsGameTest {
                 hit.set(true);
             previousHealth[0]=health;
         });
-        h.runAfterDelay(141,()->{
+        body.setNoAi(false);
+        h.startSequence().thenWaitUntil(()->h.assertTrue(hit.get(),"waiting for quill hit: volley="+volley+" emitted="+emitted+" caster="+body.position()+"/"+body.tickCount+"/"+body.getRemovalReason()+" target="+target.position()+"/"+target.tickCount+"/"+target.getRemovalReason()+" health="+target.getHealth()+" dmg="+target.getLastDamageSource())).thenExecute(()->{
             try{
                 h.assertTrue(volley.get(),"the sensory AI committed a volley against the assigned target");
                 h.assertTrue(emitted.get(),"the caster emitted a physical quill");
@@ -97,7 +135,6 @@ public final class EvolvedVariantsGameTest {
             }finally{
                 body.discard();
                 target.discard();
-                if(forcedCaster)h.getLevel().setChunkForced(casterChunk.x,casterChunk.z,false);
             }
             h.succeed();
         });
