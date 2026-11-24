@@ -16,7 +16,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 /** One defence and one sense coexist with the selected offensive power. */
 public final class UtilityPowerSystem {
     public static final int DEFENSE = PowerForm.SHIELD.bit() | PowerForm.ARMOR.bit();
-    public static boolean supported(PowerForm f) { return f == PowerForm.SOVEREIGN_WINGS || f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
+    public static boolean supported(PowerForm f) { return f == PowerForm.GAZE_VACUOLE || f == PowerForm.SOVEREIGN_WINGS || f == PowerForm.SHIELD || f == PowerForm.ARMOR || f == PowerForm.THERMAL_VISION || f == PowerForm.INFECTED_VISION; }
     public static boolean active(Player p, PowerForm form) {
         if(!p.isAlive()||!ModAttachments.available(p))return false;
         var state = ModAttachments.peekData(p, ModAttachments.PLAYER_STATE);
@@ -55,7 +55,7 @@ public final class UtilityPowerSystem {
         if (!supported(form)) return;
         int old = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_POWERS);
         if ((old & form.bit()) == 0 && ParasiteSystem.blocked(p, form)) return;
-        int group = form==PowerForm.SOVEREIGN_WINGS ? form.bit() : (form.bit() & DEFENSE) != 0 ? DEFENSE : PowerForm.THERMAL_VISION.bit() | PowerForm.INFECTED_VISION.bit();
+        int group = form==PowerForm.SOVEREIGN_WINGS || form==PowerForm.GAZE_VACUOLE ? form.bit() : (form.bit() & DEFENSE) != 0 ? DEFENSE : PowerForm.THERMAL_VISION.bit() | PowerForm.INFECTED_VISION.bit();
         int mask = (old & form.bit()) != 0 ? old & ~form.bit() : (old & ~group) | form.bit();
         if (group == DEFENSE) {
             var s = com.codex.blacklight.registry.ModAttachments.getData(p, ModAttachments.UTILITY_STATE);

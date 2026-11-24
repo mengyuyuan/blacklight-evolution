@@ -49,8 +49,20 @@ public final class SpiderFooting {
         float phase = Mth.clamp((boss.level().getGameTime()-step.getLong("At")+partial)/STRIDE,0,1);
         if (phase>=1) return end;
         var start = position(step,"From");
-        double lift = Math.min(2.3,.48 + .19*start.distanceTo(end));
-        return start.lerp(end,phase*phase*(3-2*phase)).add(0,lift*Math.sin(Math.PI*phase),0);
+        return swing(start,end,phase);
+    }
+
+    static Vec3 swing(Vec3 start,Vec3 end,float phase){
+        if(phase<=0)return start;
+        if(phase>=1)return end;
+        double length=start.distanceTo(end);
+        double lift=Math.min(2.3,.48+.19*length);
+        // Free the toe before moving it forwards. Descending stairs takes a longer reach,
+        // but still transfers the load to the new support with zero speed at contact.
+        float travel=SpiderGesture.ease(phase,.09F,.95F);
+        float peak=end.y>start.y?.40F:.47F;
+        float height=phase<=peak?SpiderGesture.ease(phase,0,peak):1-SpiderGesture.ease(phase,peak,1);
+        return start.lerp(end,travel).add(0,lift*height,0);
     }
 
     public void tick(ServerLevel level) {

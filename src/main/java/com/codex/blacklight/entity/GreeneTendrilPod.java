@@ -1,5 +1,6 @@
 package com.codex.blacklight.entity;
 
+import com.codex.blacklight.combat.GoddessImpact;
 import com.codex.blacklight.combat.SpiderFoley;
 import com.codex.blacklight.registry.ModEntities;
 import java.util.UUID;
@@ -89,7 +90,9 @@ public final class GreeneTendrilPod extends Mob {
         for(var p:l.getEntitiesOfClass(ServerPlayer.class,getBoundingBox().inflate(RADIUS),p->p.isAlive()&&!p.isCreative()&&!p.isSpectator())){
             var contact=p.getBoundingBox().getCenter();
             if(contact.distanceToSqr(center)>RADIUS*RADIUS || l.clip(new ClipContext(center,contact,ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,this)).getType()!=HitResult.Type.MISS)continue;
-            if(p.hurt(boss.damageSources().mobAttack(boss),(float)boss.kind().damage*.8F)){
+            float damage = getPersistentData().getBoolean("GoddessPod")
+                    ? GoddessImpact.TENDRIL_POD.incoming(p) : (float)boss.kind().damage*.8F;
+            if(p.hurt(boss.damageSources().mobAttack(boss),damage)){
                 var away=contact.subtract(center).multiply(1,0,1).normalize();
                 p.push(away.x*.54,.34,away.z*.54);p.hurtMarked=true;
             }

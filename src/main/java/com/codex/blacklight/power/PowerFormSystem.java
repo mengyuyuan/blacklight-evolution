@@ -31,6 +31,7 @@ public final class PowerFormSystem {
                 : combat.action()!=ClawCombatState.Action.IDLE || !combat.canToggleTransform(player.tickCount))return false;
         // Validate the requested form before touching the current attack.
         if (form != PowerForm.NONE && !state.hasUnlocked(form) && !(purchase && state.buy(form))) {
+            if(form==PowerForm.GAZE_VACUOLE){FieldNotes.record(player, Component.translatable("message.blacklight.gaze_source"));return false;}
             FieldNotes.record(player, Component.translatable("message.blacklight.form_locked", Component.translatable("power.blacklight." + form.id()), form.epCost()));
             return false;
         }

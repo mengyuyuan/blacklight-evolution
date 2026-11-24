@@ -16,8 +16,21 @@ import java.util.UUID;
 
 /** Server-owned attack clocks. The telegraph, fixed aim and closing sphere share one replicated center. */
 public final class GoddessAttacks {
-    public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL, HAND, RUSH, STRUGGLE }
-    private static final Move[] ORDERS={Move.VACUOLE,Move.HAND,Move.CALL,Move.HAND,Move.BLOOD_SURF,Move.NEEDLE_RAIN,Move.WALL_SPEARS,Move.HAND,Move.STRONG_CALL,Move.HAND,Move.RUSH,Move.STRUGGLE};
+    public enum Move { REST, VACUOLE, BREATHER, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, CALL, STRONG_CALL, HAND, RUSH, STRUGGLE, INVERTED_ACID, TENDRIL_ERUPTION, SONIC_CRY, SPIKE_FIELD, INFECTION_WAVE, SEEKING_ORBS, TENDRIL_CRUSH, PACK_POUNCE }
+    private static final Move[] ORDERS = {
+            Move.VACUOLE, Move.HAND, Move.CALL, Move.HAND, Move.SONIC_CRY, Move.INVERTED_ACID,
+            Move.SEEKING_ORBS, Move.BLOOD_SURF, Move.SPIKE_FIELD, Move.TENDRIL_CRUSH, Move.RUSH,
+            Move.PACK_POUNCE, Move.WALL_SPEARS, Move.HAND, Move.INFECTION_WAVE, Move.STRONG_CALL,
+            Move.TENDRIL_ERUPTION, Move.STRUGGLE, Move.NEEDLE_RAIN, Move.HAND
+    };
+    private static final Move[] ARMLESS = {
+            Move.VACUOLE, Move.INVERTED_ACID, Move.CALL, Move.SONIC_CRY, Move.WALL_SPEARS,
+            Move.PACK_POUNCE, Move.SPIKE_FIELD, Move.SEEKING_ORBS, Move.BLOOD_SURF, Move.STRUGGLE,
+            Move.INFECTION_WAVE, Move.STRONG_CALL, Move.TENDRIL_ERUPTION, Move.NEEDLE_RAIN
+    };
+    public final GoddessTerrainCast terrain;
+    public final GoddessCrownCast crown;
+    public final GoddessCommandCast commands;
     public final GoddessHand hand;
     public final GoddessRush rush;
     public final GoddessStruggle struggle;
@@ -29,10 +42,12 @@ public final class GoddessAttacks {
     private static final int GAZE_INHALE_TICKS = 12;
     private int elapsed, sequence, groups, order;
     private int lastVolley = -1;
+    private Move lastAttack=Move.REST;
     static final int CALL_FIRST = 18, CALL_INTERVAL = 8;
     static final int NORMAL_CALL_END = 52, STRONG_CALL_END = 70;
     static final int RAIN_END = 44, SURF_END = 49, SPEARS_END = 80;
     private UUID target;
+    private Vec3 flightHome;
     private Vec3 center=Vec3.ZERO;
     private final GoddessAim measuredAim = new GoddessAim();
 
@@ -47,7 +62,7 @@ public final class GoddessAttacks {
     private final java.util.List<UUID> debris=new java.util.ArrayList<>(4);
     public float captureYaw(){return boss.level().isClientSide?client().getFloat("CaptureYaw"):captureYaw;}
     private static double ease(double t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
-    GoddessAttacks(EncounterMob boss){this.boss=boss;struggle=new GoddessStruggle(boss);hand=new GoddessHand(boss);rush=new GoddessRush(boss);brood=new GoddessBrood(boss);volley=new GoddessVolley(boss);}
+    GoddessAttacks(EncounterMob boss){this.boss=boss;terrain=new GoddessTerrainCast(boss);crown=new GoddessCrownCast(boss);commands=new GoddessCommandCast(boss);struggle=new GoddessStruggle(boss);hand=new GoddessHand(boss);rush=new GoddessRush(boss);brood=new GoddessBrood(boss);volley=new GoddessVolley(boss);}
 
     private CompoundTag client(){return boss.goddessData().getCompound("Offense");}
     public Move move(){return boss.level().isClientSide?decode(client()):move;}
@@ -59,7 +74,15 @@ public final class GoddessAttacks {
         return physical<2*GAZE_INHALE_TICKS ? physical*.5F : physical-GAZE_INHALE_TICKS;
     }
     void receiveTimeline(CompoundTag data, long observed) {
-        scene.synchronize(data.getInt("Sequence"),decode(data).ordinal(),data.getLong("Start"),observed,boss.tickCount);
+        Move move=decode(data);
+        long start=data.getLong("Start");
+        int age=data.getInt("Age");
+        scene.synchronize(data.getInt("Sequence"),move.ordinal(),start,
+                move==Move.VACUOLE?start+age:observed,boss.tickCount);
+        // At low frame rates entity ticks can lag behind the spatial sounds and capture state.
+        // Track the server's published cast age without ever replaying a completed beat.
+        if(move==Move.VACUOLE)scene.catchUpTo(age,boss.tickCount);
+        crown.load(data.getCompound("Crown"));commands.load(data.getCompound("Commands"));terrain.load(data.getCompound("Terrain"));
         struggle.receiveTimeline(data.getCompound("Struggle"),observed);
     }
     public Vec3 center(){return boss.level().isClientSide?readCenter(client()):center;}
@@ -90,6 +113,7 @@ public final class GoddessAttacks {
 
     private void send(){boss.goddess.publish();}
     private void enter(Move next,ServerPlayer p){
+        if(move==Move.SEEKING_ORBS || move==Move.TENDRIL_CRUSH || move==Move.PACK_POUNCE)commands.clear();
         if(move==Move.VACUOLE && caught && !paid && boss.level() instanceof ServerLevel level)GoddessHeldMovement.release(player(level),boss);
         debris.clear();
         if(move==Move.BREATHER || next==Move.BREATHER)brood.clearMeals();
@@ -111,9 +135,47 @@ public final class GoddessAttacks {
         }
         enter(Move.REST,null);
     }
+    // The entity root follows the cave floor. Its articulated mesh supplies the actual floating height.
+    private void approach(ServerLevel level,ServerPlayer player){
+        if(flightHome==null)flightHome=boss.position();
+        Vec3 offset=player.position().subtract(boss.position()).multiply(1,0,1);
+        double distance=offset.length();
+        if(distance<16 || distance>112 || (boss.tickCount&1)!=0)return;
+        Vec3 forward=offset.normalize();
+        Vec3 probe=boss.position().add(0,6,0);
+        boolean obscured=!clear(probe,player.getEyePosition());
+        if(distance<32 && !obscured)return;
+        boolean clockwise=(boss.getId()&1)==0;
+        float side=clockwise?1:-1;
+        float steer=obscured?.88F*side:.12F*side;
+        for(float angle:new float[]{steer,-steer,1.25F*side,-1.25F*side}){
+            Vec3 step=forward.yRot(angle).scale(obscured?.48:.58);
+            Vec3 end=boss.position().add(step);
+            if(end.subtract(flightHome).horizontalDistance()>64 || !level.hasChunkAt(BlockPos.containing(end)))continue;
+            var floor=level.clip(new ClipContext(end.add(0,1.6,0),end.add(0,-2.6,0),ClipContext.Block.COLLIDER,ClipContext.Fluid.NONE,boss));
+            if(floor.getType()!=HitResult.Type.BLOCK || floor.getDirection()!=net.minecraft.core.Direction.UP)continue;
+            if(!clear(probe,probe.add(step.scale(8))) || !clear(probe.add(0,12,0),probe.add(0,12,0).add(step.scale(6))))continue;
+            double climb=Math.max(-.5,Math.min(.5,floor.getLocation().y-boss.getY()));
+            Vec3 motion=step.add(0,climb,0);
+            var box=boss.getBoundingBox();
+            if(!level.getWorldBorder().isWithinBounds(box.move(motion)))continue;
+            // Move against live terrain so excavation and newly placed columns affect the pursuit.
+            Vec3 permitted=net.minecraft.world.entity.Entity.collideBoundingBox(boss,motion,box,level,java.util.List.of());
+            if(permitted.horizontalDistanceSqr()<step.horizontalDistanceSqr()*.64)continue;
+            boss.move(net.minecraft.world.entity.MoverType.SELF,permitted);
+            return;
+        }
+    }
     public void tick(){
         if(!(boss.level() instanceof ServerLevel level))return;
         elapsed++;
+        if(flightHome==null)flightHome=boss.position();
+        // Stop the body for every committed throw, capture and rest meal; keep advancing while conducting at range.
+        if(move==Move.HAND || move==Move.CALL || move==Move.STRONG_CALL
+                || move==Move.NEEDLE_RAIN && elapsed<8 || move==Move.WALL_SPEARS && elapsed<16){
+            var tracked=player(level);
+            if(tracked!=null)approach(level,tracked);
+        }
         if(move==Move.REST){
             if (elapsed < (order == 0 ? 10 : 2)) return;
             var p=nearest(level);
@@ -123,21 +185,24 @@ public final class GoddessAttacks {
                     && recoveryDue(groups, other.getHealth(), other.getMaxHealth()));
             if(recover){enter(Move.BREATHER,p);}
             else {
-                Move selected=ORDERS[Math.floorMod(order++,ORDERS.length)];
-                if((selected==Move.CALL || selected==Move.STRONG_CALL) && !brood.ready(selected==Move.STRONG_CALL))selected=Move.NEEDLE_RAIN;
+                Move[] choices=(boss.goddess.removed()&3)==3?ARMLESS:ORDERS;
+                int slot=Math.floorMod(order++,choices.length);
+                Move selected=choices[slot];
+                if(selected==Move.TENDRIL_CRUSH && (!hand.readyForGrip() || !commands.canCrush(level,p)))selected=Move.HAND;
+                if(selected==Move.PACK_POUNCE && !commands.canPounce(level,p))selected=fallback();
+                if((selected==Move.CALL || selected==Move.STRONG_CALL) && !brood.ready(selected==Move.STRONG_CALL))selected=fallback();
                 if(selected==Move.STRUGGLE){
-                    if(!struggle.begin(p))selected=Move.NEEDLE_RAIN;
+                    if(!struggle.begin(p))selected=fallback();
                 }else if(selected==Move.RUSH && hand.readyForGrip() && !rush.close(p) && struggle.begin(p)){
                     selected=Move.STRUGGLE;
                 }
                 else if(selected==Move.RUSH){
                     if(!rush.begin(p))selected=Move.WALL_SPEARS;
-                }else if(selected==Move.WALL_SPEARS && (boss.goddess.removed()&3)!=3
-                        && rush.close(p) && rush.begin(p)){
+                }else if(selected==Move.HAND && slot==3 && rush.close(p) && rush.begin(p,true)){
                     selected=Move.RUSH;
                 }
                 if (selected == Move.HAND && !hand.begin(level,p)) {
-                    selected = (order & 2) == 0 ? Move.BLOOD_SURF : Move.NEEDLE_RAIN;
+                    selected = fallback();
                 }
                 enter(selected,p);
             }
@@ -167,6 +232,9 @@ public final class GoddessAttacks {
                     else finish();
                 }
             }
+            case INVERTED_ACID, TENDRIL_ERUPTION -> {var active=move;if(crown.tick(level,p,active,elapsed) && move==active)finish();}
+            case SONIC_CRY, SPIKE_FIELD, INFECTION_WAVE -> {var active=move;if(terrain.tick(level,p,active,elapsed) && move==active)finish();}
+            case SEEKING_ORBS, TENDRIL_CRUSH, PACK_POUNCE -> {var active=move;if(commands.tick(level,p,active,elapsed) && move==active)finish();}
             case VACUOLE -> bubble(level,p);
             case HAND -> {if(hand.tick(level,p,volley) && move==Move.HAND)finish();}
             case RUSH -> {if(rush.tick(level,p,elapsed))finish();}
@@ -239,6 +307,8 @@ public final class GoddessAttacks {
             case HAND -> elapsed>=5 && elapsed<=34 ? wrist : -1;
             // A fully charged rock needs about 20 ticks to leave the hand and reach her face from the cave floor.
             case VACUOLE -> elapsed>=1 && elapsed<GAZE_INHALE_TICKS+28 ? 0 : -1;
+            case SEEKING_ORBS -> elapsed>=15 && elapsed<34 ? ((boss.goddess.removed() & GoddessVitals.RIGHT_ARM)==0 ? 9 : wrist>=0 ? wrist : 11) : -1;
+            case TENDRIL_ERUPTION -> elapsed>=53 && elapsed<76 ? 1 : -1;
             case NEEDLE_RAIN -> elapsed>=4 && elapsed<=35 ? 11 : -1;
             case BLOOD_SURF -> elapsed<=12 || elapsed>=22 && elapsed<=38 ? (wrist>=0?wrist:1) : -1;
             case CALL, STRONG_CALL, WALL_SPEARS -> elapsed>=12 && elapsed<=32 ? (wrist>=0?wrist:1) : -1;
@@ -253,6 +323,10 @@ public final class GoddessAttacks {
         var joint=region.bounds().getCenter();
         var edge=region.boxes().get((elapsed/4)%region.boxes().size()).nearest(center);
         SpiderFoley.strands(boss,edge,joint.subtract(edge),4);
+        if(move==Move.SEEKING_ORBS || move==Move.TENDRIL_ERUPTION){
+            SpiderFoley.strands(boss,joint,edge.subtract(joint),7);
+            return;
+        }
         if(boss.level() instanceof ServerLevel server){
             var visible=edge.add(center.subtract(edge).normalize().scale(.2));
             // A player on the floor can be more than 32 blocks from the face of this 46-block boss.
@@ -261,7 +335,13 @@ public final class GoddessAttacks {
                         visible.x,visible.y,visible.z,6,.36,.32,.36,.018);
         }
     }
+    private Move fallback(){
+        Move[] volleys={Move.WALL_SPEARS,Move.BLOOD_SURF,Move.NEEDLE_RAIN,Move.VACUOLE};
+        int index=Math.floorMod(order,volleys.length);
+        return volleys[index]!=lastAttack?volleys[index]:volleys[(index+1)%volleys.length];
+    }
     private void finish(){
+        lastAttack=move;
         boss.goddess.finishedAttack();
         lastVolley = sequence;
         groups=Math.min(4,groups+(move==Move.STRONG_CALL && paid ? 2 : 1));
@@ -304,12 +384,11 @@ public final class GoddessAttacks {
             Vec3 nearest=new Vec3(Math.max(p.getBoundingBox().minX,Math.min(center.x,p.getBoundingBox().maxX)),
                     Math.max(p.getBoundingBox().minY,Math.min(center.y,p.getBoundingBox().maxY)),
                     Math.max(p.getBoundingBox().minZ,Math.min(center.z,p.getBoundingBox().maxZ)));
-            if(nearest.distanceToSqr(center)<=9 && clear(center,p.getBoundingBox().getCenter()) && clear(eyes(),p.getEyePosition())){
+            if(nearest.distanceToSqr(center)<=9 && clear(center,p.getBoundingBox().getCenter()) && clear(eyes(),center)){
                 caught=true;
                 var bounds=p.getBoundingBox();
                 var soles=new AABB(bounds.minX+.025,bounds.minY-.065,bounds.minZ+.025,bounds.maxX-.025,bounds.minY+.002,bounds.maxZ-.025);
                 grounded=p.getDeltaMovement().y<.09 && level.getBlockCollisions(p,soles).iterator().hasNext();
-                center=new Vec3(center.x,bounds.getCenter().y,center.z);
                 captureYaw=p.yBodyRot;
                 entry=p.position().subtract(center);
                 var travel=p.getDeltaMovement().multiply(1,0,1);
@@ -330,7 +409,7 @@ public final class GoddessAttacks {
             GoddessHeldMovement.release(p,boss);
             paid=true;
             float before=p.getHealth();
-            p.hurt(boss.damageSources().mobAttack(boss),.30F*p.getMaxHealth()/com.codex.blacklight.power.CombatScale.units(p));
+            p.hurt(boss.damageSources().mobAttack(boss),GoddessImpact.VACUOLE.incoming(p));
             p.fallDistance=0;
             bled=p.getHealth()<before;
             sound(level,center,com.codex.blacklight.registry.ModInfectedSounds.Pressure.BURST,1.6F);
@@ -404,7 +483,7 @@ public final class GoddessAttacks {
         }
     }
     public CompoundTag save(){
-        var t=new CompoundTag();t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putInt("Age",elapsed);if(move==Move.VACUOLE)t.putBoolean("GazeInhale",true);t.putLong("Start",boss.level().getGameTime()-elapsed);
+        var t=new CompoundTag();t.put("Crown",crown.save());t.put("Commands",commands.save());t.put("Terrain",terrain.save());t.put("Hand",hand.save());t.put("Rush",rush.save());t.put("Struggle",struggle.save());t.putString("Move",move.name());t.putString("LastAttack",lastAttack.name());t.putInt("Age",elapsed);if(move==Move.VACUOLE)t.putBoolean("GazeInhale",true);t.putLong("Start",boss.level().getGameTime()-elapsed);
         brood.saveCall(t);t.putInt("Sequence",sequence);t.putInt("Groups",groups);t.putInt("LastVolley",lastVolley);t.putInt("Order",order);t.put("RecoveryMeals",brood.saveMeals());
         t.putBoolean("Caught",caught);t.putBoolean("Ground",grounded);t.putBoolean("Paid",paid);t.putBoolean("Bled",bled);
         t.putDouble("X",center.x);t.putDouble("Y",center.y);t.putDouble("Z",center.z);
@@ -412,16 +491,19 @@ public final class GoddessAttacks {
         t.putDouble("EntryX",entry.x);t.putDouble("EntryY",entry.y);t.putDouble("EntryZ",entry.z);
         t.putDouble("PushX",impulse.x);t.putDouble("PushZ",impulse.z);
         for(int i=0;i<debris.size();i++)t.putUUID("Stone"+i,debris.get(i));
+        if(flightHome!=null){t.putDouble("HomeX",flightHome.x);t.putDouble("HomeY",flightHome.y);t.putDouble("HomeZ",flightHome.z);}
         if(target!=null)t.putUUID("Target",target);
         return t;
     }
     private static Move decode(CompoundTag t){try{return Move.valueOf(t.getString("Move"));}catch(IllegalArgumentException e){return Move.REST;}}
     private static Vec3 readCenter(CompoundTag t){return new Vec3(t.getDouble("X"),t.getDouble("Y"),t.getDouble("Z"));}
     public void load(CompoundTag t){
-        brood.loadCall(t);struggle.load(t.getCompound("Struggle"));hand.load(t.getCompound("Hand"));rush.load(t.getCompound("Rush"));captureYaw=t.getFloat("CaptureYaw");
+        flightHome=t.contains("HomeX")?new Vec3(t.getDouble("HomeX"),t.getDouble("HomeY"),t.getDouble("HomeZ")):null;
+        crown.load(t.getCompound("Crown"));commands.load(t.getCompound("Commands"));terrain.load(t.getCompound("Terrain"));brood.loadCall(t);struggle.load(t.getCompound("Struggle"));hand.load(t.getCompound("Hand"));rush.load(t.getCompound("Rush"));captureYaw=t.getFloat("CaptureYaw");
         entry=new Vec3(t.getDouble("EntryX"),t.contains("EntryY")?t.getDouble("EntryY"):-.9,t.getDouble("EntryZ"));
         impulse=new Vec3(t.getDouble("PushX"),0,t.getDouble("PushZ"));
         debris.clear();for(int i=0;i<4;i++)if(t.hasUUID("Stone"+i))debris.add(t.getUUID("Stone"+i));
+        try{lastAttack=Move.valueOf(t.getString("LastAttack"));}catch(IllegalArgumentException ignored){lastAttack=Move.REST;}
         move=decode(t);elapsed=Math.max(0,t.getInt("Age"));
         if(move==Move.VACUOLE && elapsed>0 && !t.getBoolean("GazeInhale"))elapsed+=GAZE_INHALE_TICKS;
         sequence=t.getInt("Sequence");lastVolley=t.contains("LastVolley")?t.getInt("LastVolley"):-1;groups=t.getInt("Groups");order=t.getInt("Order");brood.loadMeals(t.getList("RecoveryMeals",10));

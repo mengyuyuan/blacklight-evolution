@@ -29,6 +29,11 @@ public abstract class LivingConsumePoseMixin {
     @Inject(method="setupRotations",at=@At("HEAD"),cancellable=true)
     private void blacklight$physicalRoot(LivingEntity entity,PoseStack stack,float bob,float bodyYaw,float partial,CallbackInfo ci){
         com.codex.blacklight.client.renderer.QuillOrganRenderer.contractHost(entity,stack,partial);
+        float pressure=com.codex.blacklight.combat.PlayerGazeField.squeeze(entity,partial);
+        if(pressure>0){
+            stack.translate(0,entity.getBbHeight()*.12F*pressure,0);
+            stack.scale(1-.19F*pressure,1-.27F*pressure,1-.16F*pressure);
+        }
         if(com.codex.blacklight.client.animation.ImpactRagdoll.active(entity)||com.codex.blacklight.client.renderer.AdaptiveRagdoll.active(entity)){
             stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-bodyYaw));ci.cancel();
         }

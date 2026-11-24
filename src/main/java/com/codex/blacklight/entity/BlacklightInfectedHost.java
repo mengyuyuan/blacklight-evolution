@@ -987,6 +987,7 @@ public final class BlacklightInfectedHost extends Monster {
             if(attackCooldown>0)attackCooldown--;
             clearTissueStrike();return;
         }
+        if(isNoAi() && getPersistentData().hasUUID("PounceCaller"))return;
         if(isEvolved()&&evolvedCombat.tick())return;
         if(nativeCombat.tick())return;
         if(organAbilities.tick())return;

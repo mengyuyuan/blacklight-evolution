@@ -37,6 +37,13 @@ public final class ModInfectedSounds {
     }
     public static SoundEvent pressure(Pressure cue){return PRESSURE.get(cue).get();}
     public static SoundEvent molt(int cue){return MOLT.get(cue).get();}
+    private static final Supplier<SoundEvent> SONIC_PING = sonic("ping");
+    private static final Supplier<SoundEvent> SONIC_HOWL = sonic("howl");
+    private static Supplier<SoundEvent> sonic(String name) {
+        String id = "greene.sonic." + name;
+        return SOUNDS.register(id, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("blacklight",id)));
+    }
+    public static SoundEvent sonic(boolean howl) { return (howl ? SONIC_HOWL : SONIC_PING).get(); }
     private static final Map<com.codex.blacklight.combat.SpiderFoley.Cue,Supplier<SoundEvent>> SPIDER =
             new EnumMap<>(com.codex.blacklight.combat.SpiderFoley.Cue.class);
     static {

@@ -83,6 +83,20 @@ final class GoddessHandRenderer {
                 }
             }
         }
+        if(conducting && hand.melee()){
+            float time=hand.controlTime(partial);
+            if(time>=11 && time<=20 || time>=42 && time<=49){
+                var earlier=hand.pose(partial-2.5F);
+                if(earlier!=null && earlier.links().size()==shape.links().size()){
+                    for(int i=4;i<shape.links().size();i+=3){
+                        var oldTip=earlier.links().get(i+2).end().subtract(origin);
+                        var tip=shape.links().get(i+2).end().subtract(origin);
+                        if(oldTip.distanceToSqr(tip)>.8)
+                            GoddessCastRenderer.coil(poses,buffers,0xf000f0,oldTip,tip,0,1,.55F,.12F,i,.81F,2);
+                    }
+                }
+            }
+        }
         int skins=hand.skins();
         for(int appearance=0;appearance<4;appearance++){
             var people=buffers.getBuffer(RenderType.entityCutoutNoCull(CommonInfectedRenderer.skin(appearance)));

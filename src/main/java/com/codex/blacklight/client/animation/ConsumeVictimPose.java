@@ -132,6 +132,19 @@ public final class ConsumeVictimPose {
     public static void vanilla(EntityModel<?> model,LivingEntity entity,float partial) {
         restore(model);
         try {
+            float pressure=com.codex.blacklight.combat.PlayerGazeField.squeeze(entity,partial);
+            if(pressure>0 && model instanceof HumanoidModel<?> h){
+                var saved=new IdentityHashMap<ModelPart,PartPose>();
+                SAVED.put(model,saved);
+                rotate(saved,h.head,.43F*pressure,0,0);
+                rotate(saved,h.hat,.43F*pressure,0,0);
+                rotate(saved,h.body,.38F*pressure,0,0);
+                rotate(saved,h.rightArm,-1.21F*pressure,.32F*pressure,-.40F*pressure);
+                rotate(saved,h.leftArm,-1.05F*pressure,-.32F*pressure,.44F*pressure);
+                rotate(saved,h.rightLeg,-.64F*pressure,0,.14F*pressure);
+                rotate(saved,h.leftLeg,-.42F*pressure,0,-.14F*pressure);
+                return;
+            }
         if(GrappleMotion.greeneGrip(entity,ModAttachments.getData(entity,ModAttachments.CONSUME_VISUAL)))return;
         var parasite=com.codex.blacklight.entity.QuillOrgan.extracting(entity);
         if(parasite!=null){quillStruggle(model,entity,parasite,partial);return;}

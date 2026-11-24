@@ -18,15 +18,44 @@ public final class EvolvedQuillRenderer extends EntityRenderer<EvolvedQuill> {
     @Override public void render(EvolvedQuill quill,float yaw,float partial,PoseStack pose,MultiBufferSource buffers,int light){
         pose.pushPose();pose.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partial,quill.yRotO,quill.getYRot())));pose.mulPose(Axis.XP.rotationDegrees(-Mth.lerp(partial,quill.xRotO,quill.getXRot())));
         var out=buffers.getBuffer(RenderType.entityCutoutNoCull(ConsumedMobVisuals.WHITE));
-        if(quill.bloodSpear())bloodSpear(out,pose,light);
+        if(quill.bloodSpear()){
+            bloodSpear(out,pose,light);
+            var wake=buffers.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
+            if(quill.lodgedSpear()){
+                float t=quill.tickCount+partial;
+                for(int i=0;i<3;i++){
+                    float a=t*.14F+i*2.0944F,x=Mth.cos(a),y=Mth.sin(a);
+                    float spread=.60F+.16F*Mth.sin(t*.49F);
+                    vertex(wake,pose,.1F*x,.1F*y,-.53F,0xbee7ac99,light);
+                    vertex(wake,pose,spread*x,spread*y,-1.82F,0xb7cb655e,light);
+                    vertex(wake,pose,.25F*x,.25F*y,-2.74F,0x40af4c64,light);
+                    vertex(wake,pose,.22F*x-.1F*y,.22F*y+.1F*x,-1.7F,0x99231631,light);
+                }
+            }else {
+                needleWake(wake,pose,light,quill.tickCount+partial);
+                GoddessFlare.volley(pose,buffers,false,false,quill.tickCount+partial);
+            }
+        }
         else if(quill.barrage()!=0){
             if(quill.barrage()==EvolvedQuill.CROWN_NEEDLE){
                 pose.scale(1.12F,1.12F,1.06F);
                 bloodSpear(out,pose,light);
                 var wake=buffers.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
                 needleWake(wake,pose,light,quill.tickCount+partial);
+                GoddessFlare.volley(pose,buffers,false,false,quill.tickCount+partial);
             }else{
-                surf(out,pose,light,quill.barrage()==EvolvedQuill.HIGH_SURF,quill.tickCount+partial);
+                boolean high=quill.barrage()==EvolvedQuill.HIGH_SURF;
+                surf(out,pose,light,high,quill.tickCount+partial);
+                var foam=buffers.getBuffer(RenderType.entityTranslucentEmissive(ConsumedMobVisuals.WHITE));
+                for(int i=-1;i<=1;i++){
+                    float x=i*.43F;
+                    float crest=(high?-1:1)*(.28F+.15F*Mth.sin((quill.tickCount+partial)*.38F+i));
+                    vertex(foam,pose,x-.13F,0,.31F,0xcaeac3ae,light);
+                    vertex(foam,pose,x+.13F,0,.29F,0xb9dc9589,light);
+                    vertex(foam,pose,x+.07F,crest,-1.4F,0x9ab14e62,light);
+                    vertex(foam,pose,x-.06F,crest*.7F,-3.4F,0x36513345,light);
+                }
+                GoddessFlare.volley(pose,buffers,true,high,quill.tickCount+partial);
             }
         }
         else for(int i=0;i<4;i++){
@@ -39,9 +68,9 @@ public final class EvolvedQuillRenderer extends EntityRenderer<EvolvedQuill> {
         for(int i=0;i<3;i++){
             float a=twist+i*2.0944F;
             float x=Mth.cos(a),y=Mth.sin(a);
-            vertex(out,pose,.12F*x,.12F*y,-.44F,0xc2e4d1bb,light);
+            vertex(out,pose,.12F*x,.12F*y,-.44F,0xeee4d1bb,light);
             vertex(out,pose,.40F*x+.10F*y,.40F*y-.10F*x,-1.65F,0xa6b96a65,light);
-            vertex(out,pose,.53F*x+.23F*y,.53F*y-.23F*x,-4.5F,0x16473349,light);
+            vertex(out,pose,.53F*x+.23F*y,.53F*y-.23F*x,-6.15F,0x39694359,light);
             vertex(out,pose,.19F*x-.08F*y,.19F*y+.08F*x,-2.18F,0x78492334,light);
         }
     }

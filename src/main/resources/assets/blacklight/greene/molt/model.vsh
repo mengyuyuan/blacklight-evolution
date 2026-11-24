@@ -3,7 +3,7 @@ in vec3 pos,normal,ink;in vec2 uv;in float joint;
 uniform mat4 camera,root;uniform sampler2D bones,actors;
 uniform int severed; uniform vec2 legBends[8];
 const vec3 legJoint[16]=vec3[16](vec3(3.26562,5.22297,-1.25000),vec3(6.04688,9.63932,-3.42188),vec3(3.78125,4.07980,-0.46875),vec3(7.46875,7.68422,-0.90625),vec3(3.50000,4.26225,1.23438),vec3(3.75000,6.98466,2.59375),vec3(3.35938,3.60484,2.03125),vec3(5.46875,5.93191,3.54688),vec3(-1.54688,4.86653,-0.60938),vec3(-4.54688,9.62314,-2.59375),vec3(-1.84375,4.12370,0.10938),vec3(-7.31250,7.87852,0.28125),vec3(-1.56250,4.59460,1.76562),vec3(-2.54688,7.51469,3.04688),vec3(-1.85938,3.40105,2.43750),vec3(-4.20312,5.87183,3.79688));
-uniform int kind; uniform float time;uniform vec3 pivots[12];
+uniform int kind,liveForm; uniform float time;uniform vec3 pivots[12];
 out vec3 rgb, norm,wp;out vec2 texuv;flat out int surface;
 mat3 rx(float a){float c=cos(a),s=sin(a);return mat3(1,0,0,0,c,s,0,-s,c);}
 mat3 ry(float a){float c=cos(a),s=sin(a);return mat3(c,0,-s,0,1,0,s,0,c);}
@@ -76,4 +76,5 @@ void main(){
    }
  }else{surface=3+j;p=(root*vec4(p,1)).xyz;}
  wp=p;norm=n;gl_Position=camera*vec4(p,1);
+ if(liveForm==2)gl_Position.z-=gl_Position.w*.000001;
 }

@@ -16,6 +16,16 @@ public final class GoddessDamage {
         var parent=p.serverLevel().getEntity(entity.getPersistentData().getUUID("EncounterOwner"));
         return parent instanceof EncounterMob m && m.goddess.active()?m:null;
     }
+    /** Vanilla falling-block damage is calculated per landing before player defenses. The hand is the
+     * only system that assigns an EncounterOwner to a falling block, including blocks in older saves. */
+    public static float fallingRock(Player player, DamageSource source, float amount) {
+        if (amount <= 0 || !(player instanceof ServerPlayer p)
+                || !(source.getDirectEntity() instanceof net.minecraft.world.entity.item.FallingBlockEntity block)
+                || !block.getPersistentData().hasUUID("EncounterOwner")) return amount;
+        if (owner(p, block) != null) return GoddessImpact.THROWN_ROCK.incoming(p);
+        // A rock still dropping after the encounter ends cannot revert to vanilla fixed damage.
+        return block.getPersistentData().contains("GoddessSequence") ? 0 : amount;
+    }
     static boolean fromEncounter(ServerPlayer p,DamageSource s){return owner(p,s.getEntity())!=null || owner(p,s.getDirectEntity())!=null;}
     public static float health(Player player,DamageSource source,float proposed){
         if(!(player instanceof ServerPlayer p) || proposed>=p.getHealth())return proposed;
