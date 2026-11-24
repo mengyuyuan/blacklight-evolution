@@ -10,7 +10,12 @@ import java.util.*;
 public record ContactEffectsPayload(long tick,long serial,int kind,CombatImpactPayload flash,
         InfectedImpactPayload tissue,boolean heavy,List<Surface> terrain,List<Sound> sounds) implements CustomPacketPayload {
     public static final int GROUND=0,CRUSH=1,TISSUE=2,GUARD=3,SOUND=4,OBSTACLE=5,BOSS_ARMOR=6,BOSS_FLESH=7,BOSS_WEAK=8,BOSS_BREAK=9;
-    public record Surface(double x,double y,double z,int state,int ring,int index,double angle) {}
+    public record Surface(double x,double y,double z,int state,int ring,int index,double angle) {
+        public boolean fits(CombatImpactPayload flash) {
+            return Math.abs(x - flash.x()) <= 13 && Math.abs(z - flash.z()) <= 13
+                    && Math.abs(y - flash.y()) <= 2;
+        }
+    }
     public record Sound(ResourceLocation id,float volume,float pitch) {}
     public static final Type<ContactEffectsPayload> TYPE=new Type<>(ResourceLocation.fromNamespaceAndPath("blacklight","contact_effects"));
     public static final StreamCodec<RegistryFriendlyByteBuf,ContactEffectsPayload> STREAM_CODEC=StreamCodec.of(
@@ -32,7 +37,7 @@ public record ContactEffectsPayload(long tick,long serial,int kind,CombatImpactP
         if(tick<0||kind<0||kind>BOSS_BREAK||flash==null||terrain.size()>48||sounds.size()>3)throw new IllegalArgumentException("Invalid contact receipt");
         if(!Double.isFinite(flash.x()+flash.y()+flash.z()))throw new IllegalArgumentException("Nonfinite contact");
         for(var s:terrain)if(!Double.isFinite(s.x+s.y+s.z+s.angle)||s.ring<0||s.ring>2||s.index<0||s.index>15||s.state<0
-                ||Math.abs(s.x-flash.x())>13||Math.abs(s.z-flash.z())>13||Math.abs(s.y-flash.y())>2)throw new IllegalArgumentException("Invalid terrain sample");
+                ||!s.fits(flash))throw new IllegalArgumentException("Invalid terrain sample");
         for(var s:sounds)if(!Float.isFinite(s.volume+s.pitch)||s.volume<0||s.volume>4||s.pitch<=0||s.pitch>2)throw new IllegalArgumentException("Invalid sound cue");
         if((kind==CRUSH||kind==TISSUE)&&tissue==null)throw new IllegalArgumentException("Missing hit receipt");
         terrain=List.copyOf(terrain);sounds=List.copyOf(sounds);

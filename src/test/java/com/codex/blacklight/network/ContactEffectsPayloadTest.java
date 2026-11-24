@@ -70,6 +70,32 @@ class ContactEffectsPayloadTest {
             }finally{b.release();}
         }
     }
+    @Test void groundReceiptAcceptsItsBoundaryOnEitherSideOfTheFirstHit() {
+        var origin = new CombatImpactPayload(301.5, 64, 885.5, 4, true);
+        for (int sign : new int[]{-1, 1}) {
+            var edge = new ContactEffectsPayload.Surface(origin.x() + sign * 13, origin.y() + sign * 2,
+                    origin.z() + sign * 13, 1, 1, 4, 0);
+            assertTrue(edge.fits(origin));
+            var receipt = new ContactEffectsPayload(1, 1, ContactEffectsPayload.GROUND, origin, null,
+                    true, List.of(edge), List.of());
+            var bytes = buffer();
+            try {
+                ContactEffectsPayload.STREAM_CODEC.encode(bytes, receipt);
+                assertEquals(receipt, ContactEffectsPayload.STREAM_CODEC.decode(bytes));
+            } finally {
+                bytes.release();
+            }
+            for (var beyond : List.of(
+                    new ContactEffectsPayload.Surface(edge.x() + sign * .01, edge.y(), edge.z(), 1, 1, 4, 0),
+                    new ContactEffectsPayload.Surface(edge.x(), edge.y() + sign * .01, edge.z(), 1, 1, 4, 0),
+                    new ContactEffectsPayload.Surface(edge.x(), edge.y(), edge.z() + sign * .01, 1, 1, 4, 0))) {
+                assertFalse(beyond.fits(origin));
+                assertThrows(IllegalArgumentException.class, () -> new ContactEffectsPayload(1, 1,
+                        ContactEffectsPayload.GROUND, origin, null, true, List.of(beyond), List.of()));
+            }
+        }
+    }
+
     @Test void impossibleTerrainAndMissingAcceptedHitCannotBePresented(){
         var flash=new CombatImpactPayload(0,80,0,3,true);
         assertThrows(IllegalArgumentException.class,()->new ContactEffectsPayload(1,1,0,flash,null,true,List.of(new ContactEffectsPayload.Surface(0,100,0,1,0,0,0)),List.of()));

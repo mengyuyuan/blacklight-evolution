@@ -18,11 +18,25 @@ public final class ContactEffects {
     private ContactEffects(){}
     public static void ground(Entity actor,BlockHitResult contact,float radius,boolean heavy,List<TerrainImpactEffects.Surface> samples){
         var at=contact.getLocation();var level=(ServerLevel)actor.level();var state=level.getBlockState(contact.getBlockPos());
-        var surfaces=samples.stream().map(s->{var p=s.hit().getLocation();return new ContactEffectsPayload.Surface(p.x,p.y,p.z,Block.getId(level.getBlockState(s.hit().getBlockPos())),s.ring(),s.index(),s.angle());}).toList();
+        var flash = new CombatImpactPayload(at.x, at.y, at.z, radius, true);
+        var surfaces = new ArrayList<ContactEffectsPayload.Surface>();
+        for (var sample : samples) {
+            var hit = sample.hit();
+            var point = hit.getLocation();
+            var material = level.getBlockState(hit.getBlockPos());
+            var surface = new ContactEffectsPayload.Surface(point.x, point.y, point.z,
+                    Block.getId(material), sample.ring(), sample.index(), sample.angle());
+            if (surface.fits(flash)) {
+                surfaces.add(surface);
+            } else {
+                // A wide slam can hit another elevation. Emit its debris at the real hit.
+                TerrainImpactEffects.emitSurface(level, sample, material, heavy);
+            }
+        }
         var sounds=new ArrayList<ContactEffectsPayload.Sound>();
         if(!actor.isSilent())sounds.add(new ContactEffectsPayload.Sound(BuiltInRegistries.SOUND_EVENT.getKey(state.getSoundType().getBreakSound()),heavy?1.2F:.7F,heavy?.65F:.75F));
         var cue=ModInfectedSounds.prepare(actor,InfectedSoundCue.GROUND,at);if(cue!=null)sounds.add(sound(cue));
-        send(actor,new ContactEffectsPayload(level.getGameTime(),++serial,ContactEffectsPayload.GROUND,new CombatImpactPayload(at.x,at.y,at.z,radius,true),null,heavy,surfaces,sounds));
+        send(actor,new ContactEffectsPayload(level.getGameTime(),++serial,ContactEffectsPayload.GROUND,flash,null,heavy,surfaces,sounds));
     }
     public static void obstacle(Entity actor,Vec3 point,AABB shape){
         var level=(ServerLevel)actor.level();var state=level.getBlockState(net.minecraft.core.BlockPos.containing(shape.getCenter()));
