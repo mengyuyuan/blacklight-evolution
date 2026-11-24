@@ -11,6 +11,10 @@
     {
       "type": "patchouli:text",
       "text": "If a site is already active, return to its existing fight. For an unresponsive lock, check normal mode, the item in your hand, difficulty and the exit space. Search newly generated terrain with structures enabled for natural sites."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "If an older save recorded the underground victory too early, finish the pump encounter, then sneak and hold Use with Greene's tissue for one full pulse near the underground den to replay the fight."
     }
   ]
 }

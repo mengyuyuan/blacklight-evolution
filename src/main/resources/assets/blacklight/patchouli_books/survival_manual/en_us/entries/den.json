@@ -10,7 +10,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Enter the chamber carrying the tissue on a non-Peaceful difficulty. Survive Greene's ground and airborne phases to complete the outbreak milestone. Parasite experiments, repeatable evolution and symbiotes remain open.$(br2)$(l:recovery)Recover a lost lead$(/l)"
+      "text": "After earning the pump milestone, enter the chamber on a non-Peaceful difficulty. You can continue if another player has the tissue or it was lost. Defeat the spider, then bring the goddess down and extract both arms and her head. Completing the head extraction grants Gaze Vacuole to participants.$(br2)$(l:recovery)Recover a lost lead$(/l)"
     }
   ]
 }

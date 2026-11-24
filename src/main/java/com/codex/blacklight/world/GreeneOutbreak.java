@@ -4,7 +4,6 @@ import com.codex.blacklight.entity.EncounterKind;
 import com.codex.blacklight.item.GreeneTissueItem;
 import com.codex.blacklight.registry.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.*;
@@ -15,14 +14,7 @@ import net.minecraft.world.phys.Vec3;
 final class GreeneOutbreak {
     private GreeneOutbreak(){}
     static void arrive(ServerPlayer player){
-        boolean carries = false;
-        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
-            if (GreeneTissueItem.isTissue(player.getInventory().getItem(slot))) {
-                carries = true;
-                break;
-            }
-        }
-        if (!carries) return;
+        // The escape drops one tracking sample for the party. Every credited participant can enter the den.
         var level = player.serverLevel();
         var den = GreeneHiveCave.nearest(level.getSeed(), player.blockPosition());
         if (GreeneTissueItem.held(player) && !GreeneTissueItem.isTissue(player.getUseItem())) {

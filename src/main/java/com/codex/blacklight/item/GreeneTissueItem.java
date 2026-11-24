@@ -33,7 +33,7 @@ public final class GreeneTissueItem extends Item {
                                         int slot, boolean selected) {
         if (!(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0 || player.isSpectator()
                 || !(selected || player.getOffhandItem() == stack) || level.dimension() != CityTravel.WORLD
-                || SurvivalGuide.done(player, "greene_outbreak")) return;
+                || !SurvivalGuide.followingGreene(player)) return;
         // The city itself uses a custom flat-derived generator. Check the save's overworld preset.
         if (player.serverLevel().getServer().overworld().getChunkSource().getGenerator().getClass()
                 == net.minecraft.world.level.levelgen.FlatLevelSource.class) return;
@@ -64,7 +64,7 @@ public final class GreeneTissueItem extends Item {
         if (age != 12 && age != 21) return;
         var world = player.serverLevel();
         world.playSound(null, player.blockPosition(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, .6F, age == 12 ? 1.04F : .82F);
-        if (world.dimension() != CityTravel.WORLD || SurvivalGuide.done(player, "greene_outbreak")) {
+        if (world.dimension() != CityTravel.WORLD || !SurvivalGuide.followingGreene(player)) {
             if (age == 12) FieldNotes.record(player, Component.translatable(world.dimension() != CityTravel.WORLD
                     ? "item.blacklight.greene_tissue.distant" : "item.blacklight.greene_tissue.quiet"));
             return;
@@ -82,6 +82,7 @@ public final class GreeneTissueItem extends Item {
     }
 
     @Override public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity holder) {
+        if (holder instanceof ServerPlayer player) SurvivalGuide.revisitGreene(player);
         if (holder instanceof Player player) player.getCooldowns().addCooldown(this, 12);
         return stack;
     }

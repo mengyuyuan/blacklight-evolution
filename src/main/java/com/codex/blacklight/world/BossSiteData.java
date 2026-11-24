@@ -16,6 +16,12 @@ import java.util.UUID;
 
 /** Each dimension owns its consoles. Offline awards are queued in the Overworld. */
 public final class BossSiteData extends SavedData {
+    // Bit 4 is also present in legacy victories that did not verify head extraction.
+    private static final int GODDESS_VICTORY = 4 | 8;
+    private static final String HEAD_CONFIRMED = "BlacklightGoddessHeadConfirmed";
+    static boolean headConfirmed(ServerPlayer player) {
+        return player.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG).getBoolean(HEAD_CONFIRMED);
+    }
     private static final String HOME = "BlacklightBossConsole";
     private static final String SQUAD = "BlacklightBossParticipants";
     private final Map<Long, UUID> active = new HashMap<>();
@@ -38,6 +44,11 @@ public final class BossSiteData extends SavedData {
         var squad = data.getCompound(SQUAD);
         squad.putBoolean(player.getStringUUID(), true);
         data.put(SQUAD, squad);
+    }
+    void restoreEscapeOwner(GreeneHost host, BlockPos station) {
+        var tag=host.getPersistentData();
+        if (tag.contains(HOME,Tag.TAG_LONG) && tag.getLong(HOME)==station.asLong()
+                && active.putIfAbsent(station.asLong(),host.getUUID())==null) setDirty();
     }
     void release(Entity boss) {
         if (active.remove(boss.getPersistentData().getLong(HOME), boss.getUUID())) setDirty();
@@ -67,16 +78,23 @@ public final class BossSiteData extends SavedData {
         if (!boss.getUUID().equals(data.active.get(boss.getPersistentData().getLong(HOME)))) return;
         participant(boss, killer);
         if(boss.kind()==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE) {
-            if(boss.greeneOutbreak()) {
-                complete(boss,killer,4);
-                return;
+            var site=BlockPos.of(boss.getPersistentData().getLong(HOME));
+            if (boss.getPersistentData().contains("PlazaSurface") || !boss.greeneOutbreak()) {
+                GreeneHost.releaseFrom(boss,level,site);
+            } else if (level.dimension()==com.codex.blacklight.city.CityTravel.WORLD
+                    && GreeneHiveCave.nearest(level.getSeed(),site).equals(site)
+                    && boss.goddess.headExtractionComplete()) {
+                complete(boss,killer,GODDESS_VICTORY);
             }
-            GreeneHost.releaseFrom(boss,level,BlockPos.of(boss.getPersistentData().getLong(HOME)));
             return;
         }
         complete(boss,killer,1);
     }
-    static void complete(Entity boss, Entity finisher, int bit) {
+    static void escaped(GreeneHost host) {
+        if (!host.isRemoved() && host.stage()==GreeneHost.ESCAPING && host.age(0)>=GreeneHost.ESCAPE_END)
+            complete(host,null,2);
+    }
+    private static void complete(Entity boss, Entity finisher, int bit) {
         if(!(boss.level() instanceof ServerLevel level) || !boss.getPersistentData().contains(HOME)) return;
         var data=get(level);
         if(!boss.getUUID().equals(data.active.get(boss.getPersistentData().getLong(HOME)))) return;
@@ -95,7 +113,7 @@ public final class BossSiteData extends SavedData {
         }
         rewards.setDirty();
         data.release(boss);
-        if (bit==4) return; // The outbreak advancement pays its XP once per participant.
+        if ((bit & 4)!=0) return; // The outbreak advancement pays its XP once per participant.
         boss.spawnAtLocation(bit == 1 ? com.codex.blacklight.registry.ModItems.HEAVY_ARMOR_CORE.get()
                 : com.codex.blacklight.registry.ModItems.GREENE_TISSUE.get());
     }
@@ -103,6 +121,12 @@ public final class BossSiteData extends SavedData {
         var bits = pending.remove(player.getUUID());
         if (bits == null) return;
         if ((bits & 1) != 0) GrowthSystem.award(player, "convoy_cleared");
+        if ((bits & GODDESS_VICTORY) == GODDESS_VICTORY) {
+            var saved=player.getPersistentData().getCompound(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG);
+            saved.putBoolean(HEAD_CONFIRMED,true);
+            saved.remove(SurvivalGuide.REPLAY_GREENE);
+            player.getPersistentData().put(net.minecraft.world.entity.player.Player.PERSISTED_NBT_TAG,saved);
+        }
         if ((bits & 4) != 0) {
             GrowthSystem.award(player,"greene_outbreak");
             com.codex.blacklight.combat.PlayerGazeField.inherit(player);
