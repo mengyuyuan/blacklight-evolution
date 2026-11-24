@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import com.codex.blacklight.forge.PacketDistributor;
 import java.util.ArrayList;
@@ -68,19 +69,27 @@ public final class TerrainImpactEffects {
         PacketDistributor.sendToPlayersNear(level,null,center.x,center.y,center.z,80,
                 new CombatImpactPayload(center.x,center.y,center.z,radius,true));
         for(var sample:surfaces(actor,center,radius)) {
-            var at=sample.hit().getLocation();var block=level.getBlockState(sample.hit().getBlockPos());
-            int ring=sample.ring(),i=sample.index();double angle=sample.angle();
-            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK,block),at.x,at.y+.05,at.z,0,
-                    Math.cos(angle)*(.12+ring*.055),.18+ring*.05,Math.sin(angle)*(.12+ring*.055),1);
-            if((i&3)==0)level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),at.x,at.y+.08,at.z,2,.12,.06,.12,.025);
-            if(ring==1&&i%(heavy?2:4)==0) {
-                float size=heavy?.44F:.27F;
-                LandingDebrisSystem.fragment(level,at.add(0,size*.6+.05,0),block,
-                        new Vec3(Math.cos(angle)*.15,heavy?.36:.25,Math.sin(angle)*.15),size,heavy?16:12);
-            }
+            emitSurface(level, sample, level.getBlockState(sample.hit().getBlockPos()), heavy);
         }
         disturbItems(actor,center,radius,heavy?.35:.18);
         return true;
+    }
+
+    static void emitSurface(ServerLevel level, Surface sample, BlockState material, boolean heavy) {
+        var at = sample.hit().getLocation();
+        int ring = sample.ring();
+        double dx = Math.cos(sample.angle()), dz = Math.sin(sample.angle());
+        double speed = .12 + ring * .055;
+        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, material), at.x, at.y + .05, at.z,
+                0, dx * speed, .18 + ring * .05, dz * speed, 1);
+        if ((sample.index() & 3) == 0)
+            level.sendParticles(com.codex.blacklight.registry.ModParticles.CONTACT_DUST.get(),
+                    at.x, at.y + .08, at.z, 2, .12, .06, .12, .025);
+        if (ring == 1 && sample.index() % (heavy ? 2 : 4) == 0) {
+            float size = heavy ? .44F : .27F;
+            LandingDebrisSystem.fragment(level, at.add(0, size * .6 + .05, 0), material,
+                    new Vec3(dx * .15, heavy ? .36 : .25, dz * .15), size, heavy ? 16 : 12);
+        }
     }
 
     /** Each sample uses its own block and collision height, including snow/slabs/stairs. */
