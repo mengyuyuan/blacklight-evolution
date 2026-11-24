@@ -83,7 +83,12 @@ public final class BossSiteData extends SavedData {
         participant(boss,finisher);
         var rewards=get(level.getServer().overworld());
         for (String key : boss.getPersistentData().getCompound(SQUAD).getAllKeys()) {
-            UUID id = UUID.fromString(key);
+            UUID id;
+            try {
+                id = UUID.fromString(key);
+            } catch (IllegalArgumentException malformedParticipant) {
+                continue;
+            }
             rewards.pending.merge(id, bit, (a, b) -> a | b);
             var player = level.getServer().getPlayerList().getPlayer(id);
             if (player != null) rewards.deliver(player);
