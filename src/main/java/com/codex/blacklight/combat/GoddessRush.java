@@ -17,13 +17,14 @@ public final class GoddessRush {
     private Vec3 origin=Vec3.ZERO, mark=Vec3.ZERO, heading=Vec3.ZERO, previousPalm, flight=Vec3.ZERO, feet, contactOffset=Vec3.ZERO;
     private float yaw,entryYaw;
     private int arm,grip=-1;
-    private boolean released,landed;
+    private boolean released,landed,backhand,brushed;
     private long next;
 
     GoddessRush(EncounterMob boss){this.boss=boss;}
     private CompoundTag remote(){return boss.goddessData().getCompound("Offense").getCompound("Rush");}
     public int arm(){return boss.level().isClientSide?remote().getInt("Arm"):arm;}
     public int grip(){return boss.level().isClientSide?remote().getInt("Grip"):grip;}
+    public boolean backhand(){return boss.level().isClientSide?remote().getBoolean("Backhand"):backhand;}
     public boolean released(){return boss.level().isClientSide?remote().getBoolean("Released"):released;}
     public boolean landed(){return boss.level().isClientSide?remote().getBoolean("Landed"):landed;}
     public boolean holding(){return grip()>=0&&!released();}
@@ -31,6 +32,7 @@ public final class GoddessRush {
     public float bodyYaw(float t){
         float start=boss.level().isClientSide?remote().getFloat("EntryYaw"):entryYaw;
         int side=arm()==1?1:-1;
+        if(backhand())return Mth.rotLerp(ease(t,0,9),start,yaw())+side*(23*ease(t,1,11)-52*ease(t,11,18)+29*ease(t,20,32));
         float sweep=-side*20*ease(t,12,26)*(1-ease(t,26,41));
         int g=grip();
         float twist=g<0?side*18*ease(t,34,43)*(1-ease(t,48,66)):
@@ -45,6 +47,8 @@ public final class GoddessRush {
         if(held>0)t=caught+(float)(2*(1-Math.exp(-held/2)));
         var direction=boss.level().isClientSide?vec(remote(),"Heading"):heading;
         var across=new Vec3(direction.z,0,-direction.x).scale(arm()==1?1:-1);
+        if(backhand())return aim().add(across.scale(-5.8+11.6*ease(t,11,19)))
+                .add(direction.scale(-1.2+2.2*ease(t,11,19))).add(0,.35*Math.sin(Math.PI*ease(t,11,19)),0);
         double sweep=-6+11*ease(t,26,42);
         return aim().add(direction.scale(sweep)).add(across.scale(-2.9+5*ease(t,26,41)))
                 .add(0,.32*(1-ease(t,24,32))+1.45*ease(held,0,6),0);
@@ -69,13 +73,14 @@ public final class GoddessRush {
         int slot=(boss.goddess.removed()&1)==0?5:9;
         return boss.hurtRegions(0).get(slot).boxes().stream().anyMatch(b->b.nearest(p.getEyePosition()).distanceToSqr(p.getEyePosition())<49);
     }
-    boolean begin(ServerPlayer p){
+    boolean begin(ServerPlayer p){return begin(p,false);}
+    boolean begin(ServerPlayer p,boolean quick){
         if(com.codex.blacklight.entity.GoddessEmplacement.releaseGrace(p,boss))return false;
         if(boss.level().getGameTime()<next || (boss.goddess.removed()&3)==3 || p.isPassenger() || p.isCreative()
                 || p.isSpectator() || p.distanceToSqr(boss)>40*40 || !p.isAlive())return false;
         Vec3 delta=p.position().subtract(boss.position()).multiply(1,0,1);
         if(delta.lengthSqr()<4)return false;
-        grip=-1;origin=boss.position();mark=boss.goddess.attacks.lead(p,34);
+        backhand=quick;brushed=false;grip=-1;origin=boss.position();mark=boss.goddess.attacks.lead(p,quick?15:34);
         delta=mark.subtract(origin).multiply(1,0,1);
         if(delta.lengthSqr()<4)return false;
         heading=delta.normalize();
@@ -86,7 +91,7 @@ public final class GoddessRush {
             yaw=(float)Math.toDegrees(Math.atan2(-heading.x,heading.z));
             if(!selectArm(p,preferred))continue;
             grip=-1;released=landed=false;previousPalm=null;feet=null;flight=Vec3.ZERO;
-            next=boss.level().getGameTime()+260;
+            next=boss.level().getGameTime()+(quick?43:96);
             boss.getNavigation().stop();boss.goddess.attacks.hand.cancel();
             return true;
         }
@@ -97,9 +102,9 @@ public final class GoddessRush {
         for(int candidate:new int[]{preferred,3-preferred}){
             if((boss.goddess.removed()&candidate)!=0)continue;
             arm=candidate;
-            Vec3 from=lane(26),to=lane(42);
+            Vec3 from=lane(backhand?11:26),to=lane(backhand?19:42);
             var exit=right.scale(candidate==1?-4:4).add(0,3,0);
-            if(!route(p,to.subtract(from),AABB.ofSize(from,.9,1,.9)) || !route(p,exit,p.getBoundingBox()))continue;
+            if(!route(p,to.subtract(from),AABB.ofSize(from,.9,1,.9)) || !backhand && !route(p,exit,p.getBoundingBox()))continue;
             var palm=boss.hurtRegions(0).get(arm==1?5:9);
             if(!palm.boxes().isEmpty() && HydraHurtContact.clear(boss,palm.bounds().getCenter(),from))return true;
         }
@@ -114,8 +119,34 @@ public final class GoddessRush {
         released=landed=true;
         boss.goddess.publish();
     }
+    private boolean swipe(ServerPlayer player,int t){
+        float turn=bodyYaw(t);
+        boss.setYRot(turn);boss.yBodyRot=turn;
+        var region=boss.hurtRegions(0).get(arm==1?5:9);
+        if(region.boxes().isEmpty())return true;
+        var palm=region.boxes().get(0);
+        if(t==4 || t==12)SpiderFoley.play(boss,palm.center,t==4?SpiderFoley.Cue.LOAD:SpiderFoley.Cue.STRIKE,2.1F);
+        if(!brushed && t>=12 && t<=19 && previousPalm!=null){
+            var delta=palm.center.subtract(previousPalm);
+            var box=player.getBoundingBox();
+            var at=box.getCenter();
+            var half=new Vec3(box.getXsize(),box.getYsize(),box.getZsize()).scale(.5);
+            if((palm.touches(box)||palm.sweepBox(at.add(delta),at,half)!=null)
+                    && HydraHurtContact.clear(boss,palm.nearest(at),at)){
+                brushed=true;
+                if(player.hurt(boss.damageSources().mobAttack(boss),GoddessImpact.BACKHAND.incoming(player))){
+                    var push=delta.multiply(1,0,1).normalize().scale(.76);
+                    player.push(push.x,.18,push.z);player.hurtMarked=true;
+                    SpiderFoley.play(boss,at,SpiderFoley.Cue.CATCH,1.5F);
+                }
+            }
+        }
+        previousPalm=palm.center;
+        return t>=32;
+    }
     boolean tick(ServerLevel level,ServerPlayer p,int t){
         if((boss.goddess.removed()&arm)!=0 || p.isCreative() || p.isPassenger()){endHold(p);return true;}
+        if(backhand)return swipe(p,t);
         if(t==9)SpiderFoley.play(boss,boss.hurtRegions(0).get(0).bounds().getCenter(),SpiderFoley.Cue.INHALE,1.25F);
         if(t>=5 && t<=65){
             // Give the body clearance over broken flooring, then settle onto the live terrain.
@@ -182,7 +213,7 @@ public final class GoddessRush {
                     TerrainImpactEffects.emit(boss,impact,1.8F,false);
                 }
                 SpiderFoley.play(boss,p.position(),SpiderFoley.Cue.FRACTURE,1.65F);
-                p.hurt(boss.damageSources().mobAttack(boss),p.getMaxHealth()*.23F);
+                p.hurt(boss.damageSources().mobAttack(boss),GoddessImpact.BODY_THROW.incoming(p));
             }else{
                 flight=flight.add(0,-.08,0).scale(.98);
                 if(t-grip>69){p.setDeltaMovement(flight);p.hurtMarked=true;endHold(p);}
@@ -196,12 +227,14 @@ public final class GoddessRush {
         var t=new CompoundTag();
         put(t,"Origin",origin);put(t,"Mark",mark);put(t,"Heading",heading);put(t,"Palm",previousPalm);put(t,"Feet",feet);put(t,"Flight",flight);put(t,"ContactOffset",contactOffset);
         t.putFloat("Yaw",yaw);t.putFloat("EntryYaw",entryYaw);t.putInt("Arm",arm);t.putInt("Grip",grip);
+        t.putBoolean("Backhand",backhand);t.putBoolean("Brushed",brushed);
         t.putBoolean("Released",released);t.putBoolean("Landed",landed);t.putLong("Next",next);return t;
     }
     void load(CompoundTag t){
         origin=vec(t,"Origin");mark=vec(t,"Mark");heading=vec(t,"Heading");flight=vec(t,"Flight");contactOffset=vec(t,"ContactOffset");
         previousPalm=t.contains("PalmX")?vec(t,"Palm"):null;feet=t.contains("FeetX")?vec(t,"Feet"):null;
         yaw=t.getFloat("Yaw");entryYaw=t.getFloat("EntryYaw");arm=t.getInt("Arm");grip=t.contains("Grip")?t.getInt("Grip"):-1;
+        backhand=t.getBoolean("Backhand");brushed=t.getBoolean("Brushed");
         released=t.getBoolean("Released");landed=t.getBoolean("Landed");next=t.getLong("Next");
     }
 }

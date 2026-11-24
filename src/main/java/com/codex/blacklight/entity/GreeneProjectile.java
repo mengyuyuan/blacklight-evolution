@@ -170,7 +170,9 @@ public final class GreeneProjectile extends Projectile {
             var target=contact.target;var ammo=flight.ammo();
             if(target instanceof LivingEntity living&&owner.enemy(living)&&!com.codex.blacklight.firearms.FirearmsCombat.protectedTarget(owner,living)){
                 float damage=(float)(living instanceof Player?ammo.damageOnPlayer:ammo.damageOnNpc)*LIVING_DAMAGE_ADAPTER;
-                if(flesh())damage*=cannon()?3.7F:1.85F;
+                if (living instanceof Player p && owner.goddess.active() && getPersistentData().getBoolean("GoddessHandShot")) {
+                    damage = (cannon() ? GoddessImpact.PALM_CANNON : GoddessImpact.FINGER_SHOT).incoming(p);
+                } else if(flesh())damage*=cannon()?3.7F:1.85F;
                 var source=damageSources().thrown(this,owner);var body=AnimatedHurtBody.of(living);
                 if(body!=null&&contact.body!=null)body.hurtAt(source,damage,contact.body);
                 else if(body==null)living.hurt(source,damage);

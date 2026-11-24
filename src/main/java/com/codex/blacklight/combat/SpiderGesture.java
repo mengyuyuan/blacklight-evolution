@@ -130,12 +130,32 @@ public final class SpiderGesture {
             case CATALYZE -> {roll-=.065F*phrase(t,2,12,27,37);}
             default -> {}
         }
-        if(b.spider.feeding()){
+        // With only a few supports left, the shell stays on the underside. The strike still
+        // reaches via its IK target, but the torso can no longer throw its full weight sideways.
+        int missing=Integer.bitCount(lost & 255);
+        if(missing>=4){
+            float available=(8-missing)/4F;
+            lateral*=.34F+.66F*available;
+            forward*=.64F+.36F*available;
+            roll=support.roll()+(roll-support.roll())*(.49F+.51F*available);
+            twist*=.71F+.29F*available;
+        }
+        var meal=b.spiderData();
+        float sinceSwallow=b.level().getGameTime()-meal.getLong("Swallowed")+partial;
+        boolean finishingBite=!b.spider.feeding() && meal.contains("Swallowed") && sinceSwallow>=0 && sinceSwallow<8;
+        if(b.spider.feeding() || finishingBite){
             var s=b.spiderData();float elapsed=b.level().getGameTime()-s.getLong("MealStart")+partial;
             float delay=s.getLong("DragAt")-s.getLong("MealStart");
             float bite=s.getLong("SwallowAt")-s.getLong("MealStart");
             float strain=phrase(elapsed,0,delay,Math.max(delay+1,bite-4),bite+2);
-            float side=s.getBoolean("PreyLeft")?1:-1;roll+=side*strain*.043F;sink-=strain*.13F;
+            float side=s.getBoolean("PreyLeft")?1:-1;
+            roll+=side*strain*.085F;sink-=strain*.21F;
+            // Plant the jaws for the actual contact. The abdomen recoils after the server
+            // settles a prey, so even a stolen or interrupted meal keeps its original opening.
+            float drawPrey=phrase(elapsed,0,Math.max(4,delay),bite-12,bite-5);
+            float biteDown=finishingBite?phrase(sinceSwallow,0,3,4,8):0;
+            twist+=side*(.12F*drawPrey-.15F*biteDown);
+            forward+=.52F*drawPrey-.80F*biteDown;
             if(s.getBoolean("HeavyPrey")){
                 float tug=phrase(elapsed,delay-1,delay+4,delay+7,delay+16);
                 m.translate(side*.42F*tug,0,-.26F*tug);roll+=side*.08F*tug;pitch+=.13F*tug;
@@ -224,6 +244,6 @@ public final class SpiderGesture {
             else if(arm){z+=(raised?1:-1)*(.48F*inhale-.32F*kick);x-=.38F*kick;}
             else x+=.30F*inhale-.48F*kick;
         }
-        return new Quaternionf().rotateZYX(z,y,x);
+        return SpiderUpperMotion.apply(move,bone,t,side,new Quaternionf().rotateZYX(z,y,x));
     }
 }

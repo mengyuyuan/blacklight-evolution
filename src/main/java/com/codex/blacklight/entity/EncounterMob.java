@@ -284,7 +284,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         for(int i=0;i<parts.length;i++)parts[i]=new EncounterPart(this,i);
         // Legacy class name retained so existing native-ray adapters can use the
         // same AnimatedHurtBody-backed proxies for both source-posed bosses.
-        greeneParts=new GreenePart[kind==EncounterKind.ELIZABETH_GREENE?Math.max(GreeneContact.regionBones().size(),SpiderAnatomy.NAMES.size()):kind==EncounterKind.GOLIATH?GoliathContact.regionBones().size():0];
+        greeneParts=new GreenePart[kind==EncounterKind.ELIZABETH_GREENE?Math.max(GoddessRig.PARTS.size(),Math.max(GreeneContact.regionBones().size(),SpiderAnatomy.NAMES.size())):kind==EncounterKind.GOLIATH?GoliathContact.regionBones().size():0];
         for(int i=0;i<greeneParts.length;i++)greeneParts[i]=new GreenePart(this,i);
         flyerParts=new FlyerPart[kind==EncounterKind.FLYER?FlyerContact.regionBones().size():0];
         for(int i=0;i<flyerParts.length;i++)flyerParts[i]=new FlyerPart(this,i);
@@ -630,7 +630,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         }
         // The downed mesh extends far beyond the root. Every observer and the
         // server use the heading captured when it fell, regardless of look AI.
-        if(kind==EncounterKind.ELIZABETH_GREENE&&greeneBattle.exposed()){
+        if(kind==EncounterKind.ELIZABETH_GREENE&&(greeneBattle.exposed() || greeneStage()==GreeneBattleCycle.MOLTING)){
             setYRot(greeneBattle.collapseYaw());
             yBodyRot=yBodyRotO=getYRot();
         }
@@ -1326,6 +1326,12 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                     BossImpactFeedback.contact(this,source,incomingContact.point(),BossImpactFeedback.Contact.WEAK,amount);
                     return true;
                 }
+                if(slot>=com.codex.blacklight.combat.GoddessCrownCast.FIRST_ROW){
+                    if(!(source.getEntity() instanceof ServerPlayer player) || !goddess.attacks.crown.interrupt(slot))return false;
+                    BossSiteData.participant(this,player);
+                    BossImpactFeedback.contact(this,source,incomingContact.point(),BossImpactFeedback.Contact.WEAK,amount);
+                    return true;
+                }
                 if(slot>=GoddessHandPose.WRIST){
                     if(!goddess.attacks.hand.hit(slot,source,amount,incomingContact.point()))return false;
                     BossSiteData.participant(this,source.getEntity());
@@ -1342,6 +1348,7 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
                 if(incomingContact!=null)confirmedIncoming(source,amount);
                 goddess.afterDamage();
                 if(source.getDirectEntity() instanceof ThrownBlock rock)goddess.rockImpact(rock,incomingContact);
+                goddess.attacks.commands.hitController(source,incomingContact);
                 goddess.attacks.hand.hitController(source,incomingContact);
             }
             return accepted;

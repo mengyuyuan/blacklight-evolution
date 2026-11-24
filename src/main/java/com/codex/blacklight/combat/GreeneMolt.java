@@ -22,9 +22,10 @@ public final class GreeneMolt {
     private static final String OWNER="GreeneMoltOwner";
     private static final String HOME="GreeneMoltAnchor";
     private static final int SLOTS=16;
-    private static final int[] CUES={0,48,102,177,266,333};
+    private static final int[] CUES={GreeneMoltShockwave.ROAR_TICK,48,102,177,266,333};
     private final UUID[] captives=new UUID[SLOTS];
     private final GreeneMoltShockwave shockwave = new GreeneMoltShockwave();
+    private final GreeneMoltSurge surge = new GreeneMoltSurge();
     private int spawned,absent;
     public int absent(){return absent;}
 
@@ -58,8 +59,12 @@ public final class GreeneMolt {
     }
     public boolean tick(EncounterMob boss, int age){
         if(!(boss.level() instanceof ServerLevel level))return false;
-        if (age == 0) shockwave.begin(boss, level);
+        if (age == 0) {
+            shockwave.begin(boss, level);
+            SpiderFoley.play(boss,boss.position().add(0,9,0),SpiderFoley.Cue.INHALE,2.4F);
+        }
         shockwave.tick(boss, level, age);
+        surge.tick(boss, level, age);
         boss.spider.actions.moltBrood(level,age);
         int prior=absent;
         boolean relocated=!vents.prepared;
@@ -134,11 +139,11 @@ public final class GreeneMolt {
     public CompoundTag save(){
         var t=new CompoundTag();t.putInt("Spawned",spawned);t.putInt("Absent",absent);
         for(int i=0;i<SLOTS;i++)if(captives[i]!=null)t.putUUID("Actor"+i,captives[i]);
-        writeVents(t);shockwave.save(t);
+        writeVents(t);shockwave.save(t);surge.save(t);
         return t;
     }
     public void load(CompoundTag t){
-        vents.load(t);shockwave.load(t);
+        vents.load(t);shockwave.load(t);surge.load(t);
         spawned=t.getInt("Spawned");absent=t.getInt("Absent");
         for(int i=0;i<SLOTS;i++)captives[i]=t.hasUUID("Actor"+i)?t.getUUID("Actor"+i):null;
     }

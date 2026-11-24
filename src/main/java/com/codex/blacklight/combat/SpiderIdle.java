@@ -18,15 +18,37 @@ public final class SpiderIdle {
     private static final String FILE="/assets/blacklight/animations/entity/greene_spider.animation.json";
     private static final Map<String,Track> TRACKS=new HashMap<>();
     private static final int LENGTH;
-    private record Track(float[] times,float[] xyz){
+    private record Track(float[] times,float[] xyz,float[] slopes){
+        private Track(float[] times,float[] xyz){
+            this(times,xyz,new float[xyz.length]);
+            // First and last keys describe the same pose. Use the neighbouring segments on
+            // both sides of the loop. A reversal gets zero slope, so a held pose cannot overshoot.
+            for(int i=0;i<times.length && times.length>2;i++){
+                int previous=i==0?times.length-2:i-1;
+                int next=i==times.length-1?1:i+1;
+                float left=i==0?times[times.length-1]-times[previous]:times[i]-times[previous];
+                float right=next==1 && i==times.length-1?times[1]-times[0]:times[next]-times[i];
+                for(int axis=0;axis<3;axis++){
+                    float a=(xyz[i*3+axis]-xyz[previous*3+axis])/left;
+                    float b=(xyz[next*3+axis]-xyz[i*3+axis])/right;
+                    slopes[i*3+axis]=a*b>0?2*a*b/(a+b):0;
+                }
+            }
+        }
+        private float value(int a,int b,int axis,float u){
+            float left=xyz[a*3+axis],right=xyz[b*3+axis];
+            float d=times[b]-times[a],v=1-u;
+            return left*v*v*(1+2*u)+right*u*u*(3-2*u)
+                    + d*u*v*(slopes[a*3+axis]*v-slopes[b*3+axis]*u);
+        }
         Quaternionf sample(float tick,float weight){
             int index=Arrays.binarySearch(times,tick);
             int a=index>=0?index:Math.max(0,-index-2);
             int b=Math.min(a+1,times.length-1);
             float u=a==b?0:Mth.clamp((tick-times[a])/(times[b]-times[a]),0,1);
-            float x=Mth.lerp(u,xyz[a*3],xyz[b*3])*weight;
-            float y=Mth.lerp(u,xyz[a*3+1],xyz[b*3+1])*weight;
-            float z=Mth.lerp(u,xyz[a*3+2],xyz[b*3+2])*weight;
+            float x=value(a,b,0,u)*weight;
+            float y=value(a,b,1,u)*weight;
+            float z=value(a,b,2,u)*weight;
             return new Quaternionf().rotateZYX(z,y,x);
         }
     }

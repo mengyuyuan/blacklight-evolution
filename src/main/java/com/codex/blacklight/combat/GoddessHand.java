@@ -55,11 +55,24 @@ public final class GoddessHand {
         if(struggle.active() && !struggle.hair())
             return new GoddessHandPose(struggle.palm(partial),struggle.palmYaw(partial),gripSide(),
                     4,struggle.step()==GoddessStruggle.Step.WARN?-1-struggle.age(partial):struggle.closure(partial),0,1,now()+partial,0);
+        if(!growing && boss.goddess.attacks.move()==GoddessAttacks.Move.TENDRIL_CRUSH)
+            return new GoddessHandPose(pos,t==null?yaw:t.getFloat("Yaw"),gripSide(),6,boss.goddess.attacks.age(partial),
+                    t==null?lost:t.getInt("Lost"),1,now()+partial,recoil);
         if(playing && !growing && (t==null?pattern:t.getInt("Move"))==GoddessPalmCombo.MOVE)
             return comboPose(age);
         return new GoddessHandPose(pos,t==null?yaw:t.getFloat("Yaw"),t==null?side:t.getInt("Side"),
                 playing&&!growing?(t==null?pattern:t.getInt("Move")):0,playing&&!growing?age:60,
                 t==null?lost:t.getInt("Lost"),growing?.05+.95*Mth.clamp(age/35.,0,1):1,now()+partial,recoil);
+    }
+    int playingPattern(){
+        if(boss.level().isClientSide){
+            var t=remote();
+            return t.getBoolean("Acting") && !t.getBoolean("Forming")?t.getInt("Move"):-1;
+        }
+        return acting && !forming?pattern:-1;
+    }
+    float gestureAge(float partial){
+        return now()-(boss.level().isClientSide?remote().getLong("Start"):started)+partial;
     }
     public boolean melee(){
         if(boss.level().isClientSide){var t=remote();return t.getBoolean("Acting") && !t.getBoolean("Forming") && t.getInt("Move")==GoddessPalmCombo.MOVE;}
@@ -133,11 +146,11 @@ public final class GoddessHand {
             for(int i=0;i<Math.min(8,bodies.size());i++){
                 var m=bodies.get(i);donors.add(m.getUUID());skins|=m.appearance()<<(i*2);
             }
-            forming=true;lost=0;next=0;Arrays.fill(strain,0);
+            forming=true;lost=0;Arrays.fill(strain,0);
         }
         // The hand has its own clear staging position beside its target, even across the cavern from Greene.
         pattern=lastWasMelee?Math.floorMod(next,4):GoddessPalmCombo.MOVE;
-        if(formed && pattern==3){
+        if(pattern==3){
             vein=stoneSite(l,p,goal);
             if(vein==null || (lost&1)!=0)pattern=0;
         }
@@ -160,7 +173,7 @@ public final class GoddessHand {
         }
         return null;
     }
-    private boolean canLift(ServerLevel l,ServerPlayer p,BlockPos pos){
+    boolean canLift(ServerLevel l,ServerPlayer p,BlockPos pos){
         return l.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) && BlockThrowSystem.selectable(p,pos)
                 && net.neoforged.neoforge.event.EventHooks.canEntityGrief(l,boss) && net.neoforged.neoforge.common.CommonHooks.canEntityDestroy(l,pos,boss);
     }
@@ -243,6 +256,7 @@ public final class GoddessHand {
             if(!block.isRemoved()&&l.getEntity(block.getUUID())==block){
                 stone=block.getUUID();block.setNoGravity(true);block.setHurtsEntities(2.5F,35);
                 block.getPersistentData().putUUID("EncounterOwner",boss.getUUID());
+                block.getPersistentData().putInt("GoddessSequence",boss.goddess.attacks.sequence());
                 boss.goddess.publish();
                 SpiderFoley.play(boss,block.position(),SpiderFoley.Cue.FRACTURE,1.35F);
             }
@@ -299,6 +313,22 @@ public final class GoddessHand {
         SpiderFoley.strands(boss,point,point.subtract(anchor),8);
         if(lost==31)cancel();
         boss.goddess.publish();return true;
+    }
+    boolean clipPounce(Vec3 previous, Vec3 current, double radius) {
+        var pose=pose(0);
+        if(pose==null || pose.palm().distanceToSqr(current)>13*13)return false;
+        for(var link:pose.links()){
+            var bounds=new net.minecraft.world.phys.AABB(link.base(),link.end()).inflate(Math.max(link.width(),link.depth())+radius);
+            if(!bounds.contains(previous) && bounds.clip(previous,current).isEmpty())continue;
+            if(ProjectileSphereContact.sweep(previous,current,radius,link.surface())==null)continue;
+            kicked=now();
+            flinched=Math.max(0,link.slot()-GoddessHandPose.THUMB);
+            SpiderFoley.strands(boss,current,current.subtract(previous),9);
+            SpiderFoley.play(boss,current,SpiderFoley.Cue.STRIKE,1.55F);
+            boss.goddess.publish();
+            return true;
+        }
+        return false;
     }
     CompoundTag save(){
         var t=new CompoundTag();

@@ -347,6 +347,7 @@ final class GoddessBrood {
         var t=mob.getPersistentData();
         if(t.contains("GoddessReleaseAt") && mob.level().getGameTime()>=t.getLong("GoddessReleaseAt")){
             t.remove("GoddessReleaseAt");
+            t.remove("PounceCaller");
             if(!ConsumeControl.protectedEntity(mob))mob.setNoAi(false);
             else t.putLong("GoddessReleaseAt",mob.level().getGameTime()+5);
         }

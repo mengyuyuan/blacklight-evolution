@@ -90,7 +90,7 @@ public final class BlacklightState {
         infected = false;
         biomass = 0;
         evolutionPoints = 0;
-        unlockedMask = 0;
+        unlockedMask &= PowerForm.GAZE_VACUOLE.bit();
         activePower = PowerForm.NONE;
         stowedWeapon = PowerForm.CLAWS;
         disguiseIdentity = "";
@@ -109,7 +109,7 @@ public final class BlacklightState {
     }
 
     public boolean buy(PowerForm form) {
-        if (!infected || form == PowerForm.NONE || hasUnlocked(form) || evolutionPoints < form.epCost()) return false;
+        if (!infected || form == PowerForm.NONE || form == PowerForm.GAZE_VACUOLE || hasUnlocked(form) || evolutionPoints < form.epCost()) return false;
         evolutionPoints -= form.epCost();
         return unlock(form);
     }

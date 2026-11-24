@@ -19,7 +19,11 @@ import org.lwjgl.opengl.GL11;
 
 /** Refract the rendered world inside the visible volume of each mouth blast. */
 public final class SpiderPainEffect {
-    private record Pulse(Vec3 start, Vec3 end, float radius, float strength, float age, GoddessBubbleRenderer.Shell shell) {}
+    private record Pulse(Vec3 start, Vec3 end, float radius, float strength, float age, GoddessBubbleRenderer.Shell shell, float sonicCos) {
+        Pulse(Vec3 start,Vec3 end,float radius,float strength,float age,GoddessBubbleRenderer.Shell shell){
+            this(start,end,radius,strength,age,shell,-1F);
+        }
+    }
     private static final LinkedHashMap<Integer,Pulse> pending = new LinkedHashMap<>();
     private static PostChain chain;
     private static RenderTarget depth;
@@ -45,7 +49,7 @@ public final class SpiderPainEffect {
     static void shell(int id,GoddessBubbleRenderer.Shell shape,float strength,float age){
         lastVisible=System.nanoTime();
         float bound=(float)Math.max(shape.axes().x,Math.max(shape.axes().y,shape.axes().z))*1.40F;
-        pending.put(id,new Pulse(shape.center(),shape.eye(),bound,strength,age,shape));
+        pending.put(id,new Pulse(shape.center(),shape.center(),bound,strength,age,shape));
     }
 
     private static void vector(String name,Vector3f v){
@@ -69,8 +73,25 @@ public final class SpiderPainEffect {
     public static void finishFrame(Matrix4f view, Matrix4f projection, Vec3 camera, float partial) {
         // The camera may see the trapped player while Greene herself is outside its frustum.
         var level=Minecraft.getInstance().level;
+        if(level!=null && com.codex.blacklight.client.GazeInput.preview() && Minecraft.getInstance().player!=null){
+            var p=Minecraft.getInstance().player;
+            GoddessBubbleRenderer.playerField(-1,com.codex.blacklight.combat.PlayerGazeField.aim(p,partial),partial,null,true);
+        }
         if(level!=null)for(var entity:level.entitiesForRendering())
-            if(entity instanceof EncounterMob boss && boss.goddess.active())GoddessBubbleRenderer.collect(boss,partial);
+            if(entity instanceof com.codex.blacklight.combat.PlayerGazeField field){
+                GoddessBubbleRenderer.playerField(field.getId(),field.position(),field.age(partial),field.victim(),false);
+            }else if(entity instanceof EncounterMob boss && boss.goddess.active()){
+                GoddessBubbleRenderer.collect(boss,partial);
+                var attack=boss.goddess.attacks;
+                if(attack.move()!=com.codex.blacklight.combat.GoddessAttacks.Move.SONIC_CRY || !attack.terrain.ready())continue;
+                float age=attack.age(partial);
+                int i=age<com.codex.blacklight.combat.GoddessTerrainCast.HOWL?0:1;
+                float r=com.codex.blacklight.combat.GoddessTerrainCast.soundRadius(age,i);
+                var m=attack.terrain.mouth(i);var axis=attack.terrain.axis(i);
+                if(r<.4 || r>com.codex.blacklight.combat.GoddessTerrainCast.soundReach(i)+4 || axis.lengthSqr()<.5)continue;
+                lastVisible=System.nanoTime();
+                pending.put(boss.getId(),new Pulse(m,m.add(axis),r,.86F,age,null,(float)Math.cos(com.codex.blacklight.combat.GoddessTerrainCast.soundAngle(i))));
+            }
         if (pending.isEmpty()) {
             if (lastVisible == 0 || System.nanoTime() - lastVisible > 2_000_000_000L) { release(); return; }
             if (chain != null || failed) return;
@@ -123,7 +144,8 @@ public final class SpiderPainEffect {
                 var start = toView(pulse.start(), camera, view);
                 var end = toView(pulse.end(), camera, view);
                 var shell=pulse.shell();
-                uniform("Inward",shell==null?0F:1F);
+                uniform("Inward",pulse.sonicCos()>=0?2F:shell==null?0F:1F);
+                if(pulse.sonicCos()>=0)uniform("Contact",pulse.sonicCos());
                 if(shell!=null){
                     vector("Axis",shell.axes().toVector3f());
                     vector("Right",view.transformDirection(shell.right().toVector3f()));

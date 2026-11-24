@@ -19,6 +19,7 @@ public final class GoddessHandPose {
     static double bend(int move,int digit,double t){
         return switch(move){
             case GoddessPalmCombo.MOVE -> .12+1.33*GoddessPalmCombo.lift((float)t)*(1-GoddessPalmCombo.recover((float)t));
+            case 6 -> .60*(1-ease((t-digit*1.0)/8))+.08+1.26*ease((t-27-digit*.5)/5)*(1-ease((t-36)/12));
             case 4 -> t<0?.06+.75*(1-ease((-t-1-digit*2.8)/11)):.06+t*(digit==0?1.68:1.46);
             case 0 -> {
                 double fire=digit==2?39:13;

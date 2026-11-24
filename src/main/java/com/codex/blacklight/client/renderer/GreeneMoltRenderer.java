@@ -6,6 +6,8 @@ import com.codex.blacklight.combat.GreeneBattleCycle;
 import com.codex.blacklight.combat.GreeneHydraVents;
 import net.minecraft.world.phys.Vec3;
 import com.codex.blacklight.combat.GreeneForm;
+import com.codex.blacklight.combat.GreeneMolt;
+import com.codex.blacklight.combat.GreeneMoltSurge;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.io.*;
@@ -53,13 +55,15 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     private static final String[] ATTR={"pos","normal","ink","uv","joint"};
     private final List<Integer> textures=new ArrayList<>(),vaos=new ArrayList<>(),buffers=new ArrayList<>(),programs=new ArrayList<>();
     private final Map<Integer,Map<String,Integer>> uniforms=new HashMap<>();
-    private final int[] gridIndex=new int[3];
-    private final int[] models=new int[5],counts=new int[5],grids=new int[4],gridCounts=new int[4];
+    private final int[] gridIndex=new int[6];
+    private final int[] models=new int[5],counts=new int[5],grids=new int[6],gridCounts=new int[6];
     private final GreeneBroodVisuals brood=new GreeneBroodVisuals();
     private final int[] preyVao=new int[4],preyVbo=new int[4],preyCounts=new int[4],preySkins=new int[4];
     private FloatBuffer staging=org.lwjgl.BufferUtils.createFloatBuffer(65536);
     private final int[] dynamic=new int[3];
     private final int combatTiming;
+    private final int surge,surgeTerrain;
+    private final Map<EncounterMob,MoltSurgeFloor> surgeFloors=new WeakHashMap<>();
     private final float[] combatPaths=new float[3*16*3],combatProfiles=new float[3*4];
     private final int fissures,fissureCount;
     private final int model,strand,shell,wrap,mist,people,lines,frames,schedule,actorSize,pathSize,frameSize;
@@ -132,6 +136,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             model=link("model","model.vsh","model.fsh",ATTR);strand=link("strand","strand.vsh","strand.fsh","param");
             shell=link("shroud","shell.vsh","shell.fsh","param");wrap=link("wrap","wrap.vsh","strand.fsh","param");
             mist=link("dust","mist.vsh","mist.fsh","corner");
+            surge=link("birth surge","surge.vsh","surge.fsh","param");
             ByteBuffer b=dataSet.animation();
             var gait=dataSet.climb();if(gait.getInt()!=0x434c4d31||gait.getInt()!=145||gait.getInt()!=202||gait.getInt()!=10||gait.remaining()!=145*climbPose.length*4)throw new IOException("Invalid Greene climbing rig");
             climbFrames=values(gait,145*climbPose.length);glActiveTexture(GL_TEXTURE0);
@@ -142,11 +147,11 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             for(int i=0;i<pivots.length;i++)pivots[i]=b.getFloat();
             glActiveTexture(GL_TEXTURE0);schedule=dataTexture(1,lines,4,values(b,lines*4));
             for(var contact:List.of(hydra,hunter))for(int i=0;i<9;i++)contact[i]=b.getFloat();
-            for(int i=0;i<2;i++){
-                var vertices=values(b,b.getInt()*12);
-                if(i==1)vertices=GreeneColonies.mesh(vertices);
-                counts[i]=vertices.length/12;models[i]=mesh(vertices,3,3,3,2,1);
-            }
+            int spiderVertices=b.getInt();
+            b.position(Math.addExact(b.position(),Math.multiplyExact(spiderVertices,12*Float.BYTES)));
+            var colonyVertices=GreeneColonies.mesh(values(b,b.getInt()*12));
+            counts[1]=colonyVertices.length/12;
+            models[1]=mesh(colonyVertices,3,3,3,2,1);
             var peopleMesh=brood.civilian();models[2]=mesh(peopleMesh,3,3,3,2,1);counts[2]=peopleMesh.length/12;
             for(int i=0;i<4;i++){
                 preyVao[i]=mesh(new float[12],3,3,3,2,1);preyVbo[i]=buffers.get(buffers.size()-1);
@@ -161,6 +166,12 @@ public final class GreeneMoltRenderer implements AutoCloseable {
                 fissureCount=data.remaining()/48;fissures=mesh(values(data,fissureCount*12),3,3,3,2,1);
             }
             combatTiming=dataTexture(1,3,4,null);
+            surgeTerrain=dataTexture(MoltSurgeFloor.SIDE,MoltSurgeFloor.SIDE,3,null);
+            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+            grid(4,144,12);grid(5,14,8);
             grid(0,40,4);grid(1,170,80);grid(2,57,6);
             grids[3]=mesh(new float[]{-1,-1,1,-1,1,1,-1,-1,1,1,-1,1},2);gridCounts[3]=6;
         }catch(IOException|RuntimeException ex){close();throw ex;}
@@ -220,67 +231,92 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         scalar(effect,"time",t);scalar(effect,"sceneLight",light);
         glBindVertexArray(grids[slot]);if(slot<3)glDrawElementsInstanced(GL_TRIANGLES,gridCounts[slot],GL_UNSIGNED_INT,0L,instances);else glDrawArraysInstanced(GL_TRIANGLES,0,gridCounts[slot],instances);
     }
-    private static float settle(float seconds,int joint){
-        float delay=joint>=13 && joint<=28?(((joint-13)/2)%4)*.09F:joint>=29?.19F:.10F;
-        float f=Math.max(0,Math.min(1,(seconds-delay)/.95F));
-        return f*f*(3-2*f);
-    }
-    private void blendLastSpiderPose(EncounterMob boss,float seconds){
-        int[] saved=boss.spiderData().getIntArray("LastPose");
-        if(saved.length!=39*16)return;
-        var from=new Matrix4f();var to=new Matrix4f();float[] a=new float[16];
-        var translation=new org.joml.Vector3f();var scale=new org.joml.Vector3f();
-        var rotation=new org.joml.Quaternionf();var targetRotation=new org.joml.Quaternionf();var tmp=new org.joml.Vector3f();
-        for(int joint=0;joint<39;joint++){
-            float f=settle(seconds,joint);if(f>=1)continue;
-            int at=joint*16;for(int n=0;n<16;n++)a[n]=Float.intBitsToFloat(saved[at+n]);
-            from.set(a);to.set(bones,at);from.getTranslation(translation).lerp(to.getTranslation(tmp),f);
-            from.getUnnormalizedRotation(rotation).normalize().slerp(to.getUnnormalizedRotation(targetRotation).normalize(),f);
-            from.getScale(scale).lerp(to.getScale(tmp),f);
-            from.translationRotateScale(translation,rotation,scale).get(bones,at);
+    private final SpiderMoltPose spiderMoltPose = new SpiderMoltPose();
+    private final GoddessMoltSurgePose surgePose = new GoddessMoltSurgePose();
+    private final float[] combatIdle = new float[BONES];
+    private GreeneGoddessRenderer combatModel;
+    private UUID anchorOwner;
+    private float anchorTime;
+    private final float[] legBends=new float[16];
+
+    private void sampleBody(EncounterMob boss,float t,float partial){
+        float frame=t*SAMPLE_RATE;
+        int ai=(int)frame,a=ai*frameSize,b=Math.min(frames-1,ai+1)*frameSize;
+        // Hard rig handoff inside the sealed volume; never interpolate bones of different models.
+        interpolate(bones,a,b,0,ai==131?0:frame-ai);
+        if(t<SpiderMoltPose.END){
+            spiderMoltPose.sample(t,boss.spider.brokenMask(),boss.spiderData().getIntArray("LastPose"),bones);
+            anchorOwner=boss.getUUID();anchorTime=t;
+        }
+        System.arraycopy(bones,0,boneUpload,0,BONES);
+        if(t>=13.2F){
+            float tick=t*20F, weight=GoddessMoltSurgePose.settle(tick);
+            if(weight>0){
+                float clock=boss.tickCount+partial;
+                combatModel.writeJointMatrices(clock,combatIdle);
+                surgePose.settle(weight,com.codex.blacklight.combat.GoddessRig.hover(clock),boneUpload,combatIdle);
+            }
+            GreeneColonies.pose(boneUpload);
+            surgePose.release(tick,boneUpload);
         }
     }
-    private void render(EncounterMob boss,float partial,Matrix4f camera,int packedLight,int[] skins){
-        float t=Math.min(23,boss.greeneBattle().age(partial)/20F),frame=t*SAMPLE_RATE;
+
+    private void sampleBends(EncounterMob boss,float t,float partial){
+        for(int i=0;i<8;i++){
+            String suffix=(i<4?"L":"R")+(i%4+1);
+            float ease=boss.spiderData().contains("LastPose")?SpiderMoltPose.settle(t,13+2*i):1;
+            legBends[2*i]=ease*boss.spider.fold("coxa_"+suffix,partial);
+            legBends[2*i+1]=ease*boss.spider.fold("tibia_"+suffix,partial);
+        }
+    }
+
+    private void render(EncounterMob boss,float partial,Matrix4f camera,int packedLight,int[] skins,int lightmap){
+        float age=Math.min(GreeneMolt.DURATION,boss.greeneBattle().age(partial));
+        float t=age/20F,frame=t*SAMPLE_RATE;
         int ai=(int)frame,bi=Math.min(frames-1,ai+1),a=ai*frameSize,b=bi*frameSize;
-        // Hard rig handoff inside the sealed volume; never interpolate bones of different models.
-        interpolate(bones,a,b,0,ai==131?0:frame-ai);interpolate(actors,a,b,BONES,frame-ai);
+        interpolate(actors,a,b,BONES,frame-ai);
         interpolate(paths,a,b,BONES+actorSize,frame-ai);interpolate(animalMatrices,a,b,BONES+actorSize+pathSize,frame-ai);
         if(t<14.5F){
             int lo=Math.min(144,ai)*climbPose.length,hi=Math.min(144,bi)*climbPose.length;float mix=frame-ai;
             for(int i=0;i<climbPose.length;i++){float v=climbFrames[lo+i];climbPose[i]=v+(climbFrames[hi+i]-v)*mix;}
         }
         posePrey(boss,t,partial,packedLight);
-        if(t<1.5F)blendLastSpiderPose(boss,t);
-        System.arraycopy(bones,0,boneUpload,0,BONES);
-        if(t>=13.2F)GreeneColonies.pose(boneUpload);
-        upload(0,dynamic[0],16,t>=13.2F?GreeneColonies.ROWS:(JOINTS+3)/4,GL_RGBA,boneUpload);upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
-        bind(2,skins[0]);bind(3,skins[7]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
+        if(t<SpiderMoltPose.END){
+            if(!boss.getUUID().equals(anchorOwner) || anchorTime!=t)sampleBody(boss,t,partial);
+            spiderMoltPose.alignTendrils(paths);
+        }
+        upload(1,dynamic[1],3,people,GL_RGBA,actors);upload(4,dynamic[2],16,lines,GL_RGB,paths);
+        bind(2,skins[0]);bind(5,schedule);for(int i=0;i<4;i++)bind(7+i,skins[i+1]);
         if(t<14.5F)upload(11,clamberTexture,30,people,GL_RGBA,climbPose);
         bind(12,skins[5]);bind(13,skins[6]);
         float rotation=(float)Math.toRadians(180-boss.greeneBattle().collapseYaw());
+        // The finale is anchored to the terrain in world blocks; the authored clip uses a scaled local rig.
+        Matrix4f surgeView=age>=GreeneMoltSurge.GATHER?new Matrix4f(camera):null;
         camera.rotateY(rotation).scale(GreeneForm.OUTBREAK_SCALE);
         var e=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().subtract(boss.getPosition(partial)).yRot(-rotation).scale(1/GreeneForm.OUTBREAK_SCALE);
         float[] eye={(float)e.x,(float)e.y,(float)e.z};
         float light=.38F+.62F*Math.min(1,Math.max((packedLight>>20)&15,(packedLight>>4)&15)/15F);
         int absent=boss.greeneBattle().missingMoltActors();
         glDisable(GL_CULL_FACE);glEnable(GL_DEPTH_TEST);glDepthMask(true);glDisable(GL_BLEND);glUseProgram(model);
-        integer(model,"liveForm",0);integer(model,"clamber",11);integer(model,"bones",0);integer(model,"actors",1);integer(model,"atlas",2);integer(model,"spiderSkin",3);for(int i=0;i<4;i++)integer(model,"civilian"+i,7+i);
+        integer(model,"liveForm",0);integer(model,"clamber",11);integer(model,"bones",0);integer(model,"actors",1);integer(model,"atlas",2);for(int i=0;i<4;i++)integer(model,"civilian"+i,7+i);
         integer(model,"paths",4);integer(model,"animal",6);integer(model,"absent",absent);
         glUniform3fv(u(model,"pivots"),pivots);glUniform3fv(u(model,"eye"),eye);scalar(model,"time",t);scalar(model,"sceneLight",light);
         mat(model,"camera",camera);mat(model,"root",new Matrix4f());boolean second=t>=13.2F;
         integer(model,"kind",3);glBindVertexArray(fissures);glDrawArrays(GL_TRIANGLES,0,fissureCount);
-        int severed=0;
-        var bends=new float[16];
-        for(int i=0;i<8;i++){
-            if(boss.spider.severed(i))severed|=1<<i;
-            String suffix=(i<4?"L":"R")+(i%4+1);
-            float ease=boss.spiderData().contains("LastPose")?settle(t,13+2*i):1;
-            bends[2*i]=ease*boss.spider.fold("coxa_"+suffix,partial);
-            bends[2*i+1]=ease*boss.spider.fold("tibia_"+suffix,partial);
+        float radiance=moltRadiance(age);
+        boolean emissionOnly=ShaderPackCompat.active();
+        if(second && (!emissionOnly || radiance>0)){
+            sampleBody(boss,t,partial);
+            upload(0,dynamic[0],16,GreeneColonies.ROWS,GL_RGBA,boneUpload);
+            setLiveMaterial(model,packedLight,net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,lightmap);
+            scalar(model,"radiance",radiance);
+            if(emissionOnly)beginRadiancePass(model);
+            integer(model,"kind",1);
+            drawModel(1,1);
+            if(emissionOnly){glDisable(GL_BLEND);glDepthMask(true);}
+            integer(model,"liveForm",0);
         }
-        integer(model,"severed",severed);glUniform2fv(u(model,"legBends"),bends);
-        integer(model,"kind",second?1:0);drawModel(second?1:0,1);if(t<14.5F){integer(model,"kind",2);drawModel(2,people);}
+        if(t<14.5F){integer(model,"kind",2);drawModel(2,people);}
         integer(model,"kind",6);
         for(int i=0;i<4;i++){
             int k=i*17;float drain=animalMatrices[k+16];if(drain>=1 || (absent&(1<<(12+i)))!=0)continue;
@@ -298,8 +334,86 @@ public final class GreeneMoltRenderer implements AutoCloseable {
             glEnable(GL_BLEND);glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(false);
             gridPass(mist,3,580,camera,eye,t,light);
         }
+        if(age>=GreeneMoltSurge.GATHER-40){
+            var floor=surgeFloors.computeIfAbsent(boss,k->new MoltSurgeFloor());
+            floor.update(boss);
+            if(surgeView!=null){
+                floor.light=light;
+                floor.origin=boss.getPosition(partial);
+                floor.age=age;
+                floor.lastFrame=boss.level().getGameTime()+(double)partial;
+                var eyeLocal=Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().subtract(floor.origin);
+                drawSurge(eyeLocal,age,surgeView,floor);
+            }
+        }
     }
-    static boolean drawColony(GreeneGoddessRenderer colony,float ticks,PoseStack stack,int light,int overlay,org.joml.Matrix4f[] offsets){
+    private void drawSurge(Vec3 eye,float age,Matrix4f camera,MoltSurgeFloor floor){
+        glEnable(GL_DEPTH_TEST);glDepthMask(false);glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        upload(6,surgeTerrain,MoltSurgeFloor.SIDE,MoltSurgeFloor.SIDE,GL_RGB,floor.samples);
+        glUseProgram(surge);
+        integer(surge,"terrain",6);
+        scalar(surge,"terrainSpan",MoltSurgeFloor.STEP*MoltSurgeFloor.SIDE);
+        scalar(surge,"front",GreeneMoltSurge.frontRadius(age));
+        scalar(surge,"charge",net.minecraft.util.Mth.clamp((age-GreeneMoltSurge.GATHER)/
+                (GreeneMoltSurge.RELEASE-GreeneMoltSurge.GATHER),0,1));
+        scalar(surge,"released",Math.max(0,age-GreeneMoltSurge.RELEASE)/20F);
+        scalar(surge,"fade",net.minecraft.util.Mth.clamp((MoltSurgeFloor.CLEAR_AGE-age)/(MoltSurgeFloor.CLEAR_AGE-GreeneMoltSurge.ARRIVAL),0,1));
+        scalar(surge,"crestFade",net.minecraft.util.Mth.clamp((GreeneMolt.DURATION+3-age)/9F,0,1));
+        scalar(surge,"sceneLight",floor.light);
+        glUniform3f(u(surge,"eye"),(float)eye.x,(float)eye.y,(float)eye.z);
+        mat(surge,"vp",camera);
+        // Broken side plumes behind the advancing fold, then the continuous low pressure front.
+        integer(surge,"plumes",1);
+        glBindVertexArray(grids[5]);glDrawElementsInstanced(GL_TRIANGLES,gridCounts[5],GL_UNSIGNED_INT,0L,64);
+        integer(surge,"plumes",0);
+        glBindVertexArray(grids[4]);glDrawElementsInstanced(GL_TRIANGLES,gridCounts[4],GL_UNSIGNED_INT,0L,3);
+    }
+    private static int levelLightmap(){
+        // turnOnLightLayer binds a texture through Minecraft's state cache. Run it before our raw GL bindings.
+        Minecraft.getInstance().gameRenderer.lightTexture().turnOnLightLayer();
+        return RenderSystem.getShaderTexture(2);
+    }
+    private void setLiveMaterial(int shader,int light,int overlay,int lightmap){
+        bind(14,lightmap);
+        integer(shader,"liveForm",1);
+        integer(shader,"levelLight",14);
+        scalar(shader,"damage",(overlay>>16)==3?1F:0F);
+        scalar(shader,"coreFlash",(overlay&15)/15F);
+        glUniform2i(u(shader,"lightUV"),(light>>4)&15,(light>>20)&15);
+    }
+    private static float smooth(float a,float b,float v){
+        float t=net.minecraft.util.Mth.clamp((v-a)/(b-a),0,1);
+        return t*t*(3-2*t);
+    }
+    static float moltRadiance(float age){
+        if(age<=GreeneMoltSurge.RELEASE)
+            return .79F*smooth(GreeneMoltSurge.GATHER,GreeneMoltSurge.RELEASE,age);
+        return .79F-.39F*smooth(GreeneMoltSurge.RELEASE,436,age)+.49F*smooth(436,GreeneMolt.DURATION,age);
+    }
+    static float combatRadiance(EncounterMob boss,float partial){
+        var data=boss.goddessData();
+        // An old completed transformation starts at the steady intensity, including after a world reload.
+        if(!data.contains("FormedAt"))return .42F;
+        float elapsed=Math.max(0,boss.level().getGameTime()-data.getLong("FormedAt")+partial);
+        return .89F+.11F*smooth(0,12,elapsed)-.58F*smooth(30,70,elapsed);
+    }
+    private void beginRadiancePass(int shader){
+        integer(shader,"liveForm",2);
+        glEnable(GL_BLEND);glBlendFunc(GL_ONE,GL_ONE);
+        glDepthMask(false);
+    }
+    private record LitColony(GreeneGoddessRenderer colony,float ticks,int light,int overlay,Matrix4f[] offsets,float radiance){}
+    private static final Map<EncounterMob,LitColony> litColonies=new LinkedHashMap<>();
+    static void queueRadiance(EncounterMob boss,GreeneGoddessRenderer colony,float ticks,int light,int overlay,Matrix4f[] offsets,float radiance){
+        litColonies.put(boss,new LitColony(colony,ticks,light,overlay,offsets,radiance));
+    }
+    static boolean drawColony(GreeneGoddessRenderer colony,float ticks,PoseStack stack,int light,int overlay,Matrix4f[] offsets,float radiance){
+        var view=new Matrix4f(RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
+        return drawColony(colony,ticks,view,RenderSystem.getProjectionMatrix(),light,overlay,offsets,radiance,false);
+    }
+    private static boolean drawColony(GreeneGoddessRenderer colony,float ticks,Matrix4f view,Matrix4f projection,int light,int overlay,
+                                      Matrix4f[] offsets,float radiance,boolean emissionOnly){
         var renderer=scene;
         if(renderer==null)return false;
         // The mesh is already resident after the transformation. Only joint poses change each frame.
@@ -307,8 +421,7 @@ public final class GreeneMoltRenderer implements AutoCloseable {
         int body=skin("textures/entity/greene_goddess_tissue.png");
         int[] civilians=new int[4];
         for(int i=0;i<civilians.length;i++)civilians[i]=mc.getTextureManager().getTexture(CommonInfectedRenderer.skin(i)).getId();
-        mc.gameRenderer.lightTexture().turnOnLightLayer();
-        int lightmap=RenderSystem.getShaderTexture(2);
+        int lightmap=emissionOnly?0:levelLightmap();
         try(var state=new State()){
             colony.writeJointMatrices(ticks,renderer.boneUpload);
             GreeneColonies.pose(renderer.boneUpload);
@@ -317,25 +430,24 @@ public final class GreeneMoltRenderer implements AutoCloseable {
                 for(int group=0;group<GreeneColonies.JOINTS;group++){
                     int carrier=group<GreeneColonies.NATIVE?com.codex.blacklight.combat.GoddessRig.carrier(group)
                             :GreeneColonies.GROUPS.get((group-GreeneColonies.NATIVE)/12).owner();
-                    var offset=offsets[carrier];
+                    var offset=offsets[com.codex.blacklight.combat.GoddessCrownColonies.offsetIndex(offsets,group,carrier)];
                     if(offset.m33()==0)scratch.identity().scale(0).get(renderer.boneUpload,group*16);
                     else scratch.set(renderer.boneUpload,group*16).mulLocal(offset).get(renderer.boneUpload,group*16);
                 }
             }
             upload(0,renderer.dynamic[0],16,GreeneColonies.ROWS,GL_RGBA,renderer.boneUpload);
-            bind(2,body);bind(14,lightmap);
+            bind(2,body);
             int shader=renderer.model;
             glUseProgram(shader);glDisable(GL_CULL_FACE);glDisable(GL_BLEND);glEnable(GL_DEPTH_TEST);glDepthMask(true);
-            renderer.integer(shader,"liveForm",1);renderer.integer(shader,"kind",1);renderer.integer(shader,"bones",0);
-            renderer.integer(shader,"atlas",2);renderer.integer(shader,"levelLight",14);
+            renderer.setLiveMaterial(shader,light,overlay,lightmap);
+            renderer.scalar(shader,"radiance",radiance);
+            if(emissionOnly)renderer.beginRadiancePass(shader);
+            renderer.integer(shader,"kind",1);renderer.integer(shader,"bones",0);
+            renderer.integer(shader,"atlas",2);
             for(int i=0;i<4;i++){bind(7+i,civilians[i]);renderer.integer(shader,"civilian"+i,7+i);}
-            renderer.scalar(shader,"damage",(overlay>>16)==3?1F:0F);
-            renderer.scalar(shader,"coreFlash",(overlay&15)/15F);
-            glUniform2i(renderer.u(shader,"lightUV"),(light>>4)&15,(light>>20)&15);
-            var view=new Matrix4f(RenderSystem.getModelViewMatrix()).mul(stack.last().pose());
             var eye=view.invert(new Matrix4f()).transformPosition(new org.joml.Vector3f());
             glUniform3f(renderer.u(shader,"eye"),eye.x,eye.y,eye.z);
-            renderer.mat(shader,"camera",new Matrix4f(RenderSystem.getProjectionMatrix()).mul(view));
+            renderer.mat(shader,"camera",new Matrix4f(projection).mul(view));
             renderer.mat(shader,"root",new Matrix4f());
             renderer.drawModel(1,1);
         }
@@ -405,7 +517,30 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     // Only draw the raw GLSL scene into the final world colour target, with its terrain depth.
     private static final Map<EncounterMob,Integer> packedScenes=new LinkedHashMap<>();
 
-    static void draw(EncounterMob boss,float partial,PoseStack stack,int light){
+    static void draw(EncounterMob boss,float partial,PoseStack stack,
+                     net.minecraft.client.renderer.MultiBufferSource buffers,int light,
+                     GreeneSpiderRenderer spider,GreeneGoddessRenderer goddess){
+        if(scene==null){
+            beginLoad();
+            try(var saved=new State()){
+                scene=new GreeneMoltRenderer(loading.join());loading=null;
+            }catch(IOException ex){throw new IllegalStateException("Cannot load Greene molt",ex);}
+        }
+        float t=Math.min(23,boss.greeneBattle().age(partial)/20F);
+        scene.combatModel=goddess;
+        if(t<13.2F || ShaderPackCompat.active()){
+            scene.sampleBody(boss,t,partial);
+            stack.pushPose();
+            stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180-boss.greeneBattle().collapseYaw()));
+            stack.scale(GreeneForm.OUTBREAK_SCALE,GreeneForm.OUTBREAK_SCALE,GreeneForm.OUTBREAK_SCALE);
+            if(t<13.2F){
+                scene.sampleBends(boss,t,partial);
+                spider.drawMolt(boss,partial,stack,buffers,light,scene.boneUpload,t,scene.legBends);
+            }else{
+                goddess.drawMolt(scene.boneUpload,stack,buffers,light);
+            }
+            stack.popPose();
+        }
         if(ShaderPackCompat.active()){
             packedScenes.put(boss,light);
             return;
@@ -415,11 +550,21 @@ public final class GreeneMoltRenderer implements AutoCloseable {
     }
 
     public static void finishFrame(Matrix4f view,Matrix4f projection,Vec3 eye,float partial){
-        if(packedScenes.isEmpty())return;
+        if(scene!=null && !scene.surgeFloors.isEmpty())scene.drawLingeringSurges(view,projection,eye,partial);
+        if(packedScenes.isEmpty() && litColonies.isEmpty())return;
         var mc=Minecraft.getInstance();
         try{
             if(!ShaderPackCompat.active())return;
             mc.getMainRenderTarget().bindWrite(true);
+            for(var entry:litColonies.entrySet()){
+                var boss=entry.getKey();
+                if(boss.isRemoved() || boss.level()!=mc.level || !boss.goddess.active())continue;
+                var offset=boss.getPosition(partial).subtract(eye);
+                var modelView=new Matrix4f(view).translate((float)offset.x,(float)offset.y,(float)offset.z)
+                        .mul(com.codex.blacklight.combat.GoddessRig.root(boss,partial));
+                var lit=entry.getValue();
+                drawColony(lit.colony,lit.ticks,modelView,projection,lit.light,lit.overlay,lit.offsets,lit.radiance,true);
+            }
             for(var entry:packedScenes.entrySet()){
                 var boss=entry.getKey();
                 if(boss.isRemoved() || boss.level()!=mc.level || boss.greeneStage()!=GreeneBattleCycle.MOLTING)continue;
@@ -428,22 +573,38 @@ public final class GreeneMoltRenderer implements AutoCloseable {
                 drawScene(boss,partial,camera,entry.getValue());
             }
         }finally{
-            packedScenes.clear();
+            packedScenes.clear();litColonies.clear();
+        }
+    }
+
+    private void drawLingeringSurges(Matrix4f view,Matrix4f projection,Vec3 eye,float partial){
+        var mc=Minecraft.getInstance();
+        for(var it=surgeFloors.entrySet().iterator();it.hasNext();){
+            var entry=it.next();
+            var boss=entry.getKey();
+            if(boss.isRemoved() || boss.level()!=mc.level){it.remove();continue;}
+            if(boss.greeneStage()==GreeneBattleCycle.MOLTING)continue;
+            var floor=entry.getValue();
+            float age=(float)(floor.age+(boss.level().getGameTime()-floor.lastFrame)+partial);
+            if(floor.age<GreeneMoltSurge.ARRIVAL-3 || age>=MoltSurgeFloor.CLEAR_AGE){it.remove();continue;}
+            var offset=floor.origin.subtract(eye);
+            var camera=new Matrix4f(projection).mul(view).translate((float)offset.x,(float)offset.y,(float)offset.z);
+            mc.getMainRenderTarget().bindWrite(true);
+            try(var saved=new State()){drawSurge(eye.subtract(floor.origin),age,camera,floor);}
         }
     }
 
     private static void drawScene(EncounterMob boss,float partial,Matrix4f camera,int light){
-        int[] skins=new int[8];skins[0]=skin("textures/entity/greene_goddess_tissue.png");
-        skins[7]=skin("textures/entity/greene_spider_brood.png");
+        int[] skins=new int[7];skins[0]=skin("textures/entity/greene_goddess_tissue.png");
         for(int i=0;i<4;i++)skins[i+1]=Minecraft.getInstance().getTextureManager().getTexture(CommonInfectedRenderer.skin(i)).getId();
         skins[5]=Minecraft.getInstance().getTextureManager().getTexture(ConsumeTendrilSegmentMesh.TEXTURE).getId();
         skins[6]=skin("textures/entity/consume_charcoal_skin.png");
+        int lightmap=ShaderPackCompat.active()?0:levelLightmap();
         try(var state=new State()){
-            if(scene==null){beginLoad();scene=new GreeneMoltRenderer(loading.join());loading=null;}
-            scene.render(boss,partial,camera,light,skins);
-        }catch(IOException ex){throw new IllegalStateException("Cannot load Greene molt",ex);}
+            scene.render(boss,partial,camera,light,skins,lightmap);
+        }
     }
-    public static void invalidate(){packedScenes.clear();loading=null;if(scene!=null){scene.close();scene=null;}}
+    public static void invalidate(){packedScenes.clear();litColonies.clear();loading=null;if(scene!=null){scene.close();scene=null;}}
     @Override public void close(){
         for(int v:vaos)glDeleteVertexArrays(v);for(int v:buffers)glDeleteBuffers(v);
         for(int v:textures)glDeleteTextures(v);for(int v:programs)glDeleteProgram(v);
