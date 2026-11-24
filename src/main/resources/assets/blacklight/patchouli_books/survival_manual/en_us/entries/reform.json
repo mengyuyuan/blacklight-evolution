@@ -10,7 +10,11 @@
     },
     {
       "type": "patchouli:text",
-      "text": "A qualifying lethal hit spends biomass to enter liquid form. There is no shell to return to after death. Find living, consumable prey quickly and finish feeding. Tamed, mounted or invulnerable targets are poor choices. Find standing room to reform."
+      "text": "To survive a lethal hit as an aggregate, be infected, enter Prototype mode and keep at least 150 biomass in reserve by default. An ordinary lethal hit spends that reserve. Damage that bypasses invulnerability skips the transformation. Servers can change the cost."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A death aggregate has no shell to recall. Touch living, consumable prey and let the aggregate envelop it. Leave room to stand when you reform. The base lifetime is 45 seconds. Viral Stability I extends it to 75 seconds, II to 120 seconds, and III removes natural decay."
     }
   ]
 }

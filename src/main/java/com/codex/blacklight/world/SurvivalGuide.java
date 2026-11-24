@@ -1,8 +1,10 @@
 package com.codex.blacklight.world;
 
 import com.codex.blacklight.power.GrowthSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +15,8 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 public final class SurvivalGuide {
     private SurvivalGuide() {}
+    private static final String WIKI_URL = "https://prototype.qibusu.com/wiki";
+    static final String REPLAY_GREENE = "BlacklightGoddessReplay";
     private static final String[] SITES = {"on_research_station_maps", "lost_convoy", "mother_plaza", "dispatch_intersection"};
 
     @SubscribeEvent public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -34,7 +38,19 @@ public final class SurvivalGuide {
         if(event.getEntity() instanceof ServerPlayer player && player.tickCount%20==0
                 && player.level().dimension()==com.codex.blacklight.city.CityTravel.WORLD
                 && !player.isSpectator()
-                && done(player,"plaza_cleared") && !done(player,"greene_outbreak"))GreeneOutbreak.arrive(player);
+                && done(player,"plaza_cleared") && followingGreene(player))GreeneOutbreak.arrive(player);
+    }
+    public static boolean followingGreene(ServerPlayer player) {
+        return !done(player,"greene_outbreak")
+                || player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getBoolean(REPLAY_GREENE);
+    }
+    /** Old victories did not record the extraction. The player can explicitly revisit the den. */
+    public static void revisitGreene(ServerPlayer player) {
+        if (!player.isShiftKeyDown() || player.isSpectator() || player.serverLevel().dimension()!=com.codex.blacklight.city.CityTravel.WORLD
+                || !done(player,"plaza_cleared") || !done(player,"greene_outbreak") || BossSiteData.headConfirmed(player)) return;
+        var saved=player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        saved.putBoolean(REPLAY_GREENE,true);
+        player.getPersistentData().put(Player.PERSISTED_NBT_TAG,saved);
     }
     @SubscribeEvent public static void captive(net.neoforged.neoforge.event.tick.EntityTickEvent.Post event){
         if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide){
@@ -79,6 +95,13 @@ public final class SurvivalGuide {
         }
     }
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("wiki").executes(ctx -> {
+            var link = Component.literal(WIKI_URL).withStyle(style -> style
+                    .withColor(ChatFormatting.AQUA).withUnderlined(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, WIKI_URL)));
+            ctx.getSource().sendSystemMessage(Component.translatable("survival.blacklight.wiki", link));
+            return 1;
+        }));
         event.getDispatcher().register(Commands.literal("blacklightguide").executes(ctx -> {
             var player = ctx.getSource().getPlayerOrException();
             FieldNotes.open(player, false);
@@ -91,7 +114,7 @@ public final class SurvivalGuide {
         if (!player.getData(com.codex.blacklight.registry.ModAttachments.PLAYER_STATE).isInfected()) {
             next = done(player, "sealed_sample") ? Component.translatable("advancement.blacklight.sealed_sample.desc")
                     : done(player, "research_station") ? Component.translatable("survival.blacklight.cold_storage") : introduction();
-        } else if (done(player,"greene_outbreak")) next=Component.translatable("survival.blacklight.journal.greene_defeated");
+        } else if (!followingGreene(player)) next=Component.translatable("survival.blacklight.journal.greene_defeated");
         else if (done(player,"plaza_cleared")) next=Component.translatable("survival.blacklight.journal.mother_core");
         else if (done(player,"bloodtox_starter")) next=Component.translatable("survival.blacklight.journal.bloodtox_starter");
         else if (done(player,"convoy_cleared")) next=Component.translatable("survival.blacklight.after_convoy");

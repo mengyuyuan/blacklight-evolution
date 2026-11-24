@@ -255,12 +255,20 @@ public final class CityHiveSupplyGameTest {
     });}
     @GameTest(template="wall_test",timeoutTicks=240,batch="density_independent_pools")
     public static void aFullResidentPoolAllowsRealInfectedBirthsAndReservesBothPoolsDuringJoins(GameTestHelper h){var f=new Fixture(h);int limit=CityConfig.MOB_LIMIT.get(),cap=OutbreakConfig.DIMENSION_CAP.get();h.runAfterDelay(100,()->{
-        CityConfig.MOB_LIMIT.set(1);OutbreakConfig.DIMENSION_CAP.set(2);
+        var existing=EntityType.COW.create(f.level);
+        existing.setNoAi(true);
+        existing.moveTo(f.outside(0).getX()+3.5,f.outside(0).getY(),f.outside(0).getZ()+.5,0,0);
+        h.assertTrue(f.level.addFreshEntity(existing),"an existing resident is loaded before measuring the two pools");
+        int residents=0,infected=0;
+        for(var entity:f.level.getAllEntities())if(entity instanceof Mob mob&&mob.isAlive()){
+            if(BlacklightInfectionSystem.isInfected(mob))infected++;else residents++;
+        }
+        CityConfig.MOB_LIMIT.set(residents+1);OutbreakConfig.DIMENSION_CAP.set(infected+2);
         var resident=EntityType.COW.create(f.level);resident.setNoAi(true);resident.setPos(f.outside(0).getBottomCenter());Mob[] nested={null};
         java.util.function.Consumer<net.neoforged.neoforge.event.entity.EntityJoinLevelEvent> callback=e->{if(e.getLevel()==f.level&&e.getEntity()==resident)nested[0]=WorldOutbreakSystem.spawnAt(f.level,f.outside(1),OutbreakRules.Tier.FRESH);};
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(callback);
         try{
-            h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,resident)&&nested[0]!=null,"a real infected producer can use its own slot inside the final resident join callback");
+            h.assertTrue(WorldOutbreakSystem.addScheduled(f.level,resident)&&nested[0]!=null,"a real infected producer can use its own slot inside the final resident join callback: "+f.birthStatus());
             h.assertTrue(!CitySystem.hasPopulationRoom(f.level,DistrictThreat.Zone.GREEN)&&CitySystem.hasPopulationRoom(f.level,DistrictThreat.Zone.RED),"full green resident districts are skipped while red districts retain their own infection slot");
             var extraResident=EntityType.COW.create(f.level);extraResident.setPos(f.outside(2).getBottomCenter());h.assertTrue(!WorldOutbreakSystem.addScheduled(f.level,extraResident),"a full resident pool cannot borrow infection slots");
             h.assertTrue(WorldOutbreakSystem.spawnAt(f.level,f.outside(2),OutbreakRules.Tier.FRESH)!=null,"the second real infection slot is independent of the full resident pool");

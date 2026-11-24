@@ -138,6 +138,7 @@ public final class BiomassSystem {
                     :CombatTargeting.visible(p,p.getEyePosition(),victim.getBoundingBox()));
     }
     public static boolean healthReady(Player player, Mob victim) {
+        if(ConsumeSystem.isGreeneShell(victim))return false;
         if(victim instanceof GreeneHost host && host.stage()!=GreeneHost.SPENT)return false;
         if(!AssimilationSystem.ready(victim))return false;
         if(victim instanceof com.codex.blacklight.entity.EncounterMob boss&&boss.kind()==com.codex.blacklight.entity.EncounterKind.GOLIATH)return boss.goliathFinisherReady();

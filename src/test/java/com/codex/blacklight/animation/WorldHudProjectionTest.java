@@ -6,6 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WorldHudProjectionTest {
+    @Test void denBearingTracksVisibleTargetsAndKeepsOffscreenTargetsAtTheEdge() {
+        var front = WorldHudProjection.waypointBearing(new org.joml.Vector4f(.5F, -.5F, 0, 2));
+        assertEquals(.25F, front.x); assertEquals(-.25F, front.y);
+        var right = WorldHudProjection.waypointBearing(new org.joml.Vector4f(7, 2, 0, -1));
+        assertEquals(1F, right.x); assertTrue(right.y > 0);
+        var behind = WorldHudProjection.waypointBearing(new org.joml.Vector4f(0, 0, 0, -1));
+        assertEquals(0F, behind.x); assertEquals(-1F, behind.y);
+    }
     @Test void worldPerspectiveProjectsBeforeGuiOrthographicReplacesIt() {
         var view=new Matrix4f();var projection=new Matrix4f().perspective((float)Math.toRadians(70),16F/9,.05F,512);
         var copy=new Matrix4f(projection);

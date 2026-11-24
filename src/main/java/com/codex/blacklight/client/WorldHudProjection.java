@@ -7,6 +7,14 @@ import org.joml.Vector4f;
 public final class WorldHudProjection {
     public record Point(float x,float y,float depth,boolean inFront,boolean onScreen) { }
     private WorldHudProjection() { }
+    /** Normalized HUD position. A target behind the camera stays on the nearest screen edge. */
+    public static org.joml.Vector2f waypointBearing(Vector4f clip) {
+        float edge = Math.max(Math.abs(clip.x), Math.abs(clip.y));
+        if (clip.w <= 0 && edge < .0001F) return new org.joml.Vector2f(0, -1);
+        float scale = Math.max(.0001F, Math.max(clip.w, edge));
+        return new org.joml.Vector2f(clip.x / scale, clip.y / scale);
+    }
+
     public static Point project(Matrix4f view,Matrix4f projection,double cameraX,double cameraY,double cameraZ,
                                 double x,double y,double z,int width,int height) {
         var clip=new Vector4f((float)(x-cameraX),(float)(y-cameraY),(float)(z-cameraZ),1);

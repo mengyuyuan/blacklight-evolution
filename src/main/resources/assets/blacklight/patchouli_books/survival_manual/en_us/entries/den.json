@@ -6,11 +6,23 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "After the plaza fight, bring Greene's tissue back to Futian. Hold it and use it to follow the spore trail. Holding the tissue marks the den and its distance in the world. The marker is hidden in superflat saves. Once you are above the den, descend to the chamber."
+      "text": "Return to Futian after Greene escapes. In a normal world, follow the den marker and its distance even with your weapon out. Look for a way down when you reach it. In superflat, hold Greene's tissue and hold Use to follow spores from your palm."
     },
     {
       "type": "patchouli:text",
-      "text": "Enter the chamber carrying the tissue on a non-Peaceful difficulty. Survive Greene's ground and airborne phases to complete the outbreak milestone. Parasite experiments, repeatable evolution and symbiotes remain open.$(br2)$(l:recovery)Recover a lost lead$(/l)"
+      "text": "Check your advancements for the pump encounter. With that milestone, enter the chamber on any difficulty above Peaceful. You can start the fight even if a teammate picked up the only sample or you lost it. Without the sample, search east of the center of a Futian infected district for a passage leading down.$(br2)$(l:recovery)Replay on an older save$(/l)"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Weaken an Evolved to 35% health or less and grab it. While holding it, tap Disguise (default X) to implant it. Face the spider as it feeds. Hold Attack to charge, then release to throw the Evolved into its open mouth. Two feeding-window mouth hits stop it feeding."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "While the airborne goddess is casting, hit the straining body part with a charged block throw to interrupt her. When she falls, stand beside the exposed part, press Grab, then Use. Extract her left arm, her right arm, then her head. Finishing the head execution grants Gaze Vacuole to participants."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Select Gaze Vacuole on the utility wheel. Hold its skill key to preview the center up to 40 blocks away. Release to cast. The center stays where you placed it, so a moving target can escape before it closes. Each cast costs 15 biomass and has a five-second cooldown."
     }
   ]
 }

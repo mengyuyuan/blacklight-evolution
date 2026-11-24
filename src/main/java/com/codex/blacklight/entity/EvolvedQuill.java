@@ -10,6 +10,7 @@ import net.minecraft.world.phys.*;
 
 /** Physical, dodgeable bone projectile. Owner attribution preserves the normal damage pipeline. */
 public final class EvolvedQuill extends ThrowableItemProjectile {
+    public static final float GRAVITY = .012F;
     private float damage=8;
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> SPEAR=net.minecraft.network.syncher.SynchedEntityData.defineId(EvolvedQuill.class,net.minecraft.network.syncher.EntityDataSerializers.INT);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> BARRAGE =
@@ -55,7 +56,7 @@ public final class EvolvedQuill extends ThrowableItemProjectile {
     public EvolvedQuill(Level level,LivingEntity owner){super(com.codex.blacklight.registry.ModEntities.EVOLVED_QUILL.get(),owner,level);}
     public void damage(float amount){damage=Float.isFinite(amount)?Math.clamp(amount,0,1000000):0;}
     @Override protected Item getDefaultItem(){return Items.IRON_NUGGET;}
-    @Override protected double getDefaultGravity(){return .012;}
+    @Override protected double getDefaultGravity(){return GRAVITY;}
     @Override protected boolean canHitEntity(Entity e){if((bloodSpear() || barrage()!=0) && e instanceof EvolvedQuill other && other.getOwner()==getOwner())return false;
         return entityData.get(SPEAR)!=4 && !(getPersistentData().hasUUID("GoddessSpineCaster") && e.getUUID().equals(getPersistentData().getUUID("GoddessSpineCaster")))
             && super.canHitEntity(e)&&e!=getOwner()&&(!(getOwner() instanceof LivingEntity owner)||!owner.isAlliedTo(e));}
