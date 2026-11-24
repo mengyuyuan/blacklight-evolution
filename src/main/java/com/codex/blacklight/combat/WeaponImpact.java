@@ -24,10 +24,10 @@ public final class WeaponImpact {
     }
 
     static void contact(ServerPlayer p,LivingEntity v,ImpactTier tier,boolean first,PhysicalFeedbackPayload.Effect effect,WeaponMove action,Vec3 origin){
-        if (v.level().isClientSide) return;
+        if (v.level().isClientSide || !ModAttachments.available(v)) return;
         var report = p == null ? WeaponCutContact.Report.NONE : WeaponCutContact.impact(p, v, HitStop.launchVelocity(v));
         if(!GroundSpikePin.held(v)&&tier.atLeast(ImpactTier.HEAVY)){
-            var state=com.codex.blacklight.registry.ModAttachments.getData(v, ModAttachments.HIT_REACTION);
+            var state=ModAttachments.peekData(v, ModAttachments.HIT_REACTION, HitReaction.EMPTY);
             if(!v.isAlive()||state.weight(v.level().getGameTime(),0)>0)
                 RagdollImpact.send(v,ImpactProfile.FALL,Math.max(18,state.duration()),false,HitStop.launchVelocity(v),
                         report);
