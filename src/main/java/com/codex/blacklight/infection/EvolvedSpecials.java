@@ -1,5 +1,6 @@
 package com.codex.blacklight.infection;
 
+import com.codex.blacklight.combat.BlockThrowBallistics;
 import com.codex.blacklight.entity.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -141,8 +142,12 @@ public final class EvolvedSpecials {
     private void fire(LivingEntity target,int index){
         if(!visible(target,24))return;
         var dart=new EvolvedQuill(host.level(),host);dart.setPos(host.getX(),host.getEyeY()-.4,host.getZ());
-        var d=target.getBoundingBox().getCenter().subtract(dart.position());dart.damage((float)host.getAttributeValue(Attributes.ATTACK_DAMAGE)*.42F);
-        dart.shoot(d.x,d.y+Math.sqrt(d.x*d.x+d.z*d.z)*.018,d.z,1.3F,index==1?1.5F:0);
+        float speed=1.3F;
+        var shot=BlockThrowBallistics.solve(dart.position(),target.getBoundingBox().getCenter(),Vec3.ZERO,speed,EvolvedQuill.GRAVITY);
+        if(shot==null)return;
+        var velocity=shot.velocity();
+        dart.damage((float)host.getAttributeValue(Attributes.ATTACK_DAMAGE)*.42F);
+        dart.shoot(velocity.x,velocity.y,velocity.z,speed,index==1?1.5F:0);
         host.level().addFreshEntity(dart);EvolvedCombatEffects.sweep(host);
     }
 }
