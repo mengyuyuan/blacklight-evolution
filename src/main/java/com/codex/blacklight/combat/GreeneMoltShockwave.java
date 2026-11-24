@@ -5,23 +5,34 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-/** Clears space for the rooted spider before the brood arrives. */
+/** The first displacement clears the player; the roar then rolls through the cave floor and brood. */
 final class GreeneMoltShockwave {
     static final double RADIUS = 26;
+    static final int ROAR_TICK = 16;
+    private static final int ROAR_BANDS = 6;
+    private static final double BAND_WIDTH = 9;
+    private static final ImpactProfile FLINCH = new ImpactProfile(HitReaction.STAGGER, ImpactProfile.BODY, 8, 0, 0, false);
     private static final int TRAVEL_TICKS = 16;
     private final Set<UUID> affected = new HashSet<>();
+    private final Set<UUID> recoiled = new HashSet<>();
 
     void begin(EncounterMob boss, ServerLevel level) {
         affected.clear();
+        recoiled.clear();
         for (ServerPlayer player : level.players()) {
             double height = player.getY() - boss.getY();
             if (!player.isAlive() || player.isSpectator() || height < -5 || height > 46) continue;
@@ -32,11 +43,15 @@ final class GreeneMoltShockwave {
     }
 
     void tick(EncounterMob boss, ServerLevel level, int age) {
+        int elapsed = age - ROAR_TICK;
+        if (elapsed >= 0 && elapsed < ROAR_BANDS * 3 && elapsed % 3 == 0) {
+            roarBand(boss, level, elapsed / 3);
+        }
         if (age > TRAVEL_TICKS) return;
-        if (age % 2 == 0 && age <= 12) {
+        if (age % 4 == 0 && age <= 12) {
             double ring = 2 + age * 2;
-            for (int i = 0; i < 28; i++) {
-                double angle = i * (Math.PI * 2 / 28);
+            for (int i = 0; i < 16; i++) {
+                double angle = i * (Math.PI * 2 / 16);
                 level.sendParticles(ParticleTypes.CLOUD, boss.getX() + ring * Math.cos(angle),
                         boss.getY() + .55, boss.getZ() + ring * Math.sin(angle), 1, .35, .10, .35, .04);
             }
@@ -59,6 +74,56 @@ final class GreeneMoltShockwave {
             player.fallDistance = 0;
             return false;
         });
+    }
+
+    private void roarBand(EncounterMob boss, ServerLevel level, int band) {
+        double outer = (band + 1) * BAND_WIDTH;
+        Vec3 origin = boss.position();
+        var audience = level.players().stream().filter(p -> p.distanceToSqr(boss) <= 100 * 100).toList();
+        // Sample the actual floor and ceiling. A missing surface sheds no fragments.
+        for (int i = 0; !audience.isEmpty() && i < 12; i++) {
+            double angle = (i + .5 * (band % 2)) * Math.PI / 6;
+            double radius = outer - BAND_WIDTH * .5;
+            Vec3 at = origin.add(radius * Math.cos(angle), 0, radius * Math.sin(angle));
+            if (!level.hasChunkAt(BlockPos.containing(at))) continue;
+            var hit = level.clip(new ClipContext(at.add(0, 9, 0), at.add(0, -16, 0),
+                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+            if (hit.getType() != HitResult.Type.BLOCK || hit.isInside() || hit.getDirection() != Direction.UP) continue;
+            Vec3 floor = hit.getLocation().add(0, .19, 0);
+            scatter(level, audience, floor, hit.getBlockPos(), 9);
+            if (i % 4 == 0) {
+                var roof = level.clip(new ClipContext(floor, floor.add(0, 64, 0),
+                        ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, boss));
+                if (roof.getType() == HitResult.Type.BLOCK && !roof.isInside() && roof.getDirection() == Direction.DOWN)
+                    scatter(level, audience, roof.getLocation().add(0, -.25, 0), roof.getBlockPos(), 6);
+            }
+        }
+        AABB area = new AABB(origin.add(-outer, -10, -outer), origin.add(outer, 20, outer));
+        for (Mob mob : level.getEntitiesOfClass(Mob.class, area, SpiderPhase::edible)) {
+            Vec3 offset = mob.position().subtract(origin);
+            double distance = offset.horizontalDistance();
+            if (distance > outer || (band > 0 && distance <= outer - BAND_WIDTH) || recoiled.contains(mob.getUUID()) || !mob.isAlive()
+                    || mob instanceof com.codex.blacklight.entity.BlacklightHydra
+                    || mob instanceof com.codex.blacklight.entity.BlacklightInfectedHost host && host.giantBoss()
+                    || mob.noPhysics || mob.isNoAi() || mob.isPassenger() || mob.isVehicle()
+                    || mob.getPersistentData().hasUUID("GreeneMoltOwner")
+                    || mob.getPersistentData().hasUUID("EncounterOwner") && !boss.getUUID().equals(mob.getPersistentData().getUUID("EncounterOwner"))
+                    || GroundSpikePin.held(mob) || ConsumeControl.protectedEntity(mob) || ConsumeControl.ownsMotion(mob)
+                    || ImpactControl.stunned(mob)) continue;
+            recoiled.add(mob.getUUID());
+            double angle = distance > .01 ? Math.atan2(offset.z, offset.x) : Math.toRadians(mob.getYRot() + 90);
+            float yaw = (float)Math.toDegrees(angle) - 90;
+            ImpactControl.begin(mob, FLINCH, yaw);
+            mob.knockback(.95 - .35 * distance / (BAND_WIDTH * ROAR_BANDS), -Math.cos(angle), -Math.sin(angle));
+            mob.hurtMarked = true;
+        }
+        if (band == ROAR_BANDS - 1) recoiled.clear();
+    }
+
+    private static void scatter(ServerLevel level, java.util.List<ServerPlayer> audience, Vec3 pos, BlockPos surface, int count) {
+        var chips = new BlockParticleOption(ParticleTypes.BLOCK, level.getBlockState(surface));
+        for (ServerPlayer player : audience)
+            level.sendParticles(player, chips, true, pos.x, pos.y, pos.z, count, .8, .14, .8, .16);
     }
 
     private static void landOutside(EncounterMob boss, ServerLevel level, ServerPlayer player, double direction) {
@@ -97,10 +162,23 @@ final class GreeneMoltShockwave {
             players.add(entry);
         }
         tag.put("ShockwavePlayers", players);
+        ListTag brood = new ListTag();
+        for (UUID id : recoiled) {
+            CompoundTag entry = new CompoundTag();
+            entry.putUUID("Mob", id);
+            brood.add(entry);
+        }
+        tag.put("RoarBrood", brood);
     }
 
     void load(CompoundTag tag) {
         affected.clear();
+        recoiled.clear();
+        ListTag brood = tag.getList("RoarBrood", Tag.TAG_COMPOUND);
+        for (int i = 0; i < brood.size(); i++) {
+            CompoundTag entry = brood.getCompound(i);
+            if (entry.hasUUID("Mob")) recoiled.add(entry.getUUID("Mob"));
+        }
         ListTag players = tag.getList("ShockwavePlayers", Tag.TAG_COMPOUND);
         for (int i = 0; i < players.size(); i++) {
             CompoundTag entry = players.getCompound(i);

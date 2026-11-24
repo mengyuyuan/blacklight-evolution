@@ -18,16 +18,21 @@ import net.minecraftforge.client.event.ViewportEvent;
 @EventBusSubscriber(modid="blacklight",value=Dist.CLIENT)
 public final class GoddessExecutionCamera {
     private static EncounterMob actor;
-    private static float yaw,pitch;
-    private static double fov;
+    private static float yaw,pitch,shownYaw,shownPitch;
+    private static double fov,returnWeight;
+    private static final float RETURNED=133;
+    public static boolean finalHead(){
+        return actor!=null && (actor.goddess.poseMask()&3)==3 && actor.goddess.part()==com.codex.blacklight.combat.GoddessVitals.HEAD;
+    }
     public static boolean active(){
         var mc=Minecraft.getInstance();
         return actor!=null && mc.level==actor.level() && mc.player!=null && mc.getCameraEntity()==mc.player
-                && mc.player.isAlive() && !actor.isRemoved() && actor.goddess.action()==GoddessEncounter.Action.EXTRACTING;
+                && mc.player.isAlive() && !mc.player.isSpectator() && !actor.isRemoved() && actor.goddess.action()==GoddessEncounter.Action.EXTRACTING
+                && (!finalHead() || actor.goddess.age(0)<RETURNED);
     }
     public static boolean update(net.minecraft.world.entity.Entity view){
         var mc=Minecraft.getInstance();actor=view==mc.player && mc.player!=null && mc.player.isAlive()?GoddessEncounter.paired(mc.player):null;
-        if(actor==null)framed=null;
+        if(actor==null){framed=null;returnWeight=0;}
         return active();
     }
     private static EncounterMob framed;
@@ -175,9 +180,44 @@ public final class GoddessExecutionCamera {
         float turn=(float)(1.8*dt);
         yaw=entering?heading:net.minecraft.util.Mth.approachDegrees(yaw,heading,turn);
         pitch=entering?tilt:net.minecraft.util.Mth.approach(pitch,tilt,turn);
-        fov=45;
+        shownYaw=yaw;shownPitch=pitch;fov=45;returnWeight=0;
+        if(finalHead() && t>=86){
+            // During the last third of the tissue stream the lens crosses to Greene's eye.
+            // Keep the eye on the full-size skull surface: the last moving skin vertices enter the glove.
+            double enter=ease((t-86)/10),leave=ease((t-115)/(RETURNED-115));
+            var victim=mc.player;
+            var pupil=GoddessRig.extractionEye(actor,partial);
+            var glove=actor.skinOrigin(partial).add(new Vec3(root.transformPosition(GoddessActor.gloveLocal(actor,partial))));
+            var subject=victim.getPosition(partial).add(actor.goddess.drawnActorOffset(victim,partial)).add(0,1.45,0).lerp(glove,.32);
+            // The final skin lies immediately behind the eye. Set the lens just outside its surface.
+            var gaze=subject.subtract(pupil).normalize();
+            var eyeSite=pupil.add(gaze.scale(.30));
+            if(!lensClear(mc,eyeSite)){
+                var lifted=eyeSite.add(0,.48,0);
+                eyeSite=lensClear(mc,lifted)?lifted:pupil;
+            }
+            var line=subject.subtract(eyeSite);
+            float memoryYaw=(float)Math.toDegrees(Math.atan2(-line.x,line.z));
+            float memoryPitch=(float)-Math.toDegrees(Math.atan2(line.y,line.horizontalDistance()));
+            shownYaw=net.minecraft.util.Mth.rotLerp((float)enter,yaw,memoryYaw);
+            shownPitch=net.minecraft.util.Mth.lerp((float)enter,pitch,memoryPitch);
+            eye=eye.lerp(eyeSite,enter);
+            fov=45+16*enter;
+            if(leave>0){
+                boolean first=mc.options.getCameraType().isFirstPerson();
+                Vec3 home=first?victim.getEyePosition(partial):camera.getPosition();
+                float homeYaw=first?victim.getViewYRot(partial):camera.getYRot();
+                float homePitch=first?victim.getViewXRot(partial):camera.getXRot();
+                eye=eye.lerp(home,leave);
+                var lifted=eye.add(0,.32*Math.sin(Math.PI*leave),0);
+                if(lensClear(mc,lifted))eye=lifted;
+                shownYaw=net.minecraft.util.Mth.rotLerp((float)leave,shownYaw,homeYaw);
+                shownPitch=net.minecraft.util.Mth.lerp((float)leave,shownPitch,homePitch);
+                returnWeight=leave;
+            }
+        }
         var access=(PrototypeCameraAccess)camera;
-        access.blacklight$setPosition(eye);access.blacklight$setRotation(yaw,pitch);
+        access.blacklight$setPosition(eye);access.blacklight$setRotation(shownYaw,shownPitch);
     }
     @SubscribeEvent
     public static void actorTick(net.minecraftforge.event.TickEvent.ClientTickEvent event){
@@ -189,9 +229,9 @@ public final class GoddessExecutionCamera {
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
     public static void angles(ViewportEvent.ComputeCameraAngles event){
-        if(active()){event.setYaw(yaw);event.setPitch(pitch);event.setRoll(0);}
+        if(active()){event.setYaw(shownYaw);event.setPitch(shownPitch);event.setRoll(0);}
     }
     @SubscribeEvent(priority=EventPriority.LOWEST)
-    public static void fov(ViewportEvent.ComputeFov event){if(active() && fov>0 && event.usedConfiguredFov())event.setFOV(fov);}
+    public static void fov(ViewportEvent.ComputeFov event){if(active() && fov>0 && event.usedConfiguredFov())event.setFOV(fov+(event.getFOV()-fov)*returnWeight);}
     private GoddessExecutionCamera(){}
 }

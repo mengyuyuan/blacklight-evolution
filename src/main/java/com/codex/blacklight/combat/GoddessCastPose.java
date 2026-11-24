@@ -8,8 +8,9 @@ import org.joml.Vector3f;
 /** The carrier joints move before the crown, fingertips, wound colonies and receiver patches are sampled. */
 public final class GoddessCastPose {
     public static boolean active(GoddessAttacks.Move move) {
+        if(GoddessTerrainCast.active(move)) return true;
         return switch (move) {
-            case VACUOLE, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF -> true;
+            case VACUOLE, NEEDLE_RAIN, WALL_SPEARS, BLOOD_SURF, SEEKING_ORBS, TENDRIL_CRUSH, PACK_POUNCE -> true;
             default -> false;
         };
     }
@@ -28,13 +29,22 @@ public final class GoddessCastPose {
         return boss.getPosition(partial).add(new Vec3(skull.transformPosition(new Vector3f(EYES))));
     }
 
+    public static Vec3 lips(EncounterMob boss,float partial) {
+        var skull=GoddessRig.root(boss,partial).mul(GoddessRig.pose(boss,partial)[0]);
+        float open=GoddessTerrainCast.jawOpening(boss.goddess.attacks.age(partial));
+        var seam=new Vector3f(-.157537F+.0215F*open,.476313F-.155F*open,-.921028F-.046F*open);
+        return boss.getPosition(partial).add(new Vec3(skull.transformPosition(seam)));
+    }
+
     static void apply(EncounterMob boss, Matrix4f[] pose, float partial) {
+        if(GoddessTerrainCast.active(boss.goddess.attacks.move())) { GoddessTerrainPose.apply(boss,pose,partial); return; }
         var attack=boss.goddess.attacks;
         float t=attack.age(partial);
         var move=attack.move();
-        float end=switch(move){case WALL_SPEARS -> GoddessAttacks.SPEARS_END; case VACUOLE -> 62; case BLOOD_SURF -> GoddessAttacks.SURF_END; default -> GoddessAttacks.RAIN_END;};
+        float end=switch(move){case WALL_SPEARS -> GoddessAttacks.SPEARS_END; case VACUOLE -> 62; case BLOOD_SURF -> GoddessAttacks.SURF_END; case SEEKING_ORBS -> 52; case TENDRIL_CRUSH -> 51; case PACK_POUNCE -> 47; default -> GoddessAttacks.RAIN_END;};
         float engage=beat(t,0,move==GoddessAttacks.Move.VACUOLE?17:10,end-10,end);
-        var target=attack.center().subtract(boss.getPosition(partial)).toVector3f();
+        var focus=move==GoddessAttacks.Move.PACK_POUNCE?attack.commands.commandLook(t):attack.center();
+        var target=focus.subtract(boss.getPosition(partial)).toVector3f();
         new Matrix4f(GoddessRig.root(boss,partial)).invert().transformPosition(target);
         var line=new Vector3f(target).sub(pose[0].getTranslation(new Vector3f()));
         if(line.lengthSquared()<.0001F) return;
@@ -42,6 +52,25 @@ public final class GoddessCastPose {
         float pitch=(float)Math.atan2(line.y,Math.hypot(line.x,line.z));
         float draw=0, strike=0, roll=0, crown=0, fold=0;
         switch(move){
+            case SEEKING_ORBS -> {
+                boolean second=!attack.commands.secondBroken();
+                draw=beat(t,0,8,11,16)+(second?beat(t,17,27,30,36):0);
+                strike=beat(t,11,14,15,21)+(second?beat(t,30,34,35,45):0);
+                roll=(1-2*GoddessRush.ease(t,15,22))*(.24F*draw-.34F*strike);
+                crown=-.35F*draw+.52F*strike;
+            }
+            case TENDRIL_CRUSH -> {
+                draw=beat(t,0,10,23,32);
+                fold=beat(t,22,32,35,48);
+                strike=beat(t,28,32,34,43);
+                crown=-.36F*draw+.42F*fold;
+            }
+            case PACK_POUNCE -> {
+                draw=beat(t,0,13,19,26);
+                strike=beat(t,20,26,27,39);
+                roll=-.32F*draw+.46F*strike;
+                crown=-.80F*draw+.78F*strike;
+            }
             case VACUOLE -> {
                 draw=beat(t,2,16,19,27);
                 fold=beat(t,22,45,51,57);
@@ -61,7 +90,7 @@ public final class GoddessCastPose {
             case BLOOD_SURF -> {
                 draw=beat(t,0,8,9,13)+beat(t,19,31,33,39);
                 strike=beat(t,9,12,14,23)+beat(t,34,38,40,GoddessAttacks.SURF_END);
-                roll=(t<24?1:-1)*(.34F*draw-.30F*strike);
+                roll=(1-2*GoddessRush.ease(t,18,27))*(.34F*draw-.30F*strike);
                 crown=-.30F*draw+.35F*strike;
             }
             case WALL_SPEARS -> {
@@ -95,18 +124,7 @@ public final class GoddessCastPose {
         var mane=pose[33].getTranslation(new Vector3f());
         var whip=about(mane,-roll*1.2F,crown,-roll*.62F);
         pose[33].mulLocal(whip);pose[34].mulLocal(whip);
-        for(int side=0;side<2;side++){
-            int first=side==0?5:19;
-            float sign=side==0?1:-1;
-            var shoulder=pose[first].getTranslation(new Vector3f());
-            float reach=(move==GoddessAttacks.Move.BLOOD_SURF ? 1.23F:.56F)*draw;
-            var gesture=about(shoulder,sign*(.23F*draw-.37F*fold),-reach+.66F*strike,
-                    sign*(.47F*draw-.65F*strike-.47F*fold));
-            for(int j=first;j<first+14;j++)pose[j].mulLocal(gesture);
-            var wrist=pose[first+2].getTranslation(new Vector3f());
-            var curl=about(wrist,-sign*.45F*fold,.33F*draw-.36F*strike,sign*.26F*fold);
-            for(int j=first+2;j<first+14;j++)pose[j].mulLocal(curl);
-        }
+        GoddessGesture.cast(boss,pose,t,draw,strike,fold);
     }
 
     private static Matrix4f about(Vector3f point,float yaw,float pitch,float roll) {

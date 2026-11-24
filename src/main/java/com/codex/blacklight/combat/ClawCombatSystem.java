@@ -50,6 +50,7 @@ public final class ClawCombatSystem {
     }
 
     public static void handle(ServerPlayer player, ClawActionPayload.Action request) {
+        if(request==ClawActionPayload.Action.GAZE_RELEASE){PlayerGazeField.release(player);return;}
         if(request==ClawActionPayload.Action.SPIDER_ESCAPE){SpiderActions.escape(player);return;}
         if(com.codex.blacklight.power.BiomassSystem.active(player))return;
         if(request==ClawActionPayload.Action.TERRAIN_GRAB_KEEPALIVE){TerrainGrabSelection.keepAlive(player);return;}

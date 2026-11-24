@@ -39,6 +39,7 @@ public final class GoddessEncounter {
         var state=boss.goddessData();return state.hasUUID("Actor")&&state.getUUID("Actor").equals(p.getUUID());
     }
     private boolean initialized, committed;
+    private long formedAt=-1;
     private int age, part, previousMask;
     private float facing, entryYaw, fallFrom;
     private boolean staggerLocked;
@@ -169,6 +170,7 @@ public final class GoddessEncounter {
     public boolean damageable() { return action() == Action.FLYING || action() == Action.STAGGER; }
 
     public void born() {
+        formedAt=boss.level().getGameTime();
         initialized = true;
         life.restore(0,false,0);
         boss.spider.synchronizeShellHealth();
@@ -207,7 +209,10 @@ public final class GoddessEncounter {
         };
     }
     public boolean groundWeakSpot(net.minecraft.world.damagesource.DamageSource source, HydraHurtContact.Contact hit) {
-        if (action != Action.STAGGER || age < LOWER_TICKS || age >= LOWER_TICKS + OPEN_TICKS || hit == null
+        boolean inverted=action==Action.FLYING && attacks.move()==GoddessAttacks.Move.INVERTED_ACID && attacks.crown.acting()
+                && attacks.age(0)>=GoddessCrownCast.OPEN && attacks.age(0)<GoddessCrownCast.RISE && hit!=null && GoddessRig.PARTS.get(0).equals(hit.bone());
+        boolean staggered=action==Action.STAGGER && age>=LOWER_TICKS && age<LOWER_TICKS+OPEN_TICKS;
+        if ((!staggered && !inverted) || hit == null
                 || !(source.getDirectEntity() instanceof ServerPlayer player)) return false;
         if (!player.onGround() && (player.getDeltaMovement().y > .01
                 || !player.level().getBlockCollisions(player,player.getBoundingBox().move(0,-.04,0)).iterator().hasNext())) return false;
@@ -412,6 +417,7 @@ public final class GoddessEncounter {
         var t=new CompoundTag();
         t.put("Offense",attacks.save());
         t.putBoolean("Initialized",initialized);
+        if(formedAt>=0)t.putLong("FormedAt",formedAt);
         t.putInt("Action",action.ordinal());
         t.putInt("SceneSequence",sceneSequence);
         t.putInt("Age",age);
@@ -434,6 +440,7 @@ public final class GoddessEncounter {
     public void load(CompoundTag t) {
         attacks.load(t.getCompound("Offense"));
         initialized=t.getBoolean("Initialized");
+        formedAt=t.contains("FormedAt")?t.getLong("FormedAt"):-1;
         action=readAction(t);
         sceneSequence=t.getInt("SceneSequence");
         age=Math.max(0,t.getInt("Age"));

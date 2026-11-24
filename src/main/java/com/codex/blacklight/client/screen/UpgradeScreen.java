@@ -77,7 +77,10 @@ public final class UpgradeScreen extends Screen {
                 for (var skill : CombatSkill.values())
                     if (skill.powerRequires() == null && !skill.adaptivePassive()) entries.add(combatEntry(skill));
             }
-            case UTILITY -> {entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS,PowerForm.SOVEREIGN_WINGS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
+            case UTILITY -> {
+                if(state()!=null && state().hasUnlocked(PowerForm.GAZE_VACUOLE))
+                    entries.add(new Entry(PowerForm.GAZE_VACUOLE.id(),0,null,true));
+                entries.add(new Entry(RicochetRules.ID,0,null,false));for(var u:List.of(PowerForm.SHIELD,PowerForm.ARMOR,PowerForm.THERMAL_VISION,PowerForm.INFECTED_VISION,PowerForm.BIOMASS,PowerForm.SOVEREIGN_WINGS))entries.add(new Entry(u.id(),u.epCost(),null,false));for(var u:CombatSkill.values())if(u.shieldBorer())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?PowerForm.SHIELD.id():u.requires().id(),false));}
             case BIOLOGY -> {for(var u:CombatSkill.values())if(u.adaptivePassive())entries.add(new Entry(u.id(),u.epCost(),u.requires()==null?null:u.requires().id(),false));for(var u:GrowthUpgrade.values())entries.add(new Entry(u.id,u.cost,u.requires()==null?null:u.requires().id,false));}
             case ORGANS -> {for(var core:com.codex.blacklight.infection.TissueCore.values())if(core.legacy())entries.add(new Entry(core.id,0,null,false));}
             case EVOLUTION -> {for(var a:EvolutionAttribute.values())entries.add(new Entry(a.id,0,null,false));}

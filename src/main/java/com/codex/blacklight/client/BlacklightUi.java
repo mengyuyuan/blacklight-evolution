@@ -14,7 +14,7 @@ public final class BlacklightUi {
     public static void emblem(GuiGraphics g,com.codex.blacklight.power.PowerForm form,int x,int y,int size) {
         int slot=switch(form){
             case CLAWS->0;case BLADE->1;case HAMMERFISTS->2;case WHIPFIST->3;case MUSCLE_MASS->4;case BACKSPINES->5;
-            case SHIELD->7;case ARMOR->8;case THERMAL_VISION,INFECTED_VISION->9;case BIOMASS->10;case SOVEREIGN_WINGS->11;
+            case SHIELD->7;case ARMOR->8;case THERMAL_VISION,INFECTED_VISION,GAZE_VACUOLE->9;case BIOMASS->10;case SOVEREIGN_WINGS->11;
             default->6;
         };
         g.blit(EMBLEMS,x,y,size,size,(slot%4)*32F,(slot/4)*32F,32,32,128,96);

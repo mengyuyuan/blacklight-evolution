@@ -18,6 +18,7 @@ public final class SurvivalGuide {
     @SubscribeEvent public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         BossSiteData.get(player.server.overworld()).deliver(player);
+        if(done(player,"greene_outbreak"))com.codex.blacklight.combat.PlayerGazeField.inherit(player);
         var saved = player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
         if (!saved.getBoolean("BlacklightManualIssued")) {
             var manual = new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.SURVIVAL_MANUAL.get());

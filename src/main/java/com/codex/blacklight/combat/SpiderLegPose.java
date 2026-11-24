@@ -102,11 +102,17 @@ public final class SpiderLegPose {
                 if(heavy)aim=aim.add(0,-.56,0);
                 var away=rest.subtract(aim).multiply(1,0,1).normalize();
                 var cocked=rest.lerp(aim,.26).add(away.scale(heavy?2.45:1.8)).add(0,heavy?8.4:6.4,0);
-                var raised=rest.lerp(cocked,SpiderGesture.ease(time,2,12));
-                var driven=raised.lerp(aim,SpiderGesture.ease(time,12,18));
+                float rise=SpiderGesture.ease(time,2,12);
+                var raised=rest.lerp(cocked,rise);
+                // Open the hip outwards during the slow lift, then whip the tip through the
+                // final approach. The foot reaches the same world contact on tick 18.
+                float drive=SpiderGesture.ease(time,12,18);
+                var driven=raised.lerp(aim,drive*drive).add(side.scale((heavy?2.7:1.65)
+                        *Math.sin(Math.PI*rise)*Math.sin(Math.PI*rise)*(1-drive)));
                 float pull=heavy?SpiderGesture.ease(time,58,70):SpiderGesture.ease(time,23,41);
-                dest=driven.lerp(rest,pull).add(away.scale(-1.3*Math.sin(Math.PI*pull)))
-                        .add(0,3.1*Math.sin(Math.PI*pull),0);
+                float unhook=pull*pull;
+                dest=driven.lerp(rest,unhook).add(away.scale(-1.3*Math.sin(Math.PI*unhook)))
+                        .add(0,(heavy?4.15:3.1)*Math.sin(Math.PI*pull),0);
             }else{
                 // One foot fences off the exit before the other closes across the prey.
                 float lead=leg==chosen?0:3;
@@ -146,7 +152,7 @@ public final class SpiderLegPose {
             dest=catchAt.lerp(rest,SpiderGesture.ease(time,28,44));
         }
         boolean pinned=heavy && chosen==leg && time>=18 && time<58;
-        double kneeTwist=pinned?(leg<4?1:-1)*(.084*SpiderGesture.phrase(time,26,31,32,38)+.13*SpiderGesture.phrase(time,44,50,51,57)):0;
+        double kneeTwist=pinned?(leg<4?1:-1)*(.105*SpiderGesture.phrase(time,26,32,34,40)+.19*SpiderGesture.phrase(time,43,52,54,58)):0;
         if(state.contains("Flinch"+leg)){
             float since=boss.level().getGameTime()-state.getLong("Flinch"+leg)+partial;
             float recoil=SpiderGesture.phrase(since,0,3,4,13)*state.getFloat("Recoil"+leg);

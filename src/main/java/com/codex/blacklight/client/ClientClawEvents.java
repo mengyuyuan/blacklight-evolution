@@ -79,6 +79,7 @@ public final class ClientClawEvents {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(GRAB);
+        event.register(GazeInput.KEY);
         event.register(ContextActionInput.KEY);
         event.register(CYCLE_FORM);
         event.register(TOGGLE_CLAWS);
@@ -99,11 +100,13 @@ public final class ClientClawEvents {
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.UAV.get(),com.codex.blacklight.client.renderer.UavRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PROJECTILE.get(),context->new net.minecraft.client.renderer.entity.ThrownItemRenderer<>(context));
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_PROJECTILE.get(),com.codex.blacklight.client.renderer.GreeneProjectileRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GODDESS_COMMAND_PROJECTILE.get(),com.codex.blacklight.client.renderer.GoddessCommandRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SPIDER.get(), com.codex.blacklight.client.renderer.GreeneSpiderRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_GODDESS.get(), com.codex.blacklight.client.renderer.GreeneGoddessRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_HOST.get(),com.codex.blacklight.client.renderer.GreeneHostRenderer::new);
         event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.GREENE_SEGMENT_CORPSE.get(),com.codex.blacklight.client.renderer.GreeneSegmentCorpseRenderer::new);
         event.registerEntityRenderer(ModEntities.VEHICLE_ORDNANCE.get(),com.codex.blacklight.client.renderer.OrdnanceRenderer::new);
+        event.registerEntityRenderer(com.codex.blacklight.registry.EncounterEntities.PLAYER_GAZE_FIELD.get(),net.minecraft.client.renderer.entity.NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.HELLFIRE_BLAST.get(),net.minecraft.client.renderer.entity.NoopRenderer::new);
         event.registerEntityRenderer(ModEntities.MILITARY_TRUCK.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"truck"));
         event.registerEntityRenderer(ModEntities.MILITARY_APC.get(),context->new com.codex.blacklight.client.renderer.MilitaryVehicleRenderer(context,"apc"));
@@ -222,6 +225,7 @@ public final class ClientClawEvents {
     public static void onClientTick(ClientTickEvent event){if(event.phase!=net.minecraftforge.event.TickEvent.Phase.END)return;
         com.codex.blacklight.client.audio.GreeneProjectileAudio.tick();
         ContextActionInput.poll();
+        GazeInput.poll();
         resetInputOwner();
         suppressPrototypePlayerList();
         if(VehicleControls.riding()){

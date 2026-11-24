@@ -14,6 +14,10 @@ final class GoddessSceneClock {
         entityOrigin = entityTick - Math.max(0, observedServerTick - start);
     }
 
+    void catchUpTo(int publishedAge, int entityTick) {
+        if (anchored) entityOrigin = Math.min(entityOrigin, (long) entityTick - publishedAge);
+    }
+
     float age(int entityTick, float partial) {
         return anchored ? (entityTick - entityOrigin) + partial : 0;
     }
