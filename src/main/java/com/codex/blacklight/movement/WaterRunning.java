@@ -13,14 +13,15 @@ public final class WaterRunning {
     private WaterRunning() { }
 
     public static boolean canRun(Player player) {
-        var state = com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.PLAYER_STATE);
-        if (!state.isInfected() || !state.isPrototypeMode() || !player.isAlive()
+        // Spawn placement queries water collisions before the new player has a network connection.
+        var state = ModAttachments.peekData(player, ModAttachments.PLAYER_STATE, null);
+        if (state == null || !state.isInfected() || !state.isPrototypeMode() || !player.isAlive()
                 || player.isSpectator() || player.isPassenger() || player.isFallFlying()
-                || player.getAbilities().flying || player.isShiftKeyDown() || player.isInLava()
-                || !(player.isSprinting() || com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).sprinting()
-                    && com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.MOVEMENT_STATE).forwardHeld())
-                || com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.WEAPON_VISUAL).spec() != null
-                || com.codex.blacklight.registry.ModAttachments.getData(player, ModAttachments.CONSUMING)) return false;
+                || player.getAbilities().flying || player.isShiftKeyDown() || player.isInLava()) return false;
+        var movement = ModAttachments.peekData(player, ModAttachments.MOVEMENT_STATE, null);
+        if (!player.isSprinting() && (movement == null || !movement.sprinting() || !movement.forwardHeld())) return false;
+        var weapon = ModAttachments.peekData(player, ModAttachments.WEAPON_VISUAL, null);
+        if ((weapon != null && weapon.spec() != null) || ModAttachments.peekData(player, ModAttachments.CONSUMING, false)) return false;
         BlockPos pos = player.blockPosition();
         FluidState fluid = player.level().getFluidState(pos);
         // Surface support starts only after swimming/riseToSurface clears the water.

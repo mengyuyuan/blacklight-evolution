@@ -23,6 +23,8 @@ public final class GazeRewardGameTest {
         city.getChunk(chunk.x,chunk.z);
         var profile=new GameProfile(UUID.randomUUID(),"DenSurvivor");
         var player=new ServerPlayer(city.getServer(),city,profile);
+        h.assertTrue(!com.codex.blacklight.movement.WaterRunning.canRun(player),
+                "water collision on login must be safe before the play connection is installed");
         player.connection=FakePlayerFactory.get(city,profile).connection;
         player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(site));
         player.tickCount=20;
