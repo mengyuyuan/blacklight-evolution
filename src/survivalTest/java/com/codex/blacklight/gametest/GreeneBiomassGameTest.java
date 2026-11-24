@@ -39,7 +39,7 @@ public final class GreeneBiomassGameTest {
     }
 
     @GameTest(template="mother_plaza",timeoutTicks=460)
-    public static void slimeCanHoldALiveSegmentAndFinishTheReturnedWoman(GameTestHelper h) {
+    public static void slimeRejectsTheMotherShellAndTheSpentWomanEscapes(GameTestHelper h) {
         var level=h.getLevel();
         var operator=join(h,"greene-operator");
         var slime=join(h,"greene-absorber");
@@ -82,20 +82,11 @@ public final class GreeneBiomassGameTest {
             h.assertTrue(!BiomassSystem.edible(slime,boss),"a fatal biomass form cannot claim full-health Greene");
             boss.setHealth(1);
             tick(slime);
-            h.assertTrue(BiomassSystem.state(slime).victim()==boss.getId(),"automatic contact selected Greene on her armour; position="+at+" edible="+BiomassSystem.edible(slime,boss));
-            h.assertTrue(ConsumeControl.protectedEntity(boss) && BiomassSystem.claimant(boss)==slime,"physical attachment protects the parent without entering hit selection");
-            h.assertTrue(!part.isPickable() && part.hasSurface(),"protected armour can support the slime even when external attacks cannot select it");
-            tick(slime);
-            h.assertTrue(BiomassSystem.state(slime).phase()==BiomassState.ABSORBING,"next live tick retains the attachment");
-            boss.setHealth(boss.getMaxHealth());
-            tick(slime);
-            h.assertTrue(BiomassSystem.claimant(boss)==null && BiomassSystem.state(slime).phase()==BiomassState.CRAWLING,"healing out of the execution window cancels an existing claim");
-            boss.setHealth(1);
-            crawl(slime,level.getGameTime()-14);
-            tick(slime);
+            h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.eligible(boss) && !BiomassSystem.edible(slime,boss)
+                    && BiomassSystem.claimant(boss)==null,"the living Mother shell never enters a generic consume scene, even at one HP");
+            h.assertTrue(!com.codex.blacklight.combat.ConsumeSystem.executeConsumption(slime,boss,Float.MAX_VALUE)
+                    && boss.isAlive(),"direct execution cannot bypass the story interaction");
             slime.setPos(station.getX()+32,station.getY(),station.getZ()+32);
-            tick(slime);
-            h.assertTrue(BiomassSystem.claimant(boss)==null && BiomassSystem.state(slime).phase()==BiomassState.CRAWLING,"lost physical contact releases the claim");
             h.assertTrue(boss.hurt(level.damageSources().genericKill(),Float.MAX_VALUE),"shell reaches its real death callback");
         }).thenWaitUntil(()->{
             var spent=level.getEntitiesOfClass(GreeneHost.class,near,e->e.stage()==GreeneHost.SPENT);
@@ -129,6 +120,7 @@ public final class GreeneBiomassGameTest {
         }).thenExecute(()->{
             var host=escaping[0];
             h.assertTrue(done(slime,"plaza_cleared") && done(operator,"plaza_cleared"),"finisher and operator both receive the plaza reward");
+            h.assertTrue(!done(slime,"greene_outbreak") && !state.hasUnlocked(PowerForm.GAZE_VACUOLE),"the escape gives no goddess victory or gaze");
             var cores=level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,host.getBoundingBox().inflate(6),
                     item -> item.getItem().is(com.codex.blacklight.registry.ModItems.GREENE_TISSUE.get()));
             h.assertTrue(cores.size()==1 && cores.get(0).getItem().getCount()==1,"escape leaves a single living tissue sample");

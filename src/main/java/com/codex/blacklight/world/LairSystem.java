@@ -122,6 +122,7 @@ public final class LairSystem {
         boolean waiting=false;var data2=data;
         for(var o:LairSiting.offsets()){
             int sx=x+o[0],sz=z+o[1];
+            if(data.nearSuspended(sx,sz,force ? 1 : Math.max(spacing,1)))continue;
             if(force&&data.jobs.stream().anyMatch(job->job.entrance.getX()==sx&&job.entrance.getZ()==sz))return Result.PLACED;
             if(!force&&crowded(data2,sx,sz,spacing))continue;
             if(WorldOutbreakSystem.sanctuary(level,new BlockPos(sx,64,sz)))continue;
@@ -526,6 +527,17 @@ public final class LairSystem {
         final List<Long> lairs=new ArrayList<>(),stale=new ArrayList<>();
         Stage staging;
         final List<LairConstruction> jobs=new ArrayList<>();
+        private final List<CompoundTag> suspendedJobs=new ArrayList<>();
+
+        private boolean nearSuspended(int x,int z,int spacing) {
+            for(var record:suspendedJobs) {
+                if(!record.contains("Entrance",Tag.TAG_LONG))continue;
+                long entrance=record.getLong("Entrance");
+                long dx=(long)BlockPos.getX(entrance)-x, dz=(long)BlockPos.getZ(entrance)-z;
+                if(dx*dx+dz*dz < (long)spacing*spacing)return true;
+            }
+            return false;
+        }
         final LinkedHashSet<Long> seen=new LinkedHashSet<>();
         final ArrayDeque<Pending> pending=new ArrayDeque<>();
         /** Chunks that already rolled for a Lair (NeoForge keeps this as a chunk attachment). */
@@ -536,11 +548,20 @@ public final class LairSystem {
             for(long l:tag.getLongArray("Stale"))d.stale.add(l);
             if(tag.getInt("Version")<VERSION){for(long l:tag.getLongArray("Lairs"))d.stale.add(l);d.setDirty();}
             else for(long l:tag.getLongArray("Lairs"))d.lairs.add(l);
-            for(var job:tag.getList("Construction",Tag.TAG_COMPOUND))
-                d.jobs.add(LairConstruction.load((CompoundTag)job));
+            for(var job:tag.getList("Construction",Tag.TAG_COMPOUND)) {
+                var record=(CompoundTag)job;
+                try {
+                    d.jobs.add(LairConstruction.load(record));
+                } catch(IllegalArgumentException invalid) {
+                    d.suspendedJobs.add(record.copy());
+                    com.codex.blacklight.BlacklightNeoMod.LOGGER.warn("Paused lair construction at {}: {}",
+                            record.get("Entrance"),invalid.getMessage());
+                }
+            }
             return d;}
         @Override public CompoundTag save(CompoundTag tag){tag.put("Rolled",new LongArrayTag(new ArrayList<>(rolled)));var construction=new ListTag();
             for(var job:jobs)construction.add(job.save());
+            for(var record:suspendedJobs)construction.add(record.copy());
             tag.put("Construction",construction);
             tag.putInt("Version",VERSION);tag.put("Lairs",new LongArrayTag(lairs));tag.put("Stale",new LongArrayTag(stale));return tag;}
     }

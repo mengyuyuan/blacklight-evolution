@@ -80,15 +80,27 @@
       ],
       [
         "The Pump and Greene",
-        "Break the shell's attack organs, then close on the fallen body. When Greene's human form emerges, grab and consume in Prototype mode. She escapes. Recover the living tissue she leaves behind.\n\nTrack the underground den"
+        "When the shell falls, approach the kneeling Greene in Prototype mode. Aim at her and press Grab (default E). Once caught, she tears free and slips underground, leaving living tissue behind.\n\nTrack the den"
       ],
       [
         "The Underground Den",
-        "After the plaza fight, bring Greene's tissue back to Futian. Hold it and use it to follow the spore trail. Holding the tissue marks the den and its distance in the world. The marker is hidden in superflat saves. Once you are above the den, descend to the chamber."
+        "Return to Futian after Greene escapes. In a normal world, follow the den marker and its distance even with your weapon out. Look for a way down when you reach it. In superflat, hold Greene's tissue and hold Use to follow spores from your palm."
       ],
       [
         "The Underground Den",
-        "Enter the chamber carrying the tissue on a non-Peaceful difficulty. Survive Greene's ground and airborne phases to complete the outbreak milestone. Parasite experiments, repeatable evolution and symbiotes remain open.\n\nRecover a lost lead"
+        "Check your advancements for the pump encounter. With that milestone, enter the chamber on any difficulty above Peaceful. You can start the fight even if a teammate picked up the only sample or you lost it. Without the sample, search east of the center of a Futian infected district for a passage leading down.\n\nReplay on an older save"
+      ],
+      [
+        "The Underground Den",
+        "Weaken an Evolved to 35% health or less and grab it. While holding it, tap Disguise (default X) to implant it. Face the spider as it feeds. Hold Attack to charge, then release to throw the Evolved into its open mouth. Two feeding-window mouth hits stop it feeding."
+      ],
+      [
+        "The Underground Den",
+        "While the airborne goddess is casting, hit the straining body part with a charged block throw to interrupt her. When she falls, stand beside the exposed part, press Grab, then Use. Extract her left arm, her right arm, then her head. Finishing the head execution grants Gaze Vacuole to participants."
+      ],
+      [
+        "The Underground Den",
+        "Select Gaze Vacuole on the utility wheel. Hold its skill key to preview the center up to 40 blocks away. Release to cast. The center stays where you placed it, so a moving target can escape before it closes. Each cast costs 15 biomass and has a five-second cooldown."
       ],
       [
         "Recover a Lost Lead",
@@ -99,12 +111,20 @@
         "If a site is already active, return to its existing fight. For an unresponsive lock, check normal mode, the item in your hand, difficulty and the exit space. Search newly generated terrain with structures enabled for natural sites."
       ],
       [
+        "Recover a Lost Lead",
+        "If an older save recorded the underground victory at the pump, finish the pump milestone first. In Futian, sneak and hold Use with Greene's living tissue until one full pulse ends. Follow the spores to the underground chamber to replay the goddess fight."
+      ],
+      [
         "Your Field Notes",
         "Use the manual to read. Sneak-use to open your field notes: your current objective, recorded destinations and recent discoveries or field feedback. You can also open the notes with /blacklightguide."
       ],
       [
         "Your Field Notes",
-        "The next page links to the community wiki. Published defaults can differ from your current release or server settings. Use your own notes and the site itself for active missions."
+        "Lost your manual? Craft a replacement with one ordinary book and one rotten flesh in any arrangement. You can also enter /blacklightguide without the book to open your field notes and check this character's current lead."
+      ],
+      [
+        "Your Field Notes",
+        "Enter /wiki and click the link in chat to open the Blacklight Wiki. Articles list their game version. Check your field notes for your current objective."
       ],
       [
         "Your Field Notes",
@@ -153,7 +173,11 @@
       ],
       [
         "Biomass and Reconstruction",
-        "A qualifying lethal hit spends biomass to enter liquid form. There is no shell to return to after death. Find living, consumable prey quickly and finish feeding. Tamed, mounted or invulnerable targets are poor choices. Find standing room to reform."
+        "To survive a lethal hit as an aggregate, be infected, enter Prototype mode and keep at least 150 biomass in reserve by default. An ordinary lethal hit spends that reserve. Damage that bypasses invulnerability skips the transformation. Servers can change the cost."
+      ],
+      [
+        "Biomass and Reconstruction",
+        "A death aggregate has no shell to recall. Touch living, consumable prey and let the aggregate envelop it. Leave room to stand when you reform. The base lifetime is 45 seconds. Viral Stability I extends it to 75 seconds, II to 120 seconds, and III removes natural decay."
       ],
       [
         "Research and Repeatable Growth",
@@ -414,6 +438,10 @@
       [
         "Load and Infuse",
         "As an infected survivor, stand close to an edge at the base level. Sneak-use the rim empty-handed and stand still for about 4.8 seconds. When infusion finishes, ingredients and biomass are spent. Take the result from the core. Moving away cancels the channel."
+      ],
+      [
+        "Load and Infuse",
+        "Each accessory takes one Blighted Wither Core. Hit a wither directly with a Blacklight Virus Ampoule and let the infection take hold before killing it. With mob loot enabled, each infected wither drops one core. Place it in the center cell. The full set takes four."
       ],
       [
         "Blacklight Sternum Seal",

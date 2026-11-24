@@ -11,6 +11,10 @@
     {
       "type": "patchouli:text",
       "text": "If a site is already active, return to its existing fight. For an unresponsive lock, check normal mode, the item in your hand, difficulty and the exit space. Search newly generated terrain with structures enabled for natural sites."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "If an older save recorded the underground victory at the pump, finish the pump milestone first. In Futian, sneak and hold Use with Greene's living tissue until one full pulse ends. Follow the spores to the underground chamber to replay the goddess fight."
     }
   ]
 }

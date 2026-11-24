@@ -29,6 +29,7 @@ public final class GreeneHost extends PathfinderMob {
     private static final EntityDataAccessor<Long> START=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> WATCHING=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> NOTICED=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.LONG);
+    private boolean restoreReservation;
     private int alertTicks;
     private BlockPos station;
     private int elapsed;
@@ -47,6 +48,15 @@ public final class GreeneHost extends PathfinderMob {
         entityData.define(START,0L);
         entityData.define(WATCHING,-1);
         entityData.define(NOTICED,-1000L);
+    }
+    /** Only the first visible entity within a hand's reach can take priority over a weapon's grab binding. */
+    public static GreeneHost aimedForGrab(net.minecraft.world.entity.player.Player player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 end = player.pick(3, 1, false).getLocation();
+        var hit = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(player, eye, end,
+                new AABB(eye, end).inflate(1), e -> e.isPickable() && !e.isSpectator(), eye.distanceToSqr(end));
+        return hit != null && hit.getEntity() instanceof GreeneHost host && host.stage() == SPENT
+                && host.isAlive() ? host : null;
     }
     public int stage() { return entityData.get(STAGE); }
     public float age(float partial) {
@@ -115,6 +125,10 @@ public final class GreeneHost extends PathfinderMob {
     @Override public void tick() {
         super.tick();
         if (!(level() instanceof ServerLevel level) || station==null) return;
+        if (restoreReservation) {
+            BossSiteData.get(level).restoreEscapeOwner(this,station);
+            restoreReservation=false;
+        }
         // A piston, flowing water or a nearby large mob must not move the actor off the emergence pad.
         if(stage()!=SPENT && stage()!=ESCAPING && pad!=null) {
             setPos(pad.getX()+.5,pad.getY(),pad.getZ()+.5);
@@ -144,7 +158,7 @@ public final class GreeneHost extends PathfinderMob {
             case ESCAPING -> tickEscape(level);
             case SPENT -> {
                 if(tickCount%60==1) for (var p:level.players()) if(p.distanceToSqr(this)<12*12 && !p.isSpectator())
-                    FieldNotes.record(p, Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab"),Component.keybind("key.use")));
+                    FieldNotes.record(p, Component.translatable("survival.blacklight.greene_spent",Component.keybind("key.blacklight.grab")));
             }
         }
     }
@@ -242,7 +256,7 @@ public final class GreeneHost extends PathfinderMob {
         }
         if(elapsed>=ESCAPE_END) {
             if(level.hasChunkAt(station) && level.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(level);
-            BossSiteData.complete(this,null,2);
+            BossSiteData.escaped(this);
             for (var observer:level.players()) if (observer.distanceToSqr(this)<24*24)
                 FieldNotes.record(observer, Component.translatable("survival.blacklight.greene_escaped"));
             discard();
@@ -274,6 +288,7 @@ public final class GreeneHost extends PathfinderMob {
         station=tag.contains("Station")?BlockPos.of(tag.getLong("Station")):null;
         pad=tag.contains("Surface")?BlockPos.of(tag.getLong("Surface")):blockPosition();
         enter(Math.max(WAITING,Math.min(ESCAPING,tag.getInt("PlazaStage"))),Math.max(0,tag.getInt("Elapsed")));
+        restoreReservation=stage()==SPENT || stage()==ESCAPING;
         if(stage()==ESCAPING) {
             entityData.set(DRAIN,new Vec3(tag.getDouble("DrainX"),tag.getDouble("DrainY"),tag.getDouble("DrainZ")).toVector3f());
             setNoGravity(true);

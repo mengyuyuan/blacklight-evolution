@@ -1547,7 +1547,8 @@ public final class EncounterMob extends Monster implements GeoEntity,AnimatedHur
         greeneFeedback.resetObservation();Arrays.fill(greeneFlash,-100000L);
         if(kind==EncounterKind.ELIZABETH_GREENE)greeneStateEpoch++;
         super.readAdditionalSaveData(tag);
-        entityData.set(GREENE_OUTBREAK,(tag.getBoolean("GreeneOutbreak") || tag.getBoolean("GreenePursuit")));
+        entityData.set(GREENE_OUTBREAK,!getPersistentData().contains("PlazaSurface")
+                && (tag.getBoolean("GreeneOutbreak") || tag.getBoolean("GreenePursuit")));
         spider.load(tag.getCompound("SpiderAnatomy").copy());
         entityData.set(PHASE,Math.max(0,Math.min(kind==EncounterKind.ELIZABETH_GREENE?3:2,tag.getInt("EncounterPhase"))));
         sequence=Math.max(0,tag.getInt("EncounterSequence"));entityData.set(BROKEN,tag.getInt("EncounterBroken")&((1<<parts.length)-1));

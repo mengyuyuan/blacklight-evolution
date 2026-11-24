@@ -255,12 +255,14 @@ public final class SurvivalEncounterGameTest {
             h.assertTrue(forms[1].isAlive(), "the original spent human survives the conversion interval");
             var state=com.codex.blacklight.registry.ModAttachments.getData(finisher,com.codex.blacklight.registry.ModAttachments.PLAYER_STATE);
             state.infect();state.setPrototypeMode(true);
+            var spines=com.codex.blacklight.power.PowerForm.BACKSPINES;
+            state.unlock(spines); state.activate(spines);
             var host=forms[1];
             finisher.moveTo(host.getX(),host.getY(),host.getZ()-1.7,0,0);
             finisher.setOnGround(true);
             finisher.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
             com.codex.blacklight.registry.ModAttachments.getData(finisher,com.codex.blacklight.registry.ModAttachments.MOVEMENT_STATE).setCameraYaw(0);
-            com.codex.blacklight.combat.CombatTargeting.requestLock(finisher,host.getId());
+            h.assertTrue(GreeneHost.aimedForGrab(finisher)==host,"aim at the exhausted host without a lock");
 
             h.assertTrue(finisher.isAlive() && !finisher.isRemoved(),"finisher is present: "+finisher.getRemovalReason());
             h.assertTrue(state.isPrototypeMode() && state.isInfected(),"infected grab controls enabled");
@@ -268,13 +270,13 @@ public final class SurvivalEncounterGameTest {
             h.assertTrue(finisher.hasLineOfSight(host),"clear sight to the returned human: "+finisher.position()+" "+host.position());
             ConsumeSystem.request(finisher);
             h.assertTrue(ConsumeSystem.active(finisher),"normal grab acquires exhausted Greene; aim="+com.codex.blacklight.movement.TraversalSteering.forward(finisher)+" ground="+finisher.onGround()+" blocked="+com.codex.blacklight.combat.TerrainGrabSelection.targetsTerrain(finisher)+" distance="+finisher.distanceTo(host));
-            ConsumeSystem.consume(finisher);
+            h.assertTrue(host.stage()==GreeneHost.SPENT,"E first establishes the grip before she escapes");
             // Embedded connections have no client movement packets to advance the player scene.
             for(int tick=0;tick<220 && ConsumeSystem.active(finisher);tick++) {
                 finisher.tickCount++;
                 ConsumeSystem.tick(new net.minecraftforge.event.TickEvent.PlayerTickEvent(net.minecraftforge.event.TickEvent.Phase.END,finisher));
             }
-            h.assertTrue(host.isAlive() && host.stage()==GreeneHost.ESCAPING,"manual consume starts a live escape");
+            h.assertTrue(host.isAlive() && host.stage()==GreeneHost.ESCAPING,"a Backspines grab alone starts the escape");
             var separation = host.position().subtract(finisher.position());
             var facing = net.minecraft.world.phys.Vec3.directionFromRotation(0, finisher.getYRot());
             h.assertTrue(separation.dot(facing) >= 0.59 && separation.horizontalDistance() < 1.1,
@@ -285,6 +287,7 @@ public final class SurvivalEncounterGameTest {
             h.assertTrue(forms[1].isRemoved() && done(finisher,"plaza_cleared") && done(audience,"plaza_cleared"),
                     "completed consume pays both players: removed="+forms[1].isRemoved()+" operator="+done(audience,"plaza_cleared")+" finisher="+done(finisher,"plaza_cleared"));
         }).thenExecute(()->{
+            h.assertTrue(!done(finisher,"greene_outbreak") && !done(audience,"greene_outbreak"),"neither participant receives underground victory for the escape");
             h.assertTrue(BossSiteBlock.activate(level,console,audience).equals("plaza_started"),"pump rearms after consumption");
             finisher.setPos(audience.getX()+1,audience.getY(),audience.getZ()+1);
         }).thenWaitUntil(()->{

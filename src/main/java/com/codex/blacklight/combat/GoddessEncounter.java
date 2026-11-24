@@ -166,6 +166,10 @@ public final class GoddessEncounter {
         return net.minecraft.util.Mth.rotLerp(action()==Action.FALLING ? fraction(age(partial)/38F) : lowered(partial), start, end);
     }
     public boolean terminal() { return life.finished(); }
+    public boolean headExtractionComplete() {
+        return active() && life.finished() && action==Action.EXTRACTING && part==GoddessVitals.HEAD
+                && committed && age>=EXTRACTION_TICKS;
+    }
     public boolean zeroOnBar() { return (removed() & 3) == 3 && part() == GoddessVitals.HEAD && action()!=Action.FLYING && action()!=Action.STAGGER && action()!=Action.RISING; }
     public boolean damageable() { return action() == Action.FLYING || action() == Action.STAGGER; }
 
