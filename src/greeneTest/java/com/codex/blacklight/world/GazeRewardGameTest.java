@@ -40,10 +40,16 @@ public final class GazeRewardGameTest {
             for(var mob:city.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,new net.minecraft.world.phys.AABB(site).inflate(20)))mob.discard();
             com.codex.blacklight.power.GrowthSystem.award(player,"greene_outbreak");
             h.assertTrue(!SurvivalGuide.followingGreene(player),"existing victory stays quiet by default");
+            player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(site).add(160,0,0));
+            ModAttachments.getData(player,ModAttachments.PLAYER_STATE).infect();
             player.setShiftKeyDown(true);
             var tissue=new net.minecraft.world.item.ItemStack(com.codex.blacklight.registry.ModItems.GREENE_TISSUE.get());
             tissue.finishUsingItem(city,player);
-            h.assertTrue(SurvivalGuide.followingGreene(player),"listening at the den opts an unverified old victory into a replay");
+            h.assertTrue(SurvivalGuide.followingGreene(player),"listening in Futian restores tracking before reaching the den");
+            h.assertTrue(SurvivalGuide.currentLeads(player).get(0).equals(net.minecraft.network.chat.Component.translatable("survival.blacklight.journal.mother_core")),"field notes show the den lead during replay");
+            SurvivalGuide.outbreak(tick);
+            h.assertTrue(!sites.occupied(site),"listening at a distance does not start the fight");
+            player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(site));
             SurvivalGuide.outbreak(tick);
             h.assertTrue(sites.occupied(site),"replay starts the underground fight");
             for(var mob:city.getEntitiesOfClass(com.codex.blacklight.entity.EncounterMob.class,new net.minecraft.world.phys.AABB(site).inflate(20)))mob.discard();

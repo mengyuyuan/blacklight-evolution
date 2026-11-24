@@ -11,6 +11,10 @@
     {
       "type": "patchouli:text",
       "text": "As an infected survivor, stand close to an edge at the base level. Sneak-use the rim empty-handed and stand still for about 4.8 seconds. When infusion finishes, ingredients and biomass are spent. Take the result from the core. Moving away cancels the channel."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each accessory takes one Blighted Wither Core. Hit a wither directly with a Blacklight Virus Ampoule and let the infection take hold before killing it. With mob loot enabled, each infected wither drops one core. Place it in the center cell. The full set takes four."
     }
   ]
 }

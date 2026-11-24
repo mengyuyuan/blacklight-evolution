@@ -15,7 +15,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Break the shell's attack organs, then close on the fallen body. When Greene's human form emerges, grab and consume in Prototype mode. She escapes. Recover the living tissue she leaves behind.$(br2)$(l:den)Track the underground den$(/l)"
+      "text": "Wait for Greene's human body to emerge. In Prototype mode, switch to unarmed or claws, close in, press Grab (default E), then Use once you have her. She breaks free and leaves living tissue behind. In Backspines form, Grab recalls your spines.$(br2)$(l:den)Track the den$(/l)"
     }
   ]
 }

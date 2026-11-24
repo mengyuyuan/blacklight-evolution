@@ -10,6 +10,10 @@
     },
     {
       "type": "patchouli:text",
+      "text": "Lost your manual? Craft a replacement with one ordinary book and one rotten flesh in any arrangement. You can also enter /blacklightguide without the book to open your field notes and check this character's current lead."
+    },
+    {
+      "type": "patchouli:text",
       "text": "The next page links to the community wiki. Published defaults can differ from your current release or server settings. Use your own notes and the site itself for active missions."
     },
     {
