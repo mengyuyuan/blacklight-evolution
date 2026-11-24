@@ -1,6 +1,7 @@
 package com.codex.blacklight.gametest;
 
 import com.codex.blacklight.combat.TerrainImpactEffects;
+import com.codex.blacklight.combat.ContactEffects;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.*;
 import net.minecraft.world.entity.*;
@@ -40,6 +41,33 @@ public final class TerrainImpactGameTest {
         for(int x=0;x<16;x++)for(int z=0;z<16;z++)h.assertTrue(h.getLevel().getBlockState(h.absolutePos(new net.minecraft.core.BlockPos(x,1,z))).is(x<8?Blocks.DIRT:Blocks.STONE),"world blocks remain intact");
         debris.forEach(Entity::discard);proxy.discard();actor.discard();h.succeed();
     }
+    @GameTest(template="blackwatch_arena",batch="terrain_slam_ledges",timeoutTicks=20)
+    public static void wideSlamKeepsDebrisOnSeparatedLedges(GameTestHelper h) {
+        var actor = scene(h);
+        h.setBlock(4, 5, 8, Blocks.SANDSTONE);
+        var origin = hit(actor, h.absoluteVec(new Vec3(.5, 2, 8.5)));
+        var ledge = hit(actor, h.absoluteVec(new Vec3(4.5, 6, 8.5)));
+        var far = hit(actor, h.absoluteVec(new Vec3(15.5, 2, 8.5)));
+        h.assertTrue(ledge.getLocation().y - origin.getLocation().y == 4, "raised ledge is four blocks higher");
+        h.assertTrue(far.getLocation().distanceTo(origin.getLocation()) == 15, "far contact is fifteen blocks away");
+        var samples = java.util.List.of(new TerrainImpactEffects.Surface(origin, 0, 1, 0),
+                new TerrainImpactEffects.Surface(ledge, 0, 1, 2),
+                new TerrainImpactEffects.Surface(far, 0, 1, 4));
+        ContactEffects.ground(actor, origin, 4, true, samples);
+        for (var sample : samples) {
+            var at = sample.hit().getLocation();
+            var debris = h.getLevel().getEntitiesOfClass(Display.BlockDisplay.class, new AABB(at, at).inflate(1));
+            h.assertTrue(debris.size() == (sample.hit() == origin ? 0 : 1), "debris at actual slam contact " + at);
+            if (!debris.isEmpty()) {
+                String expected = sample.hit() == ledge ? "minecraft:sandstone" : "minecraft:stone";
+                h.assertTrue(expected.equals(material(debris.get(0))), "fragment uses the struck block");
+            }
+            debris.forEach(Entity::discard);
+        }
+        actor.discard();
+        h.succeed();
+    }
+
     private static String material(Display.BlockDisplay display) {
         return display.saveWithoutId(new net.minecraft.nbt.CompoundTag()).getCompound("block_state").getString("Name");
     }
