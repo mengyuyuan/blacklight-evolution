@@ -76,12 +76,34 @@ final class LairConstruction {
     }
 
     static LairConstruction load(CompoundTag tag) {
+        if (!tag.contains("Entrance", Tag.TAG_LONG) || !tag.contains("Positions", Tag.TAG_LONG_ARRAY)
+                || !tag.contains("Original", Tag.TAG_INT_ARRAY) || !tag.contains("Target", Tag.TAG_INT_ARRAY)
+                || !compoundList(tag, "Palette") || !compoundList(tag, "Hives"))
+            throw new IllegalArgumentException("missing or mistyped construction fields");
+        long[] positions = tag.getLongArray("Positions");
+        int[] original = tag.getIntArray("Original"), target = tag.getIntArray("Target");
+        if (positions.length != original.length || positions.length != target.length)
+            throw new IllegalArgumentException("block edit arrays have different lengths");
         var palette = new ArrayList<BlockState>();
         for (var entry : tag.getList("Palette", Tag.TAG_COMPOUND))
             palette.add(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), (CompoundTag)entry));
         var hives = new ArrayList<CompoundTag>();
-        for (var entry : tag.getList("Hives", Tag.TAG_COMPOUND)) hives.add((CompoundTag)entry);
-        return new LairConstruction(BlockPos.of(tag.getLong("Entrance")), tag.getLongArray("Positions"),
-                tag.getIntArray("Original"), tag.getIntArray("Target"), palette, hives);
+        for (int i = 0; i < positions.length; i++) {
+            if (original[i] < 0 || original[i] >= palette.size() || target[i] < 0 || target[i] >= palette.size())
+                throw new IllegalArgumentException("unknown block palette index at edit " + i);
+        }
+        for (var entry : tag.getList("Hives", Tag.TAG_COMPOUND)) {
+            var hive = (CompoundTag) entry;
+            var pos = hive.getList("Pos", Tag.TAG_DOUBLE);
+            if (!hive.hasUUID("UUID") || pos.size() != 3 || !Double.isFinite(pos.getDouble(0))
+                    || !Double.isFinite(pos.getDouble(1)) || !Double.isFinite(pos.getDouble(2)))
+                throw new IllegalArgumentException("invalid hive identity or position");
+            hives.add(hive);
+        }
+        return new LairConstruction(BlockPos.of(tag.getLong("Entrance")), positions, original, target, palette, hives);
+    }
+
+    private static boolean compoundList(CompoundTag tag, String key) {
+        return tag.get(key) instanceof ListTag list && (list.isEmpty() || list.getElementType() == Tag.TAG_COMPOUND);
     }
 }
