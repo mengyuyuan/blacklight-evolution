@@ -285,6 +285,7 @@ public final class SurvivalEncounterGameTest {
             h.assertTrue(forms[1].isRemoved() && done(finisher,"plaza_cleared") && done(audience,"plaza_cleared"),
                     "completed consume pays both players: removed="+forms[1].isRemoved()+" operator="+done(audience,"plaza_cleared")+" finisher="+done(finisher,"plaza_cleared"));
         }).thenExecute(()->{
+            h.assertTrue(!done(finisher,"greene_outbreak") && !done(audience,"greene_outbreak"),"neither participant receives underground victory for the escape");
             h.assertTrue(BossSiteBlock.activate(level,console,audience).equals("plaza_started"),"pump rearms after consumption");
             finisher.setPos(audience.getX()+1,audience.getY(),audience.getZ()+1);
         }).thenWaitUntil(()->{

@@ -9,7 +9,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
@@ -71,7 +70,8 @@ public final class WorldSaveRecoveryGameTest {
     public static void invalidParticipantDoesNotAbortBossRewards(GameTestHelper h) {
         var level = h.getLevel();
         var home = h.absolutePos(new BlockPos(2, 2, 2));
-        var boss = h.spawn(EntityType.PIG, new BlockPos(2, 2, 2));
+        var boss = com.codex.blacklight.registry.EncounterEntities.CREATURES.get(com.codex.blacklight.entity.EncounterKind.GOLIATH).get().create(level);
+        boss.setPos(net.minecraft.world.phys.Vec3.atBottomCenterOf(home));
         var sites = BossSiteData.get(level);
         sites.reserve(home, boss, null);
         var squad = new CompoundTag();
@@ -79,12 +79,12 @@ public final class WorldSaveRecoveryGameTest {
         squad.putBoolean(offline.toString(), true);
         squad.putString("legacy_note", "old record");
         boss.getPersistentData().put("BlacklightBossParticipants", squad);
-        BossSiteData.complete(boss, null, 4);
+        BossSiteData.defeated(boss, null);
         h.assertTrue(!sites.occupied(home), "completed encounter releases its site");
         var rewards = BossSiteData.get(level.getServer().overworld()).save(new CompoundTag())
                 .getList("rewards", Tag.TAG_COMPOUND);
         h.assertTrue(rewards.stream().map(CompoundTag.class::cast).anyMatch(entry ->
-                offline.equals(entry.getUUID("player")) && entry.getInt("bits") == 4), "valid offline player earns the reward");
+                offline.equals(entry.getUUID("player")) && entry.getInt("bits") == 1), "valid offline player earns the reward");
         h.succeed();
     }
 }

@@ -29,6 +29,7 @@ public final class GreeneHost extends PathfinderMob {
     private static final EntityDataAccessor<Long> START=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.LONG);
     private static final EntityDataAccessor<Integer> WATCHING=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> NOTICED=SynchedEntityData.defineId(GreeneHost.class,EntityDataSerializers.LONG);
+    private boolean restoreReservation;
     private int alertTicks;
     private BlockPos station;
     private int elapsed;
@@ -115,6 +116,10 @@ public final class GreeneHost extends PathfinderMob {
     @Override public void tick() {
         super.tick();
         if (!(level() instanceof ServerLevel level) || station==null) return;
+        if (restoreReservation) {
+            BossSiteData.get(level).restoreEscapeOwner(this,station);
+            restoreReservation=false;
+        }
         // A piston, flowing water or a nearby large mob must not move the actor off the emergence pad.
         if(stage()!=SPENT && stage()!=ESCAPING && pad!=null) {
             setPos(pad.getX()+.5,pad.getY(),pad.getZ()+.5);
@@ -242,7 +247,7 @@ public final class GreeneHost extends PathfinderMob {
         }
         if(elapsed>=ESCAPE_END) {
             if(level.hasChunkAt(station) && level.getBlockEntity(station) instanceof PumpStation pump) pump.quietAfterVictory(level);
-            BossSiteData.complete(this,null,2);
+            BossSiteData.escaped(this);
             for (var observer:level.players()) if (observer.distanceToSqr(this)<24*24)
                 FieldNotes.record(observer, Component.translatable("survival.blacklight.greene_escaped"));
             discard();
@@ -274,6 +279,7 @@ public final class GreeneHost extends PathfinderMob {
         station=tag.contains("Station")?BlockPos.of(tag.getLong("Station")):null;
         pad=tag.contains("Surface")?BlockPos.of(tag.getLong("Surface")):blockPosition();
         enter(Math.max(WAITING,Math.min(ESCAPING,tag.getInt("PlazaStage"))),Math.max(0,tag.getInt("Elapsed")));
+        restoreReservation=stage()==SPENT || stage()==ESCAPING;
         if(stage()==ESCAPING) {
             entityData.set(DRAIN,new Vec3(tag.getDouble("DrainX"),tag.getDouble("DrainY"),tag.getDouble("DrainZ")).toVector3f());
             setNoGravity(true);

@@ -458,8 +458,14 @@ public final class ConsumeSystem {
     }
 
     /** Ordinary human soldiers retain their grab class regardless of armour/health tuning. */
+    public static boolean isGreeneShell(LivingEntity target) {
+        return target instanceof com.codex.blacklight.entity.EncounterMob boss
+                && boss.kind()==com.codex.blacklight.entity.EncounterKind.ELIZABETH_GREENE;
+    }
+
     public static boolean healthReady(LivingEntity target) { return healthReady(null,target); }
     public static boolean healthReady(net.minecraft.world.entity.player.Player consumer,LivingEntity target) {
+        if(isGreeneShell(target))return false;
         // The claimant keeps the window it opened; claim() itself marks the boss as being consumed.
         if(target instanceof BlacklightHunter infected&&infected.parasite())return infected.parasiteLocked()||consumer!=null&&infected.isAlive()&&infected.consumerId()==consumer.getId();
         if(target instanceof com.codex.blacklight.entity.BlacklightSupremeHunter supreme)return supreme.consumable()||consumer!=null&&supreme.isAlive()&&supreme.consumerId()==consumer.getId();
@@ -473,6 +479,7 @@ public final class ConsumeSystem {
 
     public static boolean eligible(Mob mob) {return com.codex.blacklight.power.BiomassSystem.claimant(mob)==null&&eligibleBiomass(mob);}
     public static boolean eligibleBiomass(Mob mob) {
+        if(isGreeneShell(mob))return false;
         if(com.codex.blacklight.infection.TissueCompetition.controls(mob))return false;
         if(mob instanceof com.codex.blacklight.entity.BlacklightHydra hydra&&hydra.planted())return false;
         if(mob instanceof com.codex.blacklight.entity.HiveTendril)return false;
@@ -985,6 +992,7 @@ public final class ConsumeSystem {
     }
     /** Run the death callback while the absorber and the type of execution are still known. */
     public static boolean executeConsumption(ServerPlayer player, Mob target, float damage) {
+        if(isGreeneShell(target) || target instanceof com.codex.blacklight.world.GreeneHost)return false;
         var source = target.damageSources().playerAttack(player);
         target.invulnerableTime = 0;
         return ConsumeLastChance.execute(target, () -> {

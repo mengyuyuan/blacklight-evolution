@@ -13,6 +13,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public final class SurvivalGuide {
     private SurvivalGuide() {}
+    static final String REPLAY_GREENE = "BlacklightGoddessReplay";
     private static final String[] SITES = {"on_research_station_maps", "lost_convoy", "mother_plaza", "dispatch_intersection"};
 
     @SubscribeEvent public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -35,7 +36,21 @@ public final class SurvivalGuide {
         if(event.player instanceof ServerPlayer player && player.tickCount%20==0
                 && player.level().dimension()==com.codex.blacklight.city.CityTravel.WORLD
                 && !player.isSpectator()
-                && done(player,"plaza_cleared") && !done(player,"greene_outbreak"))GreeneOutbreak.arrive(player);
+                && done(player,"plaza_cleared") && followingGreene(player))GreeneOutbreak.arrive(player);
+    }
+    public static boolean followingGreene(ServerPlayer player) {
+        return !done(player,"greene_outbreak")
+                || player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG).getBoolean(REPLAY_GREENE);
+    }
+    /** Old victories did not record the extraction. The player can explicitly revisit the den. */
+    public static void revisitGreene(ServerPlayer player) {
+        if (!player.isShiftKeyDown() || player.isSpectator() || player.serverLevel().dimension()!=com.codex.blacklight.city.CityTravel.WORLD
+                || !done(player,"plaza_cleared") || !done(player,"greene_outbreak") || BossSiteData.headConfirmed(player)) return;
+        var site=GreeneHiveCave.nearest(player.serverLevel().getSeed(),player.blockPosition());
+        if (player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(site))>88*88) return;
+        var saved=player.getPersistentData().getCompound(Player.PERSISTED_NBT_TAG);
+        saved.putBoolean(REPLAY_GREENE,true);
+        player.getPersistentData().put(Player.PERSISTED_NBT_TAG,saved);
     }
     @SubscribeEvent public static void captive(net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent event){
         if(event.getEntity() instanceof net.minecraft.world.entity.Mob mob && !mob.level().isClientSide){
