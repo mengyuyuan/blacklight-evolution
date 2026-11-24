@@ -1275,6 +1275,7 @@
   "item.blacklight.mother_intel": "母巢截获情报",
   "block.blacklight.encounter_console": "黑色守望现场终端",
   "survival.blacklight.upgrade": "继续吸收生物积攒进化点。按 %s 打开升级面板，查看价格并购买第一项生物进化。",
+  "survival.blacklight.wiki": "黑光百科 · 点击打开 %s",
   "survival.blacklight.branch": "调查检疫哨破门或追猎野外进化者。用神经节制作破解器，去运输单标记的车队。母巢藏有福田行动情报。",
   "survival.blacklight.cold_storage": "沿楼梯进入研究站地下，从隔离区后方前往冷藏室，打开冰块旁的样本箱。",
   "survival.blacklight.map.lost_convoy": "失联车队位置图",

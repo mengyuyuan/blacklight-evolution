@@ -1,8 +1,10 @@
 package com.codex.blacklight.world;
 
 import com.codex.blacklight.power.GrowthSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +15,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 public final class SurvivalGuide {
     private SurvivalGuide() {}
+    private static final String WIKI_URL = "https://prototype.qibusu.com/wiki";
     static final String REPLAY_GREENE = "BlacklightGoddessReplay";
     private static final String[] SITES = {"on_research_station_maps", "lost_convoy", "mother_plaza", "dispatch_intersection"};
 
@@ -92,6 +95,13 @@ public final class SurvivalGuide {
         }
     }
     @SubscribeEvent public static void commands(RegisterCommandsEvent event) {
+        event.getDispatcher().register(Commands.literal("wiki").executes(ctx -> {
+            var link = Component.literal(WIKI_URL).withStyle(style -> style
+                    .withColor(ChatFormatting.AQUA).withUnderlined(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, WIKI_URL)));
+            ctx.getSource().sendSystemMessage(Component.translatable("survival.blacklight.wiki", link));
+            return 1;
+        }));
         event.getDispatcher().register(Commands.literal("blacklightguide").executes(ctx -> {
             var player = ctx.getSource().getPlayerOrException();
             FieldNotes.open(player, false);

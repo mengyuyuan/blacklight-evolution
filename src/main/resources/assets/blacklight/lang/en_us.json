@@ -1275,6 +1275,7 @@
   "item.blacklight.mother_intel": "Intercepted Mother Hive Report",
   "block.blacklight.encounter_console": "Blackwatch Field Console",
   "survival.blacklight.upgrade": "Consume creatures to earn evolution points. Press %s to check prices and buy your first biological upgrade.",
+  "survival.blacklight.wiki": "Blacklight Wiki · Click to open %s",
   "survival.blacklight.branch": "Inspect a quarantine breach or hunt wild Evolved. Craft a decoder with a ganglion and follow the convoy manifest. A giant hive carries the Futian dispatch.",
   "survival.blacklight.cold_storage": "Take the station stairs down, pass quarantine and open the sample chest by the ice in cold storage.",
   "survival.blacklight.map.lost_convoy": "Lost Convoy Map",
