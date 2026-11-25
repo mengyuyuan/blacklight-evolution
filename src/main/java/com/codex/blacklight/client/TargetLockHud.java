@@ -1,5 +1,6 @@
 package com.codex.blacklight.client;
 
+import com.codex.blacklight.item.GreeneTissueItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.phys.Vec3;
@@ -34,7 +35,7 @@ public final class TargetLockHud {
             denLevel = null;
             return;
         }
-        if (mc.player.isSpectator()) return;
+        if (mc.player.isSpectator() || !GreeneTissueItem.held(mc.player)) return;
         var at = Vec3.atCenterOf(den);
         var clip = handTarget(at);
         if (clip == null || !clip.isFinite()) return;
