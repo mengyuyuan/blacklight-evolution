@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minecraft:item/spider_eye"
+    "layer0": "blacklight:item/evolved_ganglion"
   }
 }

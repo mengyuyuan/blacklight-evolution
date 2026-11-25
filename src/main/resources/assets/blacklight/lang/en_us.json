@@ -76,7 +76,7 @@
   "survival.blacklight.map.on_research_station_maps": "Cold Storage Delivery Map",
   "item.blacklight.station_record": "Cold Storage Transfer Record",
   "item.blacklight.greene_tissue": "Greene’s Living Tissue",
-  "item.blacklight.greene_tissue.hint": "Hold %s to listen. Follow the spores to the underground hive.",
+  "item.blacklight.greene_tissue.hint": "Hold the tissue to see the den marker in a normal world. Hold %s to follow spores to the den.",
   "item.blacklight.greene_tissue.distant": "The tissue twitches faintly. Its echo is stronger in Futian.",
   "item.blacklight.greene_tissue.quiet": "The tissue still pulses. The hive has fallen silent.",
   "item.blacklight.mother_core": "Mother Core",
