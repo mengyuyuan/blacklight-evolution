@@ -39,7 +39,7 @@ public final class SurvivalGuide {
         if(event.player instanceof ServerPlayer player && player.tickCount%20==0
                 && player.level().dimension()==com.codex.blacklight.city.CityTravel.WORLD
                 && !player.isSpectator()
-                && done(player,"plaza_cleared") && followingGreene(player))GreeneOutbreak.arrive(player);
+                && done(player,"plaza_cleared")) GreeneOutbreak.update(player);
     }
     public static boolean followingGreene(ServerPlayer player) {
         return !done(player,"greene_outbreak")

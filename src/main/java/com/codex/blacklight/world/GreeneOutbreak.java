@@ -13,8 +13,10 @@ import net.minecraft.world.phys.Vec3;
 
 final class GreeneOutbreak {
     private GreeneOutbreak(){}
-    static void arrive(ServerPlayer player){
-        // The escape drops one tracking sample for the party. Every credited participant can enter the den.
+    static void update(ServerPlayer player) {
+        boolean following = SurvivalGuide.followingGreene(player);
+        boolean holdingTissue = GreeneTissueItem.held(player);
+        if (!following && !holdingTissue) return;
         var level = player.serverLevel();
         var den = GreeneHiveCave.nearest(level.getSeed(), player.blockPosition());
         // Check the overworld preset: the city dimension itself uses a flat-derived generator.
@@ -22,7 +24,8 @@ final class GreeneOutbreak {
                 != net.minecraft.world.level.levelgen.FlatLevelSource.class) {
             com.codex.blacklight.forge.PacketDistributor.sendToPlayer(player, new com.codex.blacklight.network.GreeneSignalPayload(den));
         }
-        if (GreeneTissueItem.held(player) && !GreeneTissueItem.isTissue(player.getUseItem())) {
+        if (!following) return;
+        if (holdingTissue && !GreeneTissueItem.isTissue(player.getUseItem())) {
             var from=player.getEyePosition().add(player.getLookAngle().scale(.6)).add(0,-.24,0);
             var direction=GreeneHiveCave.guidance(den,from);
             for(int i=1;i<=7;i++){

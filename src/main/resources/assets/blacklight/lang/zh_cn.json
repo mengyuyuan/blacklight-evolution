@@ -76,7 +76,7 @@
   "survival.blacklight.map.on_research_station_maps": "冰下研究站运输图",
   "item.blacklight.station_record": "冷库调运记录",
   "item.blacklight.greene_tissue": "格林的活性组织",
-  "item.blacklight.greene_tissue.hint": "按住 %s 倾听搏动，沿孢子指向寻找地下母巢。",
+  "item.blacklight.greene_tissue.hint": "普通地图中，手持时显示地下母巢的距离光标。按住 %s 可沿孢子指向寻找母巢。",
   "item.blacklight.greene_tissue.distant": "组织轻轻抽动。回到福田，才能听清巢穴的回响。",
   "item.blacklight.greene_tissue.quiet": "组织仍在搏动。洞穴深处已经安静下来。",
   "item.blacklight.mother_core": "母体核心",
