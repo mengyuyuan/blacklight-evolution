@@ -1088,7 +1088,7 @@
   "setting.blacklight.cinematic_strength": "Combat effect strength",
   "setting.blacklight.cinematic_strength.desc": "Click to cycle 50%, 75%, 100% and 125%. Only changes the local accent strength.",
   "setting.blacklight.cinematic_strength.value": "Now %s%% · click to change",
-  "entity.blacklight.supreme_hunter": "至尊猎杀者 Supreme Hunter",
+  "entity.blacklight.supreme_hunter": "Supreme Hunter",
   "item.blacklight.supreme_hunter_spawn_egg": "Supreme Hunter Spawn Egg",
   "message.blacklight.supreme_hunter_warning": "The ruined hive pulses... something is digging its way out.",
   "message.blacklight.supreme_hunter_slain": "The Supreme Hunter falls. Gained 400 EP and 500 biomass.",
