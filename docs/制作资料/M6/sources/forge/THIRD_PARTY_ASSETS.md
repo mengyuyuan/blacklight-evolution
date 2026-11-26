@@ -39,7 +39,7 @@ from existing `source` records (initial lineage). The legacy `privateNotice`
 key remains for packaging compatibility, but obsolete local-build restrictions
 have been replaced with descriptive metadata. This is not a per-keyframe
 authorship audit or a claim that every keyframe was authored from scratch.
-See [动作来源与本项目修改](docs/MOTION_PROVENANCE_ZH.md).
+See [动作来源与本项目修改](../../../../MOTION_PROVENANCE_ZH.md).
 
 The 2026-10-14 metadata update preserves all animation and gameplay values.
 The manifest contains current file hashes, which change when metadata changes;
